@@ -1,0 +1,89 @@
+@import '~lato-font/scss/public-api';
+$lato-font-path: '~lato-font/fonts';
+
+// Your settings for Typesettings :)
+$font-sans: Lato, Helvetica, Arial, sans-serif;
+$font-serif: Georgia, 'Times New Roman', serif;
+$font-mono: 'Lucida Console', Monaco, monospace;
+$text-color: #000;
+$base-vertical-unit: 8px;
+$base-line-multi: 3;
+$base-font-size: 15px;
+//$base-vertical-unit: 6px;
+//$base-line-multi: 4;
+//$base-font-size: 15px;
+//$ms-ratio: 1.5;
+$ms-ratio: 1.25;
+$paragraph-indent: true;
+$paragraph-justify: true;
+$load-typesetted: false;
+$global-init: true; // By default set to false, loaded with typesetted
+
+// Lato font weights overview
+// @see https://github.com/betsol/lato-font/blob/master/scss/internal/_variables.scss
+$weight--headline: 'black';
+$weight--label: 'bold';
+$weight--button: 'heavy'; //$weight--label;
+
+@mixin typo-headline() {
+  @include lato-font($weight--headline);
+  //line-height: emRhythm(3);
+}
+
+@mixin typo-label() {
+  @include lato-font($weight--label, italic);
+}
+
+@mixin typo-button() {
+  @include lato-font($weight--btton);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  // @include typo-headline()
+}
+
+/*
+$rootsizes: (
+        rootsize-0: 7,   // 24px line-height body text
+        rootsize-1: 7,   // 28px line-height body text
+        rootsize-2: 8,   // 30px line-height body text
+        rootsize-3: 9,   // 34px line-height body text
+        rootsize-4: 10    // 38px line-height body text
+);
+
+$bodytype: (
+        font-family: 'Lato',
+        regular: 300,
+        bold: 700,
+        italic: italic,
+        cap-height: 0.76
+) !default;
+
+*/
+/*
+$breakpoints: (
+  small: 640px,
+  large: 1200px
+);
+
+$typefaces: (
+  primary: (
+    font-size-ratio: 1,
+    stack: (Lato, Helvetica, Arial, sans-serif),
+    weights: (
+      light: 300,
+      normal: 400,
+      bold: 700
+    ),
+  )
+);
+
+$typi: (
+  base: (
+    null: (12px, 1.6),
+    small: (14px, 1.4),
+    large: (16px, 1.2)
+    )
+  // Other font maps here
+);
+*/

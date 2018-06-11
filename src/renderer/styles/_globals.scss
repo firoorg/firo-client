@@ -1,0 +1,18 @@
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    @include lato-font('regular');
+    letter-spacing: 0.00125em;
+    -webkit-font-smoothing: antialiased;
+
+    h1 {
+        @include font-black();
+        @include setType(7, $ms-up5);
+        margin-top: 0;
+        //@include setLeading(3);
+    }
+}

@@ -1,0 +1,1 @@
+export const HIDE_INTRO_SCREEN = 'HIDE_INTRO_SCREEN'

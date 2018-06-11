@@ -1,0 +1,66 @@
+.overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    //transition: opacity 0.15s ease-out;
+    background: rgba($color--dark, 0.9);
+    //opacity: 1;
+
+    .status {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -10%);
+        width: 10rem;
+        height: auto;
+        z-index: 1;
+    }
+
+    &.centered {
+        .grid {
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr;
+            grid-gap: emRhythm(5);
+            height: 100%;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .content {
+           text-align: center;
+           max-width: emRhythm(96);
+        }
+    }
+
+    .content {
+        position: relative;
+        color: $color--white;
+        text-shadow: 0 .1rem .15rem rgba($color--dark, 0.3);
+    }
+
+    header {
+        margin-bottom: emRhythm(8);
+    }
+
+    footer {
+        margin-top: emRhythm(4);
+
+        button {
+            margin: 0 emRhythm(1);
+        }
+    }
+
+    h1,
+    p {
+        position: relative;
+        z-index: 2;
+    }
+
+    h1 {
+        margin: 0;
+    }
+}
