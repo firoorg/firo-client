@@ -85,8 +85,15 @@
 
     .popover-inner {
       padding: emRhythm(6);
-      border-radius: 0.5rem;
+      border-radius: 0;
       @include box-shadow-large();
+
+      .content-wrapper {
+        & > footer {
+          padding-top: emRhythm(3);
+          text-align: right;
+        }
+      }
     }
 
     &.dark {

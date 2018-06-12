@@ -14,19 +14,10 @@
                         </template>
 
                         <template slot="content">
-                            <h1>Tello Borld</h1>
-
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea exercitationem hic minus repellendus temporibus.
-                            </p>
-                        </template>
-
-                        <template slot="footer">
-                            <BaseButton
-                                    color="green"
-                                    is-popover
-                                    @click="closeTour"
-                            >Ok, let's go!</BaseButton>
+                            <component
+                                    :is="currentSetting"
+                                    :onNext="nextSettingsStep"
+                            />
                         </template>
                     </BasePopover>
                 </header>
@@ -39,16 +30,31 @@
 </template>
 
 <script>
+    // import Vue from 'vue'
     import ZcoinLogo from '@/assets/zcoin-logo-text.svg'
     import { sleep } from '../../lib/utils'
     import types from '~/types'
 
+    import IntroScreenWelcome from '@/components/IntroScreenWelcome'
+    import IntroScreenOther from '@/components/IntroScreenOther'
+
     export default {
         name: 'IntroScreen',
         components: {
-            ZcoinLogo
+            ZcoinLogo,
+            IntroScreenWelcome,
+            IntroScreenOther
         },
         async created () {
+            /*
+            const v = new Vue({
+                ...IntroScreenWelcome,
+                store: this.$store
+            })
+            console.log(v)
+            console.log(v.foobar())
+             */
+
             await sleep(2000)
             // todo check welcome guide status here and start the tour / settings / changelog etc.
             this.isReady = true
@@ -56,20 +62,37 @@
 
         data () {
             return {
-                isReady: false
+                isReady: false,
+                settings: [
+                    'IntroScreenWelcome',
+                    'IntroScreenOther'
+                    /*
+                    'IntroScreenSelectBlockchainLocation',
+                     */
+                ],
+                currentSettingValue: ''
             }
         },
 
         computed: {
+            currentSetting () {
+                return this.currentSettingValue || this.settings[0]
+            },
             showIntro () {
                 return this.isReady && this.$store.getters['App/showIntroScreen']
             }
         },
 
         methods: {
-            async closeTour () {
+            async nextSettingsStep () {
+                if (this.settings[this.settings.length - 1] !== this.currentSetting) {
+                    const currentPosition = this.settings.indexOf(this.currentSetting)
+                    this.currentSettingValue = this.settings[currentPosition + 1]
+                    return
+                }
+
                 this.isReady = false
-                await sleep(250)
+                await sleep(500)
                 this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
             }
         }
@@ -95,7 +118,7 @@
         left: 0;
         height: 100%;
         width: 31.5%;
-        border: 1px solid yellow;
+        // border: 1px solid yellow;
         text-align: right;
         line-height: 100px;
         opacity: 0;
