@@ -52,6 +52,9 @@
         display: inline-block;
         // outline: none;
 
+        @include rhythmBorderTop(1px, $padding-v);
+        @include rhythmBorderBottom(1px, $padding-v);
+
         @include font-heavy();
         @include box-shadow();
 
@@ -64,9 +67,6 @@
 
         &.is-outline {
             background-color: transparent;
-
-            @include rhythmBorderTop(1px, $padding-v);
-            @include rhythmBorderBottom(1px, $padding-v);
 
             &.red {
                 color: $color--red;
@@ -99,22 +99,33 @@
         }
 
         &.green {
-            color: $color--white-light;
-            background: $color--green;
-            border-color: transparent;
+            padding-top: emRhythm($padding-v);
+            padding-bottom: emRhythm($padding-v);
+            border: none;
+            border-color: red;
 
-            &:hover,
-            &:focus {
-                color: $color--white;
-                background: $color--green-bright;
+            &.green {
+                color: $color--white-light;
+                background: $color--green;
+                border-color: transparent;
+
+                /*  &:before {
+                    background: $gradient--green-bright;
+                }*/
+
+                &:hover,
+                &:focus {
+                    color: $color--white;
+                    background: $color--green;
+
+                    &.is-popover {
+                        box-shadow: 0 1px 2px rgba($color--dark, 0.5);
+                    }
+                }
 
                 &.is-popover {
-                    box-shadow: inset 0 0 0 rgba($color--dark, 0.5);
+                    box-shadow: inset 0 1px 2px rgba($color--dark, 0.5);
                 }
-            }
-
-            &.is-popover {
-                box-shadow: inset 0 1px 2px rgba($color--dark, 0.5);
             }
         }
 

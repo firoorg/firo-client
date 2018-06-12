@@ -2,6 +2,9 @@ $grid--columns: 16;
 $grid--height: 13;
 $grid--height-rem: $grid--height / 16 * 1rem;
 
+$color--black: #000;
+$color--black-light: rgba($color--black, 0.85);
+
 $color--white: #fff;
 $color--white-light: rgba($color--white, 0.85);
 
