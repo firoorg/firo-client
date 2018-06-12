@@ -2,7 +2,7 @@
 
 import Debug from 'debug'
 import { app } from 'electron'
-import { join, resolve } from 'path'
+import { join } from 'path'
 
 // import settings from 'electron-settings'
 
@@ -16,8 +16,6 @@ import windowManager from './lib/windows'
 import CONFIG from './config'
 const debug = Debug('zcoin:main')
 
-const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : resolve(app.getAppPath(), '../../')
-
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -25,6 +23,8 @@ const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : reso
 if (process.env.NODE_ENV !== 'development') {
     global.__static = join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
+
+const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
 
 // build settings via electron-settings module
 
@@ -57,7 +57,7 @@ if (stopOnQuit) {
 }
 
 // start it!
-coreDaemonManager.start(join(rootFolder, '/static/core/start.sh'))
+coreDaemonManager.start(join(__static, '/core/start.sh'))
 
 /*
 // daemon testing...
