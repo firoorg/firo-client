@@ -1,28 +1,30 @@
 <template>
-    <div class="main-layout wrapper" :class="{ 'has-overlay': hasOpenOverlay }">
-        <transition name="fade" :duration="overlayDuration">
-            <IntroScreen v-show="showIntroScreen" />
-        </transition>
-
-        <NotificationCenter />
-
-        <transition name="fade" :duration="overlayDuration">
-            <ConnectivityOverlay v-show="!networkIsConnected" />
-        </transition>
-        <transition name="fade" :duration="overlayDuration">
-            <div class="active-window-overlay" v-show="hasOpenModal"></div>
-        </transition>
-        <!--<header class="header">
-            Header
-        </header>-->
-        <!--<Sidebar class="aside"></Sidebar>-->
-        <main class="main">
-            <transition name="fade">
-                <router-view class="child"></router-view>
+    <transition name="fade">
+        <div class="main-layout wrapper" :class="{ 'has-overlay': hasOpenOverlay }" v-if="show">
+            <transition name="fade" :duration="overlayDuration">
+                <IntroScreen v-show="showIntroScreen" />
             </transition>
-        </main>
-        <!--<footer class="footer"></footer>-->
-    </div>
+
+            <NotificationCenter />
+
+            <transition name="fade" :duration="overlayDuration">
+                <ConnectivityOverlay v-show="!networkIsConnected" />
+            </transition>
+            <transition name="fade" :duration="overlayDuration">
+                <div class="active-window-overlay" v-show="hasOpenModal"></div>
+            </transition>
+            <!--<header class="header">
+                Header
+            </header>-->
+            <!--<Sidebar class="aside"></Sidebar>-->
+            <main class="main">
+                <transition name="fade">
+                    <router-view class="child"></router-view>
+                </transition>
+            </main>
+            <!--<footer class="footer"></footer>-->
+        </div>
+    </transition>
 </template>
 
 <script>
@@ -43,6 +45,14 @@
             NotificationCenter,
             ConnectivityOverlay
         },
+
+        data () {
+            return {
+                show: false,
+                overlayDuration: 100
+            }
+        },
+
         async created () {
             await sleep(1000)
             this.overlayDuration = 1000
@@ -50,11 +60,8 @@
             console.log(types.app.HIDE_INTRO_SCREEN)
         },
 
-        data () {
-            return {
-                show: false,
-                overlayDuration: 100
-            }
+        mounted () {
+            this.show = true
         },
 
         computed: {
