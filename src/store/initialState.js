@@ -1,54 +1,55 @@
+// the comment // gui/daemon indicates who is responsible for persisting that particular key-value-pair
 module.exports = {
     Network: {
         height: 0,
         timestamp: 0,
-        isConnected: true
+        isConnected: true // gui
     },
     Notification: {
-        lastMessage: null,
-        lastNotification: null
+        lastMessage: null, // gui
+        lastNotification: null // gui
     },
     Window: {
-        welcomeGuide: false,
-        settings: false
+        welcomeGuide: false, // gui
+        settings: false // gui
     },
     PaymentRequest: {
         requests: [
             {
-                title: 'label with #hashtags',
-                address: 'abc',
-                amount: 100,
-                created_at: new Date(),
+                title: 'label with #hashtags', // deamon
+                address: 'abc', // deamon
+                amount: 100, // deamon
+                created_at: new Date(), // daemon
                 message: `Hey Alice, 
                     party was nice yesterday 🎉. do you remember, i borrowed you some money...
                     BestBest
-                    Bob`,
-                isSubscription: false
+                    Bob`, // deamon
+                isSubscription: false // gui
                 // transactions are linked via the address field
             }
         ],
-        lastSeen: new Date(), // last visited the tab to validate unseen/seen of a request
-        currentPaymentRequest: ''
+        lastSeen: new Date(), // gui // last visited the tab to validate unseen/seen of a request
+        currentPaymentRequest: '' // gui
     },
     Address: {
         addresses: [
             {
-                address: 'abc',
+                address: 'abc', // daemon
                 transactions: [
                     {
-                        txid: 'txid',
-                        timestamp: new Date(),
-                        amount: 1000
+                        txid: 'txid', // daemon
+                        timestamp: new Date(), // daemon
+                        amount: 1000 // daemon
                     }
                 ]
             }
         ]
     },
     Settings: {
-        blockchainLocation: ''
+        blockchainLocation: '' // daemon
     },
     App: {
-        showIntroScreen: true,
+        showIntroScreen: true, // gui
         other: 1
     }
 }
