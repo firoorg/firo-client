@@ -10,12 +10,8 @@ requester.on('message', (msg) => {
 })
 
 // send stringified json
-// user should be able to update message and title/label
 requester.send(JSON.stringify({
-    type: 'update',
+    type: 'delete',
     collection: 'payment-request',
-    id: 'address-here',
-    payload: {
-        message: 'this is a modified payment request message'
-    }
+    id: 'address-here'
 }))

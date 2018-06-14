@@ -11,10 +11,21 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'create-payment-request',
+    type: 'mint',
     payload: {
-        amount: 4000,
-        title: 'title',
-        message: 'message'
+        denominations: [
+            {
+                denomination: 25,
+                amount: 4
+            },
+            {
+                denomination: 10,
+                amount: 4
+            },
+            {
+                denomination: 1,
+                amount: 9
+            }
+        ]
     }
 }))
