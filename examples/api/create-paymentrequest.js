@@ -6,7 +6,7 @@ requester.connect('tcp://127.0.0.1:5557')
 // log out replies
 requester.on('message', (msg) => {
     console.log('received message')
-    console.log(msg)
+    console.log(JSON.parse(msg.toString()))
 })
 
 // send stringified json
