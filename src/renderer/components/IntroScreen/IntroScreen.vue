@@ -1,7 +1,7 @@
 <template>
     <div class="overlay centered">
         <div class="grid">
-            <main class="content">
+            <main class="content" :class="getCurrentSettingsClass">
                 <header>
                     <ZcoinLogo class="logo" />
                     <BasePopover
@@ -15,7 +15,7 @@
 
                         <template slot="content">
                             <component
-                                    :is="currentSetting"
+                                    :is="currentSettings"
                                     :onNext="nextSettingsStep"
                             />
                         </template>
@@ -32,17 +32,19 @@
 <script>
     // import Vue from 'vue'
     import ZcoinLogo from '@/assets/zcoin-logo-text.svg'
-    import { sleep } from '../../lib/utils'
+    import { sleep } from '../../../lib/utils'
     import types from '~/types'
 
-    import IntroScreenWelcome from '@/components/IntroScreenWelcome'
-    import IntroScreenOther from '@/components/IntroScreenOther'
+    import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
+    import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
+    import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 
     export default {
         name: 'IntroScreen',
         components: {
             ZcoinLogo,
             IntroScreenWelcome,
+            IntroScreenBlockchainLocation,
             IntroScreenOther
         },
         async created () {
@@ -65,18 +67,22 @@
                 isReady: false,
                 settings: [
                     'IntroScreenWelcome',
+                    'IntroScreenBlockchainLocation',
                     'IntroScreenOther'
                     /*
                     'IntroScreenSelectBlockchainLocation',
                      */
                 ],
-                currentSettingValue: ''
+                currentSettingsValue: ''
             }
         },
 
         computed: {
-            currentSetting () {
-                return this.currentSettingValue || this.settings[0]
+            currentSettings () {
+                return this.currentSettingsValue || this.settings[0]
+            },
+            getCurrentSettingsClass () {
+                return 'setting-' + this.currentSettings.replace('IntroScreen', '').toLowerCase()
             },
             showIntro () {
                 return this.isReady && this.$store.getters['App/showIntroScreen']
@@ -85,9 +91,9 @@
 
         methods: {
             async nextSettingsStep () {
-                if (this.settings[this.settings.length - 1] !== this.currentSetting) {
-                    const currentPosition = this.settings.indexOf(this.currentSetting)
-                    this.currentSettingValue = this.settings[currentPosition + 1]
+                if (this.settings[this.settings.length - 1] !== this.currentSettings) {
+                    const currentPosition = this.settings.indexOf(this.currentSettings)
+                    this.currentSettingsValue = this.settings[currentPosition + 1]
                     return
                 }
 
@@ -104,9 +110,18 @@
         background: rgba($color--dark, 0.95);
     }
 
+    .content {
+        transition: margin 0.25s ease-out;
+    }
+
     header {
         position: relative;
     }
+
+    .setting-blockchainlocation {
+        // margin-left: -25%;
+    }
+
     .logo {
         width: 20rem;
         @include drop-shadow();

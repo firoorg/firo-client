@@ -14,6 +14,7 @@
 
 <script>
     import GuideStepMixin from '@/mixins/GuideStepMixin'
+
     export default {
         name: 'IntroScreenWelcome',
         mixins: [

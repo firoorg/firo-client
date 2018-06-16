@@ -13,10 +13,12 @@
 </template>
 
 <script>
+    import GuideStepMixin from '@/mixins/GuideStepMixin'
+
     export default {
         name: 'IntroScreenOther',
-        props: [
-            'onNext'
+        mixins: [
+            GuideStepMixin
         ]
     }
 </script>
