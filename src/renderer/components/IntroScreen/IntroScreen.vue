@@ -3,7 +3,7 @@
         <div class="grid">
             <main class="content" :class="getCurrentSettingsClass">
                 <header>
-                    <ZcoinLogo class="logo" />
+                    <ZcoinLogoText class="logo" />
                     <BasePopover
                             :open="showIntro"
                             placement="right-center"
@@ -31,9 +31,10 @@
 
 <script>
     // import Vue from 'vue'
-    import ZcoinLogo from '@/assets/zcoin-logo-text.svg'
     import { sleep } from '../../../lib/utils'
     import types from '~/types'
+
+    import ZcoinLogoText from '@/components/Icons/ZcoinLogoText'
 
     import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
     import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
@@ -42,7 +43,7 @@
     export default {
         name: 'IntroScreen',
         components: {
-            ZcoinLogo,
+            ZcoinLogoText,
             IntroScreenWelcome,
             IntroScreenBlockchainLocation,
             IntroScreenOther
@@ -124,7 +125,6 @@
 
     .logo {
         width: 20rem;
-        @include drop-shadow();
     }
 
     .popover {
