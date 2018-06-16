@@ -89,7 +89,7 @@
       @include box-shadow-large();
 
       .content-wrapper {
-        & > footer {
+        & > div > footer {
           padding-top: emRhythm(3);
           text-align: right;
         }

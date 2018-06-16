@@ -48,7 +48,7 @@ $gradient--green-bright: linear-gradient(to right, $color--green, $color--green-
 $gradient--green-dark: linear-gradient(to right, $color--green-dark, $color--green);
 $gradient--green-dark-bright: linear-gradient(to right, $color--green-dark, $color--green-bright);
 
-$gradient--comet-dark-vertical: linear-gradient(to bottom right, $color--comet-dark, $color--dark);
+$gradient--comet-dark-vertical: linear-gradient(to right, $color--comet-dark, $color--dark);
 $gradient--comet-dark-horizontal: linear-gradient(to bottom, $color--comet-dark, $color--dark);
 
 $gradient--comet-vertical: linear-gradient(to bottom right, $color--comet, $color--comet-dark);

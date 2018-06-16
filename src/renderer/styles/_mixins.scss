@@ -85,6 +85,17 @@
   box-shadow: 0 2px 4px rgba($color, 0.5);
 }
 
+@mixin glow-transition-start ($color: $color--dark) {
+  box-shadow: 0 0 0 rgba($color, 0);
+}
+
+@mixin glow-small-box ($color: $color--dark) {
+  box-shadow: 0 1rem 3rem rgba($color, 0.3);
+}
+
+@mixin glow-huge-box ($color: $color--dark) {
+  box-shadow: 0 2rem 6rem rgba($color, 0.5);
+}
 @mixin glow-huge-icon ($color: $color--dark) {
   text-shadow: 0 2rem 6rem rgba($color, 0.5);
 }
@@ -92,7 +103,7 @@
 @mixin font-heavy () {
   @include lato-font('heavy');
   letter-spacing: 0.025em;
-  box-shadow: inset 0 1px 1px rgba($color--black, 0.5);
+  // box-shadow: inset 0 1px 1px rgba($color--black, 0.5);
 }
 
 @mixin font-black () {
