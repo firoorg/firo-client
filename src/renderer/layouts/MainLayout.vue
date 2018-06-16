@@ -35,7 +35,7 @@
     // import Sidebar from '@/components/Sidebar'
     import NotificationCenter from '@/components/NotificationCenter'
     import ConnectivityOverlay from '@/components/ConnectivityOverlay'
-    import IntroScreen from '@/components/IntroScreen'
+    import IntroScreen from '@/components/IntroScreen/IntroScreen'
 
     export default {
         name: 'MainLayout',
