@@ -85,7 +85,11 @@ module.exports = {
     },
 
     Settings: { // daemon: isSubscription
-        blockchainLocation: '', // daemon
+        // blockchainLocation: '~/Library/Application Support/zcoin', // daemon // has, set
+        blockchainLocation: '',
+        passphrase: {
+            hasPassphrase: true // setPassphrase, verifyPassphrase
+        },
         confirmationsRequired: 6,
         network: {
             upnp: true,
