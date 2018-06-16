@@ -11,7 +11,8 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'create-payment-request',
+    type: 'create',
+    collection: 'payment-request',
     data: {
         amount: 4000,
         label: 'label',
