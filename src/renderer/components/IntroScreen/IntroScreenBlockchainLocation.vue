@@ -23,6 +23,7 @@
 
 <script>
     import GuideStepMixin from '@/mixins/GuideStepMixin'
+    import path from 'path'
 
     const { dialog } = require('electron').remote
 
@@ -45,19 +46,20 @@
 
         methods: {
             selectFolder () {
-                const path = dialog.showOpenDialog({
-                    title: 'Select Blockchain Location',
+                const [ blockchainPath ] = dialog.showOpenDialog({
+                    title: 'Select Zcoin Blockchain Location',
                     // message: 'just a message',
-                    properties: ['openDirectory']
+                    properties: ['openDirectory'],
+                    defaultPath: path.resolve('/Users/joernroeder/Library/Application Support/zcoin'),
+                    buttonLabel: 'Select Location'
                 })
 
-                if (!path) {
+                if (!blockchainPath) {
                     console.log('user canceled the selection in the dialog box')
                     return
                 }
 
-                console.log(path)
-                this.bclocation = path
+                this.$store.dispatch('Settings/setBlockchainLocation', { location: blockchainPath })
                 this.onNext()
             },
 
