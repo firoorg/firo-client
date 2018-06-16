@@ -2,21 +2,21 @@
     <transition name="fade">
         <div class="main-layout wrapper" :class="{ 'has-overlay': hasOpenOverlay }" v-if="show">
             <transition name="fade" :duration="overlayDuration">
-                <IntroScreen v-show="showIntroScreen" />
+                <IntroScreen v-if="showIntroScreen" />
             </transition>
 
             <NotificationCenter />
 
             <transition name="fade" :duration="overlayDuration">
-                <ConnectivityOverlay v-show="!networkIsConnected" />
+                <ConnectivityOverlay v-if="!networkIsConnected" />
             </transition>
             <transition name="fade" :duration="overlayDuration">
-                <div class="active-window-overlay" v-show="hasOpenModal"></div>
+                <div class="active-window-overlay" v-if="hasOpenModal"></div>
             </transition>
             <!--<header class="header">
                 Header
             </header>-->
-            <!--<Sidebar class="aside"></Sidebar>-->
+            <Sidebar class="aside"></Sidebar>
             <main class="main">
                 <transition name="fade">
                     <router-view class="child"></router-view>
@@ -32,7 +32,7 @@
     import { sleep } from '../../lib/utils'
     import types from '~/types'
 
-    // import Sidebar from '@/components/Sidebar'
+    import Sidebar from '@/components/Sidebar'
     import NotificationCenter from '@/components/NotificationCenter'
     import ConnectivityOverlay from '@/components/ConnectivityOverlay'
     import IntroScreen from '@/components/IntroScreen/IntroScreen'
@@ -41,7 +41,7 @@
         name: 'MainLayout',
         components: {
             IntroScreen,
-            // Sidebar,
+            Sidebar,
             NotificationCenter,
             ConnectivityOverlay
         },
