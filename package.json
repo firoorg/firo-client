@@ -65,9 +65,13 @@
     "v-tooltip": "^2.0.0-rc.32",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
+    "vue-lottie": "^0.2.1",
+    "vue-qrcode-component": "^2.1.1",
     "vue-router": "^3.0.1",
     "vue-timeago": "^4.0.2",
-    "vuex": "^3.0.1"
+    "vuetable-2": "^2.0.0-beta.1",
+    "vuex": "^3.0.1",
+    "zeromq": "^4.6.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
