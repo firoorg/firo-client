@@ -6,15 +6,15 @@ const state = {
 
 const mutations = {
     [types.SET_BLOCKCHAIN_LOCATION] (state, location) {
-        console.log(location)
+        state.blockchainLocation = location
     }
 }
 
 const actions = {
-    [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
+    setBlockchainLocation ({ commit, state }, { location }) {
         console.log('setting blockchain location', location)
         // todo test if location exists
-        commit(types.SET_BLOCKCHAIN_LOCATION, { location: location })
+        commit(types.SET_BLOCKCHAIN_LOCATION, location)
     }
 }
 
