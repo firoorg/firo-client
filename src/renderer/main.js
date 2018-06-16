@@ -1,14 +1,27 @@
 import Vue from 'vue'
 import VTooltip from 'v-tooltip'
+import VueTimeago from 'vue-timeago'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
+
+import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 
 import App from './App'
 import router from './router'
 import store from '../store/renderer'
 
 Vue.use(VTooltip)
+
+Vue.use(VueTimeago, {
+    name: 'Timeago', // Component name, `Timeago` by default
+    locale: undefined, // Default locale
+    locales: {
+        // 'zh-CN': require('date-fns/locale/zh_cn'),
+        'en': require('date-fns/locale/en')
+    }
+})
+Vue.use(BindScopedSlotsPlugin)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
