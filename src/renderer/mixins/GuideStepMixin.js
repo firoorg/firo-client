@@ -21,7 +21,9 @@ export default {
     },
 
     // components can decide weather they are available or not (based on e.g. settings)
-    isEnabled () {
-        return true
+    methods: {
+        isEnabled () {
+            return true
+        }
     }
 }
