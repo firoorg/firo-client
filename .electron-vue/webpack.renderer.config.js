@@ -21,7 +21,8 @@ const { VueLoaderPlugin } = require('vue-loader')
  */
 let whiteListedModules = [
     'vue',
-    'vue-qrcode-component'
+    'vue-qrcode-component',
+    'vue-lottie'
 ]
 
 let rendererConfig = {
