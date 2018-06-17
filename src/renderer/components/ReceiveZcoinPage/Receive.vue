@@ -13,10 +13,10 @@
                     <div class="status"
                          v-show="!qrCodeIsVisible"
                          :class="{ received: received }">
-                        <PaymentRequestStatus :received="received" />
+                        <payment-request-status :received="received" />
                     </div>
                     <h2>
-                        <NaturalLanguageTags :content="label" tag-size="large" :onTagClick="tagClicked" />
+                        <natural-language-tags :content="label" tag-size="large" :onTagClick="tagClicked" />
                         <i v-if="!received" class="qr-toggle el-icon-menu" @click="toggleQrCode"></i>
                     </h2>
                 </header>
@@ -36,11 +36,11 @@
             <div class="action-wrap">
                 <div v-if="received">
                     <!--<el-button plain>Mark as Recurring</el-button>-->
-                    <BaseButton>Open in Block Explorer</BaseButton>
+                    <base-button>Open in Block Explorer</base-button>
                 </div>
                 <div v-else-if="!received">
-                    <BaseButton @click="() => received = !received">Copy Link</BaseButton>
-                    <BaseButton color="green" @click="shareViaMail">Share via E-Mail</BaseButton>
+                    <base-button @click="() => received = !received">Copy Link</base-button>
+                    <base-button color="green" @click="shareViaMail">Share via E-Mail</base-button>
                 </div>
 
                 <!-- E-Mail Template -->

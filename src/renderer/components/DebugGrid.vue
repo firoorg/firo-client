@@ -1,7 +1,7 @@
 <template>
     <div class="debug-grid" :class="{ active: isVisible }">
         <form>
-            <el-switch v-model="isVisible"></el-switch>
+            <input type="checkbox" v-model="isVisible" />
         </form>
         <div class="grid va-debug"></div>
     </div>

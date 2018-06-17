@@ -79,8 +79,6 @@
 </script>
 
 <style lang="scss">
-    @import '../styles';
-
     .main-layout {
         min-height: 100vh;
         max-width: 100vw;
