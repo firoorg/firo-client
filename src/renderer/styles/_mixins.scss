@@ -89,12 +89,12 @@
   box-shadow: 0 0 0 rgba($color, 0);
 }
 
-@mixin glow-small-box ($color: $color--dark) {
-  box-shadow: 0 1rem 3rem rgba($color, 0.3);
+@mixin glow-small-box ($color: $color--dark, $yOff: 1rem, $blur: 3rem) {
+  box-shadow: 0 $yOff $blur rgba($color, 0.3);
 }
 
-@mixin glow-huge-box ($color: $color--dark) {
-  box-shadow: 0 2rem 6rem rgba($color, 0.5);
+@mixin glow-huge-box ($color: $color--dark, $yOff: 2rem, $blur: 6rem) {
+  box-shadow: 0 $yOff $blur rgba($color, 0.5);
 }
 @mixin glow-huge-icon ($color: $color--dark) {
   text-shadow: 0 2rem 6rem rgba($color, 0.5);
@@ -109,4 +109,11 @@
 @mixin font-black () {
   @include lato-font('black');
   letter-spacing: -0.025em;
+}
+
+@mixin bleed-h ($value) {
+  margin-left: emRhythm($value) * -1;
+  margin-right: emRhythm($value) * -1;
+  padding-left: emRhythm($value);
+  padding-right: emRhythm($value);
 }
