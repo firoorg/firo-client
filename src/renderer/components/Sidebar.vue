@@ -1,7 +1,7 @@
 <template>
     <aside class="sidebar">
         <div class="logo">
-            <router-link :to="{ name: 'receive-zcoin-paymentrequest' }">
+            <router-link :to="{ name: 'receive-zcoin' }">
                 <ZcoinLogoText />
             </router-link>
         </div>
