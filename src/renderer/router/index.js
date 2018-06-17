@@ -22,13 +22,12 @@ export default new Router({
                             path: ':address',
                             name: 'receive-zcoin-paymentrequest',
                             component: require('@/components/ReceiveZcoinPage/Receive').default
-                        }/*,
+                        },
                         {
                             path: '',
                             name: 'receive-zcoin',
                             component: require('@/components/ReceiveZcoinPage/Create.vue').default
                         }
-                        */
                     ]
                 }
             ]

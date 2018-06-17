@@ -74,7 +74,7 @@
   import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
 
   export default {
-      name: 'receive',
+      name: 'receivePaymentRequest',
       components: {
           PaymentRequestStatus,
           NaturalLanguageTags,
