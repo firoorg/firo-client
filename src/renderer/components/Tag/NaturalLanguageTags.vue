@@ -2,7 +2,7 @@
     <span :class="{ interactive: hasTagClick }">
         <span v-for="(word, index) in parsedContent" class="word">
             <a v-if="word.type === 'tag'" @click="() => onClick(word.content)">
-                <el-tag :size="tagSize" class="tag">{{ word.content }}</el-tag>
+                <BaseTag :size="tagSize" class="tag">{{ word.content }}</BaseTag>
             </a>
             <span v-else>{{ word.content }}</span>
         </span>
