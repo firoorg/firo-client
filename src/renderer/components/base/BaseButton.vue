@@ -3,7 +3,9 @@
             v-bind="$attrs"
             :class="[color, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
             @click="$emit('click', $event.target.value)">
-        <slot />
+        <span>
+            <slot />
+        </span>
     </button>
 </template>
 
@@ -56,13 +58,16 @@
         @include rhythmBorderBottom(1px, $padding-v);
 
         @include font-heavy();
-        @include box-shadow();
 
         transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out;
 
         &:hover,
         &:focus {
             background: $color--white;
+        }
+
+        .has-shadow {
+            @include box-shadow();
         }
 
         &.is-outline {
@@ -99,10 +104,37 @@
         }
 
         &.green {
+            position: relative;
             padding-top: emRhythm($padding-v);
             padding-bottom: emRhythm($padding-v);
             border: none;
-            border-color: red;
+
+            // gradient
+            &:before,
+            &:after {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                content: '';
+                background: $gradient--green-bright;
+                transition: opacity 0.25s ease-out;
+                opacity: 0;
+            }
+
+            &:after {
+                background: transparent;
+                @include glow-small-box($color--green, 0);
+            }
+
+
+            span {
+                position: relative;
+                z-index: 2;
+            }
 
             &.green {
                 color: $color--white-light;
@@ -115,8 +147,18 @@
 
                 &:hover,
                 &:focus {
-                    color: $color--white;
                     background: $color--green;
+
+                    &:before {
+                        opacity: 0.5;
+                    }
+                    &:after {
+                        opacity: 1;
+                    }
+
+                    span {
+                        color: $color--white;
+                    }
 
                     &.is-popover {
                         box-shadow: 0 1px 2px rgba($color--dark, 0.5);
