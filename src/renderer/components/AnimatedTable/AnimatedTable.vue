@@ -199,6 +199,15 @@
                 @include font-heavy();
                 color: $color--comet-dark;
                 padding-bottom: emRhythm(2);
+
+                &.sortable {
+                    transition: color 0.15s ease-out;
+
+                    &:hover {
+                        color: $color--dark;
+                    }
+
+                }
             }
         }
 
