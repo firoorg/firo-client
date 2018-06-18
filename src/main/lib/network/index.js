@@ -49,7 +49,7 @@ const callBoundModuleMethod = (list, actionOrMutation, module) => {
     const { action, payload, type } = actionOrMutation
     let fn = null
 
-    console.log(list, type)
+    // console.log(list, type)
 
     if (list[type]) {
         fn = module[list[type]]
@@ -99,20 +99,18 @@ export default {
                 ...config,
                 dispatch,
                 commit
-                // identity: networkIdentity
             })
+
+            if (module.requestInitialState) {
+
+            }
         })
     },
 
-    onStoreAction ({ action, payload, type, namespace }) {
-        console.log('network received action', action, payload, type, namespace)
-    },
-
-    close: async () => {
+    close () {
         console.log('closing network')
         Object.keys(modules).forEach((module) => {
             modules[module].close()
         })
-    // await client.close() // disconnect(promise)
     }
 }
