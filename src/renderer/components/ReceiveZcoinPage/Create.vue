@@ -123,14 +123,14 @@
             }),
 
             ...mapGetters({
-                'PaymentRequest/isLoading': 'isLoading'
+                isLoading: 'PaymentRequest/isLoading'
             }),
 
             validationTooltipToShow () {
                 let tooltipToShow = ''
 
                 for (let key of this.validationFieldOrder) {
-                    if (this.validationErrors.has(key) && this.validationErrors[key].dirty) {
+                    if (this.validationErrors.has(key) && this.validationFields[key].dirty) {
                         tooltipToShow = key
                         break
                     }
