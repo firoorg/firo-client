@@ -31,16 +31,45 @@ const mutations = {
 }
 
 const actions = {
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL] ({ commit }, value) {
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field: 'label', value })
+    [types.SET_INITIAL_STATE] ({ dispatch }, initialState) {
+        console.log(initialState)
+
+        for (let address in initialState) {
+            dispatch(types.ADD_PAYMENT_REQUEST, {
+                ...initialState[address],
+                address
+            })
+        }
     },
 
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT] ({ commit }, value) {
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field: 'amount', value })
+    [types.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL] ({ commit, state }, value) {
+        const field = 'label'
+
+        if (state.createPaymentRequestForm[field] !== value) {
+            return
+        }
+
+        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field, value })
     },
 
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE] ({ commit }, value) {
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field: 'message', value })
+    [types.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT] ({ commit, state }, value) {
+        const field = 'amount'
+
+        if (state.createPaymentRequestForm[field] !== value) {
+            return
+        }
+
+        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field, value })
+    },
+
+    [types.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE] ({ commit, state }, value) {
+        const field = 'message'
+
+        if (state.createPaymentRequestForm[field] !== value) {
+            return
+        }
+
+        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field, value })
     },
 
     [types.RESET_PAYMENT_REQUEST_CREATE_FORM] ({ dispatch }) {
