@@ -145,24 +145,30 @@
                     background: $gradient--green-bright;
                 }*/
 
-                &:hover,
-                &:focus {
-                    background: $color--green;
+                &:not([disabled]) {
+                    &:hover,
+                    &:focus {
+                        background: $color--green;
 
-                    &:before {
-                        opacity: 0.5;
-                    }
-                    &:after {
-                        opacity: 1;
-                    }
+                        &:before {
+                            opacity: 0.5;
+                        }
+                        &:after {
+                            opacity: 1;
+                        }
 
-                    span {
-                        color: $color--white;
-                    }
+                        span {
+                            color: $color--white;
+                        }
 
-                    &.is-popover {
-                        box-shadow: 0 1px 2px rgba($color--dark, 0.5);
+                        &.is-popover {
+                            box-shadow: 0 1px 2px rgba($color--dark, 0.5);
+                        }
                     }
+                }
+
+                &[disabled] {
+                    background: grayscale($color--green);
                 }
 
                 &.is-popover {
