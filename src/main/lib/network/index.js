@@ -73,7 +73,6 @@ export default {
 
         debug('connected')
         Object.keys(modules).forEach((moduleName) => {
-            console.log('moduleName', moduleName)
             const appConfig = NETWORK_CONFIG[MAIN_OR_TEST] || {}
             const config = {
                 ...appConfig,
@@ -82,8 +81,6 @@ export default {
 
             const module = modules[moduleName]
             const { namespace, actions, mutations } = module
-
-            console.log(namespace, mutations, actions)
 
             utils.connectToStore({
                 store,
