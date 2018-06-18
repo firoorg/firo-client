@@ -7,7 +7,7 @@ import { join } from 'path'
 // import settings from 'electron-settings'
 
 import PidManager from './lib/core/PidManager'
-// import network from './lib/network'
+import network from './lib/network'
 // import wallet from './lib/wallet'
 
 import store from '../store/main'
@@ -87,7 +87,7 @@ const interval = setInterval(() => {
 // https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 // app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
 
-// network.init({ store, namespace: 'Network' })
+network.init({ store })
 // wallet.init({ store, namespace: 'Wallet' })
 
 windowManager.connectToStore({ store, namespace: 'Window' })
@@ -100,7 +100,7 @@ app.on('ready', () => {
 
 app.on('before-quit', () => {
     console.log('app before quit')
-    // network.close()
+    network.close()
 })
 
 app.on('will-quit', () => {
