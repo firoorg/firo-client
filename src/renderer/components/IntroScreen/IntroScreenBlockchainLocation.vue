@@ -24,6 +24,7 @@
 <script>
     import GuideStepMixin from '@/mixins/GuideStepMixin'
     import path from 'path'
+    import types from '~/types'
 
     const { dialog } = require('electron').remote
 
@@ -59,7 +60,8 @@
                     return
                 }
 
-                this.$store.dispatch('Settings/setBlockchainLocation', { location: blockchainPath })
+                console.log(types)
+                this.$store.dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location: blockchainPath })
                 this.onNext()
             },
 

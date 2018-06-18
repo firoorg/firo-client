@@ -56,31 +56,39 @@
 </template>
 
 <script>
-  export default {
-      name: 'createPaymentRequest',
-      data () {
-          return {
-              buttonStep: 0,
-              createForm: {
-                  amount: null,
-                  label: '',
-                  message: ''
-              }
-          }
-      },
-      methods: {
-          resetForm () {
-              this.createForm = {
-                  amount: null,
-                  label: '',
-                  message: ''
-              }
-          },
-          submitForm () {
-              console.log('submitting form')
-          }
-      }
-  }
+    import types from '~/types'
+
+    export default {
+        name: 'createPaymentRequest',
+        data () {
+            return {
+                buttonStep: 0,
+                createForm: {
+                    amount: null,
+                    label: '',
+                    message: ''
+                }
+            }
+        },
+        methods: {
+            resetForm () {
+                this.createForm = {
+                    amount: null,
+                    label: '',
+                    message: ''
+                }
+            },
+            submitForm () {
+                const { label, amount, message } = this.createForm
+                this.$store.dispatch(types.paymentrequest.CREATE_PAYMENT_REQUEST, {
+                    label,
+                    amount,
+                    message
+                })
+                console.log('submitting form')
+            }
+        }
+}
 </script>
 
 <style lang="scss" scoped>
