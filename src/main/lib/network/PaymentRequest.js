@@ -56,16 +56,17 @@ export default {
     createPaymentRequest ({ label, message, amount }) {
         console.log('CREATING PAYMENT REQUEST')
 
-        requester.on('message', function (msg) {
+        requester.once('message', function (msg) {
             const response = JSON.parse(msg.toString())
 
-            console.log(response)
-            const { meta } = response
+            console.log('received message from the network', response)
+            commitMutation(types.paymentrequest.IS_LOADING, false)
+
+            const { meta, data } = response
 
             if (meta.status !== 200) {
                 console.warn(response)
                 // todo send error response back
-                dispatchAction(types.paymentrequest.CREATING_PAYMENT_REQUEST, false)
                 return
             }
 
@@ -73,12 +74,12 @@ export default {
                 label,
                 message,
                 amount,
-                address: response.data
+                address: data.address
             }
 
             console.log(types)
 
-            console.log('Created Payment Request', paymentRequest)
+            console.log('Created Payment Request', paymentRequest, data)
             dispatchAction(types.paymentrequest.ADD_PAYMENT_REQUEST, paymentRequest)
         })
 

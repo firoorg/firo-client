@@ -16,12 +16,36 @@ module.exports = {
     },
 
     PaymentRequest: {
-        requests: [
-            {
+        paymentRequests: {
+            abc: {
                 label: 'label with #hashtags', // deamon // editable
                 address: 'abc', // deamon
                 amount: 100, // deamon
-                created_at: new Date(), // daemon
+                created_at: new Date() - (Math.random() * 60000), // daemon
+                message: `Hey Alice, 
+                    party was nice yesterday 🎉. do you remember, i borrowed you some money...
+                    BestBest
+                    Bob`, // deamon
+                isRecurring: false // gui // editable
+                // transactions are linked via the address field
+            },
+            cba: {
+                label: 'other with #hashtags', // deamon // editable
+                address: 'cba', // deamon
+                amount: 1000, // deamon
+                created_at: new Date() - (Math.random() * 30000), // daemon
+                message: `Hey Alice, 
+                    party was nice yesterday 🎉. do you remember, i borrowed you some money...
+                    BestBest
+                    Bob`, // deamon
+                isRecurring: false // gui // editable
+                // transactions are linked via the address field
+            },
+            mining123: {
+                label: '#mining #mining all the time', // deamon // editable
+                address: 'mining123', // deamon
+                amount: 10, // deamon
+                created_at: new Date() - (Math.random() * 10000), // daemon
                 message: `Hey Alice, 
                     party was nice yesterday 🎉. do you remember, i borrowed you some money...
                     BestBest
@@ -29,7 +53,13 @@ module.exports = {
                 isRecurring: false // gui // editable
                 // transactions are linked via the address field
             }
-        ],
+        },
+        isLoading: false,
+        createPaymentRequestForm: {
+            amount: null,
+            label: '',
+            message: ''
+        },
         lastSeen: 'blockHeightAsInteger', // gui // last visited the tab to validate unseen/seen of a request
         currentPaymentRequest: '' // gui // payment request showed in detail
     },

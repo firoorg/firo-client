@@ -7,8 +7,8 @@
                     Zcoin
                 </h1>
 
-                <animated-table :data="this.$store.state.PaymentRequest.requests"
-                                :fields="fields"
+                <animated-table :data="paymentRequests"
+                                :fields="tableFields"
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
                                 :on-row-select="onTableRowSelect">
@@ -27,10 +27,11 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
 
-    const fields = [
+    const tableFields = [
         {
             name: 'amount'
         },
@@ -44,14 +45,15 @@
             name: 'label',
             title: 'Label',
             sortField: 'label'
-        },
-
+        }
+        /*,
         {
             name: 'gender',
             formatter: (value) => {
                 return value === 'M' ? 'Male' : 'Female'
             }
         }
+        */
     ]
 
     export default {
@@ -62,12 +64,16 @@
 
         data () {
             return {
-                fields,
+                tableFields,
                 selectedPaymentRequest: null
             }
         },
 
         computed: {
+            ...mapGetters({
+                paymentRequests: 'PaymentRequest/paymentRequests'
+            }),
+
             selectedPaymentRequestWithAddress () {
                 if (!this.selectedPaymentRequest) {
                     return null
@@ -94,9 +100,6 @@
                     ...paymentRequest,
                     address
                 }
-            },
-            paymentRequests () {
-                return this.$store.state.PaymentRequest.requests
             }
         },
 

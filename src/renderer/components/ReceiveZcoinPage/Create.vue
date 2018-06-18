@@ -1,6 +1,6 @@
 <template>
     <transition name="slide-down" leave-active-class="slide-up-leave-active">
-        <section class="create">
+        <form class="create" @submit.prevent="submitForm">
             <div class="form">
                 <h2>
                     Create<br>
@@ -9,15 +9,30 @@
 
                 <div class="field">
                     <label for="label">Title</label>
+
                     <div class="control">
-                        <input v-model="createForm.label" type="text" id="label">
+                        <input v-model.trim="createFormLabel"
+                               v-validate="'required'"
+                               v-tooltip="getValidationTooltip('label')"
+                               type="text"
+                               ref="label"
+                               name="label"
+                               id="label">
                     </div>
                 </div>
 
                 <div class="field amount-field">
                     <label for="amount">Amount</label>
+
                     <div class="control">
-                        <input v-model="createForm.amount" type="text" id="amount" class="amount">
+                        <input v-model.number="createFormAmount"
+                               v-validate="amountValidationRules"
+                               v-tooltip="getValidationTooltip('amount')"
+                               type="text"
+                               ref="amount"
+                               name="amount"
+                               id="amount"
+                               class="amount">
                         <div class="prefix">XZC</div>
                     </div>
                 </div>
@@ -25,15 +40,21 @@
                 <div class="field message-field">
                     <label for="message">Message</label>
                     <div class="control">
-                        <base-textarea v-model="createForm.message" class="message" id="message" />
+                        <base-textarea v-model.lazy="createFormMessage"
+                                       ref="message"
+                                       name="message"
+                                       id="message"
+                                       class="message" />
                     </div>
                 </div>
             </div>
 
             <div class="create-wrap">
                 <base-button color="green"
-                             @click="submitForm"
-                             class="submit">
+                             type="submit"
+                             class="submit"
+                             ref="submit"
+                             :disabled="!canSubmit">
                     Create Payment Request
                 </base-button>
             </div>
@@ -51,11 +72,13 @@
                     New Payment Request test
                 </el-button>
             </ActionButtons>-->
-        </section>
+        </form>
     </transition>
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+    import { addVuexModel } from '@/utils/store'
     import types from '~/types'
 
     export default {
@@ -63,32 +86,108 @@
         data () {
             return {
                 buttonStep: 0,
+                /*
                 createForm: {
                     amount: null,
                     label: '',
                     message: ''
+                },
+                */
+                validationFieldOrder: [
+                    'label',
+                    'amount',
+                    'message'
+                ],
+                amountValidationRules: {
+                    decimal: 8,
+                    min_value: 0.001
                 }
             }
         },
+
+        computed: {
+            ...addVuexModel({
+                name: 'createFormLabel',
+                getter: 'PaymentRequest/createFormLabel',
+                action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL
+            }),
+            ...addVuexModel({
+                name: 'createFormAmount',
+                getter: 'PaymentRequest/createFormAmount',
+                action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT
+            }),
+            ...addVuexModel({
+                name: 'createFormMessage',
+                getter: 'PaymentRequest/createFormMessage',
+                action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE
+            }),
+
+            ...mapGetters({
+                'PaymentRequest/isLoading': 'isLoading'
+            }),
+
+            validationTooltipToShow () {
+                let tooltipToShow = ''
+
+                for (let key of this.validationFieldOrder) {
+                    if (this.validationErrors.has(key)) {
+                        tooltipToShow = key
+                        break
+                    }
+                }
+
+                return tooltipToShow
+            },
+
+            formValidated () {
+                const fieldNames = Object.keys(this.validationFields)
+
+                const fieldsAreDirty = fieldNames.some(key => this.validationFields[key].dirty)
+                const fieldsValidated = fieldNames.some(key => this.validationFields[key].validated)
+                const fieldValuesAreValid = fieldNames.every(key => this.validationFields[key].valid)
+
+                return fieldsAreDirty && fieldsValidated && fieldValuesAreValid
+            },
+
+            canSubmit () {
+                return this.formValidated && !this.isLoading
+            }
+        },
+
         methods: {
-            resetForm () {
-                this.createForm = {
-                    amount: null,
-                    label: '',
-                    message: ''
+            getValidationTooltip (fieldName) {
+                return {
+                    content: this.validationErrors.first(fieldName),
+                    trigger: 'manual',
+                    boundariesElement: 'body',
+                    offset: 8,
+                    placement: 'right',
+                    classes: 'error',
+                    show: this.validationTooltipToShow === fieldName
                 }
             },
-            submitForm () {
-                const { label, amount, message } = this.createForm
-                this.$store.dispatch(types.paymentrequest.CREATE_PAYMENT_REQUEST, {
-                    label,
-                    amount,
-                    message
-                })
+
+            /*
+            canSubmit () {
+                console.log('canSubmit')
+
+                // return this.$validator.validateAll()
+                return false
+            },
+            */
+
+            async submitForm () {
+                if (!this.canSubmit) {
+                    return
+                }
+
+                this.$store.dispatch(types.paymentrequest.CREATE_PAYMENT_REQUEST)
                 console.log('submitting form')
+                this.$refs.submit.$el.blur()
+                this.$nextTick(() => this.$validator.reset())
             }
         }
-}
+    }
 </script>
 
 <style lang="scss" scoped>
