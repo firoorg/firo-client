@@ -1,119 +1,119 @@
 @mixin typography {
-  /*
-  @include lato-font('light');
+    /*
+    @include lato-font('light');
 
-  h1, h2, h3 {
-    margin-top: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    max-width: emRhythm(96);
-    font-weight: normal;
-    @include lato-font('regular');
-  }
-
-  h1 {
-    margin-bottom: emRhythm(4.3, $ms-up3, $silent: true);
-    @include setType(5.8, $ms-up3, $silent: true);
-
-    /*@media (min-width: 43.75em) {
-      // [3]
-      margin-bottom: emRhythm(1, $ms-up3); // [4]
-      @include setType(8, $ms-up3); // [5]
+    h1, h2, h3 {
+        margin-top: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        max-width: emRhythm(96);
+        font-weight: normal;
+        @include lato-font('regular');
     }
 
-    @media (min-width: 56.25em) {
-      margin-bottom: emRhythm(1, $ms-up4);
-      @include setType(10, $ms-up4);
-    }* /
-  }
+    h1 {
+        margin-bottom: emRhythm(4.3, $ms-up3, $silent: true);
+        @include setType(5.8, $ms-up3, $silent: true);
 
-  h2, .h2 {
-    margin-bottom: emRhythm(3.5, $ms-up2, $silent: true);
-    @include setType(4.8, $ms-up2, $silent: true);
+        /*@media (min-width: 43.75em) {
+            // [3]
+            margin-bottom: emRhythm(1, $ms-up3); // [4]
+            @include setType(8, $ms-up3); // [5]
+        }
 
-    /*@media (min-width: 43.75em) {
-      margin-bottom: emRhythm(1, $ms-up2);
-      @include setType(6, $ms-up2)
+        @media (min-width: 56.25em) {
+            margin-bottom: emRhythm(1, $ms-up4);
+            @include setType(10, $ms-up4);
+        }* /
     }
 
-    @media (min-width: 56.25em) {
-      margin-bottom: emRhythm(1, $ms-up3);
-      @include setType(8, $ms-up3);
-    }* /
-  }
+    h2, .h2 {
+        margin-bottom: emRhythm(3.5, $ms-up2, $silent: true);
+        @include setType(4.8, $ms-up2, $silent: true);
 
-  h3, .h3 {
-    margin-bottom: emRhythm(2, $ms-up1);
-    @include setType(3, $ms-up1);
+        /*@media (min-width: 43.75em) {
+            margin-bottom: emRhythm(1, $ms-up2);
+            @include setType(6, $ms-up2)
+        }
 
-    /*@media (min-width: 56.25em) {
-      margin-bottom: emRhythm(1, $ms-up2);
-      @include setType(6, $ms-up2);
-    }* /
-  }
+        @media (min-width: 56.25em) {
+            margin-bottom: emRhythm(1, $ms-up3);
+            @include setType(8, $ms-up3);
+        }* /
+    }
 
-  p {
-    margin-top: 0;
-    margin-bottom: emRhythm($base-line-multi);
-    padding-top: 0;
-    padding-bottom: 0;
-    max-width: emRhythm(96);
-  }*/
+    h3, .h3 {
+        margin-bottom: emRhythm(2, $ms-up1);
+        @include setType(3, $ms-up1);
+
+        /*@media (min-width: 56.25em) {
+            margin-bottom: emRhythm(1, $ms-up2);
+            @include setType(6, $ms-up2);
+        }* /
+    }
+
+    p {
+        margin-top: 0;
+        margin-bottom: emRhythm($base-line-multi);
+        padding-top: 0;
+        padding-bottom: 0;
+        max-width: emRhythm(96);
+    }*/
 }
 
 @mixin color-gradient ($gradient) {
-  color: transparent;
-  background-image: $gradient;
-  -webkit-background-clip: text;
-  background-clip: text;
-  display: inline-block;
+    color: transparent;
+    background-image: $gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    display: inline-block;
 }
 
 @mixin drop-shadow ($color: $color--dark) {
-  filter: drop-shadow(0 2px 2px rgba($color, 0.5));
+    filter: drop-shadow(0 2px 2px rgba($color, 0.5));
 }
 
 @mixin box-shadow ($color: $color--dark) {
-  box-shadow: 0 2px 2px rgba($color, 0.5);
+    box-shadow: 0 2px 2px rgba($color, 0.5);
 }
 
 @mixin drop-shadow-large ($color: $color--dark) {
-  filter: drop-shadow(0 2px 4px rgba($color, 0.5));
+    filter: drop-shadow(0 2px 4px rgba($color, 0.5));
 }
 
 @mixin box-shadow-large ($color: $color--dark) {
-  box-shadow: 0 2px 4px rgba($color, 0.5);
+    box-shadow: 0 2px 4px rgba($color, 0.5);
 }
 
 @mixin glow-transition-start ($color: $color--dark) {
-  box-shadow: 0 0 0 rgba($color, 0);
+    box-shadow: 0 0 0 rgba($color, 0);
 }
 
 @mixin glow-small-box ($color: $color--dark, $yOff: 1rem, $blur: 3rem) {
-  box-shadow: 0 $yOff $blur rgba($color, 0.3);
+    box-shadow: 0 $yOff $blur rgba($color, 0.3);
 }
 
 @mixin glow-huge-box ($color: $color--dark, $yOff: 2rem, $blur: 6rem) {
-  box-shadow: 0 $yOff $blur rgba($color, 0.5);
+    box-shadow: 0 $yOff $blur rgba($color, 0.5);
 }
 @mixin glow-huge-icon ($color: $color--dark) {
-  text-shadow: 0 2rem 6rem rgba($color, 0.5);
+    text-shadow: 0 2rem 6rem rgba($color, 0.5);
 }
 
 @mixin font-heavy () {
-  @include lato-font('heavy');
-  letter-spacing: 0.025em;
-  // box-shadow: inset 0 1px 1px rgba($color--black, 0.5);
+    @include lato-font('heavy');
+    letter-spacing: 0.025em;
+    // box-shadow: inset 0 1px 1px rgba($color--black, 0.5);
 }
 
 @mixin font-black () {
-  @include lato-font('black');
-  letter-spacing: -0.025em;
+    @include lato-font('black');
+    letter-spacing: -0.025em;
 }
 
 @mixin bleed-h ($value) {
-  margin-left: emRhythm($value) * -1;
-  margin-right: emRhythm($value) * -1;
-  padding-left: emRhythm($value);
-  padding-right: emRhythm($value);
+    margin-left: emRhythm($value) * -1;
+    margin-right: emRhythm($value) * -1;
+    padding-left: emRhythm($value);
+    padding-right: emRhythm($value);
 }
