@@ -67,8 +67,6 @@ requireComponent.keys().forEach(fileName => {
     )
 })
 
-store.replaceState(require('../store/initialState'))
-
 /* eslint-disable no-new */
 new Vue({
     components: { App },
