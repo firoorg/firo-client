@@ -130,7 +130,7 @@
                 let tooltipToShow = ''
 
                 for (let key of this.validationFieldOrder) {
-                    if (this.validationErrors.has(key)) {
+                    if (this.validationErrors.has(key) && this.validationErrors[key].dirty) {
                         tooltipToShow = key
                         break
                     }
