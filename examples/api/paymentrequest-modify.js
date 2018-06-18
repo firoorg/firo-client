@@ -1,7 +1,7 @@
 const zmq = require('zeromq')
 
 const requester = zmq.socket('req')
-requester.connect('tcp://127.0.0.1:15557')
+requester.connect('tcp://127.0.0.1:15558')
 
 // log out replies
 requester.on('message', (msg) => {
@@ -13,8 +13,8 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'update',
     collection: 'payment-request',
-    id: 'address-here',
     data: {
+        id: 'id-here',
         label: 'this is a modified payment request label',
         isRecurring: true
     }

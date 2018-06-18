@@ -11,9 +11,6 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'delete',
+    type: 'initial',
     collection: 'payment-request',
-    data: {
-        id: 'address-here'
-    }
 }))
