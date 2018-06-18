@@ -10,19 +10,6 @@
         <p>Donec sed odio dui. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum. Sed posuere consectetur est at lobortis. Nulla vitae elit libero, a pharetra augue.</p>
         <p>Maecenas faucibus mollis interdum. Curabitur blandit tempus porttitor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Etiam porta sem malesuada magna mollis euismod. Curabitur blandit tempus porttitor. Donec sed odio dui.</p>
 
-        <el-button type="primary" @click="() => this.$store.dispatch('Window/show', 'settings')">
-            Open Settings
-        </el-button>
-
-        <el-button type="primary" @click="() => this.$store.dispatch('Window/show', 'welcomeGuide')">
-            Open Welcome Guide
-        </el-button>
-
-        <el-tag>None</el-tag>
-        <el-tag type="primary">Primary</el-tag>
-        <el-tag type="info">Info</el-tag>
-        <el-tag type="warning">Warning</el-tag>
-        <el-tag type="danger">Danger</el-tag>
     </section>
 </template>
 

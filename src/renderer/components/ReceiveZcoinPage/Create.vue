@@ -58,20 +58,6 @@
                     Create Payment Request
                 </base-button>
             </div>
-            <!--<ActionButtons class="create-wrap">
-                <el-button slot="secondary"
-                           type="danger"
-                           @click="() => this.$router.go(-1)"
-                           plain>
-                    Cancel
-                </el-button>
-                <el-button slot="primary"
-                           icon="el-icon-plus"
-                           type="primary"
-                           @click="() => this.$router.push({ name: 'receive-zcoin' })">
-                    New Payment Request test
-                </el-button>
-            </ActionButtons>-->
         </form>
     </transition>
 </template>

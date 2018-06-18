@@ -1,10 +1,6 @@
 <template>
     <section class="blockchain">
-        <el-progress class="sync-progress"
-                     :percentage="progress"
-                     :show-text="false"
-                     :strokeWidth="2"
-                     status="success"></el-progress>
+        SYNC HERE
         <div class="status">
             <i class="el-icon-loading"></i>
         </div>

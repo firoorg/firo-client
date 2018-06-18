@@ -8,20 +8,6 @@
         <div class="label">
             Zcoin Balance
             <span>
-                <!--
-                <el-popover ref="explainPendingConfirmations"
-                            placement="right"
-                            width="200"
-                            :open-delay="500"
-                            trigger="hover"
-                            content="this is content, this is content, this is content">
-                </el-popover>
-                <ConfirmationBadge class="pending-confirmations"
-                                   :with="requiredConfirmations - pendingConfirmations"
-                                   :of="requiredConfirmations"
-                                   v-popover:explainPendingConfirmations>
-                </ConfirmationBadge>
-                -->
             </span>
         </div>
         <!-- TODO animate change of current balance
