@@ -63,6 +63,7 @@
     "ps-tree": "^1.1.0",
     "typesettings": "^4.0.0",
     "v-tooltip": "^2.0.0-rc.32",
+    "vee-validate": "^2.1.0-beta.2",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-lottie": "^0.2.1",

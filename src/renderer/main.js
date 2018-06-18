@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
+import VeeValidate from 'vee-validate'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
@@ -21,6 +22,12 @@ Vue.use(VueTimeago, {
         'en': require('date-fns/locale/en')
     }
 })
+
+Vue.use(VeeValidate, {
+    errorBagName: 'validationErrors',
+    fieldsBagName: 'validationFields'
+})
+
 Vue.use(BindScopedSlotsPlugin)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
