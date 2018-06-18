@@ -26,6 +26,8 @@
     import path from 'path'
     import types from '~/types'
 
+    import fs from 'fs'
+
     const { dialog } = require('electron').remote
 
     export default {
@@ -33,15 +35,10 @@
         mixins: [
             GuideStepMixin
         ],
-        data () {
-            return {
-                bclocation: ''
-            }
-        },
 
         computed: {
             location () {
-                return this.bclocation || this.$store.state.Settings.blockchainLocation
+                return this.$store.state.Settings.blockchainLocation
             }
         },
 
@@ -51,6 +48,7 @@
                     title: 'Select Zcoin Blockchain Location',
                     // message: 'just a message',
                     properties: ['openDirectory'],
+                    // todo get default path
                     defaultPath: path.resolve('/Users/joernroeder/Library/Application Support/zcoin'),
                     buttonLabel: 'Select Location'
                 })
@@ -66,7 +64,7 @@
             },
 
             isEnabled () {
-                return !this.location
+                return !this.location || !fs.existsSync(this.location)
             }
         }
     }
