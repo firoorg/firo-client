@@ -1,5 +1,5 @@
 <template>
-    <transition name="fade">
+
         <section class="receive">
             <div class="info-wrap">
                 <qr-code class="qr-code"
@@ -24,8 +24,8 @@
                 <dl>
                     <dt>Created</dt>
                     <dd><timeago :since="created_at" :auto-update="30"></timeago></dd>
-                    <dt>Amount Received</dt>
-                    <dd>{{ amountRequested ? amountRequested : 'No Amount Requested' }}</dd>
+                    <dt>Amount</dt>
+                    <dd>{{ amount ? amount + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
             </div>
 
@@ -35,7 +35,6 @@
 
             <div class="action-wrap">
                 <div v-if="received">
-                    <!--<el-button plain>Mark as Recurring</el-button>-->
                     <base-button>Open in Block Explorer</base-button>
                 </div>
                 <div v-else-if="!received">
@@ -63,7 +62,6 @@
                 </div>
             </div>
         </section>
-    </transition>
 </template>
 
 <script>
@@ -84,7 +82,7 @@
       props: [
           'received',
           'label',
-          'amountRequested',
+          'amount',
           'message',
           'created_at',
           'address'
@@ -132,7 +130,7 @@
 
     .receive {
         background: $color--white;
-        padding: emRhythm(15) emRhythm(5) emRhythm(5);
+        padding: emRhythm(10) emRhythm(5) emRhythm(5);
         text-align: center;
         min-height: 100%;
         box-sizing: border-box;
@@ -255,7 +253,7 @@
     .message-wrap {
         border-top: 1px solid $color--polo-medium;
         background: radial-gradient(at top, rgba($color--comet-light, 0.35), rgba($color--comet-light, 0) 70%);
-        min-height: 10rem;
+        // min-height: 10rem;
         padding-bottom: emRhythm(5);
         @include rhythmBorderTop(1px, 5);
         margin: 0 emRhythm(3);

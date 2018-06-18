@@ -103,11 +103,13 @@
             }
         }
 
-        &.green {
+        &.green,
+        &.comet {
             position: relative;
             padding-top: emRhythm($padding-v);
             padding-bottom: emRhythm($padding-v);
             border: none;
+            outline: none;
 
             // gradient
             &:before,
@@ -120,16 +122,37 @@
                 height: 100%;
                 z-index: 1;
                 content: '';
-                background: $gradient--green-bright;
                 transition: opacity 0.25s ease-out;
                 opacity: 0;
             }
 
             &:after {
                 background: transparent;
-                @include glow-small-box($color--green, 0);
             }
 
+            &:not([disabled]) {
+                &:hover,
+                &:focus {
+                    &:before {
+                        opacity: 0.5;
+                    }
+                    &:after {
+                        opacity: 1;
+                    }
+
+                    span {
+                        color: $color--white;
+                    }
+
+                    &.is-popover {
+                        box-shadow: 0 1px 2px rgba($color--dark, 0.5);
+                    }
+                }
+            }
+
+            &.is-popover {
+                box-shadow: inset 0 1px 2px rgba($color--dark, 0.5);
+            }
 
             span {
                 position: relative;
@@ -141,38 +164,34 @@
                 background: $color--green;
                 border-color: transparent;
 
-                /*  &:before {
+                &:before {
                     background: $gradient--green-bright;
-                }*/
+                }
 
-                &:not([disabled]) {
-                    &:hover,
-                    &:focus {
-                        background: $color--green;
-
-                        &:before {
-                            opacity: 0.5;
-                        }
-                        &:after {
-                            opacity: 1;
-                        }
-
-                        span {
-                            color: $color--white;
-                        }
-
-                        &.is-popover {
-                            box-shadow: 0 1px 2px rgba($color--dark, 0.5);
-                        }
-                    }
+                &:after {
+                    @include glow-small-box($color--green, 0);
                 }
 
                 &[disabled] {
                     background: grayscale($color--green);
                 }
+            }
 
-                &.is-popover {
-                    box-shadow: inset 0 1px 2px rgba($color--dark, 0.5);
+            &.comet {
+                color: $color--white-light;
+                background: $color--comet-dark;
+                border-color: transparent;
+
+                &:before {
+                    background: $gradient--comet-dark-vertical;
+                }
+
+                &:after {
+                    @include glow-small-box($color--comet-dark, 0);
+                }
+
+                &[disabled] {
+                    background: grayscale($color--green);
                 }
             }
         }
