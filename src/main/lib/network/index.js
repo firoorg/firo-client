@@ -47,22 +47,13 @@ const callBoundModuleMethod = (list, actionOrMutation, module) => {
     }
 
     const { action, payload, type } = actionOrMutation
-    let fn = null
-
-    // console.log(list, type)
 
     if (list[type]) {
-        fn = module[list[type]]
+        module[list[type]](payload)
     } else if (list[action]) {
-        fn = module[list[action]]
-    }
-
-    if (fn) {
-        fn(payload)
+        module[list[action]](payload)
     }
 }
-
-const MAIN_OR_TEST = 'testnet'
 
 export default {
 
@@ -73,7 +64,7 @@ export default {
 
         debug('connected')
         Object.keys(modules).forEach((moduleName) => {
-            const appConfig = NETWORK_CONFIG[MAIN_OR_TEST] || {}
+            const appConfig = NETWORK_CONFIG[NETWORK_CONFIG.currentNetwork] || {}
             const config = {
                 ...appConfig,
                 ...(NETWORK_CONFIG[moduleName] || {})
@@ -101,9 +92,7 @@ export default {
                 commit
             })
 
-            if (module.requestInitialState) {
-
-            }
+            console.log(module)
         })
     },
 

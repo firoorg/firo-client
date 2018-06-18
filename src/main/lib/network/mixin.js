@@ -5,13 +5,12 @@ import types from '../../../store/types'
 
 // @see http://zguide.zeromq.org/php:chapter5#Getting-an-Out-of-Band-Snapshot
 export default {
-    namespace: 'PaymentRequest',
+    namespace: '',
 
     mutations: {
-        [types.paymentrequest.CREATE_PAYMENT_REQUEST]: 'createPaymentRequest'
     },
 
-    collection: 'payment-request',
+    collection: '',
 
     subscriber: null, // zmq.socket('sub')
     requester: null, // zmq.socket('req')
@@ -66,6 +65,11 @@ export default {
         if (meta.status < 200 || meta.status >= 400) {
             console.warn(response)
             // todo send error response back
+            return
+        }
+
+        if (!data) {
+            console.log('nothing received. returning...')
             return
         }
 

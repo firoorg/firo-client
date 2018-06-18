@@ -1,6 +1,8 @@
 const HOST = 'tcp://127.0.0.1'
 
 export default {
+    currentNetwork: 'testnet',
+
     mainnet: {
         host: HOST,
         ports: {

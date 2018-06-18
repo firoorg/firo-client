@@ -45,7 +45,7 @@ const actions = {
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL] ({ commit, state }, value) {
         const field = 'label'
 
-        if (state.createPaymentRequestForm[field] !== value) {
+        if (state.createPaymentRequestForm[field] === value) {
             return
         }
 
@@ -55,7 +55,7 @@ const actions = {
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT] ({ commit, state }, value) {
         const field = 'amount'
 
-        if (state.createPaymentRequestForm[field] !== value) {
+        if (state.createPaymentRequestForm[field] === value) {
             return
         }
 
@@ -65,7 +65,7 @@ const actions = {
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE] ({ commit, state }, value) {
         const field = 'message'
 
-        if (state.createPaymentRequestForm[field] !== value) {
+        if (state.createPaymentRequestForm[field] === value) {
             return
         }
 
