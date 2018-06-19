@@ -51,10 +51,10 @@ $gradient--green-dark-bright: linear-gradient(to right, $color--green-dark, $col
 $gradient--comet-dark-vertical: linear-gradient(to right, $color--comet-dark, $color--dark);
 $gradient--comet-dark-horizontal: linear-gradient(to bottom, $color--comet-dark, $color--dark);
 
-$gradient--comet-vertical: linear-gradient(to bottom right, $color--comet, $color--comet-dark);
+$gradient--comet-vertical: linear-gradient(to bottom left, $color--comet, $color--comet-dark);
 $gradient--comet-horizontal: linear-gradient(to bottom, $color--comet, $color--comet-dark);
 
-$gradient--polo-vertical: linear-gradient(to bottom right, $color--polo, $color--polo-dark);
+$gradient--polo-vertical: linear-gradient(to bottom left, $color--polo, $color--polo-dark);
 $gradient--polo-horizontal: linear-gradient(to bottom, $color--polo, $color--polo-dark);
 
 $sidebar--logo-margin-top: 8;
