@@ -1,5 +1,5 @@
 <template>
-    <aside class="sidebar">
+    <aside class="sidebar scrollable-height">
         <div class="logo">
             <router-link :to="{ name: 'home' }">
                 <zcoin-logo-text />
@@ -35,36 +35,36 @@
 
 <style lang="scss" scoped>
     .sidebar {
-         //background-image: $gradient--comet-dark-horizontal;
-         background-image: linear-gradient(to top right, $color--dark, mix($color--comet-dark, $color--dark));
+        //background-image: $gradient--comet-dark-horizontal;
+        background-image: linear-gradient(to top right, $color--dark, mix($color--comet-dark, $color--dark));
 
-         display: grid;
-         grid-row-gap: emRhythm(2);
-         grid-template-areas: "logo" "balance" "menu" "settings" "blockchain";
-         $logo-height: $sidebar--logo-margin-top + $sidebar--logo-height + $sidebar--logo-margin-bottom;
-         grid-template-rows: emRhythm($logo-height) 5rem auto 2fr 5rem;
-         color: #fff;
+        display: grid;
+        grid-row-gap: emRhythm(2);
+        grid-template-areas: "logo" "balance" "menu" "settings" "blockchain";
+        $logo-height: $sidebar--logo-margin-top + $sidebar--logo-height + $sidebar--logo-margin-bottom;
+        grid-template-rows: emRhythm($logo-height) 5rem auto 2fr 5rem;
+        color: #fff;
 
-         -webkit-user-select: none;
-         -webkit-app-region: drag;
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
     }
 
     .logo {
-         grid-area: logo;
+        grid-area: logo;
 
-         margin: emRhythm($sidebar--logo-margin-top) 0 emRhythm($sidebar--logo-margin-bottom);
-         height: emRhythm($sidebar--logo-height);
+        margin: emRhythm($sidebar--logo-margin-top) 0 emRhythm($sidebar--logo-margin-bottom);
+        height: emRhythm($sidebar--logo-height);
 
-         a {
-             display: block;
-             height: 100%;
-         }
+        a {
+            display: block;
+            height: 100%;
+        }
 
-         svg {
-             @include drop-shadow-large();
-             width: auto;
-             max-height: 100%;
-         }
+        svg {
+            @include drop-shadow-large();
+            width: auto;
+            max-height: 100%;
+        }
     }
 
     .balance {

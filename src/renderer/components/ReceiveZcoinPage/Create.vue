@@ -1,6 +1,6 @@
 <template>
     <transition name="slide-down" leave-active-class="slide-up-leave-active">
-        <form class="create" @submit.prevent="submitForm">
+        <form class="create scrollable-height" @submit.prevent="submitForm">
             <div class="form">
                 <h2>
                     Create<br>

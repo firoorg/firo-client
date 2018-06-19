@@ -23,4 +23,10 @@ body {
         margin-top: emRhythm(2, $ms-up2);
         margin-bottom: emRhythm(4, $ms-up2);
     }
+
+    .scrollable-height {
+        box-sizing: border-box;
+        overflow-y: scroll;
+        height: 100vh;
+    }
 }

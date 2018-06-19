@@ -1,6 +1,6 @@
 <template>
     <section class="receive-zcoin">
-        <div class="scrollable">
+        <div class="scrollable-height">
             <section class="paymentrequest-list">
                 <h1>
                     Receive<br>
@@ -134,15 +134,6 @@
         display: grid;
         box-sizing: border-box;
         grid-template-columns: 3fr  2fr;
-        //grid-column-gap: emRhythm(5);
-
-        .scrollable {
-            position: relative;
-            z-index: 1;
-            box-sizing: border-box;
-            overflow: scroll;
-            height: 100vh;
-        }
     }
 
     .paymentrequest-list,

@@ -1,6 +1,5 @@
 <template>
-
-        <section class="receive">
+        <section class="receive scrollable-height">
             <div class="info-wrap">
                 <qr-code class="qr-code"
                          v-show="qrCodeIsVisible"
