@@ -148,76 +148,29 @@
     }
 
     .form {
-        $input-bleed: 2;
-
         ::selection {
             color: $color--dark;
             background: $color--white-light;
         }
 
-        .field {
-            margin-bottom: emRhythm(3);
-            & > label {
-                display: block;
-                @include font-heavy();
-                padding-bottom: emRhythm(1);
+        input[type="text"],
+        select,
+        .message {
+            background: rgba($color--dark, 0.4);
+            color: $color--white-light;
+
+            &:hover {
+                background: rgba($color--dark, 0.55);
+            }
+
+            &:focus {
+                background: rgba($color--dark, 0.7);
+                color: $color--white;
             }
         }
 
-
-        .control {
-            position: relative;
-
-            input[type="text"],
-            select,
-            .message {
-                position: relative;
-                width: 100%;
-                border: none;
-                outline: none;
-                background: rgba($color--dark, 0.4);
-                color: $color--white-light;
-                // box-sizing: border-box;
-
-                transition: background 0.25s ease-out, background 0.15s ease-out;
-
-                &:hover {
-                    background: rgba($color--dark, 0.55);
-                }
-
-                &:focus {
-                    background: rgba($color--dark, 0.7);
-                    color: $color--white;
-                }
-            }
-
-            input[type="text"] {
-                @include setType(5);
-            }
-
-            input[type="text"],
-            .message {
-                @include bleed-h($input-bleed);
-            }
-
-            .prefix {
-                position: absolute;
-                top: 0;
-                right: emRhythm($input-bleed) * -1;
-                padding-right: emRhythm($input-bleed);
-                height: 100%;
-                @include setType(5);
-                // opacity: 0.5;
-                color: $color--comet;
-                // user-select: none;
-                pointer-events: none;
-            }
-
-            .message {
-                padding: emRhythm(2);
-                //box-sizing: border-box;
-                @include setType(3);
-            }
+        .prefix {
+            color: $color--comet;
         }
     }
 
