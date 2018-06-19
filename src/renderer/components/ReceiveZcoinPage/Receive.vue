@@ -137,25 +137,7 @@
         color: $color--dark;
 
         display: grid;
-        // info: auto; message: 1fr; actions: auto;
         grid-template-rows: auto 1fr auto;
-        /*grid-template-areas:
-                'info'
-                'message'
-                'actions';
-                */
-
-        /*
-        .info-wrap {
-            grid-area: info;
-        }
-        .message-wrap {
-            grid-area: message;
-        }
-        .action-wrap {
-            grid-area: actions;
-        }
-        */
     }
 
     .create-payment {
@@ -176,24 +158,13 @@
     }
 
     .status {
-        text-align: center;
-        font-size: emRhythm(18);
-        color: $color--comet;
-
-        i {
-            @include glow-huge-icon($color--comet-dark);
-            @include color-gradient($gradient--comet-dark-horizontal);
-            font-weight: bold;
-        }
-
-        &.received i {
-            @include glow-huge-icon($color--green);
-            background-image: $gradient--green-bright;
-        }
+        max-width: emRhythm(35);
+        margin: 0 auto;
+        opacity: 0.4;
     }
 
     header {
-        margin-bottom: emRhythm(4);
+        // margin-bottom: emRhythm(4);
         position: relative;
 
         h1, h2 {
@@ -205,7 +176,7 @@
             grid-template-rows: 1fr;
             align-items: center;
             top: 0;
-            margin-bottom: 0;
+            margin: 0;
 
             @include typo-headline();
             mix-blend-mode: multiply;
@@ -225,7 +196,7 @@
 
     dl {
         margin: 0 auto emRhythm(5);
-        max-width: 25rem;
+        max-width: emRhythm(35);
         text-align: left;
         overflow: hidden;
     }

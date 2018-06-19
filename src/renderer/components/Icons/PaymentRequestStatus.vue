@@ -1,15 +1,16 @@
 <template>
     <div class="payment-request-status-animation">
-    <lottie :options="defaultOptions"
-            @animCreated="handleAnimation" />
+        <lottie :options="defaultOptions"
+                @animCreated="handleAnimation" />
     </div>
 </template>
 
 <script>
     import Lottie from 'vue-lottie'
-    import animationData from '@/assets/animations/payment-request-status.json'
-
-    console.log(animationData)
+    // import animationData from '@/assets/animations/payment-request-status.json'
+    // import animationData from '@/assets/animations/pending.json'
+    import animationData from '@/assets/animations/pending-to-check.json'
+    // import animationData from '@/assets/animations/check-outline-fill.json'
 
     export default {
         name: 'PaymentRequestStatus',
@@ -26,15 +27,15 @@
                     animationData,
                     loop: false,
                     autoplay: false
-                },
-                animationSpeed: 1
+                }
             }
         },
         methods: {
             handleAnimation (anim) {
                 this.anim = anim
+
                 if (this.received) {
-                    this.anim.goToAndStop(50)
+                    this.anim.goToAndStop(this.anim.getDuration(true), true)
                 }
             },
 
@@ -66,10 +67,5 @@
     }
 </script>
 
-<style lang="scss">
-    .payment-request-status-animation {
-        svg > g {
-            @include glow-huge-box()
-        }
-    }
+<style lang="scss" scoped>
 </style>
