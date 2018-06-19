@@ -42,6 +42,10 @@
 </script>
 
 <style lang="scss" scoped>
+    $bleed: 2;
+    $bleed-active: 3;
+    $padding: 3;
+
     .menu {
         //margin-top: emRhythm(0.41);
         //@include sassline(zeta, $bodytype, 2, 2, all);
@@ -56,8 +60,8 @@
     }
 
     li {
-        padding-left: emRhythm(4);
-        padding-right: emRhythm(4);
+        padding-left: emRhythm(max(4, $bleed-active + $padding));
+        padding-right: emRhythm(max(4, $bleed-active + $padding));
 
         &.has-divider {
             border: 0px solid $color--comet-dark;
@@ -75,8 +79,8 @@
         border-radius: 0.25rem;
         color: $color--white-light;
         text-decoration: none;
-        @include bleed-h(1);
-        transition: padding .15s ease-out, margin .15s ease-out;
+        @include bleed-h($bleed);
+        transition: padding .1s ease-in-out, margin .1s ease-in-out;
 
         &:after {
             position: absolute;
@@ -107,7 +111,7 @@
         }
 
         &.router-link-active {
-            @include bleed-h(2);
+            @include bleed-h($bleed-active);
             //padding-left: emRhythm(2);
             &:after {
                 opacity: .3;
