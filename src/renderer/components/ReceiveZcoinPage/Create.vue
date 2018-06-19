@@ -63,31 +63,24 @@
 </template>
 
 <script>
+    import ValidationMixin from '@/mixins/ValidationMixin'
     import { mapGetters } from 'vuex'
     import { addVuexModel } from '@/utils/store'
     import types from '~/types'
 
     export default {
         name: 'createPaymentRequest',
+        mixins: [
+            ValidationMixin
+        ],
         data () {
             return {
                 buttonStep: 0,
-                /*
-                createForm: {
-                    amount: null,
-                    label: '',
-                    message: ''
-                },
-                */
                 validationFieldOrder: [
                     'label',
                     'amount',
                     'message'
-                ],
-                amountValidationRules: {
-                    decimal: 8,
-                    min_value: 0.001
-                }
+                ]
             }
         },
 
@@ -112,57 +105,13 @@
                 isLoading: 'PaymentRequest/isLoading'
             }),
 
-            validationTooltipToShow () {
-                let tooltipToShow = ''
-
-                for (let key of this.validationFieldOrder) {
-                    if (this.validationErrors.has(key) && this.validationFields[key].dirty) {
-                        tooltipToShow = key
-                        break
-                    }
-                }
-
-                return tooltipToShow
-            },
-
-            formValidated () {
-                const fieldNames = Object.keys(this.validationFields)
-
-                const fieldsAreDirty = fieldNames.some(key => this.validationFields[key].dirty)
-                const fieldsValidated = fieldNames.some(key => this.validationFields[key].validated)
-                const fieldValuesAreValid = fieldNames.every(key => this.validationFields[key].valid)
-
-                return fieldsAreDirty && fieldsValidated && fieldValuesAreValid
-            },
-
             canSubmit () {
                 return this.formValidated && !this.isLoading
             }
         },
 
         methods: {
-            getValidationTooltip (fieldName) {
-                return {
-                    content: this.validationErrors.first(fieldName),
-                    trigger: 'manual',
-                    boundariesElement: 'body',
-                    offset: 8,
-                    placement: 'right',
-                    classes: 'error',
-                    show: this.validationTooltipToShow === fieldName
-                }
-            },
-
-            /*
-            canSubmit () {
-                console.log('canSubmit')
-
-                // return this.$validator.validateAll()
-                return false
-            },
-            */
-
-            async submitForm () {
+            submitForm () {
                 if (!this.canSubmit) {
                     return
                 }
@@ -170,7 +119,7 @@
                 this.$store.dispatch(types.paymentrequest.CREATE_PAYMENT_REQUEST)
                 console.log('submitting form')
                 this.$refs.submit.$el.blur()
-                this.$nextTick(() => this.$validator.reset())
+                this.resetValidator()
             }
         }
     }
