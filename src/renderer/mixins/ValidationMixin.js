@@ -1,4 +1,10 @@
 export default {
+    props: {
+        autofocusFirstField: {
+            type: Boolean,
+            default: true
+        }
+    },
     data () {
         return {
             validationFieldOrder: [],
@@ -6,6 +12,12 @@ export default {
                 decimal: 8,
                 min_value: 0.001
             }
+        }
+    },
+
+    mounted () {
+        if (this.autofocusFirstField && this.validationFieldOrder.length) {
+            this.$nextTick(() => this.$refs[this.validationFieldOrder[0]].focus())
         }
     },
 
