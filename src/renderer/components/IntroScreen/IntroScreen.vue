@@ -3,8 +3,8 @@
         <div class="grid">
             <main class="content" :class="getCurrentSettingsClass">
                 <header>
-                    <ZcoinLogoText class="logo" />
-                    <BasePopover
+                    <zcoin-logo-text class="logo" />
+                    <base-popover
                             :open="showIntro"
                             placement="right-center"
                             popover-class="dark"
@@ -19,7 +19,7 @@
                                     :onNext="nextSettingsStep"
                             />
                         </template>
-                    </BasePopover>
+                    </base-popover>
                 </header>
                 Loading Wallet...
                 <footer>
