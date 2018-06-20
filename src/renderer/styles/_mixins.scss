@@ -100,15 +100,37 @@
     text-shadow: 0 2rem 6rem rgba($color, 0.5);
 }
 
+
+// @include lato-include-font('semibold');
+
+@mixin font-medium () {
+    @include lato-font('semibold');
+}
+
+// @include lato-include-font('heavy');
 @mixin font-heavy () {
     @include lato-font('heavy');
     letter-spacing: 0.025em;
     // box-shadow: inset 0 1px 1px rgba($color--black, 0.5);
 }
 
+// @include lato-include-font('black');
 @mixin font-black () {
     @include lato-font('black');
     letter-spacing: -0.025em;
+}
+
+@mixin h2-with-description ($heading-color: inherit, $description-color: inherit, $description-width: emRhythm(40)) {
+    h2 {
+        margin-bottom: emRhythm(2, $ms-up2);
+        color: $heading-color;
+    }
+
+    p {
+        max-width: $description-width;
+        font-style: italic;
+        color: $description-color;
+    }
 }
 
 @mixin bleed-h ($value) {

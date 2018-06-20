@@ -29,6 +29,11 @@ export default new Router({
                             component: require('@/components/ReceiveZcoinPage/Create.vue').default
                         }
                     ]
+                },
+                {
+                    path: '/send',
+                    name: 'send-zcoin',
+                    component: require('@/components/SendZcoinPage').default
                 }
             ]
         }
