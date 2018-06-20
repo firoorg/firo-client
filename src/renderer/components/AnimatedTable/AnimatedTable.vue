@@ -24,9 +24,9 @@
 </template>
 
 <script>
-    // import Vue from 'vue'
-    import Vuetable from 'vuetable-2/src/index'
-    import VuetablePagination from 'vuetable-2/src/components/VuetablePagination'
+    import { Vuetable, VuetablePagination } from 'vuetable-2'
+    // import Vuetable from 'vuetable-2/src/index'
+    // import VuetablePagination from 'vuetable-2/src/components/VuetablePagination'
     // import VuetableFieldHandle from 'vuetable-2/src/components/VuetableFieldHandle.vue'
     import _ from 'lodash'
 
