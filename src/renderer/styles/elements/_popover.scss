@@ -83,7 +83,8 @@
         }
     }
 
-    &.error {
+    &.error,
+    &.red {
         .tooltip-inner {
             background-color: $color--red-bright;
         }
@@ -100,10 +101,26 @@
         .popover-inner {
             padding: emRhythm(6);
             border-radius: 0;
-            @include box-shadow-large();
+            @include glow-small-box();
             max-width: none;
 
             .content-wrapper {
+                header {
+                    padding-bottom: emRhythm(2);
+
+                    h2 {
+                        margin-top: 0;
+                        margin-bottom: emRhythm(1);
+                    }
+
+                    p {
+                        max-width: emRhythm(35);
+                        margin: 0;
+                        @include font-medium();
+                        font-style: italic;
+                        // color: $color--green-dark;
+                    }
+                }
                 & > div > footer {
                     padding-top: emRhythm(3);
                     text-align: right;
@@ -117,6 +134,16 @@
             .popover-inner {
                 background: $color;
                 color: black;
+            }
+        }
+
+        &.success,
+        &.green {
+            $color: $color--green;
+
+            .popover-inner {
+                background: $color;
+                color: $color--white-light;
             }
         }
 
