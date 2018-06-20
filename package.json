@@ -22,7 +22,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "zcoin-client",
+    "productName": "Zcoin",
     "appId": "com.zcoin.client",
     "directories": {
       "output": "build"
@@ -31,6 +31,8 @@
       "dist/electron/**/*"
     ],
     "dmg": {
+      "background": "build/assets/background.png",
+      "iconSize": 120,
       "contents": [
         {
           "x": 410,
