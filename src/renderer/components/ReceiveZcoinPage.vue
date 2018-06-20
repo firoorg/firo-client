@@ -20,7 +20,7 @@
         </div>
         <section class="paymentrequest-detail">
             <transition name="fade">
-                <div class="create-wrap" v-if="$route.name != 'receive-zcoin'">
+                <div class="fixed-button-detail-top-wrap" v-if="$route.name != 'receive-zcoin'">
                     <base-button color="comet"
                                  class="create-payment-request" @click="$router.push({ name: 'receive-zcoin' })">
                         Create Payment Request
@@ -149,17 +149,5 @@
         //background: $gradient--comet-dark-horizontal;
         //background: $gradient--polo-horizontal;
         background: $color--white;
-    }
-
-    .create-wrap {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 2;
-        width: 100%;
-
-        .create-payment-request {
-            width: 100%;
-        }
     }
 </style>

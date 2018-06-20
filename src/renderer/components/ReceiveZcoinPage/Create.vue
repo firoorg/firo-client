@@ -133,7 +133,7 @@
         grid-template-rows: auto auto;
 
         min-height: 100%;
-        padding: emRhythm(5);
+        padding: emRhythm(5) emRhythm(6);
         box-sizing: border-box;
 
         // background: $color--polo-medium;
@@ -181,6 +181,6 @@
     .create-wrap {
         align-self: self-end;
         position: relative;
-        padding: emRhythm(5) emRhythm(3) 0;
+        padding: emRhythm(5) emRhythm(4) 0;
     }
 </style>

@@ -125,8 +125,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '../../styles';
-
     .receive {
         background: $color--white;
         padding: emRhythm(10) emRhythm(5) emRhythm(5);
