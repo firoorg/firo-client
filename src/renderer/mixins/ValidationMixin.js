@@ -6,11 +6,19 @@ export default {
         }
     },
     data () {
+        const amountRules = {
+            decimal: 8,
+            min_value: 0.001
+        }
+
         return {
             validationFieldOrder: [],
             amountValidationRules: {
-                decimal: 8,
-                min_value: 0.001
+                ...amountRules
+            },
+            requiredAmountValidationRules: {
+                ...amountRules,
+                required: true
             }
         }
     },
