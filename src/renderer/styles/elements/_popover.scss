@@ -134,7 +134,12 @@
 
             .popover-inner {
                 background: $color;
-                color: black;
+                color: $color--dark;
+            }
+
+            .popover-arrow {
+                border-color: $color;
+            }
             }
         }
 
@@ -146,10 +151,10 @@
                 background: $color;
                 color: $color--white-light;
             }
-        }
 
-        .popover-arrow {
-            border-color: $color;
+            .popover-arrow {
+                border-color: $color;
+            }
         }
     }
 
