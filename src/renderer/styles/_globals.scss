@@ -24,6 +24,12 @@ body {
         margin-bottom: emRhythm(4, $ms-up2);
     }
 
+    .debug {
+        box-sizing: border-box;
+        border: 1px solid rgba(#f00, 0.5);
+        background: rgba(#f00, 0.1);
+    }
+
     .scrollable-height {
         box-sizing: border-box;
         overflow-y: scroll;

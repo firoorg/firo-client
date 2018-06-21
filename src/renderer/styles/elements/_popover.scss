@@ -97,6 +97,7 @@
     &.popover {
         $color: $color--dark;
         transition: transform .2s ease-in-out;
+        box-shadow: none;
 
         .popover-inner {
             padding: emRhythm(6);
