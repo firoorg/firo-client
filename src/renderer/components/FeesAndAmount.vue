@@ -1,16 +1,6 @@
 <template>
     <section class="fees-amount">
-        <ul class="payments">
-            <li v-for="(value, key) in payments" :key="key">
-                <div class="label">
-                    <!--<slot v-bind="value" />-->
-                    {{ value.label }}
-                </div>
-                <div class="amount">
-                    {{ value.amount }} <span class="unit">xzc</span>
-                </div>
-            </li>
-        </ul>
+        <pending-payments :payments="payments"></pending-payments>
 
         <dl v-if="hasPayments">
             <dt class="fees">Fees</dt>
@@ -26,8 +16,13 @@
 </template>
 
 <script>
+    import PendingPayments from '@/components/PendingPayments'
+
     export default {
         name: 'FeesAndAmount',
+        components: {
+            PendingPayments
+        },
         props: {
             feesPerKb: {
                 type: Number,
@@ -60,30 +55,6 @@
 </script>
 
 <style lang="scss" scoped>
-    .payments {
-        list-style: none;
-        padding: 0;
-        border-bottom-color: rgba($color--white, 0.5);
-        border-bottom-style: solid;
-        @include rhythmBorderBottom(1px, 1);
-
-        li {
-            padding-top: emRhythm(1);
-            @include rhythmBorderBottom(1px, 1);
-            border-color: rgba($color--white, 0.3);
-            border-bottom-style: dashed;
-            @include font-medium();
-
-            display: grid;
-            grid-template-columns: auto auto;
-
-            &:last-child {
-                border: none;
-                padding-bottom: emRhythm(1);
-            };
-        }
-    }
-
     dl {
         display: grid;
         grid-template-rows: 1fr 1fr;
