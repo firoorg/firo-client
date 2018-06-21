@@ -3,7 +3,7 @@
             v-bind="$attrs"
             class="popover"
             offset="12"
-            :auto-hide="false"
+            :auto-hide="this.$attrs['auto-hide'] !== undefined ? this.$attrs['auto-hide'] : false"
     >
         <!-- This will be the popover target (for the events and position) -->
         <slot name="target" />
