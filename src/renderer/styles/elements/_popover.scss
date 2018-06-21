@@ -140,6 +140,18 @@
             .popover-arrow {
                 border-color: $color;
             }
+        }
+
+        &.comet {
+            $color: $color--comet-dark;
+
+            .popover-inner {
+                background: $color;
+                color: $color--white-light;
+            }
+
+            .popover-arrow {
+                border-color: $color;
             }
         }
 
