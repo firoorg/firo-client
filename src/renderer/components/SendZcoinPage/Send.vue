@@ -1,13 +1,15 @@
 <template>
     <section class="send-zcoin-queue-form">
+        <!--
         <div class="fixed-button-detail-top-wrap" v-if="showQueueButton">
             <base-button color="comet">({{ sendQueueLength }}) Show Queue</base-button>
         </div>
+        -->
         <form class="send scrollable-height" @submit.prevent="submitForm">
-            <fieldset :disabled="/*showSendConfirmation*/false">
-                <div class="grid" ref="grid">
-                    <div class="form">
-                        <header>
+            <div class="grid" ref="grid">
+                <div class="form">
+                    <header>
+                        <div>
                             <h2>
                                 Send Zcoin
                             </h2>
@@ -15,8 +17,32 @@
                             <p>
                                 Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
                             </p>
-                        </header>
+                        </div>
+                        <div>
+                            <base-popover
+                                    placement="bottom"
+                                    popover-class="comet"
+                                    class="pending-payments-popover"
+                                    :boundaries-element="this.$refs.grid"
+                            >
+                                <template slot="target">
+                                    Icon
+                                </template>
 
+                                <template slot="content">
+                                    <header>
+                                        <h2>Pending Payments</h2>
+                                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                                    </header>
+
+                                    <pending-payments :payments="pendingPayments">
+                                    </pending-payments>
+                                </template>
+                            </base-popover>
+                        </div>
+                    </header>
+
+                    <fieldset :disabled="showSendConfirmation">
                         <div class="field">
                             <label for="label">Title</label>
 
@@ -69,42 +95,44 @@
                                 [x] Pay only the required fee
                             </div>
                         </div>
-                    </div>
-
-                    <div class="button-wrap">
-                        <!--
-                            <base-button v-show="!showSendConfirmation"
-                                         :style="{ visibility: showSendConfirmation ? '_hidden' : '_visible' }"
-                                         class="add-to-queue"
-                                         ref="addToQueue"
-                                         @click.prevent="toggleTooltip"
-                                         :disabled="!canSubmit">
-                                Send Later
-                            </base-button>
-                        -->
-
-                        <send-confirm-dialog :can-submit="canSubmit"
-                                             :is-open="showSendConfirmation"
-                                             :boundaries-element="$refs.grid"
-                                             :on-cancel="onCancelPayment"
-                                             :on-confirm="onConfirmAndSendPayment">
-                            <div class="confirmation-popover-content-wrap">
-                                <header>
-                                    <h2>Confirm Payment</h2>
-                                    <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
-                                </header>
-
-                                <fees-and-amount :fees-per-kb="0.001" :payments="pendingPayments">
-                                    <template slot-scope="payment">
-                                        {{ payment.label }}
-                                        {{ payment.amount }}
-                                    </template>
-                                </fees-and-amount>
-                            </div>
-                        </send-confirm-dialog>
-                    </div>
+                    </fieldset>
                 </div>
-            </fieldset>
+
+                <div class="button-wrap">
+                    <!--
+                        <base-button v-show="!showSendConfirmation"
+                                     :style="{ visibility: showSendConfirmation ? '_hidden' : '_visible' }"
+                                     class="add-to-queue"
+                                     ref="addToQueue"
+                                     @click.prevent="toggleTooltip"
+                                     :disabled="!canSubmit">
+                            Send Later
+                        </base-button>
+                    -->
+
+                    <send-confirm-dialog :can-submit="canSubmit"
+                                         :is-open="showSendConfirmation"
+                                         :boundaries-element="$refs.grid"
+                                         :on-cancel="onCancelPayment"
+                                         :on-confirm="onConfirmAndSendPayment"
+                                         :on-queue-add="addToQueueAndClearFields"
+                                         :queued-payments="sendQueueLength">
+                        <div class="confirmation-popover-content-wrap">
+                            <header>
+                                <h2>Confirm Payment</h2>
+                                <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                            </header>
+
+                            <fees-and-amount :fees-per-kb="0.001" :payments="pendingPayments">
+                                <template slot-scope="payment">
+                                    {{ payment.label }}
+                                    {{ payment.amount }}
+                                </template>
+                            </fees-and-amount>
+                        </div>
+                    </send-confirm-dialog>
+                </div>
+            </div>
         </form>
     </section>
 </template>
@@ -114,6 +142,7 @@
     import ValidationMixin from '@/mixins/ValidationMixin'
     import FeesAndAmount from '@/components/FeesAndAmount'
     import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
+    import PendingPayments from '@/components/PendingPayments'
 
     // import { addVuexModel } from '@/utils/store'
     // import types from '~/types'
@@ -122,7 +151,8 @@
         name: 'SendZcoin',
         components: {
             SendConfirmDialog,
-            FeesAndAmount
+            FeesAndAmount,
+            PendingPayments
         },
         mixins: [
             ValidationMixin
@@ -180,8 +210,22 @@
                 this.showSendConfirmation = true
             },
 
-            toggleTooltip () {
-                this.showSendConfirmation = !this.showSendConfirmation
+            addToQueue () {
+                this.pendingPayments = {
+                    ...this.pendingPayments,
+                    [this.address]: {
+                        label: this.label,
+                        amount: this.amount,
+                        address: this.address,
+                        confirmed: false,
+                        sent: false
+                    }
+                }
+            },
+
+            addToQueueAndClearFields () {
+                this.addToQueue()
+                this.cleanup()
             },
 
             alreadyUsedAddress (address) {
@@ -233,16 +277,7 @@
                 // 2. check if confirmed -> show confirm dialog
                 if (!this.isConfirmed) {
                     console.log('not confirmed yet... showing tooltip')
-                    this.pendingPayments = {
-                        ...this.pendingPayments,
-                        [this.address]: {
-                            label: this.label,
-                            amount: this.amount,
-                            address: this.address,
-                            confirmed: false,
-                            sent: false
-                        }
-                    }
+                    this.addToQueue()
 
                     this.openSendConfirmation()
                     return
@@ -281,6 +316,11 @@
 
     .form {
         //align-self: self-end;
+
+        & > header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+        }
 
         ::selection {
             color: $color--white-light;

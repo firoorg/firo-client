@@ -19,9 +19,10 @@
                         <base-button :style="{ visibility: isOpen ? '_hidden' : '_visible' }"
                                      class="add-to-queue"
                                      ref="addToQueue"
-                                     @click.prevent="toggleTooltip"
+                                     @click.prevent="onQueueAddFn"
                                      :disabled="!canSubmit">
-                            Send Later
+                            <span v-if="!hasQueuedPayments">Send Later</span>
+                            <span v-else>Add To Queue</span>
                         </base-button>
                     </div>
                 </transition>
@@ -43,7 +44,7 @@
                                                  key="confirm-send"
                                                  color="green"
                                                  @click.prevent="onConfirmFn" tabindex="4">
-                                        <span>Yes, send it now!</span>
+                                        <span>Yes, send ({{ queuedPayments }}) now!</span>
                                     </base-button>
                                     <circular-timer v-else
                                                     key="confirm-timer"
@@ -58,7 +59,8 @@
                                              class="submit"
                                              ref="submit"
                                              :disabled="!canSubmit">
-                                    <span>Send Now</span>
+                                    <span v-if="!hasQueuedPayments">Send Now</span>
+                                    <span v-else>Send ({{ queuedPayments }}) Now</span>
                                 </base-button>
                             </div>
                         </transition>
@@ -93,6 +95,10 @@
             boundariesElement: {
                 required: false
             },
+            onQueueAdd: {
+                type: Function,
+                required: true
+            },
             onCancel: {
                 type: Function,
                 required: true
@@ -100,6 +106,11 @@
             onConfirm: {
                 type: Function,
                 required: true
+            },
+            queuedPayments: {
+                type: Number,
+                required: false,
+                default: 0
             }
         },
 
@@ -115,6 +126,12 @@
             this.minCellWidth = this.$refs.submit.$el.clientWidth
         },
 
+        computed: {
+            hasQueuedPayments () {
+                return this.queuedPayments > 0
+            }
+        },
+
         methods: {
             onTimerDone () {
                 this.timerDone = true
@@ -128,6 +145,11 @@
             onConfirmFn () {
                 this.reset()
                 this.onConfirm()
+            },
+
+            onQueueAddFn () {
+                this.reset()
+                this.onQueueAdd()
             },
 
             reset () {
