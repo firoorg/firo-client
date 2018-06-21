@@ -2,7 +2,7 @@
     <button
             v-bind="$attrs"
             :class="[color, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
-            @click="$emit('click', $event.target.value)">
+            @click="$emit('click', $event)">
         <span>
             <slot />
         </span>
