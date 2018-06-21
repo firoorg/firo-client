@@ -1,10 +1,10 @@
 <template>
     <section class="send-zcoin-queue-form">
         <div class="fixed-button-detail-top-wrap" v-if="showQueueButton">
-            <base-button color="comet">Show Queue</base-button>
+            <base-button color="comet">({{ sendQueueLength }}) Show Queue</base-button>
         </div>
         <form class="send scrollable-height" @submit.prevent="submitForm">
-            <fieldset :disabled="showSendConfirmation">
+            <fieldset :disabled="/*showSendConfirmation*/false">
                 <div class="grid" ref="grid">
                     <div class="form">
                         <header>
@@ -37,7 +37,7 @@
 
                             <div class="control">
                                 <input v-model.number="amount"
-                                       v-validate="amountValidationRules"
+                                       v-validate="requiredAmountValidationRules"
                                        v-tooltip="getValidationTooltip('amount')"
                                        type="text"
                                        ref="amount"
@@ -72,46 +72,36 @@
                     </div>
 
                     <div class="button-wrap">
-                        <base-button class="add-to-queue"
-                                     ref="addToQueue"
-                                     :disabled="!canSubmit">
-                            Send Later
-                        </base-button>
+                        <!--
+                            <base-button v-show="!showSendConfirmation"
+                                         :style="{ visibility: showSendConfirmation ? '_hidden' : '_visible' }"
+                                         class="add-to-queue"
+                                         ref="addToQueue"
+                                         @click.prevent="toggleTooltip"
+                                         :disabled="!canSubmit">
+                                Send Later
+                            </base-button>
+                        -->
 
-                        <base-popover
-                                :open="showSendConfirmation"
-                                placement="top"
-                                popover-class="green"
-                                class="confirmation-popover"
-                                :boundariesElement="$refs.grid"
-                                trigger="manually"
-                        >
-                            <template slot="target">
-                                <base-button color="green"
-                                             type="submit"
-                                             class="submit"
-                                             ref="submit"
-                                             :disabled="!canSubmit">
-                                    Send Now
-                                </base-button>
-                            </template>
+                        <send-confirm-dialog :can-submit="canSubmit"
+                                             :is-open="showSendConfirmation"
+                                             :boundaries-element="$refs.grid"
+                                             :on-cancel="onCancelPayment"
+                                             :on-confirm="onConfirmAndSendPayment">
+                            <div class="confirmation-popover-content-wrap">
+                                <header>
+                                    <h2>Confirm Payment</h2>
+                                    <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                                </header>
 
-                            <template slot="content">
-                                <div class="confirmation-popover-content-wrap">
-                                    <header>
-                                        <h2>Confirm Payment</h2>
-                                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
-                                    </header>
-
-                                    <fees-and-amount :fees-per-kb="0.001" :payments="pendingPayments">
-                                        <template slot-scope="payment">
-                                            {{ payment.label }}
-                                            {{ payment.amount }}
-                                        </template>
-                                    </fees-and-amount>
-                                </div>
-                            </template>
-                        </base-popover>
+                                <fees-and-amount :fees-per-kb="0.001" :payments="pendingPayments">
+                                    <template slot-scope="payment">
+                                        {{ payment.label }}
+                                        {{ payment.amount }}
+                                    </template>
+                                </fees-and-amount>
+                            </div>
+                        </send-confirm-dialog>
                     </div>
                 </div>
             </fieldset>
@@ -123,6 +113,7 @@
     import isEmpty from 'lodash/isEmpty'
     import ValidationMixin from '@/mixins/ValidationMixin'
     import FeesAndAmount from '@/components/FeesAndAmount'
+    import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
 
     // import { addVuexModel } from '@/utils/store'
     // import types from '~/types'
@@ -130,6 +121,7 @@
     export default {
         name: 'SendZcoin',
         components: {
+            SendConfirmDialog,
             FeesAndAmount
         },
         mixins: [
@@ -188,10 +180,14 @@
                 this.showSendConfirmation = true
             },
 
+            toggleTooltip () {
+                this.showSendConfirmation = !this.showSendConfirmation
+            },
+
             alreadyUsedAddress (address) {
                 // todo move to mixin. compose this internally from different sources, use it all over the place for incoming outgoing etc.
                 for (let destination in this.pendingPayments) {
-                    if (address === destination) {
+                    if (address === destination && this.pendingPayments[destination].sent) {
                         return true
                     }
                 }
@@ -199,7 +195,32 @@
                 return false
             },
 
+            cleanup () {
+                this.showSendConfirmation = false
+
+                this.label = ''
+                this.amount = null
+                this.address = ''
+            },
+
+            removeFromQueue (address) {
+                this.pendingPayments[address] = null
+                delete this.pendingPayments[address]
+            },
+
+            onCancelPayment () {
+                this.showSendConfirmation = false
+            },
+
+            onConfirmAndSendPayment () {
+                console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
+
+                this.cleanup()
+                this.removeFromQueue(this.address)
+            },
+
             submitForm () {
+                console.log('submitting...')
                 if (!this.canSubmit) {
                     return
                 }
@@ -218,7 +239,8 @@
                             label: this.label,
                             amount: this.amount,
                             address: this.address,
-                            confirmed: false
+                            confirmed: false,
+                            sent: false
                         }
                     }
 
@@ -311,11 +333,15 @@
 
         button + button,
         button + .confirmation-popover {
-            margin-left: emRhythm(3)
+            margin-left: emRhythm(1)
         }
     }
 
-    .confirmation-popover {
+    /*.confirmation-popover {
         display: inline-block;
+    }*/
+
+    .debug {
+        align-self: end;
     }
 </style>
