@@ -20,13 +20,17 @@
                         </div>
                         <div>
                             <base-popover
+                                    :disabled="showSendConfirmation"
+                                    :auto-hide="true"
                                     placement="bottom"
                                     popover-class="comet"
                                     class="pending-payments-popover"
                                     :boundaries-element="this.$refs.grid"
+                                    :trigger="showSendConfirmation ? 'manually' : 'click'"
                             >
                                 <template slot="target">
                                     Icon
+                                    <span v-if="showSendConfirmation">(disabled ->confirm)</span>
                                 </template>
 
                                 <template slot="content">
