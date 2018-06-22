@@ -1,17 +1,22 @@
 <template>
     <section class="fees-amount">
-        <pending-payments :payments="payments"></pending-payments>
+        <template v-if="hasPayments">
+            <h3>Payments</h3>
+            <pending-payments :payments="payments"
+                              class="pending-payments" />
 
-        <dl v-if="hasPayments">
-            <dt class="fees">Fees</dt>
-            <dd class="fees">
-                <span class="value">{{ fee }}</span> <span class="unit">xzc</span>
-            </dd>
-            <dt class="amount">Amount</dt>
-            <dd class="amount">
-                <span class="value">{{ total }}</span> <span class="unit">XZC</span>
-            </dd>
-        </dl>
+            <h3>Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a></h3>
+            <dl>
+                <dt class="fees">{{ fee.label }} < 20min</dt>
+                <dd class="fees">
+                    <span class="value">{{ fee.amount }}</span> <span class="unit">xzc</span>
+                </dd>
+                <dt class="amount">Total</dt>
+                <dd class="amount">
+                    <span class="value">{{ total }}</span> <span class="unit">XZC</span>
+                </dd>
+            </dl>
+        </template>
     </section>
 </template>
 
@@ -24,13 +29,17 @@
             PendingPayments
         },
         props: {
-            feesPerKb: {
-                type: Number,
+            fee: {
+                type: Object,
                 required: true
             },
             payments: {
                 type: Object,
                 default: {}
+            },
+            onChangeFee: {
+                type: Function,
+                default: () => {}
             }
         },
 
@@ -39,22 +48,29 @@
                 return Object.keys(this.payments).length
             },
 
-            fee () {
-                return this.feesPerKb
-            },
-
             total () {
                 const total = Object
                     .values(this.payments)
                     .reduce((accumulator, payment) => accumulator + payment.amount, 0)
 
-                return total + this.fee
+                return total + this.fee.amount
             }
         }
     }
 </script>
 
 <style lang="scss" scoped>
+
+    h3 {
+        @include setType(2);
+        font-style: italic;
+        margin: emRhythm(2) 0 emRhythm(1);
+    }
+
+    .pending-payments {
+        margin-bottom: emRhythm(3);
+    }
+
     dl {
         display: grid;
         grid-template-rows: 1fr 1fr;
@@ -63,7 +79,7 @@
     }
 
     dt, dd {
-        margin-bottom: emRhythm(1);
+        margin-bottom: emRhythm(2);
 
         &:last-of-type {
             margin-bottom: 0;
@@ -82,10 +98,12 @@
 
     dt.fees {
         font-style: italic;
+        position: relative;
+        display: block;
     }
 
     dt.amount {
-        @include setType(4);
+        @include setType(4, $ms-up1);
         @include font-heavy();
     }
 
@@ -98,5 +116,31 @@
 
     .unit {
         opacity: 0.5;
+    }
+
+    .change-fee {
+        color: $color--white-light;
+        font-style: normal;
+        text-decoration: none;
+        background: rgba($color--green-dark, 0.3);
+        @include setType(2, $ms-down2);
+        text-transform: uppercase;
+        letter-spacing: 0.025rem;
+        display: inline-block;
+        padding: emRhythm(0.75, $silent: true) emRhythm(1);
+        margin: -1 * emRhythm(0.75, $silent: true) 0;
+
+        transition: color 0.15s ease-out, background 0.15s ease-out;
+
+        //position: absolute;
+        //right: 0;
+        //margin-right: -50%;
+        //top: 0;
+
+        &:hover,
+        &:focus {
+            color: $color--white;
+            background: $color--green-dark;
+        }
     }
 </style>
