@@ -12,6 +12,10 @@ import App from './App'
 import router from './router'
 import store from '../store/renderer'
 
+const customValidationRules = [
+    'isZcoinAddress'
+]
+
 Vue.use(VTooltip)
 
 Vue.use(VueTimeago, {
@@ -21,6 +25,10 @@ Vue.use(VueTimeago, {
         // 'zh-CN': require('date-fns/locale/zh_cn'),
         'en': require('date-fns/locale/en')
     }
+})
+
+customValidationRules.forEach((rule) => {
+    require('./utils/validationRules/' + rule)
 })
 
 Vue.use(VeeValidate, {
