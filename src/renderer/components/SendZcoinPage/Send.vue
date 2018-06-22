@@ -29,8 +29,10 @@
                                     :trigger="showSendConfirmation ? 'manually' : 'click'"
                             >
                                 <template slot="target">
-                                    Icon
-                                    <span v-if="showSendConfirmation">(disabled ->confirm)</span>
+                                    <base-badge :visible="hasSendQueue"
+                                                :count="sendQueueLength">
+                                        Icon
+                                    </base-badge>
                                 </template>
 
                                 <template slot="content">
