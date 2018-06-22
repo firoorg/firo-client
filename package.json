@@ -10,7 +10,7 @@
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
-    "dev": "node .electron-vue/dev-runner.js",
+    "dev": "DEBUG=zcoin:* node .electron-vue/dev-runner.js",
     "e2e": "npm run pack && mocha test/e2e",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
@@ -58,11 +58,13 @@
     }
   },
   "dependencies": {
+    "bs58": "^4.0.1",
     "debug": "^3.1.0",
     "lato-font": "^3.0.0",
     "lodash": "^4.17.10",
     "normalize-scss": "^7.0.1",
     "ps-tree": "^1.1.0",
+    "sha.js": "^2.4.11",
     "typesettings": "^4.0.0",
     "v-tooltip": "^2.0.0-rc.32",
     "vee-validate": "^2.1.0-beta.2",
