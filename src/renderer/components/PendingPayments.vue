@@ -31,6 +31,7 @@
         border-bottom-color: rgba($color--white, 0.5);
         border-bottom-style: solid;
         @include rhythmBorderBottom(1px, 1);
+        margin: 0;
 
         li {
             padding-top: emRhythm(1);
