@@ -1,10 +1,5 @@
 <template>
     <section class="send-zcoin-queue-form">
-        <!--
-        <div class="fixed-button-detail-top-wrap" v-if="showQueueButton">
-            <base-button color="comet">({{ sendQueueLength }}) Show Queue</base-button>
-        </div>
-        -->
         <form class="send scrollable-height" @submit.prevent="submitForm">
             <div class="grid" ref="grid">
                 <div class="form">
@@ -93,48 +88,39 @@
                                        id="address">
                             </div>
                         </div>
-
-                        <div class="field">
-                            <label for="address">Fee</label>
-
-                            <div class="control">
-                                [x] Pay only the required fee
-                            </div>
-                        </div>
                     </fieldset>
                 </div>
 
                 <div class="button-wrap">
-                    <!--
-                        <base-button v-show="!showSendConfirmation"
-                                     :style="{ visibility: showSendConfirmation ? '_hidden' : '_visible' }"
-                                     class="add-to-queue"
-                                     ref="addToQueue"
-                                     @click.prevent="toggleTooltip"
-                                     :disabled="!canSubmit">
-                            Send Later
-                        </base-button>
-                    -->
-
                     <send-confirm-dialog :can-submit="canSubmit"
                                          :is-open="showSendConfirmation"
                                          :boundaries-element="$refs.grid"
                                          :on-cancel="onCancelPayment"
                                          :on-confirm="onConfirmAndSendPayment"
                                          :on-queue-add="addToQueueAndClearFields"
-                                         :queued-payments="sendQueueLength">
+                                         :queued-payments="sendQueueLength"
+                                         :popover-class="showFeeSelection ? 'comet' : 'green'">
                         <div class="confirmation-popover-content-wrap">
-                            <header>
-                                <h2>Confirm Payment</h2>
-                                <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
-                            </header>
+                            <transition name="fade_" mode="out-in">
+                                <section v-if="!showFeeSelection" key="confirm-payment">
+                                    <header>
+                                        <h2>Confirm Payment</h2>
+                                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                                    </header>
 
-                            <fees-and-amount :fees-per-kb="0.001" :payments="pendingPayments">
-                                <template slot-scope="payment">
-                                    {{ payment.label }}
-                                    {{ payment.amount }}
-                                </template>
-                            </fees-and-amount>
+                                    <fees-and-amount :fee="fee"
+                                                     :payments="pendingPayments"
+                                                     :on-change-fee="toggleFeeSelection">
+                                        <template slot-scope="payment">
+                                            {{ payment.label }}
+                                            {{ payment.amount }}
+                                        </template>
+                                    </fees-and-amount>
+                                </section>
+                                <section v-else key="fee-selection">
+                                    <send-fee-selection  :selected-fee="fee.key" @onFeeSelect="updateFee" />
+                                </section>
+                            </transition>
                         </div>
                     </send-confirm-dialog>
                 </div>
@@ -148,6 +134,7 @@
     import ValidationMixin from '@/mixins/ValidationMixin'
     import FeesAndAmount from '@/components/FeesAndAmount'
     import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
+    import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
     import PendingPayments from '@/components/PendingPayments'
 
     // import { addVuexModel } from '@/utils/store'
@@ -156,6 +143,7 @@
     export default {
         name: 'SendZcoin',
         components: {
+            SendFeeSelection,
             SendConfirmDialog,
             FeesAndAmount,
             PendingPayments
@@ -168,15 +156,21 @@
                 label: '',
                 amount: null,
                 address: '',
-                fees: 0.001,
+                fee: {
+                    key: 'fast',
+                    label: 'Fast',
+                    amount: 0.01
+                },
 
                 validationFieldOrder: [
                     'label',
                     'amount',
                     'address'
                 ],
+
                 pendingPayments: {},
-                showSendConfirmation: false
+                showSendConfirmation: false,
+                showFeeSelection: false
             }
         },
 
@@ -207,11 +201,24 @@
             },
 
             canSubmit () {
-                return this.formValidated // todo check (spend + fees) < available balance
+                // todo check (spend + fees) < available balance
+                return this.formValidated && !this.showFeeSelection
             }
         },
 
         methods: {
+            toggleFeeSelection () {
+                console.log('toggle fee selection')
+                this.showFeeSelection = !this.showFeeSelection
+            },
+
+            updateFee (newVal) {
+                this.fee = newVal
+                this.toggleFeeSelection()
+            },
+
+            // ---
+
             openSendConfirmation () {
                 this.showSendConfirmation = true
             },
@@ -245,12 +252,15 @@
                 return false
             },
 
-            cleanup () {
-                this.showSendConfirmation = false
-
+            cleanupForm () {
                 this.label = ''
                 this.amount = null
                 this.address = ''
+            },
+
+            cleanupPopover () {
+                this.showSendConfirmation = false
+                this.showFeeSelection = false
             },
 
             removeFromQueue (address) {
@@ -259,13 +269,14 @@
             },
 
             onCancelPayment () {
-                this.showSendConfirmation = false
+                this.cleanupPopover()
             },
 
             onConfirmAndSendPayment () {
                 console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
 
-                this.cleanup()
+                this.cleanupForm()
+                this.cleanupPopover()
                 this.removeFromQueue(this.address)
             },
 
