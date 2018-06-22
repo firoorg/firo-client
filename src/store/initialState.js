@@ -105,7 +105,7 @@ module.exports = {
             IsFailed: false
         },
         attempt: 0,
-        testnet: false,
+        testnet: true,
         blocks: 84354,
         currentBlock: {
             height: 84350,
@@ -136,6 +136,16 @@ module.exports = {
                     ip: '127.0.0.1',
                     port: 9050
                 }
+            }
+        },
+        b58Prefixes: {
+            mainnet: {
+                pubkeyAddress: 82, // ['a', 'Z'],
+                scriptAddress: 7 // ['3', '4']
+            },
+            testnet: {
+                pubkeyAddress: 65, // ['T'],
+                scriptAddress: 178 // ['2']
             }
         }
     },
