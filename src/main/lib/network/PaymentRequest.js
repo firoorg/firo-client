@@ -5,12 +5,11 @@ export default {
     ...mixin,
     ...({
         namespace: 'PaymentRequest',
+        collection: 'payment-request',
 
         mutations: {
             [types.paymentrequest.CREATE_PAYMENT_REQUEST]: 'createPaymentRequest'
         },
-
-        collection: 'payment-request',
 
         createPaymentRequest ({ label, message, amount }) {
             console.log('CREATING PAYMENT REQUEST')

@@ -45,11 +45,17 @@ export default {
 
     requestInitialState () {
         this.requester.once('message', (message) => {
-            const response = JSON.parse(message.toString())
-            // console.log('response', JSON.parse(response.toString()))
-            this.processResponse(response, types[this.namespace.toLowerCase()].SET_INITIAL_STATE)
+            try {
+                const response = JSON.parse(message.toString())
+                this.processResponse(response, types[this.namespace.toLowerCase()].SET_INITIAL_STATE)
+            } catch (e) {
+                console.log('error in response of initial request call.', this.namespace)
+                console.log(e)
+                console.log(message.toString())
+            }
         })
 
+        // todo add timeout to request
         this.requester.send(JSON.stringify({
             type: 'initial',
             collection: this.collection
