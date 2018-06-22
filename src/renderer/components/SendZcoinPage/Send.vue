@@ -237,7 +237,8 @@
 
             addToQueueAndClearFields () {
                 this.addToQueue()
-                this.cleanup()
+                this.cleanupForm()
+                this.cleanupPopover()
             },
 
             alreadyUsedAddress (address) {
