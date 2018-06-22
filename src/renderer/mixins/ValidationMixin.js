@@ -19,6 +19,12 @@ export default {
             requiredAmountValidationRules: {
                 ...amountRules,
                 required: true
+            },
+            requiredAddressValidationRules: {
+                zcoin_address: {
+                    ...this.$store.getters['Settings/b58Prefixes']
+                },
+                required: true
             }
         }
     },
