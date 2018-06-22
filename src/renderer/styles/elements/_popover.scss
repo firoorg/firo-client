@@ -99,11 +99,16 @@
         transition: transform .2s ease-in-out;
         box-shadow: none;
 
+        .popover-arrow {
+            transition: border-color .5s ease-in-out;
+        }
+
         .popover-inner {
             padding: emRhythm(6);
             border-radius: 0;
             @include glow-small-box();
             max-width: none;
+            transition: background-color .5s ease-in-out;
 
             .content-wrapper {
                 header {

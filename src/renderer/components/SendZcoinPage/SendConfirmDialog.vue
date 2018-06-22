@@ -16,8 +16,7 @@
                         </transition>
                     </div>
                     <div v-else key="send-later">
-                        <base-button :style="{ visibility: isOpen ? '_hidden' : '_visible' }"
-                                     class="add-to-queue"
+                        <base-button class="add-to-queue"
                                      ref="addToQueue"
                                      @click.prevent="onQueueAddFn"
                                      :disabled="!canSubmit">
@@ -31,7 +30,7 @@
                 <base-popover
                         :open="isOpen"
                         placement="top"
-                        popover-class="green"
+                        :popover-class="popoverClass"
                         class="confirmation-popover"
                         :boundaries-element="boundariesElement"
                         trigger="manually"
@@ -41,6 +40,7 @@
                             <div v-if="isOpen" key="wait-confirm" class="wait-confirm">
                                 <transition name="fade" mode="out-in">
                                     <base-button v-if="timerDone"
+                                                 :disabled="!canSubmit"
                                                  key="confirm-send"
                                                  color="green"
                                                  @click.prevent="onConfirmFn" tabindex="4">
@@ -111,6 +111,9 @@
                 type: Number,
                 required: false,
                 default: 0
+            },
+            popoverClass: {
+                type: String
             }
         },
 
