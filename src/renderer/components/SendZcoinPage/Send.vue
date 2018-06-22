@@ -54,8 +54,7 @@
                                        type="text"
                                        ref="label"
                                        name="label"
-                                       id="label"
-                                        autofocus>
+                                       id="label">
                             </div>
                         </div>
 
@@ -80,7 +79,7 @@
 
                             <div class="control">
                                 <input v-model.trim="address"
-                                       v-validate="'required'"
+                                       v-validate="requiredAddressValidationRules"
                                        v-tooltip="getValidationTooltip('address')"
                                        type="text"
                                        ref="address"
