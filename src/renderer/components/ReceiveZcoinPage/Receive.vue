@@ -157,7 +157,7 @@
     .status {
         max-width: emRhythm(35);
         margin: 0 auto;
-        opacity: 0.4;
+        opacity: 1;
     }
 
     header {
