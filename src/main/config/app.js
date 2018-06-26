@@ -2,7 +2,7 @@ export default {
     protocolIdentifier: 'zcoin',
     core: {
         autoRestart: true,
-        stopOnQuit: false,
-        heartbeatIntervalInSeconds: 100
+        stopOnQuit: true,
+        heartbeatIntervalInSeconds: 1
     }
 }
