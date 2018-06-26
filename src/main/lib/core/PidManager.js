@@ -125,11 +125,9 @@ export default class PidManager {
 
         try {
             process.kill(this.pid, 0) // testing existence of pid
-            debug('is running')
             this.store.dispatch(types.network.NETWORK_IS_CONNECTED)
             return true
         } catch (e) {
-            debug('not running -> cleaning up')
             await this.cleanup()
         }
 
@@ -249,7 +247,6 @@ export default class PidManager {
 
         const beat = () => {
             this.heartbeat = setTimeout(async () => {
-                debug('on heartbeatinger')
                 await this.onHeartbeat(beat)
             }, this.heartbeatInterval)
         }
@@ -261,7 +258,6 @@ export default class PidManager {
         this.lastHeartbeat = Date.now()
 
         if (await this.isRunning()) {
-            debug('onHeartbeat: is still running')
             this.autoRestartCounter = 0
             return beat()
         }
