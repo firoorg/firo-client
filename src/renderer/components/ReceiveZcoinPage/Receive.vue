@@ -28,9 +28,10 @@
                 </dl>
             </div>
 
-            <div class="message-wrap" v-show="message">
+            <div class="message-wrap" v-if="message">
                 <p>{{ message }}</p>
             </div>
+            <div v-else></div>
 
             <div class="action-wrap">
                 <div v-if="received">
