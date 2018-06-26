@@ -51,6 +51,7 @@
 
             <div class="create-wrap">
                 <base-button color="green"
+                             :is-dark="true"
                              type="submit"
                              class="submit"
                              ref="submit"

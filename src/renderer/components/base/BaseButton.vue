@@ -162,6 +162,7 @@
             //padding-bottom: emRhythm($padding-v);
             //border: none;
             outline: none;
+            color: $color--white-light;
 
             &:not([disabled]) {
                 &:hover,
@@ -194,7 +195,6 @@
             }
 
             &.green {
-                color: $color--white-light;
                 background: $color--green;
                 border-color: transparent;
 
@@ -214,11 +214,16 @@
                     span {
                         opacity: 1;
                     }
+
+                    &.is-dark {
+                        color: mix($color--green-dark, $color--dark, 15%);
+                        background: rgba(mix($color--green, $color--dark), 0.2);
+                        border-color: mix($color--green-dark, $color--dark);
+                    }
                 }
             }
 
             &.comet {
-                color: $color--white-light;
                 background: $color--comet-dark;
                 border-color: transparent;
 
