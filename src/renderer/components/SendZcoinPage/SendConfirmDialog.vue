@@ -59,7 +59,8 @@
                                              type="submit"
                                              class="submit"
                                              ref="submit"
-                                             :disabled="!canSubmit">
+                                             :disabled="!canSubmit"
+                                             :tabindex="tabindex">
                                     <span v-if="!hasQueuedPayments">Send Now</span>
                                     <span v-else>Send Now</span>
                                 </base-button>
@@ -114,6 +115,9 @@
                 default: 0
             },
             popoverClass: {
+                type: String
+            },
+            tabindex: {
                 type: String
             }
         },

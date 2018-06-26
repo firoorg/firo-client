@@ -54,7 +54,8 @@
                                        type="text"
                                        ref="label"
                                        name="label"
-                                       id="label">
+                                       id="label"
+                                       tabindex="1">
                             </div>
                         </div>
 
@@ -69,7 +70,8 @@
                                        ref="amount"
                                        name="amount"
                                        id="amount"
-                                       class="amount">
+                                       class="amount"
+                                       tabindex="2">
                                 <div class="prefix">XZC</div>
                             </div>
                         </div>
@@ -84,7 +86,8 @@
                                        type="text"
                                        ref="address"
                                        name="address"
-                                       id="address">
+                                       id="address"
+                                       tabindex="3">
                             </div>
                         </div>
                     </fieldset>
@@ -98,7 +101,8 @@
                                          :on-confirm="onConfirmAndSendPayment"
                                          :on-queue-add="addToQueueAndClearFields"
                                          :queued-payments="sendQueueLength"
-                                         :popover-class="showFeeSelection ? 'comet' : 'green'">
+                                         :popover-class="showFeeSelection ? 'comet' : 'green'"
+                                         tabindex="4">
                         <div class="confirmation-popover-content-wrap">
                             <transition name="fade" mode="out-in">
                                 <section v-if="showSendConfirmation" key="confirm-payment">
