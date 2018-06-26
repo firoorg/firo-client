@@ -26,15 +26,19 @@ const mutations = {
 }
 
 const actions = {
-    [types.NETWORK_IS_CONNECTED] ({ commit }) {
-        commit(types.NETWORK_IS_CONNECTED)
+    [types.NETWORK_IS_CONNECTED] ({ commit, state }) {
+        if (!state.isConnected) {
+            commit(types.NETWORK_IS_CONNECTED)
+        }
     },
 
     // todo delay connection lost commitment to prevent flickering of the "not connected view"
     async [types.NETWORK_CONNECTION_LOST] ({ commit }) {
         await sleep(500) // todo test sleeping
 
-        commit(types.NETWORK_CONNECTION_LOST)
+        if (state.isConnected) {
+            commit(types.NETWORK_CONNECTION_LOST)
+        }
     },
 
     // todo if it really gets called... or generic in lib/network...
