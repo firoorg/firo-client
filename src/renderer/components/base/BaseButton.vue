@@ -73,6 +73,20 @@
         &.is-outline {
             background-color: transparent;
 
+            &.is-dark {
+                background-color: rgba($color--dark, 0.2);
+                color: $color--white-light;
+                border-color: $color--white-light;
+                outline: none;
+
+                &:hover,
+                &:focus {
+                    background: rgba($color--dark, 0.4);
+                    border-color: $color--white;
+                    color: $color--white;
+                }
+            }
+
             &.red {
                 color: $color--red;
                 border-color: $color--red;
@@ -81,24 +95,6 @@
                 &:focus {
                     color: $color--red-bright;
                     border-color: $color--red-bright;
-                }
-
-                &.is-dark {
-                    color: $color--white-light;
-
-                    &:hover,
-                    &:focus {
-                        color: $color--white;
-                    }
-                }
-            }
-
-            &.is-dark {
-                background-color: rgba($color--dark, 0.2);
-
-                &:hover,
-                &:focus {
-                    background: rgba($color--dark, 0.4);
                 }
             }
         }
