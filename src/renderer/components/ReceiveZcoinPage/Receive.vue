@@ -38,7 +38,7 @@
                     <base-button>Open in Block Explorer</base-button>
                 </div>
                 <div v-else-if="!received">
-                    <base-button @click="() => received = !received">Copy Link</base-button>
+                    <base-button :is-outline="true" @click="() => received = !received">Copy Link</base-button>
                     <base-button color="green" @click="shareViaMail">Share via E-Mail</base-button>
                 </div>
 

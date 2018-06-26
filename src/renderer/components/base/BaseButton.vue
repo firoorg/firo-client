@@ -46,6 +46,7 @@
     $padding-h: 4;
 
     button {
+        position: relative;
         padding: emRhythm($padding-v) emRhythm($padding-h);
         background: $color--white-light;
         cursor: pointer;
@@ -61,9 +62,37 @@
 
         transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out;
 
-        &:hover,
+        // gradient
+        &:before,
+        &:after {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            content: '';
+            transition: opacity 0.25s ease-out;
+            opacity: 0;
+        }
+
+        &:after {
+            background: transparent;
+        }
+
+        /*&:hover,
         &:focus {
             background: $color--white;
+
+            span {
+                opacity: 1;
+            }
+        }*/
+
+        span {
+            opacity: 0.85;
+            transition: opacity 0.25s ease-in-out;
         }
 
         .has-shadow {
@@ -72,6 +101,34 @@
 
         &.is-outline {
             background-color: transparent;
+            border-color: rgba($color--dark, 0.5);
+
+            span {
+                opacity: 0.7;
+            }
+
+            &:after {
+                @include glow-small-box($color--polo, 0);
+                //opacity: 1;
+            }
+
+            &[disabled] {
+                opacity: 0.66;
+            }
+
+            &:not([disabled]) {
+                &:hover,
+                &:focus {
+                    // color: $color--red-bright;
+                    border-color: $color--dark;
+                    background-color: $color--white-light;
+
+                    &:after,
+                    span {
+                        opacity: 1;
+                    }
+                }
+            }
 
             &.is-dark {
                 background-color: rgba($color--dark, 0.2);
@@ -101,30 +158,10 @@
 
         &.green,
         &.comet {
-            position: relative;
             padding-top: emRhythm($padding-v);
             padding-bottom: emRhythm($padding-v);
             border: none;
             outline: none;
-
-            // gradient
-            &:before,
-            &:after {
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-                content: '';
-                transition: opacity 0.25s ease-out;
-                opacity: 0;
-            }
-
-            &:after {
-                background: transparent;
-            }
 
             &:not([disabled]) {
                 &:hover,

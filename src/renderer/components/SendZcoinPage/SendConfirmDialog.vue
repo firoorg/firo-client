@@ -18,6 +18,7 @@
                     <div v-else key="send-later">
                         <base-button class="add-to-queue"
                                      ref="addToQueue"
+                                     :is-outline="true"
                                      @click.prevent="onQueueAddFn"
                                      :disabled="!canSubmit">
                             <span v-if="!hasQueuedPayments">Send Later</span>
