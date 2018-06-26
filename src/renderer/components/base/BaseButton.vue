@@ -158,9 +158,9 @@
 
         &.green,
         &.comet {
-            padding-top: emRhythm($padding-v);
-            padding-bottom: emRhythm($padding-v);
-            border: none;
+            //padding-top: emRhythm($padding-v);
+            //padding-bottom: emRhythm($padding-v);
+            //border: none;
             outline: none;
 
             &:not([disabled]) {
@@ -175,6 +175,7 @@
 
                     span {
                         color: $color--white;
+                        opacity: 1;
                     }
 
                     &.is-popover {
@@ -206,7 +207,13 @@
                 }
 
                 &[disabled] {
-                    background: grayscale($color--green);
+                    background: rgba(mix($color--green, $color--dark, 40%), 0.25);
+                    border-color: $color--green;
+                    color: $color--white;
+
+                    span {
+                        opacity: 1;
+                    }
                 }
             }
 
