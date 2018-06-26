@@ -74,6 +74,7 @@
     "vue-qrcode-component": "^2.1.1",
     "vue-radial-progress": "^0.2.10",
     "vue-router": "^3.0.1",
+    "vue-smooth-height": "^1.5.6",
     "vue-timeago": "^4.0.2",
     "vuetable-2": "^2.0.0-beta.1",
     "vuex": "^3.0.1",

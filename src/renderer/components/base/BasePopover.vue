@@ -9,7 +9,7 @@
         <slot name="target" />
 
         <template slot="popover">
-            <div class="content-wrapper">
+            <div class="content-wrapper" ref="container">
                 <slot name="content" />
             </div>
         </template>
@@ -17,10 +17,20 @@
 </template>
 
 <script>
+    import smoothHeight from 'vue-smooth-height'
+
     export default {
         name: 'BasePopover',
         inheritAttrs: false,
+        mixins: [
+            smoothHeight
+        ],
 
+        mounted () {
+            this.$smoothElement({
+                el: this.$refs.container
+            })
+        },
         data () {
             return {
                 msg: ''
@@ -32,6 +42,6 @@
 <style lang="scss" scoped>
     .content-wrapper {
         position: relative;
-        max-width: 30rem;
+        max-width: 35rem;
     }
 </style>
