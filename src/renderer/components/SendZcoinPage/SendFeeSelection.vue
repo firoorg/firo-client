@@ -14,13 +14,15 @@
 
                 <label :for="key">
                     <span class="title">{{ fee.label }}</span>
-                    <span class="amount">{{ fee.amount }}</span>
+                    <span class="desc">{{ fee.description }}</span>
+                    <span class="amount">{{ fee.amount }} xzc</span>
                 </label>
             </li>
         </ul>
 
         <footer>
             <base-button :is-outline="true"
+                         :is-dark="true"
                          @click.prevent="emitCurrentFee">
                 Select Fee
             </base-button>
@@ -43,15 +45,18 @@
                 availableFees: {
                     fast: {
                         label: 'Fast',
-                        amount: 0.01
+                        description: 'have a coffee',
+                        amount: 0.001
                     },
                     medium: {
                         label: 'Medium',
-                        amount: 0.005
+                        description: 'take a long walk',
+                        amount: 0.0005
                     },
                     slow: {
                         label: 'Slow',
-                        amount: 0.001
+                        description: 'sleep over it',
+                        amount: 0.0001
                     }
                 }
             }
@@ -131,6 +136,12 @@
             .title {
                 //@include setType(4, $ms-up1);
                 @include font-heavy();
+            }
+
+            .desc {
+                white-space: nowrap;
+                display: block;
+                margin-bottom: emRhythm(1);
             }
         }
     }

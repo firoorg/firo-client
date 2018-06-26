@@ -5,7 +5,7 @@
                 <transition name="fade" mode="out-in">
                     <div v-if="isOpen" key="cancel-send">
                         <transition name="fade" mode="out-in">
-                            <base-button v-if="timerDone"
+                            <base-button v-if="timerDone && !confirmed"
                                          color="red"
                                          :is-outline="true"
                                          @click.prevent="onCancelFn"
@@ -44,7 +44,7 @@
                                                  key="confirm-send"
                                                  color="green"
                                                  @click.prevent="onConfirmFn" tabindex="4">
-                                        <span>Yes, send ({{ queuedPayments }}) now!</span>
+                                        <span>Yes, send now!</span>
                                     </base-button>
                                     <circular-timer v-else
                                                     key="confirm-timer"
@@ -60,7 +60,7 @@
                                              ref="submit"
                                              :disabled="!canSubmit">
                                     <span v-if="!hasQueuedPayments">Send Now</span>
-                                    <span v-else>Send ({{ queuedPayments }}) Now</span>
+                                    <span v-else>Send Now</span>
                                 </base-button>
                             </div>
                         </transition>
@@ -120,6 +120,7 @@
         data () {
             return {
                 timerDone: false,
+                confirmed: false,
                 minCellWidth: 0
             }
         },
@@ -146,8 +147,10 @@
             },
 
             onConfirmFn () {
-                this.reset()
-                this.onConfirm()
+                // this.reset()
+                this.confirmed = true
+
+                this.onConfirm(this.reset)
             },
 
             onQueueAddFn () {

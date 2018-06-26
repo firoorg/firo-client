@@ -7,7 +7,7 @@
 
             <h3>Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a></h3>
             <dl>
-                <dt class="fees">{{ fee.label }} < 20min</dt>
+                <dt class="fees">{{ fee.label }}</dt>
                 <dd class="fees">
                     <span class="value">{{ fee.amount }}</span> <span class="unit">xzc</span>
                 </dd>

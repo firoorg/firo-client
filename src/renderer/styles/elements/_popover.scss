@@ -153,6 +153,10 @@
             .popover-inner {
                 background: $color;
                 color: $color--white-light;
+
+                h1, h2, h3 {
+                    color: $color--white;
+                }
             }
 
             .popover-arrow {
@@ -167,6 +171,10 @@
             .popover-inner {
                 background: $color;
                 color: $color--white-light;
+
+                h1, h2, h3 {
+                    color: $color--white;
+                }
             }
 
             .popover-arrow {

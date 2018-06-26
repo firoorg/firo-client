@@ -13,9 +13,9 @@
                                 Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
                             </p>
                         </div>
-                        <div>
+                        <div v-show="false">
                             <base-popover
-                                    :disabled="showSendConfirmation"
+                                    :disabled="showPopover"
                                     :auto-hide="true"
                                     placement="bottom"
                                     popover-class="comet"
@@ -43,7 +43,7 @@
                         </div>
                     </header>
 
-                    <fieldset :disabled="showSendConfirmation">
+                    <fieldset :disabled="showPopover">
                         <div class="field">
                             <label for="label">Title</label>
 
@@ -92,7 +92,7 @@
 
                 <div class="button-wrap">
                     <send-confirm-dialog :can-submit="canSubmit"
-                                         :is-open="showSendConfirmation"
+                                         :is-open="showPopover"
                                          :boundaries-element="$refs.grid"
                                          :on-cancel="onCancelPayment"
                                          :on-confirm="onConfirmAndSendPayment"
@@ -100,8 +100,8 @@
                                          :queued-payments="sendQueueLength"
                                          :popover-class="showFeeSelection ? 'comet' : 'green'">
                         <div class="confirmation-popover-content-wrap">
-                            <transition name="fade_" mode="out-in">
-                                <section v-if="!showFeeSelection" key="confirm-payment">
+                            <transition name="fade" mode="out-in">
+                                <section v-if="showSendConfirmation" key="confirm-payment">
                                     <header>
                                         <h2>Confirm Payment</h2>
                                         <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
@@ -116,8 +116,14 @@
                                         </template>
                                     </fees-and-amount>
                                 </section>
-                                <section v-else key="fee-selection">
+                                <section v-else-if="showFeeSelection" key="fee-selection">
                                     <send-fee-selection  :selected-fee="fee.key" @onFeeSelect="updateFee" />
+                                </section>
+                                <section v-else-if="showSuccess" key="success">
+                                    <div class="success-icon">
+                                        <send-confirmation-check />
+                                    </div>
+                                    <h2>Payment sucessfully sent!</h2>
                                 </section>
                             </transition>
                         </div>
@@ -135,6 +141,7 @@
     import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
     import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
     import PendingPayments from '@/components/PendingPayments'
+    import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
 
     // import { addVuexModel } from '@/utils/store'
     // import types from '~/types'
@@ -142,6 +149,7 @@
     export default {
         name: 'SendZcoin',
         components: {
+            SendConfirmationCheck,
             SendFeeSelection,
             SendConfirmDialog,
             FeesAndAmount,
@@ -154,11 +162,11 @@
             return {
                 label: '',
                 amount: null,
-                address: '',
+                address: 'TQwMstrW9i7uEBdHMcfqT5xYydJH1yLLpn',
                 fee: {
                     key: 'fast',
                     label: 'Fast',
-                    amount: 0.01
+                    amount: 0.001
                 },
 
                 validationFieldOrder: [
@@ -168,8 +176,17 @@
                 ],
 
                 pendingPayments: {},
-                showSendConfirmation: false,
-                showFeeSelection: false
+
+                popoverStatus: '',
+                popoverTimeout: null
+                // showSendConfirmation: false
+                // showFeeSelection: false
+            }
+        },
+
+        beforeDestroy () {
+            if (this.popoverTimeout) {
+                clearTimeout(this.popoverTimeout)
             }
         },
 
@@ -177,13 +194,32 @@
             hasSendQueue () {
                 return !isEmpty(this.pendingPayments)
             },
+
+            showPopover () {
+                return this.popoverStatus !== ''
+            },
+
             sendQueueLength () {
                 return Object.keys(this.pendingPayments).length
             },
 
+            showSendConfirmation () {
+                return this.popoverStatus === 'showSendConfirmation'
+            },
+
+            showFeeSelection () {
+                return this.popoverStatus === 'showFeeSelection'
+            },
+
+            showSuccess () {
+                return this.popoverStatus === 'showSuccess'
+            },
+
+            /*
             showQueueButton () {
                 return this.hasSendQueue && !(this.showSendConfirmation && this.sendQueueLength === 1)
             },
+            */
 
             isConfirmed () {
                 if (!this.hasSendQueue) {
@@ -208,7 +244,11 @@
         methods: {
             toggleFeeSelection () {
                 console.log('toggle fee selection')
-                this.showFeeSelection = !this.showFeeSelection
+                if (this.showFeeSelection) {
+                    this.openSendConfirmation()
+                } else {
+                    this.openFeeSelection()
+                }
             },
 
             updateFee (newVal) {
@@ -219,7 +259,11 @@
             // ---
 
             openSendConfirmation () {
-                this.showSendConfirmation = true
+                this.popoverStatus = 'showSendConfirmation'
+            },
+
+            openFeeSelection () {
+                this.popoverStatus = 'showFeeSelection'
             },
 
             addToQueue () {
@@ -259,8 +303,12 @@
             },
 
             cleanupPopover () {
-                this.showSendConfirmation = false
-                this.showFeeSelection = false
+                this.popoverStatus = ''
+                if (this.popoverTimeout) {
+                    clearTimeout(this.popoverTimeout)
+                }
+                // this.showSendConfirmation = false
+                // this.showFeeSelection = false
             },
 
             removeFromQueue (address) {
@@ -272,12 +320,19 @@
                 this.cleanupPopover()
             },
 
-            onConfirmAndSendPayment () {
+            onConfirmAndSendPayment (reset) {
                 console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
 
-                this.cleanupForm()
-                this.cleanupPopover()
                 this.removeFromQueue(this.address)
+
+                this.popoverStatus = 'showSuccess'
+                /*
+                this.popoverTimeout = setTimeout(() => {
+                    reset()
+                    this.cleanupPopover()
+                    this.cleanupForm()
+                }, 7000)
+                */
             },
 
             submitForm () {
@@ -366,7 +421,7 @@
     }
 
     .confirmation-popover-content-wrap {
-        max-width: emRhythm(40);
+        max-width: emRhythm(50);
     }
 
     fieldset {
@@ -391,6 +446,15 @@
         button + button,
         button + .confirmation-popover {
             margin-left: emRhythm(1)
+        }
+    }
+
+    .success-icon {
+        max-width: emRhythm(20);
+        margin: 0 auto emRhythm(2);
+
+        & + h2 {
+            margin-bottom: 0;
         }
     }
 
