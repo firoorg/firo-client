@@ -34,6 +34,11 @@ export default new Router({
                     path: '/send',
                     name: 'send-zcoin',
                     component: require('@/components/SendZcoinPage').default
+                },
+                {
+                    path: '/mint',
+                    name: 'mint-zerocoin',
+                    component: require('@/components/MintZerocoinPage').default
                 }
             ]
         }

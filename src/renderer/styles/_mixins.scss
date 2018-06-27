@@ -120,6 +120,13 @@
     letter-spacing: -0.025em;
 }
 
+@mixin description ($description-width: emRhythm(40), $description-color: inherit) {
+    max-width: $description-width;
+    font-style: italic;
+    color: $description-color;
+    margin: 0;
+}
+
 @mixin h2-with-description ($heading-color: inherit, $description-color: inherit, $description-width: emRhythm(40)) {
     h2 {
         margin-bottom: emRhythm(2, $ms-up2);
@@ -127,9 +134,7 @@
     }
 
     p {
-        max-width: $description-width;
-        font-style: italic;
-        color: $description-color;
+        @include description($description-width, $description-color);
     }
 }
 
