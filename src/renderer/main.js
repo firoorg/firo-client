@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
+import VueI18n from 'vue-i18n'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
@@ -37,6 +38,20 @@ Vue.use(VeeValidate, {
 })
 
 Vue.use(BindScopedSlotsPlugin)
+
+Vue.use(VueI18n)
+
+const messages = {
+    en: {
+        hello: 'World {count}'
+    }
+}
+
+// Create VueI18n instance with options
+const i18n = new VueI18n({
+    locale: 'en', // set locale
+    messages // set locale messages
+})
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
@@ -80,5 +95,6 @@ new Vue({
     components: { App },
     router,
     store,
+    i18n,
     template: '<App/>'
 }).$mount('#app')
