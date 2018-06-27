@@ -1,0 +1,79 @@
+# payment-requests.detail-view-fullfilled.button-share-via-email = 'Share via Email'
+# (level2/overview/list)+(level3/detail/interaction)
+
+#
+# Naming follows [BEM](http://getbem.com) (Block Element Modifier) naming conventions
+# nested in logical groups of visually related elements.
+#
+
+#
+# The given BEM structure `block-name__element-name--modifier-name` is here used as
+# `element-type__element-name--modifier-name` e.g. `button__create-model--primvary: Yes, go ahead!`
+# for a buttons which could sit close to a `button__cancel-model-creation--secondary: No Way!` button.
+#
+# The only exception is an (optional) shorthand for cases where `element-type` equals `element-name` e.g. `title__title`.
+# Desv should consider wisely as this can lead to confusion in cases where you have a `label__label`
+# surrounded by e.g. `error__label` and `placeholder__label`.
+#
+navigation:
+  balance:
+    title: Balance
+  menu:
+    button__receive: Receive Zcoin
+    button__send: Send Zcoin
+    button__mint: Mint Zcoin
+    button__spend: Spend Privately
+    button__settings: Settings
+  settings:
+    switch__connect-via-tor: Anonymize Connection
+
+receive:
+  overview:
+    title: Receive Zcoin
+    description:  Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__primary-action: Create Payment Request
+  # approx. 100 chars // concept of payment request, simple analogy, how should someone know where to send something?
+    table__payment-requests:
+      labels:
+        label__amount: Amount
+        label__created: Created
+        label__label: Label
+
+  detail-create:
+    title__create: Create Payment Request
+    label__label: Label
+    error__label: The label field is required.
+    label__amount: Amount
+    error__amount--not-numeric: The amount field must be numeric and may contain 8 decimal points.
+    error__amount--below-minimum: The amount field must be 0.001 or more.
+    label__message: Message
+    button__create-payment-request: Create Payment Request
+
+  detail-request:
+    #receive.detail-view.detail-request.label: Etiam \#porta sem \#malesuada magna mollis euismod # labels caped in length?
+    label__created: Created
+    # receive.detail-view.detail-request.time-indicator: about 1 hour ago # language from plugin
+    label__amount: Amount
+
+    pending:
+      button__copy-link--primary: Copy Link
+      button__share-via-email--secondary: Share via E-mail
+    fulfilled:
+      button__open-explorer: Open in Block Explorer
+
+tours:
+  create-zcoin-payment:
+    assistant-mode:
+      tooltip__title: Need help creating a Payment? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!

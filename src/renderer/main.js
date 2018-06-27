@@ -9,16 +9,25 @@ import camelCase from 'lodash/camelCase'
 
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 
+import languages from '@/lang'
+
 import App from './App'
 import router from './router'
 import store from '../store/renderer'
+
+const app = require('electron').remote.app
+
+const locale = process.env.LOCALE || app.getLocale()
 
 const customValidationRules = [
     'isZcoinAddress'
 ]
 
-Vue.use(VTooltip)
+customValidationRules.forEach((rule) => {
+    require('./utils/validationRules/' + rule)
+})
 
+Vue.use(VTooltip)
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
     locale: undefined, // Default locale
@@ -27,45 +36,27 @@ Vue.use(VueTimeago, {
         'en': require('date-fns/locale/en')
     }
 })
-
-customValidationRules.forEach((rule) => {
-    require('./utils/validationRules/' + rule)
-})
-
 Vue.use(VeeValidate, {
     errorBagName: 'validationErrors',
     fieldsBagName: 'validationFields'
 })
-
 Vue.use(BindScopedSlotsPlugin)
-
 Vue.use(VueI18n)
 
-const messages = {
-    en: {
-        hello: 'World {count}'
-    }
-}
-
 // Create VueI18n instance with options
+console.log('using i18n with', locale)
+
 const i18n = new VueI18n({
-    locale: 'en', // set locale
-    messages // set locale messages
+    locale, // set locale
+    fallbackLocale: process.env.NODE_ENV !== 'production' ? 'structure' : 'en',
+    messages: languages // set locale messages
 })
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
 // automatically registering BaseComponents as Component (stripping of Base)
-const requireComponent = require.context(
-    // The relative path of the components folder
-    './components',
-    // Whether or not to look in subfolders
-    true,
-    // The regular expression used to match base component filenames
-    /Base[A-Z]\w+\.(vue|js)$/
-)
-
+const requireComponent = require.context('./components', true, /Base[A-Z]\w+\.(vue|js)$/)
 requireComponent.keys().forEach(fileName => {
     // Get component config
     const componentConfig = requireComponent(fileName)

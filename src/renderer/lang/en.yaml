@@ -1,0 +1,25 @@
+#
+# Naming follows [BEM](http://getbem.com) (Block Element Modifier) naming conventions
+# nested in logical groups of visually related elements.
+#
+
+#
+# The given BEM structure `block-name__element-name--modifier-name` is here used as
+# `element-type__element-name--modifier-name` e.g. `button__create-model--primvary: Yes, go ahead!`
+# for a buttons which could sit close to a `button__cancel-model-creation--secondary: No Way!` button.
+#
+# The only exception is an (optional) shorthand for cases where `element-type` equals `element-name` e.g. `title__title`.
+# Desv should consider wisely as this can lead to confusion in cases where you have a `label__label`
+# surrounded by e.g. `error__label` and `placeholder__label`.
+#
+navigation:
+  balance:
+    title: Balance
+  menu:
+    button__receive: Receive Zcoin
+    button__send: Send Zcoin
+    button__mint: Mint Zcoin
+    button__spend: Spend Privately
+    button__settings: Settings
+  settings:
+    switch__connect-via-tor: Anonymize Connection

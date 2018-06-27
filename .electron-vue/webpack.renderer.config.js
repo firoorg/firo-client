@@ -73,6 +73,11 @@ let rendererConfig = {
                 exclude: /node_modules/
             },
             {
+                test: /\.ya?ml$/,
+                // include: path.resolve('data'),
+                use: ['json-loader', 'yaml-loader']
+            },
+            {
                 test: /\.node$/,
                 use: 'node-loader'
             },
