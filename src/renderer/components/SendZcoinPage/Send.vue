@@ -44,7 +44,7 @@
                     </header>
 
                     <fieldset :disabled="showPopover">
-                        <div class="field">
+                        <div class="field" :class="getFieldErrorClass('label')">
                             <label for="label">Title</label>
 
                             <div class="control">
@@ -59,7 +59,7 @@
                             </div>
                         </div>
 
-                        <div class="field amount-field">
+                        <div class="field amount-field" :class="getFieldErrorClass('amount')">
                             <label for="amount">Amount</label>
 
                             <div class="control">
@@ -76,12 +76,13 @@
                             </div>
                         </div>
 
-                        <div class="field">
+                        <div class="field" :class="getFieldErrorClass('address')">
                             <label for="address">Address</label>
 
                             <div class="control">
-                                <input v-model.lazy.trim="address"
+                                <input v-model.trim="address"
                                        v-validate="requiredAddressValidationRules"
+                                       data-vv-validate-on="blur"
                                        v-tooltip="getValidationTooltip('address')"
                                        type="text"
                                        ref="address"
@@ -165,24 +166,14 @@
         ],
         data () {
             return {
-                /*
-                label: '',
-                amount: null,
-                address: 'TQwMstrW9i7uEBdHMcfqT5xYydJH1yLLpn',
-                fee: {
-                    key: 'fast',
-                    label: 'Fast',
-                    amount: 0.001
-                },
-                */
                 validationFieldOrder: [
                     'label',
                     'amount',
                     'address'
                 ],
 
+                hasSent: false,
                 pendingPayments: {},
-
                 popoverStatus: '',
                 popoverTimeout: null
                 // showSendConfirmation: false
@@ -265,7 +256,7 @@
 
             canSubmit () {
                 // todo check (spend + fees) < available balance
-                return this.formValidated && !this.showFeeSelection
+                return this.formValidated && !this.showFeeSelection && !this.hasSent
             }
         },
 
@@ -329,6 +320,8 @@
                 this.label = ''
                 this.amount = null
                 this.address = ''
+                this.hasSent = false
+                this.resetValidator()
             },
 
             cleanupPopover () {
@@ -350,18 +343,16 @@
             },
 
             onConfirmAndSendPayment (reset) {
+                this.hasSent = true
                 console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
-
                 this.removeFromQueue(this.address)
 
                 this.popoverStatus = 'showSuccess'
-                /*
                 this.popoverTimeout = setTimeout(() => {
                     reset()
                     this.cleanupPopover()
                     this.cleanupForm()
-                }, 7000)
-                */
+                }, 5000)
             },
 
             submitForm () {

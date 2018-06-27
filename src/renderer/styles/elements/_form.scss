@@ -3,6 +3,13 @@
 
     .field {
         margin-bottom: emRhythm(3);
+
+        &.has-error {
+            input[type="text"] {
+                border-bottom-color: $color--red-bright;
+            }
+        }
+
         & > label {
             display: block;
             @include font-heavy();
@@ -18,10 +25,10 @@
         .message {
             position: relative;
             width: 100%;
-            border: none;
+            border: 1px solid transparent;
             outline: none;
 
-            transition: background 0.25s ease-out, background 0.15s ease-out;
+            transition: background 0.25s ease-out, border-color 0.15s ease-out;
         }
 
         input[type="text"] {

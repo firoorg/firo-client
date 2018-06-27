@@ -30,6 +30,18 @@ export default {
     },
 
     mounted () {
+        let hasValue = false
+        for (let fieldName of this.validationFieldOrder) {
+            if (this[fieldName]) {
+                hasValue = true
+                break
+            }
+        }
+
+        if (hasValue) {
+            this.$validator.validate()
+        }
+
         if (this.autofocusFirstField && this.validationFieldOrder.length) {
             this.$nextTick(() => this.$refs[this.validationFieldOrder[0]].focus())
         }
@@ -40,7 +52,7 @@ export default {
             let tooltipToShow = ''
 
             for (let key of this.validationFieldOrder) {
-                if (this.validationErrors.has(key) && this.validationFields[key].dirty) {
+                if (this.validationErrors.has(key) && this.validationFields[key].touched) {
                     tooltipToShow = key
                     break
                 }
@@ -52,7 +64,7 @@ export default {
         formValidated () {
             const fieldNames = Object.keys(this.validationFields)
 
-            const fieldsAreDirty = fieldNames.some(key => this.validationFields[key].dirty)
+            const fieldsAreDirty = fieldNames.some(key => this.validationFields[key].touched)
             const fieldsValidated = fieldNames.some(key => this.validationFields[key].validated)
             const fieldValuesAreValid = fieldNames.every(key => this.validationFields[key].valid)
 
@@ -75,6 +87,10 @@ export default {
                 classes: 'error',
                 show: this.validationTooltipToShow === fieldName
             }
+        },
+
+        getFieldErrorClass (fieldName) {
+            return this.validationErrors.has(fieldName) ? ['has-error'] : []
         },
 
         resetValidator () {

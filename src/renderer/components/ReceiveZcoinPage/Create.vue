@@ -7,11 +7,11 @@
                     Payment Request
                 </h2>
 
-                <div class="field">
+                <div class="field" :class="getFieldErrorClass('label')">
                     <label for="label">Title</label>
 
                     <div class="control">
-                        <input v-model.trim="createFormLabel"
+                        <input v-model.trim="label"
                                v-validate="'required'"
                                v-tooltip="getValidationTooltip('label')"
                                type="text"
@@ -21,11 +21,11 @@
                     </div>
                 </div>
 
-                <div class="field amount-field">
+                <div class="field amount-field" :class="getFieldErrorClass('amount')">
                     <label for="amount">Amount</label>
 
                     <div class="control">
-                        <input v-model.number="createFormAmount"
+                        <input v-model.number="amount"
                                v-validate="amountValidationRules"
                                v-tooltip="getValidationTooltip('amount')"
                                type="text"
@@ -37,10 +37,10 @@
                     </div>
                 </div>
 
-                <div class="field message-field">
+                <div class="field message-field" :class="getFieldErrorClass('message')">
                     <label for="message">Message</label>
                     <div class="control">
-                        <base-textarea v-model.lazy="createFormMessage"
+                        <base-textarea v-model.lazy="message"
                                        ref="message"
                                        name="message"
                                        id="message"
@@ -87,17 +87,17 @@
 
         computed: {
             ...addVuexModel({
-                name: 'createFormLabel',
+                name: 'label',
                 getter: 'PaymentRequest/createFormLabel',
                 action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL
             }),
             ...addVuexModel({
-                name: 'createFormAmount',
+                name: 'amount',
                 getter: 'PaymentRequest/createFormAmount',
                 action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT
             }),
             ...addVuexModel({
-                name: 'createFormMessage',
+                name: 'message',
                 getter: 'PaymentRequest/createFormMessage',
                 action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE
             }),
