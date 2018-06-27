@@ -131,7 +131,6 @@
         },
 
         mounted () {
-            console.log(this.$refs.submit.$el.clientWidth)
             this.minCellWidth = this.$refs.submit.$el.clientWidth
         },
 
