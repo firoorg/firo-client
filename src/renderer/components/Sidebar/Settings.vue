@@ -1,6 +1,6 @@
 <template>
     <section class="settings">
-        Anonymize Connection
+        {{ $t('navigation.settings.switch__connect-via-tor') }}
     </section>
 </template>
 

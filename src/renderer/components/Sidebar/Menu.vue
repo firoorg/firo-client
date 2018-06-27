@@ -3,27 +3,27 @@
         <ul>
             <li>
                 <router-link :to="{ name: 'receive-zcoin' }">
-                    <span>Receive Zcoin</span>
+                    <span>{{ $t('navigation.menu.button__receive') }}</span>
                 </router-link>
             </li>
             <li>
                 <router-link :to="{ name: 'send-zcoin' }" exact>
-                    <span>Send Zcoin</span>
+                    <span>{{ $t('navigation.menu.button__send') }}</span>
                 </router-link>
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'mint-zerocoin' }" exact>
-                    <span>Mint Zcoin</span>
+                    <span>{{ $t('navigation.menu.button__mint') }}</span>
                 </router-link>
             </li>
             <li>
                 <router-link :to="{ name: 'spend-zerocoin' }" exact>
-                    <span>Spend Privately</span>
+                    <span>{{ $t('navigation.menu.button__spend') }}</span>
                 </router-link>
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'settings' }" exact>
-                    <span>Settings</span>
+                    <span>{{ $t('navigation.menu.button__settings') }}</span>
                 </router-link>
             </li>
         </ul>
