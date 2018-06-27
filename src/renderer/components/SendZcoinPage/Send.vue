@@ -80,7 +80,7 @@
                             <label for="address">Address</label>
 
                             <div class="control">
-                                <input v-model.trim="address"
+                                <input v-model.lazy.trim="address"
                                        v-validate="requiredAddressValidationRules"
                                        v-tooltip="getValidationTooltip('address')"
                                        type="text"
@@ -139,6 +139,10 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+    import { addVuexModel } from '@/utils/store'
+    import types from '~/types'
+
     import isEmpty from 'lodash/isEmpty'
     import ValidationMixin from '@/mixins/ValidationMixin'
     import FeesAndAmount from '@/components/FeesAndAmount'
@@ -146,9 +150,6 @@
     import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
     import PendingPayments from '@/components/PendingPayments'
     import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
-
-    // import { addVuexModel } from '@/utils/store'
-    // import types from '~/types'
 
     export default {
         name: 'SendZcoin',
@@ -164,6 +165,7 @@
         ],
         data () {
             return {
+                /*
                 label: '',
                 amount: null,
                 address: 'TQwMstrW9i7uEBdHMcfqT5xYydJH1yLLpn',
@@ -172,7 +174,7 @@
                     label: 'Fast',
                     amount: 0.001
                 },
-
+                */
                 validationFieldOrder: [
                     'label',
                     'amount',
@@ -195,6 +197,28 @@
         },
 
         computed: {
+            ...addVuexModel({
+                name: 'label',
+                getter: 'ZcoinPayment/createFormLabel',
+                action: types.zcoinpayment.SET_FORM_LABEL
+            }),
+
+            ...addVuexModel({
+                name: 'amount',
+                getter: 'ZcoinPayment/createFormAmount',
+                action: types.zcoinpayment.SET_FORM_AMOUNT
+            }),
+
+            ...addVuexModel({
+                name: 'address',
+                getter: 'ZcoinPayment/createFormAddress',
+                action: types.zcoinpayment.SET_FORM_ADDRESS
+            }),
+
+            ...mapGetters({
+                fee: 'ZcoinPayment/selectedFee'
+            }),
+
             hasSendQueue () {
                 return !isEmpty(this.pendingPayments)
             },
@@ -256,7 +280,8 @@
             },
 
             updateFee (newVal) {
-                this.fee = newVal
+                this.$store.dispatch(types.zcoinpayment.SET_FEE, newVal)
+                // this.fee = newVal
                 this.toggleFeeSelection()
             },
 

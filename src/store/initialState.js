@@ -15,6 +15,35 @@ module.exports = {
         settings: false // gui
     },
 
+    ZcoinPayment: {
+        pendingPayments: [],
+        selectedFee: 'fast',
+        availableFees: {
+            fast: {
+                label: 'Fast',
+                description: 'have a coffee',
+                amount: 0.001
+            },
+            medium: {
+                label: 'Medium',
+                description: 'take a long walk',
+                amount: 0.0005
+            },
+            slow: {
+                label: 'Slow',
+                description: 'sleep over it',
+                amount: 0.0001
+            }
+        },
+        addPaymentForm: {
+            amount: null,
+            label: '',
+            address: ''
+        },
+        isLoading: false,
+        lastSeen: 'blockHeightAsInteger'
+    },
+
     PaymentRequest: {
         paymentRequests: {
             abc: {
