@@ -17,7 +17,7 @@ import store from '../store/renderer'
 
 const app = require('electron').remote.app
 
-const locale = process.env.LOCALE || app.getLocale()
+const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
 
 const customValidationRules = [
     'isZcoinAddress'
