@@ -1,13 +1,13 @@
 import * as types from '../types/Mint'
 
 const state = {
-    denominations: {
-    }
+    currentDenominations: {},
+    mints: []
 }
 
 const mutations = {
     [types.ADD_DENOMINATION] (state, denomination) {
-        const name = 'denom-' + denomination
+        const name = `${denomination}`
         if (state.denominations[name] === undefined) {
             state.denominations[name] = 0
         }
@@ -16,7 +16,7 @@ const mutations = {
     },
 
     [types.REMOVE_DENOMINATION] (state, denomination) {
-        const name = 'denom-' + denomination
+        const name = `${denomination}`
         if (!state.denominations[name]) {
             return
         }
@@ -36,7 +36,22 @@ const actions = {
 }
 
 const getters = {
-    denominations: (state) => state.denominations
+    denominations (state) {
+        return state.mints
+            .filter((mint) => !mint.isUsed)
+            .reduce((accumulator, mint) => {
+                const { denomination } = mint
+
+                if (!accumulator[`${denomination}`]) {
+                    accumulator[`${denomination}`] = 0
+                }
+
+                accumulator[`${denomination}`]++
+
+                return accumulator
+            }, {})
+    },
+    mints: (state) => state.mints
 }
 
 export default {

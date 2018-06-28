@@ -100,7 +100,7 @@ module.exports = {
                 transactions: [
                     {
                         txid: 'txid', // daemon
-                        timestamp: new Date(), // daemon
+                        timestamp: Date.now() - (Math.random() * 100000), // daemon
                         amount: 1000, // daemon
                         type: 'in|out|mint|spend|newcoin', // daemon
                         confirmations: 1 // daemon
@@ -113,9 +113,9 @@ module.exports = {
     Mint: { // daemon: isSubscription
         mints: [
             {
-                mintid: '',
-                created_at: new Date(),
-                value: 25,
+                mintid: 'just-a-random-id',
+                created_at: Date.now() - (Math.random() * 100000),
+                denomination: 25,
                 isUsed: false
             }
         ]
