@@ -220,11 +220,7 @@
     }
 
     .message-wrap {
-        border-top: 1px solid $color--polo-medium;
-        background: radial-gradient(at top, rgba($color--comet-light, 0.35), rgba($color--comet-light, 0) 70%);
-        // min-height: 10rem;
-        padding-bottom: emRhythm(5);
-        @include rhythmBorderTop(1px, 5);
+        @include divider-top-with-gradient();
         margin: 0 emRhythm(3);
 
         p {

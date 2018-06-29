@@ -4,7 +4,7 @@
             <div class="current"
                  :class="{ 'has-current': current }"
                  :style="{ height: currentHeight }">
-                <span v-show="current">{{ current }}</span>
+                <!--<span v-show="current">{{ current }}</span>-->
             </div>
             <div class="minted"
                  :class="{ 'has-minted': minted }"
@@ -24,15 +24,11 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    // import smoothHeight from 'vue-smooth-height'
+    // import { addVuexModel } from '@/utils/store'
+    import types from '~/types'
 
     export default {
         name: 'Denomination',
-        /*
-        mixins: [
-            smoothHeight
-        ],
-        */
         props: {
             denomination: {
                 type: Number,
@@ -41,30 +37,31 @@
             availableBalance: {
                 type: Number,
                 default: 100
+            },
+            maxValue: {
+                type: Number,
+                required: true
+            },
+            maxHeight: {
+                type: Number,
+                required: true
             }
         },
 
         data () {
             return {
-                current: 0
             }
-        },
-
-        mounted () {
-            /*
-            this.$smoothElement({
-                el: this.$refs.bar
-            })
-            */
         },
 
         computed: {
             ...mapGetters({
-                denominations: 'Mint/denominations'
+                denominations: 'Mint/currentDenominations',
+                mints: 'Mint/mints'
             }),
 
             canIncrease () {
-                return this.current + this.denomination < this.availableBalance
+                // todo integrate fees in calculation
+                return (this.current + 1) * this.denomination < this.availableBalance
             },
 
             canDecrease () {
@@ -72,37 +69,62 @@
             },
 
             currentHeight () {
-                return this.calcHeight(this.current) + 'px'
+                // const all = this.calcHeight(this.current + this.minted)
+                // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
+                // return all - this.calcHeight(this.minted) + 'px'
+                // return this.mapHeight(all) + 'px'
+                return this.calcHeight(this.current) * (8 * 3) + 'px'
             },
 
             mintHeight () {
-                return this.calcHeight(this.minted) + 'px'
+                return (Math.log(this.calcHeight(this.minted + 1)) * (8 * 4)) + 'px'
+                // return this.calcHeight(this.current + this.minted) - this.calcHeight(this.current) + 'px'
+                // return (this.minted ? (Math.log(this.calcHeight(this.minted + 1)) + (8 * 3)) : 0) + 'px'
+            },
+
+            current () {
+                return this.denominations[`${this.denomination}`] || 0
             },
 
             minted () {
-                return this.denominations[`${this.denomination}`] || Math.ceil(Math.random() * 10)
+                return this.mints[`${this.denomination}`] || 0 // Math.ceil(Math.random() * 10)
             }
         },
 
         methods: {
+            mapHeight (amount) {
+                const map = (value, low1, high1, low2, high2) => {
+                    return low2 + (high2 - low2) * (value - low1) / (high1 - low1)
+                }
+
+                return map(amount, 0, Math.log(this.maxValue + 1), 30, this.maxHeight)
+            },
+
             calcHeight (amount) {
-                return !amount ? 0 : Math.log((amount + 1)/* *  this.denomination */) * (8 * 4)
+                /*
+
+                */
+
+                return !amount ? 0 : Math.ceil((amount)/* *  this.denomination */) // * (8 * 3)
+
+                // return !amount ? 0 : Math.ceil(map(Math.log(amount + 1), 0, Math.log(this.maxValue + 1) || 1, 30, this.maxHeight))
+                // return !amount ? 0 : Math.log(amount + 1)
             },
 
             increase () {
                 if (!this.canIncrease) {
                     return
                 }
-                console.log('increase')
-                this.current++
+
+                this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
             },
 
             decrease () {
                 if (!this.canDecrease) {
                     return
                 }
-                console.log('decrease')
-                this.current--
+
+                this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
             }
         }
     }
@@ -183,12 +205,15 @@
         margin-top: emRhythm(1);
 
         button {
-            background: none;
             border: none;
             @include font-heavy();
             cursor: pointer;
             color: $color--comet-dark;
             outline: none;
+            border-radius: 50%;
+            background-color: rgba($color--polo-medium, 0);
+
+            transition: color 0.15s ease-out, background-color 0.15s ease-out;
 
             &[disabled] {
                 color: $color--comet;
@@ -198,6 +223,11 @@
             &:not([disabled]) {
                 &:hover {
                     color: $color--dark;
+                    background-color: rgba($color--polo-medium, 0.7);
+                }
+
+                &:active {
+                    background-color: rgba($color--polo-medium, 1);
                 }
             }
         }

@@ -138,6 +138,13 @@
     }
 }
 
+@mixin divider-top-with-gradient() {
+    border-top: 1px solid $color--polo-medium;
+    @include rhythmBorderTop(1px, 5);
+    background: radial-gradient(at top, rgba($color--comet-light, 0.35), rgba($color--comet-light, 0) 70%);
+    padding-bottom: emRhythm(5);
+}
+
 @mixin bleed-h ($value) {
     margin-left: emRhythm($value) * -1;
     margin-right: emRhythm($value) * -1;
