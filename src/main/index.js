@@ -12,6 +12,7 @@ import network from './lib/network'
 
 import store from '../store/main'
 import windowManager from './lib/windows'
+import clipboard from './lib/clipboard'
 
 import CONFIG from './config'
 const debug = Debug('zcoin:main')
@@ -95,6 +96,8 @@ network.init({ store })
 windowManager.connectToStore({ store, namespace: 'Window' })
 windowManager.registerWindows(CONFIG.windows)
 windowManager.setupAppEvents()
+
+clipboard.watch(store)
 
 app.on('ready', () => {
     // store.dispatch('Window/show', 'welcomeGuide')

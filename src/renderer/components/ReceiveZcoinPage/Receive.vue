@@ -38,7 +38,14 @@
                     <base-button>Open in Block Explorer</base-button>
                 </div>
                 <div v-else-if="!received">
-                    <base-button :is-outline="true" @click="() => received = !received">Copy Link</base-button>
+                    <timed-tooltip :is-open="showCopySuccess"
+                                   popover-class="green"
+                                   :on-timeout="hideCopySuccess">
+                        <template slot="content">
+                            <h3>Copied Link to your clipboard</h3>
+                        </template>
+                        <base-button :is-outline="true" @click="copyUri">Copy Link</base-button>
+                    </timed-tooltip>
                     <base-button color="green" @click="shareViaMail">Share via E-Mail</base-button>
                 </div>
 
@@ -70,6 +77,7 @@
   import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
   import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
   import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
+  import TimedTooltip from '@/components/Notification/TimedTooltip'
 
   export default {
       name: 'receivePaymentRequest',
@@ -77,7 +85,8 @@
           PaymentRequestStatus,
           NaturalLanguageTags,
           ReceivePaymentRequestEmailTemplate,
-          'qr-code': VueQRCodeComponent
+          'qr-code': VueQRCodeComponent,
+          TimedTooltip
       },
       props: [
           'received',
@@ -90,7 +99,8 @@
       data () {
           return {
               showQrCode: false,
-              recurring: false
+              recurring: false,
+              showCopySuccess: false
           }
       },
       computed: {
@@ -99,9 +109,13 @@
           },
 
           getZcoinUri () {
-              const address = this.address ? this.address.address : ''
+              if (!this.address) {
+                  return ''
+              }
+              const { address } = this.address
+              const messageParam = this.message ? `&message=${encodeURIComponent(this.message)}` : ''
 
-              return `zcoin://${address}`
+              return `zcoin://${address}?amount=${this.amount.toFixed(8)}${messageParam}`
           }
       },
       methods: {
@@ -120,6 +134,15 @@
               console.log(this.$refs.emailTemplate.$el.innerHTML)
               clipboard.writeHTML(this.$refs.emailTemplate.$el.innerHTML)
               this.$electron.shell.openExternal('mailto:?subject=Zcoin Payment Request&body=please select this text and press cmd+v ;)')
+          },
+
+          copyUri () {
+              clipboard.writeText(this.getZcoinUri)
+              this.showCopySuccess = true
+          },
+
+          hideCopySuccess () {
+              this.showCopySuccess = false
           }
       }
   }

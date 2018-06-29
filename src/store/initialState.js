@@ -198,6 +198,10 @@ module.exports = {
         }
     },
 
+    Clipboard: {
+        clipboardValue: ''
+    },
+
     App: { // gui
         showIntroScreen: true,
         lastSeen: {
