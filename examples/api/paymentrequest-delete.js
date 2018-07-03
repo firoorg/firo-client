@@ -1,7 +1,7 @@
 const zmq = require('zeromq')
 
 const requester = zmq.socket('req')
-requester.connect('tcp://127.0.0.1:15558')
+requester.connect('tcp://127.0.0.1:25557')
 
 // log out replies
 requester.on('message', (msg) => {
@@ -14,6 +14,6 @@ requester.send(JSON.stringify({
     type: 'delete',
     collection: 'payment-request',
     data: {
-        id: 'address-here'
+        id: 'TDMUbj1R12q7mMQGLiGJyHv838JSYAuRCi'
     }
 }))

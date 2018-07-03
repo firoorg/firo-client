@@ -14,7 +14,7 @@ requester.send(JSON.stringify({
     type: 'update',
     collection: 'payment-request',
     data: {
-        id: 'id-here',
+        id: 'TDMUbj1R12q7mMQGLiGJyHv838JSYAuRCi',
         label: 'this is a modified payment request label',
         isRecurring: true
     }

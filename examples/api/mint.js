@@ -1,7 +1,7 @@
 const zmq = require('zeromq')
 
 const requester = zmq.socket('req')
-requester.connect('tcp://127.0.0.1:5557')
+requester.connect('tcp://127.0.0.1:25557')
 
 // log out replies
 requester.on('message', (msg) => {
@@ -12,7 +12,7 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'mint',
-    payload: {
+    data: {
         denominations: [
             {
                 denomination: 25,

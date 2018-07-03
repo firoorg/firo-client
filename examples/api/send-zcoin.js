@@ -11,11 +11,14 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'send-zcoin',
-    payload: {
-        amount: 4000,
-        address: 'address',
-        label: 'label which belongs to the tx made',
-        fee: 100000
+    collection: 'send-zcoin',
+    data: {
+        addresses: {
+            {
+                address: 3.5,
+                address: 10                
+            }
+        },
+        feeperkb: 0.001
     }
 }))
