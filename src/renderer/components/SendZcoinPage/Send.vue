@@ -112,14 +112,21 @@
                                         <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
                                     </header>
 
-                                    <fees-and-amount :fee="fee"
-                                                     :payments="pendingPayments"
-                                                     :on-change-fee="toggleFeeSelection">
-                                        <template slot-scope="payment">
-                                            {{ payment.label }}
-                                            {{ payment.amount }}
-                                        </template>
-                                    </fees-and-amount>
+
+                                    <div class="payment-fee-list">
+                                        <h3>Payments</h3>
+                                        <pending-payments :payments="pendingPayments"
+                                                          class="pending-payments" />
+                                        <fees-and-amount :amount="pendingPaymentsAmount"
+                                                         :fee="fee"
+                                                         :can-change-fee="true"
+                                                         :on-change-fee="toggleFeeSelection">
+                                            <template slot-scope="payment">
+                                                {{ payment.label }}
+                                                {{ payment.amount }}
+                                            </template>
+                                        </fees-and-amount>
+                                    </div>
                                 </section>
                                 <section v-else-if="showFeeSelection" key="fee-selection">
                                     <send-fee-selection  :selected-fee="fee.key" @onFeeSelect="updateFee" />
@@ -220,6 +227,11 @@
 
             sendQueueLength () {
                 return Object.keys(this.pendingPayments).length
+            },
+
+            pendingPaymentsAmount () {
+                return Object.values(this.pendingPayments)
+                    .reduce((accumulator, payment) => accumulator + (payment.cost || payment.amount), 0)
             },
 
             showSendConfirmation () {
@@ -442,6 +454,16 @@
 
     .confirmation-popover-content-wrap {
         max-width: emRhythm(50);
+
+        /deep/ .pending-payments {
+            margin-bottom: emRhythm(3);
+        }
+
+        /deep/ .payment-fee-list h3 {
+            @include setType(2);
+            font-style: italic;
+            margin: emRhythm(2) 0 emRhythm(1);
+        }
     }
 
     fieldset {

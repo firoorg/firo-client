@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import * as types from '../types/Mint'
 
 const state = {
@@ -8,35 +9,39 @@ const state = {
 const mutations = {
     [types.ADD_DENOMINATION] (state, denomination) {
         const name = `${denomination}`
-        if (state.denominations[name] === undefined) {
-            state.denominations[name] = 0
+        if (state.currentDenominations[name] === undefined) {
+            Vue.set(state.currentDenominations, name, 0)
         }
 
-        state.denominations[name] = state.denominations[name] + 1
+        state.currentDenominations[name] = state.currentDenominations[name] + 1
     },
 
     [types.REMOVE_DENOMINATION] (state, denomination) {
         const name = `${denomination}`
-        if (!state.denominations[name]) {
+        if (!state.currentDenominations[name]) {
             return
         }
 
-        state.denominations[name] = state.denominations[name] - 1
+        state.currentDenominations[name] = state.currentDenominations[name] - 1
     }
 }
 
 const actions = {
-    addDenomination ({ commit, state }, denomination) {
+    [types.ADD_DENOMINATION] ({ commit, state }, denomination) {
         commit(types.ADD_DENOMINATION, denomination)
     },
 
-    removeDenomination ({ commit, state }, denomination) {
-        commit(types.REMOVE_DENOMINATION)
+    [types.REMOVE_DENOMINATION] ({ commit, state }, denomination) {
+        commit(types.REMOVE_DENOMINATION, denomination)
     }
 }
 
 const getters = {
-    denominations (state) {
+    currentDenominations (state) {
+        return state.currentDenominations
+    },
+
+    mints (state) {
         return state.mints
             .filter((mint) => !mint.isUsed)
             .reduce((accumulator, mint) => {
@@ -50,8 +55,7 @@ const getters = {
 
                 return accumulator
             }, {})
-    },
-    mints: (state) => state.mints
+    }
 }
 
 export default {

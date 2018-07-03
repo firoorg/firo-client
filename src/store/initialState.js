@@ -111,11 +111,30 @@ module.exports = {
     },
 
     Mint: { // daemon: isSubscription
+        currentDenominations: {},
         mints: [
             {
                 mintid: 'just-a-random-id',
                 created_at: Date.now() - (Math.random() * 100000),
                 denomination: 25,
+                isUsed: false
+            },
+            {
+                mintid: 'just-a-random-id',
+                created_at: Date.now() - (Math.random() * 100000),
+                denomination: 10,
+                isUsed: false
+            },
+            {
+                mintid: 'just-a-random-id',
+                created_at: Date.now() - (Math.random() * 100000),
+                denomination: 10,
+                isUsed: true
+            },
+            {
+                mintid: 'just-a-random-id',
+                created_at: Date.now() - (Math.random() * 100000),
+                denomination: 10,
                 isUsed: false
             }
         ]
@@ -177,6 +196,10 @@ module.exports = {
                 scriptAddress: 178 // ['2']
             }
         }
+    },
+
+    Clipboard: {
+        clipboardValue: ''
     },
 
     App: { // gui

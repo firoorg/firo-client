@@ -1,22 +1,16 @@
 <template>
     <section class="fees-amount">
-        <template v-if="hasPayments">
-            <h3>Payments</h3>
-            <pending-payments :payments="payments"
-                              class="pending-payments" />
-
-            <h3>Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a></h3>
-            <dl>
-                <dt class="fees">{{ fee.label }}</dt>
-                <dd class="fees">
-                    <span class="value">{{ fee.amount }}</span> <span class="unit">xzc</span>
-                </dd>
-                <dt class="amount">Total</dt>
-                <dd class="amount">
-                    <span class="value">{{ total }}</span> <span class="unit">XZC</span>
-                </dd>
-            </dl>
-        </template>
+        <h3 v-if="canChangeFee">Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a></h3>
+        <dl>
+            <dt class="fees">{{ fee.label }}</dt>
+            <dd class="fees">
+                <span class="value">{{ fee.amount }}</span> <span class="unit">xzc</span>
+            </dd>
+            <dt class="amount">Total</dt>
+            <dd class="amount">
+                <span class="value">{{ total }}</span> <span class="unit">XZC</span>
+            </dd>
+        </dl>
     </section>
 </template>
 
@@ -29,13 +23,17 @@
             PendingPayments
         },
         props: {
+            amount: {
+                type: Number,
+                required: true
+            },
             fee: {
                 type: Object,
                 required: true
             },
-            payments: {
-                type: Object,
-                default: {}
+            canChangeFee: {
+                type: Boolean,
+                default: false
             },
             onChangeFee: {
                 type: Function,
@@ -44,33 +42,14 @@
         },
 
         computed: {
-            hasPayments () {
-                return Object.keys(this.payments).length
-            },
-
             total () {
-                const total = Object
-                    .values(this.payments)
-                    .reduce((accumulator, payment) => accumulator + payment.amount, 0)
-
-                return total + this.fee.amount
+                return this.amount + this.fee.amount
             }
         }
     }
 </script>
 
 <style lang="scss" scoped>
-
-    h3 {
-        @include setType(2);
-        font-style: italic;
-        margin: emRhythm(2) 0 emRhythm(1);
-    }
-
-    .pending-payments {
-        margin-bottom: emRhythm(3);
-    }
-
     dl {
         display: grid;
         grid-template-rows: 1fr 1fr;
