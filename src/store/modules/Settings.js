@@ -4,12 +4,12 @@ const state = {
     blockchainLocation: '',
     b58Prefixes: {
         mainnet: {
-            pubkeyAddress: ['a', 'Z'],
-            scriptAddress: ['3', '4']
+            pubkeyAddress: 82, // ['a', 'Z'],
+            scriptAddress: 7 // ['3', '4']
         },
         testnet: {
-            pubkeyAddress: ['T'],
-            scriptAddress: ['2']
+            pubkeyAddress: 65, // ['T'],
+            scriptAddress: 178 // ['2']
         }
     }
 }
