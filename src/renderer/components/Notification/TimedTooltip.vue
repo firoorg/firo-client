@@ -2,7 +2,7 @@
     <base-popover
             :open="isOpen"
             placement="top"
-            :popover-class="popoverClass"
+            :popover-class="popoverClass + ' notice'"
             class="timed-popover"
             :boundaries-element="boundariesElement"
             trigger="manually"
