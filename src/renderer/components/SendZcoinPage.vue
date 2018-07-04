@@ -2,10 +2,39 @@
     <section class="send-zcoin">
         <div class="scrollable-height">
             <section class="paymentrequest-list">
-                <h1>
-                    Send<br>
-                    Zcoin
-                </h1>
+                <base-popover
+                        :open="true"
+                        :disabled="false"
+                        :auto-hide="true"
+                        placement="left"
+                        popover-class="green advice"
+                        class="pending-payments-popover"
+                        trigger="manually"
+                >
+                    <template slot="target">
+                        <h1>
+                            <base-badge :visible="true"
+                                        :count="1">
+                                Send<br>
+                                Zcoin
+                            </base-badge>
+                        </h1>
+                    </template>
+
+                    <template slot="content">
+                        <header>
+                            <h2>Zcoin Address found in clipboard</h2>
+                        </header>
+
+                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                        <footer>
+                            <router-link :to="{ name: 'home' }">
+                                Fill Form
+                            </router-link>
+                        </footer>
+
+                    </template>
+                </base-popover>
 
                 <animated-table :data="paymentRequests"
                                 :fields="tableFields"
