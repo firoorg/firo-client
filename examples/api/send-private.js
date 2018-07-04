@@ -1,7 +1,7 @@
 const zmq = require('zeromq')
 
 const requester = zmq.socket('req')
-requester.connect('tcp://127.0.0.1:25557')
+requester.connect('tcp://127.0.0.1:35557')
 
 // log out replies
 requester.on('message', (msg) => {
@@ -11,18 +11,18 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'send-private',
+    collection: 'send-private',
     data: {
         denominations: [
             {
+                address: "TLqow9uuHQkCj4b3tTAhXDTNQ2UxwFpnT9",
                 denomination: 25,
-                amount: 160,
-                address: "hird-party-address-to-spend-to-or-empty-to-spend-to-myself"
+                amount: 2
             },
             {
+                address: "TLqow9uuHQkCj4b3tTAhXDTNQ2UxwFpnT9",
                 denomination: 10,
-                amount: 10,
-                address: "hird-party-address-to-spend-to-or-empty-to-spend-to-myself"
+                amount: 1
             }
         ],
         label: 'label which belongs to the spend tx'

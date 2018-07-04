@@ -11,13 +11,6 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'create',
-    collection: 'send-zcoin',
-    data: {
-        addresses: {
-            "TUAJcpmNqpg4gX4RC2ZuUN6eA34MYpgjNE": 3.5,
-            "TV3f8WhYuMyMLGJuwhdU7psvmCS63yuy3t": 10                
-        },
-        feeperkb: 0.001
-    }
+    type: 'initial',
+    collection: 'state-wallet'
 }))
