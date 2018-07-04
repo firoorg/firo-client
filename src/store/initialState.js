@@ -46,9 +46,9 @@ module.exports = {
 
     PaymentRequest: {
         paymentRequests: {
-            abc: {
+            TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V: {
                 label: 'label with #hashtags', // deamon // editable
-                address: 'abc', // deamon
+                address: 'TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V', // deamon
                 amount: 100, // deamon
                 created_at: new Date() - (Math.random() * 60000), // daemon
                 message: `Hey Alice, 
@@ -96,7 +96,7 @@ module.exports = {
     Address: { // daemon: isSubscription
         addresses: [
             {
-                address: 'abc', // daemon
+                address: 'TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V', // daemon
                 transactions: [
                     {
                         txid: 'txid', // daemon
