@@ -199,7 +199,8 @@ module.exports = {
     },
 
     Clipboard: {
-        clipboardValue: ''
+        clipboardValue: '',
+        timestamp: null
     },
 
     App: { // gui
