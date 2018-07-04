@@ -1,4 +1,5 @@
 import { clipboard } from 'electron'
+import { containsZcoinUri, containsZcoinAddress } from '#/lib/zcoin'
 
 // import Vue from 'vue'
 // import * as types from '../types/Mint'
@@ -11,14 +12,6 @@ const isDiffText = (str1, str2) => str2 && str1 !== str2
 // const isDiffImage = (img1, img2) => !img2.isEmpty() && img1.toDataURL() !== img2.toDataURL()
 
 export default {
-    containsZcoinUri (text) {
-        const zcoinUri = new RegExp('(zcoin://)([a-zA-Z0-9_])(:[0-9]+)?(/.*)?')
-
-        console.log(zcoinUri.test(text))
-
-        return zcoinUri.test(text)
-    },
-
     watch (store) {
         if (watcherId) {
             return
@@ -27,8 +20,15 @@ export default {
             if (isDiffText(previousText, previousText = clipboard.readText())) {
                 console.log('text changed', previousText)
 
-                if (this.containsZcoinUri(previousText)) {
+                if (containsZcoinUri(previousText)) {
                     store.dispatch('Clipboard/setClipboard', previousText)
+                } else {
+                    const prefixes = store.getters['Settings/b58Prefixes']
+                    const addresses = containsZcoinAddress(previousText, prefixes)
+
+                    if (addresses && addresses.length === 1) {
+                        store.dispatch('Clipboard/setClipboard', addresses[0])
+                    }
                 }
             }
 

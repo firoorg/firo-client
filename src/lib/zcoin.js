@@ -44,3 +44,25 @@ export const isZcoinAddress = function (address, b58Prefixes) {
     return pubkeyDoubleHashShaPrefix.length === checkSum.length &&
         pubkeyDoubleHashShaPrefix.every((v, i) => v === checkSum[i])
 }
+
+export const containsZcoinAddress = function (text, prefixes) {
+    console.log('contains zcoin address', text, prefixes)
+
+    return text
+        .split(/\s/)
+        .reduce((accumulator, word) => {
+            if (isZcoinAddress(word, prefixes)) {
+                accumulator.push(word)
+            }
+
+            return accumulator
+        }, [])
+}
+
+export const containsZcoinUri = function (text) {
+    const zcoinUri = new RegExp('(zcoin://)([a-zA-Z0-9_])(:[0-9]+)?(/.*)?')
+
+    console.log(zcoinUri.test(text))
+
+    return zcoinUri.test(text)
+}
