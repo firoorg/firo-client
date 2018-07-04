@@ -65,6 +65,7 @@
                 this.onTimeout()
                 if (this.isOpenTimeout) {
                     clearTimeout(this.isOpenTimeout)
+                    this.isOpenTimeout = null
                 }
             }
         },
