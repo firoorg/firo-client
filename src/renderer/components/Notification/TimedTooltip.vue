@@ -2,7 +2,7 @@
     <base-popover
             :open="isOpen"
             placement="top"
-            :popover-class="popoverClass"
+            :popover-class="popoverClass + ' notice'"
             class="timed-popover"
             :boundaries-element="boundariesElement"
             trigger="manually"
@@ -65,6 +65,7 @@
                 this.onTimeout()
                 if (this.isOpenTimeout) {
                     clearTimeout(this.isOpenTimeout)
+                    this.isOpenTimeout = null
                 }
             }
         },

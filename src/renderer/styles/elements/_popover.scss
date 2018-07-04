@@ -181,6 +181,32 @@
                 border-color: $color;
             }
         }
+
+        &.advice {
+            .popover-inner {
+                padding: emRhythm(3);
+
+                header h2 {
+                    margin: 0;
+                }
+
+                p {
+                    margin: 0 0 emRhythm(1);
+                }
+            }
+        }
+
+        &.notice {
+            .popover-inner {
+                padding: emRhythm(2)
+            }
+
+            header,
+            h2, h3 {
+                margin: 0;
+                font-style: italic;
+            }
+        }
     }
 
     &[aria-hidden='true'] {

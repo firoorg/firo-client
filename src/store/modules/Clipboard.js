@@ -1,11 +1,13 @@
 const state = {
     // currentDenominations: {},
-    clipboardValue: ''
+    clipboardValue: '',
+    timestamp: null
 }
 
 const mutations = {
     SET_CLIPBOARD (state, value) {
         state.clipboardValue = value
+        state.timestamp = Date.now()
     }
 }
 
