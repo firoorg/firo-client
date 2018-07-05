@@ -3,7 +3,7 @@ import * as types from '../types/Mint'
 
 const state = {
     currentDenominations: {},
-    mints: []
+    mints: {}
 }
 
 const mutations = {
@@ -23,6 +23,12 @@ const mutations = {
         }
 
         state.currentDenominations[name] = state.currentDenominations[name] - 1
+    },
+
+    [types.UPDATE_MINT] (state, mint) {
+        const { id } = mint
+        console.log(id, mint)
+        Vue.set(state.mints, id, mint)
     }
 }
 
@@ -33,6 +39,18 @@ const actions = {
 
     [types.REMOVE_DENOMINATION] ({ commit, state }, denomination) {
         commit(types.REMOVE_DENOMINATION, denomination)
+    },
+
+    [types.UPDATE_MINT] ({ commit, state }, mint) {
+        console.log('hello minting')
+
+        const { id, txid } = mint
+
+        commit(types.UPDATE_MINT, {
+            isUsed: false, // todo update isUsed handling when #26 gets closed
+            id: id || txid,
+            ...mint
+        })
     }
 }
 
@@ -41,17 +59,19 @@ const getters = {
         return state.currentDenominations
     },
 
+    // todo rename to confirmed mints
     mints (state) {
-        return state.mints
+        return Object.values(state.mints)
             .filter((mint) => !mint.isUsed)
+            .filter((mint) => mint.confirmations >= 6)
             .reduce((accumulator, mint) => {
-                const { denomination } = mint
+                const { amount } = mint
 
-                if (!accumulator[`${denomination}`]) {
-                    accumulator[`${denomination}`] = 0
+                if (!accumulator[`${amount}`]) {
+                    accumulator[`${amount}`] = 0
                 }
 
-                accumulator[`${denomination}`]++
+                accumulator[`${amount}`]++
 
                 return accumulator
             }, {})
