@@ -51,10 +51,9 @@
 
                 <!-- E-Mail Template -->
                 <div style="position: absolute; top:0;left:0;height:0;width:0;overflow: hidden">
-                    <!--
                     <receive-payment-request-email-template
                             :message="message"
-                            :amount="amountRequested"
+                            :amount="amount"
                             :uri="getZcoinUri"
                             ref="emailTemplate">
                         <template slot="qrcode">
@@ -65,7 +64,6 @@
                             </qr-code>
                         </template>
                     </receive-payment-request-email-template>
-                    -->
                 </div>
             </div>
         </section>
