@@ -12,6 +12,7 @@ import network from './lib/network'
 
 import store from '../store/main'
 import windowManager from './lib/windows'
+import deeplink from './lib/deeplink'
 import clipboard from './lib/clipboard'
 
 import CONFIG from './config'
@@ -92,6 +93,7 @@ store.replaceState(require('../store/initialState'))
 
 network.init({ store })
 // wallet.init({ store, namespace: 'Wallet' })
+deeplink.init({ windowManager })
 
 windowManager.connectToStore({ store, namespace: 'Window' })
 windowManager.registerWindows(CONFIG.windows)
