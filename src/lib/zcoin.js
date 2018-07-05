@@ -46,8 +46,6 @@ export const isZcoinAddress = function (address, b58Prefixes) {
 }
 
 export const containsZcoinAddress = function (text, prefixes) {
-    console.log('contains zcoin address', text, prefixes)
-
     return text
         .split(/\s/)
         .reduce((accumulator, word) => {
