@@ -43,7 +43,8 @@
 
     const tableFields = [
         {
-            name: 'amount'
+            name: 'amount',
+            sortField: 'amount'
         },
         {
             name: RelativeDate,

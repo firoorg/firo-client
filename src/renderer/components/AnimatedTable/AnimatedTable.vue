@@ -66,7 +66,7 @@
         data () {
             return {
                 interval: null,
-                perPage: 5,
+                perPage: 10,
                 rowTransition: 'fade'
             }
         },
