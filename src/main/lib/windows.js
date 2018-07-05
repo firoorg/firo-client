@@ -33,6 +33,21 @@ export default {
         return currentWindows.get(name)
     },
 
+    focus (name) {
+        const win = this.get(name)
+
+        if (!win) {
+            this.show(name)
+            return
+        }
+
+        if (win.isMinimized()) {
+            win.restore()
+        }
+
+        win.focus()
+    },
+
     show (name) {
         if (!this.hasWindow(name)) {
             this.createWindow(name)
@@ -86,7 +101,7 @@ export default {
 
     createAndOpenWindow ({name, url = ''}, windowProps) {
         if (this.hasWindow(name)) {
-            // TODO window already exist. consider window reopening / bring to foreground here
+            this.focus(name)
             return
         }
 
@@ -110,6 +125,7 @@ export default {
 
     createMainWindow () {
         if (this.hasWindow('main')) {
+            this.focus('main')
             return
         }
 
