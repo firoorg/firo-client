@@ -1,3 +1,5 @@
+import * as types from '../types/Clipboard'
+
 const state = {
     // currentDenominations: {},
     clipboardValue: '',
@@ -6,30 +8,31 @@ const state = {
 }
 
 const mutations = {
-    SET_CLIPBOARD (state, value) {
+    [types.SET_CLIPBOARD] (state, value) {
         state.clipboardValue = value
         state.timestamp = Date.now()
         state.notified = false
     },
 
-    SET_CLIPBOARD_NOTIFIED (state, value) {
+    [types.SET_CLIPBOARD_NOTIFIED] (state, value) {
         state.notified = value
     }
 }
 
 const actions = {
-    setClipboard ({ commit, state }, value) {
-        commit('SET_CLIPBOARD', value)
+    [types.SET_CLIPBOARD] ({ commit, state }, value) {
+        commit(types.SET_CLIPBOARD, value)
     },
 
-    markAsNotified ({ commit, state }) {
+    [types.MARK_AS_NOTIFIED] ({ commit, state }) {
         if (state.clipboardValue && !state.notified) {
-            commit('SET_CLIPBOARD_NOTIFIED', true)
+            commit(types.SET_CLIPBOARD_NOTIFIED, true)
         }
     }
 }
 
 const getters = {
+    isNotified: (state) => state.notified
 }
 
 export default {

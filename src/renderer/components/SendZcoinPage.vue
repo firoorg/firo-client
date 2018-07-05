@@ -3,9 +3,9 @@
         <div class="scrollable-height">
             <section class="paymentrequest-list">
                 <base-popover
-                        :open="true"
+                        :open="!clipboardNotified"
                         :disabled="false"
-                        :auto-hide="true"
+                        :auto-hide="false"
                         placement="left"
                         popover-class="green advice"
                         class="pending-payments-popover"
@@ -59,6 +59,8 @@
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import SendZcoin from '@/components/SendZcoinPage/Send'
 
+    import types from '~/types'
+
     const tableFields = [
         {
             name: 'amount'
@@ -98,9 +100,14 @@
             }
         },
 
+        beforeDestroy () {
+            this.$store.dispatch(types.clipboard.MARK_AS_NOTIFIED)
+        },
+
         computed: {
             ...mapGetters({
-                paymentRequests: 'PaymentRequest/paymentRequests'
+                paymentRequests: 'PaymentRequest/paymentRequests',
+                clipboardNotified: 'Clipboard/isNotified'
             }),
 
             selectedPaymentRequestWithAddress () {

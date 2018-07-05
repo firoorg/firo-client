@@ -2,7 +2,7 @@ import { clipboard } from 'electron'
 import { containsZcoinUri, containsZcoinAddress } from '#/lib/zcoin'
 
 // import Vue from 'vue'
-// import * as types from '../types/Mint'
+import types from '~/types'
 
 let watcherId = null
 let previousText = clipboard.readText()
@@ -21,13 +21,13 @@ export default {
                 console.log('text changed', previousText)
 
                 if (containsZcoinUri(previousText)) {
-                    store.dispatch('Clipboard/setClipboard', previousText)
+                    store.dispatch(types.clipboard.SET_CLIPBOARD, previousText)
                 } else {
                     const prefixes = store.getters['Settings/b58Prefixes']
                     const addresses = containsZcoinAddress(previousText, prefixes)
 
                     if (addresses && addresses.length === 1) {
-                        store.dispatch('Clipboard/setClipboard', addresses[0])
+                        store.dispatch(types.clipboard.SET_CLIPBOARD, addresses[0])
                     }
                 }
             }
