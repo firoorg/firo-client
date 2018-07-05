@@ -6,6 +6,7 @@ import types from '../../../store/types'
 // @see http://zguide.zeromq.org/php:chapter5#Getting-an-Out-of-Band-Snapshot
 export default {
     namespace: '',
+    namespaceTypes: null,
 
     mutations: {
     },
@@ -29,6 +30,8 @@ export default {
         this.dispatchAction = dispatch
         this.commitMutation = commit
 
+        this.types = types[this.namespace.toLowerCase()]
+
         // this.setupListeners()
         this.requestInitialState()
     },
@@ -47,7 +50,8 @@ export default {
         this.requester.once('message', (message) => {
             try {
                 const response = JSON.parse(message.toString())
-                this.processResponse(response, types[this.namespace.toLowerCase()].SET_INITIAL_STATE)
+                console.log('this.types', this.types)
+                this.processResponse(response, this.types.SET_INITIAL_STATE)
             } catch (e) {
                 console.log('error in response of initial request call.', this.namespace)
                 console.log(e)
@@ -56,6 +60,7 @@ export default {
         })
 
         // todo add timeout to request
+        console.log('sending initial state request', this.collection)
         this.requester.send(JSON.stringify({
             type: 'initial',
             collection: this.collection
@@ -63,12 +68,14 @@ export default {
     },
 
     processResponse (response, actionToDispatch) {
-        console.log('received message from the network', response)
-        this.commitMutation(types.paymentrequest.IS_LOADING, false)
+        // console.log('received message from the network', response)
+        if (this.types.IS_LOADING) {
+            this.commitMutation(this.types.IS_LOADING, false)
+        }
 
         const { meta, data } = response
 
-        if (meta.status < 200 || meta.status >= 400) {
+        if (!meta || meta.status < 200 || meta.status >= 400) {
             console.warn(response)
             // todo send error response back
             return
@@ -85,11 +92,14 @@ export default {
     },
 
     send (type, data, actionToDispatch) {
-        this.requester.once('message', (message) => {
+        const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
+            // console.log('response', response)
             this.processResponse(response, actionToDispatch)
-        })
+        }
+
+        this.requester.once('message', onMessage)
 
         this.requester.send(JSON.stringify({
             collection: this.collection,

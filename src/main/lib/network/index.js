@@ -8,10 +8,12 @@ import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
 // import blockchain from './blockchain'
+import address from './Address'
 import paymentRequest from './PaymentRequest'
 
 const modules = {
     // blockchain
+    address,
     paymentRequest
 }
 
@@ -92,7 +94,7 @@ export default {
                 commit
             })
 
-            console.log(module)
+            // console.log(module)
         })
     },
 
