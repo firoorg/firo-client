@@ -93,7 +93,7 @@ store.replaceState(require('../store/initialState'))
 
 network.init({ store })
 // wallet.init({ store, namespace: 'Wallet' })
-deeplink.init({ windowManager })
+deeplink.init({ windowManager, store })
 
 windowManager.connectToStore({ store, namespace: 'Window' })
 windowManager.registerWindows(CONFIG.windows)

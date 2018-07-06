@@ -200,6 +200,9 @@ module.exports = {
 
     Clipboard: {
         clipboardValue: '',
+        address: null,
+        amount: 0,
+        message: null,
         timestamp: null,
         notified: false
     },

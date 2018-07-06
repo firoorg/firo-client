@@ -1,8 +1,12 @@
 import * as types from '../types/Clipboard'
+import { isZcoinAddress } from '#/lib/zcoin'
 
 const state = {
     // currentDenominations: {},
     clipboardValue: '',
+    address: null,
+    amount: 0,
+    message: null,
     timestamp: null,
     notified: false
 }
@@ -10,8 +14,25 @@ const state = {
 const mutations = {
     [types.SET_CLIPBOARD] (state, value) {
         state.clipboardValue = value
+
+        state.address = null
+        state.amount = 0
+        state.message = null
+
         state.timestamp = Date.now()
         state.notified = false
+    },
+
+    [types.SET_ADDRESS] (state, value) {
+        state.address = value
+    },
+
+    [types.SET_AMOUNT] (state, value) {
+        state.amount = value
+    },
+
+    [types.SET_MESSAGE] (state, value) {
+        state.message = value
     },
 
     [types.SET_CLIPBOARD_NOTIFIED] (state, value) {
@@ -24,6 +45,30 @@ const actions = {
         commit(types.SET_CLIPBOARD, value)
     },
 
+    [types.SET_ADDRESS] ({ commit, state, rootGetters }, value) {
+        if (!isZcoinAddress(value, rootGetters['Settings/b58Prefixes'])) {
+            return
+        }
+
+        commit(types.SET_ADDRESS, value)
+    },
+
+    [types.SET_AMOUNT] ({ commit, state }, value) {
+        if (isNaN(value)) {
+            return
+        }
+
+        commit(types.SET_AMOUNT, value)
+    },
+
+    [types.SET_MESSAGE] ({ commit, state }, value) {
+        if (!value) {
+            return
+        }
+
+        commit(types.SET_MESSAGE, value)
+    },
+
     [types.MARK_AS_NOTIFIED] ({ commit, state }) {
         if (state.clipboardValue && !state.notified) {
             commit(types.SET_CLIPBOARD_NOTIFIED, true)
@@ -32,7 +77,12 @@ const actions = {
 }
 
 const getters = {
-    isNotified: (state) => state.notified
+    isNotified: (state) => state.notified,
+    address: (state) => state.address,
+    amount: (state) => state.amount,
+    message: (state) => state.message,
+    canSend: (state, getters, rootState, rootGetters) => false,
+    canSpend: (state, getters, rootState, rootGetters) => false
 }
 
 export default {
