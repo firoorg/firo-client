@@ -42,12 +42,10 @@ const actions = {
     },
 
     [types.UPDATE_MINT] ({ commit, state }, mint) {
-        console.log('hello minting')
-
-        const { id, txid } = mint
+        const { id, txid, used } = mint
 
         commit(types.UPDATE_MINT, {
-            isUsed: false, // todo update isUsed handling when #26 gets closed
+            isUsed: used,
             id: id || txid,
             ...mint
         })

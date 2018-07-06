@@ -53,13 +53,14 @@ const actions = {
     },
 
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
-        const { amount, blockhash, blocktime, confirmations, fee, timereceived, txid } = mintTx
+        const { amount, blockhash, blocktime, confirmations, fee, timereceived, txid, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
             amount,
             confirmations,
             fee,
             timereceived,
+            used,
             block: {
                 hash: blockhash,
                 time: blocktime
