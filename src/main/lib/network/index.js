@@ -1,20 +1,18 @@
-// import ElectrumCli from 'electrum-client'
 // import types from '../../../store/types'
 import NETWORK_CONFIG from '../../config/network'
 import Debug from 'debug'
 import * as utils from '../../../lib/utils'
 
-// import uuid from 'uuid/v4'
-
 // todo load modules dynamically
 // import blockchain from './blockchain'
-import address from './Address'
-import paymentRequest from './PaymentRequest'
+import Address from './Address'
+import PaymentRequest from './PaymentRequest'
+import SendZcoin from './SendZcoin'
 
 const modules = {
-    // blockchain
-    address,
-    paymentRequest
+    Address,
+    PaymentRequest,
+    SendZcoin
 }
 
 const debug = Debug('zcoin:network')

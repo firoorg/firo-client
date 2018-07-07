@@ -14,6 +14,8 @@ const state = {
 }
 
 const mutations = {
+    [types.SEND_ZCOIN] () {},
+
     [types.SET_AVAILABLE_FEES] (state, availableFees) {
         console.log('setting available fees')
         state.availableFees = availableFees
@@ -77,6 +79,19 @@ const actions = {
         }
 
         commit(types.SET_FEE, key)
+    },
+
+    [types.SEND_ZCOIN] ({ commit, state }, { payments, fee }) {
+        console.log('payment in action', payments, fee)
+        // const { address, amount } = payment
+
+        commit(types.SEND_ZCOIN, {
+            payments: payments.map((payment) => ({
+                amount: payment.amount,
+                address: payment.address
+            })),
+            fee
+        })
     }
 }
 

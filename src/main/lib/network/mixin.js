@@ -47,6 +47,11 @@ export default {
     */
 
     requestInitialState () {
+        if (!this.types.SET_INITIAL_STATE) {
+            console.log('no initial state action set for', this.collection)
+            return
+        }
+
         this.requester.once('message', (message) => {
             try {
                 const response = JSON.parse(message.toString())
@@ -88,7 +93,9 @@ export default {
 
         console.log('dispatching action', actionToDispatch)
 
-        this.dispatchAction(actionToDispatch, data)
+        if (actionToDispatch) {
+            this.dispatchAction(actionToDispatch, data)
+        }
     },
 
     send (type, data, actionToDispatch) {
@@ -100,6 +107,8 @@ export default {
         }
 
         this.requester.once('message', onMessage)
+
+        console.log('sending data --> ', data)
 
         this.requester.send(JSON.stringify({
             collection: this.collection,

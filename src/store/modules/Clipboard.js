@@ -43,6 +43,7 @@ const mutations = {
 const actions = {
     [types.SET_CLIPBOARD] ({ commit, state }, value) {
         commit(types.SET_CLIPBOARD, value)
+        dispatch(types.SET_ADDRESS, value)
     },
 
     [types.SET_ADDRESS] ({ commit, state, rootGetters }, value) {
