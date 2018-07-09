@@ -94,20 +94,8 @@ module.exports = {
     },
 
     Address: { // daemon: isSubscription
-        addresses: [
-            {
-                address: 'TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V', // daemon
-                transactions: [
-                    {
-                        txid: 'txid', // daemon
-                        timestamp: Date.now() - (Math.random() * 100000), // daemon
-                        amount: 1000, // daemon
-                        type: 'in|out|mint|spend|newcoin', // daemon
-                        confirmations: 1 // daemon
-                    }
-                ]
-            }
-        ]
+        walletAddresses: {},
+        thirdPartyAddresses: {}
     },
 
     Mint: { // daemon: isSubscription
