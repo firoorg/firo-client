@@ -110,7 +110,7 @@
               if (!this.address) {
                   return ''
               }
-              const { address } = this.address
+              const address = this.address.address || this.address
               const messageParam = this.message ? `&message=${encodeURIComponent(this.message)}` : ''
 
               return `zcoin://${address}?amount=${this.amount.toFixed(8)}${messageParam}`
@@ -121,6 +121,8 @@
               console.log('toggle qr code')
               this.showQrCode = !this.showQrCode
           },
+
+          // zcoin://TCuSpTwexLpA2FM6VrwkkXkq1gYUoYNiPo?amount=10.00000000&message=Hey%2C%20this%20is%20just%20a%20new%20Payment%20Request%20test%20showing%20that%20sharing%20works%20out%20of%20the%20box%20now.%0A%0Acheerio%0Aj
 
           tagClicked (tag) {
               console.log('tag clicked -->', tag)

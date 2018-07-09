@@ -82,7 +82,8 @@
 
         computed: {
             ...mapGetters({
-                paymentRequests: 'PaymentRequest/paymentRequests'
+                paymentRequests: 'PaymentRequest/paymentRequests',
+                walletAddresses: 'Address/walletAddresses'
             }),
 
             selectedPaymentRequestWithAddress () {
@@ -90,20 +91,17 @@
                     return null
                 }
 
-                // console.log(this.$store.state.Address.addresses)
-                const getter = this.$store.state.Address.addresses
-                // const getter = this.$store.state['Zcoin/addresses']
-
-                const filteredAddress = getter.filter((address) => {
+                const filteredAddress = this.walletAddresses.filter((address) => {
                     return address.address === this.selectedPaymentRequest
                 })
 
                 console.log(filteredAddress)
 
-                const address = filteredAddress.length ? filteredAddress[0] : null
                 const [ paymentRequest ] = this.paymentRequests.filter((request) => {
                     return request.address === this.selectedPaymentRequest
                 })
+
+                const address = filteredAddress.length ? filteredAddress[0] : paymentRequest.address
 
                 console.log(paymentRequest)
 

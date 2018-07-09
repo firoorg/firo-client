@@ -13,6 +13,7 @@ const mutations = {
     [types.ADD_WALLET_ADDRESS] (state, { address, total }) {
         console.log('adding wallet address', address, total)
         state[WALLET_ADDRESS_KEY][address] = {
+            address,
             total,
             isConfirmed: false,
             transactions: []
@@ -22,6 +23,7 @@ const mutations = {
     [types.ADD_THIRD_PARTY_ADDRESS] (state, { address, total }) {
         console.log('adding third party address', address, total)
         state[THIRD_PARTY_ADDRESS_KEY][address] = {
+            address,
             total,
             transactions: []
         }
@@ -192,6 +194,8 @@ const actions = {
 }
 
 const getters = {
+    walletAddresses: (state) => Object.values(state[WALLET_ADDRESS_KEY]),
+    thirdPartyAddresses: (state) => Object.values(state[THIRD_PARTY_ADDRESS_KEY])
 }
 
 export default {
