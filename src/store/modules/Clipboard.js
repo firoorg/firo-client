@@ -41,12 +41,12 @@ const mutations = {
 }
 
 const actions = {
-    [types.SET_CLIPBOARD] ({ commit, state }, value) {
+    [types.SET_CLIPBOARD] ({ commit, dispatch }, value) {
         commit(types.SET_CLIPBOARD, value)
         dispatch(types.SET_ADDRESS, value)
     },
 
-    [types.SET_ADDRESS] ({ commit, state, rootGetters }, value) {
+    [types.SET_ADDRESS] ({ commit, rootGetters }, value) {
         if (!isZcoinAddress(value, rootGetters['Settings/b58Prefixes'])) {
             return
         }
@@ -54,7 +54,7 @@ const actions = {
         commit(types.SET_ADDRESS, value)
     },
 
-    [types.SET_AMOUNT] ({ commit, state }, value) {
+    [types.SET_AMOUNT] ({ commit }, value) {
         if (isNaN(value)) {
             return
         }
@@ -62,7 +62,7 @@ const actions = {
         commit(types.SET_AMOUNT, value)
     },
 
-    [types.SET_MESSAGE] ({ commit, state }, value) {
+    [types.SET_MESSAGE] ({ commit }, value) {
         if (!value) {
             return
         }
@@ -83,7 +83,8 @@ const getters = {
     amount: (state) => state.amount,
     message: (state) => state.message,
     canSend: (state, getters, rootState, rootGetters) => false,
-    canSpend: (state, getters, rootState, rootGetters) => false
+    canSpend: (state, getters, rootState, rootGetters) => false,
+    hasNewAddress: (state, getters) => !!getters.address && !getters.isNotified
 }
 
 export default {

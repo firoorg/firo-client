@@ -82,6 +82,11 @@
         @include bleed-h($bleed);
         transition: padding .1s ease-in-out, margin .1s ease-in-out;
 
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
         &:after {
             position: absolute;
             content: '';
