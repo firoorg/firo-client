@@ -12,7 +12,7 @@ const state = {
 const mutations = {
     [types.ADD_WALLET_ADDRESS] (state, { address, total }) {
         console.log('adding wallet address', address, total)
-        state.walletAddresses[address] = {
+        state[WALLET_ADDRESS_KEY][address] = {
             total,
             isConfirmed: false,
             transactions: []
@@ -21,14 +21,14 @@ const mutations = {
 
     [types.ADD_THIRD_PARTY_ADDRESS] (state, { address, total }) {
         console.log('adding third party address', address, total)
-        state.thirdPartyAddresses[address] = {
+        state[THIRD_PARTY_ADDRESS_KEY][address] = {
             total,
             transactions: []
         }
     },
 
     [types.SET_ADDRESS_CONFIRMED_STATUS] (state, { address, isConfirmed }) {
-        state.walletAddresses[address].isConfirmed = isConfirmed
+        state[WALLET_ADDRESS_KEY][address].isConfirmed = isConfirmed
     },
 
     [types.ADD_TRANSACTION] (state, { stack, address, transaction }) {
@@ -75,6 +75,7 @@ const actions = {
 
                 case 'send':
                     dispatch(types.ADD_THIRD_PARTY_ADDRESS, { address: addressKey, total })
+                    dispatch(types.ADD_SEND_FROM_TX, tx)
                     // console.log('got send tx', addressKey, tx)
                     break
                 case 'mint':
@@ -150,6 +151,26 @@ const actions = {
         } else if (confirmations < 6 && state[WALLET_ADDRESS_KEY][address].confirmed) {
             dispatch(types.MARK_ADDRESS_AS_UNCONFIRMED, address)
         }
+    },
+
+    [types.ADD_SEND_FROM_TX] ({ commit }, sendTx) {
+        const { address, amount, blockhash, blocktime, confirmations, fee, timereceived, txid } = sendTx
+
+        commit(types.ADD_TRANSACTION, {
+            stack: THIRD_PARTY_ADDRESS_KEY,
+            address,
+            transaction: {
+                amount,
+                confirmations,
+                fee,
+                timereceived,
+                block: {
+                    hash: blockhash,
+                    time: blocktime
+                },
+                id: txid
+            }
+        })
     },
 
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
