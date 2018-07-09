@@ -7,6 +7,8 @@ const state = {
 }
 
 const mutations = {
+    [types.DO_MINT] () {},
+
     [types.ADD_DENOMINATION] (state, denomination) {
         const name = `${denomination}`
         if (state.currentDenominations[name] === undefined) {
@@ -27,7 +29,7 @@ const mutations = {
 
     [types.UPDATE_MINT] (state, mint) {
         const { id } = mint
-        console.log(id, mint)
+        // console.log(id, mint)
         Vue.set(state.mints, id, mint)
     }
 }
@@ -48,6 +50,12 @@ const actions = {
             isUsed: used,
             id: id || txid,
             ...mint
+        })
+    },
+
+    [types.DO_MINT] ({ commit, state }) {
+        commit(types.DO_MINT, {
+            denominations: state.currentDenominations
         })
     }
 }
