@@ -35,9 +35,12 @@ export default {
             }))
             */
 
-            this.send('create', {
-                addresses,
-                feeperkb: data.fee
+            this.send({
+                type: 'create',
+                data: {
+                    addresses,
+                    feeperkb: data.fee
+                }
             })
         }
     })

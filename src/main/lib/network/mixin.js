@@ -98,7 +98,7 @@ export default {
         }
     },
 
-    send (type, data, actionToDispatch) {
+    send ({ type, collection, data, actionToDispatch }) {
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
@@ -111,7 +111,7 @@ export default {
         console.log('sending data --> ', data)
 
         this.requester.send(JSON.stringify({
-            collection: this.collection,
+            collection: collection || this.collection,
             type,
             data
         }))
