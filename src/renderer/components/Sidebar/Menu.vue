@@ -3,27 +3,28 @@
         <ul>
             <li>
                 <router-link :to="{ name: 'receive-zcoin' }">
-                    <span>{{ $t('navigation.menu.button__receive') }}</span>
+                    <span class="text">{{ $t('navigation.menu.button__receive') }}</span>
                 </router-link>
             </li>
             <li>
                 <router-link :to="{ name: 'send-zcoin' }" exact>
-                    <span>{{ $t('navigation.menu.button__send') }}</span>
+                    <span class="text">{{ $t('navigation.menu.button__send') }}</span>
+                    <span v-show="hasSendNotification" class="has-notification"></span>
                 </router-link>
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'mint-zerocoin' }" exact>
-                    <span>{{ $t('navigation.menu.button__mint') }}</span>
+                    <span class="text">{{ $t('navigation.menu.button__mint') }}</span>
                 </router-link>
             </li>
             <li>
                 <router-link :to="{ name: 'spend-zerocoin' }" exact>
-                    <span>{{ $t('navigation.menu.button__spend') }}</span>
+                    <span class="text">{{ $t('navigation.menu.button__spend') }}</span>
                 </router-link>
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'settings' }" exact>
-                    <span>{{ $t('navigation.menu.button__settings') }}</span>
+                    <span class="text">{{ $t('navigation.menu.button__settings') }}</span>
                 </router-link>
             </li>
         </ul>
@@ -31,14 +32,26 @@
 </template>
 
 <script>
-  import AttentionBadge from '@/components/Badge/AttentionBadge'
+    import { mapGetters } from 'vuex'
+    import AttentionBadge from '@/components/Badge/AttentionBadge'
 
-  export default {
-      name: 'Menu',
-      components: {
-          AttentionBadge
-      }
-  }
+    export default {
+        name: 'Menu',
+        components: {
+            AttentionBadge
+        },
+
+        computed: {
+            ...mapGetters({
+                clipboardAddress: 'Clipboard/address',
+                clipboardHasNewAddress: 'Clipboard/hasNewAddress',
+                currentSendFormAddress: 'ZcoinPayment/createFormAddress'
+            }),
+            hasSendNotification () {
+                return this.clipboardHasNewAddress && this.currentSendFormAddress !== this.clipboardAddress
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -102,10 +115,24 @@
 
         }
 
-        span {
+        .text {
             position: relative;
             z-index: 2;
         }
+
+        .has-notification {
+            @include box-shadow();
+            display: inline-block;
+            width: emRhythm(1);
+            height: emRhythm(1);
+            border-radius: 50%;
+            background: $gradient--green-bright;
+            //position: absolute;
+            //right: 0;
+            //top: 0;
+            text-align: right;
+        }
+
 
 
         &:hover,

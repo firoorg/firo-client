@@ -7,13 +7,15 @@ const state = {
     addPaymentForm: {
         amount: null,
         label: '',
-        address: ''
+        address: '',
+        totalTxFee: 0
     },
     isLoading: false,
     lastSeen: 'blockHeightAsInteger'
 }
 
 const mutations = {
+    [types.CALC_TX_FEE] () {},
     [types.SEND_ZCOIN] () {},
 
     [types.SET_AVAILABLE_FEES] (state, availableFees) {
@@ -35,17 +37,24 @@ const mutations = {
 
     [types.SET_FORM_ADDRESS] (state, address) {
         state.addPaymentForm.address = address
+    },
+
+    [types.SET_TX_FEE] (state, txFee) {
+        console.log('got new tx fee', txFee)
+        state.addPaymentForm.totalTxFee = txFee
     }
 }
 
 const actions = {
-    [types.SET_INITIAL_STATE] ({ dispatch }, initialState = {}) {
+    [types.SET_AVAILABLE_FEES] ({ dispatch }, availableFees) {
+        /*
         const { availableFees } = initialState
 
         if (!availableFees) {
             console.warn('No fees provided in initial state')
             return
         }
+        */
 
         dispatch(types.SET_AVAILABLE_FEES, availableFees)
         dispatch(types.SET_FEE, Object.keys(availableFees)[0])
@@ -79,6 +88,16 @@ const actions = {
         }
 
         commit(types.SET_FEE, key)
+    },
+
+    [types.CALC_TX_FEE] ({ commit }, { payments, fee }) {
+        commit(types.CALC_TX_FEE, {
+            payments: payments.map((payment) => ({
+                amount: payment.amount,
+                address: payment.address
+            })),
+            fee
+        })
     },
 
     [types.SEND_ZCOIN] ({ commit, state }, { payments, fee }) {
