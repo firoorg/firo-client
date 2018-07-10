@@ -16,37 +16,88 @@
             </section>
         </div>
         <section class="current-mint-detail scrollable-height">
+            <template v-if="!hasCurrentMints && hasMintsInProgress">
+                <section class="mints-in-progress">
+                    <h2>Mints in Progress</h2>
 
-                <section class="current-mint">
-                    <h2>Create Mint</h2>
                     <current-mints :current-mints="currentMints" />
                 </section>
-                <form class="checkout" :submit.prevent="onSubmit">
+            </template>
+            <template v-else>
+                <section class="current-mint">
+                    <header>
+                        <h2>Create Mint</h2>
+                        <div v-show="hasMintsInProgress">
+                            <base-popover
+                                    :disabled="showPopover"
+                                    :auto-hide="true"
+                                    placement="bottom"
+                                    popover-class="comet"
+                                    class="mints-in-process-popover"
+                                    :boundaries-element="this.$refs.grid"
+                                    trigger="click"
+                            >
+                                <template slot="target">
+                                    <base-badge :visible="hasMintsInProgress"
+                                                :count="mintsInProgressLength">
+                                        Icon
+                                    </base-badge>
+                                </template>
+
+                                <template slot="content">
+                                    <header>
+                                        <h3>Mints in Progress</h3>
+                                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+
+                                        <current-mints :current-mints="currentMints" />
+                                    </header>
+
+                                    list here
+                                </template>
+                            </base-popover>
+                        </div>
+                    </header>
+                    <current-mints :current-mints="currentMints" />
+                </section>
+                <form class="checkout" @submit.prevent="onSubmit">
                     <div class="has-divider">
-                        <fees-and-amount :fee="{ label: 'Fees', amount: totalMintFee }" :amount="currentMintCost" />
+                        <fees-and-amount :fee="{ label: 'Fees', amount: totalMintFee }"
+                                         :amount="currentMintCost" />
                     </div>
-                    <base-button color="green"
-                                 class="submit"
-                                 :disabled="!canSubmit"
-                                 @click.prevent="onSubmit"
-                                 type="submit">
-                        Start Minting
-                    </base-button>
+                    <mint-confirm-dialog :can-submit="canSubmit"
+                                         :is-open="showPopover"
+                                         :on-cancel="onCancel"
+                                         :on-confirm="onConfirm" popover-class="notice">
+                        <h3>Really?</h3>
+                        <!--
+                        <base-button color="green"
+                                     class="submit"
+                                     :disabled="!canSubmit"
+                                     @click.prevent="onSubmit"
+                                     type="submit">
+                            Start Minting
+                        </base-button>
+                        -->
+                    </mint-confirm-dialog>
                 </form>
+            </template>
         </section>
     </section>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
+    import types from '~/types'
 
     import DenominationSelector from '@/components/DenominationSelector'
     import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
     import FeesAndAmount from '@/components/FeesAndAmount'
+    import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
 
     export default {
         name: 'MintZerocoinPage',
         components: {
+            MintConfirmDialog,
             FeesAndAmount,
             CurrentMints,
             DenominationSelector
@@ -54,12 +105,14 @@
 
         data () {
             return {
+                popoverStatus: ''
             }
         },
 
         computed: {
             ...mapGetters({
-                denominations: 'Mint/currentDenominations'
+                denominations: 'Mint/currentDenominations',
+                mintsInProgress: 'Mint/mintsInProgress'
             }),
 
             currentMints () {
@@ -78,6 +131,10 @@
                     })
             },
 
+            hasCurrentMints () {
+                return !!this.currentMints.length
+            },
+
             currentMintCost () {
                 return this.currentMints.reduce((accumulator, current) => accumulator + current.cost, 0)
             },
@@ -87,13 +144,51 @@
             },
 
             canSubmit () {
+                return !!Object.keys(this.currentMints).length
+            },
+
+            showPopover () {
+                return !!this.popoverStatus
+            },
+
+            hasMintsInProgress () {
                 return true
+                // return !!this.mintsInProgress.length
+            },
+
+            mintsInProgressLength () {
+                return this.mintsInProgress.length
             }
         },
 
         methods: {
+            ...mapActions({
+                resetDenominations: types.mint.RESET_DENOMINATIONS
+            }),
+
             onSubmit () {
                 console.log('start minting')
+                this.popoverStatus = 'showConfirm'
+            },
+
+            onCancel () {
+                console.log('on cancel')
+                this.popoverStatus = ''
+            },
+
+            onConfirm (popoverReset) {
+                console.log('on confirm')
+                this.popoverStatus = 'showSuccess'
+                this.reset(popoverReset)
+            },
+
+            reset (popoverReset) {
+                this.popoverStatus = ''
+                this.resetDenominations()
+
+                if (popoverReset) {
+                    popoverReset()
+                }
             }
         }
     }
@@ -152,6 +247,15 @@
     }
 
     .current-mint {
+        header {
+            // margin-left: emRhythm(3, $ms-up2);
+            margin-bottom: emRhythm(7);
 
+            @include h2-with-description(inherit, $color--polo-dark);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     }
 </style>
