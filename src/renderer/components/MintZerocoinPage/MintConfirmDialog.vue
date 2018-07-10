@@ -103,6 +103,15 @@
             this.minCellWidth = this.$refs.submit.$el.clientWidth
         },
 
+        watch: {
+            // reset timer done on close
+            isOpen (newVal, oldVal) {
+                if (!newVal) {
+                    this.timerDone = false
+                }
+            }
+        },
+
         computed: {
             hasQueuedPayments () {
                 return this.queuedPayments > 0

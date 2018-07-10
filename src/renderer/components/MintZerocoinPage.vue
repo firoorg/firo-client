@@ -12,7 +12,7 @@
                     </p>
                 </header>
 
-                <denomination-selector />
+                <denomination-selector :on-denomination-change="onDenominationChange" />
             </section>
         </div>
         <section class="current-mint-detail scrollable-height">
@@ -67,17 +67,9 @@
                     <mint-confirm-dialog :can-submit="canSubmit"
                                          :is-open="showPopover"
                                          :on-cancel="onCancel"
-                                         :on-confirm="onConfirm" popover-class="notice">
+                                         :on-confirm="onConfirm"
+                                         popover-class="notice">
                         <h3>Really?</h3>
-                        <!--
-                        <base-button color="green"
-                                     class="submit"
-                                     :disabled="!canSubmit"
-                                     @click.prevent="onSubmit"
-                                     type="submit">
-                            Start Minting
-                        </base-button>
-                        -->
                     </mint-confirm-dialog>
                 </form>
             </template>
@@ -165,6 +157,10 @@
             ...mapActions({
                 resetDenominations: types.mint.RESET_DENOMINATIONS
             }),
+
+            onDenominationChange () {
+                this.popoverStatus = ''
+            },
 
             onSubmit () {
                 console.log('start minting')
