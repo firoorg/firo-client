@@ -14,7 +14,7 @@ requester.send(JSON.stringify({
     type: 'create',
     collection: 'payment-request',
     data: {
-        amount: 4000,
+        amount: 4,
         label: 'label',
         message: 'message'
     }
