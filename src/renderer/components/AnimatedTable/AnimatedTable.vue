@@ -66,7 +66,7 @@
         data () {
             return {
                 interval: null,
-                perPage: 5,
+                perPage: 10,
                 rowTransition: 'fade'
             }
         },
@@ -257,6 +257,10 @@
                     td {
                         background: $color--green;
                         color: $color--white;
+                    }
+
+                    & /deep/ .tag {
+                        border-color: mix($color--green, $color--green-dark);
                     }
 
                     &:hover td {

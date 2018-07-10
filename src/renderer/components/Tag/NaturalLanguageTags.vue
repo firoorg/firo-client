@@ -54,8 +54,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '../../styles';
-
     .word {
         &:before,
         &:after {
@@ -70,9 +68,8 @@
     }
 
     .interactive .tag {
-        border: none;
         background: transparent;
-        border-bottom: emRhythm(0.5, $silent: true) solid $color--polo;
+        // border-bottom: emRhythm(0.5, $silent: true) solid $color--polo;
         color: inherit;
         transition: background-color 0.15s ease-in, border-color 0.15s ease-in;
         cursor: pointer;
@@ -80,6 +77,18 @@
         &:hover {
             background: rgba($color--polo, 0.5);
             border-color: $color--polo-dark;
+        }
+    }
+
+    .tag {
+        transition: border-color 0.15s ease-in;
+
+        &.tag-medium {
+            border-bottom: emRhythm(0.25, $silent: true) solid $color--polo;
+        }
+
+        &.tag-large {
+            border-bottom: emRhythm(0.5, $silent: true) solid $color--polo;
         }
     }
 </style>

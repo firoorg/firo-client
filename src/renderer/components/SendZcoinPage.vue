@@ -1,37 +1,41 @@
 <template>
-    <section class="send-zcoin">
+    <section class="send-zcoin" ref="main">
         <div class="scrollable-height">
             <section class="paymentrequest-list">
                 <base-popover
-                        :open="true"
-                        :disabled="false"
-                        :auto-hide="true"
+                        :open="showAddressFoundInClipboardPopover"
+                        :auto-hide="false"
                         placement="left"
                         popover-class="green advice"
+                        :boundaries-element="$refs.main"
                         class="pending-payments-popover"
                         trigger="manually"
                 >
                     <template slot="target">
                         <h1>
-                            <base-badge :visible="true"
-                                        :count="1">
+                            <!--<base-badge :visible="true"
+                                        :count="1">-->
                                 Send<br>
                                 Zcoin
-                            </base-badge>
+                            <!--</base-badge>-->
                         </h1>
                     </template>
 
                     <template slot="content">
                         <header>
-                            <h2>Zcoin Address found in clipboard</h2>
+                            <h3>Zcoin Address found</h3>
                         </header>
 
-                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
-                        <footer>
-                            <router-link :to="{ name: 'home' }">
-                                Fill Form
-                            </router-link>
+                        <p>
+                            Found a Zcoin address in your clipboard.<br>
+                            Would you like to use it as the recipient address to send Zcoin?
+                        </p>
+                        <div>
+                            <footer>
+                                <base-button is-outline @click.prevent="markAsNotified">Nope</base-button>
+                                <base-button @click.prevent="setCurrentFormAddress">Yes, go ahead!</base-button>
                         </footer>
+                        </div>
 
                     </template>
                 </base-popover>
@@ -54,10 +58,12 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import SendZcoin from '@/components/SendZcoinPage/Send'
+
+    import types from '~/types'
 
     const tableFields = [
         {
@@ -98,10 +104,23 @@
             }
         },
 
+        beforeDestroy () {
+            // console.log('mark as notified!')
+            // this.$store.dispatch(types.clipboard.MARK_AS_NOTIFIED)
+        },
+
         computed: {
             ...mapGetters({
-                paymentRequests: 'PaymentRequest/paymentRequests'
+                paymentRequests: 'PaymentRequest/paymentRequests',
+                clipboardNotified: 'Clipboard/isNotified',
+                clipboardAddress: 'Clipboard/address',
+                clipboardHasNewAddress: 'Clipboard/hasNewAddress',
+                currentFormAddress: 'ZcoinPayment/createFormAddress'
             }),
+
+            showAddressFoundInClipboardPopover () {
+                return this.clipboardHasNewAddress && this.clipboardAddress !== this.currentFormAddress
+            },
 
             selectedPaymentRequestWithAddress () {
                 if (!this.selectedPaymentRequest) {
@@ -133,6 +152,21 @@
         },
 
         methods: {
+            ...mapActions({
+                setFormAddress: types.zcoinpayment.SET_FORM_ADDRESS,
+                markAsNotified: types.clipboard.MARK_AS_NOTIFIED
+            }),
+            setCurrentFormAddress () {
+                if (!this.clipboardAddress) {
+                    return
+                }
+
+                this.setFormAddress(this.clipboardAddress)
+                this.markAsNotified()
+                // this.$store.dispatch(types.zcoinpayment.SET_FORM_ADDRESS, this.clipboardAddress)
+                // this.$store.dispatch(types.clipboard.MARK_AS_NOTIFIED)
+            },
+
             onTableRowSelect (rowData, index, event) {
                 // todo get paymentRequest from store
                 this.selectedPaymentRequest = rowData.address

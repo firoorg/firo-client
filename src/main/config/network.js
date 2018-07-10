@@ -14,7 +14,7 @@ export default {
         host: HOST,
         ports: {
             publisher: 8451,
-            request: 15558
+            request: 25557
         }
     }
 }

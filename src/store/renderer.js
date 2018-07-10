@@ -17,6 +17,10 @@ const store = new Vuex.Store({
     strict: process.env.NODE_ENV !== 'production' // this up to you
 })
 
+if (process.env.NODE_ENV !== 'production') {
+    window.vuexStore = store
+}
+
 // import master state
 try {
     store.replaceState({...store.state, ...ipcRenderer.sendSync('vuex-connect')})

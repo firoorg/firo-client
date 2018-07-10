@@ -40,10 +40,12 @@
     import { mapGetters } from 'vuex'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
+    import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
 
     const tableFields = [
         {
-            name: 'amount'
+            name: 'amount',
+            sortField: 'amount'
         },
         {
             name: RelativeDate,
@@ -52,9 +54,10 @@
             sortField: 'created_at'
         },
         {
-            name: 'label',
+            name: LabelWithHashTags,
             title: 'Label',
-            sortField: 'label'
+            sortField: 'label',
+            contentField: 'label'
         }
         /*,
         {
@@ -81,7 +84,8 @@
 
         computed: {
             ...mapGetters({
-                paymentRequests: 'PaymentRequest/paymentRequests'
+                paymentRequests: 'PaymentRequest/paymentRequests',
+                walletAddresses: 'Address/walletAddresses'
             }),
 
             selectedPaymentRequestWithAddress () {
@@ -89,20 +93,17 @@
                     return null
                 }
 
-                // console.log(this.$store.state.Address.addresses)
-                const getter = this.$store.state.Address.addresses
-                // const getter = this.$store.state['Zcoin/addresses']
-
-                const filteredAddress = getter.filter((address) => {
+                const filteredAddress = this.walletAddresses.filter((address) => {
                     return address.address === this.selectedPaymentRequest
                 })
 
                 console.log(filteredAddress)
 
-                const address = filteredAddress.length ? filteredAddress[0] : null
                 const [ paymentRequest ] = this.paymentRequests.filter((request) => {
                     return request.address === this.selectedPaymentRequest
                 })
+
+                const address = filteredAddress.length ? filteredAddress[0] : paymentRequest.address
 
                 console.log(paymentRequest)
 

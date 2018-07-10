@@ -2,6 +2,7 @@
     <th v-if="isHeader"
         class="vuetable-th-component-relative-date"
         v-html="title"
+        @click="$emit('click', rowField, $event)"
     ></th>
     <td v-else
         class="vuetable-td-component-relative-date"

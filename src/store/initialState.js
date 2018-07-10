@@ -94,50 +94,38 @@ module.exports = {
     },
 
     Address: { // daemon: isSubscription
-        addresses: [
-            {
-                address: 'TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V', // daemon
-                transactions: [
-                    {
-                        txid: 'txid', // daemon
-                        timestamp: Date.now() - (Math.random() * 100000), // daemon
-                        amount: 1000, // daemon
-                        type: 'in|out|mint|spend|newcoin', // daemon
-                        confirmations: 1 // daemon
-                    }
-                ]
-            }
-        ]
+        walletAddresses: {},
+        thirdPartyAddresses: {}
     },
 
     Mint: { // daemon: isSubscription
         currentDenominations: {},
-        mints: [
-            {
-                mintid: 'just-a-random-id',
-                created_at: Date.now() - (Math.random() * 100000),
-                denomination: 25,
-                isUsed: false
+        mints: {
+            '00463ca518fad1f89bcc66b6ae160a7700f752948b87a0b9c76b37e2297a997a': {
+                amount: 1,
+                blockhash: '9e06fc2a4fd4542f098f01da5179a7559cdaf21676174686639aaf6ddbdf6364',
+                blocktime: 1517944590,
+                confirmations: 42032,
+                fee: 0.009999999776482582,
+                time: 1517944389,
+                timereceived: 1517944389,
+                txid: '00463ca518fad1f89bcc66b6ae160a7700f752948b87a0b9c76b37e2297a997a',
+                status: 'new'
             },
-            {
-                mintid: 'just-a-random-id',
-                created_at: Date.now() - (Math.random() * 100000),
-                denomination: 10,
-                isUsed: false
-            },
-            {
-                mintid: 'just-a-random-id',
-                created_at: Date.now() - (Math.random() * 100000),
-                denomination: 10,
-                isUsed: true
-            },
-            {
-                mintid: 'just-a-random-id',
-                created_at: Date.now() - (Math.random() * 100000),
-                denomination: 10,
-                isUsed: false
+
+            '0361e6a52525220e4054cf5232b3e9291d03da8791d73bcf98a01fd10d4b6fbd': {
+                amount: 10,
+                blockhash: '9e06fc2a4fd4542f098f01da5179a7559cdaf21676174686639aaf6ddbdf6364',
+                blocktime: 1517944590,
+                confirmations: 42032,
+                fee: 0.009999999776482582,
+                time: 1517944400,
+                timereceived: 1517944400,
+                txid: '0361e6a52525220e4054cf5232b3e9291d03da8791d73bcf98a01fd10d4b6fbd',
+                status: 'new'
             }
-        ]
+        }
+
     },
 
     Blockchain: { // daemon: isSubscription
@@ -200,7 +188,11 @@ module.exports = {
 
     Clipboard: {
         clipboardValue: '',
-        timestamp: null
+        address: null,
+        amount: 0,
+        message: null,
+        timestamp: null,
+        notified: false
     },
 
     App: { // gui

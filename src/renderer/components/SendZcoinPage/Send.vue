@@ -284,8 +284,16 @@
 
             updateFee (newVal) {
                 this.$store.dispatch(types.zcoinpayment.SET_FEE, newVal)
+                console.log('sending fee + payments to zcoind to get estimated total fee')
                 // this.fee = newVal
                 this.toggleFeeSelection()
+            },
+
+            getTransactionFee () {
+                this.$store.dispatch(types.zcoinpayment.CALC_TX_FEE, {
+                    payments: Object.values(this.pendingPayments),
+                    fee: this.fee.amount
+                })
             },
 
             // ---
@@ -358,6 +366,12 @@
                 this.hasSent = true
                 console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
                 this.removeFromQueue(this.address)
+                this.$store.dispatch(types.zcoinpayment.SEND_ZCOIN, {
+                    payments: Object.values(this.pendingPayments),
+                    fee: this.fee.amount
+                })
+                // this.removeFromQueue(this.address)
+                this.clearQueue()
 
                 this.popoverStatus = 'showSuccess'
                 this.popoverTimeout = setTimeout(() => {
@@ -382,6 +396,7 @@
                 if (!this.isConfirmed) {
                     console.log('not confirmed yet... showing tooltip')
                     this.addToQueue()
+                    this.getTransactionFee()
 
                     this.openSendConfirmation()
                     return

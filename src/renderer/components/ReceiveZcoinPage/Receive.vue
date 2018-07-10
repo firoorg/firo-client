@@ -51,10 +51,9 @@
 
                 <!-- E-Mail Template -->
                 <div style="position: absolute; top:0;left:0;height:0;width:0;overflow: hidden">
-                    <!--
                     <receive-payment-request-email-template
                             :message="message"
-                            :amount="amountRequested"
+                            :amount="amount"
                             :uri="getZcoinUri"
                             ref="emailTemplate">
                         <template slot="qrcode">
@@ -65,7 +64,6 @@
                             </qr-code>
                         </template>
                     </receive-payment-request-email-template>
-                    -->
                 </div>
             </div>
         </section>
@@ -112,10 +110,13 @@
               if (!this.address) {
                   return ''
               }
-              const { address } = this.address
-              const messageParam = this.message ? `&message=${encodeURIComponent(this.message)}` : ''
+              const address = this.address.address || this.address
+              const params = []
+              params.push(this.amount ? `amount=${this.amount.toFixed(8)}` : '')
+              params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
+              const paramsString = params.length ? `?${params.join('&')}` : ''
 
-              return `zcoin://${address}?amount=${this.amount.toFixed(8)}${messageParam}`
+              return `zcoin://${address}${paramsString}`
           }
       },
       methods: {
@@ -123,6 +124,8 @@
               console.log('toggle qr code')
               this.showQrCode = !this.showQrCode
           },
+
+          // zcoin://TCuSpTwexLpA2FM6VrwkkXkq1gYUoYNiPo?amount=10.00000000&message=Hey%2C%20this%20is%20just%20a%20new%20Payment%20Request%20test%20showing%20that%20sharing%20works%20out%20of%20the%20box%20now.%0A%0Acheerio%0Aj
 
           tagClicked (tag) {
               console.log('tag clicked -->', tag)

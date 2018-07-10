@@ -14,11 +14,15 @@ export default {
         createPaymentRequest ({ label, message, amount }) {
             console.log('CREATING PAYMENT REQUEST')
 
-            this.send('create', {
-                label,
-                amount,
-                message
-            }, types.paymentrequest.ADD_PAYMENT_REQUEST)
+            this.send({
+                type: 'create',
+                data: {
+                    label,
+                    amount,
+                    message
+                },
+                actionToDispatch: types.paymentrequest.ADD_PAYMENT_REQUEST
+            })
         }
     })
 }
