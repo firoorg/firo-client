@@ -111,9 +111,12 @@
                   return ''
               }
               const address = this.address.address || this.address
-              const messageParam = this.message ? `&message=${encodeURIComponent(this.message)}` : ''
+              const params = []
+              params.push(this.amount ? `amount=${this.amount.toFixed(8)}` : '')
+              params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
+              const paramsString = params.length ? `?${params.join('&')}` : ''
 
-              return `zcoin://${address}?amount=${this.amount.toFixed(8)}${messageParam}`
+              return `zcoin://${address}${paramsString}`
           }
       },
       methods: {
