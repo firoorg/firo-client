@@ -40,6 +40,7 @@
     import { mapGetters } from 'vuex'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
+    import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
 
     const tableFields = [
         {
@@ -53,9 +54,10 @@
             sortField: 'created_at'
         },
         {
-            name: 'label',
+            name: LabelWithHashTags,
             title: 'Label',
-            sortField: 'label'
+            sortField: 'label',
+            contentField: 'label'
         }
         /*,
         {

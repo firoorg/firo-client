@@ -259,6 +259,10 @@
                         color: $color--white;
                     }
 
+                    & /deep/ .tag {
+                        border-color: mix($color--green, $color--green-dark);
+                    }
+
                     &:hover td {
                         background: mix($color--green-bright, $color--green, (100% * $hover-opacity));
                     }
