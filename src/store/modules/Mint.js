@@ -27,6 +27,10 @@ const mutations = {
         state.currentDenominations[name] = state.currentDenominations[name] - 1
     },
 
+    [types.RESET_DENOMINATIONS] (state) {
+        state.currentDenominations = {}
+    },
+
     [types.UPDATE_MINT] (state, mint) {
         const { id } = mint
         // console.log(id, mint)
@@ -41,6 +45,14 @@ const actions = {
 
     [types.REMOVE_DENOMINATION] ({ commit, state }, denomination) {
         commit(types.REMOVE_DENOMINATION, denomination)
+    },
+
+    [types.RESET_DENOMINATIONS] ({ commit, state }) {
+        if (!Object.keys(state.currentDenominations).length) {
+            return
+        }
+
+        commit(types.RESET_DENOMINATIONS)
     },
 
     [types.UPDATE_MINT] ({ commit, state }, mint) {
@@ -81,6 +93,12 @@ const getters = {
 
                 return accumulator
             }, {})
+    },
+
+    mintsInProgress (state) {
+        return Object.values(state.mints)
+            .filter((mint) => !mint.isUsed)
+            .filter((mint) => mint.confirmations < 6)
     }
 }
 
