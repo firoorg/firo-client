@@ -109,7 +109,7 @@
 
             currentMints () {
                 return Object.entries(this.denominations)
-                // filter out unused
+                    // filter out unused
                     .filter((pair) => pair[1])
                     // transform to [{denomination: '25', amount: 1}]
                     .map((pair) => {
@@ -155,7 +155,8 @@
 
         methods: {
             ...mapActions({
-                resetDenominations: types.mint.RESET_DENOMINATIONS
+                resetDenominations: types.mint.RESET_DENOMINATIONS,
+                doMint: types.mint.DO_MINT
             }),
 
             onDenominationChange () {
@@ -175,6 +176,11 @@
             onConfirm (popoverReset) {
                 console.log('on confirm')
                 this.popoverStatus = 'showSuccess'
+
+                this.doMint({
+                    denominations: this.currentMints
+                })
+
                 this.reset(popoverReset)
             },
 

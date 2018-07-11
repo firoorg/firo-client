@@ -13,11 +13,13 @@ import { getApiStatus } from './ApiStatus'
 import Address from './Address'
 import PaymentRequest from './PaymentRequest'
 import SendZcoin from './SendZcoin'
+import Mint from './Mint'
 
 const modules = {
     Address,
     PaymentRequest,
-    SendZcoin
+    SendZcoin,
+    Mint
 }
 
 const debug = Debug('zcoin:network')
