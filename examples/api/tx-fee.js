@@ -18,6 +18,6 @@ requester.send(JSON.stringify({
               TUAJcpmNqpg4gX4RC2ZuUN6eA34MYpgjNE: 0.01,
               TV3f8WhYuMyMLGJuwhdU7psvmCS63yuy3t: 0.01,
           },
-          feeperkb: "0.002"
+          feeperkb: 0.002
       }
 }))
