@@ -80,7 +80,7 @@ export default {
             commit
         })
 
-        const encryption = this.setupEncryption(apiStatus)
+        const encryption = apiStatus.auth ? this.setupEncryption(apiStatus) : null
 
         Object.keys(modules).forEach((moduleName) => {
             const config = {

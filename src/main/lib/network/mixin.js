@@ -24,13 +24,13 @@ export default {
         this.requester = zmq.socket('req')
         this.subscriber = zmq.socket('sub')
 
-        if (!encryption) {
-            throw new Error('encryption disabled.')
+        if (encryption) {
+            this.requester.curve_serverkey = encryption.server.public
+            this.requester.curve_publickey = encryption.client.public
+            this.requester.curve_secretkey = encryption.client.private
+        } else if (process.env.NODE_ENV !== 'development') {
+            throw new Error('no encryption provided.')
         }
-
-        this.requester.curve_serverkey = encryption.server.public
-        this.requester.curve_publickey = encryption.client.public
-        this.requester.curve_secretkey = encryption.client.private
 
         this.requester.connect(`${host}:${ports.request}`)
         // this.subscriber.subscribe(this.collection)
