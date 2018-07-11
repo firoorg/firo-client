@@ -7,14 +7,16 @@ export default {
         host: HOST,
         ports: {
             publisher: 8451,
-            request: 5557
+            request: 5557,
+            status: 5558
         }
     },
     testnet: {
         host: HOST,
         ports: {
             publisher: 8451,
-            request: 25557
+            request: 25557,
+            status: 25558
         }
     }
 }
