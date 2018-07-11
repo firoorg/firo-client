@@ -6,24 +6,21 @@
                         :open="showAddressFoundInClipboardPopover"
                         :auto-hide="false"
                         placement="left"
-                        popover-class="green advice"
+                        popover-class="advice"
                         :boundaries-element="$refs.main"
                         class="pending-payments-popover"
-                        trigger="manually"
+                        _trigger="manually"
                 >
                     <template slot="target">
                         <h1>
-                            <!--<base-badge :visible="true"
-                                        :count="1">-->
-                                Send<br>
-                                Zcoin
-                            <!--</base-badge>-->
+                            Send<br>
+                            Zcoin
                         </h1>
                     </template>
 
                     <template slot="content">
                         <header>
-                            <h3>Zcoin Address found</h3>
+                            <h2>Zcoin Address found</h2>
                         </header>
 
                         <p>
@@ -32,8 +29,16 @@
                         </p>
                         <div>
                             <footer>
-                                <base-button is-outline @click.prevent="markAsNotified">Nope</base-button>
-                                <base-button @click.prevent="setCurrentFormAddress">Yes, go ahead!</base-button>
+                                <base-button :is-outline="true"
+                                             :is-dark="true"
+                                             @click.prevent="markAsNotified">
+                                    Nope
+                                </base-button>
+                                <base-button color="green"
+                                             :is-dark="true"
+                                             @click.prevent="setCurrentFormAddress">
+                                    Yes, go ahead!
+                                </base-button>
                         </footer>
                         </div>
 
