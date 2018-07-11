@@ -4,7 +4,8 @@
                       :key="denomination"
                       :max-value="maxValue"
                       :max-height="maxHeight"
-                      :denomination="denomination">
+                      :denomination="denomination"
+                      :on-change="onDenominationChange">
         </denomination>
     </section>
 </template>
@@ -17,6 +18,13 @@
         name: 'DenominationSelector',
         components: {
             Denomination
+        },
+
+        props: {
+            onDenominationChange: {
+                type: Function,
+                default: () => {}
+            }
         },
 
         data () {

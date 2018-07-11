@@ -65,10 +65,13 @@ const actions = {
         })
     },
 
-    [types.DO_MINT] ({ commit, state }) {
+    [types.DO_MINT] ({ commit, state }, { denominations }) {
+        console.log(denominations)
+
         commit(types.DO_MINT, {
-            denominations: state.currentDenominations
+            denominations
         })
+        // console.log('sending mint', denominations)
     }
 }
 

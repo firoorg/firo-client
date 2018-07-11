@@ -45,6 +45,10 @@
             maxHeight: {
                 type: Number,
                 required: true
+            },
+            onChange: {
+                type: Function,
+                default: () => {}
             }
         },
 
@@ -117,6 +121,7 @@
                 }
 
                 this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
+                this.onChange()
             },
 
             decrease () {
@@ -125,6 +130,7 @@
                 }
 
                 this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
+                this.onChange()
             }
         }
     }

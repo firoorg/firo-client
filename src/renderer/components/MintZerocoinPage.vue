@@ -12,7 +12,7 @@
                     </p>
                 </header>
 
-                <denomination-selector />
+                <denomination-selector :on-denomination-change="onDenominationChange" />
             </section>
         </div>
         <section class="current-mint-detail scrollable-height">
@@ -67,17 +67,9 @@
                     <mint-confirm-dialog :can-submit="canSubmit"
                                          :is-open="showPopover"
                                          :on-cancel="onCancel"
-                                         :on-confirm="onConfirm" popover-class="notice">
+                                         :on-confirm="onConfirm"
+                                         popover-class="notice">
                         <h3>Really?</h3>
-                        <!--
-                        <base-button color="green"
-                                     class="submit"
-                                     :disabled="!canSubmit"
-                                     @click.prevent="onSubmit"
-                                     type="submit">
-                            Start Minting
-                        </base-button>
-                        -->
                     </mint-confirm-dialog>
                 </form>
             </template>
@@ -117,7 +109,7 @@
 
             currentMints () {
                 return Object.entries(this.denominations)
-                // filter out unused
+                    // filter out unused
                     .filter((pair) => pair[1])
                     // transform to [{denomination: '25', amount: 1}]
                     .map((pair) => {
@@ -163,8 +155,13 @@
 
         methods: {
             ...mapActions({
-                resetDenominations: types.mint.RESET_DENOMINATIONS
+                resetDenominations: types.mint.RESET_DENOMINATIONS,
+                doMint: types.mint.DO_MINT
             }),
+
+            onDenominationChange () {
+                this.popoverStatus = ''
+            },
 
             onSubmit () {
                 console.log('start minting')
@@ -179,6 +176,11 @@
             onConfirm (popoverReset) {
                 console.log('on confirm')
                 this.popoverStatus = 'showSuccess'
+
+                this.doMint({
+                    denominations: this.currentMints
+                })
+
                 this.reset(popoverReset)
             },
 

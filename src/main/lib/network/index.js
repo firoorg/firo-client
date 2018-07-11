@@ -1,18 +1,25 @@
+import fs from 'fs'
+import { join } from 'path'
+
 // import types from '../../../store/types'
-import NETWORK_CONFIG from '../../config/network'
+import CONFIG from '../../config'
 import Debug from 'debug'
 import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
 // import blockchain from './blockchain'
+import { getApiStatus } from './ApiStatus'
+
 import Address from './Address'
 import PaymentRequest from './PaymentRequest'
 import SendZcoin from './SendZcoin'
+import Mint from './Mint'
 
 const modules = {
     Address,
     PaymentRequest,
-    SendZcoin
+    SendZcoin,
+    Mint
 }
 
 const debug = Debug('zcoin:network')
@@ -63,11 +70,22 @@ export default {
         // todo whitelist modules via moduleNames
 
         debug('connected')
+        debug('getting api status')
+
+        const appConfig = CONFIG.network[CONFIG.network.currentNetwork] || {}
+
+        const apiStatus = await getApiStatus({
+            ...appConfig,
+            dispatch,
+            commit
+        })
+
+        const encryption = this.setupEncryption(apiStatus)
+
         Object.keys(modules).forEach((moduleName) => {
-            const appConfig = NETWORK_CONFIG[NETWORK_CONFIG.currentNetwork] || {}
             const config = {
                 ...appConfig,
-                ...(NETWORK_CONFIG[moduleName] || {})
+                ...(CONFIG.network[moduleName] || {})
             }
 
             const module = modules[moduleName]
@@ -89,11 +107,31 @@ export default {
             module.init({
                 ...config,
                 dispatch,
-                commit
+                commit,
+                encryption
             })
 
             // console.log(module)
         })
+    },
+
+    setupEncryption (apiStatus) {
+        const { datadir } = apiStatus
+        const { root, client, server, fileName } = CONFIG.app.folders.encryption
+
+        let certificates = {}
+
+        for (let endpoint of [client, server]) {
+            const keysPath = join(datadir, root, endpoint, fileName)
+            const endpoindCertificates = JSON.parse(fs.readFileSync(keysPath).toString())
+
+            certificates = {
+                ...certificates,
+                [endpoint]: endpoindCertificates.data
+            }
+        }
+
+        return certificates
     },
 
     close () {

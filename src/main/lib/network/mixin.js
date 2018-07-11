@@ -18,14 +18,22 @@ export default {
     dispatchAction: null,
     commitMutation: null,
 
-    init ({ host, ports, dispatch, commit }) {
+    init ({ host, ports, dispatch, commit, encryption }) {
         console.log(`connecting to ${ports.request}`)
 
         this.requester = zmq.socket('req')
         this.subscriber = zmq.socket('sub')
 
+        if (!encryption) {
+            throw new Error('encryption disabled.')
+        }
+
+        this.requester.curve_serverkey = encryption.server.public
+        this.requester.curve_publickey = encryption.client.public
+        this.requester.curve_secretkey = encryption.client.private
+
         this.requester.connect(`${host}:${ports.request}`)
-        this.subscriber.subscribe(this.collection)
+        // this.subscriber.subscribe(this.collection)
 
         this.dispatchAction = dispatch
         this.commitMutation = commit
