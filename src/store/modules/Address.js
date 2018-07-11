@@ -58,38 +58,51 @@ const actions = {
             console.log('total:', total)
 
             for (let txid of Object.keys(txids)) {
-                const tx = txids[txid]
-                // console.log(tx)
+                const { category: txCategories } = txids[txid]
 
-                const { category } = tx
-                console.log('category', category)
+                console.log('txCategories', txCategories)
 
-                if (!category) {
-                    console.log(tx, address)
-                    return
-                }
+                for (let txCategory of Object.keys(txCategories)) {
+                    console.log('txCategory', txCategory)
 
-                switch (category.toLowerCase()) {
-                case 'receive':
-                    dispatch(types.ADD_WALLET_ADDRESS, { address: addressKey, total })
-                    dispatch(types.ADD_RECEIVE_FROM_TX, tx)
-                    break
+                    const tx = txCategories[txCategory]
+                    const { category } = tx
 
-                case 'send':
-                    dispatch(types.ADD_THIRD_PARTY_ADDRESS, { address: addressKey, total })
-                    dispatch(types.ADD_SEND_FROM_TX, tx)
-                    // console.log('got send tx', addressKey, tx)
-                    break
-                case 'mint':
-                    dispatch(types.ADD_MINT_FROM_TX, tx)
-                    break
-                case 'spend':
-                    console.log('spend tx', tx)
-                    // dispatch(types.ADD_SPEND_FROM_TX, tx)
-                    break
-                default:
-                    console.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
-                    break
+                    console.log('category', category)
+
+                    if (!category) {
+                        console.log(tx, address)
+                        return
+                    }
+
+                    switch (category.toLowerCase()) {
+                    case 'receive':
+                        dispatch(types.ADD_WALLET_ADDRESS, {
+                            address: addressKey,
+                            total
+                        })
+                        dispatch(types.ADD_RECEIVE_FROM_TX, tx)
+                        break
+
+                    case 'send':
+                        dispatch(types.ADD_THIRD_PARTY_ADDRESS, {
+                            address: addressKey,
+                            total
+                        })
+                        dispatch(types.ADD_SEND_FROM_TX, tx)
+                        // console.log('got send tx', addressKey, tx)
+                        break
+                    case 'mint':
+                        dispatch(types.ADD_MINT_FROM_TX, tx)
+                        break
+                    case 'spend':
+                        console.log('spend tx', tx)
+                        // dispatch(types.ADD_SPEND_FROM_TX, tx)
+                        break
+                    default:
+                        console.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
+                        break
+                    }
                 }
             }
         }
@@ -116,7 +129,10 @@ const actions = {
             return
         }
 
-        commit(types.SET_ADDRESS_CONFIRMED_STATUS, { address, isConfirmed: true })
+        commit(types.SET_ADDRESS_CONFIRMED_STATUS, {
+            address,
+            isConfirmed: true
+        })
     },
 
     [types.MARK_ADDRESS_AS_UNCONFIRMED] ({ commit, state }, address) {
@@ -124,11 +140,14 @@ const actions = {
             return
         }
 
-        commit(types.SET_ADDRESS_CONFIRMED_STATUS, { address, isConfirmed: false })
+        commit(types.SET_ADDRESS_CONFIRMED_STATUS, {
+            address,
+            isConfirmed: false
+        })
     },
 
     [types.ADD_RECEIVE_FROM_TX] ({ commit, dispatch, state }, receiveTx) {
-        const { address, amount, blockhash, blocktime, confirmations, fee, timereceived, txid } = receiveTx
+        const { address, amount, blockhash, blocktime, category, confirmations, timereceived, txid } = receiveTx
         // dispatch(types.ADD_ADDRESS, { address })
 
         commit(types.ADD_TRANSACTION, {
@@ -136,8 +155,8 @@ const actions = {
             address,
             transaction: {
                 amount,
+                category,
                 confirmations,
-                fee,
                 timereceived,
                 block: {
                     hash: blockhash,
@@ -156,13 +175,14 @@ const actions = {
     },
 
     [types.ADD_SEND_FROM_TX] ({ commit }, sendTx) {
-        const { address, amount, blockhash, blocktime, confirmations, fee, timereceived, txid } = sendTx
+        const { address, amount, blockhash, blocktime, category, confirmations, fee, timereceived, txid } = sendTx
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,
             address,
             transaction: {
                 amount,
+                category,
                 confirmations,
                 fee,
                 timereceived,
