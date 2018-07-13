@@ -21,7 +21,6 @@
                     <h2>Mints in Progress</h2>
 
                     <mints-in-progress-list :mints="mintsInProgress" />
-                    <current-mints :current-mints="currentMints" />
                 </section>
             </template>
             <template v-else>
@@ -49,11 +48,9 @@
                                     <header>
                                         <h3>Mints in Progress</h3>
                                         <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
-
-                                        <current-mints :current-mints="currentMints" />
                                     </header>
 
-                                    list here
+                                    <mints-in-progress-list :mints="mintsInProgress" />
                                 </template>
                             </base-popover>
                         </div>
