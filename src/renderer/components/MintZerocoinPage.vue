@@ -20,6 +20,7 @@
                 <section class="mints-in-progress">
                     <h2>Mints in Progress</h2>
 
+                    <mints-in-progress-list :mints="mintsInProgress" />
                     <current-mints :current-mints="currentMints" />
                 </section>
             </template>
@@ -85,10 +86,12 @@
     import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
     import FeesAndAmount from '@/components/FeesAndAmount'
     import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
+    import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
 
     export default {
         name: 'MintZerocoinPage',
         components: {
+            MintsInProgressList,
             MintConfirmDialog,
             FeesAndAmount,
             CurrentMints,
