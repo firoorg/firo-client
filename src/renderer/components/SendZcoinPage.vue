@@ -36,7 +36,7 @@
                                 </base-button>
                                 <base-button color="green"
                                              :is-dark="true"
-                                             @click.prevent="setCurrentFormAddress">
+                                             @click.prevent="setCurrentFormFields">
                                     Yes, go ahead!
                                 </base-button>
                         </footer>
@@ -119,6 +119,7 @@
                 paymentRequests: 'PaymentRequest/paymentRequests',
                 clipboardNotified: 'Clipboard/isNotified',
                 clipboardAddress: 'Clipboard/address',
+                clipboardAmount: 'Clipboard/amount',
                 clipboardHasNewAddress: 'Clipboard/hasNewAddress',
                 currentFormAddress: 'ZcoinPayment/createFormAddress'
             }),
@@ -159,14 +160,20 @@
         methods: {
             ...mapActions({
                 setFormAddress: types.zcoinpayment.SET_FORM_ADDRESS,
+                setFormAmount: types.zcoinpayment.SET_FORM_AMOUNT,
                 markAsNotified: types.clipboard.MARK_AS_NOTIFIED
             }),
-            setCurrentFormAddress () {
+            setCurrentFormFields () {
                 if (!this.clipboardAddress) {
                     return
                 }
 
                 this.setFormAddress(this.clipboardAddress)
+
+                if (this.clipboardAmount) {
+                    this.setFormAmount(this.clipboardAmount)
+                }
+
                 this.markAsNotified()
                 // this.$store.dispatch(types.zcoinpayment.SET_FORM_ADDRESS, this.clipboardAddress)
                 // this.$store.dispatch(types.clipboard.MARK_AS_NOTIFIED)

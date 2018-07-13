@@ -99,7 +99,7 @@ windowManager.connectToStore({ store, namespace: 'Window' })
 windowManager.registerWindows(CONFIG.windows)
 windowManager.setupAppEvents()
 
-clipboard.watch(store)
+clipboard.watch({ store, deeplink })
 
 app.on('ready', () => {
     // store.dispatch('Window/show', 'welcomeGuide')

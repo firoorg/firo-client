@@ -12,7 +12,7 @@ const isDiffText = (str1, str2) => str2 && str1 !== str2
 // const isDiffImage = (img1, img2) => !img2.isEmpty() && img1.toDataURL() !== img2.toDataURL()
 
 export default {
-    watch (store) {
+    watch ({ store, deeplink }) {
         if (watcherId) {
             return
         }
@@ -21,7 +21,8 @@ export default {
                 console.log('text changed', previousText)
 
                 if (containsZcoinUri(previousText)) {
-                    store.dispatch(types.clipboard.SET_CLIPBOARD, previousText)
+                    deeplink.parseZcoinUrl(previousText)
+                    // store.dispatch(types.clipboard.SET_CLIPBOARD, previousText)
                 } else {
                     const prefixes = store.getters['Settings/b58Prefixes']
                     const addresses = containsZcoinAddress(previousText, prefixes)

@@ -46,17 +46,6 @@ export default {
 
             console.log(addresses, data.fee)
 
-            /*
-            this.requester.send(JSON.stringify({
-                collection: 'send-zcoin',
-                type: 'create',
-                data: {
-                    addresses,
-                    feeperkb: data.fee
-                }
-            }))
-            */
-
             this.send({
                 type: 'create',
                 data: {

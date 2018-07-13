@@ -35,11 +35,11 @@ export default {
         app.on('open-url', (event, url) => {
             event.preventDefault()
 
-            this.onOpenUrl(url)
+            this.parseZcoinUrl(url)
         })
     },
 
-    onOpenUrl (url) {
+    parseZcoinUrl (url) {
         const parsed = urlParse(url, true)
         const prefixes = this.store.getters['Settings/b58Prefixes']
 
