@@ -1,7 +1,8 @@
+import Debug from 'debug'
 import zmq from 'zeromq'
 import types from '../../../store/types'
 
-// const debug = Debug('zcoin:network:api')
+const debug = Debug('zcoin:network:mixin')
 
 // @see http://zguide.zeromq.org/php:chapter5#Getting-an-Out-of-Band-Snapshot
 export default {
@@ -12,6 +13,7 @@ export default {
     },
 
     collection: '',
+    subscriptions: [],
 
     subscriber: null, // zmq.socket('sub')
     requester: null, // zmq.socket('req')
@@ -19,7 +21,7 @@ export default {
     commitMutation: null,
 
     init ({ host, ports, dispatch, commit, encryption }) {
-        console.log(`connecting to ${ports.request}`)
+        debug(`connecting to requester at ${ports.request}`)
 
         this.requester = zmq.socket('req')
         this.subscriber = zmq.socket('sub')
@@ -33,30 +35,46 @@ export default {
         }
 
         this.requester.connect(`${host}:${ports.request}`)
-        // this.subscriber.subscribe(this.collection)
 
         this.dispatchAction = dispatch
         this.commitMutation = commit
 
         this.types = types[this.namespace.toLowerCase()]
 
-        // this.setupListeners()
+        if (this.subscriptions && this.subscriptions.length) {
+            debug(`connecting to publisher at ${ports.publisher}`)
+            this.subscriber.connect(`${host}:${ports.publisher}`)
+
+            this.setupSubscribers()
+        }
+
         this.requestInitialState()
     },
 
-    /*
-    setupListeners (dispatch) {
-        subscriber.on('message', (topic, message) => {
-            debug('received a message from publisher related to:', topic.toString(), 'containing message:', message.toString())
+    setupSubscribers () {
+        this.subscriber.on('message', (topic, message) => {
+            console.log(topic, message)
+            if (topic) {
+                console.log('topic', topic.toString())
+            }
+
+            if (message) {
+                console.log('message', message.toString())
+            }
+            // debug('received a message from publisher related to:', topic.toString(), 'containing message:', message.toString())
             // todo parse message, unwrap json structure
             // todo standardise vuex type
         })
+
+        for (let subscription of this.subscriptions) {
+            debug('subscribing to', subscription)
+            this.subscriber.subscribe(subscription)
+        }
     },
-    */
 
     requestInitialState () {
         if (!this.types.SET_INITIAL_STATE) {
-            console.log('no initial state action set for', this.collection)
+            debug('no initial state action set for', this.collection)
             return
         }
 
@@ -73,7 +91,7 @@ export default {
         })
 
         // todo add timeout to request
-        console.log('sending initial state request', this.collection)
+        debug('sending initial state request', this.collection)
         this.requester.send(JSON.stringify({
             type: 'initial',
             collection: this.collection
@@ -95,11 +113,11 @@ export default {
         }
 
         if (!data) {
-            console.log('nothing received. returning...')
+            debug('nothing received. returning...')
             return
         }
 
-        console.log('dispatching action', actionToDispatch)
+        debug('dispatching action', actionToDispatch)
 
         if (actionToDispatch) {
             this.dispatchAction(actionToDispatch, data)
@@ -110,7 +128,7 @@ export default {
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
-            // console.log('response', response)
+            console.log('response', response)
             this.processResponse(response, actionToDispatch)
         }
 
