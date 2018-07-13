@@ -59,7 +59,7 @@ const actions = {
             return
         }
 
-        commit(types.SET_AMOUNT, value)
+        commit(types.SET_AMOUNT, parseFloat(value))
     },
 
     [types.SET_MESSAGE] ({ commit }, value) {
