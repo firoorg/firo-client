@@ -84,7 +84,7 @@ const actions = {
         const { key } = fee
 
         if (state.selectedFee === key) {
-            return false
+            return
         }
 
         commit(types.SET_FEE, key)
