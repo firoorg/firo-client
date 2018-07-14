@@ -100,6 +100,10 @@ const actions = {
         })
     },
 
+    [types.SET_TX_FEE] ({ commit }, { fee }) {
+        commit(types.SET_TX_FEE, fee / 100000000)
+    },
+
     [types.SEND_ZCOIN] ({ commit, state }, { payments, fee }) {
         console.log('payment in action', payments, fee)
         // const { address, amount } = payment
@@ -109,7 +113,7 @@ const actions = {
                 amount: payment.amount,
                 address: payment.address
             })),
-            fee
+            fee: state.addPaymentForm.totalTxFee
         })
     }
 }
