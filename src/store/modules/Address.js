@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import * as types from '../types/Address'
 import rootTypes from '../types'
 
@@ -12,21 +13,22 @@ const state = {
 const mutations = {
     [types.ADD_WALLET_ADDRESS] (state, { address, total }) {
         console.log('adding wallet address', address, total)
-        state[WALLET_ADDRESS_KEY][address] = {
+
+        Vue.set(state[WALLET_ADDRESS_KEY], address, {
             address,
             total,
             isConfirmed: false,
             transactions: []
-        }
+        })
     },
 
     [types.ADD_THIRD_PARTY_ADDRESS] (state, { address, total }) {
         console.log('adding third party address', address, total)
-        state[THIRD_PARTY_ADDRESS_KEY][address] = {
+        Vue.set(state[THIRD_PARTY_ADDRESS_KEY], address, {
             address,
             total,
             transactions: []
-        }
+        })
     },
 
     [types.SET_ADDRESS_CONFIRMED_STATUS] (state, { address, isConfirmed }) {
