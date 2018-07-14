@@ -169,6 +169,7 @@ const actions = {
         })
 
         // todo add CONFIG
+        // todo move calculation to dynamic getters
         if (confirmations >= 6 && !state[WALLET_ADDRESS_KEY][address].confirmed) {
             dispatch(types.MARK_ADDRESS_AS_FULLY_CONFIRMED, address)
         } else if (confirmations < 6 && state[WALLET_ADDRESS_KEY][address].confirmed) {
@@ -212,6 +213,10 @@ const actions = {
             },
             id: txid
         }, { root: true })
+    },
+
+    [types.ON_ADDRESS_SUBSCRIPTION] ({ dispatch, state }, data) {
+        dispatch(types.SET_INITIAL_STATE, data)
     }
 }
 
