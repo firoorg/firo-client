@@ -113,12 +113,14 @@ const getters = {
 
             let transactionsReceived = 0
             let isFulfilled = false
+            let isReused = false
 
             // address found in wallet addresses. validating status
             if (address) {
-                const { transactions } = address
+                const { transactions, isReused: addressIsReused } = address
 
-                transactionsReceived = transactions.length
+                transactionsReceived = !!transactions.length
+                isReused = addressIsReused
 
                 if (transactionsReceived) {
                     const received = transactions.reduce((accumulator, tx) => {
@@ -128,15 +130,13 @@ const getters = {
                     if (received >= amountRequested) {
                         isFulfilled = true
                     }
-
-                    console.log('received', received)
-                    console.log('amount requested', amountRequested)
                 }
             }
 
             requests.push({
                 ...state.paymentRequests[key],
                 isFulfilled,
+                isReused,
                 transactionsReceived
             })
         }

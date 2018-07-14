@@ -216,7 +216,18 @@ const actions = {
 }
 
 const getters = {
-    walletAddresses: (state) => Object.values(state[WALLET_ADDRESS_KEY]),
+    walletAddresses (state) {
+        return Object.values(state[WALLET_ADDRESS_KEY]).map((addr) => {
+            const { transactions } = addr
+            return {
+                ...addr,
+                hasTransactions: !!transactions.length,
+                isReused: transactions.length > 1
+            }
+            // state[stack][address].hasTransactions = true
+            // state[stack][address].isReused = state[stack][address].transactions.length > 1
+        })
+    },
     thirdPartyAddresses: (state) => Object.values(state[THIRD_PARTY_ADDRESS_KEY])
 }
 
