@@ -7,7 +7,9 @@
     <td v-else
         class="vuetable-td-component-relative-date"
     >
-        <payment-request-status :is-fulfilled="isFulfilled" class="icon" />
+        <payment-request-status :is-fulfilled="isFulfilled"
+                                class="icon"
+                                :key="rowData.id" />
     </td>
 </template>
 

@@ -7,7 +7,9 @@
     <td v-else
         class="vuetable-td-component-relative-date"
     >
-        <timeago :since="relativeDate" :auto-update="30"></timeago>
+        <timeago :since="relativeDate"
+                 :auto-update="30"
+                 :key="rowData.id" />
     </td>
 </template>
 
