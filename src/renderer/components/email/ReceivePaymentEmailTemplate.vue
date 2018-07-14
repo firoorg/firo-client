@@ -60,7 +60,7 @@
                                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                                 <tbody>
                                                     <tr>
-                                                        <td :style="bigBoldStyle" style="padding-right: 8px" width="75%" align="right" valign="bottom">{{ amount }}</td>
+                                                        <td :style="bigBoldStyle" style="padding-right: 8px" width="75%" align="right" valign="bottom">{{ fixedAmount }}</td>
                                                         <td :style="textStyle" width="25%" align="left" valign="bottom">XZC</td>
                                                     </tr>
                                                 </tbody>
@@ -114,6 +114,10 @@
       ],
 
       computed: {
+          fixedAmount () {
+              return this.amount.toFixed(8)
+          },
+
           baseStyle () {
               return {
                   fontFamily: 'Lato, sans-serif',
