@@ -56,7 +56,7 @@
             },
             sortOrder: {
                 type: Array,
-                default: [
+                default: () => [
                     {
                         field: 'created_at',
                         direction: 'desc'
