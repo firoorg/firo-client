@@ -13,7 +13,9 @@ const state = {
 }
 
 const mutations = {
+    // send create request to the api
     [types.CREATE_PAYMENT_REQUEST] () {},
+
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD] (state, { field, value }) {
         state.createPaymentRequestForm[field] = value
     },
@@ -99,11 +101,44 @@ const actions = {
 }
 
 const getters = {
-    paymentRequests (state) {
+    paymentRequests (state, getters, rootState, rootGetters) {
         let requests = []
+        const walletAddresses = rootGetters['Address/walletAddresses']
+
+        console.log(rootState, rootGetters)
 
         for (var key in state.paymentRequests) {
-            requests.push(state.paymentRequests[key])
+            const { amount: amountRequested } = state.paymentRequests[key]
+            const address = walletAddresses.filter((addr) => addr.address === key).pop()
+
+            let transactionsReceived = 0
+            let isFulfilled = false
+
+            // address found in wallet addresses. validating status
+            if (address) {
+                const { transactions } = address
+
+                transactionsReceived = transactions.length
+
+                if (transactionsReceived) {
+                    const received = transactions.reduce((accumulator, tx) => {
+                        return accumulator + tx.amount
+                    }, 0)
+
+                    if (received >= amountRequested) {
+                        isFulfilled = true
+                    }
+
+                    console.log('received', received)
+                    console.log('amount requested', amountRequested)
+                }
+            }
+
+            requests.push({
+                ...state.paymentRequests[key],
+                isFulfilled,
+                transactionsReceived
+            })
         }
 
         return requests

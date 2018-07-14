@@ -15,7 +15,7 @@
             Lottie
         },
         props: {
-            received: Boolean,
+            isFulfilled: Boolean,
             default: false
         },
         data () {
@@ -31,7 +31,7 @@
             handleAnimation (anim) {
                 this.anim = anim
 
-                if (this.received) {
+                if (this.isFulfilled) {
                     this.anim.goToAndStop(this.anim.getDuration(true), true)
                 }
             },
@@ -54,8 +54,8 @@
         },
 
         watch: {
-            received (newVal, oldVal) {
-                console.log('received changed from', oldVal, newVal)
+            isFulfilled (newVal, oldVal) {
+                console.log('isFulfilled changed from', oldVal, newVal)
                 if (newVal) {
                     this.anim.play()
                 }

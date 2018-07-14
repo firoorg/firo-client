@@ -11,12 +11,12 @@
                 <header>
                     <div class="status"
                          v-show="!qrCodeIsVisible"
-                         :class="{ received: received }">
-                        <payment-request-status :received="received" />
+                         :class="{ 'is-fulfilled': isFulfilled }">
+                        <payment-request-status :is-fulfilled="isFulfilled" />
                     </div>
                     <h2>
                         <natural-language-tags :content="label" tag-size="large" :onTagClick="tagClicked" />
-                        <i v-if="!received" class="qr-toggle el-icon-menu" @click="toggleQrCode"></i>
+                        <i v-if="!isFulfilled" class="qr-toggle el-icon-menu" @click="toggleQrCode"></i>
                     </h2>
                 </header>
 
@@ -34,10 +34,10 @@
             <div v-else></div>
 
             <div class="action-wrap">
-                <div v-if="received">
-                    <base-button>Open in Block Explorer</base-button>
+                <div v-if="isFulfilled">
+                    <base-button @click.prevent="openBlockExplorer">Open in Block Explorer</base-button>
                 </div>
-                <div v-else-if="!received">
+                <div v-else>
                     <timed-tooltip :is-open="showCopySuccess"
                                    popover-class="green"
                                    :on-timeout="hideCopySuccess">
@@ -87,7 +87,7 @@
           TimedTooltip
       },
       props: [
-          'received',
+          'isFulfilled',
           'label',
           'amount',
           'message',
@@ -146,6 +146,13 @@
 
           hideCopySuccess () {
               this.showCopySuccess = false
+          },
+
+          openBlockExplorer (event) {
+              event.preventDefault()
+
+              // todo
+              alert(`opening ${this.address.address} in block explorer`)
           }
       }
   }
