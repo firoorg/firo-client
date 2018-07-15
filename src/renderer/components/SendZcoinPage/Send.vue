@@ -443,8 +443,9 @@
         //align-self: self-end;
 
         & > header {
-            display: grid;
-            grid-template-columns: 1fr auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         ::selection {
