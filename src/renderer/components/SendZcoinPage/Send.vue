@@ -284,9 +284,15 @@
 
             updateFee (newVal) {
                 this.$store.dispatch(types.zcoinpayment.SET_FEE, newVal)
-                console.log('sending fee + payments to zcoind to get estimated total fee')
-                // this.fee = newVal
-                this.toggleFeeSelection()
+                console.log('direct', this.fee.amount)
+
+                // we need to defer calculation into the next tick
+                // as we have to wait that the `newVal` gets synced down to components
+                this.$nextTick(() => {
+                    console.log('sending fee + payments to zcoind to get estimated total fee')
+                    this.getTransactionFee()
+                    this.toggleFeeSelection()
+                })
             },
 
             getTransactionFee () {
