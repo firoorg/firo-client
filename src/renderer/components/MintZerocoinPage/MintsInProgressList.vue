@@ -10,7 +10,7 @@
 
                 <div class="wrapper">
                     <div v-for="(confirmations, id) in value.tx" class="item" :key="id">
-                        <span class="process" :style="{ width: calcProcessInPercent(confirmations) + '%' }"></span>
+                        <span class="progress" :style="{ width: calcProcessInPercent(confirmations) + '%' }"></span>
                     </div>
                 </div>
             </div>
@@ -106,11 +106,12 @@
                         margin-right: 0;
                     }
 
-                    .process {
+                    .progress {
                         display: block;
                         height: 100%;
                         background: $color--green;
                         transition: width 1s ease-out;
+                        min-width: emRhythm(1);
                     }
                 }
 
