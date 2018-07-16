@@ -50,6 +50,10 @@ const actions = {
         for (const addressKey of Object.keys(initialState)) {
             const address = initialState[addressKey]
 
+            if (!address) {
+                continue
+            }
+
             const { txids, total } = address
 
             if (!txids) {
@@ -97,10 +101,12 @@ const actions = {
                     case 'mint':
                         dispatch(types.ADD_MINT_FROM_TX, tx)
                         break
+                    /*
                     case 'spend':
                         console.log('spend tx', tx)
                         // dispatch(types.ADD_SPEND_FROM_TX, tx)
                         break
+                    */
                     default:
                         console.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
                         break
@@ -199,6 +205,8 @@ const actions = {
     },
 
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
+        console.log('ADD_MINT_FROM_TX', mintTx)
+
         const { amount, blockhash, blocktime, confirmations, fee, timereceived, txid, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
@@ -216,7 +224,15 @@ const actions = {
     },
 
     [types.ON_ADDRESS_SUBSCRIPTION] ({ dispatch, state }, data) {
-        dispatch(types.SET_INITIAL_STATE, data)
+        console.log('ON_ADDRESS_SUBSCRIPTION')
+        try {
+            dispatch(types.SET_INITIAL_STATE, data)
+        } catch (e) {
+            console.log('ON_ADDRESS_SUBSCRIPTION ERROR\n---------------')
+            console.log(e)
+            console.log(data)
+            console.log('---------------')
+        }
     }
 }
 
