@@ -1,4 +1,8 @@
+import fs from 'fs'
 import * as types from '../types/Settings'
+
+import Debug from 'debug'
+const debug = Debug('zcoin:store:settings')
 
 const state = {
     blockchainLocation: '',
@@ -22,13 +26,26 @@ const mutations = {
 
 const actions = {
     [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
-        console.log('setting blockchain location', location)
-        // todo test if location exists
+        console.log('SET_BLOCKCHAIN_LOCATION')
+
+        if (!location) {
+            return
+        }
+
+        if (!fs.existsSync(location)) {
+            debug('given location does not exits', location)
+            return
+        }
+
+        // todo: could potentially watch the location to catch cases where the user freakes out and...
+        // todo: ...moves the folder while zcoin is running
+
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
     }
 }
 
 const getters = {
+    hasBlockchainLocation: (state) => !!state.blockchainLocation,
     b58Prefixes: (state, getters, rootState) => {
         const testOrMainNet = rootState.Blockchain.testnet ? 'testnet' : 'mainnet'
 

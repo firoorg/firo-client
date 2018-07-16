@@ -80,6 +80,7 @@ export default {
             commit
         })
 
+        this.setDataDirectory(apiStatus)
         const encryption = apiStatus.auth ? this.setupEncryption(apiStatus) : null
 
         Object.keys(modules).forEach((moduleName) => {
@@ -132,6 +133,16 @@ export default {
         }
 
         return certificates
+    },
+
+    setDataDirectory (apiStatus) {
+        const { datadir: location } = apiStatus
+
+        dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location: location })
+    },
+
+    setNetworkType (apiStatus) {
+
     },
 
     close () {
