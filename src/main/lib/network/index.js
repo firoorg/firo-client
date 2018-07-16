@@ -1,9 +1,10 @@
 import fs from 'fs'
 import { join } from 'path'
 
-// import types from '../../../store/types'
-import CONFIG from '../../config'
 import Debug from 'debug'
+
+import CONFIG from '../../config'
+import types from '~/types'
 import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
@@ -11,12 +12,14 @@ import * as utils from '../../../lib/utils'
 import { getApiStatus } from './ApiStatus'
 
 import Address from './Address'
+import Blockchain from './Blockchain'
 import PaymentRequest from './PaymentRequest'
 import SendZcoin from './SendZcoin'
 import Mint from './Mint'
 
 const modules = {
     Address,
+    Blockchain,
     PaymentRequest,
     SendZcoin,
     Mint
