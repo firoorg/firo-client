@@ -59,7 +59,9 @@ if (stopOnQuit) {
 }
 
 // start it!
-coreDaemonManager.start(join(__static, '/core/start.sh'))
+const upstreamPath = '/Users/joernroeder/Projects/zcoin/wallet/zcoin-upstream/src/zcoind'
+// const testPath = join(__static, '/core/start.sh')
+coreDaemonManager.start(upstreamPath)
 
 /*
 // daemon testing...
@@ -91,7 +93,10 @@ const interval = setInterval(() => {
 
 store.replaceState(require('../store/initialState'))
 
-network.init({ store })
+setTimeout(() => {
+    console.log('STARTING NETWORK')
+    network.init({ store })
+}, 15 * 1000)
 // wallet.init({ store, namespace: 'Wallet' })
 deeplink.init({ windowManager, store })
 
