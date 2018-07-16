@@ -59,9 +59,9 @@ if (stopOnQuit) {
 }
 
 // start it!
-const upstreamPath = '/Users/joernroeder/Projects/zcoin/wallet/zcoin-upstream/src/zcoind'
 // const testPath = join(__static, '/core/start.sh')
-coreDaemonManager.start(upstreamPath)
+const zcoindPath = join(__static, '/core/zcoind')
+coreDaemonManager.start(zcoindPath)
 
 /*
 // daemon testing...
