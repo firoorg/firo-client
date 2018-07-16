@@ -84,6 +84,7 @@ export default {
         })
 
         this.setDataDirectory(apiStatus)
+        this.setNetworkType(apiStatus)
         const encryption = apiStatus.auth ? this.setupEncryption(apiStatus) : null
 
         Object.keys(modules).forEach((moduleName) => {
