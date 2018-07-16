@@ -18,8 +18,8 @@ navigation:
   menu:
     button__receive: Receive Zcoin
     button__send: Send Zcoin
-    button__mint: Mint Zcoin
-    button__spend: Spend Privately
+    button__mint: Anonymize Zcoin
+    button__spend: Private Spend
     button__settings: Settings
   settings:
     switch__connect-via-tor: Anonymize Connection
