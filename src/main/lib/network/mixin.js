@@ -82,6 +82,10 @@ export default {
     },
 
     requestInitialState () {
+        if (!this.collection) {
+            return
+        }
+
         if (!this.types.SET_INITIAL_STATE) {
             debug('no initial state action set for', this.collection)
             return
@@ -135,6 +139,16 @@ export default {
     },
 
     send ({ type, collection, data, actionToDispatch }) {
+        if (!collection && !this.collection) {
+            debug('can not send. no collection given!', {
+                type,
+                data,
+                actionToDispatch
+            })
+
+            return
+        }
+
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
