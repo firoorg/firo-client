@@ -17,7 +17,6 @@ const mutations = {
         Vue.set(state[WALLET_ADDRESS_KEY], address, {
             address,
             total,
-            isConfirmed: false,
             transactions: []
         })
     },
@@ -29,10 +28,6 @@ const mutations = {
             total,
             transactions: []
         })
-    },
-
-    [types.SET_ADDRESS_CONFIRMED_STATUS] (state, { address, isConfirmed }) {
-        state[WALLET_ADDRESS_KEY][address].isConfirmed = isConfirmed
     },
 
     [types.ADD_TRANSACTION] (state, { stack, address, transaction }) {
@@ -132,30 +127,8 @@ const actions = {
         commit(types.ADD_THIRD_PARTY_ADDRESS, { address, total })
     },
 
-    [types.MARK_ADDRESS_AS_FULLY_CONFIRMED] ({ commit, state }, address) {
-        if (state.walletAddresses[address] === undefined) {
-            return
-        }
-
-        commit(types.SET_ADDRESS_CONFIRMED_STATUS, {
-            address,
-            isConfirmed: true
-        })
-    },
-
-    [types.MARK_ADDRESS_AS_UNCONFIRMED] ({ commit, state }, address) {
-        if (state.walletAddresses[address] === undefined) {
-            return
-        }
-
-        commit(types.SET_ADDRESS_CONFIRMED_STATUS, {
-            address,
-            isConfirmed: false
-        })
-    },
-
     [types.ADD_RECEIVE_FROM_TX] ({ commit, dispatch, state }, receiveTx) {
-        const { address, amount, blockhash, blocktime, category, confirmations, timereceived, txid } = receiveTx
+        const { address, amount, blockheight, blockhash, blocktime, category, confirmations, timereceived, txid } = receiveTx
         // dispatch(types.ADD_ADDRESS, { address })
 
         commit(types.ADD_TRANSACTION, {
@@ -167,24 +140,17 @@ const actions = {
                 confirmations,
                 timereceived,
                 block: {
+                    height: blockheight,
                     hash: blockhash,
                     time: blocktime
                 },
                 id: txid
             }
         })
-
-        // todo add CONFIG
-        // todo move calculation to dynamic getters
-        if (confirmations >= 6 && !state[WALLET_ADDRESS_KEY][address].confirmed) {
-            dispatch(types.MARK_ADDRESS_AS_FULLY_CONFIRMED, address)
-        } else if (confirmations < 6 && state[WALLET_ADDRESS_KEY][address].confirmed) {
-            dispatch(types.MARK_ADDRESS_AS_UNCONFIRMED, address)
-        }
     },
 
     [types.ADD_SEND_FROM_TX] ({ commit }, sendTx) {
-        const { address, amount, blockhash, blocktime, category, confirmations, fee, timereceived, txid } = sendTx
+        const { address, amount, blockheight, blockhash, blocktime, category, confirmations, fee, timereceived, txid } = sendTx
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,
@@ -196,6 +162,7 @@ const actions = {
                 fee,
                 timereceived,
                 block: {
+                    height: blockheight,
                     hash: blockhash,
                     time: blocktime
                 },
@@ -237,16 +204,19 @@ const actions = {
 }
 
 const getters = {
-    walletAddresses (state) {
+    walletAddresses (state, getters, rootState, rootGetters) {
         return Object.values(state[WALLET_ADDRESS_KEY]).map((addr) => {
             const { transactions } = addr
+            const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
+            const confirmations = currentBlockHeight ? currentBlockHeight - addr.block.height : addr.confirmations
+
             return {
                 ...addr,
                 hasTransactions: !!transactions.length,
-                isReused: transactions.length > 1
+                isReused: transactions.length > 1,
+                confirmations,
+                isConfimed: confirmations >= 6
             }
-            // state[stack][address].hasTransactions = true
-            // state[stack][address].isReused = state[stack][address].transactions.length > 1
         })
     },
     thirdPartyAddresses: (state) => Object.values(state[THIRD_PARTY_ADDRESS_KEY])
