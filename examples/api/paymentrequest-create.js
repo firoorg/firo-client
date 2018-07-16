@@ -14,9 +14,13 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'create',
     collection: 'payment-request',
+	auth: {
+	    password: config.password
+	},
     data: {
         amount: 4,
         label: 'label',
         message: 'message'
     }
+
 }))

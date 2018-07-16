@@ -13,6 +13,9 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     collection: 'send-private',
+	auth: {
+	    password: config.password
+	},
     data: {
         denominations: [
             {

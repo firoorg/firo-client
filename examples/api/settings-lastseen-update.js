@@ -14,6 +14,9 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'update',
     collection: 'settings',
+	auth: {
+	    password: config.password
+	},
     id: 'lastSeen',
     payload: {
         paymentRequest: 1000

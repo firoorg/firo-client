@@ -14,6 +14,9 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'update',
     collection: 'payment-request',
+	auth: {
+	    password: config.password
+	},
     data: {
         id: 'TDMUbj1R12q7mMQGLiGJyHv838JSYAuRCi',
         label: 'this is a modified payment request label',
