@@ -4,12 +4,11 @@
             <section class="paymentrequest-list">
                 <base-popover
                         :open="showAddressFoundInClipboardPopover"
-                        :auto-hide="false"
                         placement="left"
                         popover-class="advice"
                         :boundaries-element="$refs.main"
                         class="pending-payments-popover"
-                        _trigger="manually"
+                        trigger="manually"
                 >
                     <template slot="target">
                         <h1>

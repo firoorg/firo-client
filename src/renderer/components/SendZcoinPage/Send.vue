@@ -13,7 +13,7 @@
                                 Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
                             </p>
                         </div>
-                        <div v-show="false">
+                        <div v-show="hasSendQueue">
                             <base-popover
                                     :disabled="showPopover"
                                     :auto-hide="true"
@@ -129,7 +129,8 @@
                                     </div>
                                 </section>
                                 <section v-else-if="showFeeSelection" key="fee-selection">
-                                    <send-fee-selection  :selected-fee="fee.key" @onFeeSelect="updateFee" />
+                                    <send-fee-selection :selected-fee="fee.key"
+                                                        @onFeeSelect="updateFee" />
                                 </section>
                                 <section v-else-if="showSuccess" key="success">
                                     <div class="success-icon">
@@ -283,6 +284,7 @@
             },
 
             updateFee (newVal) {
+                console.log('update fee', newVal)
                 this.$store.dispatch(types.zcoinpayment.SET_FEE, newVal)
                 console.log('direct', this.fee.amount)
 
@@ -364,6 +366,10 @@
                 delete this.pendingPayments[address]
             },
 
+            clearQueue () {
+                this.pendingPayments = {}
+            },
+
             onCancelPayment () {
                 this.cleanupPopover()
             },
@@ -371,7 +377,6 @@
             onConfirmAndSendPayment (reset) {
                 this.hasSent = true
                 console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
-                this.removeFromQueue(this.address)
                 this.$store.dispatch(types.zcoinpayment.SEND_ZCOIN, {
                     payments: Object.values(this.pendingPayments),
                     fee: this.fee.amount
