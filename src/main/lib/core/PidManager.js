@@ -5,7 +5,7 @@ import fs from 'fs'
 import psTree from 'ps-tree'
 import Debug from 'debug'
 
-import types from '../../../store/types'
+import types from '~/types'
 
 const debug = Debug('zcoin:core:manager')
 
