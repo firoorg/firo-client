@@ -1,7 +1,8 @@
 const zmq = require('zeromq')
+const config = require("./config")
 
 const subscriber = zmq.socket('sub')
-subscriber.connect('tcp://127.0.0.1:28332')
+subscriber.connect('tcp://127.0.0.1:' + config.sub)
 
 subscriber.subscribe('address')
 subscriber.subscribe('block')
