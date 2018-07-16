@@ -8,13 +8,7 @@ subscriber.subscribe('address')
 subscriber.subscribe('block')
 
 subscriber.on('message', (topic, message) => {
-    console.log('received message from address publisher')
+    console.log('received message from publisher')
     console.log('topic', topic.toString())
-    console.log('message', message ? JSON.parse(message.toString()) : message)
-})
-
-subscriber.on('message', (topic, message) => {
-    console.log('received message from block publisher')
-    console.log('topic', topic.toString())
-    console.log('message', message ? JSON.parse(message.toString()) : message)
+    console.log('message', message ? JSON.stringify(JSON.parse(message.toString()), null, 4) : message)
 })

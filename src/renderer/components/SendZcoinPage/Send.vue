@@ -13,7 +13,7 @@
                                 Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
                             </p>
                         </div>
-                        <div v-show="false">
+                        <div v-show="hasSendQueue">
                             <base-popover
                                     :disabled="showPopover"
                                     :auto-hide="true"
@@ -129,7 +129,8 @@
                                     </div>
                                 </section>
                                 <section v-else-if="showFeeSelection" key="fee-selection">
-                                    <send-fee-selection  :selected-fee="fee.key" @onFeeSelect="updateFee" />
+                                    <send-fee-selection :selected-fee="fee.key"
+                                                        @onFeeSelect="updateFee" />
                                 </section>
                                 <section v-else-if="showSuccess" key="success">
                                     <div class="success-icon">
@@ -283,10 +284,17 @@
             },
 
             updateFee (newVal) {
+                console.log('update fee', newVal)
                 this.$store.dispatch(types.zcoinpayment.SET_FEE, newVal)
-                console.log('sending fee + payments to zcoind to get estimated total fee')
-                // this.fee = newVal
-                this.toggleFeeSelection()
+                console.log('direct', this.fee.amount)
+
+                // we need to defer calculation into the next tick
+                // as we have to wait that the `newVal` gets synced down to components
+                this.$nextTick(() => {
+                    console.log('sending fee + payments to zcoind to get estimated total fee')
+                    this.getTransactionFee()
+                    this.toggleFeeSelection()
+                })
             },
 
             getTransactionFee () {
@@ -358,6 +366,10 @@
                 delete this.pendingPayments[address]
             },
 
+            clearQueue () {
+                this.pendingPayments = {}
+            },
+
             onCancelPayment () {
                 this.cleanupPopover()
             },
@@ -365,7 +377,6 @@
             onConfirmAndSendPayment (reset) {
                 this.hasSent = true
                 console.log('SENDING PAYMENT!', this.pendingPayments[this.address])
-                this.removeFromQueue(this.address)
                 this.$store.dispatch(types.zcoinpayment.SEND_ZCOIN, {
                     payments: Object.values(this.pendingPayments),
                     fee: this.fee.amount
@@ -437,8 +448,9 @@
         //align-self: self-end;
 
         & > header {
-            display: grid;
-            grid-template-columns: 1fr auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         ::selection {

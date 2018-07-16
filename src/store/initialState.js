@@ -46,42 +46,6 @@ module.exports = {
 
     PaymentRequest: {
         paymentRequests: {
-            TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V: {
-                label: 'label with #hashtags', // deamon // editable
-                address: 'TMJv3BJ6QFf3QzGf4oapy7RNJV6K2G4Y7V', // deamon
-                amount: 100, // deamon
-                created_at: new Date() - (Math.random() * 60000), // daemon
-                message: `Hey Alice, 
-                    party was nice yesterday 🎉. do you remember, i borrowed you some money...
-                    BestBest
-                    Bob`, // deamon
-                isRecurring: false // gui // editable
-                // transactions are linked via the address field
-            },
-            cba: {
-                label: 'other with #hashtags', // deamon // editable
-                address: 'cba', // deamon
-                amount: 1000, // deamon
-                created_at: new Date() - (Math.random() * 30000), // daemon
-                message: `Hey Alice, 
-                    party was nice yesterday 🎉. do you remember, i borrowed you some money...
-                    BestBest
-                    Bob`, // deamon
-                isRecurring: false // gui // editable
-                // transactions are linked via the address field
-            },
-            mining123: {
-                label: '#mining #mining all the time', // deamon // editable
-                address: 'mining123', // deamon
-                amount: 10, // deamon
-                created_at: new Date() - (Math.random() * 10000), // daemon
-                message: `Hey Alice, 
-                    party was nice yesterday 🎉. do you remember, i borrowed you some money...
-                    BestBest
-                    Bob`, // deamon
-                isRecurring: false // gui // editable
-                // transactions are linked via the address field
-            }
         },
         isLoading: false,
         createPaymentRequestForm: {
@@ -100,54 +64,25 @@ module.exports = {
 
     Mint: { // daemon: isSubscription
         currentDenominations: {},
-        mints: {
-            '00463ca518fad1f89bcc66b6ae160a7700f752948b87a0b9c76b37e2297a997a': {
-                amount: 1,
-                blockhash: '9e06fc2a4fd4542f098f01da5179a7559cdaf21676174686639aaf6ddbdf6364',
-                blocktime: 1517944590,
-                confirmations: 42032,
-                fee: 0.009999999776482582,
-                time: 1517944389,
-                timereceived: 1517944389,
-                txid: '00463ca518fad1f89bcc66b6ae160a7700f752948b87a0b9c76b37e2297a997a',
-                status: 'new'
-            },
-
-            '0361e6a52525220e4054cf5232b3e9291d03da8791d73bcf98a01fd10d4b6fbd': {
-                amount: 10,
-                blockhash: '9e06fc2a4fd4542f098f01da5179a7559cdaf21676174686639aaf6ddbdf6364',
-                blocktime: 1517944590,
-                confirmations: 42032,
-                fee: 0.009999999776482582,
-                time: 1517944400,
-                timereceived: 1517944400,
-                txid: '0361e6a52525220e4054cf5232b3e9291d03da8791d73bcf98a01fd10d4b6fbd',
-                status: 'new'
-            }
-        }
+        mints: {}
 
     },
 
     Blockchain: { // daemon: isSubscription
-        // we could add this later when we provide a separate electrumX blockchain connector in the future
-        type: 'full|light',
-
-        // we need to clarify status types. e.g. is isSynced === isFailed possible?
-        status: {
-            IsBlockchainSynced: true,
-            IsZnodeListSynced: true,
-            IsWinnersListSynced: true,
-            IsSynced: true,
-            IsFailed: false
-        },
-        attempt: 0,
-        testnet: true,
-        blocks: 84354,
+        connections: 1,
         currentBlock: {
-            height: 84350,
-            timestamp: new Date()
+            height: 0,
+            timestamp: 0
         },
-        connections: 10
+        status: {
+            IsBlockchainSynced: false,
+            IsFailed: false,
+            IsSynced: false,
+            IsWinnersListSynced: false,
+            IsZnodeListSynced: false
+        },
+        testnet: true,
+        type: 'full'
     },
 
     Settings: { // daemon: isSubscription

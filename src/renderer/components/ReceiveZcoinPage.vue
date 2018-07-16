@@ -39,13 +39,14 @@
 <script>
     import { mapGetters } from 'vuex'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
+    import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
 
     const tableFields = [
         {
-            name: 'amount',
-            sortField: 'amount'
+            name: PaymentRequestTableStatus,
+            sortField: 'isFulfilled'
         },
         {
             name: RelativeDate,
@@ -58,6 +59,10 @@
             title: 'Label',
             sortField: 'label',
             contentField: 'label'
+        },
+        {
+            name: 'amount',
+            sortField: 'amount'
         }
         /*,
         {

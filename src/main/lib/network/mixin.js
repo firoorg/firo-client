@@ -52,18 +52,27 @@ export default {
     },
 
     setupSubscribers () {
-        this.subscriber.on('message', (topic, message) => {
-            console.log(topic, message)
+        this.subscriber.on('message', (topicBuffer, messageBuffer) => {
+            const topic = topicBuffer ? topicBuffer.toString() : null
+            const message = messageBuffer ? messageBuffer.toString() : null
+
             if (topic) {
-                console.log('topic', topic.toString())
+                console.log('topic', topic)
             }
 
             if (message) {
-                console.log('message', message.toString())
+                console.log('message', message)
             }
             // debug('received a message from publisher related to:', topic.toString(), 'containing message:', message.toString())
             // todo parse message, unwrap json structure
             // todo standardise vuex type
+            try {
+                this.processResponse(JSON.parse(message), this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`])
+            } catch (e) {
+                debug('error in response of', topic, 'request', this.subscriptions)
+                debug(e)
+                debug(message)
+            }
         })
 
         for (let subscription of this.subscriptions) {
@@ -73,20 +82,26 @@ export default {
     },
 
     requestInitialState () {
+        if (!this.collection) {
+            return
+        }
+
         if (!this.types.SET_INITIAL_STATE) {
             debug('no initial state action set for', this.collection)
             return
         }
 
         this.requester.once('message', (message) => {
+            debug('received initial state request', this.collection)
+
             try {
                 const response = JSON.parse(message.toString())
                 console.log('this.types', this.types)
                 this.processResponse(response, this.types.SET_INITIAL_STATE)
             } catch (e) {
-                console.log('error in response of initial request call.', this.namespace)
-                console.log(e)
-                console.log(message.toString())
+                debug('error in response of initial request call.', this.namespace)
+                debug(e)
+                debug(message.toString())
             }
         })
 
@@ -117,14 +132,23 @@ export default {
             return
         }
 
-        debug('dispatching action', actionToDispatch)
-
         if (actionToDispatch) {
+            debug('dispatching action', actionToDispatch)
             this.dispatchAction(actionToDispatch, data)
         }
     },
 
     send ({ type, collection, data, actionToDispatch }) {
+        if (!collection && !this.collection) {
+            debug('can not send. no collection given!', {
+                type,
+                data,
+                actionToDispatch
+            })
+
+            return
+        }
+
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 

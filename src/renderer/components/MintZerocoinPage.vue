@@ -144,8 +144,7 @@
             },
 
             hasMintsInProgress () {
-                return true
-                // return !!this.mintsInProgress.length
+                return !!this.mintsInProgress.length
             },
 
             mintsInProgressLength () {

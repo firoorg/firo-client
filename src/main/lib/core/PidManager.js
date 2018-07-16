@@ -5,7 +5,7 @@ import fs from 'fs'
 import psTree from 'ps-tree'
 import Debug from 'debug'
 
-import types from '../../../store/types'
+import types from '~/types'
 
 const debug = Debug('zcoin:core:manager')
 
@@ -136,7 +136,7 @@ export default class PidManager {
 
     // ---
 
-    async killProcess (pid, signal = 'SIGKILL') {
+    async killProcess (pid, signal = 'SIGTERM') {
         debug('killing process %d with signal %s', pid, signal)
 
         if (pid === -1) {

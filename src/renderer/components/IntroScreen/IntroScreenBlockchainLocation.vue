@@ -6,7 +6,7 @@
 
         <footer>
             <BaseButton
-                    v-if="!location"
+                    v-if="!hasLocation"
                     color="green"
                     is-popover
                     @click="selectFolder"
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
     import GuideStepMixin from '@/mixins/GuideStepMixin'
     import path from 'path'
     import types from '~/types'
@@ -37,9 +38,10 @@
         ],
 
         computed: {
-            location () {
-                return this.$store.state.Settings.blockchainLocation
-            }
+            ...mapGetters({
+                hasLocation: 'Settings/hasBlockchainLocation',
+                location: 'Settings/blockchainLocation'
+            })
         },
 
         methods: {
@@ -64,7 +66,7 @@
             },
 
             isEnabled () {
-                return !this.location || !fs.existsSync(this.location)
+                return !this.hasLocation || !fs.existsSync(this.location)
             }
         }
     }

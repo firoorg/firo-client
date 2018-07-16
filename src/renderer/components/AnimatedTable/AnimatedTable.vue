@@ -5,6 +5,7 @@
                   :fields="fields"
                   :per-page="perPage"
                   :track-by="trackBy"
+                  :sort-order="sortOrder"
                   :data-manager="dataManager"
                   pagination-path="pagination"
                   :row-transition-name="rowTransition"
@@ -52,6 +53,15 @@
             trackBy: {
                 type: String,
                 default: 'id'
+            },
+            sortOrder: {
+                type: Array,
+                default: () => [
+                    {
+                        field: 'created_at',
+                        direction: 'desc'
+                    }
+                ]
             },
             selectedRow: {
                 type: String,

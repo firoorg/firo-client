@@ -186,8 +186,11 @@
             .popover-inner {
                 padding: emRhythm(3);
 
-                header h2 {
-                    margin: 0;
+                header {
+                    h2,
+                    h3 {
+                        margin: 0;
+                    }
                 }
 
                 p {
