@@ -39,7 +39,8 @@
 
         computed: {
             ...mapGetters({
-                hasLocation: 'Settings/hasBlockchainLocation'
+                hasLocation: 'Settings/hasBlockchainLocation',
+                location: 'Settings/blockchainLocation'
             })
         },
 
@@ -65,7 +66,7 @@
             },
 
             isEnabled () {
-                return !this.location || !fs.existsSync(this.location)
+                return !this.hasLocation || !fs.existsSync(this.location)
             }
         }
     }
