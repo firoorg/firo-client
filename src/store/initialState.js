@@ -69,25 +69,20 @@ module.exports = {
     },
 
     Blockchain: { // daemon: isSubscription
-        // we could add this later when we provide a separate electrumX blockchain connector in the future
-        type: 'full|light',
-
-        // we need to clarify status types. e.g. is isSynced === isFailed possible?
-        status: {
-            IsBlockchainSynced: true,
-            IsZnodeListSynced: true,
-            IsWinnersListSynced: true,
-            IsSynced: true,
-            IsFailed: false
-        },
-        attempt: 0,
-        testnet: true,
-        blocks: 84354,
+        connections: 1,
         currentBlock: {
-            height: 84350,
-            timestamp: new Date()
+            height: 0,
+            timestamp: 0
         },
-        connections: 10
+        status: {
+            IsBlockchainSynced: false,
+            IsFailed: false,
+            IsSynced: false,
+            IsWinnersListSynced: false,
+            IsZnodeListSynced: false
+        },
+        testnet: true,
+        type: 'full'
     },
 
     Settings: { // daemon: isSubscription
