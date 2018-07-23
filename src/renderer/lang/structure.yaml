@@ -1,4 +1,4 @@
-# payment-requests.detail-view-fullfilled.button-share-via-email = 'Share via Email'
+# payment-requests.detail-view-fulfilled.button-share-via-email = 'Share via Email'
 # (level2/overview/list)+(level3/detail/interaction)
 
 #
@@ -28,10 +28,10 @@ navigation:
     switch__connect-via-tor: Anonymize Connection
 
 receive:
+  # TODO: description, error messages
   overview:
     title: Receive Zcoin
     description:  Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
-    button__primary-action: Create Payment Request
   # approx. 100 chars // concept of payment request, simple analogy, how should someone know where to send something?
     table__payment-requests:
       labels:
@@ -39,27 +39,155 @@ receive:
         label__created: Created
         label__label: Label
 
-  detail-create:
+  detail-create-request:
     title__create: Create Payment Request
     label__label: Label
-    error__label: The label field is required.
+    error__label: The label field is required. # note to internal labeling
     label__amount: Amount
     error__amount--not-numeric: The amount field must be numeric and may contain 8 decimal points.
     error__amount--below-minimum: The amount field must be 0.001 or more.
-    label__message: Message
+    label__message: Message # optional?
     button__create-payment-request: Create Payment Request
 
-  detail-request:
-    #receive.detail-view.detail-request.label: Etiam \#porta sem \#malesuada magna mollis euismod # labels caped in length?
+  detail-entry-request:
+    # TODO: label subscribed, subscribed state
+    button__primary-action: Create Payment Request
     label__created: Created
-    # receive.detail-view.detail-request.time-indicator: about 1 hour ago # language from plugin
     label__amount: Amount
+    pending:
+      button__copy-link--primary: Copy Link
+      button__share-via-email--secondary: Share via E-mail
+    fulfilled:
+      button__open-explorer: Open in Block Explorer
+
+send:
+  # TODO: descriptions, error messages
+  overview:
+    title: Send Zcoin
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    table__send:
+      labels:
+        label__created: Created
+        label__label: Label
+        label__amount: Amount
+
+  detail-create-send:
+    title__send: Send Zcoin
+    label__label: Label
+    error__label: The label field is required. # note internal labeling
+    label__amount: Amount
+    error__amount--not-numeric: The amount field must be numeric and may contain 8 decimal points.
+    error__amount--below-minimum: The amount field must be 0.001 or more.
+    label__address: Address
+    error__address: The address field must cointain a valid Zcoin address. / Ups, it looks like you accidentally mistyped your address!
+
+    single-send:
+      button__send-now--primary: Send Now
+      button__send-later--secondary: Send Later
+    multi-send:
+      button__send-all--primary: Send All
+      button__add-to-queue--secondary: Add to Queue
+
+    pending-payments:
+      title__pending-payments: Pending Payments
+      description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+
+    confirm-payment:
+      title__confirm-send: Confirm Payment
+      description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. # necessary?
+      label__payments: Payments
+      label__fees: Fees
+      button__change: Change
+      label__total: Total
+
+      button__confirm-send--primary: Yes, send now!
+      button__cancel--secondary: Cancel
+      label__success: Payment successfully send!
+
+
+  detail-entry-send:
+    label__created: Created
+    label__amount-received: Amount Received
+    label__fulfilled: Fulfilled
 
     pending:
       button__copy-link--primary: Copy Link
       button__share-via-email--secondary: Share via E-mail
     fulfilled:
       button__open-explorer: Open in Block Explorer
+
+mint:
+  # TODO: descriptions, detail-process-mint
+  overview:
+    title: Mint Zcoin
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+
+  detail-create-mint:
+    title__mint: Create Mint
+    label__fees: Fees
+    label__amount: Total Amount
+    button__start-minting--primary: Start Minting
+
+    confirm-mint:
+      title__confirm-mint: Confirm Payment
+      description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. # necessary?
+      label__fees: Fees
+      label__total: Total Amount
+
+      button__confirm-send--primary: Yes, mint now!
+      button__cancel--secondary: Cancel
+      label__success: # necessary?
+
+  detail-process-mint: # incomplete / old mockup, probably changed
+    button__primary-action: Create Mint
+    title__progress-mint: Mints in Progress
+    label__processing: processed
+    label__completed: completed
+    button__clear-list: Remove Completed from List
+
+
+spend:
+
+znodes:
+
+settings:
+
+landing-page:
+
+warnings-flyout:
+  unexpected-payment:
+    # TODO: 3rd transaction > didnt subscribe (create new payment request?) > warning (red)
+    # CASE: 2nd transaction > warning (orange)
+    title__unexpected-payment: Unexpected Payment Received
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__subscription--secondary: Subscription
+    button__skip--primary: Ok, I got it!
+
+  zcoin-address-in-clipboard:
+    # TODO: spend possible
+    # CASE: Only Send Zcoin possible with available balance / requested amount
+    title__address-found: Zcoin Address found
+    description: Found a Zcoin address in your clipboard. Would you like to use it as the recipient address to send Zcoin?
+      button__cancel--secondary: Nope
+      button__confirm--primary: Yes, go ahead!
+
+warnings-fullscreen:
+  connection-lost:
+    # TODO: description, more cases?
+    # CASE: Connection to Deamon
+    title__connection-lost: Connection Lost
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__restart-demon--primary: Restart Deamon
+    button__close-client--secondary: Close Zcoin Client
+
+  unlock-wallet:
+    # TODO: description, error message
+    title__unlock-wallet: Unlock Wallet
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.
+    label__password: Password
+    error__password: Vestibulum id ligula porta felis euismod semper.
+    button__unlock-wallet--primary: Unlock Wallet
+    button__cancel--secondary: Cancel
 
 tours:
   create-zcoin-payment:
