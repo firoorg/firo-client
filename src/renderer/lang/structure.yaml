@@ -189,7 +189,23 @@ warnings-fullscreen:
     button__unlock-wallet--primary: Unlock Wallet
     button__cancel--secondary: Cancel
 
+onboarding:
+  # TODO: create complete onboarding
+  # CASE: structural dummy & dummy content
+  start-zcoin-experience:
+    zcoin-general-feature-1: # Why Zcoin?
+    zcoin-general-feature-2: # Why Privacy?
+    zcoin-general-feature-3: # Why Client?
+    zcoin-highlight-feature: # Latest Update
+  setup:
+    select-blockchain-directory:
+    wallet-setup:
+      import-wallet-from-backup:
+      create-new-wallet:
+
 tours:
+  # TODO: create complete tours
+  # CASE: structural dummy
   create-zcoin-payment:
     assistant-mode:
       tooltip__title: Need help creating a Payment? No worries, we got you covered!
@@ -199,7 +215,51 @@ tours:
         decription: Sed posuere consectetur est at lobortis.
         button__prev--secondary: Close
         button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
 
+  send-zcoin:
+    assistant-mode:
+      tooltip__title: Need help sending a Payment? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
+
+  mint-zcoin:
+    assistant-mode:
+      tooltip__title: Need help minting a Zcoin? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
+
+  spend-zcoin:
+    assistant-mode:
+      tooltip__title: Need help spending a minted Zcoin? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
       other-step:
         title: Title of the step
         decription: Sed posuere consectetur est at lobortis.
