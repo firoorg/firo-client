@@ -149,6 +149,45 @@ mint:
 spend:
 
 znodes:
+  overview:
+    title: Znodes
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    # TODO: searchbar for filtering w/ errors, feedback
+    table__send:
+      labels:
+        label__address: Address
+        label__protocol: Protocol # hidden?
+        label__status: Status #hidden?
+        label__active: Active
+        label__last-seen: Last Seen
+        label__payee: Payee # hidden?
+    label__node-count: Node Count
+  detail-my-znode:
+    title: Znode Details # My Znode
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    label__alias: Alias # could also be 'znode name' and / or used as the detail title
+    label__status: Status
+    label__address: Address
+    label__active: Active
+    label__last-seen: Last Seen
+    label__payee: Payee
+    label__total-payouts: Total Payouts
+    label__action-info: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__update-status: Update Status
+    button__start-znode: Start Znode # "start missing" renaming, no start all > restarts all active in current queue
+    # TODO: start-znode feedback when running successfully > approx. 15 min (pre-enabled?)
+
+  detail-other-znode:
+        title: Znode Details
+        description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+        label__status: Status
+        label__address: Address
+        label__active: Active
+        label__last-seen: Last Seen
+        label__payee: Payee
+        label__action-info: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+        button__open-explorer: Open in Block Explorer
+
 
 settings:
 
@@ -313,6 +352,21 @@ tours:
   spend-zcoin:
     assistant-mode:
       tooltip__title: Need help spending a minted Zcoin? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
+
+  zondes:
+    assistant-mode:
+      tooltip__title: Need help setting up a znode? No worries, we got you covered!
     steps:
       step-name:
         title: Title of the step
