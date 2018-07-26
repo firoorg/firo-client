@@ -260,7 +260,7 @@ onboarding:
         bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
         faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
         ligula, eget lacinia odio sem nec elit. # wordcount: 37
-        button__prev--secondary: back to previous feature # start at first paragraph of last feature or last paragraph of last feature
+        button__prev--secondary: previous feature # start at first paragraph of last feature or last paragraph of last feature
         button__next--primary: next paragraph
       paragraph-n:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
@@ -276,7 +276,7 @@ onboarding:
         bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
         faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
         ligula, eget lacinia odio sem nec elit. # wordcount: 37
-        button__prev--secondary: back to intro # OR no button
+        button__prev--secondary: previous feature
         button__next--primary: next paragraph
       paragraph-n:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
