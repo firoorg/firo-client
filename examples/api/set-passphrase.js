@@ -14,8 +14,8 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'create',
     collection: 'set-passphrase',
-    data: {
-        "oldpassword": "password",
-        "newpassword": "12345"
-    }
+	auth: {
+	    password: config.password,
+        newpassword: config.password
+	}
 }))

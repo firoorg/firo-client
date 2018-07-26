@@ -14,6 +14,9 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'create',
     collection: 'send-zcoin',
+	auth: {
+	    password: config.password
+	},
     data: {
         addresses: {
             "TUAJcpmNqpg4gX4RC2ZuUN6eA34MYpgjNE": 3.5,

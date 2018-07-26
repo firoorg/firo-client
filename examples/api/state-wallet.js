@@ -14,5 +14,8 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'initial',
-    collection: 'state-wallet'
+    collection: 'state-wallet',
+    auth: {
+        password: config.password
+    }
 }))

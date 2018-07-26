@@ -14,11 +14,12 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'create',
     collection: 'mint',
+	auth: {
+	    password: config.password
+	},
     data: {
         denominations: {
-            "25" : 4,
-            "10": 4,
-            "1": 9
+            "1" : 1
         }
     }
 }))

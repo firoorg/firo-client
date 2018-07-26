@@ -14,6 +14,9 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'delete',
     collection: 'payment-request',
+	auth: {
+	    password: config.password
+	},
     data: {
         id: 'TDMUbj1R12q7mMQGLiGJyHv838JSYAuRCi'
     }

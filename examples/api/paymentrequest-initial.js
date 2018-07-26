@@ -14,4 +14,7 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'initial',
     collection: 'payment-request',
+	auth: {
+	    password: config.password
+	}
 }))
