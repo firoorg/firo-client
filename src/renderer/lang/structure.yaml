@@ -191,17 +191,76 @@ warnings-fullscreen:
 
 onboarding:
   # TODO: create complete onboarding
-  # CASE: structural dummy & dummy content
+  # LENGTH: 30 - 45 words per slide, multiple slides per topic possible!
+  # STRUCTURE: maybe switch order of setup and start-zcoin-experience to handle:
+  # first-time-xzc-user (opened app the first time and create new wallet)
+  # first-time-client-user (opened app the first time and imported wallet from QT)
+  # updated-client-user (opened app the first time after an update)
+  # regular-client-user (no functional changes since last usage, only transactional and znode status updates)
   start-zcoin-experience:
     zcoin-general-feature-1: # Why Zcoin?
+      title: Title of the Zcoin Feature 1
+      paragraph-1:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: back to intro # OR no button
+        button__next--primary: next paragraph
+      paragraph-n:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous paragraph
+        button__next--primary: next feature
     zcoin-general-feature-2: # Why Privacy?
+      title: Title of the Zcoin Feature 2
+      paragraph-1:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: back to previous feature # start at first paragraph of last feature or last paragraph of last feature
+        button__next--primary: next paragraph
+      paragraph-n:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous paragraph
+        button__next--primary: next feature
     zcoin-general-feature-3: # Why Client?
+      title: Title of the Zcoin Feature
+      paragraph-1:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: back to intro # OR no button
+        button__next--primary: next paragraph
+      paragraph-n:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous paragraph
+        button__next--primary: next feature
     zcoin-highlight-feature: # Latest Update
+    zcoin-client-update: # Functional Changes / Bug Fixes
   setup:
+    intro-setup: # What is going to happen in the next steps?
     select-blockchain-directory:
     wallet-setup:
-      import-wallet-from-backup:
+      restore-wallet-from-backup: # from QT or Vue?
+        test-passphrase-if-set:
       create-new-wallet:
+        create-passphrase: # what is a good passphrase? tools?
+        create-first-backup: # where to store? how to store? digital / analog, mention hardware wallet support
+    blockchain-sync: # What can I do in the meantime?
+      start-guided-tour: # start guided tour for exploring features and usability
+                         # create-first-payment request to transfer XZC from exchange to wallet (owning private keys)
+
 
 tours:
   # TODO: create complete tours
