@@ -178,15 +178,15 @@ znodes:
     # TODO: start-znode feedback when running successfully > approx. 15 min (pre-enabled?)
 
   detail-other-znode:
-        title: Znode Details
-        description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
-        label__status: Status
-        label__address: Address
-        label__active: Active
-        label__last-seen: Last Seen
-        label__payee: Payee
-        label__action-info: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
-        button__open-explorer: Open in Block Explorer
+    title: Znode Details
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    label__status: Status
+    label__address: Address
+    label__active: Active
+    label__last-seen: Last Seen
+    label__payee: Payee
+    label__action-info: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__open-explorer: Open in Block Explorer
 
 
 settings:
@@ -207,8 +207,8 @@ warnings-flyout:
     # CASE: Only Send Zcoin possible with available balance / requested amount
     title__address-found: Zcoin Address found
     description: Found a Zcoin address in your clipboard. Would you like to use it as the recipient address to send Zcoin?
-      button__cancel--secondary: Nope
-      button__confirm--primary: Yes, go ahead!
+    button__cancel--secondary: Nope
+    button__confirm--primary: Yes, go ahead!
 
 warnings-fullscreen:
   connection-lost:
