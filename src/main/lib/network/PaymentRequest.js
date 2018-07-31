@@ -5,7 +5,7 @@ export default {
     ...mixin,
     ...({
         namespace: 'PaymentRequest',
-        collection: 'payment-request',
+        collection: 'paymentrequest',
 
         mutations: {
             [types.paymentrequest.CREATE_PAYMENT_REQUEST]: 'createPaymentRequest'

@@ -15,7 +15,7 @@ export const getApiStatus = async function ({ host, ports }) {
 
         apiStatus.send(JSON.stringify({
             type: 'get',
-            collection: 'api-status'
+            collection: 'apistatus'
         }))
     })
 }
