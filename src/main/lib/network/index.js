@@ -9,7 +9,7 @@ import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
 // import blockchain from './blockchain'
-import { getApiStatus } from './ApiStatus'
+import { getApiStatus, waitForApi } from './ApiStatus'
 
 import Address from './Address'
 import Blockchain from './Blockchain'
@@ -83,9 +83,22 @@ export default {
             commit
         })
 
+        debug('got api status', apiStatus)
+
         this.setDataDirectory(apiStatus)
         this.setNetworkType(apiStatus)
-        const encryption = apiStatus.auth ? this.setupEncryption(apiStatus) : null
+        // todo this.setWalletLocked(apiStatus)
+
+        const encryption = apiStatus.devauth ? this.setupEncryption(apiStatus) : null
+
+        try {
+            await waitForApi({ ...appConfig, apiStatus })
+        } catch (e) {
+            debug('Core API module not loaded after XX seconds.', e)
+            // todo consider error throw here and shod message to the user. -> should try to restart...
+        }
+
+        debug('api loaded! setting up modules...')
 
         Object.keys(modules).forEach((moduleName) => {
             const config = {
