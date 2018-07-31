@@ -11,6 +11,6 @@ config.passphrase = "12345";
 
 config.sub = '28332';
 
-TESTNET = false;
+TESTNET = true;
 
 module.exports = config;
