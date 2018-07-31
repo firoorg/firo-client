@@ -90,8 +90,25 @@ const actions = {
         dispatch(types.SET_CURRENT_BLOCK, currentBlock)
 
         if (status) {
-            for (let key of status) {
-                console.log(key)
+            for (let [key, value] of Object.entries(status)) {
+                if (state.status[key] === undefined) {
+                    debug('unknown blockchain status key', key, value)
+                    continue
+                }
+
+                if (state.status[key] === value) {
+                    continue
+                }
+
+                const mutationName = key.replace(/\.?([A-Z]+)/g, function (x, y) {
+                    return '_' + y
+                }).replace(/^_/, '').toUpperCase()
+
+                if (!types[mutationName]) {
+                    debug('no mutation name found for', mutationName)
+                }
+
+                dispatch(types[mutationName])
             }
         }
 
@@ -146,6 +163,10 @@ const actions = {
 
     [types.SET_CLIENT_TYPE] ({ commit, state }, type) {
         if (!type) {
+            return
+        }
+
+        if (type === state.type) {
             return
         }
 
