@@ -241,48 +241,49 @@ onboarding:
       title: Title of the Zcoin Feature 1
       paragraph-1:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
-        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
-        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
-        ligula, eget lacinia odio sem nec elit. # wordcount: 37
-        button__prev--secondary: back to intro # OR no button
+          bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+          faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+          ligula, eget lacinia odio sem nec elit.
+        button__prev--secondary: back to intro
         button__next--primary: next paragraph
       paragraph-n:
-        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
-        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
-        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
-        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        description: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+          bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+          faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+          ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous paragraph
         button__next--primary: next feature
     zcoin-general-feature-2: # Why Privacy?
       title: Title of the Zcoin Feature 2
       paragraph-1:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
-        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
-        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
-        ligula, eget lacinia odio sem nec elit. # wordcount: 37
-        button__prev--secondary: previous feature # start at first paragraph of last feature or last paragraph of last feature
+          bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+          faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+          ligula, eget lacinia odio sem nec elit.
+        # start at first paragraph of last feature or last paragraph of last feature
+        button__prev--secondary: previous feature
         button__next--primary: next paragraph
       paragraph-n:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
-        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
-        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
-        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+          bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+          faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+          ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous paragraph
         button__next--primary: next feature
     zcoin-general-feature-3: # Why Client?
       title: Title of the Zcoin Feature
       paragraph-1:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
-        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
-        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
-        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+          bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+          faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+          ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous feature
         button__next--primary: next paragraph
       paragraph-n:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
-        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
-        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
-        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+          bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+          faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+          ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous paragraph
         button__next--primary: next feature
     zcoin-highlight-feature: # Latest Update
