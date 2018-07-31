@@ -1,4 +1,4 @@
-# payment-requests.detail-view-fullfilled.button-share-via-email = 'Share via Email'
+# payment-requests.detail-view-fulfilled.button-share-via-email = 'Share via Email'
 # (level2/overview/list)+(level3/detail/interaction)
 
 #
@@ -28,10 +28,10 @@ navigation:
     switch__connect-via-tor: Anonymize Connection
 
 receive:
+  # TODO: description, error messages
   overview:
     title: Receive Zcoin
     description:  Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
-    button__primary-action: Create Payment Request
   # approx. 100 chars // concept of payment request, simple analogy, how should someone know where to send something?
     table__payment-requests:
       labels:
@@ -39,21 +39,76 @@ receive:
         label__created: Created
         label__label: Label
 
-  detail-create:
+  detail-create-request:
     title__create: Create Payment Request
     label__label: Label
-    error__label: The label field is required.
+    error__label: The label field is required. # note to internal labeling
     label__amount: Amount
     error__amount--not-numeric: The amount field must be numeric and may contain 8 decimal points.
     error__amount--below-minimum: The amount field must be 0.001 or more.
-    label__message: Message
+    label__message: Message # optional?
     button__create-payment-request: Create Payment Request
 
-  detail-request:
-    #receive.detail-view.detail-request.label: Etiam \#porta sem \#malesuada magna mollis euismod # labels caped in length?
+  detail-entry-request:
+    # TODO: label subscribed, subscribed state
+    button__primary-action: Create Payment Request
     label__created: Created
-    # receive.detail-view.detail-request.time-indicator: about 1 hour ago # language from plugin
     label__amount: Amount
+    pending:
+      button__copy-link--primary: Copy Link
+      button__share-via-email--secondary: Share via E-mail
+    fulfilled:
+      button__open-explorer: Open in Block Explorer
+
+send:
+  # TODO: descriptions, error messages
+  overview:
+    title: Send Zcoin
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    table__send:
+      labels:
+        label__created: Created
+        label__label: Label
+        label__amount: Amount
+
+  detail-create-send:
+    title__send: Send Zcoin
+    label__label: Label
+    error__label: The label field is required. # note internal labeling
+    label__amount: Amount
+    error__amount--not-numeric: The amount field must be numeric and may contain 8 decimal points.
+    error__amount--below-minimum: The amount field must be 0.001 or more.
+    label__address: Address
+    error__address: The address field must cointain a valid Zcoin address. / Ups, it looks like you accidentally mistyped your address!
+
+    single-send:
+      button__send-now--primary: Send Now
+      button__send-later--secondary: Send Later
+    multi-send:
+      button__send-all--primary: Send All
+      button__add-to-queue--secondary: Add to Queue
+
+    pending-payments:
+      title__pending-payments: Pending Payments
+      description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+
+    confirm-payment:
+      title__confirm-send: Confirm Payment
+      description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. # necessary?
+      label__payments: Payments
+      label__fees: Fees
+      button__change: Change
+      label__total: Total
+
+      button__confirm-send--primary: Yes, send now!
+      button__cancel--secondary: Cancel
+      label__success: Payment successfully send!
+
+
+  detail-entry-send:
+    label__created: Created
+    label__amount-received: Amount Received
+    label__fulfilled: Fulfilled
 
     pending:
       button__copy-link--primary: Copy Link
@@ -61,7 +116,194 @@ receive:
     fulfilled:
       button__open-explorer: Open in Block Explorer
 
+mint:
+  # TODO: descriptions, detail-process-mint
+  overview:
+    title: Mint Zcoin
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+
+  detail-create-mint:
+    title__mint: Create Mint
+    label__fees: Fees
+    label__amount: Total Amount
+    button__start-minting--primary: Start Minting
+
+    confirm-mint:
+      title__confirm-mint: Confirm Payment
+      description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. # necessary?
+      label__fees: Fees
+      label__total: Total Amount
+
+      button__confirm-send--primary: Yes, mint now!
+      button__cancel--secondary: Cancel
+      label__success: # necessary?
+
+  detail-process-mint: # incomplete / old mockup, probably changed
+    button__primary-action: Create Mint
+    title__progress-mint: Mints in Progress
+    label__processing: processed
+    label__completed: completed
+    button__clear-list: Remove Completed from List
+
+
+spend:
+
+znodes:
+  overview:
+    title: Znodes
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    # TODO: searchbar for filtering w/ errors, feedback
+    table__send:
+      labels:
+        label__address: Address
+        label__protocol: Protocol # hidden?
+        label__status: Status #hidden?
+        label__active: Active
+        label__last-seen: Last Seen
+        label__payee: Payee # hidden?
+    label__node-count: Node Count
+  detail-my-znode:
+    title: Znode Details # My Znode
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    label__alias: Alias # could also be 'znode name' and / or used as the detail title
+    label__status: Status
+    label__address: Address
+    label__active: Active
+    label__last-seen: Last Seen
+    label__payee: Payee
+    label__total-payouts: Total Payouts
+    label__action-info: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__update-status: Update Status
+    button__start-znode: Start Znode # "start missing" renaming, no start all > restarts all active in current queue
+    # TODO: start-znode feedback when running successfully > approx. 15 min (pre-enabled?)
+
+  detail-other-znode:
+        title: Znode Details
+        description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+        label__status: Status
+        label__address: Address
+        label__active: Active
+        label__last-seen: Last Seen
+        label__payee: Payee
+        label__action-info: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+        button__open-explorer: Open in Block Explorer
+
+
+settings:
+
+landing-page:
+
+warnings-flyout:
+  unexpected-payment:
+    # TODO: 3rd transaction > didnt subscribe (create new payment request?) > warning (red)
+    # CASE: 2nd transaction > warning (orange)
+    title__unexpected-payment: Unexpected Payment Received
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__subscription--secondary: Subscription
+    button__skip--primary: Ok, I got it!
+
+  zcoin-address-in-clipboard:
+    # TODO: spend possible
+    # CASE: Only Send Zcoin possible with available balance / requested amount
+    title__address-found: Zcoin Address found
+    description: Found a Zcoin address in your clipboard. Would you like to use it as the recipient address to send Zcoin?
+      button__cancel--secondary: Nope
+      button__confirm--primary: Yes, go ahead!
+
+warnings-fullscreen:
+  connection-lost:
+    # TODO: description, more cases?
+    # CASE: Connection to Deamon
+    title__connection-lost: Connection Lost
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__restart-demon--primary: Restart Deamon
+    button__close-client--secondary: Close Zcoin Client
+
+  unlock-wallet:
+    # TODO: description, error message
+    title__unlock-wallet: Unlock Wallet
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.
+    label__password: Password
+    error__password: Vestibulum id ligula porta felis euismod semper.
+    button__unlock-wallet--primary: Unlock Wallet
+    button__cancel--secondary: Cancel
+
+onboarding:
+  # TODO: create complete onboarding
+  # LENGTH: 30 - 45 words per slide, multiple slides per topic possible!
+  # STRUCTURE: maybe switch order of setup and start-zcoin-experience to handle:
+  # first-time-xzc-user (opened app the first time and create new wallet)
+  # first-time-client-user (opened app the first time and imported wallet from QT)
+  # updated-client-user (opened app the first time after an update)
+  # regular-client-user (no functional changes since last usage, only transactional and znode status updates)
+  start-zcoin-experience:
+    zcoin-general-feature-1: # Why Zcoin?
+      title: Title of the Zcoin Feature 1
+      paragraph-1:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: back to intro # OR no button
+        button__next--primary: next paragraph
+      paragraph-n:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous paragraph
+        button__next--primary: next feature
+    zcoin-general-feature-2: # Why Privacy?
+      title: Title of the Zcoin Feature 2
+      paragraph-1:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous feature # start at first paragraph of last feature or last paragraph of last feature
+        button__next--primary: next paragraph
+      paragraph-n:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous paragraph
+        button__next--primary: next feature
+    zcoin-general-feature-3: # Why Client?
+      title: Title of the Zcoin Feature
+      paragraph-1:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous feature
+        button__next--primary: next paragraph
+      paragraph-n:
+        decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
+        bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
+        faucibus mollis interdum. Duis mollis, est non commodo luctus, nisi erat porttitor
+        ligula, eget lacinia odio sem nec elit. # wordcount: 37
+        button__prev--secondary: previous paragraph
+        button__next--primary: next feature
+    zcoin-highlight-feature: # Latest Update
+    zcoin-client-update: # Functional Changes / Bug Fixes
+  setup:
+    intro-setup: # What is going to happen in the next steps?
+    select-blockchain-directory:
+    wallet-setup:
+      restore-wallet-from-backup: # from QT or Vue?
+        test-passphrase-if-set:
+      create-new-wallet:
+        create-passphrase: # what is a good passphrase? tools?
+        create-first-backup: # where to store? how to store? digital / analog, mention hardware wallet support
+    blockchain-sync: # What can I do in the meantime?
+      start-guided-tour: # start guided tour for exploring features and usability
+                         # create-first-payment request to transfer XZC from exchange to wallet (owning private keys)
+
+
 tours:
+  # TODO: create complete tours
+  # CASE: structural dummy
   create-zcoin-payment:
     assistant-mode:
       tooltip__title: Need help creating a Payment? No worries, we got you covered!
@@ -71,7 +313,66 @@ tours:
         decription: Sed posuere consectetur est at lobortis.
         button__prev--secondary: Close
         button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
 
+  send-zcoin:
+    assistant-mode:
+      tooltip__title: Need help sending a Payment? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
+
+  mint-zcoin:
+    assistant-mode:
+      tooltip__title: Need help minting a Zcoin? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
+
+  spend-zcoin:
+    assistant-mode:
+      tooltip__title: Need help spending a minted Zcoin? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
+      other-step:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: go back
+        button__next--primary: Ok, done!
+
+  zondes:
+    assistant-mode:
+      tooltip__title: Need help setting up a znode? No worries, we got you covered!
+    steps:
+      step-name:
+        title: Title of the step
+        decription: Sed posuere consectetur est at lobortis.
+        button__prev--secondary: Close
+        button__next--primary: Got it!
       other-step:
         title: Title of the step
         decription: Sed posuere consectetur est at lobortis.
