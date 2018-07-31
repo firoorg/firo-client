@@ -2,7 +2,7 @@ const config = require("./config")
 const zmq = require('zeromq')
 
 const requester = zmq.socket('req')
-requester.connect('tcp://127.0.0.1:' + config.testnet + config.auth)
+requester.connect('tcp://127.0.0.1:' + (TESTNET ? config.testnet : config.regtest) + config.auth)
 
 // log out replies
 requester.on('message', (msg) => {
@@ -13,13 +13,9 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'update',
-    collection: 'payment-request',
-	auth: {
-	    password: config.password
-	},
-    data: {
-        id: 'TDMUbj1R12q7mMQGLiGJyHv838JSYAuRCi',
-        label: 'this is a modified payment request label',
-        isRecurring: true
+    collection: 'setpassphrase',
+    auth: {
+        passphrase: config.passphrase,
+        newpassphrase: config.passphrase
     }
 }))

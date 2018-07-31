@@ -13,12 +13,12 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'update',
-    collection: 'settings',
+    collection: 'paymentrequest',
 	auth: {
 	    passphrase: config.passphrase
 	},
-    id: 'lastSeen',
-    payload: {
-        paymentRequest: 1000
+    data: {
+        id: 'TLCxbGmndQyC1YPbsiJ1voV5aPtW75E739',
+        label: 'this is a modified payment request label'
     }
 }))

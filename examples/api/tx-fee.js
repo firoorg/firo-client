@@ -2,7 +2,7 @@ const config = require("./config")
 const zmq = require('zeromq')
 
 const requester = zmq.socket('req')
-requester.connect('tcp://127.0.0.1:' + config.testnet + config.auth)
+requester.connect('tcp://127.0.0.1:' + (TESTNET ? config.testnet : config.regtest) + config.auth)
 
 // log out replies
 requester.on('message', (msg) => {
@@ -11,17 +11,16 @@ requester.on('message', (msg) => {
 })
 
 // send stringified json
-requester.send(JSON.stringify({
-      type: 'get',
-      collection: 'tx-fee',
+requester.send(JSON.stringify({ 
+      collection: 'txfee',
 			auth: {
-			    password: config.password
+			    passphrase: config.passphrase
 			},
       data: {
           addresses: {
-              TUAJcpmNqpg4gX4RC2ZuUN6eA34MYpgjNE: 0.01,
-              TV3f8WhYuMyMLGJuwhdU7psvmCS63yuy3t: 0.01,
+              TUAJcpmNqpg4gX4RC2ZuUN6eA34MYpgjNE: 1000000,
+              TV3f8WhYuMyMLGJuwhdU7psvmCS63yuy3t: 1000000,
           },
-          feeperkb: 0.002
+          feeperkb: 200000
       }
 }))
