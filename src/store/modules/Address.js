@@ -166,15 +166,15 @@ const actions = {
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
         console.log('ADD_MINT_FROM_TX', mintTx)
 
-        const { amount, blockhash, blocktime, confirmations, fee, timereceived, txid, used } = mintTx
+        const { amount, blockheight, blockhash, blocktime, fee, timereceived, txid, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
             amount,
-            confirmations,
             fee,
             timereceived,
             used,
             block: {
+                height: blockheight,
                 hash: blockhash,
                 time: blocktime
             },
@@ -197,7 +197,7 @@ const getters = {
         return Object.values(state[WALLET_ADDRESS_KEY]).map((addr) => {
             const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
             const { block, transactions } = addr
-            const confirmations = currentBlockHeight && block ? currentBlockHeight - block.height : addr.confirmations
+            const confirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
 
             return {
                 ...addr,
