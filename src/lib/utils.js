@@ -34,6 +34,36 @@ export const connectToStore = function ({ store, namespace, onStoreMutation, onS
     }
 }
 
+// todo move to utils
+export const tryUntil = async function ({
+    functionToTry,
+    validator,
+    ttlInSeconds,
+    retryInterval = 100,
+    errorMessage = 'tryUntil timed out'
+}) {
+    let start = Date.now()
+    const runner = async (resolve, reject) => {
+        const { meta, data } = await functionToTry()
+        const { status } = meta
+
+        if (validator({ status, data })) {
+            resolve(data)
+            return
+        }
+
+        if (Date.now() - start < ttlInSeconds * 1000) {
+            await sleep(retryInterval)
+            await runner(resolve, reject)
+            return
+        }
+
+        reject(new Error(`${errorMessage} / TTL: ${ttlInSeconds}`))
+    }
+
+    return new Promise(runner)
+}
+
 export const sleep = function (ms) {
     return new Promise((resolve, reject) => setTimeout(() => resolve(), ms))
 }

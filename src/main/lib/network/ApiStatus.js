@@ -1,4 +1,4 @@
-import { sleep } from '#/lib/utils'
+import { tryUntil } from '#/lib/utils'
 import zmq from 'zeromq'
 
 const apiStatus = zmq.socket('req')
@@ -45,33 +45,4 @@ export const waitForApi = async function ({ host, ports, apiStatus }) {
         validator,
         ttlInSeconds: 5
     })
-}
-
-// todo move to utils
-export const tryUntil = async function ({
-    functionToTry,
-    validator,
-    ttlInSeconds,
-    retryInterval = 100
-}) {
-    let start = Date.now()
-    const runner = async (resolve, reject) => {
-        const { meta, data } = await functionToTry()
-        const { status } = meta
-
-        if (validator({ status, data })) {
-            resolve(data)
-            return
-        }
-
-        if (Date.now() - start < ttlInSeconds * 1000) {
-            await sleep(retryInterval)
-            await runner(resolve, reject)
-            return
-        }
-
-        reject(new Error('api not ready after', ttlInSeconds))
-    }
-
-    return new Promise(runner)
 }
