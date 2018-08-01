@@ -159,11 +159,25 @@ export default {
     },
 
     setNetworkType (apiStatus) {
+    },
 
+    disconnect () {
+        console.log('disconnecting from network')
+        if (!modules || !Object.keys(modules).length) {
+            return
+        }
+
+        Object.keys(modules).forEach((module) => {
+            modules[module].disconnect()
+        })
     },
 
     close () {
         console.log('closing network')
+        if (!modules || !Object.keys(modules).length) {
+            return
+        }
+
         Object.keys(modules).forEach((module) => {
             modules[module].close()
         })
