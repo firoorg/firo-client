@@ -28,8 +28,7 @@ export const waitForApi = async function ({ host, ports, apiStatus }) {
     const validator = ({ status, data }) => {
         const { modules = {} } = data
 
-        // todo remove parsing once issue #57 is closed
-        return parseInt(status) === 200 && modules.API
+        return status === 200 && modules.API
     }
 
     const { meta, data } = apiStatus

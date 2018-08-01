@@ -121,7 +121,6 @@ export default {
 
         const { meta, data } = response
 
-        // todo check current behaviour with status beeing a string #57
         if (!meta || meta.status < 200 || meta.status >= 400) {
             console.warn(response)
             // todo send error response back
