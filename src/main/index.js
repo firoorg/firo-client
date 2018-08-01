@@ -49,7 +49,13 @@ const coreDaemonManager = new PidManager({
     path: pathToStorePid,
     autoRestart,
     heartbeatIntervalInSeconds,
-    store
+    store,
+    onStarted: () => {
+        console.log('STARTING NETWORK')
+        network.disconnect()
+        // network.close()
+        network.init({ store })
+    }
 })
 
 if (stopOnQuit) {
@@ -93,10 +99,10 @@ const interval = setInterval(() => {
 
 store.replaceState(require('../store/initialState'))
 
-setTimeout(() => {
-    console.log('STARTING NETWORK')
-    network.init({ store })
-}, 15 * 1000)
+// coreDaemonManager.on
+// console.log('STARTING NETWORK')
+// network.init({ store })
+
 // wallet.init({ store, namespace: 'Wallet' })
 deeplink.init({ windowManager, store })
 
