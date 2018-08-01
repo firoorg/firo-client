@@ -1,10 +1,10 @@
 import { tryUntil } from '#/lib/utils'
 import zmq from 'zeromq'
 
-const apiStatus = zmq.socket('req')
-
 export const getApiStatus = async function ({ host, ports }) {
-    apiStatus.connect(`${host}:${ports.status}`)
+    let apiStatus = zmq.socket('req')
+    const uri = `${host}:${ports.status}`
+    apiStatus.connect(uri)
 
     return new Promise((resolve, reject) => {
         apiStatus.once('message', (msg) => {
@@ -13,7 +13,9 @@ export const getApiStatus = async function ({ host, ports }) {
             resolve(JSON.parse(msg.toString()))
             // todo reject based on status code / errors
 
-            // apiStatus.close()
+            apiStatus.disconnect(uri)
+            apiStatus.close()
+            apiStatus = null
         })
 
         apiStatus.send(JSON.stringify({
