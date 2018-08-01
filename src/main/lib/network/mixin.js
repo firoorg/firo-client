@@ -69,9 +69,7 @@ export default {
             if (message) {
                 console.log('message', message)
             }
-            // debug('received a message from publisher related to:', topic.toString(), 'containing message:', message.toString())
-            // todo parse message, unwrap json structure
-            // todo standardise vuex type
+
             try {
                 this.processResponse(JSON.parse(message), this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`])
             } catch (e) {

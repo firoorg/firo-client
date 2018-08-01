@@ -61,7 +61,6 @@ const actions = {
 
             for (let txCategory of Object.keys(txids)) {
                 for (let txid of Object.keys(txids[txCategory])) {
-
                     const tx = txids[txCategory][txid]
                     const { category } = tx
 

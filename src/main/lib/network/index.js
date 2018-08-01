@@ -159,6 +159,7 @@ export default {
     },
 
     setNetworkType (apiStatus) {
+        // todo?
     },
 
     disconnect () {
