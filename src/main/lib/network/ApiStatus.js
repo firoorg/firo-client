@@ -23,7 +23,7 @@ export const getApiStatus = async function ({ host, ports }) {
     })
 }
 
-export const waitForApi = async function ({ host, ports, apiStatus }) {
+export const waitForApi = async function ({ host, ports, apiStatus, ttlInSeconds }) {
     console.log('waiting for api')
     const validator = ({ status, data }) => {
         const { modules = {} } = data
@@ -42,6 +42,6 @@ export const waitForApi = async function ({ host, ports, apiStatus }) {
             return getApiStatus({ host, ports })
         },
         validator,
-        ttlInSeconds: 5
+        ttlInSeconds
     })
 }
