@@ -1,4 +1,5 @@
 import * as types from '../types/PaymentRequest'
+import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 
 const state = {
     paymentRequests: {},
@@ -61,7 +62,10 @@ const actions = {
             return
         }
 
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field, value })
+        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, {
+            field,
+            value: convertToSatoshi(value)
+        })
     },
 
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE] ({ commit, state }, value) {
@@ -151,6 +155,9 @@ const getters = {
     },
     createFormAmount (state) {
         return state.createPaymentRequestForm.amount
+    },
+    createFormAmountAsBaseCoin (state) {
+        return convertToCoin(state.createPaymentRequestForm.amount)
     },
     createFormMessage (state) {
         return state.createPaymentRequestForm.message
