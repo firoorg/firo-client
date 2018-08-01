@@ -29,7 +29,7 @@ const unlink = promisify(fs.unlink)
 const IS_WINDOWS = /^win/.test(process.platform)
 
 export default class PidManager {
-    constructor ({ path: filePath, name, store, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
+    constructor ({ path: filePath, name, store, onStarted, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
         debug('setting up a new PidManager for %s', name)
         debug('going to write pid file to "%s"', filePath)
 
@@ -42,6 +42,8 @@ export default class PidManager {
 
         this.maxAutoRestartTries = maxAutoRestartTries
         autoRestart ? this.enableAutoRestart() : this.disableAutoRestart()
+
+        this.onStarted = onStarted || (() => {})
     }
 
     async start (pathToSpawn) {
@@ -64,7 +66,7 @@ export default class PidManager {
 
         if (await this.isRunning()) {
             debug('daemon is still running. no need to start it...')
-            this.startHeartbeat()
+            this.onStart()
             return
         }
 
@@ -86,10 +88,18 @@ export default class PidManager {
         debug('started managed process with pid id', this.pid)
 
         await this.write()
-        this.startHeartbeat()
+        this.onStart()
         this.store.dispatch(types.network.NETWORK_IS_CONNECTED)
 
         return this.pid
+    }
+
+    onStart () {
+        this.startHeartbeat()
+        console.log('onStarted...')
+        this.onStarted({
+            pid: this.pid
+        })
     }
 
     async stop () {
