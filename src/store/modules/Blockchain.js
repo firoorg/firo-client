@@ -82,7 +82,7 @@ const mutations = {
 }
 
 const actions = {
-    [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch, state }, block) {
+    [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch, commit, state }, block) {
         console.log('ON_BLOCK_SUBSCRIPTION')
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType } = block
         console.log('got block!', block)
@@ -113,9 +113,9 @@ const actions = {
         }
 
         if (isTestnet) {
-            dispatch(types.SET_NETWORK_TO_TESTNET)
+            commit(types.SET_NETWORK_TO_TESTNET)
         } else {
-            dispatch(types.SET_NETWORK_TO_MAINNET)
+            commit(types.SET_NETWORK_TO_MAINNET)
         }
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
