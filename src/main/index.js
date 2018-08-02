@@ -43,6 +43,8 @@ const pathToStorePid = rootFolder
 // get core config
 const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
 
+store.replaceState(require('../store/initialState'))
+
 // set up the manager
 const coreDaemonManager = new PidManager({
     name: 'core',
@@ -52,7 +54,7 @@ const coreDaemonManager = new PidManager({
     store,
     onStarted: () => {
         console.log('STARTING NETWORK')
-        network.disconnect()
+        // network.disconnect()
         // network.close()
         network.init({ store })
     }
@@ -96,8 +98,6 @@ const interval = setInterval(() => {
 // https://electronjs.org/docs/api/app#appcommandlineappendswitchswitch-value
 // https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 // app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
-
-store.replaceState(require('../store/initialState'))
 
 // coreDaemonManager.on
 // console.log('STARTING NETWORK')

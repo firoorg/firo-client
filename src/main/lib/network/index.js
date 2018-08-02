@@ -9,7 +9,7 @@ import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
 // import blockchain from './blockchain'
-import { getApiStatus, waitForApi } from './ApiStatus'
+import { getApiStatus, closeApiStatus, waitForApi } from './ApiStatus'
 
 import Address from './Address'
 import Blockchain from './Blockchain'
@@ -175,6 +175,8 @@ export default {
 
     close () {
         console.log('closing network')
+        closeApiStatus()
+
         if (!modules || !Object.keys(modules).length) {
             return
         }
