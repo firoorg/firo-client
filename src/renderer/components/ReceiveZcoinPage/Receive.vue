@@ -195,7 +195,7 @@
     }
 
     .status {
-        max-width: emRhythm(35);
+        max-width: emRhythm(25);
         margin: 0 auto;
         opacity: 1;
     }
