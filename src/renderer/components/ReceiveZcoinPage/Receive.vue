@@ -22,7 +22,7 @@
 
                 <dl>
                     <dt>Created</dt>
-                    <dd><timeago :since="created_at" :auto-update="30"></timeago></dd>
+                    <dd><timeago :datetime="created_at" :auto-update="30"></timeago></dd>
                     <dt>Amount</dt>
                     <dd>{{ amount ? amount + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
@@ -129,7 +129,13 @@
 
           tagClicked (tag) {
               console.log('tag clicked -->', tag)
-              console.log('todo: redirecting to the filtered list page')
+
+              this.$router.push({
+                  name: this.$router.currentRoute.name || 'receive-zcoin-paymentrequest',
+                  query: {
+                      filter: `#${tag}`
+                  }
+              })
           },
 
           shareViaMail () {

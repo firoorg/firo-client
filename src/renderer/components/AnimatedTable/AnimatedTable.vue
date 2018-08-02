@@ -122,7 +122,11 @@
 
             dataManager (sortOrder, pagination) {
                 console.log('DATAMANAGER CALLED!')
-                if (this.data.length < 1) return
+                if (this.data.length < 1) {
+                    return {
+                        data: []
+                    }
+                }
 
                 let local = this.data
 

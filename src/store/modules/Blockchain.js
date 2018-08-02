@@ -82,7 +82,11 @@ const mutations = {
 }
 
 const actions = {
-    [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch, state }, block) {
+    [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
+        console.log('ON BLOCKCHAIN INITIAL STATE', initialState)
+    },
+
+    [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch, commit, state }, block) {
         console.log('ON_BLOCK_SUBSCRIPTION')
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType } = block
         console.log('got block!', block)
@@ -90,15 +94,32 @@ const actions = {
         dispatch(types.SET_CURRENT_BLOCK, currentBlock)
 
         if (status) {
-            for (let key of status) {
-                console.log(key)
+            for (let [key, value] of Object.entries(status)) {
+                if (state.status[key] === undefined) {
+                    debug('unknown blockchain status key', key, value)
+                    continue
+                }
+
+                if (state.status[key] === value) {
+                    continue
+                }
+
+                const mutationName = key.replace(/\.?([A-Z]+)/g, function (x, y) {
+                    return '_' + y
+                }).replace(/^_/, '').toUpperCase()
+
+                if (!types[mutationName]) {
+                    debug('no mutation name found for', mutationName)
+                }
+
+                dispatch(types[mutationName])
             }
         }
 
         if (isTestnet) {
-            dispatch(types.SET_NETWORK_TO_TESTNET)
+            commit(types.SET_NETWORK_TO_TESTNET)
         } else {
-            dispatch(types.SET_NETWORK_TO_MAINNET)
+            commit(types.SET_NETWORK_TO_MAINNET)
         }
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
@@ -146,6 +167,10 @@ const actions = {
 
     [types.SET_CLIENT_TYPE] ({ commit, state }, type) {
         if (!type) {
+            return
+        }
+
+        if (type === state.type) {
             return
         }
 

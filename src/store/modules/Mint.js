@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import * as types from '../types/Mint'
+import { convertToCoin } from '#/lib/convert'
 
 const state = {
     currentDenominations: {},
@@ -81,18 +82,27 @@ const getters = {
     },
 
     // todo rename to confirmed mints
-    mints (state) {
+    mints (state, getters, rootState, rootGetters) {
+        console.log(state)
+        console.log(Object.values(state.mints).length)
         return Object.values(state.mints)
             .filter((mint) => !mint.isUsed)
-            .filter((mint) => mint.confirmations >= 6)
+            .filter((mint) => {
+                const { block } = mint
+                const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
+                const confirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
+
+                return confirmations >= 6
+            })
             .reduce((accumulator, mint) => {
                 const { amount } = mint
+                const label = parseInt(convertToCoin(amount))
 
-                if (!accumulator[`${amount}`]) {
-                    accumulator[`${amount}`] = 0
+                if (!accumulator[`${label}`]) {
+                    accumulator[`${label}`] = 0
                 }
 
-                accumulator[`${amount}`]++
+                accumulator[`${label}`]++
 
                 return accumulator
             }, {})

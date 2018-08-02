@@ -41,9 +41,10 @@ const mutations = {
 const actions = {
     [types.SET_INITIAL_STATE] ({ commit, dispatch, state }, initialState) {
         console.log(Object.keys(initialState))
+        const { addresses } = initialState
 
-        for (const addressKey of Object.keys(initialState)) {
-            const address = initialState[addressKey]
+        for (const addressKey of Object.keys(addresses)) {
+            const address = addresses[addressKey]
 
             if (!address) {
                 continue
@@ -58,18 +59,10 @@ const actions = {
 
             console.log('total:', total)
 
-            for (let txid of Object.keys(txids)) {
-                const { category: txCategories } = txids[txid]
-
-                console.log('txCategories', txCategories)
-
-                for (let txCategory of Object.keys(txCategories)) {
-                    console.log('txCategory', txCategory)
-
-                    const tx = txCategories[txCategory]
+            for (let txCategory of Object.keys(txids)) {
+                for (let txid of Object.keys(txids[txCategory])) {
+                    const tx = txids[txCategory][txid]
                     const { category } = tx
-
-                    console.log('category', category)
 
                     if (!category) {
                         console.log(tx, address)
@@ -129,7 +122,6 @@ const actions = {
 
     [types.ADD_RECEIVE_FROM_TX] ({ commit, dispatch, state }, receiveTx) {
         const { address, amount, blockheight, blockhash, blocktime, category, confirmations, timereceived, txid } = receiveTx
-        // dispatch(types.ADD_ADDRESS, { address })
 
         commit(types.ADD_TRANSACTION, {
             stack: WALLET_ADDRESS_KEY,
@@ -174,15 +166,15 @@ const actions = {
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
         console.log('ADD_MINT_FROM_TX', mintTx)
 
-        const { amount, blockhash, blocktime, confirmations, fee, timereceived, txid, used } = mintTx
+        const { amount, blockheight, blockhash, blocktime, fee, timereceived, txid, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
             amount,
-            confirmations,
             fee,
             timereceived,
             used,
             block: {
+                height: blockheight,
                 hash: blockhash,
                 time: blocktime
             },
@@ -191,14 +183,11 @@ const actions = {
     },
 
     [types.ON_ADDRESS_SUBSCRIPTION] ({ dispatch, state }, data) {
-        console.log('ON_ADDRESS_SUBSCRIPTION')
         try {
             dispatch(types.SET_INITIAL_STATE, data)
         } catch (e) {
-            console.log('ON_ADDRESS_SUBSCRIPTION ERROR\n---------------')
             console.log(e)
             console.log(data)
-            console.log('---------------')
         }
     }
 }
@@ -206,16 +195,16 @@ const actions = {
 const getters = {
     walletAddresses (state, getters, rootState, rootGetters) {
         return Object.values(state[WALLET_ADDRESS_KEY]).map((addr) => {
-            const { transactions } = addr
             const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
-            const confirmations = currentBlockHeight ? currentBlockHeight - addr.block.height : addr.confirmations
+            const { block, transactions } = addr
+            const confirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
 
             return {
                 ...addr,
                 hasTransactions: !!transactions.length,
                 isReused: transactions.length > 1,
-                confirmations,
-                isConfimed: confirmations >= 6
+                isConfimed: confirmations >= 6,
+                confirmations
             }
         })
     },

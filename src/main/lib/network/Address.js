@@ -5,7 +5,7 @@ export default {
     ...mixin,
     ...({
         namespace: 'Address',
-        collection: 'state-wallet',
+        collection: 'statewallet',
         subscriptions: ['address']
     })
 }

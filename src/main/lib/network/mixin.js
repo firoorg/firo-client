@@ -15,8 +15,12 @@ export default {
     collection: '',
     subscriptions: [],
 
+    subscriberUri: '',
     subscriber: null, // zmq.socket('sub')
+
+    requesterUri: '',
     requester: null, // zmq.socket('req')
+
     dispatchAction: null,
     commitMutation: null,
 
@@ -34,7 +38,8 @@ export default {
             throw new Error('no encryption provided.')
         }
 
-        this.requester.connect(`${host}:${ports.request}`)
+        this.requesterUri = `${host}:${ports.request}`
+        this.requester.connect(this.requesterUri)
 
         this.dispatchAction = dispatch
         this.commitMutation = commit
@@ -43,7 +48,8 @@ export default {
 
         if (this.subscriptions && this.subscriptions.length) {
             debug(`connecting to publisher at ${ports.publisher}`)
-            this.subscriber.connect(`${host}:${ports.publisher}`)
+            this.subscriberUri = `${host}:${ports.publisher}`
+            this.subscriber.connect(this.subscriberUri)
 
             this.setupSubscribers()
         }
@@ -63,9 +69,7 @@ export default {
             if (message) {
                 console.log('message', message)
             }
-            // debug('received a message from publisher related to:', topic.toString(), 'containing message:', message.toString())
-            // todo parse message, unwrap json structure
-            // todo standardise vuex type
+
             try {
                 this.processResponse(JSON.parse(message), this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`])
             } catch (e) {
@@ -165,6 +169,21 @@ export default {
             type,
             data
         }))
+    },
+
+    disconnect () {
+        try {
+            this.subscriber.disconnect(this.subscriberUri)
+        } catch (e) {
+            console.log(e.type)
+            // console.log(e)
+        }
+
+        try {
+            this.requester.disconnect(this.requesterUri)
+        } catch (e) {
+            // console.log(e)
+        }
     },
 
     close () {

@@ -93,7 +93,7 @@
             }),
             ...addVuexModel({
                 name: 'amount',
-                getter: 'PaymentRequest/createFormAmount',
+                getter: 'PaymentRequest/createFormAmountAsBaseCoin',
                 action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT
             }),
             ...addVuexModel({

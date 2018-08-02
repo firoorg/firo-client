@@ -7,7 +7,9 @@
                     Zcoin
                 </h1>
 
-                <animated-table :data="paymentRequests"
+                <input type="text" v-model="tableFilter" />
+
+                <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
@@ -29,7 +31,7 @@
             </transition>
             <transition name="fade" mode="out-in">
                 <router-view v-bind="selectedPaymentRequestWithAddress"
-                             :key="$route.fullPath"
+                             :key="$route.path"
                              class="paymentrequest-detail-route scrollable"></router-view>
             </transition>
         </section>
@@ -110,11 +112,50 @@
 
                 const address = filteredAddress.length ? filteredAddress[0] : paymentRequest.address
 
-                console.log(paymentRequest)
-
                 return {
                     ...paymentRequest,
                     address
+                }
+            },
+
+            filteredPaymentRequests () {
+                if (!this.tableFilter) {
+                    return this.paymentRequests
+                }
+
+                return this.paymentRequests.filter((request) => {
+                    return request.label ? request.label.includes(this.tableFilter) : false
+                })
+            },
+
+            tableFilter: {
+                get () {
+                    try {
+                        const { filter } = this.$store.state.AppRouter.query
+
+                        return filter
+                    } catch (e) {
+                        console.error(e)
+                        return ''
+                    }
+                },
+
+                set (newValue) {
+                    const route = {
+                        name: this.$router.currentRoute.name
+                    }
+
+                    if (!newValue) {
+                        this.$router.replace(route)
+                        return
+                    }
+
+                    this.$router.replace({
+                        ...route,
+                        query: {
+                            filter: newValue
+                        }
+                    })
                 }
             }
         },
@@ -128,6 +169,9 @@
                     name: 'receive-zcoin-paymentrequest',
                     params: {
                         address: this.selectedPaymentRequest
+                    },
+                    query: {
+                        filter: this.tableFilter
                     }
                 })
             }

@@ -5,7 +5,7 @@ export default {
     ...mixin,
     ...({
         namespace: 'ZcoinPayment',
-        collection: 'send-zcoin',
+        collection: 'sendzcoin',
 
         mutations: {
             [types.zcoinpayment.SEND_ZCOIN]: 'sendZcoin',
