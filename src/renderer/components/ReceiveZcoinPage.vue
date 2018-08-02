@@ -8,6 +8,8 @@
                 </h1>
 
                 <animated-table :data="paymentRequests"
+                <input type="text" v-model="tableFilter" />
+
                                 :fields="tableFields"
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
@@ -115,6 +117,36 @@
                 return {
                     ...paymentRequest,
                     address
+                }
+            },
+            tableFilter: {
+                get () {
+                    try {
+                        const { filter } = this.$store.state.AppRouter.query
+
+                        return filter
+                    } catch (e) {
+                        console.error(e)
+                        return ''
+                    }
+                },
+
+                set (newValue) {
+                    const route = {
+                        name: this.$router.currentRoute.name
+                    }
+
+                    if (!newValue) {
+                        this.$router.replace(route)
+                        return
+                    }
+
+                    this.$router.replace({
+                        ...route,
+                        query: {
+                            filter: newValue
+                        }
+                    })
                 }
             }
         },
