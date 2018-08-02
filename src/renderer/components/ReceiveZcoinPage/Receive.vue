@@ -129,7 +129,13 @@
 
           tagClicked (tag) {
               console.log('tag clicked -->', tag)
-              console.log('todo: redirecting to the filtered list page')
+
+              this.$router.push({
+                  name: this.$router.currentRoute.name || 'receive-zcoin-paymentrequest',
+                  query: {
+                      filter: `#${tag}`
+                  }
+              })
           },
 
           shareViaMail () {
