@@ -41,7 +41,7 @@
         computed: {
             ...mapGetters({
                 currentDenominations: 'Mint/currentDenominations',
-                mints: 'Mint/mints'
+                mints: 'Mint/confirmedMintsPerDenomination'
             }),
 
             maxValue () {

@@ -60,7 +60,7 @@
         computed: {
             ...mapGetters({
                 denominations: 'Mint/currentDenominations',
-                mints: 'Mint/mints'
+                mints: 'Mint/confirmedMintsPerDenomination'
             }),
 
             canIncrease () {
