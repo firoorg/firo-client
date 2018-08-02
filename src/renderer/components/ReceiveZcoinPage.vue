@@ -31,7 +31,7 @@
             </transition>
             <transition name="fade" mode="out-in">
                 <router-view v-bind="selectedPaymentRequestWithAddress"
-                             :key="$route.fullPath"
+                             :key="$route.path"
                              class="paymentrequest-detail-route scrollable"></router-view>
             </transition>
         </section>
@@ -160,6 +160,9 @@
                     name: 'receive-zcoin-paymentrequest',
                     params: {
                         address: this.selectedPaymentRequest
+                    },
+                    query: {
+                        filter: this.tableFilter
                     }
                 })
             }
