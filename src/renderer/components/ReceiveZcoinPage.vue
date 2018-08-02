@@ -7,7 +7,9 @@
                     Zcoin
                 </h1>
 
-                <input type="text" v-model="tableFilter" />
+                <base-filter-input type="text"
+                                   v-model="tableFilter"
+                                   placeholder="Filter by label" />
 
                 <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
