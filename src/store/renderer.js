@@ -9,7 +9,7 @@ Vue.use(Vuex)
 const localModules = [
     // todo reduce modules here by looking for local: true in the module definition
     // Object.keys(modules).map((name) => { modules[name].local ? name : )
-    'mainRouter'
+    'AppRouter'
 ]
 
 const store = new Vuex.Store({

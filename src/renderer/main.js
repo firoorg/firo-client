@@ -6,6 +6,7 @@ import VueI18n from 'vue-i18n'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
+import { sync } from 'vuex-router-sync'
 
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 
@@ -79,6 +80,11 @@ requireComponent.keys().forEach(fileName => {
         // otherwise fall back to module's root.
         componentConfig.default || componentConfig
     )
+})
+
+// sync router and store
+sync(store, router, {
+    moduleName: 'AppRouter'
 })
 
 /* eslint-disable no-new */
