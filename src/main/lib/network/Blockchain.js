@@ -5,6 +5,7 @@ export default {
     ...mixin,
     ...({
         namespace: 'Blockchain',
+        collection: 'blockchain',
         subscriptions: ['block']
     })
 }

@@ -82,6 +82,10 @@ const mutations = {
 }
 
 const actions = {
+    [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
+        console.log('ON BLOCKCHAIN INITIAL STATE', initialState)
+    },
+
     [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch, commit, state }, block) {
         console.log('ON_BLOCK_SUBSCRIPTION')
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType } = block
