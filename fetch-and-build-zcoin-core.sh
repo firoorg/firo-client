@@ -5,15 +5,14 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 REPO_NAME=zcoin-repo
 REPO=$DIR/$REPO_NAME
 
-if [ -d "$REPO" ]; then
-    rm -rf $REPO
+if [ ! -d "$REPO" ]; then
+    # clone the repo
+    git clone --branch client-api https://github.com/zcoinofficial/zcoin/ $REPO
 fi
 
-# clone the repo
-git clone --branch client-api https://github.com/zcoinofficial/zcoin/ $REPO
-
 cd $REPO
-git branch
+git status
+git pull
 
 # compile
 ./autogen.sh
