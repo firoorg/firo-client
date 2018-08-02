@@ -7,9 +7,9 @@
                     Zcoin
                 </h1>
 
-                <animated-table :data="paymentRequests"
                 <input type="text" v-model="tableFilter" />
 
+                <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
@@ -112,13 +112,22 @@
 
                 const address = filteredAddress.length ? filteredAddress[0] : paymentRequest.address
 
-                console.log(paymentRequest)
-
                 return {
                     ...paymentRequest,
                     address
                 }
             },
+
+            filteredPaymentRequests () {
+                if (!this.tableFilter) {
+                    return this.paymentRequests
+                }
+
+                return this.paymentRequests.filter((request) => {
+                    return request.label ? request.label.includes(this.tableFilter) : false
+                })
+            },
+
             tableFilter: {
                 get () {
                     try {
