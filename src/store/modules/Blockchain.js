@@ -84,37 +84,17 @@ const mutations = {
 const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
         console.log('ON BLOCKCHAIN INITIAL STATE', initialState)
-    },
 
-    [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch, commit, state }, block) {
-        console.log('ON_BLOCK_SUBSCRIPTION')
-        const { connections, currentBlock, status, testnet: isTestnet, type: clientType } = block
-        console.log('got block!', block)
+        const { connections, currentBlock, status, testnet: isTestnet, type: clientType } = initialState
+        const { height, timestamp } = currentBlock
+        console.log('got block!', initialState)
         dispatch(types.SET_CONNECTIONS, connections)
-        dispatch(types.SET_CURRENT_BLOCK, currentBlock)
 
-        if (status) {
-            for (let [key, value] of Object.entries(status)) {
-                if (state.status[key] === undefined) {
-                    debug('unknown blockchain status key', key, value)
-                    continue
-                }
-
-                if (state.status[key] === value) {
-                    continue
-                }
-
-                const mutationName = key.replace(/\.?([A-Z]+)/g, function (x, y) {
-                    return '_' + y
-                }).replace(/^_/, '').toUpperCase()
-
-                if (!types[mutationName]) {
-                    debug('no mutation name found for', mutationName)
-                }
-
-                dispatch(types[mutationName])
-            }
-        }
+        // todo remove parsing when https://github.com/joernroeder/zcoin-client/issues/59 is fixed
+        dispatch(types.SET_CURRENT_BLOCK, {
+            height: typeof height === 'number' ? height : parseInt(height),
+            timestamp: typeof timestamp === 'number' ? timestamp : parseInt(timestamp)
+        })
 
         if (isTestnet) {
             commit(types.SET_NETWORK_TO_TESTNET)
@@ -123,6 +103,39 @@ const actions = {
         }
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
+
+        if (!status) {
+            return
+        }
+
+        for (let [key, value] of Object.entries(status)) {
+            if (state.status[key] === undefined) {
+                debug('unknown blockchain status key', key, value)
+                continue
+            }
+
+            if (state.status[key] === value) {
+                continue
+            }
+
+            const mutationName = key.replace(/\.?([A-Z]+)/g, function (x, y) {
+                return '_' + y
+            }).replace(/^_/, '').toUpperCase()
+
+            if (!types[mutationName]) {
+                debug('no mutation name found for', mutationName)
+            }
+
+            console.log('committing mutation', mutationName)
+
+            commit(types[mutationName], value)
+        }
+    },
+
+    [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch }, block) {
+        console.log('ON_BLOCK_SUBSCRIPTION')
+
+        dispatch(types.SET_INITIAL_STATE, block)
     },
 
     [types.SET_CONNECTIONS] ({ commit, state }, connections) {
