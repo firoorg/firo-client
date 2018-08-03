@@ -277,6 +277,16 @@
                         border-color: mix($color--green, $color--green-dark);
                     }
 
+                    & /deep/ .payment-request-table-status {
+                        &.is-fulfilled path {
+                            stroke: $color--white;
+                        }
+
+                        &:not(.is-fulfilled) g {
+                            fill: $color--white;
+                        }
+                    }
+
                     &:hover td {
                         background: mix($color--green-bright, $color--green, (100% * $hover-opacity));
                     }
