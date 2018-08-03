@@ -49,6 +49,7 @@
     import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
+    import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
 
     const tableFields = [
         {
@@ -68,7 +69,8 @@
             contentField: 'label'
         },
         {
-            name: 'amount',
+            name: Amount,
+            title: 'Amount',
             sortField: 'amount'
         }
         /*,
