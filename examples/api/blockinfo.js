@@ -13,7 +13,7 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'initial',
-    collection: 'blockinfo',
+    collection: 'blockchain',
     auth: {
         passphrase: config.passphrase
     }
