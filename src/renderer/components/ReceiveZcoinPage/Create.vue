@@ -127,8 +127,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '../../styles';
-
     .create {
         display: grid;
         grid-template-rows: auto auto;

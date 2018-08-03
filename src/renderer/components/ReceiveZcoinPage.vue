@@ -7,7 +7,12 @@
                     Zcoin
                 </h1>
 
-                <input type="text" v-model="tableFilter" />
+                <div class="table-filter-input-wrap">
+                    <base-filter-input type="text"
+                                       class="table-filter-input"
+                                       v-model="tableFilter"
+                                       placeholder="Filter by label" />
+                </div>
 
                 <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
@@ -44,6 +49,7 @@
     import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
+    import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
 
     const tableFields = [
         {
@@ -63,7 +69,8 @@
             contentField: 'label'
         },
         {
-            name: 'amount',
+            name: Amount,
+            title: 'Amount',
             sortField: 'amount'
         }
         /*,
@@ -199,5 +206,15 @@
         //background: $gradient--comet-dark-horizontal;
         //background: $gradient--polo-horizontal;
         background: $color--white;
+    }
+
+    .table-filter-input-wrap {
+        text-align: right;
+        margin-top: emRhythm(3) * -1;
+        margin-bottom: emRhythm(3);
+
+        .table-filter-input {
+            width: 50%;
+        }
     }
 </style>

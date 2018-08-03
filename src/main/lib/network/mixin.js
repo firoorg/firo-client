@@ -71,7 +71,12 @@ export default {
             }
 
             try {
-                this.processResponse(JSON.parse(message), this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`])
+                console.log('processing response -> ', `ON_${topic.toUpperCase()}_SUBSCRIPTION`)
+
+                const json = JSON.parse(message)
+                const { data } = json
+
+                this.dispatchAction(this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`], data)
             } catch (e) {
                 debug('error in response of', topic, 'request', this.subscriptions)
                 debug(e)
@@ -125,6 +130,7 @@ export default {
 
         const { meta, data } = response
 
+        // todo subscriptions are pushed to the client and therefore dont have a meta key set.
         if (!meta || meta.status < 200 || meta.status >= 400) {
             console.warn(response)
             // todo send error response back

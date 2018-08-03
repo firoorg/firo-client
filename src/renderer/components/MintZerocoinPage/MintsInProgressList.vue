@@ -19,6 +19,8 @@
 </template>
 
 <script>
+    import { convertToCoin } from '#/lib/convert'
+
     export default {
         name: 'MintsInProgressList',
         props: {
@@ -38,7 +40,7 @@
 
                     if (!list[key]) {
                         list[key] = {
-                            denomination: amount,
+                            denomination: parseInt(convertToCoin(amount)),
                             tx: {}
                         }
                     }

@@ -81,37 +81,44 @@ const getters = {
         return state.currentDenominations
     },
 
-    // todo rename to confirmed mints
     mints (state, getters, rootState, rootGetters) {
-        console.log(state)
-        console.log(Object.values(state.mints).length)
         return Object.values(state.mints)
             .filter((mint) => !mint.isUsed)
-            .filter((mint) => {
+            .map((mint) => {
                 const { block } = mint
                 const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
-                const confirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
+                const confirmations = currentBlockHeight && block && block.height ? currentBlockHeight - block.height : 0
 
-                return confirmations >= 6
-            })
-            .reduce((accumulator, mint) => {
-                const { amount } = mint
-                const label = parseInt(convertToCoin(amount))
-
-                if (!accumulator[`${label}`]) {
-                    accumulator[`${label}`] = 0
+                return {
+                    ...mint,
+                    confirmations
                 }
-
-                accumulator[`${label}`]++
-
-                return accumulator
-            }, {})
+            })
     },
 
-    mintsInProgress (state) {
-        return Object.values(state.mints)
+    confirmedMints (state, getters) {
+        return getters.mints.filter((mint) => mint.confirmations >= 6)
+    },
+
+    confirmedMintsPerDenomination (state, getters) {
+        return getters.confirmedMints.reduce((accumulator, mint) => {
+            const { amount } = mint
+            const label = parseInt(convertToCoin(amount))
+
+            if (!accumulator[`${label}`]) {
+                accumulator[`${label}`] = 0
+            }
+
+            accumulator[`${label}`]++
+
+            return accumulator
+        }, {})
+    },
+
+    mintsInProgress (state, getters) {
+        return getters.mints
             .filter((mint) => !mint.isUsed)
-            .filter((mint) => mint.confirmations < 6)
+            .filter((mint) => !mint.confirmations || mint.confirmations < 6)
     }
 }
 

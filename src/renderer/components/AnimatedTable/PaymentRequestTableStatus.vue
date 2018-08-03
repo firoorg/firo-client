@@ -15,7 +15,7 @@
 
 <script>
     import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
-    import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
+    import PaymentRequestStatus from '@/components/Icons/PaymentRequestTableStatus'
 
     export default {
         name: 'PaymentRequestTableStatus',

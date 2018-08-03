@@ -20,11 +20,7 @@
 </script>
 
 <style lang="scss" scoped>
-    /*
-    @import '../styles';
-
     .test-page {
         padding: emRhythm(5);
     }
-    */
 </style>

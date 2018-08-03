@@ -184,7 +184,7 @@ const actions = {
 
     [types.ON_ADDRESS_SUBSCRIPTION] ({ dispatch, state }, data) {
         try {
-            dispatch(types.SET_INITIAL_STATE, data)
+            dispatch(types.SET_INITIAL_STATE, { addresses: data })
         } catch (e) {
             console.log(e)
             console.log(data)
