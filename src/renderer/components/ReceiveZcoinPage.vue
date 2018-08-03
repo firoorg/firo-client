@@ -7,9 +7,12 @@
                     Zcoin
                 </h1>
 
-                <base-filter-input type="text"
-                                   v-model="tableFilter"
-                                   placeholder="Filter by label" />
+                <div class="table-filter-input-wrap">
+                    <base-filter-input type="text"
+                                       class="table-filter-input"
+                                       v-model="tableFilter"
+                                       placeholder="Filter by label" />
+                </div>
 
                 <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
@@ -201,5 +204,15 @@
         //background: $gradient--comet-dark-horizontal;
         //background: $gradient--polo-horizontal;
         background: $color--white;
+    }
+
+    .table-filter-input-wrap {
+        text-align: right;
+        margin-top: emRhythm(3) * -1;
+        margin-bottom: emRhythm(3);
+
+        .table-filter-input {
+            width: 50%;
+        }
     }
 </style>

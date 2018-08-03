@@ -36,7 +36,6 @@
 </script>
 
 <style lang="scss" scoped>
-
     .filter-input {
         position: relative;
         display: inline-block;
@@ -44,6 +43,8 @@
 
     input {
         border: none;
+        width: 100%;
+        box-sizing: border-box;
 
         @include setType(5);
         @include rhythmBorderBottom(1px, 0);
