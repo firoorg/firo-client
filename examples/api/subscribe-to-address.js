@@ -6,6 +6,7 @@ subscriber.connect('tcp://127.0.0.1:' + config.sub)
 
 subscriber.subscribe('address')
 subscriber.subscribe('block')
+subscriber.subscribe('transaction')
 
 subscriber.on('message', (topic, message) => {
     console.log('received message from publisher')
