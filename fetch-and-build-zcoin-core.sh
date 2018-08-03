@@ -12,11 +12,13 @@ CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu || ech
 if [ ! -d "$REPO" ]; then
     # clone the repo
     git clone --branch client-api https://github.com/zcoinofficial/zcoin/ $REPO
+else
+    cd $REPO
+    git status
+    git checkout -- . # discard changes
+    git pull
+    make clean
 fi
-
-cd $REPO
-git status
-git pull
 
 # compile
 ./autogen.sh
