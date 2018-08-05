@@ -18,7 +18,7 @@ requester.send(JSON.stringify({
 	    passphrase: config.passphrase
 	},
     data: {
-        id: 'TLCxbGmndQyC1YPbsiJ1voV5aPtW75E739',
+        id: 'TP6G2GQqbGWm5iZuD3HxXkroo99ycQrfxH',
         label: 'this is a modified payment request label'
     }
 }))

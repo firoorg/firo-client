@@ -14,7 +14,4 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'initial',
     collection: 'blockchain',
-    auth: {
-        passphrase: config.passphrase
-    }
 }))

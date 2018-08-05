@@ -13,23 +13,18 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'create',
-    collection: 'sendprivate',
-	auth: {
-	    passphrase: config.passphrase
-	},
+    collection: 'sendPrivate',
     data: {
         denominations: [
             {
-                address: "TLqow9uuHQkCj4b3tTAhXDTNQ2UxwFpnT9",
-                denomination: 25,
-                amount: 2
-            },
-            {
-                address: "TLqow9uuHQkCj4b3tTAhXDTNQ2UxwFpnT9",
-                denomination: 10,
+                address: "TZ35x37AyosYnsKunVXwCUjTkwuardy15H",
+                denomination: 1,
                 amount: 1
             }
         ],
         label: 'label which belongs to the spend tx'
-    }
+    },
+    auth: {
+        passphrase: config.passphrase
+    },
 }))

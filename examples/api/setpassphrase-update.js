@@ -13,9 +13,9 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'update',
-    collection: 'setpassphrase',
+    collection: 'setPassphrase',
     auth: {
         passphrase: config.passphrase,
-        newpassphrase: config.passphrase
+        newPassphrase: config.passphrase
     }
 }))

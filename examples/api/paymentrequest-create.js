@@ -13,7 +13,7 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'create',
-    collection: 'paymentrequest',
+    collection: 'paymentRequest',
 	auth: {
 	    passphrase: config.passphrase
 	},

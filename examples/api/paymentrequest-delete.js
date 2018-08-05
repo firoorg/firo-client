@@ -13,12 +13,11 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'delete',
-    collection: 'paymentrequest',
+    collection: 'paymentRequest',
 	auth: {
 	    passphrase: config.passphrase
 	},
     data: {
-        id: 'TJGCbD628dUBGt2NpTtEmkrBm67V5aee7D',
-        label: 'this is a modified payment request label'
+        id: 'TT2CKpgn1DydqEPm3LZkKpbLMS4Gg6sHwg'
     }
 }))

@@ -13,5 +13,5 @@ requester.on('message', (msg) => {
 // send stringified json
 requester.send(JSON.stringify({
     type: 'initial',
-    collection: 'apistatus'
+    collection: 'apiStatus'
 }))
