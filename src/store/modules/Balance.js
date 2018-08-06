@@ -25,28 +25,29 @@ const mutations = {
         debug('going to update balance', balance)
 
         const { total, xzc, zerocoin } = balance
-        const { all, pending, available } = total
-        const { confirmedXzc, unconfirmedXzc, locked } = xzc
-        const { confirmedZerocoin, unconfirmedZerocoin } = zerocoin
 
-        state = {
-            total: {
-                ...state.total,
-                all,
-                pending,
-                available
-            },
-            xzc: {
-                ...state.xzc,
-                confirmed: confirmedXzc,
-                unconfirmed: unconfirmedXzc,
-                locked
-            },
-            zerocoin: {
-                ...state.zerocoin,
-                confirmed: confirmedZerocoin,
-                unconfirmed: unconfirmedZerocoin
-            }
+        const { all, pending, available } = total
+        const { confirmed: confirmedXzc, unconfirmed: unconfirmedXzc, locked } = xzc
+        const { confirmed: confirmedZerocoin, unconfirmed: unconfirmedZerocoin } = zerocoin
+
+        state.total = {
+             ...state.total,
+            all,
+            pending,
+            available
+        }
+
+        state.xzc = {
+            ...state.xzc,
+            confirmed: confirmedXzc,
+            unconfirmed: unconfirmedXzc,
+            locked
+        }
+
+        state.zerocoin = {
+            ...state.zerocoin,
+            confirmed: confirmedZerocoin,
+            unconfirmed: unconfirmedZerocoin
         }
     }
 }
