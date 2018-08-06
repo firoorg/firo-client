@@ -22,7 +22,7 @@
 
                 <dl>
                     <dt>Created</dt>
-                    <dd><timeago :datetime="created_at" :auto-update="30"></timeago></dd>
+                    <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
                     <dt>Amount</dt>
                     <dd>{{ amount ? amount + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
@@ -91,7 +91,7 @@
           'label',
           'amount',
           'message',
-          'created_at',
+          'createdAt',
           'address'
       ],
       data () {
