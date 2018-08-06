@@ -6,6 +6,9 @@ export default {
     ...({
         namespace: 'Address',
         collection: 'stateWallet',
-        subscriptions: ['address']
+        subscriptions: [
+            'address',
+            'transaction'
+        ]
     })
 }

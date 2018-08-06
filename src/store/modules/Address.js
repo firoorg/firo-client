@@ -183,6 +183,12 @@ const actions = {
             console.log(e)
             console.log(data)
         }
+    },
+
+    [types.ON_TRANSACTION_SUBSCRIPTION] ({ dispatch, state }, data) {
+        // todo clarify behaviour with @riordant
+        const payload = !data.addresses ? { addresses: data } : data
+        dispatch(types.SET_INITIAL_STATE, payload)
     }
 }
 
