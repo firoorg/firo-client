@@ -68,6 +68,23 @@ module.exports = {
 
     },
 
+    Balance: {
+        total: {
+            all: 0,
+            pending: 0,
+            available: 0
+        },
+        xzc: {
+            confirmed: 0,
+            unconfirmed: 0,
+            locked: 0
+        },
+        zerocoin: {
+            confirmed: 0,
+            unconfirmed: 0
+        }
+    },
+
     Blockchain: { // daemon: isSubscription
         connections: 1,
         currentBlock: {
@@ -75,11 +92,11 @@ module.exports = {
             timestamp: 0
         },
         status: {
-            IsBlockchainSynced: false,
-            IsFailed: false,
-            IsSynced: false,
-            IsWinnersListSynced: false,
-            IsZnodeListSynced: false
+            isBlockchainSynced: false,
+            isFailed: false,
+            isSynced: false,
+            isWinnersListSynced: false,
+            isZnodeListSynced: false
         },
         testnet: true,
         type: 'full'
