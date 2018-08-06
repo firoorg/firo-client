@@ -54,24 +54,28 @@
     const tableFields = [
         {
             name: PaymentRequestTableStatus,
-            sortField: 'isFulfilled'
+            sortField: 'isFulfilled',
+            width: '2rem'
         },
         {
             name: RelativeDate,
             title: 'Created',
-            dateField: 'created_at',
-            sortField: 'created_at'
+            dateField: 'createdAt',
+            sortField: 'createdAt',
+            width: '30%'
         },
         {
             name: LabelWithHashTags,
             title: 'Label',
             sortField: 'label',
-            contentField: 'label'
+            contentField: 'label',
+            width: '50%'
         },
         {
             name: Amount,
             title: 'Amount',
-            sortField: 'amount'
+            sortField: 'amount',
+            width: '25%'
         }
         /*,
         {
@@ -211,10 +215,10 @@
     .table-filter-input-wrap {
         text-align: right;
         margin-top: emRhythm(3) * -1;
-        margin-bottom: emRhythm(3);
+        margin-bottom: emRhythm(5);
 
         .table-filter-input {
-            width: 50%;
+            width: 45%;
         }
     }
 </style>

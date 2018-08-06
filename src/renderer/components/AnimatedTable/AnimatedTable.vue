@@ -182,6 +182,50 @@
 
                     &:hover {
                         color: $color--dark;
+
+                        .sort-icon {
+                            color: $color--comet-dark;
+                        }
+                    }
+
+                    .sort-icon {
+                        float: none !important;
+                        display: inline-block;
+                        color: $color--comet;
+                        padding-left: 0.25rem;
+                        // border: 1px solid blue;
+
+                        @include setType(1);
+                        transition: transform 0.25s ease-in-out;
+
+                        &:after {
+                            // border: 1px solid red;
+
+                            //@include setType(1, $ms-up1);
+                            display: block;
+                            content: '‹›';
+                            transform: rotate(90deg);
+                            font-style: normal;
+                        }
+
+                        &.up,
+                        &.down {
+                            @include setType(1, $ms-up3);
+                            //height: 1.25rem;
+                            padding-top: 0.25rem;
+                            box-sizing: border-box;
+
+                            &:after {
+                                content: '›';
+                                height: 1rem;
+                                transform: rotate(270deg);
+                            }
+                        }
+
+                        &.down:after {
+                            transform: rotate(90deg);
+                        }
+
                     }
 
                 }
