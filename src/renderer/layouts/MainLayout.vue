@@ -2,13 +2,13 @@
     <transition name="fade">
         <div class="main-layout wrapper" :class="{ 'has-overlay': hasOpenOverlay }" v-if="show">
             <transition name="fade" :duration="overlayDuration">
-                <IntroScreen v-if="showIntroScreen" />
+                <IntroScreen v-if="showIntro" />
             </transition>
 
             <NotificationCenter />
 
             <transition name="fade" :duration="overlayDuration">
-                <ConnectivityOverlay v-if="!networkIsConnected" />
+                <ConnectivityOverlay v-if="showConnectivityOverlay" />
             </transition>
             <transition name="fade" :duration="overlayDuration">
                 <div class="active-window-overlay" v-if="hasOpenModal"></div>
@@ -68,13 +68,37 @@
             ...mapGetters({
                 hasOpenModal: 'Window/hasOpenModal',
                 networkIsConnected: 'Network/isConnected',
+                networkConnectionError: 'Network/connectionError',
                 showIntroScreen: 'App/showIntroScreen'
             }),
 
+            showConnectivityOverlay () {
+                return !!(!this.networkIsConnected || this.networkConnectionError)
+            },
+
+            showIntro () {
+                return this.showIntroScreen && !this.showConnectivityOverlay
+            },
+
             hasOpenOverlay () {
-                return this.hasOpenModal || !this.networkIsConnected || this.showIntroScreen
+                return this.hasOpenModal ||
+                    !this.networkIsConnected ||
+                    this.showIntroScreen ||
+                    this.networkConnectionError
             }
         }
+
+        /*
+        watch: {
+            showConnectivityOverlay: {
+                handler (newVal, oldVal) {
+                    console.log('showConnectivityOverlay', newVal)
+                    this.showIntroScreen = !newVal
+                },
+                immediate: true
+            }
+        }
+        */
     }
 </script>
 

@@ -30,8 +30,10 @@
         methods: {
             closeApp () {
                 console.log('closing app')
+                // todo change to app quit
                 window.close()
             }
+            // todo implement daemon restart.
         }
     }
 </script>

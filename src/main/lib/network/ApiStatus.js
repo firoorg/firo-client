@@ -8,16 +8,17 @@ export const getApiStatus = async function ({ host, ports }) {
 
     return new Promise((resolve, reject) => {
         apiStatus.once('message', (msg) => {
-            console.log(JSON.parse(msg.toString()))
+            try {
+                const { data, meta, error } = JSON.parse(msg.toString())
 
-            resolve(JSON.parse(msg.toString()))
-            // todo reject based on status code / errors
+                if (error || (meta.status < 200 && meta.status >= 400)) {
+                    reject(new Error('error occured during api status fetching.', error))
+                    return
+                }
+                resolve({ data, meta })
+            } catch (e) {
 
-            /*
-            apiStatus.disconnect(uri)
-            apiStatus.close()
-            apiStatus = null
-            */
+            }
         })
 
         apiStatus.send(JSON.stringify({
@@ -36,7 +37,6 @@ export const closeApiStatus = function () {
 }
 
 export const waitForApi = async function ({ host, ports, apiStatus, ttlInSeconds }) {
-    console.log('waiting for api')
     const validator = ({ status, data }) => {
         const { modules = {} } = data
 

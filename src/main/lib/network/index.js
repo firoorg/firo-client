@@ -94,10 +94,16 @@ export default {
         const encryption = apiStatus.devauth ? this.setupEncryption(apiStatus) : null
 
         try {
-            await waitForApi({ ...appConfig, apiStatus, ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady })
+            await waitForApi({
+                ...appConfig,
+                apiStatus,
+                ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady
+            })
         } catch (e) {
             debug('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...
+            dispatch(types.network.SET_NETWORK_CONNECTION_ERROR, 1)
+            return
         }
 
         debug('api loaded! setting up modules...')

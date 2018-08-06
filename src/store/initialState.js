@@ -2,7 +2,8 @@
 module.exports = {
     Network: { // daemon: isSubscription?
         type: 'tor|proxy|direct',
-        isConnected: true
+        isConnected: true,
+        connectionErrorCode: 0
     },
 
     Notification: {

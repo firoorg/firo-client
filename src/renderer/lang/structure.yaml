@@ -218,6 +218,11 @@ warnings-fullscreen:
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
     button__restart-demon--primary: Restart Deamon
     button__close-client--secondary: Close Zcoin Client
+  could-not-connect:
+    title__connection-apistatus-timeout: Could not get Zcoin Core Status
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    button__restart-demon--primary: Restart Deamon
+    button__close-client--secondary: Close Zcoin Client
 
   unlock-wallet:
     # TODO: description, error message
