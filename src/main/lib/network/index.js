@@ -12,6 +12,7 @@ import * as utils from '../../../lib/utils'
 import { getApiStatus, closeApiStatus, waitForApi } from './ApiStatus'
 
 import Address from './Address'
+import Balance from './Balance'
 import Blockchain from './Blockchain'
 import PaymentRequest from './PaymentRequest'
 import SendZcoin from './SendZcoin'
@@ -19,6 +20,7 @@ import Mint from './Mint'
 
 const modules = {
     Address,
+    Balance,
     Blockchain,
     PaymentRequest,
     SendZcoin,

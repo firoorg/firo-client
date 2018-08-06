@@ -12,6 +12,7 @@ export default {
     mutations: {
     },
 
+    initialRequestType: 'initial',
     collection: '',
     subscriptions: [],
 
@@ -117,7 +118,7 @@ export default {
         // todo add timeout to request
         debug('sending initial state request', this.collection)
         this.requester.send(JSON.stringify({
-            type: 'initial',
+            type: this.initialRequestType,
             collection: this.collection
         }))
     },
