@@ -10,11 +10,11 @@ const state = {
         timestamp: 0
     },
     status: {
-        IsBlockchainSynced: false,
-        IsFailed: false,
-        IsSynced: false,
-        IsWinnersListSynced: false,
-        IsZnodeListSynced: false
+        isBlockchainSynced: false,
+        isFailed: false,
+        isSynced: false,
+        isWinnersListSynced: false,
+        isZnodeListSynced: false
     },
     testnet: true,
     type: 'full'

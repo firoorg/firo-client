@@ -22,7 +22,7 @@ export const getApiStatus = async function ({ host, ports }) {
 
         apiStatus.send(JSON.stringify({
             type: 'initial',
-            collection: 'apistatus'
+            collection: 'apiStatus'
         }))
     })
 }

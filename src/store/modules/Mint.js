@@ -57,10 +57,9 @@ const actions = {
     },
 
     [types.UPDATE_MINT] ({ commit, state }, mint) {
-        const { id, txid, used } = mint
+        const { id, txid } = mint
 
         commit(types.UPDATE_MINT, {
-            isUsed: used,
             id: id || txid,
             ...mint
         })
@@ -117,7 +116,7 @@ const getters = {
 
     mintsInProgress (state, getters) {
         return getters.mints
-            .filter((mint) => !mint.isUsed)
+            .filter((mint) => !mint.used)
             .filter((mint) => !mint.confirmations || mint.confirmations < 6)
     }
 }

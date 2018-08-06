@@ -5,6 +5,22 @@ import rootTypes from '../types'
 const WALLET_ADDRESS_KEY = 'walletAddresses'
 const THIRD_PARTY_ADDRESS_KEY = 'thirdPartyAddresses'
 
+const getTxBasics = function (tx) {
+    const { txid, category, amount, blockHeight, blockHash, blockTime, firstSeenAt } = tx
+
+    return {
+        id: txid,
+        category,
+        amount,
+        firstSeenAt,
+        block: {
+            height: blockHeight,
+            hash: blockHash,
+            time: blockTime
+        }
+    }
+}
+
 const state = {
     [WALLET_ADDRESS_KEY]: {},
     [THIRD_PARTY_ADDRESS_KEY]: {}
@@ -121,64 +137,42 @@ const actions = {
     },
 
     [types.ADD_RECEIVE_FROM_TX] ({ commit, dispatch, state }, receiveTx) {
-        const { address, amount, blockheight, blockhash, blocktime, category, confirmations, timereceived, txid } = receiveTx
+        const txBasics = getTxBasics(receiveTx)
+        const { address, amount } = receiveTx
 
         commit(types.ADD_TRANSACTION, {
             stack: WALLET_ADDRESS_KEY,
             address,
             transaction: {
-                amount,
-                category,
-                confirmations,
-                timereceived,
-                block: {
-                    height: blockheight,
-                    hash: blockhash,
-                    time: blocktime
-                },
-                id: txid
+                ...txBasics,
+                amount
             }
         })
     },
 
     [types.ADD_SEND_FROM_TX] ({ commit }, sendTx) {
-        const { address, amount, blockheight, blockhash, blocktime, category, confirmations, fee, timereceived, txid } = sendTx
+        const txBasics = getTxBasics(sendTx)
+        const { address, fee } = sendTx
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,
             address,
             transaction: {
-                amount,
-                category,
-                confirmations,
-                fee,
-                timereceived,
-                block: {
-                    height: blockheight,
-                    hash: blockhash,
-                    time: blocktime
-                },
-                id: txid
+                ...txBasics,
+                fee
             }
         })
     },
 
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
-        console.log('ADD_MINT_FROM_TX', mintTx)
+        const txBasics = getTxBasics(mintTx)
 
         const { amount, blockheight, blockhash, blocktime, fee, timereceived, txid, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
-            amount,
+            ...txBasics,
             fee,
-            timereceived,
-            used,
-            block: {
-                height: blockheight,
-                hash: blockhash,
-                time: blocktime
-            },
-            id: txid
+            used
         }, { root: true })
     },
 

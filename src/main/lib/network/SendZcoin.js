@@ -5,7 +5,7 @@ export default {
     ...mixin,
     ...({
         namespace: 'ZcoinPayment',
-        collection: 'sendzcoin',
+        collection: 'sendZcoin',
 
         mutations: {
             [types.zcoinpayment.SEND_ZCOIN]: 'sendZcoin',
@@ -30,10 +30,10 @@ export default {
 
             this.send({
                 type: 'get',
-                collection: 'tx-fee',
+                collection: 'txfee',
                 data: {
                     addresses,
-                    feeperkb: fee
+                    feePerKb: fee
                 },
                 actionToDispatch: types.zcoinpayment.SET_TX_FEE
             })
@@ -46,11 +46,12 @@ export default {
 
             console.log(addresses, data.fee)
 
+            // todo add auth passphrase
             this.send({
                 type: 'create',
                 data: {
                     addresses,
-                    feeperkb: data.fee
+                    feePerKb: data.fee
                 }
             })
         }

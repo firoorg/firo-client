@@ -96,8 +96,15 @@ const actions = {
     },
 
     [types.ADD_PAYMENT_REQUEST] ({ commit, dispatch, state }, paymentRequest) {
-        // todo check if already exists
-        commit(types.ADD_PAYMENT_REQUEST, paymentRequest)
+        const { address, createdAt, amount, message, label } = paymentRequest
+
+        commit(types.ADD_PAYMENT_REQUEST, {
+            address,
+            createdAt: createdAt * 1000,
+            amount,
+            message,
+            label
+        })
 
         // clean up form fields
         dispatch(types.RESET_PAYMENT_REQUEST_CREATE_FORM)
