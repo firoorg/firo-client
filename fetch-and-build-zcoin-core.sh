@@ -9,16 +9,13 @@ NUMBER_OF_PROCESSORS=1
 # @link https://stackoverflow.com/a/47594483/520544
 CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu || echo "$NUMBER_OF_PROCESSORS")
 
-if [ ! -d "$REPO" ]; then
-    # clone the repo
-    git clone --branch client-api https://github.com/zcoinofficial/zcoin/ $REPO
-else
-    cd $REPO
-    git status
-    git checkout -- . # discard changes
-    git pull
-    make clean
+if [ -d "$REPO" ]; then
+    rm -rf $REPO
 fi
+
+# clone the repo
+git clone --branch client-api https://github.com/zcoinofficial/zcoin/ $REPO
+cd $REPO
 
 # compile
 ./autogen.sh
