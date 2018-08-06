@@ -179,6 +179,9 @@ const actions = {
     [types.ON_ADDRESS_SUBSCRIPTION] ({ dispatch, state }, data) {
         try {
             dispatch(types.SET_INITIAL_STATE, { addresses: data })
+            // todo clarify behaviour with @riordant
+            const payload = !data.addresses ? { addresses: data } : data
+            dispatch(types.SET_INITIAL_STATE, payload)
         } catch (e) {
             console.log(e)
             console.log(data)
