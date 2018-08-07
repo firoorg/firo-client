@@ -9,7 +9,7 @@
             <li>
                 <router-link :to="{ name: 'send-zcoin' }" exact>
                     <span class="text">{{ $t('navigation.menu.button__send') }}</span>
-                    <span v-show="hasSendNotification" class="has-notification"></span>
+                    <notification-indicator v-show="hasSendNotification" :has-shadow="true" />
                 </router-link>
             </li>
             <li class="has-divider">
@@ -34,10 +34,12 @@
 <script>
     import { mapGetters } from 'vuex'
     import AttentionBadge from '@/components/Badge/AttentionBadge'
+    import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 
     export default {
         name: 'Menu',
         components: {
+            NotificationIndicator,
             AttentionBadge
         },
 
@@ -119,21 +121,6 @@
             position: relative;
             z-index: 2;
         }
-
-        .has-notification {
-            @include box-shadow();
-            display: inline-block;
-            width: emRhythm(1);
-            height: emRhythm(1);
-            border-radius: 50%;
-            background: $gradient--green-bright;
-            //position: absolute;
-            //right: 0;
-            //top: 0;
-            text-align: right;
-        }
-
-
 
         &:hover,
         &:focus {

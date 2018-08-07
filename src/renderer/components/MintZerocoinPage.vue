@@ -38,10 +38,12 @@
                                     trigger="click"
                             >
                                 <template slot="target">
-                                    <base-badge :visible="hasMintsInProgress"
-                                                :count="mintsInProgressLength">
-                                        Icon
-                                    </base-badge>
+                                    <div class="list-icon">
+                                        <stack />
+                                        <transition name="fade">
+                                            <notification-indicator class="indicator" v-show="hasMintsInProgress" />
+                                        </transition>
+                                    </div>
                                 </template>
 
                                 <template slot="content">
@@ -84,15 +86,19 @@
     import FeesAndAmount from '@/components/FeesAndAmount'
     import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
     import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
+    import Stack from '@/components/Icons/Stack'
+    import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 
     export default {
         name: 'MintZerocoinPage',
         components: {
+            NotificationIndicator,
             MintsInProgressList,
             MintConfirmDialog,
             FeesAndAmount,
             CurrentMints,
-            DenominationSelector
+            DenominationSelector,
+            Stack
         },
 
         data () {
@@ -257,6 +263,32 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+    }
+
+    .list-icon {
+        position: relative;
+        cursor: pointer;
+
+        /deep/ svg > g > path,
+        /deep/ svg g > g {
+            transition: stroke 0.15s ease-in;
+        }
+
+        &:hover {
+            /deep/ svg > g > path {
+                stroke: $color--dark;
+            }
+            /deep/ svg g g {
+                stroke: $color--comet-dark;
+            }
+        }
+
+        .indicator {
+            position: absolute;
+            right: 0;
+            transform: translateX(50%);
+            top: 50%;
         }
     }
 </style>
