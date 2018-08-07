@@ -72,7 +72,12 @@ const actions = {
     }
 }
 
-const getters = {}
+const getters = {
+    total: (state) => state.total.all,
+    availableTotal: (state) => state.total.available,
+    availableXzc: (state) => state.xzc.confirmed,
+    availableZerocoin: (state) => state.zerocoin.confirmed
+}
 
 export default {
     namespaced: true,
