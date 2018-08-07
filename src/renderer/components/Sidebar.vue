@@ -6,7 +6,7 @@
             </router-link>
         </div>
 
-        <!--<Balance class="balance"></Balance>-->
+        <Balance class="balance"></Balance>
         <main-menu class="menu"></main-menu>
 
         <settings class="settings"></settings>
@@ -16,7 +16,7 @@
 
 <script>
     import ZcoinLogoText from '@/components/Icons/ZcoinLogoText'
-    // import Balance from '@/components/Sidebar/Balance'
+    import Balance from '@/components/Sidebar/Balance'
     import Menu from '@/components/Sidebar/Menu'
     import Settings from '@/components/Sidebar/Settings'
     // import Blockchain from '@/components/Sidebar/Blockchain'
@@ -25,7 +25,7 @@
         name: 'sidebar',
         components: {
             ZcoinLogoText,
-            // Balance,
+            Balance,
             'main-menu': Menu,
             Settings
             // Blockchain

@@ -20,6 +20,7 @@
 
 <script>
   import { mapGetters } from 'vuex' /* , mapActions */
+  import { convertToCoin } from '#/lib/convert'
   // import ConfirmationBadge from '@/components/Badge/ConfirmationBadge'
 
   export default {
@@ -42,6 +43,7 @@
           }
       },
 
+      /*
       created () {
           this.confirmationsInterval = setInterval(() => {
               this.pendingConfirmations--
@@ -55,6 +57,7 @@
       beforeDestroy () {
           clearInterval(this.confirmationsInterval)
       },
+      */
 
       computed: {
           ...mapGetters({
@@ -68,7 +71,7 @@
           balance () {
               const {factor, unit, decimals} = this.exchange
 
-              return this.showBalanceInCurrency ? `${(this.totalBalance * factor).toFixed(decimals)} ${unit}` : `${this.totalBalance} XZC`
+              return this.showBalanceInCurrency ? `${(this.totalBalance * factor).toFixed(decimals)} ${unit}` : `${convertToCoin(this.totalBalance)} XZC`
           }
       },
 
