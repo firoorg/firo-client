@@ -6,7 +6,7 @@
                 {{ value.label }}
             </div>
             <div class="amount">
-                {{ value.amount }} <span class="unit">xzc</span>
+                {{ value.amountAsBaseCoin }} <span class="unit">xzc</span>
             </div>
         </li>
     </ul>

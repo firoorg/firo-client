@@ -30,7 +30,7 @@ export default {
 
             this.send({
                 type: 'get',
-                collection: 'txfee',
+                collection: 'txFee',
                 data: {
                     addresses,
                     feePerKb: fee

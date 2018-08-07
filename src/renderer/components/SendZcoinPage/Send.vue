@@ -26,7 +26,7 @@
                                 <template slot="target">
                                     <base-badge :visible="hasSendQueue"
                                                 :count="sendQueueLength">
-                                        Icon
+                                        <stack />
                                     </base-badge>
                                 </template>
 
@@ -159,6 +159,7 @@
     import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
     import PendingPayments from '@/components/PendingPayments'
     import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
+    import Stack from '@/components/Icons/Stack'
 
     export default {
         name: 'SendZcoin',
@@ -167,7 +168,8 @@
             SendFeeSelection,
             SendConfirmDialog,
             FeesAndAmount,
-            PendingPayments
+            PendingPayments,
+            Stack
         },
         mixins: [
             ValidationMixin
@@ -204,7 +206,7 @@
 
             ...addVuexModel({
                 name: 'amount',
-                getter: 'ZcoinPayment/createFormAmount',
+                getter: 'ZcoinPayment/createFormAmountAsBaseCoin',
                 action: types.zcoinpayment.SET_FORM_AMOUNT
             }),
 
@@ -215,7 +217,8 @@
             }),
 
             ...mapGetters({
-                fee: 'ZcoinPayment/selectedFee'
+                fee: 'ZcoinPayment/selectedFee',
+                amountAsSatoshi: 'ZcoinPayment/createFormAmount'
             }),
 
             hasSendQueue () {
@@ -319,7 +322,8 @@
                     ...this.pendingPayments,
                     [this.address]: {
                         label: this.label,
-                        amount: this.amount,
+                        amount: this.amountAsSatoshi,
+                        amountAsBaseCoin: this.amount,
                         address: this.address,
                         confirmed: false,
                         sent: false

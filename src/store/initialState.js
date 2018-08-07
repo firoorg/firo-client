@@ -23,17 +23,17 @@ module.exports = {
             fast: {
                 label: 'Fast',
                 description: 'have a coffee',
-                amount: 0.001
+                amount: 100000
             },
             medium: {
                 label: 'Medium',
                 description: 'take a long walk',
-                amount: 0.0005
+                amount: 50000
             },
             slow: {
                 label: 'Slow',
                 description: 'sleep over it',
-                amount: 0.0001
+                amount: 10000
             }
         },
         addPaymentForm: {

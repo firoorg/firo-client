@@ -1,4 +1,5 @@
-import * as types from '../types/ZcoinPayment'
+import * as types from '~/types/ZcoinPayment'
+import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 
 const state = {
     pendingPayments: {},
@@ -69,7 +70,7 @@ const actions = {
     [types.SET_FORM_AMOUNT] ({ commit, state }, value) {
         // todo check via getter
 
-        commit(types.SET_FORM_AMOUNT, value)
+        commit(types.SET_FORM_AMOUNT, convertToSatoshi(value))
     },
 
     [types.SET_FORM_ADDRESS] ({ commit, state }, value) {
@@ -101,7 +102,7 @@ const actions = {
     },
 
     [types.SET_TX_FEE] ({ commit }, { fee }) {
-        commit(types.SET_TX_FEE, fee / 100000000)
+        commit(types.SET_TX_FEE, fee)
     },
 
     [types.SEND_ZCOIN] ({ commit, state }, { payments, fee }) {
@@ -128,6 +129,7 @@ const getters = {
 
     createFormLabel: (state) => state.addPaymentForm.label,
     createFormAmount: (state) => state.addPaymentForm.amount,
+    createFormAmountAsBaseCoin: (state) => convertToCoin(state.addPaymentForm.amount),
     createFormAddress: (state) => state.addPaymentForm.address
 }
 

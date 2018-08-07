@@ -4,17 +4,18 @@
         <dl>
             <dt class="fees">{{ fee.label }}</dt>
             <dd class="fees">
-                <span class="value">{{ fee.amount }}</span> <span class="unit">xzc</span>
+                <span class="value">{{ feeAmountAsBaseCoin }}</span> <span class="unit">xzc</span>
             </dd>
             <dt class="amount">Total</dt>
             <dd class="amount">
-                <span class="value">{{ total }}</span> <span class="unit">XZC</span>
+                <span class="value">{{ totalAsBaseCoin }}</span> <span class="unit">XZC</span>
             </dd>
         </dl>
     </section>
 </template>
 
 <script>
+    import { convertToCoin } from '#/lib/convert'
     import PendingPayments from '@/components/PendingPayments'
 
     export default {
@@ -44,6 +45,12 @@
         computed: {
             total () {
                 return this.amount + this.fee.amount
+            },
+            totalAsBaseCoin () {
+                return convertToCoin(this.total)
+            },
+            feeAmountAsBaseCoin () {
+                return convertToCoin(this.fee.amount)
             }
         }
     }

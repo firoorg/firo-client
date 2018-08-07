@@ -63,6 +63,7 @@
 
 <script>
     import { mapGetters, mapActions } from 'vuex'
+    import { convertToCoin } from '#/lib/convert'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import SendZcoin from '@/components/SendZcoinPage/Send'
@@ -170,7 +171,7 @@
                 this.setFormAddress(this.clipboardAddress)
 
                 if (this.clipboardAmount) {
-                    this.setFormAmount(this.clipboardAmount)
+                    this.setFormAmount(convertToCoin(this.clipboardAmount))
                 }
 
                 this.markAsNotified()

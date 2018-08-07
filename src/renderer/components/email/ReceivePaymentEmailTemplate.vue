@@ -115,7 +115,7 @@
 
       computed: {
           fixedAmount () {
-              return this.amount ? this.amount.toFixed(8) : ''
+              return this.amount ? this.amount : ''
           },
 
           baseStyle () {
