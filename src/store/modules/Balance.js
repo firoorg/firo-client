@@ -31,7 +31,7 @@ const mutations = {
         const { confirmed: confirmedZerocoin, unconfirmed: unconfirmedZerocoin } = zerocoin
 
         state.total = {
-             ...state.total,
+            ...state.total,
             all,
             pending,
             available
