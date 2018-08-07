@@ -71,14 +71,17 @@
         },
 
         watch: {
-            isOpen (newVal, oldVal) {
-                if (newVal && !oldVal) {
-                    console.log('opening')
-                    this.open()
-                } else if (!newVal && oldVal) {
-                    console.log('closing')
-                    this.close()
-                }
+            isOpen: {
+                handler (newVal, oldVal) {
+                    if (newVal && !oldVal) {
+                        console.log('opening')
+                        this.open()
+                    } else if (!newVal && oldVal) {
+                        console.log('closing')
+                        this.close()
+                    }
+                },
+                immediate: true
             }
         }
     }
