@@ -41,7 +41,8 @@
                                     <div class="list-icon">
                                         <stack />
                                         <transition name="fade">
-                                            <notification-indicator class="indicator" v-show="hasMintsInProgress" />
+                                            <notification-indicator class="indicator"
+                                                                    v-show="hasMintsInProgress" />
                                         </transition>
                                     </div>
                                 </template>
@@ -52,7 +53,8 @@
                                         <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
                                     </header>
 
-                                    <mints-in-progress-list :mints="mintsInProgress" />
+                                    <mints-in-progress-list :mints="mintsInProgress"
+                                                            :is-monochrome="true" />
                                 </template>
                             </base-popover>
                         </div>

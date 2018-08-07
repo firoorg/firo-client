@@ -1,5 +1,5 @@
 <template>
-    <ul class="mints-in-progress">
+    <ul class="mints-in-progress" :class="{ monochrome: isMonochrome }">
         <li v-for="(value, key) in items" :key="key">
             <div class="label">
                 <!--<slot v-bind="value" />-->
@@ -27,6 +27,10 @@
             mints: {
                 type: Array,
                 required: true
+            },
+            isMonochrome: {
+                type: Boolean,
+                default: false
             }
         },
 
@@ -103,6 +107,7 @@
                     margin-bottom: emRhythm(1.25, $silent: true);
                     margin-right: emRhythm(1);
                     transition: width 0.25s ease-out;
+                    box-sizing: border-box;
 
                     &:last-child {
                         margin-right: 0;
@@ -116,7 +121,17 @@
                         min-width: emRhythm(1);
                     }
                 }
+            }
+        }
 
+        &.monochrome li .wrapper {
+            .item {
+                background: rgba($color--dark, 0.3);
+                // border: 1px solid $color--comet;
+
+                .progress {
+                    background: $color--comet-light;
+                }
             }
         }
     }
