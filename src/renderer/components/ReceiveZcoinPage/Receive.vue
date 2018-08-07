@@ -24,7 +24,7 @@
                     <dt>Created</dt>
                     <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
                     <dt>Amount</dt>
-                    <dd>{{ amount ? amount + ' XZC' : 'No Amount Requested' }}</dd>
+                    <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
             </div>
 
@@ -53,7 +53,7 @@
                 <div style="position: absolute; top:0;left:0;height:0;width:0;overflow: hidden">
                     <receive-payment-request-email-template
                             :message="message"
-                            :amount="amount"
+                            :amount="amountInBaseCoin"
                             :uri="getZcoinUri"
                             ref="emailTemplate">
                         <template slot="qrcode">
@@ -70,98 +70,97 @@
 </template>
 
 <script>
-  import { clipboard } from 'electron'
-  import VueQRCodeComponent from 'vue-qrcode-component'
-  import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
-  import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
-  import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
-  import TimedTooltip from '@/components/Notification/TimedTooltip'
+    import { clipboard } from 'electron'
+    import VueQRCodeComponent from 'vue-qrcode-component'
+    import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
+    import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
+    import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
+    import TimedTooltip from '@/components/Notification/TimedTooltip'
+    import { convertToCoin } from '#/lib/convert'
 
-  export default {
-      name: 'receivePaymentRequest',
-      components: {
-          PaymentRequestStatus,
-          NaturalLanguageTags,
-          ReceivePaymentRequestEmailTemplate,
-          'qr-code': VueQRCodeComponent,
-          TimedTooltip
-      },
-      props: [
-          'isFulfilled',
-          'label',
-          'amount',
-          'message',
-          'createdAt',
-          'address'
-      ],
-      data () {
-          return {
-              showQrCode: false,
-              recurring: false,
-              showCopySuccess: false
-          }
-      },
-      computed: {
-          qrCodeIsVisible () {
-              return !this.received && this.showQrCode
-          },
+    export default {
+        name: 'receivePaymentRequest',
+        components: {
+            PaymentRequestStatus,
+            NaturalLanguageTags,
+            ReceivePaymentRequestEmailTemplate,
+            'qr-code': VueQRCodeComponent,
+            TimedTooltip
+        },
+        props: [
+            'isFulfilled',
+            'label',
+            'amount',
+            'message',
+            'createdAt',
+            'address'
+        ],
+        data () {
+            return {
+                showQrCode: false,
+                recurring: false,
+                showCopySuccess: false
+            }
+        },
+        computed: {
+            qrCodeIsVisible () {
+                return !this.received && this.showQrCode
+            },
 
-          getZcoinUri () {
-              if (!this.address) {
-                  return ''
-              }
-              const address = this.address.address || this.address
-              const params = []
-              params.push(this.amount ? `amount=${this.amount.toFixed(8)}` : '')
-              params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
-              const paramsString = params.length ? `?${params.join('&')}` : ''
+            amountInBaseCoin () {
+                return convertToCoin(this.amount)
+            },
 
-              return `zcoin://${address}${paramsString}`
-          }
-      },
-      methods: {
-          toggleQrCode () {
-              console.log('toggle qr code')
-              this.showQrCode = !this.showQrCode
-          },
+            getZcoinUri () {
+                if (!this.address) {
+                    return ''
+                }
+                const address = this.address.address || this.address
+                const params = []
+                params.push(this.amount ? `amount=${this.amount}` : '')
+                params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
+                const paramsString = params.length ? `?${params.join('&')}` : ''
 
-          // zcoin://TCuSpTwexLpA2FM6VrwkkXkq1gYUoYNiPo?amount=10.00000000&message=Hey%2C%20this%20is%20just%20a%20new%20Payment%20Request%20test%20showing%20that%20sharing%20works%20out%20of%20the%20box%20now.%0A%0Acheerio%0Aj
+                return `zcoin://${address}${paramsString}`
+            }
+        },
+        methods: {
+            toggleQrCode () {
+                console.log('toggle qr code')
+                this.showQrCode = !this.showQrCode
+            },
 
-          tagClicked (tag) {
-              console.log('tag clicked -->', tag)
+            tagClicked (tag) {
+                this.$router.push({
+                    name: this.$router.currentRoute.name || 'receive-zcoin-paymentrequest',
+                    query: {
+                        filter: `#${tag}`
+                    }
+                })
+            },
 
-              this.$router.push({
-                  name: this.$router.currentRoute.name || 'receive-zcoin-paymentrequest',
-                  query: {
-                      filter: `#${tag}`
-                  }
-              })
-          },
+            shareViaMail () {
+                clipboard.writeHTML(this.$refs.emailTemplate.$el.innerHTML)
+                this.$electron.shell.openExternal('mailto:?subject=Zcoin Payment Request&body=please select this text and press cmd+v ;)')
+            },
 
-          shareViaMail () {
-              // clipboard.writeHTML('<h1>Hello</h1><a href="#">World</a><img src="data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7" />')
-              console.log(this.$refs.emailTemplate.$el.innerHTML)
-              clipboard.writeHTML(this.$refs.emailTemplate.$el.innerHTML)
-              this.$electron.shell.openExternal('mailto:?subject=Zcoin Payment Request&body=please select this text and press cmd+v ;)')
-          },
+            copyUri () {
+                clipboard.writeText(this.getZcoinUri)
+                this.showCopySuccess = true
+            },
 
-          copyUri () {
-              clipboard.writeText(this.getZcoinUri)
-              this.showCopySuccess = true
-          },
+            hideCopySuccess () {
+                this.showCopySuccess = false
+            },
 
-          hideCopySuccess () {
-              this.showCopySuccess = false
-          },
+            openBlockExplorer (event) {
+                event.preventDefault()
 
-          openBlockExplorer (event) {
-              event.preventDefault()
-
-              // todo
-              alert(`opening ${this.address.address} in block explorer`)
-          }
-      }
-  }
+                // todo
+                alert(`opening ${this.address.address} in block explorer`)
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>
