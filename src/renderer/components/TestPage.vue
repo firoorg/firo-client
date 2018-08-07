@@ -6,6 +6,15 @@
         <h2>Commodo Inceptos Lorem Tellus Tortor Tristique Ligula Ligula Pellentesque</h2>
         <p>Vestibulum id ligula porta felis euismod semper. Maecenas faucibus mollis interdum.</p>
 
+        <multi-step-popover-buttons :steps="steps" :current-step="currentStep" @step-change="onStepChange">
+            <base-button slot="step-a" slot-scope="{ actions }" color="green" @click.prevent="actions.next">Foo</base-button>
+            <template slot="step-b" slot-scope="{ actions }">
+                <base-button color="green" :is-outline="true" @click="actions.prev">back</base-button>
+                <base-button color="green" @click.prevent="actions.next">next</base-button>
+            </template>
+            <h1>foo</h1>
+        </multi-step-popover-buttons>
+
         <h3>Risus Porta Lorem Tellus Tortor Tristique Ligula Vestibulum Mattis Venenatis</h3>
         <p>Donec sed odio dui. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum. Sed posuere consectetur est at lobortis. Nulla vitae elit libero, a pharetra augue.</p>
         <p>Maecenas faucibus mollis interdum. Curabitur blandit tempus porttitor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Etiam porta sem malesuada magna mollis euismod. Curabitur blandit tempus porttitor. Donec sed odio dui.</p>
@@ -14,9 +23,33 @@
 </template>
 
 <script>
-  export default {
-      name: 'test-page'
-  }
+    import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
+    import TestA from '@/components/Notification/TestA'
+    import TestB from '@/components/Notification/TestB'
+
+    export default {
+        name: 'test-page',
+        components: {
+            MultiStepPopoverButtons
+        },
+
+        data () {
+            return {
+                steps: {
+                    a: TestA,
+                    b: TestB,
+                    c: TestA
+                },
+                currentStep: 'a'
+            }
+        },
+
+        methods: {
+            onStepChange (newStep, oldStep) {
+                this.currentStep = newStep
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>
