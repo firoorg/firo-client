@@ -12,7 +12,8 @@
                     </p>
                 </header>
 
-                <denomination-selector :on-denomination-change="onDenominationChange" />
+                <denomination-selector :on-denomination-change="onDenominationChange"
+                                       :current-mint-costs="currentMintCostInSatoshi" />
             </section>
         </div>
         <section class="current-mint-detail scrollable-height">
@@ -83,6 +84,8 @@
     import { mapGetters, mapActions } from 'vuex'
     import types from '~/types'
 
+    import { convertToSatoshi } from '#/lib/convert'
+
     import DenominationSelector from '@/components/DenominationSelector'
     import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
     import FeesAndAmount from '@/components/FeesAndAmount'
@@ -137,6 +140,10 @@
 
             currentMintCost () {
                 return this.currentMints.reduce((accumulator, current) => accumulator + current.cost, 0)
+            },
+
+            currentMintCostInSatoshi () {
+                return convertToSatoshi(this.currentMintCost)
             },
 
             totalMintFee () {

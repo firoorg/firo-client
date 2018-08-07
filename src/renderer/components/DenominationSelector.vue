@@ -5,7 +5,8 @@
                       :max-value="maxValue"
                       :max-height="maxHeight"
                       :denomination="denomination"
-                      :on-change="onDenominationChange">
+                      :on-change="onDenominationChange"
+                      :available-balance="getAvailableBalanceToMint">
         </denomination>
     </section>
 </template>
@@ -24,6 +25,11 @@
             onDenominationChange: {
                 type: Function,
                 default: () => {}
+            },
+
+            currentMintCosts: {
+                type: Number,
+                required: true
             }
         },
 
@@ -41,7 +47,8 @@
         computed: {
             ...mapGetters({
                 currentDenominations: 'Mint/currentDenominations',
-                mints: 'Mint/confirmedMintsPerDenomination'
+                mints: 'Mint/confirmedMintsPerDenomination',
+                availableXzcBalance: 'Balance/availableXzc'
             }),
 
             maxValue () {
@@ -62,6 +69,14 @@
                 }
 
                 return max
+            },
+
+            getAvailableBalanceToMint () {
+                // substract current costs + one additional fee for (potential) upcoming mint
+                // todo get mint fee from config
+                const available = this.availableXzcBalance - this.currentMintCosts - 100000
+
+                return available > 0 ? available : 0
             }
         }
     }
@@ -72,6 +87,6 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        height: 300px;
+        height: 250px;
     }
 </style>

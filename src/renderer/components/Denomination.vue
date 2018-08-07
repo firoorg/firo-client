@@ -24,6 +24,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
+    import { convertToSatoshi } from '#/lib/convert'
     // import { addVuexModel } from '@/utils/store'
     import types from '~/types'
 
@@ -36,7 +37,7 @@
             },
             availableBalance: {
                 type: Number,
-                default: 100
+                required: true
             },
             maxValue: {
                 type: Number,
@@ -64,8 +65,8 @@
             }),
 
             canIncrease () {
-                // todo integrate fees in calculation
-                return (this.current + 1) * this.denomination < this.availableBalance
+                // fees for this increase are already subtracted by the parent element
+                return (this.current + 1) * convertToSatoshi(this.denomination) < this.availableBalance
             },
 
             canDecrease () {
