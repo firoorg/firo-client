@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import * as types from '../types/Address'
-import rootTypes from '../types'
+import * as types from '~/types/Address'
+import rootTypes from '~/types'
 
 const WALLET_ADDRESS_KEY = 'walletAddresses'
 const THIRD_PARTY_ADDRESS_KEY = 'thirdPartyAddresses'
@@ -102,15 +102,27 @@ const actions = {
                         dispatch(types.ADD_SEND_FROM_TX, tx)
                         // console.log('got send tx', addressKey, tx)
                         break
+
                     case 'mint':
                         dispatch(types.ADD_MINT_FROM_TX, tx)
                         break
-                    /*
+
                     case 'spend':
-                        console.log('spend tx', tx)
-                        // dispatch(types.ADD_SPEND_FROM_TX, tx)
+                        dispatch(types.ADD_THIRD_PARTY_ADDRESS, {
+                            address: addressKey,
+                            total
+                        })
+                        dispatch(types.ADD_SPEND_FROM_TX, tx)
                         break
-                    */
+
+                    case 'mined':
+                        dispatch(types.ADD_WALLET_ADDRESS, {
+                            address: addressKey,
+                            total
+                        })
+                        dispatch(types.ADD_MINED_FROM_TX, tx)
+                        break
+
                     default:
                         console.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
                         break
@@ -164,10 +176,25 @@ const actions = {
         })
     },
 
+    [types.ADD_SPEND_FROM_TX] ({ commit }, spendTx) {
+        const txBasics = getTxBasics(spendTx)
+        const { address, fee } = spendTx
+
+        commit(types.ADD_TRANSACTION, {
+            stack: THIRD_PARTY_ADDRESS_KEY,
+            address,
+            transaction: {
+                ...txBasics,
+                fee
+            }
+        })
+    },
+
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
         const txBasics = getTxBasics(mintTx)
 
         const { amount, blockheight, blockhash, blocktime, fee, timereceived, txid, used } = mintTx
+        const { fee, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
             ...txBasics,
@@ -176,9 +203,23 @@ const actions = {
         }, { root: true })
     },
 
+    [types.ADD_MINED_FROM_TX] ({ commit, dispatch, state }, minedTx) {
+        // todo create virtual payment request
+        const txBasics = getTxBasics(minedTx)
+        const { address, amount } = minedTx
+
+        commit(types.ADD_TRANSACTION, {
+            stack: WALLET_ADDRESS_KEY,
+            address,
+            transaction: {
+                ...txBasics,
+                amount
+            }
+        })
+    },
+
     [types.ON_ADDRESS_SUBSCRIPTION] ({ dispatch, state }, data) {
         try {
-            dispatch(types.SET_INITIAL_STATE, { addresses: data })
             // todo clarify behaviour with @riordant
             const payload = !data.addresses ? { addresses: data } : data
             dispatch(types.SET_INITIAL_STATE, payload)
