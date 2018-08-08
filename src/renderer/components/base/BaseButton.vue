@@ -154,9 +154,21 @@
                     border-color: $color--red-bright;
                 }
             }
+
+            &.orange {
+                color: $color--orange;
+                border-color: $color--orange;
+
+                &:hover,
+                &:focus {
+                    color: $color--orange-bright;
+                    border-color: $color--orange-bright;
+                }
+            }
         }
 
         &.green,
+        &.orange,
         &.comet {
             //padding-top: emRhythm($padding-v);
             //padding-bottom: emRhythm($padding-v);
@@ -237,6 +249,23 @@
 
                 &[disabled] {
                     background: grayscale($color--green);
+                }
+            }
+
+            &.orange {
+                background: $color--orange;
+                border-color: transparent;
+
+                &:before {
+                    background: $gradient--orange-vertical;
+                }
+
+                &:after {
+                    @include glow-small-box($color--orange, 0);
+                }
+
+                &[disabled] {
+                    background: grayscale($color--orange);
                 }
             }
         }
