@@ -134,8 +134,10 @@
                     return this.paymentRequests
                 }
 
+                const filter = this.tableFilter.toLowerCase()
+
                 return this.paymentRequests.filter((request) => {
-                    return request.label ? request.label.includes(this.tableFilter) : false
+                    return request.label ? request.label.toLowerCase().includes(filter) : false
                 })
             },
 
