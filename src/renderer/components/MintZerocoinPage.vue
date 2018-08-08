@@ -65,7 +65,7 @@
                 <form class="checkout" @submit.prevent="onSubmit">
                     <div class="has-divider">
                         <fees-and-amount :fee="{ label: 'Fees', amount: totalMintFee }"
-                                         :amount="currentMintCost" />
+                                         :amount="currentMintCostInSatoshi" />
                     </div>
                     <mint-confirm-dialog :can-submit="canSubmit"
                                          :is-open="showPopover"
@@ -147,7 +147,7 @@
             },
 
             totalMintFee () {
-                return this.currentMints.reduce((accumulator, current) => accumulator + current.amount, 0) / 1000
+                return this.currentMints.reduce((accumulator, current) => accumulator + convertToSatoshi(current.amount), 0) / 1000
             },
 
             canSubmit () {
