@@ -75,7 +75,7 @@ const actions = {
 const getters = {
     total: (state) => state.total.all,
     availableTotal: (state) => state.total.available,
-    availableXzc: (state) => state.xzc.confirmed,
+    availableXzc: (state) => state.xzc.confirmed - state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed
 }
 
