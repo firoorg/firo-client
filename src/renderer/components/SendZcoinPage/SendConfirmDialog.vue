@@ -43,7 +43,7 @@
                                     <base-button v-if="timerDone"
                                                  :disabled="!canSubmit"
                                                  key="confirm-send"
-                                                 color="green"
+                                                 :color="greenOrWarning"
                                                  @click.prevent="onConfirmFn" tabindex="4">
                                         <span>Yes, send now!</span>
                                     </base-button>
@@ -55,7 +55,7 @@
                             </div>
                             <div v-else key="send">
                                 <base-button key="confirm-trigger"
-                                             color="green"
+                                             :color="greenOrWarning"
                                              type="submit"
                                              class="submit"
                                              ref="submit"
@@ -119,6 +119,10 @@
             },
             tabindex: {
                 type: String
+            },
+            containsUsedAddress: {
+                type: Boolean,
+                required: true
             }
         },
 
@@ -137,6 +141,9 @@
         computed: {
             hasQueuedPayments () {
                 return this.queuedPayments > 0
+            },
+            greenOrWarning () {
+                return this.containsUsedAddress ? 'orange' : 'green'
             }
         },
 

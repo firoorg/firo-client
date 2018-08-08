@@ -103,7 +103,8 @@
                                          :on-queue-add="addToQueueAndClearFields"
                                          :queued-payments="sendQueueLength"
                                          :popover-class="getConfirmPopoverClass"
-                                         tabindex="4">
+                                         tabindex="4"
+                                         :contains-used-address="containsUsedAddress">
                         <div class="confirmation-popover-content-wrap">
                             <transition name="fade" mode="out-in">
                                 <section v-if="showSendConfirmation" key="confirm-payment">
@@ -259,7 +260,7 @@
 
             getConfirmPopoverClass () {
                 if (this.containsUsedAddress) {
-                    return 'orange'
+                    return 'warning'
                 }
 
                 return this.showFeeSelection ? 'comet' : 'green'
