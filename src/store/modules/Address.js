@@ -252,7 +252,17 @@ const getters = {
             }
         })
     },
-    thirdPartyAddresses: (state) => Object.values(state[THIRD_PARTY_ADDRESS_KEY])
+    thirdPartyAddresses: (state) => Object.values(state[THIRD_PARTY_ADDRESS_KEY]),
+
+    hasAlreadySentToAddress (state) {
+        return (address) => {
+            return !!(
+                state[THIRD_PARTY_ADDRESS_KEY][address] &&
+                state[THIRD_PARTY_ADDRESS_KEY][address].transactions &&
+                state[THIRD_PARTY_ADDRESS_KEY][address].transactions.length
+            )
+        }
+    }
 }
 
 export default {
