@@ -36,7 +36,7 @@
 <style lang="scss" scoped>
     .sidebar {
         //background-image: $gradient--comet-dark-horizontal;
-        background-image: linear-gradient(to top right, $color--dark, mix($color--comet-dark, $color--dark));
+        background-image: linear-gradient(to top right, $color--dark, $color--comet-dark-mixed);
 
         display: grid;
         grid-row-gap: emRhythm(2);

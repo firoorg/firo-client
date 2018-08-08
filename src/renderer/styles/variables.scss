@@ -38,6 +38,8 @@ $color--polo-dark: #8596C7;
 $color--polo-medium: #D8DDED;
 $color--polo-light: #F5F7FF;
 
+$color--comet-dark-mixed: mix($color--comet-dark, $color--dark);
+
 // inputs
 $input-bleed: 2;
 

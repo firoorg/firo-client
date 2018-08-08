@@ -7,8 +7,8 @@
                              :animation="{ duration }"
                              :total-steps="totalSteps"
                              :stroke-width="8"
-                             stop-color="#23B852"
-                             start-color="#23B852"
+                             stop-color="#383853"
+                             start-color="#383853"
                              inner-stroke-color="#ccc">
         </radial-progress-bar>
         </div>
