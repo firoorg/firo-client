@@ -94,11 +94,14 @@ export default {
         const encryption = apiStatus.devauth ? this.setupEncryption(apiStatus) : null
 
         try {
-            await waitForApi({
+            const warmedUpApiStatus = await waitForApi({
                 ...appConfig,
                 apiStatus,
                 ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady
             })
+
+            const { blocks } = warmedUpApiStatus
+            dispatch(types.blockchain.SET_BLOCKCHAIN_TIP, blocks)
         } catch (e) {
             debug('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...

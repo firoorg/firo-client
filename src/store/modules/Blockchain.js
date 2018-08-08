@@ -5,6 +5,7 @@ const debug = Debug('zcoin:store:blockchain')
 
 const state = {
     connections: 0,
+    blockchainTip: 0,
     currentBlock: {
         height: 0,
         timestamp: 0
@@ -23,6 +24,10 @@ const state = {
 const mutations = {
     [types.SET_CONNECTIONS] (state, connections) {
         state.connections = connections
+    },
+
+    [types.SET_BLOCKCHAIN_TIP] (state, height) {
+        state.blockchainTip = height
     },
 
     [types.SET_CURRENT_BLOCK] (state, { height, timestamp }) {
@@ -90,10 +95,9 @@ const actions = {
         console.log('got block!', initialState)
         dispatch(types.SET_CONNECTIONS, connections)
 
-        // todo remove parsing when https://github.com/joernroeder/zcoin-client/issues/59 is fixed
         dispatch(types.SET_CURRENT_BLOCK, {
-            height: typeof height === 'number' ? height : parseInt(height),
-            timestamp: typeof timestamp === 'number' ? timestamp : parseInt(timestamp)
+            height,
+            timestamp
         })
 
         if (isTestnet) {
@@ -138,6 +142,14 @@ const actions = {
         dispatch(types.SET_INITIAL_STATE, block)
     },
 
+    [types.SET_BLOCKCHAIN_TIP] ({ commit, state }, height) {
+          if (state.blockchainTip >= height) {
+              return
+          }
+
+          commit(types.SET_BLOCKCHAIN_TIP, height)
+    },
+
     [types.SET_CONNECTIONS] ({ commit, state }, connections) {
         if (!connections || isNaN(connections) || connections === state.connections) {
             return
@@ -146,7 +158,7 @@ const actions = {
         commit(types.SET_CONNECTIONS, connections)
     },
 
-    [types.SET_CURRENT_BLOCK] ({ commit, state }, { height, timestamp }) {
+    [types.SET_CURRENT_BLOCK] ({ dispatch, commit, state }, { height, timestamp }) {
         if (!height || !timestamp) {
             return
         }
@@ -155,6 +167,7 @@ const actions = {
             return
         }
 
+        dispatch(types.SET_BLOCKCHAIN_TIP, height)
         commit(types.SET_CURRENT_BLOCK, { height, timestamp })
     },
 
