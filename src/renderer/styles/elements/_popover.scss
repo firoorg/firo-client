@@ -7,7 +7,7 @@
     @include box-shadow-large();
 
     .tooltip-inner {
-        background: $color--dark;
+        background: $color--comet-dark-mixed;
         color: $color--white;
         padding: $tooltip--padding;
         max-width: emRhythm(30);
@@ -19,7 +19,7 @@
         border-style: solid;
         position: absolute;
         margin: emRhythm(1);
-        border-color: $color--dark;
+        border-color: $color--comet-dark-mixed;
         z-index: 1;
     }
 
