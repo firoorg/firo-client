@@ -93,7 +93,17 @@
 
         methods: {
             getRowClass (item, index) {
-                return item[this.trackBy] === this.selectedRow ? 'selected' : ''
+                const classes = []
+
+                if (item[this.trackBy] === this.selectedRow) {
+                    classes.push('selected')
+                }
+
+                if (item.isReused) {
+                    classes.push('is-reused')
+                }
+
+                return classes.join(' ')
             },
 
             onRowClick (rowData) {
@@ -249,6 +259,10 @@
 
                 transition: box-shadow 0.15s ease-out;
 
+                &.is-reused {
+                    @include glow-transition-start($color--orange);
+                }
+
                 td {
                     position: relative;
                     border-color: $color--polo-medium;
@@ -311,6 +325,32 @@
                         border: 10px solid blue;
                     }*/
                     @include glow-small-box($color--green);
+
+                    &.is-reused {
+                        @include glow-small-box($color--orange);
+
+                        td {
+                            background: $color--orange;
+                        }
+
+                        & /deep/ .tag {
+                            border-color: mix($color--orange, $color--orange-dark);
+                        }
+
+                        &:hover td {
+                            background: mix($color--orange-bright, $color--orange, (100% * $hover-opacity));
+                        }
+
+                        &:nth-child(odd) {
+                            td {
+                                background: mix($color--orange-bright, $color--orange, (100% * $odd-opacity / 2));
+                            }
+
+                            &:hover td {
+                                background: mix($color--orange-bright, $color--orange, (100% * ($hover-opacity + $odd-opacity) / 2));
+                            }
+                        }
+                    }
 
                     td {
                         background: $color--green;
