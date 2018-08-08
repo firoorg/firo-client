@@ -48,7 +48,7 @@ const mutations = {
 
     [types.ADD_TRANSACTION] (state, { stack, address, transaction }) {
         state[stack][address].transactions = [
-            ...state[stack][address].transactions,
+            ...state[stack][address].transactions.filter((tx) => tx.id !== transaction.id),
             transaction
         ]
     }
