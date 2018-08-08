@@ -193,7 +193,6 @@ const actions = {
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
         const txBasics = getTxBasics(mintTx)
 
-        const { amount, blockheight, blockhash, blocktime, fee, timereceived, txid, used } = mintTx
         const { fee, used } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
