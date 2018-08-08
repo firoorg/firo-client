@@ -83,6 +83,17 @@
         }
     }
 
+    &.warning,
+    &.orange {
+        .tooltip-inner {
+            background-color: $color--orange;
+        }
+
+        .tooltip-arrow {
+            border-color: $color--orange;
+        }
+    }
+
     &.error,
     &.red {
         .tooltip-inner {

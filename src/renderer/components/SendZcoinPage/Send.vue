@@ -102,7 +102,7 @@
                                          :on-confirm="onConfirmAndSendPayment"
                                          :on-queue-add="addToQueueAndClearFields"
                                          :queued-payments="sendQueueLength"
-                                         :popover-class="showFeeSelection ? 'comet' : 'green'"
+                                         :popover-class="getConfirmPopoverClass"
                                          tabindex="4">
                         <div class="confirmation-popover-content-wrap">
                             <transition name="fade" mode="out-in">
@@ -218,7 +218,8 @@
 
             ...mapGetters({
                 fee: 'ZcoinPayment/selectedFee',
-                amountAsSatoshi: 'ZcoinPayment/createFormAmount'
+                amountAsSatoshi: 'ZcoinPayment/createFormAmount',
+                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
             }),
 
             hasSendQueue () {
@@ -255,6 +256,30 @@
                 return this.hasSendQueue && !(this.showSendConfirmation && this.sendQueueLength === 1)
             },
             */
+
+            getConfirmPopoverClass () {
+                if (this.containsUsedAddress) {
+                    return 'orange'
+                }
+
+                return this.showFeeSelection ? 'comet' : 'green'
+            },
+
+            containsUsedAddress () {
+                if (this.hasAlreadySentToAddress(this.address)) {
+                    return true
+                }
+
+                for (let address in this.pendingPayments) {
+                    const usedAddress = this.hasAlreadySentToAddress(address)
+
+                    if (usedAddress) {
+                        return true
+                    }
+                }
+
+                return false
+            },
 
             isConfirmed () {
                 if (!this.hasSendQueue) {
@@ -339,6 +364,7 @@
 
             alreadyUsedAddress (address) {
                 // todo move to mixin. compose this internally from different sources, use it all over the place for incoming outgoing etc.
+                /*
                 for (let destination in this.pendingPayments) {
                     if (address === destination && this.pendingPayments[destination].sent) {
                         return true
@@ -346,6 +372,8 @@
                 }
 
                 return false
+                */
+                return this.hasAlreadySentToAddress(address)
             },
 
             cleanupForm () {
