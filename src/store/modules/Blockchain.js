@@ -143,11 +143,11 @@ const actions = {
     },
 
     [types.SET_BLOCKCHAIN_TIP] ({ commit, state }, height) {
-          if (state.blockchainTip >= height) {
-              return
-          }
+        if (state.blockchainTip >= height) {
+            return
+        }
 
-          commit(types.SET_BLOCKCHAIN_TIP, height)
+        commit(types.SET_BLOCKCHAIN_TIP, height)
     },
 
     [types.SET_CONNECTIONS] ({ commit, state }, connections) {
