@@ -118,7 +118,7 @@
                         height: 100%;
                         background: $color--green;
                         transition: width 1s ease-out;
-                        min-width: emRhythm(1);
+                        min-width: emRhythm(0.5, $silent: true);
                     }
                 }
             }
