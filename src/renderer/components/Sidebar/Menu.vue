@@ -6,20 +6,20 @@
                     <span class="text">{{ $t('navigation.menu.button__receive') }}</span>
                 </router-link>
             </li>
-            <li>
-                <router-link :to="{ name: 'send-zcoin' }" exact>
-                    <span class="text">{{ $t('navigation.menu.button__send') }}</span>
-                    <notification-indicator v-show="hasSendNotification" :has-shadow="true" />
-                </router-link>
-            </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'mint-zerocoin' }" exact>
                     <span class="text">{{ $t('navigation.menu.button__mint') }}</span>
                 </router-link>
             </li>
-            <li>
+            <li class="has-divider">
                 <router-link :to="{ name: 'spend-zerocoin' }" exact>
                     <span class="text">{{ $t('navigation.menu.button__spend') }}</span>
+                </router-link>
+            </li>
+            <li>
+                <router-link :to="{ name: 'send-zcoin' }" exact>
+                    <span class="text">{{ $t('navigation.menu.button__send') }}</span>
+                    <notification-indicator v-show="hasSendNotification" :has-shadow="true" />
                 </router-link>
             </li>
             <li class="has-divider">
