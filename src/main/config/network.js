@@ -1,15 +1,16 @@
 const HOST = 'tcp://127.0.0.1'
 
 export default {
+    // todo remove current network as this originates from apiStatus call now
     currentNetwork: 'testnet',
     secondsToWaitForApiToGetReady: 60,
 
-    mainnet: {
+    main: {
         host: HOST,
         ports: {
             publisher: 18332,
-            request: 5557,
-            status: 5558
+            request: 15557,
+            status: 25558
         }
     },
     testnet: {
@@ -23,7 +24,9 @@ export default {
     regtest: {
         host: HOST,
         ports: {
-            publisher: 38332
+            publisher: 38332,
+            request: 35557,
+            status: 25558
         }
     }
 }
