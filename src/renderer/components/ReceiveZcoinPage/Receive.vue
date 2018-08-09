@@ -71,12 +71,14 @@
 
 <script>
     import { clipboard } from 'electron'
+    import { mapActions } from 'vuex'
     import VueQRCodeComponent from 'vue-qrcode-component'
     import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
     import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
     import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
     import TimedTooltip from '@/components/Notification/TimedTooltip'
     import { convertToCoin } from '#/lib/convert'
+    import types from '~/types'
 
     export default {
         name: 'receivePaymentRequest',
@@ -102,6 +104,11 @@
                 showCopySuccess: false
             }
         },
+
+        beforeDestroy () {
+            this.markAsVisited(this.address.address)
+        },
+
         computed: {
             qrCodeIsVisible () {
                 return !this.received && this.showQrCode
@@ -125,6 +132,10 @@
             }
         },
         methods: {
+            ...mapActions({
+                markAsVisited: types.paymentrequest.SET_PAYMENT_REQUEST_TO_VISITED
+            }),
+
             toggleQrCode () {
                 console.log('toggle qr code')
                 this.showQrCode = !this.showQrCode

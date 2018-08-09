@@ -30,6 +30,10 @@ const mutations = {
             ...state.paymentRequests,
             [request.address]: request
         }
+    },
+
+    [types.SET_PAYMENT_REQUEST_TO_VISITED] (state, id) {
+        state.paymentRequests[id].visited = true
     }
 }
 
@@ -103,11 +107,24 @@ const actions = {
             createdAt: createdAt * 1000,
             amount,
             message,
-            label
+            label,
+            visited: false
         })
 
         // clean up form fields
         dispatch(types.RESET_PAYMENT_REQUEST_CREATE_FORM)
+    },
+
+    [types.SET_PAYMENT_REQUEST_TO_VISITED] ({ commit, dispatch, state }, id) {
+        if (!state.paymentRequests[id]) {
+            return
+        }
+
+        if (state.paymentRequests[id].visited) {
+            return
+        }
+
+        commit(types.SET_PAYMENT_REQUEST_TO_VISITED, id)
     }
 }
 
