@@ -7,7 +7,7 @@ export default {
     mainnet: {
         host: HOST,
         ports: {
-            publisher: 8451,
+            publisher: 18332,
             request: 5557,
             status: 5558
         }
@@ -18,6 +18,12 @@ export default {
             publisher: 28332,
             request: 25557,
             status: 25558
+        }
+    },
+    regtest: {
+        host: HOST,
+        ports: {
+            publisher: 38332
         }
     }
 }
