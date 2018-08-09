@@ -26,6 +26,10 @@
                     <dt>Amount</dt>
                     <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
+
+                <unexpected-transaction-popover :boundaries-element="null">
+                    <h3>Test</h3>
+                </unexpected-transaction-popover>
             </div>
 
             <div class="message-wrap" v-if="message">
@@ -77,12 +81,14 @@
     import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
     import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
     import TimedTooltip from '@/components/Notification/TimedTooltip'
+    import UnexpectedTransactionPopover from '@/components/ReceiveZcoinPage/UnexpectedTransactionPopover'
     import { convertToCoin } from '#/lib/convert'
     import types from '~/types'
 
     export default {
         name: 'receivePaymentRequest',
         components: {
+            UnexpectedTransactionPopover,
             PaymentRequestStatus,
             NaturalLanguageTags,
             ReceivePaymentRequestEmailTemplate,
