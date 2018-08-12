@@ -74,6 +74,10 @@
         mixins: [
             ValidationMixin
         ],
+        $_veeValidate: {
+            validator: 'new' // give me my own validator instance.
+        },
+
         data () {
             return {
                 buttonStep: 0,
