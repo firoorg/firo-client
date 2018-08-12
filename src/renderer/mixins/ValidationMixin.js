@@ -17,14 +17,14 @@ export default {
                 ...amountRules
             },
             requiredAmountValidationRules: {
-                ...amountRules,
-                required: true
+                required: true,
+                ...amountRules
             },
             requiredAddressValidationRules: {
+                required: true,
                 zcoin_address: {
                     ...this.$store.getters['Settings/b58Prefixes']
-                },
-                required: true
+                }
             }
         }
     },
