@@ -32,7 +32,7 @@
                             <base-popover
                                     :disabled="showPopover"
                                     :auto-hide="true"
-                                    placement="bottom"
+                                    placement="bottom-end"
                                     popover-class="comet"
                                     class="mints-in-process-popover"
                                     :boundaries-element="this.$refs.grid"
