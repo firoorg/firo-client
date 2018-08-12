@@ -1,3 +1,7 @@
+import Payment from '~/mixins/Payments'
+
+const pendingPayment = Payment.types('zcoin')
+
 // export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
 export const SET_AVAILABLE_FEES = 'SET_AVAILABLE_FEES'
 
@@ -15,3 +19,8 @@ export const SET_FEE = 'SET_FEE'
 export const CALC_TX_FEE = 'CALC_TX_FEE'
 export const SET_TX_FEE = 'SET_TX_FEE'
 export const SEND_ZCOIN = 'SEND_ZCOIN'
+
+// export mixed in types
+export default {
+    ...pendingPayment
+}
