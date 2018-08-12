@@ -6,7 +6,7 @@
         </header>
 
         <ul>
-            <li v-for="(fee, key) in availableFees">
+            <li v-for="(fee, key) in availableFeesWithAmount">
                 <input type="radio"
                        v-model="currentFee"
                        :value="key"
@@ -15,7 +15,7 @@
                 <label :for="key">
                     <span class="title">{{ fee.label }}</span>
                     <span class="desc">{{ fee.description }}</span>
-                    <span class="amount">{{ fee.amount }} xzc</span>
+                    <span class="amount">{{ fee.amountInBaseCoin }} xzc</span>
                 </label>
             </li>
         </ul>
@@ -32,6 +32,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
+    import { convertToCoin } from '#/lib/convert'
 
     export default {
         name: 'SendFeeSelection',
@@ -50,7 +51,26 @@
         computed: {
             ...mapGetters({
                 availableFees: 'ZcoinPayment/availableFees'
-            })
+            }),
+
+            availableFeesWithAmount () {
+                let fees = {}
+
+                for (let key of Object.keys(this.availableFees)) {
+                    const fee = this.availableFees[key]
+                    const { amount } = fee
+
+                    fees = {
+                        ...fees,
+                        [key]: {
+                            ...fee,
+                            amountInBaseCoin: convertToCoin(amount)
+                        }
+                    }
+                }
+
+                return fees
+            }
         },
 
         methods: {
