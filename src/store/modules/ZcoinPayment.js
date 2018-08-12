@@ -1,8 +1,11 @@
 import * as types from '~/types/ZcoinPayment'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+import Payments from '~/mixins/Payments'
+
+const pendingPayments = Payments.module('zcoin')
 
 const state = {
-    pendingPayments: {},
+    ...pendingPayments.state,
     selectedFee: {},
     availableFees: [],
     addPaymentForm: {
@@ -16,17 +19,9 @@ const state = {
 }
 
 const mutations = {
+    ...pendingPayments.mutations,
     [types.CALC_TX_FEE] () {},
     [types.SEND_ZCOIN] () {},
-
-    [types.SET_AVAILABLE_FEES] (state, availableFees) {
-        console.log('setting available fees')
-        state.availableFees = availableFees
-    },
-
-    [types.SET_FEE] (state, fee) {
-        state.selectedFee = fee
-    },
 
     [types.SET_FORM_LABEL] (state, label) {
         state.addPaymentForm.label = label
@@ -40,6 +35,17 @@ const mutations = {
         state.addPaymentForm.address = address
     },
 
+    // --- Fee ---
+
+    [types.SET_AVAILABLE_FEES] (state, availableFees) {
+        console.log('setting available fees')
+        state.availableFees = availableFees
+    },
+
+    [types.SET_FEE] (state, fee) {
+        state.selectedFee = fee
+    },
+
     [types.SET_TX_FEE] (state, txFee) {
         console.log('got new tx fee', txFee)
         state.addPaymentForm.totalTxFee = txFee
@@ -47,6 +53,7 @@ const mutations = {
 }
 
 const actions = {
+    ...pendingPayments.actions,
     [types.SET_AVAILABLE_FEES] ({ dispatch }, availableFees) {
         /*
         const { availableFees } = initialState
@@ -120,6 +127,7 @@ const actions = {
 }
 
 const getters = {
+    ...pendingPayments.getters,
     availableFees: (state) => state.availableFees,
     selectedFee: (state) => ({
         ...state.availableFees[state.selectedFee],
