@@ -14,10 +14,14 @@ export const convertToCoin = function (satoshi) {
         return ''
     }
 
-    return new Big(satoshi)
-        .times(satoshiBase)
-        .div(coinBase)
-        .toFixed(8)
+    try {
+        return new Big(satoshi)
+            .times(satoshiBase)
+            .div(coinBase)
+            .toFixed(8)
+    } catch (e) {
+        return ''
+    }
 }
 
 /**
@@ -31,8 +35,12 @@ export const convertToSatoshi = function (base) {
         return 0
     }
 
-    return parseInt(new Big(base)
-        .times(coinBase)
-        .div(satoshiBase)
-        .toString())
+    try {
+        return parseInt(new Big(base)
+            .times(coinBase)
+            .div(satoshiBase)
+            .toString())
+    } catch (e) {
+        return 0
+    }
 }
