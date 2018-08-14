@@ -40,35 +40,35 @@ const mutations = {
     [types.IS_BLOCKCHAIN_SYNCED] (state, isSynced) {
         state.status = {
             ...state.status,
-            IsBlockchainSynced: isSynced
+            isBlockchainSynced: isSynced
         }
     },
 
     [types.IS_FAILED] (state, isFailed) {
         state.status = {
             ...state.status,
-            IsFailed: isFailed
+            isFailed: isFailed
         }
     },
 
     [types.IS_SYNCED] (state, isSynced) {
         state.status = {
             ...state.status,
-            IsSynced: isSynced
+            isSynced: isSynced
         }
     },
 
     [types.IS_WINNERS_LIST_SYNCED] (state, isSynced) {
         state.status = {
             ...state.status,
-            IsWinnersListSynced: isSynced
+            isWinnersListSynced: isSynced
         }
     },
 
     [types.IS_ZNODE_LIST_SYNCED] (state, isSynced) {
         state.status = {
             ...state.status,
-            IsZnodeListSynced: isSynced
+            isZnodeListSynced: isSynced
         }
     },
 
@@ -83,6 +83,10 @@ const mutations = {
     [types.IS_FULL_NODE] (state) {
         // todo get string from config
         state.type = 'full'
+    },
+
+    [types.SET_AVERAGE_BLOCK_TIME] (state, averageBlockTime) {
+        state.averageBlockTime = averageBlockTime
     }
 }
 
@@ -90,7 +94,7 @@ const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
         console.log('ON BLOCKCHAIN INITIAL STATE', initialState)
 
-        const { connections, currentBlock, status, testnet: isTestnet, type: clientType } = initialState
+        const { connections, currentBlock, status, testnet: isTestnet, type: clientType, avgBlockTime } = initialState
         const { height, timestamp } = currentBlock
         console.log('got block!', initialState)
         dispatch(types.SET_CONNECTIONS, connections)
