@@ -16,7 +16,7 @@
 
 <script>
     import { convertToCoin } from '#/lib/convert'
-    import PendingPayments from '@/components/PendingPayments'
+    import PendingPayments from '@/components/payments/PendingPayments'
 
     export default {
         name: 'FeesAndAmount',
