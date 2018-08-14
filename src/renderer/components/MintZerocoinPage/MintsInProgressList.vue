@@ -5,7 +5,9 @@
                 <!--<slot v-bind="value" />-->
                 <div>
                     <span class="name">Mint {{ value.denomination }}</span>
-                    <span class="eta">eta here</span>
+                    <span class="eta">
+                        <timeago :datetime="value.eta" :auto-update="30" />
+                    </span>
                 </div>
 
                 <div class="wrapper">
@@ -19,6 +21,7 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
     import { convertToCoin } from '#/lib/convert'
 
     export default {
@@ -35,16 +38,23 @@
         },
 
         computed: {
+            ...mapGetters({
+                averageBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds'
+            }),
+
             items () {
                 let list = {}
+                const now = Date.now()
 
                 for (let mint of this.mints) {
                     const { amount, id, confirmations } = mint
-                    const key = amount + ''
+                    const eta = now + ((6 - confirmations) * this.averageBlockTime)
+                    const key = amount + '-' + eta
 
                     if (!list[key]) {
                         list[key] = {
                             denomination: parseInt(convertToCoin(amount)),
+                            eta: eta,
                             tx: {}
                         }
                     }
