@@ -100,7 +100,9 @@ export default {
                 ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady
             })
 
-            const { blocks } = warmedUpApiStatus
+            const { blocks, walletLock } = warmedUpApiStatus
+
+            dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
             dispatch(types.blockchain.SET_BLOCKCHAIN_TIP, blocks)
         } catch (e) {
             debug('Core API module not loaded after XX seconds.', e)
