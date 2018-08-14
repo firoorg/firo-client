@@ -149,7 +149,7 @@ export default {
         }
     },
 
-    send ({ type, collection, data, actionToDispatch }) {
+    send ({ type, collection, data, auth = {}, actionToDispatch }) {
         if (!collection && !this.collection) {
             debug('can not send. no collection given!', {
                 type,
@@ -174,7 +174,8 @@ export default {
         this.requester.send(JSON.stringify({
             collection: collection || this.collection,
             type,
-            data
+            data,
+            auth
         }))
     },
 
