@@ -1,22 +1,28 @@
+import { convertToCoin } from '#/lib/convert'
+
 const ucfirst = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 const getName = (namespace) => {
     const name = `pending${ucfirst(namespace)}Payments`
     const Name = ucfirst(name)
+    const NAME = `PENDING_${namespace.toUpperCase()}_PAYMENTS`
 
     return {
         name,
-        Name
+        Name,
+        NAME
     }
 }
 
 const types = function (namespace) {
+    const { NAME: PAYMENTS } = getName(namespace)
+
     return {
-        TESTING: 'TESTING'
+        [`ADD_${PAYMENTS}`]: `ADD_${PAYMENTS}`
     }
 }
 
 const module = function (namespace = '') {
-    const { name, Name } = getName(namespace)
+    const { name: payment, Name: Payments, NAME: PAYMENTS } = getName(namespace)
 
     return {
         state: {
@@ -24,19 +30,39 @@ const module = function (namespace = '') {
         },
 
         mutations: {
+            [`ADD_${PAYMENTS}`] (state, payment) {
+                const { address, amount } = payment
 
+                state.pendingPayments = {
+                    ...state.pendingPayments,
+                    [address]: {
+                        ...payment,
+                        amountAsBaseCoin: convertToCoin(amount),
+                        sent: false
+                    }
+                }
+            }
         },
 
         actions: {
             TESTING () {
+                console.log('testing')
+            },
+
+            [`ADD_${PAYMENTS}`] ({ commit }, payment) {
                 console.log('yes, works!')
+
+                commit(`ADD_${PAYMENTS}`, payment)
             }
         },
 
         getters: {
-            [name]: (state) => Object.values(state.pendingPayments),
-            [`${name}Size`]: (state, getters) => getters[name].length,
-            [`has${Name}`]: (state, getter) => !!getter[`${[name]}Size`]
+            [payment]: (state) => Object.values(state.pendingPayments),
+            [`${payment}Size`]: (state, getters) => getters[payment].length,
+            [`has${Payments}`]: (state, getter) => !!getter[`${[payment]}Size`],
+            [`${payment}Amount`]: (state, getters) => getters[payment].reduce((accumulator, payment) => {
+                return accumulator + (payment.cost || payment.amount)
+            }, 0)
         }
     }
 }
