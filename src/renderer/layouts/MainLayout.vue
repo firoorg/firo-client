@@ -17,9 +17,9 @@
                 Header
             </header>-->
             <Sidebar class="aside"></Sidebar>
-            <main class="main">
+            <main class="main" ref="main">
                 <transition name="fade">
-                    <router-view class="child"></router-view>
+                    <router-view class="child" :boundaries-element="$refs.main"></router-view>
                 </transition>
             </main>
             <!--<footer class="footer"></footer>-->

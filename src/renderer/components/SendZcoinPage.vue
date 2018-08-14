@@ -1,8 +1,8 @@
 <template>
-    <section class="send-zcoin" ref="main">
+    <section class="send-zcoin">
         <div class="scrollable-height">
             <section class="paymentrequest-list">
-                <send-from-clipboard-popover :boundaries-element="$refs.main">
+                <send-from-clipboard-popover :boundaries-element="boundariesElement">
                     <h1>
                         Send<br>
                         Zcoin
@@ -21,7 +21,7 @@
             </section>
         </div>
         <section class="paymentrequest-detail">
-            <send-zcoin />
+            <send-zcoin :boundaries-element="boundariesElement" />
         </section>
     </section>
 </template>
@@ -68,6 +68,10 @@
             AnimatedTable,
             SendZcoin
         },
+
+        props: [
+            'boundariesElement'
+        ],
 
         data () {
             return {
