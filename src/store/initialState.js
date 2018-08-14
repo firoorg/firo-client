@@ -42,7 +42,8 @@ module.exports = {
             address: ''
         },
         isLoading: false,
-        lastSeen: 'blockHeightAsInteger'
+        lastSeen: 'blockHeightAsInteger',
+        passphrase: null
     },
 
     PaymentRequest: {
@@ -100,7 +101,8 @@ module.exports = {
             isZnodeListSynced: false
         },
         testnet: true,
-        type: 'full'
+        type: 'full',
+        averageBlockTime: 0
     },
 
     Settings: { // daemon: isSubscription
@@ -150,6 +152,7 @@ module.exports = {
 
     App: { // gui
         showIntroScreen: true,
+        clientIsLocked: false,
         lastSeen: {
             paymentRequest: 23345932,
             mint: 23489034

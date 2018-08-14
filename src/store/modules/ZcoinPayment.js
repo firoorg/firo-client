@@ -15,7 +15,8 @@ const state = {
         totalTxFee: 0
     },
     isLoading: false,
-    lastSeen: 'blockHeightAsInteger'
+    lastSeen: 'blockHeightAsInteger',
+    passphrase: null
 }
 
 const mutations = {
@@ -49,6 +50,10 @@ const mutations = {
     [types.SET_TX_FEE] (state, txFee) {
         console.log('got new tx fee', txFee)
         state.addPaymentForm.totalTxFee = txFee
+    },
+
+    [types.SET_CURRENT_PASSPHRASE] (state, passphrase) {
+        state.passphrase = passphrase
     }
 }
 
@@ -112,17 +117,27 @@ const actions = {
         commit(types.SET_TX_FEE, fee)
     },
 
-    [types.SEND_ZCOIN] ({ commit, state }, { payments, fee }) {
+    [types.SEND_ZCOIN] ({ commit, state }, { payments, fee, auth }) {
         console.log('payment in action', payments, fee)
         // const { address, amount } = payment
 
         commit(types.SEND_ZCOIN, {
-            payments: payments.map((payment) => ({
-                amount: payment.amount,
-                address: payment.address
-            })),
-            fee: state.addPaymentForm.totalTxFee
+            data: {
+                payments: payments.map((payment) => ({
+                    amount: payment.amount,
+                    address: payment.address
+                })),
+                fee: state.addPaymentForm.totalTxFee
+            },
+            auth: {
+                ...auth
+            }
         })
+    },
+
+    [types.SET_CURRENT_PASSPHRASE] ({ commit, state }, passphrase) {
+        console.log(types.SET_CURRENT_PASSPHRASE, passphrase)
+        commit(types.SET_CURRENT_PASSPHRASE, passphrase)
     }
 }
 
@@ -138,7 +153,8 @@ const getters = {
     createFormLabel: (state) => state.addPaymentForm.label,
     createFormAmount: (state) => state.addPaymentForm.amount,
     createFormAmountAsBaseCoin: (state) => convertToCoin(state.addPaymentForm.amount),
-    createFormAddress: (state) => state.addPaymentForm.address
+    createFormAddress: (state) => state.addPaymentForm.address,
+    currentPassphrase: (state) => state.passphrase
 }
 
 export default {

@@ -39,19 +39,23 @@ export default {
             })
         },
 
-        sendZcoin (data) {
-            console.log('SENDING ZCOIN')
+        sendZcoin (payload) {
+            const { auth, data } = payload
+            const { passphrase = null } = auth
+
+            console.log('SENDING ZCOIN', data, auth)
 
             let addresses = this.convertToAddressAmountPair(data.payments)
 
-            console.log(addresses, data.fee)
 
-            // todo add auth passphrase
             this.send({
                 type: 'create',
                 data: {
                     addresses,
                     feePerKb: data.fee
+                },
+                auth: {
+                    passphrase
                 }
             })
         }
