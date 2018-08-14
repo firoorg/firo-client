@@ -18,7 +18,8 @@ const state = {
         isZnodeListSynced: false
     },
     testnet: true,
-    type: 'full'
+    type: 'full',
+    averageBlockTime: 0
 }
 
 const mutations = {
@@ -112,6 +113,10 @@ const actions = {
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
 
+        dispatch(types.SET_AVERAGE_BLOCK_TIME, {
+            averageBlockTime: avgBlockTime
+        })
+
         if (!status) {
             return
         }
@@ -147,6 +152,10 @@ const actions = {
     },
 
     [types.SET_BLOCKCHAIN_TIP] ({ commit, state }, height) {
+        if (!height) {
+            return
+        }
+
         if (state.blockchainTip >= height) {
             return
         }
@@ -213,6 +222,14 @@ const actions = {
             debug('unrecognized client type given')
             break
         }
+    },
+
+    [types.SET_AVERAGE_BLOCK_TIME] ({ commit, state }, { averageBlockTime }) {
+        if (state.averageBlockTime === averageBlockTime) {
+            return
+        }
+
+        commit(types.SET_AVERAGE_BLOCK_TIME, averageBlockTime)
     }
 }
 
@@ -220,7 +237,8 @@ const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
     isTestnet: (state) => state.testnet,
     isMainnet: (state, getters) => !getters.isTestnet,
-    networkIdentifier: (state, getters) => getters.isMainnet ? 'mainnet' : 'testnet'
+    networkIdentifier: (state, getters) => getters.isMainnet ? 'mainnet' : 'testnet',
+    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime * 1000
 }
 
 export default {
