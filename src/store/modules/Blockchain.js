@@ -93,11 +93,9 @@ const mutations = {
 
 const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
-        console.log('ON BLOCKCHAIN INITIAL STATE', initialState)
-
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType, avgBlockTime } = initialState
         const { height, timestamp } = currentBlock
-        console.log('got block!', initialState)
+
         dispatch(types.SET_CONNECTIONS, connections)
 
         dispatch(types.SET_CURRENT_BLOCK, {
@@ -106,9 +104,9 @@ const actions = {
         })
 
         if (isTestnet) {
-            commit(types.SET_NETWORK_TO_TESTNET)
+            dispatch(types.SET_NETWORK_TO_TESTNET)
         } else {
-            commit(types.SET_NETWORK_TO_MAINNET)
+            dispatch(types.SET_NETWORK_TO_MAINNET)
         }
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
@@ -202,6 +200,22 @@ const actions = {
             debug('unrecognized network type given')
             break
         }
+    },
+
+    [types.SET_NETWORK_TO_TESTNET] ({ commit, getters }) {
+        if (getters.isTestnet) {
+            return
+        }
+
+        commit(types.SET_NETWORK_TO_TESTNET)
+    },
+
+    [types.SET_NETWORK_TO_MAINNET] ({ commit, getters }) {
+        if (getters.isMainnet) {
+            return
+        }
+
+        commit(types.SET_NETWORK_TO_MAINNET)
     },
 
     [types.SET_CLIENT_TYPE] ({ commit, state }, type) {
