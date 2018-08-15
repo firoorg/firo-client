@@ -135,7 +135,7 @@ const getters = {
 
         console.log(rootState, rootGetters)
 
-        for (var key in state.paymentRequests) {
+        for (let key in state.paymentRequests) {
             const { amount: amountRequested } = state.paymentRequests[key]
             const address = walletAddresses.filter((addr) => addr.address === key).pop()
 
