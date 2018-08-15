@@ -8,7 +8,10 @@ export default {
     data () {
         const amountRules = {
             decimal: 8,
-            min_value: 0.001
+            min_value: 0.001,
+            not_exceeding_balance: {
+                limit: this.$store.getters['Balance/availableXzc']
+            }
         }
 
         return {
