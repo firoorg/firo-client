@@ -11,6 +11,7 @@
         color: $color--white;
         padding: $tooltip--padding;
         max-width: emRhythm(30);
+        overflow: hidden;
     }
 
     .tooltip-arrow {
@@ -238,4 +239,18 @@
 
 .v-popover .trigger {
     outline: none;
+}
+
+.overlay-popover {
+    z-index: 30000;
+}
+
+.popover {
+    &.step-done {
+        max-width: emRhythm(42);
+    }
+
+    &.is-blurred {
+        filter: blur($overlay--popover-blur);
+    }
 }

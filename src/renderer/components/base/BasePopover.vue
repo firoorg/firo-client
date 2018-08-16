@@ -1,7 +1,9 @@
 <template>
     <v-popover
             v-bind="$attrs"
+            v-on="$listeners"
             class="popover"
+            :popover-class="getPopoverClass"
             offset="12"
             :auto-hide="this.$attrs['auto-hide'] !== undefined ? this.$attrs['auto-hide'] : false"
     >
@@ -18,6 +20,7 @@
 
 <script>
     import smoothHeight from 'vue-smooth-height'
+    import { mapGetters } from 'vuex'
 
     export default {
         name: 'BasePopover',
@@ -26,14 +29,40 @@
             smoothHeight
         ],
 
+        props: {
+            canBlur: {
+                type: Boolean,
+                default: true
+            }
+        },
+
         mounted () {
+            console.log(this.$attrs)
             this.$smoothElement({
                 el: this.$refs.container
             })
         },
+
         data () {
             return {
                 msg: ''
+            }
+        },
+
+        computed: {
+            ...mapGetters({
+                hasOpenOverlay: 'App/hasOpenOverlay'
+            }),
+
+            isBlurred () {
+                return this.canBlur && this.hasOpenOverlay
+            },
+
+            getPopoverClass () {
+                const parent = this.$attrs['popover-class'] || ''
+                const classes = parent ? [parent] : []
+
+                return this.isBlurred ? [...classes, 'is-blurred'] : classes
             }
         }
     }
