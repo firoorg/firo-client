@@ -39,9 +39,15 @@ module.exports = {
         addPaymentForm: {
             amount: null,
             label: '',
-            address: ''
+            address: '',
+            totalTxFee: 100000
         },
         isLoading: false,
+        sendZcoinResponse: {
+            _meta: null,
+            data: null,
+            error: null
+        },
         lastSeen: 'blockHeightAsInteger',
         passphrase: null
     },
@@ -68,6 +74,16 @@ module.exports = {
         currentDenominations: {},
         mints: {}
 
+    },
+
+    ZerocoinSpend: {
+        isLoading: false,
+        spendForm: {
+            label: '',
+            mints: {
+            },
+            address: null
+        }
     },
 
     Balance: {

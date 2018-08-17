@@ -126,7 +126,7 @@
                 header {
                     padding-bottom: emRhythm(2);
 
-                    h2 {
+                    h2, h3 {
                         margin-top: 0;
                         margin-bottom: emRhythm(1);
                     }
@@ -137,6 +137,14 @@
                         @include font-medium();
                         font-style: italic;
                         // color: $color--green-dark;
+                    }
+
+                    &.right {
+                        text-align: right;
+
+                        p {
+                            margin-left: auto;
+                        }
                     }
                 }
                 & > div > footer {

@@ -17,7 +17,7 @@ navigation:
     title: Balance
   menu:
     button__receive: Receive Zcoin
-    button__send: Send Zcoin
+    button__send: Public Send
     button__mint: Anonymize Zcoin
     button__spend: Private Spend
     button__settings: Settings

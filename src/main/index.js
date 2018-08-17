@@ -124,7 +124,9 @@ app.on('before-quit', () => {
 app.on('will-quit', () => {
     console.log('app will quit')
     // network.close()
-    coreDaemonManager.stop()
+    if (stopOnQuit) {
+        coreDaemonManager.stop()
+    }
 })
 
 /**

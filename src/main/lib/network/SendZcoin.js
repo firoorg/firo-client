@@ -34,8 +34,9 @@ export default {
                 data: {
                     addresses,
                     feePerKb: fee
-                },
-                actionToDispatch: types.zcoinpayment.SET_TX_FEE
+                }
+            }, {
+                onSuccess: types.zcoinpayment.SET_TX_FEE
             })
         },
 
@@ -47,7 +48,6 @@ export default {
 
             let addresses = this.convertToAddressAmountPair(data.payments)
 
-
             this.send({
                 type: 'create',
                 data: {
@@ -57,6 +57,9 @@ export default {
                 auth: {
                     passphrase
                 }
+            }, {
+                onSuccess: types.zcoinpayment.ON_SEND_ZCOIN_SUCCESS,
+                onError: types.zcoinpayment.ON_SEND_ZCOIN_ERROR
             })
         }
     })

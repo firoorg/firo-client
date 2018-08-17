@@ -107,7 +107,11 @@ export default {
             try {
                 const response = JSON.parse(message.toString())
                 console.log('this.types', this.types)
-                this.processResponse(response, this.types.SET_INITIAL_STATE)
+                this.processResponse(response, {
+                    onSuccess: this.types.SET_INITIAL_STATE
+                })
+                // todo set intial loading true
+                // this.setLoading(false)
             } catch (e) {
                 debug('error in response of initial request call.', this.namespace)
                 debug(e)
@@ -123,18 +127,23 @@ export default {
         }))
     },
 
-    processResponse (response, actionToDispatch) {
-        // console.log('received message from the network', response)
+    setLoading (val) {
         if (this.types.IS_LOADING) {
-            this.commitMutation(this.types.IS_LOADING, false)
+            this.commitMutation(this.types.IS_LOADING, val)
         }
+    },
 
-        const { meta, data } = response
+    processResponse (response, { onSuccess, onError }) {
+        // console.log('received message from the network', response)
+        const { meta, data, error } = response
 
         // todo subscriptions are pushed to the client and therefore dont have a meta key set.
         if (!meta || meta.status < 200 || meta.status >= 400) {
             console.warn(response)
-            // todo send error response back
+            if (onError) {
+                debug('dispatching action', onError)
+                this.dispatchAction(onError, { _meta: meta, error })
+            }
             return
         }
 
@@ -143,18 +152,18 @@ export default {
             return
         }
 
-        if (actionToDispatch) {
-            debug('dispatching action', actionToDispatch)
-            this.dispatchAction(actionToDispatch, data)
+        if (onSuccess) {
+            debug('dispatching action', onSuccess)
+            this.dispatchAction(onSuccess, { _meta: meta, ...data })
         }
     },
 
-    send ({ type, collection, data, auth = {}, actionToDispatch }) {
+    send ({ type, collection, data, auth = {} }, actionsToDispatch = {}) {
         if (!collection && !this.collection) {
             debug('can not send. no collection given!', {
                 type,
                 data,
-                actionToDispatch
+                actionsToDispatch
             })
 
             return
@@ -164,12 +173,14 @@ export default {
             const response = JSON.parse(message.toString())
 
             console.log('response', response)
-            this.processResponse(response, actionToDispatch)
+            this.processResponse(response, actionsToDispatch)
+            this.setLoading(false)
         }
 
         this.requester.once('message', onMessage)
 
         console.log('sending data --> ', data)
+        this.setLoading(true)
 
         this.requester.send(JSON.stringify({
             collection: collection || this.collection,

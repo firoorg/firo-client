@@ -18,6 +18,10 @@
     .control {
         position: relative;
 
+        .trigger {
+            width: 100%;
+        }
+
         input[type="text"],
         select,
         .message {

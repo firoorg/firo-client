@@ -16,13 +16,22 @@ const state = {
     },
     isLoading: false,
     lastSeen: 'blockHeightAsInteger',
-    passphrase: null
+    passphrase: null,
+    sendZcoinResponse: {
+        _meta: null,
+        data: null,
+        error: null
+    }
 }
 
 const mutations = {
     ...pendingPayments.mutations,
     [types.CALC_TX_FEE] () {},
     [types.SEND_ZCOIN] () {},
+
+    [types.IS_LOADING] (state, isLoading) {
+        state.isLoading = isLoading
+    },
 
     [types.SET_FORM_LABEL] (state, label) {
         state.addPaymentForm.label = label
@@ -54,11 +63,23 @@ const mutations = {
 
     [types.SET_CURRENT_PASSPHRASE] (state, passphrase) {
         state.passphrase = passphrase
+    },
+
+    [types.SET_SEND_ZCOIN_RESPONSE] (state, response) {
+        console.log('mutation', types.SET_SEND_ZCOIN_RESPONSE, response)
+        const { _meta, data, error } = response
+        console.log(_meta, data, error)
+        state.sendZcoinResponse = {
+            ...response
+        }
     }
+
+    // --- Payment Queue ---
 }
 
 const actions = {
     ...pendingPayments.actions,
+
     [types.SET_AVAILABLE_FEES] ({ dispatch }, availableFees) {
         /*
         const { availableFees } = initialState
@@ -93,7 +114,14 @@ const actions = {
         commit(types.SET_FORM_ADDRESS, value)
     },
 
+    [types.CLEAR_FORM] ({ dispatch }) {
+        dispatch(types.SET_FORM_LABEL, '')
+        dispatch(types.SET_FORM_AMOUNT, null)
+        dispatch(types.SET_FORM_ADDRESS, '')
+    },
+
     [types.SET_FEE] ({ commit, state }, fee) {
+        console.log('setting fee', fee)
         const { key } = fee
 
         if (state.selectedFee === key) {
@@ -135,6 +163,24 @@ const actions = {
         })
     },
 
+    [types.ON_SEND_ZCOIN_SUCCESS] ({ commit, dispatch, state }, response) {
+        console.log(types.ON_SEND_ZCOIN_SUCCESS)
+        console.log(response)
+
+        commit(types.SET_SEND_ZCOIN_RESPONSE, response)
+    },
+
+    [types.ON_SEND_ZCOIN_ERROR] ({ commit, dispatch, state }, response) {
+        console.log(types.ON_SEND_ZCOIN_ERROR)
+        console.log(response)
+
+        try {
+            commit(types.SET_SEND_ZCOIN_RESPONSE, response)
+        } catch (e) {
+            console.log(e)
+        }
+    },
+
     [types.SET_CURRENT_PASSPHRASE] ({ commit, state }, passphrase) {
         console.log(types.SET_CURRENT_PASSPHRASE, passphrase)
         commit(types.SET_CURRENT_PASSPHRASE, passphrase)
@@ -154,7 +200,16 @@ const getters = {
     createFormAmount: (state) => state.addPaymentForm.amount,
     createFormAmountAsBaseCoin: (state) => convertToCoin(state.addPaymentForm.amount),
     createFormAddress: (state) => state.addPaymentForm.address,
-    currentPassphrase: (state) => state.passphrase
+    createFormIsEmpty: (state, getters) => (
+        !getters.createFormLabel &&
+        !getters.createFormAmount &&
+        !getters.createFormAddress
+    ),
+
+    currentPassphrase: (state) => state.passphrase,
+    currentResponse: (state) => state.sendZcoinResponse,
+    currentResponseIsError: (state) => state.sendZcoinResponse._meta ? state.sendZcoinResponse._meta.status !== 200 : false,
+    currentResponseError: (state) => state.sendZcoinResponse.error
 }
 
 export default {

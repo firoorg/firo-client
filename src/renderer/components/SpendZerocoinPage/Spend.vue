@@ -1,12 +1,12 @@
 <template>
-    <section class="send-zcoin-queue-form">
+    <section class="spend-zerocoin-queue-form">
         <form class="send scrollable-height" @submit.prevent="submitForm">
             <div class="grid" ref="grid">
                 <div class="form">
                     <header>
                         <div>
                             <h2>
-                                Public Send
+                                Private Spend
                             </h2>
 
                             <p>
@@ -17,8 +17,9 @@
                                                 :boundariesElement="$refs.grid" />
                     </header>
 
-                    <send-zcoin-form :is-disabled="false"
-                                     @form-validated="setFormValidationStatus" />
+                    <spend-zerocoin-form :is-disabled="false"
+                                         @form-validated="setFormValidationStatus"
+                                         :boundaries-element="boundariesElement" />
                 </div>
 
                 <send-zcoin-steps :boundaries-element="boundariesElement"
@@ -35,7 +36,7 @@
     // import isEmpty from 'lodash/isEmpty'
     import types from '~/types'
 
-    import SendZcoinForm from '@/components/SendZcoinPage/SendZcoinForm'
+    import SpendZerocoinForm from '@/components/SpendZerocoinPage/SpendZerocoinForm'
     import SendZcoinSteps from '@/components/SendZcoinPage/SendZcoinSteps'
 
     // import FeesAndAmount from '@/components/FeesAndAmount'
@@ -47,10 +48,10 @@
     import PendingPaymentsQueue from '@/components/payments/PendingPaymentsQueue'
 
     export default {
-        name: 'SendZcoin',
+        name: 'SpendZerocoin',
         components: {
             PendingPaymentsQueue,
-            SendZcoinForm,
+            SpendZerocoinForm,
             SendZcoinSteps,
             SendConfirmationCheck,
             SendFeeSelection,
@@ -197,14 +198,23 @@
 </script>
 
 <style lang="scss" scoped>
-    .send-zcoin-queue-form {
+    .spend-zerocoin-queue-form {
         height: 100vh;
+        background: $color--comet-dark;
+
+        color: $color--white;
 
         header {
             // margin-left: emRhythm(3, $ms-up2);
             margin-bottom: emRhythm(7);
+            margin-left: emRhythm(3, $ms-up2);
+            margin-bottom: emRhythm(7, $ms-up2);
 
             @include h2-with-description(inherit, $color--polo-dark);
+
+            p {
+                color: $color--white-light;
+            }
         }
     }
 

@@ -196,7 +196,7 @@
     .receive-zcoin {
         display: grid;
         box-sizing: border-box;
-        grid-template-columns: 3fr  2fr;
+        grid-template-columns: 1fr $detail-view--min-width;
     }
 
     .paymentrequest-list,

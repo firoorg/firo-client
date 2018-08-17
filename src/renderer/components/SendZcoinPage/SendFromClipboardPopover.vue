@@ -1,7 +1,7 @@
 <template>
     <base-popover
             :open="isOpen"
-            placement="left"
+            placement="left-start"
             :popover-class="[ isUsedAddress ? 'warning' : '' ]"
             :boundaries-element="boundariesElement"
             class="send-from-clipboard-popover advice"

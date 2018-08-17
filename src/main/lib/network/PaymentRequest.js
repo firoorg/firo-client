@@ -20,8 +20,9 @@ export default {
                     label,
                     amount,
                     message
-                },
-                actionToDispatch: types.paymentrequest.ADD_PAYMENT_REQUEST
+                }
+            }, {
+                onSuccess: types.paymentrequest.ADD_PAYMENT_REQUEST
             })
         }
     })

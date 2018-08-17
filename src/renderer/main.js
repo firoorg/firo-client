@@ -21,7 +21,8 @@ const app = require('electron').remote.app
 const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
 
 const customValidationRules = [
-    'isZcoinAddress'
+    'isZcoinAddress',
+    'notExceedingBalance'
 ]
 
 customValidationRules.forEach((rule) => {
@@ -39,7 +40,8 @@ Vue.use(VueTimeago, {
 })
 Vue.use(VeeValidate, {
     errorBagName: 'validationErrors',
-    fieldsBagName: 'validationFields'
+    fieldsBagName: 'validationFields',
+    inject: false
 })
 Vue.use(BindScopedSlotsPlugin)
 Vue.use(VueI18n)

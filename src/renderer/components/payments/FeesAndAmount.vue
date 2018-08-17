@@ -1,11 +1,17 @@
 <template>
     <section class="fees-amount">
-        <h3 v-if="canChangeFee">Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a></h3>
+        <template v-if="showFee">
+            <h3 v-if="canChangeFee">
+                Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a>
+            </h3>
+        </template>
         <dl>
-            <dt class="fees">{{ fee.label }}</dt>
-            <dd class="fees">
-                <span class="value">{{ feeAmountAsBaseCoin }}</span> <span class="unit">xzc</span>
-            </dd>
+            <template v-if="showFee">
+                <dt class="fees">{{ fee.label }}</dt>
+                <dd class="fees">
+                    <span class="value">{{ feeAmountAsBaseCoin }}</span> <span class="unit">xzc</span>
+                </dd>
+            </template>
             <dt class="amount">Total</dt>
             <dd class="amount">
                 <span class="value">{{ totalAsBaseCoin }}</span> <span class="unit">XZC</span>
@@ -30,7 +36,7 @@
             },
             fee: {
                 type: Object,
-                required: true
+                default: () => ({ amount: 0, label: '' })
             },
             canChangeFee: {
                 type: Boolean,
@@ -39,6 +45,10 @@
             onChangeFee: {
                 type: Function,
                 default: () => {}
+            },
+            showFee: {
+                type: Boolean,
+                default: true
             }
         },
 
@@ -108,13 +118,14 @@
         color: $color--white-light;
         font-style: normal;
         text-decoration: none;
-        background: rgba($color--green-dark, 0.3);
+        background: rgba($color--dark, 0.3);
         @include setType(2, $ms-down2);
         text-transform: uppercase;
         letter-spacing: 0.025rem;
         display: inline-block;
         padding: emRhythm(0.75, $silent: true) emRhythm(1);
         margin: -1 * emRhythm(0.75, $silent: true) 0;
+        border-radius: emRhythm(0.25, $silent: true);
 
         transition: color 0.15s ease-out, background 0.15s ease-out;
 
@@ -126,7 +137,7 @@
         &:hover,
         &:focus {
             color: $color--white;
-            background: $color--green-dark;
+            background: rgba($color--dark, 0.85);
         }
     }
 </style>

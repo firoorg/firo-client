@@ -4,7 +4,7 @@
             v-on="$listeners"
             class="popover"
             :popover-class="getPopoverClass"
-            offset="12"
+            :offset="offset"
             :auto-hide="this.$attrs['auto-hide'] !== undefined ? this.$attrs['auto-hide'] : false"
     >
         <!-- This will be the popover target (for the events and position) -->
@@ -33,6 +33,10 @@
             canBlur: {
                 type: Boolean,
                 default: true
+            },
+            offset: {
+                type: Number,
+                default: 12
             }
         },
 

@@ -43,6 +43,9 @@ $color--comet-dark-mixed: mix($color--comet-dark, $color--dark);
 // inputs
 $input-bleed: 2;
 
+// detail view
+$detail-view--min-width: 34rem;
+
 // $color--bg-header: #B3C0D1;
 
 // $color--blue: #42425B;
@@ -60,6 +63,9 @@ $gradient--green-dark-bright: linear-gradient(to right, $color--green-dark, $col
 
 $gradient--orange-vertical: linear-gradient(to right, $color--orange, $color--orange-bright);
 $gradient--orange-horizontal: linear-gradient(to bottom, $color--orange, $color--orange-bright);
+
+$gradient--red-vertical: linear-gradient(to right, $color--red, $color--red-bright);
+$gradient--red-horizontal: linear-gradient(to bottom, $color--red, $color--red-bright);
 
 $gradient--comet-dark-vertical: linear-gradient(to right, $color--comet-dark, $color--dark);
 $gradient--comet-dark-horizontal: linear-gradient(to bottom, $color--comet-dark, $color--dark);

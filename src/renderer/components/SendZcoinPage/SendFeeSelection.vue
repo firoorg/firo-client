@@ -48,6 +48,10 @@
             }
         },
 
+        mounted () {
+            this.$emit('can-cancel', true) // currentStepCanCancel
+        },
+
         computed: {
             ...mapGetters({
                 availableFees: 'ZcoinPayment/availableFees'
@@ -77,7 +81,7 @@
             emitCurrentFee () {
                 const current = this.availableFees[this.currentFee]
 
-                this.$emit('onFeeSelect', {
+                this.$emit('fee-change', {
                     ...current,
                     key: this.currentFee
                 })

@@ -17,7 +17,7 @@
         name: 'PendingPayments',
         props: {
             payments: {
-                type: Object,
+                type: Array,
                 required: true
             }
         }

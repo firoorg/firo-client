@@ -88,7 +88,7 @@
 
     import DenominationSelector from '@/components/DenominationSelector'
     import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
-    import FeesAndAmount from '@/components/FeesAndAmount'
+    import FeesAndAmount from '@/components/payments/FeesAndAmount'
     import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
     import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
     import Stack from '@/components/Icons/Stack'

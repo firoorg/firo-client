@@ -86,7 +86,7 @@ export default {
                 trigger: 'manual',
                 boundariesElement: 'body',
                 offset: 8,
-                placement: 'right',
+                placement: 'left',
                 classes: 'error',
                 show: this.validationTooltipToShow === fieldName
             }

@@ -32,6 +32,7 @@ const debug = Debug('zcoin:network')
 // const networkIdentity = uuid()
 // let client = null
 let store = null
+let connectedToStore = false
 
 const dispatch = (key, v) => {
     if (!store) {
@@ -122,18 +123,24 @@ export default {
             const module = modules[moduleName]
             const { namespace, actions, mutations } = module
 
-            utils.connectToStore({
-                store,
-                namespace,
-                // actions are coming from the network
-                onStoreAction: (action) => {
-                    callBoundModuleMethod(actions, action, module)
-                },
-                // mutations to the store are done by the user/gui
-                onStoreMutation: (mutation) => {
-                    callBoundModuleMethod(mutations, mutation, module)
-                }
-            })
+            // todo check if multiple listeners will be bound on hot reload / daemon restart
+            if (!connectedToStore) {
+                debug('connecting newtork to store')
+                utils.connectToStore({
+                    store,
+                    namespace,
+                    // actions are coming from the network
+                    onStoreAction: (action) => {
+                        callBoundModuleMethod(actions, action, module)
+                    },
+                    // mutations to the store are done by the user/gui
+                    onStoreMutation: (mutation) => {
+                        callBoundModuleMethod(mutations, mutation, module)
+                    }
+                })
+
+                connectedToStore = true
+            }
 
             module.init({
                 ...config,

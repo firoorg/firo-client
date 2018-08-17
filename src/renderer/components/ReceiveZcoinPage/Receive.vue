@@ -23,13 +23,22 @@
                 <dl>
                     <dt>Created</dt>
                     <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
-                    <dt>Amount</dt>
+                    <dt>Requested</dt>
                     <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
 
+                <dl>
+                    <dt>Fulfilled</dt>
+                    <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
+                    <dt>Received</dt>
+                    <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
+                </dl>
+
+                <!--
                 <unexpected-transaction-popover :boundaries-element="null">
                     <h3>Test</h3>
                 </unexpected-transaction-popover>
+                -->
             </div>
 
             <div class="message-wrap" v-if="message">

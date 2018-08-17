@@ -2,7 +2,7 @@
     <ul class="mints">
         <li v-for="(value, key) in currentMints" :key="key">
             <div class="amount">
-                {{ value.amount }} x
+                {{ value.amount }}&MediumSpace;x
             </div>
             <div class="label">
                 <!--<slot v-bind="value" />-->

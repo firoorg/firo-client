@@ -69,7 +69,8 @@
                 hasOpenModal: 'Window/hasOpenModal',
                 networkIsConnected: 'Network/isConnected',
                 networkConnectionError: 'Network/connectionError',
-                showIntroScreen: 'App/showIntroScreen'
+                showIntroScreen: 'App/showIntroScreen',
+                hasOpenOverlay: 'App/hasOpenOverlay'
             }),
 
             showConnectivityOverlay () {
@@ -78,14 +79,16 @@
 
             showIntro () {
                 return this.showIntroScreen && !this.showConnectivityOverlay
-            },
+            }
 
+            /*
             hasOpenOverlay () {
                 return this.hasOpenModal ||
                     !this.networkIsConnected ||
                     this.showIntroScreen ||
                     this.networkConnectionError
             }
+            */
         }
 
         /*
@@ -145,7 +148,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        z-index: 1000;
+        z-index: 20000;
         transition: opacity 0.15s ease-out;
     }
 

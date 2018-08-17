@@ -1,7 +1,7 @@
 <template>
-    <section class="send-zcoin">
+    <section class="spend-zerocoin">
         <div class="scrollable-height">
-            <section class="paymentrequest-list">
+            <section class="payment-list">
                 <send-from-clipboard-popover :boundaries-element="boundariesElement">
                     <h1>
                         Send<br>
@@ -20,8 +20,8 @@
                 </animated-table>
             </section>
         </div>
-        <section class="paymentrequest-detail">
-            <send-zcoin :boundaries-element="boundariesElement" />
+        <section class="payment-detail">
+            <spend-zerocoin :boundaries-element="boundariesElement" />
         </section>
     </section>
 </template>
@@ -31,7 +31,7 @@
     // import { convertToCoin } from '#/lib/convert'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
-    import SendZcoin from '@/components/SendZcoinPage/Send'
+    import SpendZerocoin from '@/components/SpendZerocoinPage/Spend'
 
     // import types from '~/types'
     import SendFromClipboardPopover from '@/components/SendZcoinPage/SendFromClipboardPopover'
@@ -62,11 +62,11 @@
     ]
 
     export default {
-        name: 'sendZcoinPage',
+        name: 'SpendZerocoinPage',
         components: {
             SendFromClipboardPopover,
             AnimatedTable,
-            SendZcoin
+            SpendZerocoin
         },
 
         props: [
@@ -153,10 +153,11 @@
 </script>
 
 <style lang="scss" scoped>
-    .send-zcoin {
+    .spend-zerocoin {
         display: grid;
         box-sizing: border-box;
         grid-template-columns: 1fr $detail-view--min-width;
+        // background-image: linear-gradient(to top right, $color--dark, $color--comet-dark-mixed);
         //grid-column-gap: emRhythm(5);
 
         .scrollable {
@@ -168,16 +169,16 @@
         }
     }
 
-    .paymentrequest-list,
-    .paymentrequest-detail {
+    .payment-list,
+    .payment-detail {
         position: relative;
     }
 
-    .paymentrequest-list {
+    .payment-list {
         padding: emRhythm(5) emRhythm(4);
     }
 
-    .paymentrequest-detail {
+    .payment-detail {
         //background: $gradient--comet-dark-horizontal;
         //background: $gradient--polo-horizontal;
         background: $color--white;

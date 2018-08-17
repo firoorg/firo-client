@@ -7,8 +7,8 @@
                     <base-popover
                             :open="showIntro"
                             placement="right-center"
-                            popover-class="dark"
-                    >
+                            popover-class="dark overlay-popover"
+                            :can-blur="false">
                         <template slot="target">
                             <a href="#" class="logo-trigger">click</a>
                         </template>
@@ -38,6 +38,7 @@
 
     import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
     import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
+    import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
     import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 
     export default {
@@ -46,6 +47,7 @@
             ZcoinLogoText,
             IntroScreenWelcome,
             IntroScreenBlockchainLocation,
+            IntroScreenLockWallet,
             IntroScreenOther
         },
         async created () {
@@ -69,6 +71,7 @@
                 settings: [
                     'IntroScreenWelcome',
                     'IntroScreenBlockchainLocation',
+                    'IntroScreenLockWallet',
                     'IntroScreenOther'
                     /*
                     'IntroScreenSelectBlockchainLocation',
@@ -100,6 +103,7 @@
 
                 this.isReady = false
                 await sleep(500)
+                console.log(types.app.HIDE_INTRO_SCREEN)
                 this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
             }
         }
@@ -109,6 +113,7 @@
 <style lang="scss" scoped>
     .overlay {
         background: rgba($color--dark, 0.95);
+        z-index: 20000;
     }
 
     .content {

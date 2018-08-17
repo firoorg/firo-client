@@ -51,7 +51,7 @@
 
             <div class="create-wrap">
                 <base-button color="green"
-                             :is-dark="true"
+                             :is-dark="false"
                              type="submit"
                              class="submit"
                              ref="submit"
@@ -139,10 +139,10 @@
         padding: emRhythm(5) emRhythm(6);
         box-sizing: border-box;
 
-        // background: $color--polo-medium;
-        background: $color--comet-dark;
+        background: $color--polo-medium;
+        // background: $color--comet-dark;
         // background: $gradient--comet-horizontal;
-        color: $color--white;
+        // color: $color--white;
 
         h2 {
             margin-left: emRhythm(3, $ms-up2);
@@ -159,21 +159,11 @@
         input[type="text"],
         select,
         .message {
-            background: rgba($color--dark, 0.4);
-            color: $color--white-light;
-
-            &:hover {
-                background: rgba($color--dark, 0.55);
-            }
-
-            &:focus {
-                background: rgba($color--dark, 0.7);
-                color: $color--white;
-            }
+            @include light-input();
         }
 
         .prefix {
-            color: $color--comet;
+            color: $color--polo-dark;
         }
     }
 
