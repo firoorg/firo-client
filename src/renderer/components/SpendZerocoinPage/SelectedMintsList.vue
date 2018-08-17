@@ -1,5 +1,5 @@
 <template>
-    <ul class="selected-mints-list">
+    <ul class="selected-mints-list" :class="{ 'is-open': isOpen }">
         <li v-for="denom in mints"
             v-if="denom.amount"
             :key="denom.denomination">
@@ -51,13 +51,22 @@
         margin: 0 (emRhythm($input-bleed) * -1);
         padding:  emRhythm(1) 0 emRhythm(1) emRhythm(1.25, $silent: true);
 
-        background: rgba($color--dark, 0.4);
+        transition: background 0.25s ease-out;
+        @include dark-input();
 
-            &:hover {
-                li.hover {
-                    opacity: 1;
-                }
+        &:hover,
+        &:focus,
+        &.is-open {
+            //background: rgba($color--dark, 0.6);
+
+            li.hover {
+                opacity: 1;
             }
+
+            .placeholder {
+                @include dark-placeholder-hover();
+            }
+        }
 
         li {
             background: $color--comet-dark;
@@ -91,6 +100,13 @@
                 @include dark-placeholder();
             }
 
+            &:hover,
+            &:focus {
+                &.placeholder {
+                    @include dark-placeholder-hover();
+                }
+            }
+
             &.hover {
                 position: absolute;
                 top: 0;
@@ -103,8 +119,8 @@
                 &.placeholder {
                     padding: emRhythm(1.25, $silent: true) emRhythm(0.75, $silent: true);
                     background: rgba(mix($color--dark, $color--comet-dark, 40%), 0.80);
-                    color: $color--comet-light;
-                    font-style: italic;
+
+                    @include dark-placeholder-hover();
                 }
             }
 

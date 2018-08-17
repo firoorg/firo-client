@@ -11,7 +11,8 @@
                        ref="label"
                        name="label"
                        id="label"
-                       tabindex="1">
+                       tabindex="1"
+                       placeholder="Enter Title">
             </div>
         </div>
 
