@@ -11,26 +11,8 @@
                        ref="label"
                        name="label"
                        id="label"
-                       tabindex="1">
-            </div>
-        </div>
-
-        <div class="field amount-field" :class="getFieldErrorClass('amount')">
-            <label for="amount">Amount</label>
-
-            <div class="control">
-                <!-- todo validate if amount is available in balance to spend -->
-                <input v-model.lazy="amount"
-                       v-validate="requiredAmountValidationRules"
-                       data-vv-validate-on="change"
-                       v-tooltip="getValidationTooltip('amount')"
-                       type="text"
-                       ref="amount"
-                       name="amount"
-                       id="amount"
-                       class="amount"
-                       tabindex="2">
-                <div class="prefix">XZC</div>
+                       tabindex="1"
+                       placeholder="placeholder with #hastag hint">
             </div>
         </div>
 
@@ -47,7 +29,27 @@
                        ref="address"
                        name="address"
                        id="address"
-                       tabindex="3">
+                       tabindex="2"
+                       placeholder="placeholder">
+            </div>
+        </div>
+
+        <div class="field amount-field" :class="getFieldErrorClass('amount')">
+            <label for="amount">Amount</label>
+
+            <div class="control">
+                <input v-model.lazy="amount"
+                       v-validate="requiredAmountValidationRules"
+                       data-vv-validate-on="change"
+                       v-tooltip="getValidationTooltip('amount')"
+                       type="text"
+                       ref="amount"
+                       name="amount"
+                       id="amount"
+                       class="amount"
+                       tabindex="3"
+                       placeholder="Enter Amount to send publicly">
+                <div class="prefix">XZC</div>
             </div>
         </div>
     </fieldset>
