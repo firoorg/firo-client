@@ -118,9 +118,10 @@
 
                 &.placeholder {
                     padding: emRhythm(1.25, $silent: true) emRhythm(0.75, $silent: true);
-                    background: rgba(mix($color--dark, $color--comet-dark, 40%), 0.80);
+                    background: rgba(mix($color--dark, $color--comet-dark, 55%), 0.85);
+                    color: mix($color--comet, $color--comet-medium);
 
-                    @include dark-placeholder-hover();
+                    // @include dark-placeholder-hover();
                 }
             }
 

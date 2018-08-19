@@ -47,7 +47,7 @@
                              :class="{ 'has-focus': amountSelectorIsOpen }"
                              @focus="showAmountSelector"
                              @blur="hideAmountSelector">
-                            <selected-mints-list :mints="formattedSpendFormMints"
+                            <selected-mints-list :mints="spendFormMintsFormatted"
                                                  :is-open="amountSelectorIsOpen" />
                             <!--
                             <current-mints :current-mints="formMints" />
@@ -74,10 +74,6 @@
                     </template>
                 </base-popover>
             </div>
-
-            <fees-and-amount class="fees-and-amount"
-                             :amount="spendFormMintCostsInSatoshi"
-                             :show-fee="false" />
         </div>
     </fieldset>
 </template>
@@ -86,11 +82,9 @@
     import { mapGetters, mapActions } from 'vuex'
     import types from '~/types'
 
-    import { convertToSatoshi } from '#/lib/convert'
     import { addVuexModel } from '@/utils/store'
     import ValidationMixin from '@/mixins/ValidationMixin'
     import SpendDenominationSelector from '@/components/SpendZerocoinPage/SpendDenominationSelector'
-    import FeesAndAmount from '@/components/payments/FeesAndAmount'
     import SelectedMintsList from '@/components/SpendZerocoinPage/SelectedMintsList'
     import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
 
@@ -99,7 +93,6 @@
         components: {
             SelectedMintsList,
             CurrentMints,
-            FeesAndAmount,
             SpendDenominationSelector
         },
 
@@ -136,62 +129,27 @@
 
         computed: {
             ...mapGetters({
-                spendFormMints: 'ZerocoinSpend/spendFormMints'
+                spendFormMints: 'ZerocoinSpend/spendFormMints',
+                spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted'
             }),
 
             ...addVuexModel({
                 name: 'label',
-                getter: 'ZcoinPayment/createFormLabel',
-                action: types.zcoinpayment.SET_FORM_LABEL
+                getter: 'ZerocoinSpend/spendFormLabel',
+                action: types.zerocoinspend.SET_FORM_LABEL
             }),
 
             ...addVuexModel({
                 name: 'amount',
-                getter: 'ZcoinPayment/createFormAmountAsBaseCoin',
-                action: types.zcoinpayment.SET_FORM_AMOUNT
+                getter: 'ZerocoinSpend/spendFormAmountAsBaseCoin',
+                action: types.zerocoinspend.SET_FORM_AMOUNT
             }),
 
             ...addVuexModel({
                 name: 'address',
-                getter: 'ZcoinPayment/createFormAddress',
-                action: types.zcoinpayment.SET_FORM_ADDRESS
-            }),
-
-            formattedSpendFormMints () {
-                if (!this.spendFormMints) {
-                    return []
-                }
-
-                return Object.entries(this.spendFormMints)
-                // transform to [{denomination: '25', amount: 1}]
-                    .map((pair) => {
-                        const [ denomination, amount ] = pair
-
-                        return {
-                            denomination,
-                            amount,
-                            cost: parseInt(denomination) * amount
-                        }
-                    })
-            },
-
-            spendFormMintCosts () {
-                return this.formattedSpendFormMints
-                    .reduce((accumulator, current) => accumulator + current.cost, 0)
-            },
-
-            spendFormMintCostsInSatoshi () {
-                return convertToSatoshi(this.spendFormMintCosts)
-            }
-
-            /*
-            ...addVuexModel({
-                name: 'currentMints',
-                getter: 'ZerocoinSpend/spendFormMints',
-                action: types.zerocoinspend.SET_FORM_MINTS
+                getter: 'ZerocoinSpend/spendFormAddress',
+                action: types.zerocoinspend.SET_FORM_ADDRESS
             })
-            */
-
         },
 
         watch: {

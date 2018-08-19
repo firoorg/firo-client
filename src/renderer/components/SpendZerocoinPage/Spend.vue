@@ -13,19 +13,23 @@
                                 Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
                             </p>
                         </div>
-                        <pending-payments-queue :is-disabled="false"
-                                                :boundariesElement="$refs.grid" />
                     </header>
 
                     <spend-zerocoin-form :is-disabled="false"
                                          @form-validated="setFormValidationStatus"
                                          :boundaries-element="boundariesElement" />
                 </div>
-
-                <send-zcoin-steps :boundaries-element="boundariesElement"
-                                  :form-is-valid="formSectionIsValid"
-                                  :cleanup-form="cleanupForm"
-                                  :update-transaction-fee="updateTransactionFee" />
+                <section class="checkout has-divider">
+                    <!--<div class="">-->
+                    <fees-and-amount class="fees-and-amount"
+                                     :amount="spendFormMintCostsInSatoshi"
+                                     :show-fee="false" />
+                    <!--</div>-->
+                    <send-zcoin-steps :boundaries-element="boundariesElement"
+                                      :form-is-valid="formSectionIsValid"
+                                      :cleanup-form="cleanupForm"
+                                      :update-transaction-fee="updateTransactionFee" />
+                </section>
             </div>
         </form>
     </section>
@@ -37,6 +41,7 @@
     import types from '~/types'
 
     import SpendZerocoinForm from '@/components/SpendZerocoinPage/SpendZerocoinForm'
+    import FeesAndAmount from '@/components/payments/FeesAndAmount'
     import SendZcoinSteps from '@/components/SendZcoinPage/SendZcoinSteps'
 
     // import FeesAndAmount from '@/components/FeesAndAmount'
@@ -45,30 +50,22 @@
     // import PendingPayments from '@/components/payments/PendingPayments'
 
     import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
-    import PendingPaymentsQueue from '@/components/payments/PendingPaymentsQueue'
 
     export default {
         name: 'SpendZerocoin',
         components: {
-            PendingPaymentsQueue,
+            FeesAndAmount,
             SpendZerocoinForm,
             SendZcoinSteps,
             SendConfirmationCheck,
             SendFeeSelection,
             SendConfirmDialog
-            // FeesAndAmount,
-            // PendingPayments,
         },
 
         $_veeValidate: {
             validator: 'new' // give me my own validator instance.
         },
 
-        /*
-        inject: [
-            'mainRef'
-        ],
-        */
         props: {
             boundariesElement: {
                 type: HTMLElement,
@@ -84,18 +81,6 @@
                     'address'
                 ],
 
-                /*
-                hasSent: false,
-                pendingPayments: {},
-                popoverStatus: '',
-                popoverTimeout: null,
-                containsUsedAddressOnSend: null,
-                */
-                // showSendConfirmation: false
-                // showFeeSelection: false
-
-                // --------- new --------
-
                 formValidated: false
             }
         },
@@ -107,37 +92,25 @@
                 pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
                 selectedFee: 'ZcoinPayment/selectedFee',
                 currentPassphrase: 'ZcoinPayment/currentPassphrase',
-                pendingPaymentsSize: 'ZcoinPayment/pendingZcoinPaymentsSize'
+                spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
             }),
             formSectionIsValid () {
                 return !!(this.formValidated || this.currentFormIsEmpty)
             }
-            /*
-            canSubmit () {
-                // todo check (spend + fees) < available balance
-                // return this.formValidated && !this.showFeeSelection && !this.hasSent
-                return !!((this.formValidated || this.currentFormIsEmpty) && this.currentStepCanSubmit)
-            }
-            */
-            // ---
         },
 
         watch: {
             currentStep: {
                 handler (newVal, oldVal) {
                     window.dispatchEvent(new Event('resize'))
-                    this.currentStepCanSubmit = !newVal
                 },
                 immediate: true
-            },
-            pendingPaymentsSize (newVal, oldVal) {
-                this.updateTransactionFee()
             }
         },
 
         methods: {
             ...mapActions({
-                clearForm: types.zcoinpayment.CLEAR_FORM
+                clearForm: types.zerocoinspend.CLEAR_FORM
             }),
 
             setFormValidationStatus (isValid) {
@@ -152,46 +125,22 @@
                 console.log('cleaning up...')
                 this.clearForm()
 
-                // this.hasSent = false
-                // this.containsUsedAddressOnSend = null
                 this.resetValidator()
             },
 
-            updateTransactionFee () {
-                this.$store.dispatch(types.zcoinpayment.CALC_TX_FEE, {
-                    payments: this.pendingPayments,
-                    fee: this.selectedFee.amount
-                })
-            },
-
             submitForm () {
-                if (!this.hasPendingPayments) {
-                    console.log('no pending payments')
-                    return
-                }
-
-                if (!this.selectedFee) {
-                    console.log('no fee selected')
-                    return
-                }
-
                 if (!this.currentPassphrase) {
                     console.log('no passphrase')
                     return
                 }
 
-                this.$store.dispatch(types.zcoinpayment.SEND_ZCOIN, {
+                this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
+                    // todo: update payments
                     payments: this.pendingPayments,
-                    fee: this.selectedFee.amount,
                     auth: {
                         passphrase: this.currentPassphrase
                     }
                 })
-                /*
-                if (!this.formSectionIsValid) {
-                    return
-                }
-                */
             }
         }
     }
@@ -225,8 +174,11 @@
     }
 
     .grid {
-        display: grid;
-        grid-template-rows: auto auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        //display: grid;
+        //grid-template-rows: auto auto;
         height: 100%;
         @include bleed-h(3);
     }
@@ -263,7 +215,6 @@
     fieldset {
         margin: 0;
         padding: 0;
-        height: 100%;
         border: none;
 
         &[disabled] {
@@ -275,11 +226,17 @@
         }
     }
 
-    /*.confirmation-popover {
-        display: inline-block;
-    }*/
-
     .debug {
         align-self: end;
+    }
+
+    .has-divider {
+        margin-top: emRhythm(3);
+        @include dark-divider-top-with-gradient();
+        padding-bottom: 0;
+
+        .fees-and-amount {
+            margin-top: 0;
+        }
     }
 </style>

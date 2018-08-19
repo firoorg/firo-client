@@ -145,6 +145,13 @@
     padding-bottom: emRhythm(5);
 }
 
+@mixin dark-divider-top-with-gradient() {
+    @include divider-top-with-gradient();
+
+    border-top: 1px solid $color--comet-dark-mixed;
+    background: radial-gradient(at top, rgba($color--comet-dark-mixed, 0.25), rgba($color--comet-dark-mixed, 0) 70%);
+}
+
 @mixin bleed-h ($value) {
     margin-left: emRhythm($value) * -1;
     margin-right: emRhythm($value) * -1;

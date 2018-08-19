@@ -10,7 +10,7 @@ const satoshiBase = new Big(0.00000001)
  * @returns string
  */
 export const convertToCoin = function (satoshi) {
-    if (!satoshi) {
+    if (isNaN(satoshi)) {
         return ''
     }
 
