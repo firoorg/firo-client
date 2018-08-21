@@ -134,8 +134,6 @@ export default {
                         callBoundModuleMethod(mutations, mutation, module)
                     }
                 })
-
-                connectedToStore = true
             }
 
             module.init({
@@ -147,6 +145,8 @@ export default {
 
             // console.log(module)
         })
+
+        connectedToStore = true
     },
 
     setupEncryption (apiStatus) {
