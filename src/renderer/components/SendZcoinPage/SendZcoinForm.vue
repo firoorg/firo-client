@@ -46,7 +46,7 @@
                               :boundaries-element="boundariesElement">
                     <template slot="target">
                         <input v-model.lazy="amount"
-                               v-validate="requiredAmountValidationRules"
+                               v-validate="xzcAmountValidationRules"
                                data-vv-validate-on="change"
                                v-tooltip="getValidationTooltip('amount')"
                                type="text"

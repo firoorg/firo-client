@@ -8,10 +8,7 @@ export default {
     data () {
         const amountRules = {
             decimal: 8,
-            min_value: 0.001,
-            not_exceeding_balance: {
-                limit: this.$store.getters['Balance/availableXzc']
-            }
+            min_value: 0.001
         }
 
         return {
@@ -22,6 +19,14 @@ export default {
             requiredAmountValidationRules: {
                 required: true,
                 ...amountRules
+            },
+            xzcAmountValidationRules: {
+                required: true,
+                ...amountRules,
+                // todo return via callback function. otherwise initial availableXzc state will be used.
+                not_exceeding_balance: {
+                    limit: this.$store.getters['Balance/availableXzc']
+                }
             },
             requiredAddressValidationRules: {
                 required: true,
@@ -42,7 +47,7 @@ export default {
         }
 
         if (hasValue) {
-            this.$validator.validate()
+            this.validate()
         }
 
         if (this.autofocusFirstField && this.validationFieldOrder.length) {
@@ -94,6 +99,10 @@ export default {
 
         getFieldErrorClass (fieldName) {
             return this.validationErrors.has(fieldName) ? ['has-error'] : []
+        },
+
+        validate () {
+            this.$nextTick(() => this.$validator.validate())
         },
 
         resetValidator () {

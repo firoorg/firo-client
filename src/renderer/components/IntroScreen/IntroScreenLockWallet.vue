@@ -4,7 +4,11 @@
 
         <p>Vestibulum id ligula porta felis euismod semper. Donec ullamcorper nulla non metus auctor fringilla.</p>
 
-        <input type="text" />
+        <div class="form">
+            <div class="control">
+                <input type="text" placeholder="Enter Passphrase" />
+            </div>
+        </div>
 
         <footer>
             <BaseButton
@@ -38,6 +42,8 @@
     }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .form .control input {
+        // @include green-input();
+    }
 </style>

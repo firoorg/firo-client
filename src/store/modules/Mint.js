@@ -82,7 +82,7 @@ const getters = {
 
     mints (state, getters, rootState, rootGetters) {
         return Object.values(state.mints)
-            .filter((mint) => !mint.isUsed)
+            .filter((mint) => !mint.used)
             .map((mint) => {
                 const { block } = mint
                 const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']

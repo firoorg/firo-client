@@ -37,11 +37,12 @@
             <template slot="step-passphrase" slot-scope="{ actions }">
                 <payment-step-passphrase-buttons :actions="actions"
                                               :color="submitButtonColor"
+                                              :is-dark="true"
                                               :can-submit="canSubmit">
                 </payment-step-passphrase-buttons>
             </template>
             <template slot="step-done" slot-scope="{ actions }">
-                <base-button :color="submitButtonColor" :disabled="true">
+                <base-button :color="submitButtonColor" :is-dark="true" :disabled="true">
                     <span v-if="isLoading">Sending...</span>
                     <span v-else>Sent!</span>
                 </base-button>

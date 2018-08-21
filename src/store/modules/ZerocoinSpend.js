@@ -13,6 +13,8 @@ const state = {
 }
 
 const mutations = {
+    [types.SPEND_ZEROCOIN] () {},
+
     [types.IS_LOADING] (state, isLoading) {
         state.isLoading = isLoading
     },
@@ -61,6 +63,26 @@ const actions = {
         dispatch(types.SET_FORM_LABEL, '')
         commit(types.CLEAR_FORM_MINTS)
         dispatch(types.SET_FORM_ADDRESS, '')
+    },
+
+    [types.SPEND_ZEROCOIN] ({ commit, state }, { address, denominations, label, auth }) {
+        commit(types.SPEND_ZEROCOIN, {
+            data: {
+                address,
+                label,
+                denomination: denominations.map((denom) => {
+                    const { denomination, amount } = denom
+
+                    return {
+                        value: parseInt(denomination),
+                        amount
+                    }
+                })
+            },
+            auth: {
+                ...auth
+            }
+        })
     }
 }
 

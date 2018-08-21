@@ -87,6 +87,9 @@
         computed: {
             ...mapGetters({
                 currentPassphrase: 'App/currentPassphrase',
+                spendFormLabel: 'ZerocoinSpend/spendFormLabel',
+                spendFormAddress: 'ZerocoinSpend/spendFormAddress',
+                spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted',
                 spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
             }),
             formSectionIsValid () {
@@ -130,8 +133,9 @@
                 }
 
                 this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
-                    // todo: update payments
-                    payments: this.pendingPayments,
+                    address: this.spendFormAddress,
+                    denominations: this.spendFormMintsFormatted,
+                    label: this.spendFormLabel,
                     auth: {
                         passphrase: this.currentPassphrase
                     }

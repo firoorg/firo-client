@@ -94,6 +94,14 @@ const actions = {
                         dispatch(types.ADD_RECEIVE_FROM_TX, tx)
                         break
 
+                    case 'spendin':
+                        dispatch(types.ADD_WALLET_ADDRESS, {
+                            address: addressKey,
+                            total
+                        })
+                        dispatch(types.ADD_SPEND_IN_FROM_TX, tx)
+                        break
+
                     case 'send':
                         dispatch(types.ADD_THIRD_PARTY_ADDRESS, {
                             address: addressKey,
@@ -107,12 +115,12 @@ const actions = {
                         dispatch(types.ADD_MINT_FROM_TX, tx)
                         break
 
-                    case 'spend':
+                    case 'spendout':
                         dispatch(types.ADD_THIRD_PARTY_ADDRESS, {
                             address: addressKey,
                             total
                         })
-                        dispatch(types.ADD_SPEND_FROM_TX, tx)
+                        dispatch(types.ADD_SPEND_OUT_FROM_TX, tx)
                         break
 
                     case 'mined':
@@ -176,7 +184,21 @@ const actions = {
         })
     },
 
-    [types.ADD_SPEND_FROM_TX] ({ commit }, spendTx) {
+    [types.ADD_SPEND_IN_FROM_TX] ({ commit }, spendTx) {
+        const txBasics = getTxBasics(spendTx)
+        const { address, fee } = spendTx
+
+        commit(types.ADD_TRANSACTION, {
+            stack: WALLET_ADDRESS_KEY,
+            address,
+            transaction: {
+                ...txBasics,
+                fee
+            }
+        })
+    },
+
+    [types.ADD_SPEND_OUT_FROM_TX] ({ commit }, spendTx) {
         const txBasics = getTxBasics(spendTx)
         const { address, fee } = spendTx
 

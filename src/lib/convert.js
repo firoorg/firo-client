@@ -74,16 +74,14 @@ export const getDenominationsToSpend = function (amount, denominations = {}) {
     const denoms = clone(denominations)
     let amountToSpend = amount
     let found = false
-    let hasChange = false
     let counter = 0
 
     do {
         counter++ // todo review and remove counter.
-        const { denomination, change } = getLargestDenomination(amountToSpend, denoms)
+        const { denomination } = getLargestDenomination(amountToSpend, denoms)
         const key = `${denomination}`
 
         found = !!denomination
-        hasChange = change > 0
 
         if (!found) {
             return
@@ -100,7 +98,7 @@ export const getDenominationsToSpend = function (amount, denominations = {}) {
         if (denoms[key] > 0) {
             denoms[key]--
         }
-    } while (found && hasChange && counter < 100)
+    } while (found && counter < 100)
 
     return {
         toSpend: denomsToSpend,
