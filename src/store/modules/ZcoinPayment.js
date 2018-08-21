@@ -16,7 +16,6 @@ const state = {
     },
     isLoading: false,
     lastSeen: 'blockHeightAsInteger',
-    passphrase: null,
     sendZcoinResponse: {
         _meta: null,
         data: null,
@@ -59,10 +58,6 @@ const mutations = {
     [types.SET_TX_FEE] (state, txFee) {
         console.log('got new tx fee', txFee)
         state.addPaymentForm.totalTxFee = txFee
-    },
-
-    [types.SET_CURRENT_PASSPHRASE] (state, passphrase) {
-        state.passphrase = passphrase
     },
 
     [types.SET_SEND_ZCOIN_RESPONSE] (state, response) {
@@ -179,11 +174,6 @@ const actions = {
         } catch (e) {
             console.log(e)
         }
-    },
-
-    [types.SET_CURRENT_PASSPHRASE] ({ commit, state }, passphrase) {
-        console.log(types.SET_CURRENT_PASSPHRASE, passphrase)
-        commit(types.SET_CURRENT_PASSPHRASE, passphrase)
     }
 }
 
@@ -206,7 +196,6 @@ const getters = {
         !getters.createFormAddress
     ),
 
-    currentPassphrase: (state) => state.passphrase,
     currentResponse: (state) => state.sendZcoinResponse,
     currentResponseIsError: (state) => state.sendZcoinResponse._meta ? state.sendZcoinResponse._meta.status !== 200 : false,
     currentResponseError: (state) => state.sendZcoinResponse.error

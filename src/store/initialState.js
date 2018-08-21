@@ -48,8 +48,7 @@ module.exports = {
             data: null,
             error: null
         },
-        lastSeen: 'blockHeightAsInteger',
-        passphrase: null
+        lastSeen: 'blockHeightAsInteger'
     },
 
     PaymentRequest: {
@@ -172,6 +171,7 @@ module.exports = {
         lastSeen: {
             paymentRequest: 23345932,
             mint: 23489034
-        }
+        },
+        passphrase: null
     }
 }

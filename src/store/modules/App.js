@@ -2,7 +2,8 @@ import * as types from '../types/App'
 
 const state = {
     clientIsLocked: false,
-    showIntroScreen: true
+    showIntroScreen: true,
+    passphrase: null
 }
 
 const mutations = {
@@ -12,6 +13,14 @@ const mutations = {
 
     [types.HIDE_INTRO_SCREEN] (state) {
         state.showIntroScreen = false
+    },
+
+    [types.SET_CURRENT_PASSPHRASE] (state, passphrase) {
+        state.passphrase = passphrase
+    },
+
+    [types.CLEAR_PASSPHRASE] (state) {
+        state.passphrase = null
     }
 }
 
@@ -27,6 +36,18 @@ const actions = {
     [types.HIDE_INTRO_SCREEN] ({ commit, state }) {
         console.log('in action')
         commit(types.HIDE_INTRO_SCREEN)
+    },
+
+    [types.SET_CURRENT_PASSPHRASE] ({ commit, state }, passphrase) {
+        if (state.passphrase === passphrase) {
+            return
+        }
+
+        commit(types.SET_CURRENT_PASSPHRASE, passphrase)
+    },
+
+    [types.CLEAR_PASSPHRASE] ({ commit }) {
+        commit(types.CLEAR_PASSPHRASE)
     }
 }
 
@@ -43,7 +64,8 @@ const getters = {
             !networkIsConnected ||
             getters.showIntroScreen ||
             networkConnectionError
-    }
+    },
+    currentPassphrase: (state) => state.passphrase
 }
 
 export default {
