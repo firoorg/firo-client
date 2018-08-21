@@ -17,7 +17,8 @@ const types = function (namespace) {
     const { NAME: PAYMENTS } = getName(namespace)
 
     return {
-        [`ADD_${PAYMENTS}`]: `ADD_${PAYMENTS}`
+        [`ADD_${PAYMENTS}`]: `ADD_${PAYMENTS}`,
+        [`CLEAR_${PAYMENTS}`]: `CLEAR_${PAYMENTS}`
     }
 }
 
@@ -41,18 +42,20 @@ const module = function (namespace = '') {
                         sent: false
                     }
                 }
+            },
+
+            [`CLEAR_${PAYMENTS}`] (state) {
+                state.pendingPayments = {}
             }
         },
 
         actions: {
-            TESTING () {
-                console.log('testing')
+            [`ADD_${PAYMENTS}`] ({ commit }, payment) {
+                commit(`ADD_${PAYMENTS}`, payment)
             },
 
-            [`ADD_${PAYMENTS}`] ({ commit }, payment) {
-                console.log('yes, works!')
-
-                commit(`ADD_${PAYMENTS}`, payment)
+            [`CLEAR_${PAYMENTS}`] ({ commit }, payment) {
+                commit(`CLEAR_${PAYMENTS}`, payment)
             }
         },
 

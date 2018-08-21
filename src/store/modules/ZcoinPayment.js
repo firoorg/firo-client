@@ -1,8 +1,10 @@
 import * as types from '~/types/ZcoinPayment'
+import allTypes from '~/types'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 import Payments from '~/mixins/Payments'
 
 const pendingPayments = Payments.module('zcoin')
+const pendingPaymentTypes = Payments.types('zcoin')
 
 const state = {
     ...pendingPayments.state,
@@ -140,7 +142,7 @@ const actions = {
         commit(types.SET_TX_FEE, fee)
     },
 
-    [types.SEND_ZCOIN] ({ commit, state }, { payments, fee, auth }) {
+    [types.SEND_ZCOIN] ({ dispatch, commit, state }, { payments, fee, auth }) {
         console.log('payment in action', payments, fee)
         // const { address, amount } = payment
 
@@ -156,6 +158,9 @@ const actions = {
                 ...auth
             }
         })
+
+        dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
+        dispatch(pendingPaymentTypes.CLEAR_PENDING_ZCOIN_PAYMENTS)
     },
 
     [types.ON_SEND_ZCOIN_SUCCESS] ({ commit, dispatch, state }, response) {
