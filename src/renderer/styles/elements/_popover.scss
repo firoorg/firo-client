@@ -12,6 +12,15 @@
         padding: $tooltip--padding;
         max-width: emRhythm(30);
         overflow: hidden;
+
+        .control {
+            padding-left: emRhythm($input-bleed);
+            padding-right: emRhythm($input-bleed);
+
+            input {
+                @include dark-input();
+            }
+        }
     }
 
     .tooltip-arrow {
@@ -88,6 +97,10 @@
     &.orange {
         .tooltip-inner {
             background-color: $color--orange;
+
+            .control input {
+                @include orange-input();
+            }
         }
 
         .tooltip-arrow {
@@ -99,6 +112,10 @@
     &.red {
         .tooltip-inner {
             background-color: $color--red-bright;
+
+            .control input {
+                @include red-input();
+            }
         }
 
         .tooltip-arrow {
@@ -122,36 +139,36 @@
             max-width: none;
             transition: background-color .5s ease-in-out;
 
-            .content-wrapper {
-                header {
-                    padding-bottom: emRhythm(2);
+            header {
+                padding-bottom: emRhythm(2);
 
-                    h2, h3 {
-                        margin-top: 0;
-                        margin-bottom: emRhythm(1);
-                    }
+                h2, h3 {
+                    margin-top: 0;
+                    margin-bottom: emRhythm(1);
+                }
+
+                p {
+                    max-width: emRhythm(35);
+                    margin: 0;
+                    @include font-medium();
+                    font-style: italic;
+                    // color: $color--green-dark;
+                }
+
+                &.right {
+                    text-align: right;
 
                     p {
-                        max-width: emRhythm(35);
-                        margin: 0;
-                        @include font-medium();
-                        font-style: italic;
-                        // color: $color--green-dark;
+                        margin-left: auto;
                     }
-
-                    &.right {
-                        text-align: right;
-
-                        p {
-                            margin-left: auto;
-                        }
-                    }
-                }
-                & > div > footer {
-                    padding-top: emRhythm(3);
-                    text-align: right;
                 }
             }
+
+            .content-wrapper > div > footer {
+                padding-top: emRhythm(3);
+                text-align: right;
+            }
+
         }
 
         &.dark {
@@ -194,6 +211,10 @@
 
                 h1, h2, h3 {
                     color: $color--white;
+                }
+
+                .control input {
+                    @include green-input();
                 }
             }
 

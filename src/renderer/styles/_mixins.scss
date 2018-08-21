@@ -159,11 +159,15 @@
     padding-right: emRhythm($value);
 }
 
-@mixin dark-placeholder () {
+@mixin placeholder-base() {
     @include font-medium();
     font-style: italic;
-    color: mix($color--comet, $color--comet-dark);
     transition: color .15s ease-in-out;
+}
+
+@mixin dark-placeholder () {
+    @include placeholder-base();
+    color: mix($color--comet, $color--comet-dark);
 }
 
 @mixin dark-placeholder-hover () {
@@ -197,10 +201,8 @@
 }
 
 @mixin light-placeholder () {
-    @include font-medium();
-    font-style: italic;
+    @include placeholder-base();
     color: mix($color--polo, $color--polo-medium);
-    transition: color .15s ease-in-out;
 }
 
 @mixin light-placeholder-hover () {
@@ -231,4 +233,48 @@
             @include light-placeholder-hover();
         }
     }
+}
+
+@mixin color-input ($color) {
+    background: rgba($color, 0.4);
+    color: $color--white-light;
+
+    &:hover {
+        background: rgba($color, 0.55);
+    }
+
+    &:focus,
+    &.is-open {
+        background: rgba($color, 0.7);
+        color: $color--white;
+    }
+
+    &::placeholder {
+        @include placeholder-base();
+        color: mix($color, $color--dark, 85%);
+    }
+
+    &:hover {
+        &::placeholder {
+            color: mix($color, $color--dark, 60%);
+        }
+    }
+
+    &:focus {
+        &::placeholder {
+            color: mix($color, $color--dark, 35%);
+        }
+    }
+}
+
+@mixin green-input () {
+    @include color-input($color--green-dark);
+}
+
+@mixin orange-input () {
+    @include color-input($color--orange-dark);
+}
+
+@mixin red-input () {
+    @include color-input($color--red-dark);
 }
