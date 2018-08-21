@@ -7,9 +7,9 @@
                              :animation="{ duration }"
                              :total-steps="totalSteps"
                              :stroke-width="8"
-                             stop-color="#383853"
-                             start-color="#383853"
-                             inner-stroke-color="#ccc">
+                             :stop-color="progressColor"
+                             :start-color="progressColor"
+                             :inner-stroke-color="backgroundColor">
         </radial-progress-bar>
         </div>
     </div>
@@ -23,6 +23,10 @@
             complete: {
                 type: Function,
                 required: true
+            },
+            isDark: {
+                type: Boolean,
+                default: false
             }
         },
         data () {
@@ -53,6 +57,16 @@
 
         beforeDestroy () {
             this.stop()
+        },
+
+        computed: {
+            progressColor () {
+                return this.isDark ? '#1F1F2E' : '#383853'
+            },
+
+            backgroundColor () {
+                return this.isDark ? '#8D8DA8' : '#ADB8D9'
+            }
         },
 
         methods: {
