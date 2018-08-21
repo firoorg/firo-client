@@ -157,9 +157,9 @@
                     return false
                 }
 
-                const { change: canNotSpend } = getDenominationsToSpend(amount, this.confirmedMintsPerDenomination)
+                const { change: canNotSpendCompletely } = getDenominationsToSpend(amount, this.confirmedMintsPerDenomination)
 
-                return !canNotSpend
+                return !canNotSpendCompletely
             }
         },
 
