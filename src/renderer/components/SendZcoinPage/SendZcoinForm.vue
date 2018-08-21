@@ -68,7 +68,9 @@
                                          @click.prevent="onCanSpendPrivateTooltipCancel">
                                 No, thanks
                             </base-button>
-                            <base-button color="green">
+                            <base-button color="green"
+                                         :is-dark="true"
+                                         @click.prevent="onCanSpendPrivateTooltipSubmit">
                                 Yes, switch to private
                             </base-button>
                         </footer>
@@ -80,7 +82,7 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
     import { addVuexModel } from '@/utils/store'
     import { getDenominationsToSpend } from '#/lib/convert'
     import ValidationMixin from '@/mixins/ValidationMixin'
@@ -141,6 +143,25 @@
                 action: types.zcoinpayment.SET_FORM_ADDRESS
             }),
 
+            amountConvertedToDenominations () {
+                const amount = Number.parseFloat(this.amount)
+                const empty = {
+                    toSpend: 0,
+                    change: amount,
+                    denominations: this.confirmedMintsPerDenomination
+                }
+
+                if (!amount || Number.isNaN(amount)) {
+                    return empty
+                }
+
+                if (!Number.isInteger(amount)) {
+                    return empty
+                }
+
+                return getDenominationsToSpend(amount, this.confirmedMintsPerDenomination)
+            },
+
             showCanSpendPrivateTooltip () {
                 // already seen
                 if (this.spendPrivateTooltipAmountSeen === this.amount) {
@@ -157,7 +178,7 @@
                     return false
                 }
 
-                const { change: canNotSpendCompletely } = getDenominationsToSpend(amount, this.confirmedMintsPerDenomination)
+                const { change: canNotSpendCompletely } = this.amountConvertedToDenominations
 
                 return !canNotSpendCompletely
             }
@@ -181,8 +202,32 @@
         },
 
         methods: {
+            ...mapActions({
+                clearSpendForm: types.zerocoinspend.CLEAR_FORM,
+                setSpendFormLabel: types.zerocoinspend.SET_FORM_LABEL,
+                setSpendFormAddress: types.zerocoinspend.SET_FORM_ADDRESS,
+                setSpendFormMints: types.zerocoinspend.SET_FORM_MINTS
+            }),
+
             onCanSpendPrivateTooltipCancel () {
                 this.spendPrivateTooltipAmountSeen = this.amount
+            },
+
+            onCanSpendPrivateTooltipSubmit () {
+                const { change: canNotSpendCompletely, toSpend } = this.amountConvertedToDenominations
+
+                this.spendPrivateTooltipAmountSeen = this.amount
+
+                if (canNotSpendCompletely) {
+                    return
+                }
+
+                this.clearSpendForm()
+                this.setSpendFormLabel(this.label)
+                this.setSpendFormAddress(this.address)
+                this.setSpendFormMints(toSpend)
+
+                this.$router.push({ name: 'spend-zerocoin' })
             }
         }
     }

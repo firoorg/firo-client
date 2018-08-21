@@ -24,6 +24,10 @@ const mutations = {
         })
     },
 
+    [types.CLEAR_FORM_MINTS] (state) {
+        Vue.set(state.spendForm, 'mints', {})
+    },
+
     [types.SET_FORM_LABEL] (state, label) {
         state.spendForm.label = label
     },
@@ -53,9 +57,9 @@ const actions = {
         commit(types.SET_FORM_ADDRESS, value)
     },
 
-    [types.CLEAR_FORM] ({ dispatch }) {
+    [types.CLEAR_FORM] ({ dispatch, commit }) {
         dispatch(types.SET_FORM_LABEL, '')
-        dispatch(types.SET_FORM_MINTS, {})
+        commit(types.CLEAR_FORM_MINTS)
         dispatch(types.SET_FORM_ADDRESS, '')
     }
 }
