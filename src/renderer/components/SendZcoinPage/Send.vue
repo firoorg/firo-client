@@ -18,7 +18,8 @@
                     </header>
 
                     <send-zcoin-form :is-disabled="false"
-                                     @form-validated="setFormValidationStatus" />
+                                     @form-validated="setFormValidationStatus"
+                                     :boundaries-element="boundariesElement" />
                 </div>
 
                 <send-zcoin-steps :boundaries-element="boundariesElement"

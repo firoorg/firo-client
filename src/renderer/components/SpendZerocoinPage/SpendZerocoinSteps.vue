@@ -1,8 +1,6 @@
 <template>
     <div class="button-wrap">
         <template v-if="!currentStep">
-            <send-add-to-queue-button :can-submit="canAddToQueue"
-                                      @pending-payment-added="cleanupForm" />
             <send-step-start-button :can-submit="canStart"
                                     :color="submitButtonColor"
                                     @pending-payment-added="cleanupForm"
@@ -101,10 +99,6 @@
             cleanupForm: {
                 type: Function,
                 required: true
-            },
-            updateTransactionFee: {
-                type: Function,
-                required: true
             }
         },
 
@@ -191,10 +185,6 @@
                 return this.canStart && this.currentStepCanSubmit
             },
 
-            canAddToQueue () {
-                return !this.currentFormIsEmpty && this.formIsValid
-            },
-
             stepComponents () {
                 let components = {}
                 for (let key of Object.keys(this.steps)) {
@@ -244,32 +234,12 @@
                 return [this.submitButtonColor, `${'step'}-${this.currentStep}`].join(' ')
             },
 
-            containsUsedAddress () {
-                /*
-                if (this.containsUsedAddressOnSend !== null) {
-                    return this.containsUsedAddressOnSend
-                }
-                */
-
-                if (this.hasAlreadySentToAddress(this.currentFormAddress)) {
-                    return true
-                }
-
-                for (let payment of this.pendingPayments) {
-                    const { address } = payment
-                    console.log('let address in this.pendingPayments', address)
-                    const usedAddress = this.hasAlreadySentToAddress(address)
-
-                    if (usedAddress) {
-                        return true
-                    }
-                }
-
-                return false
+            isUsedAddress () {
+                return this.hasAlreadySentToAddress(this.currentFormAddress)
             },
 
             submitButtonColor () {
-                if (this.containsUsedAddress) {
+                if (this.isUsedAddress) {
                     return 'orange'
                 }
 
@@ -285,22 +255,9 @@
             currentStep: {
                 handler (newVal, oldVal) {
                     window.dispatchEvent(new Event('resize'))
-                    // this.currentStepCanSubmit = false
-                    // this.currentStepCanCancel = false
-                    // console.log('- - - foo - - -')
                 },
                 immediate: true
             }
-
-            /*
-            currentStepCanSubmit: {
-                handler (newVal, oldVal) {
-                    if (newVal) {
-                        this.currentStepCanCancel = true
-                    }
-                }
-            }
-            */
         },
 
         methods: {

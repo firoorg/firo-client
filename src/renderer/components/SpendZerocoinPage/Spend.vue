@@ -25,10 +25,9 @@
                                      :amount="spendFormMintCostsInSatoshi"
                                      :show-fee="false" />
                     <!--</div>-->
-                    <send-zcoin-steps :boundaries-element="boundariesElement"
-                                      :form-is-valid="formSectionIsValid"
-                                      :cleanup-form="cleanupForm"
-                                      :update-transaction-fee="updateTransactionFee" />
+                    <spend-zerocoin-steps :boundaries-element="boundariesElement"
+                                          :form-is-valid="formSectionIsValid"
+                                          :cleanup-form="cleanupForm" />
                 </section>
             </div>
         </form>
@@ -42,7 +41,7 @@
 
     import SpendZerocoinForm from '@/components/SpendZerocoinPage/SpendZerocoinForm'
     import FeesAndAmount from '@/components/payments/FeesAndAmount'
-    import SendZcoinSteps from '@/components/SendZcoinPage/SendZcoinSteps'
+    import SpendZerocoinSteps from '@/components/SpendZerocoinPage/SpendZerocoinSteps'
 
     // import FeesAndAmount from '@/components/FeesAndAmount'
     import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
@@ -56,7 +55,7 @@
         components: {
             FeesAndAmount,
             SpendZerocoinForm,
-            SendZcoinSteps,
+            SpendZerocoinSteps,
             SendConfirmationCheck,
             SendFeeSelection,
             SendConfirmDialog

@@ -38,31 +38,56 @@
             <label for="amount">Amount</label>
 
             <div class="control">
-                <input v-model.lazy="amount"
-                       v-validate="requiredAmountValidationRules"
-                       data-vv-validate-on="change"
-                       v-tooltip="getValidationTooltip('amount')"
-                       type="text"
-                       ref="amount"
-                       name="amount"
-                       id="amount"
-                       class="amount"
-                       tabindex="3"
-                       placeholder="Enter Amount to send publicly">
-                <div class="prefix">XZC</div>
+                <base-popover :open="showCanSpendPrivateTooltip"
+                              trigger="manual"
+                              placement="left-end"
+                              :offset="8*3"
+                              popover-class="advice"
+                              :boundaries-element="boundariesElement">
+                    <template slot="target">
+                        <input v-model.lazy="amount"
+                               v-validate="requiredAmountValidationRules"
+                               data-vv-validate-on="change"
+                               v-tooltip="getValidationTooltip('amount')"
+                               type="text"
+                               ref="amount"
+                               name="amount"
+                               id="amount"
+                               class="amount"
+                               tabindex="3"
+                               placeholder="Enter Amount to send publicly">
+                        <div class="prefix">XZC</div>
+                    </template>
+
+                    <template slot="content">
+                        <h2>Note: Private Payment</h2>
+                        <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                        <footer>
+                            <base-button :is-outline="true"
+                                         :is-dark="true"
+                                         @click.prevent="onCanSpendPrivateTooltipCancel">
+                                No, thanks
+                            </base-button>
+                            <base-button color="green">
+                                Yes, switch to private
+                            </base-button>
+                        </footer>
+                    </template>
+                </base-popover>
             </div>
         </div>
     </fieldset>
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
     import { addVuexModel } from '@/utils/store'
+    import { getDenominationsToSpend } from '#/lib/convert'
     import ValidationMixin from '@/mixins/ValidationMixin'
     import types from '~/types'
 
     export default {
         name: 'SendZcoinForm',
-
         mixins: [
             ValidationMixin
         ],
@@ -75,6 +100,10 @@
             isDisabled: {
                 type: Boolean,
                 required: true
+            },
+            boundariesElement: {
+                type: HTMLElement,
+                required: true
             }
         },
 
@@ -84,11 +113,16 @@
                     'label',
                     'amount',
                     'address'
-                ]
+                ],
+                spendPrivateTooltipAmountSeen: null
             }
         },
 
         computed: {
+            ...mapGetters({
+                confirmedMintsPerDenomination: 'Mint/confirmedMintsPerDenomination'
+            }),
+
             ...addVuexModel({
                 name: 'label',
                 getter: 'ZcoinPayment/createFormLabel',
@@ -105,11 +139,33 @@
                 name: 'address',
                 getter: 'ZcoinPayment/createFormAddress',
                 action: types.zcoinpayment.SET_FORM_ADDRESS
-            })
+            }),
+
+            showCanSpendPrivateTooltip () {
+                // already seen
+                if (this.spendPrivateTooltipAmountSeen === this.amount) {
+                    return false
+                }
+
+                const amount = Number.parseFloat(this.amount)
+
+                if (!amount || Number.isNaN(amount)) {
+                    return false
+                }
+
+                if (!Number.isInteger(amount)) {
+                    return false
+                }
+
+                const { change: canNotSpend } = getDenominationsToSpend(amount, this.confirmedMintsPerDenomination)
+
+                return !canNotSpend
+            }
         },
 
         watch: {
-            amount (newVal) {
+            amount (newVal, oldVal) {
+                this.spendPrivateTooltipAmountSeen = null
                 this.$validator.validate()
             },
             address (newVal) {
@@ -121,6 +177,12 @@
                     this.$emit('form-validated', newVal)
                 },
                 immediate: true
+            }
+        },
+
+        methods: {
+            onCanSpendPrivateTooltipCancel () {
+                this.spendPrivateTooltipAmountSeen = this.amount
             }
         }
     }

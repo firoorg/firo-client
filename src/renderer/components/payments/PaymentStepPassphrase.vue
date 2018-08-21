@@ -14,7 +14,19 @@
     import types from '~/types'
 
     export default {
-        name: 'SentStepPassphrase',
+        name: 'PaymentStepPassphrase',
+
+        props: {
+            action: {
+                type: String,
+                required: true
+            },
+
+            getter: {
+                type: String,
+                required: true
+            }
+        },
 
         mounted () {
             this.$refs.input.focus()

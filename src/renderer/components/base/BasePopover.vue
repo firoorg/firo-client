@@ -19,14 +19,14 @@
 </template>
 
 <script>
-    import smoothHeight from 'vue-smooth-height'
+    import smoothReflow from 'vue-smooth-reflow'
     import { mapGetters } from 'vuex'
 
     export default {
         name: 'BasePopover',
         inheritAttrs: false,
         mixins: [
-            smoothHeight
+            smoothReflow
         ],
 
         props: {
@@ -42,7 +42,13 @@
 
         mounted () {
             console.log(this.$attrs)
-            this.$smoothElement({
+            this.$smoothReflow({
+                el: this.$refs.container
+            })
+        },
+
+        beforeDestroy () {
+            this.$smoothReflow({
                 el: this.$refs.container
             })
         },
