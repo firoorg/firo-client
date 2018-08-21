@@ -1,5 +1,8 @@
-import { tryUntil } from '#/lib/utils'
 import zmq from 'zeromq'
+import types from '~/types'
+
+import { tryUntil } from '#/lib/utils'
+
 let apiStatus = zmq.socket('req')
 
 export const getApiStatus = async function ({ host, ports }) {
@@ -56,4 +59,19 @@ export const waitForApi = async function ({ host, ports, apiStatus, ttlInSeconds
         validator,
         ttlInSeconds
     })
+}
+
+export const populateStore = function ({ apiStatus, dispatch }) {
+    const { data, meta } = apiStatus
+
+    if (!meta || meta.status !== 200) {
+        return
+    }
+
+    const { blocks, walletLock, dataDir: location } = data
+    console.log(data)
+
+    dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
+    dispatch(types.blockchain.SET_BLOCKCHAIN_TIP, blocks)
+    dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location })
 }

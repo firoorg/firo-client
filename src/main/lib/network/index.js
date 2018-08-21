@@ -9,7 +9,7 @@ import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
 // import blockchain from './blockchain'
-import { getApiStatus, closeApiStatus, waitForApi } from './ApiStatus'
+import { getApiStatus, closeApiStatus, waitForApi, populateStore } from './ApiStatus'
 
 import Address from './Address'
 import Balance from './Balance'
@@ -88,9 +88,7 @@ export default {
 
         debug('got api status', apiStatus)
 
-        this.setDataDirectory(apiStatus)
-        this.setNetworkType(apiStatus)
-        // todo this.setWalletLocked(apiStatus)
+        populateStore({ apiStatus, dispatch })
 
         const encryption = apiStatus.devauth ? this.setupEncryption(apiStatus) : null
 
@@ -101,10 +99,8 @@ export default {
                 ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady
             })
 
-            const { blocks, walletLock } = warmedUpApiStatus
-
-            dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
-            dispatch(types.blockchain.SET_BLOCKCHAIN_TIP, blocks)
+            // update store with warmed up values
+            populateStore({ apiStatus: warmedUpApiStatus, dispatch })
         } catch (e) {
             debug('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...
@@ -170,16 +166,6 @@ export default {
         }
 
         return certificates
-    },
-
-    setDataDirectory (apiStatus) {
-        const { datadir: location } = apiStatus
-
-        dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location: location })
-    },
-
-    setNetworkType (apiStatus) {
-        // todo?
     },
 
     disconnect () {

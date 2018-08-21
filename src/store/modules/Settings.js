@@ -26,8 +26,6 @@ const mutations = {
 
 const actions = {
     [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
-        console.log('SET_BLOCKCHAIN_LOCATION')
-
         if (!location) {
             return
         }
