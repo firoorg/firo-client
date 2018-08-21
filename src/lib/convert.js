@@ -1,4 +1,5 @@
 import Big from 'big.js'
+import clone from 'lodash/clone'
 
 const coinBase = new Big(1)
 const satoshiBase = new Big(0.00000001)
@@ -42,5 +43,68 @@ export const convertToSatoshi = function (base) {
             .toString())
     } catch (e) {
         return 0
+    }
+}
+
+/**
+ * returns denomination with the largest possible value by not exceeding the given amount
+ *
+ * getLargestDenomination(42, { '10': 7, '25': 2 }) // { denomination: 25, change: 17 }
+ */
+export const getLargestDenomination = function (amount, denominations = {}) {
+    const denominationsPairs = Object.entries(denominations).map(([ key, value ]) => [ parseInt(key), value ])
+    const denoms = denominationsPairs.map(([ key ]) => key).reverse()
+    let denomination = null
+
+    for (let denom of denoms) {
+        if (amount >= denom && denominations[`${denom}`] > 0) {
+            denomination = denom
+            break
+        }
+    }
+
+    return {
+        denomination,
+        change: amount - denomination
+    }
+}
+
+export const getDenominationsToSpend = function (amount, denominations = {}) {
+    const denomsToSpend = {}
+    const denoms = clone(denominations)
+    let amountToSpend = amount
+    let found = false
+    let hasChange = false
+    let counter = 0
+
+    do {
+        counter++ // todo review and remove counter.
+        const { denomination, change } = getLargestDenomination(amountToSpend, denoms)
+        const key = `${denomination}`
+
+        found = !!denomination
+        hasChange = change > 0
+
+        if (!found) {
+            return
+        }
+
+        amountToSpend -= denomination
+
+        if (!denomsToSpend[key]) {
+            denomsToSpend[key] = 0
+        }
+
+        denomsToSpend[key]++
+
+        if (denoms[key] > 0) {
+            denoms[key]--
+        }
+    } while (found && hasChange && counter < 100)
+
+    return {
+        toSpend: denomsToSpend,
+        denominations: denoms,
+        change: amountToSpend
     }
 }
