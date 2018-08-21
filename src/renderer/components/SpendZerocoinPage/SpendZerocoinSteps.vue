@@ -1,7 +1,7 @@
 <template>
     <div class="button-wrap">
         <template v-if="!currentStep">
-            <send-step-start-button :can-submit="canStart"
+            <spend-zerocoin-step-start-button :can-submit="canStart"
                                     :color="submitButtonColor"
                                     @pending-payment-added="cleanupForm"
                                     @next="() => onStepChange('confirm')" />
@@ -9,6 +9,7 @@
         <template v-else-if="currentStep !== 'done'">
             <base-button v-if="currentStepCanCancel"
                          color="red"
+                         :is-dark="true"
                          :is-outline="true"
                          @click.prevent="onCancel">
                 <span>Cancel</span>
@@ -27,11 +28,11 @@
                                     :boundaries-element="boundariesElement"
                                     :popover-class="currentPopoverClass">
             <template slot="step-confirm" slot-scope="{ actions }">
-                <send-step-confirm-buttons :actions="actions"
+                <spend-zerocoin-step-confirm-buttons :actions="actions"
                                            :color="submitButtonColor"
                                            :can-submit="canSubmit"
                                            :is-timer-done="isConfirmed">
-                </send-step-confirm-buttons>
+                </spend-zerocoin-step-confirm-buttons>
             </template>
             <template slot="step-selectFee" slot-scope="{ actions }">
                 <send-step-confirm-buttons :actions="actions"
@@ -63,10 +64,10 @@
     // import types from '~/types'
 
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
-    import SendStepConfirm from '@/components/SendZcoinPage/SendStepConfirm'
+    import SpendZerocoinStepConfirm from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirm'
     import SendAddToQueueButton from '@/components/SendZcoinPage/SendAddToQueueButton'
-    import SendStepStartButton from '@/components/SendZcoinPage/SendStepStartButton'
-    import SendStepConfirmButtons from '@/components/SendZcoinPage/SendStepConfirmButtons'
+    import SpendZerocoinStepStartButton from '@/components/SpendZerocoinPage/SpendZerocoinStepStartButton'
+    import SpendZerocoinStepConfirmButtons from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirmButtons'
     import SendStepSelectFee from '@/components/SendZcoinPage/SendStepSelectFee'
     import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
@@ -78,9 +79,9 @@
         components: {
             MultiStepPopoverButtons,
             SendAddToQueueButton,
-            SendStepStartButton,
-            SendStepConfirm,
-            SendStepConfirmButtons,
+            SpendZerocoinStepStartButton,
+            SpendZerocoinStepConfirm,
+            SpendZerocoinStepConfirmButtons,
             SendStepSelectFee,
             PaymentStepPassphrase,
             PaymentStepPassphraseButtons,
@@ -106,7 +107,7 @@
             return {
                 steps: {
                     confirm: {
-                        component: SendStepConfirm,
+                        component: SpendZerocoinStepConfirm,
                         isOpen () {
                             console.log('is open ->', this, this.currentStepCanSubmit)
                             // return this.currentStepCanSubmit
