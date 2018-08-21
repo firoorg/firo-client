@@ -1,6 +1,6 @@
 <template>
     <base-button :color="color"
-                 :can-submit="canSubmit"
+                 :disabled="!canSubmit"
                  @click="actions.next">
         Unlock and send
     </base-button>
@@ -22,10 +22,6 @@
             color: {
                 type: String
             }
-        },
-
-        mounted () {
-            this.$parent.$emit('can-submit', true)
         }
     }
 </script>

@@ -34,13 +34,6 @@
                                            :is-timer-done="isConfirmed">
                 </spend-zerocoin-step-confirm-buttons>
             </template>
-            <template slot="step-selectFee" slot-scope="{ actions }">
-                <send-step-confirm-buttons :actions="actions"
-                                           :color="submitButtonColor"
-                                           :can-submit="canSubmit"
-                                           :is-timer-done="isConfirmed">
-                </send-step-confirm-buttons>
-            </template>
             <template slot="step-passphrase" slot-scope="{ actions }">
                 <payment-step-passphrase-buttons :actions="actions"
                                               :color="submitButtonColor"
@@ -68,7 +61,6 @@
     import SendAddToQueueButton from '@/components/SendZcoinPage/SendAddToQueueButton'
     import SpendZerocoinStepStartButton from '@/components/SpendZerocoinPage/SpendZerocoinStepStartButton'
     import SpendZerocoinStepConfirmButtons from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirmButtons'
-    import SendStepSelectFee from '@/components/SendZcoinPage/SendStepSelectFee'
     import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
     import SendStepStatus from '@/components/SendZcoinPage/SendStepStatus'
@@ -82,7 +74,6 @@
             SpendZerocoinStepStartButton,
             SpendZerocoinStepConfirm,
             SpendZerocoinStepConfirmButtons,
-            SendStepSelectFee,
             PaymentStepPassphrase,
             PaymentStepPassphraseButtons,
             SendStepStatus
@@ -122,21 +113,6 @@
                             }
                         }
                     },
-                    selectFee: {
-                        component: SendStepSelectFee,
-                        isOpen () {
-                            return true
-                        },
-                        placement () {
-                            return this.isConfirmed ? 'top-end' : 'top'
-                        },
-                        props () {
-                            return {
-                                updateTransactionFee: this.updateTransactionFee,
-                                isConfirmed: this.isConfirmed
-                            }
-                        }
-                    },
                     passphrase: {
                         component: PaymentStepPassphrase,
                         isOpen () {
@@ -164,22 +140,16 @@
 
         computed: {
             ...mapGetters({
-                isLoading: 'ZcoinPayment/isLoading',
+                isLoading: 'ZerocoinSpend/isLoading',
                 isError: 'ZcoinPayment/currentResponseIsError',
-                fee: 'ZcoinPayment/selectedFee',
-                currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
-                currentFormAddress: 'ZcoinPayment/createFormAddress',
-                currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
-                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress',
-                pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
-                hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments'
+                // currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
+                currentFormAddress: 'ZerocoinSpend/spendFormAddress',
+                // currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
+                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
             }),
 
             canStart () {
-                return (
-                    (this.currentFormIsEmpty && this.hasPendingPayments) ||
-                    (!this.currentFormIsEmpty && this.formIsValid)
-                )
+                return this.formIsValid
             },
 
             canSubmit () {

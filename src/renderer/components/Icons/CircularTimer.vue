@@ -65,7 +65,7 @@
             },
 
             backgroundColor () {
-                return this.isDark ? '#8D8DA8' : '#ADB8D9'
+                return this.isDark ? '#8D8DA8' : '#D8DDED'
             }
         },
 

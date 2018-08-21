@@ -49,6 +49,12 @@
                              @blur="hideAmountSelector">
                             <selected-mints-list :mints="spendFormMintsFormatted"
                                                  :is-open="amountSelectorIsOpen" />
+                            <input type="hidden"
+                                   v-validate="{ min_value: 1 }"
+                                   data-vv-validate-on="change"
+                                   :value="spendFormMintCosts"
+                                   name="mintCosts"
+                                   id="mintCosts" />
                             <!--
                             <current-mints :current-mints="formMints" />
                             -->
@@ -119,8 +125,8 @@
             return {
                 validationFieldOrder: [
                     'label',
-                    'amount',
-                    'address'
+                    'address',
+                    'mintCosts'
                 ],
                 amountSelectorIsOpen: false,
                 amountSelectorTimeout: null
@@ -130,19 +136,14 @@
         computed: {
             ...mapGetters({
                 spendFormMints: 'ZerocoinSpend/spendFormMints',
-                spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted'
+                spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted',
+                spendFormMintCosts: 'ZerocoinSpend/spendFormMintCosts'
             }),
 
             ...addVuexModel({
                 name: 'label',
                 getter: 'ZerocoinSpend/spendFormLabel',
                 action: types.zerocoinspend.SET_FORM_LABEL
-            }),
-
-            ...addVuexModel({
-                name: 'amount',
-                getter: 'ZerocoinSpend/spendFormAmountAsBaseCoin',
-                action: types.zerocoinspend.SET_FORM_AMOUNT
             }),
 
             ...addVuexModel({
@@ -154,11 +155,16 @@
 
         watch: {
             amount (newVal) {
-                this.$validator.validate()
+                this.validate()
             },
             address (newVal) {
-                this.$validator.validate()
+                this.validate()
             },
+            spendFormMintCosts (newVal) {
+                console.log('spendFormMintCosts ->', newVal)
+                this.validate()
+            },
+
             formValidated: {
                 handler (newVal, oldVal) {
                     console.log('form validated', newVal, oldVal)

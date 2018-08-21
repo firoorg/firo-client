@@ -86,15 +86,11 @@
 
         computed: {
             ...mapGetters({
-                currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
-                hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments',
-                pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
-                selectedFee: 'ZcoinPayment/selectedFee',
-                currentPassphrase: 'ZcoinPayment/currentPassphrase',
+                currentPassphrase: 'App/currentPassphrase',
                 spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
             }),
             formSectionIsValid () {
-                return !!(this.formValidated || this.currentFormIsEmpty)
+                return this.formValidated
             }
         },
 

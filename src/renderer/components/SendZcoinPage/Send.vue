@@ -106,7 +106,7 @@
                 hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments',
                 pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
                 selectedFee: 'ZcoinPayment/selectedFee',
-                currentPassphrase: 'ZcoinPayment/currentPassphrase',
+                currentPassphrase: 'App/currentPassphrase',
                 pendingPaymentsSize: 'ZcoinPayment/pendingZcoinPaymentsSize'
             }),
             formSectionIsValid () {
@@ -187,6 +187,7 @@
                         passphrase: this.currentPassphrase
                     }
                 })
+                this.resetValidator()
                 /*
                 if (!this.formSectionIsValid) {
                     return

@@ -2,12 +2,12 @@
     <section class="spend-zerocoin">
         <div class="scrollable-height">
             <section class="payment-list">
-                <send-from-clipboard-popover :boundaries-element="boundariesElement">
+                <spend-zerocoin-from-clipboard-popover :boundaries-element="boundariesElement">
                     <h1>
                         Send<br>
                         Zcoin
                     </h1>
-                </send-from-clipboard-popover>
+                </spend-zerocoin-from-clipboard-popover>
 
                 <animated-table :data="paymentRequests"
                                 :fields="tableFields"
@@ -34,7 +34,7 @@
     import SpendZerocoin from '@/components/SpendZerocoinPage/Spend'
 
     // import types from '~/types'
-    import SendFromClipboardPopover from '@/components/SendZcoinPage/SendFromClipboardPopover'
+    import SpendZerocoinFromClipboardPopover from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopover'
 
     const tableFields = [
         {
@@ -64,7 +64,7 @@
     export default {
         name: 'SpendZerocoinPage',
         components: {
-            SendFromClipboardPopover,
+            SpendZerocoinFromClipboardPopover,
             AnimatedTable,
             SpendZerocoin
         },

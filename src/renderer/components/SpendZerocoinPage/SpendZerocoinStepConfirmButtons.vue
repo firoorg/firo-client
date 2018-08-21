@@ -3,7 +3,7 @@
                  :disabled="!canSubmit"
                  :color="color"
                  :is-dark="true"
-                 @click.prevent="actions.goTo('passphrase')" tabindex="4">
+                 @click.prevent="actions.next" tabindex="4">
         <span>Yes, spend now!</span>
     </base-button>
     <circular-timer v-else

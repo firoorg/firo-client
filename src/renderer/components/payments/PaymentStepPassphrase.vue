@@ -1,10 +1,21 @@
 <template>
     <div class="form">
-        <h2>Unlock Client</h2>
-        <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+        <header>
+            <h2>Unlock Client</h2>
+            <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+        </header>
 
-        <div class="control">
-            <input type="text" v-model="passphrase" placeholder="Enter your Passphrase" ref="input" />
+        <div class="field" :class="getFieldErrorClass('passphrase')">
+            <label for="passphrase">Passphrase</label>
+            <div class="control">
+                <input type="text"
+                       v-model="passphrase"
+                       v-validate="{ required: true }"
+                       placeholder="Enter your Passphrase"
+                       name="passphrase"
+                       id="passphrase"
+                       ref="input" />
+            </div>
         </div>
     </div>
 </template>
@@ -12,20 +23,21 @@
 <script>
     import { addVuexModel } from '@/utils/store'
     import types from '~/types'
+    import ValidationMixin from '@/mixins/ValidationMixin'
 
     export default {
         name: 'PaymentStepPassphrase',
 
-        props: {
-            action: {
-                type: String,
-                required: true
-            },
+        mixins: [
+            ValidationMixin
+        ],
 
-            getter: {
-                type: String,
-                required: true
-            }
+        $_veeValidate: {
+            validator: 'new' // give me my own validator instance.
+        },
+
+        beforeCreate () {
+            this.$parent.$emit('can-submit', false)
         },
 
         mounted () {
@@ -35,9 +47,27 @@
         computed: {
             ...addVuexModel({
                 name: 'passphrase',
-                action: types.zcoinpayment.SET_CURRENT_PASSPHRASE,
-                getter: 'ZcoinPayment/currentPassphrase'
-            })
+                action: types.app.SET_CURRENT_PASSPHRASE,
+                getter: 'App/currentPassphrase'
+            }),
+
+            canSubmit () {
+                try {
+                    return !!this.validationFields.passphrase.valid
+                } catch (e) {
+                    return false
+                }
+            }
+        },
+
+        watch: {
+            canSubmit: {
+                handler (newVal) {
+                    console.log('emitting passphrase state', newVal)
+                    this.$parent.$emit('can-submit', newVal)
+                },
+                immediate: true
+            }
         }
     }
 </script>
@@ -45,11 +75,7 @@
 <style lang="scss" scoped>
     @include h2-with-description();
 
-    .control {
+    .field {
         margin-top: emRhythm(5);
-
-        input {
-            @include dark-input();
-        }
     }
 </style>
