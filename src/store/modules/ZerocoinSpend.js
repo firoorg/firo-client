@@ -65,6 +65,7 @@ const actions = {
 }
 
 const getters = {
+    isLoading: (state) => state.isLoading,
     spendFormMints: (state) => state.spendForm.mints,
     spendFormLabel: (state) => state.spendForm.label,
     spendFormMintsFormatted (state, getters) {
@@ -91,7 +92,7 @@ const getters = {
     spendFormMintCostsInSatoshi (state, getters) {
         return convertToSatoshi(getters.spendFormMintCosts)
     },
-    spendFormMintsAsBaseCoin: (state, getters) => convertToCoin(getters.spendFormMintCosts),
+    spendFormMintsAsBaseCoin: (state, getters) => convertToCoin(getters.spendFormMintCostsInSatoshi),
     spendFormAddress: (state) => state.spendForm.address,
     spendFormIsEmpty: (state, getters) => (
         !getters.spendFormLabel &&
