@@ -15,10 +15,11 @@ requester.send(JSON.stringify({
     type: 'create',
     collection: 'sendPrivate',
     data: {
-        denominations: [
+        address: "TUbC7KzQB1VyFzBv83p37VCEQiq2PUUAFy", // testnet external
+        //address: "TYyAHT6BvRtz72opiZ9QrQRjAozJcX9HDx",   // testnet internal
+        denomination: [
             {
-                address: "TZ35x37AyosYnsKunVXwCUjTkwuardy15H",
-                denomination: 1,
+                value: 1,
                 amount: 1
             }
         ],
