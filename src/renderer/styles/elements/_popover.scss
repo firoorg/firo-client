@@ -164,9 +164,14 @@
                 }
             }
 
-            .content-wrapper > div > footer {
+            .content-wrapper > div > footer,
+            .content-wrapper > footer {
                 padding-top: emRhythm(3);
                 text-align: right;
+
+                button + button {
+                    margin-left: emRhythm(2)
+                }
             }
 
         }
