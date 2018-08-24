@@ -202,7 +202,7 @@
 
 @mixin light-placeholder () {
     @include placeholder-base();
-    color: mix($color--polo, $color--polo-medium);
+    color: $color--polo;
 }
 
 @mixin light-placeholder-hover () {
