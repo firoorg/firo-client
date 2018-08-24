@@ -39,6 +39,7 @@
                                               :color="submitButtonColor"
                                               :is-dark="true"
                                               :can-submit="canSubmit">
+                    Unlock and spend
                 </payment-step-passphrase-buttons>
             </template>
             <template slot="step-done" slot-scope="{ actions }">

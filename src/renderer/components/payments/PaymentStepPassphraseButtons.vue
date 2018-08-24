@@ -2,7 +2,7 @@
     <base-button :color="color"
                  :disabled="!canSubmit"
                  @click="actions.next">
-        Unlock and send
+        <slot />
     </base-button>
 </template>
 
