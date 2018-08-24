@@ -145,7 +145,7 @@
             }
 
             &.red {
-                color: $color--red;
+                color: $color--red-bright;
                 border-color: $color--red;
 
                 &:after {
