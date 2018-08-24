@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 // const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
-const rootFolder = app.getAppPath()
+const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
 const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
 const zcoindPath = join(unpackedRootFolder, '/assets/core/zcoind')
 const userDataPath = app.getPath('userData')
