@@ -122,6 +122,7 @@
 
 @mixin description ($description-width: emRhythm(40), $description-color: inherit) {
     max-width: $description-width;
+    @include font-medium();
     font-style: italic;
     color: $description-color;
     margin: 0;
