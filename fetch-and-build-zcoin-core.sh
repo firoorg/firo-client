@@ -31,10 +31,10 @@ echo "- compiling \"$REPO_BRANCH\" branch with $CORES cores"
 ./configure --with-boost-libdir=/usr/local/Cellar/boost/1.67.0_1/lib/
 make -j${CORES}
 
-# copy binaries to gui static folder
-echo "- copying binaries to static folder"
-cp $REPO/src/zcoind $DIR/static/core
-cp $REPO/src/zcoin-cli $DIR/static/core
-cp $REPO/src/zcoin-tx $DIR/static/core
+# copy binaries to gui assets folder
+echo "- copying binaries to assets folder"
+cp $REPO/src/zcoind $DIR/assets/core
+cp $REPO/src/zcoin-cli $DIR/assets/core
+cp $REPO/src/zcoin-tx $DIR/assets/core
 
-ls -lh $DIR/static/core
+ls -lh $DIR/assets/core

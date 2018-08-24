@@ -20,19 +20,26 @@
     "test": "npm run unit && npm run e2e",
     "unit": "karma start test/unit/karma.conf.js",
     "utils:rebuild-zeromq": "VERSION=$(echo $npm_package_devDependencies_electron | sed 's/\\^//g'); npm rebuild zeromq --runtime=electron --target=${VERSION}",
-    "postinstall": "npm run utils:rebuild-zeromq; npm run lint:fix"
+    "postinstall": "npm run utils:rebuild-zeromq; npm run lint:fix",
+    "electron-toolkit": "electron ./node_modules/electron-toolkit"
   },
   "build": {
     "productName": "Zcoin",
     "appId": "com.zcoin.client",
+    "asar": true,
     "directories": {
-      "output": "build"
+      "output": "build",
+      "buildResources": "assets"
     },
     "files": [
-      "dist/electron/**/*"
+      "dist/electron/**/*",
+      "assets/core/**/*"
+    ],
+    "asarUnpack": [
+      "**/assets/core/*"
     ],
     "dmg": {
-      "background": "build/assets/background.png",
+      "background": "assets/images/background.png",
       "iconSize": 120,
       "contents": [
         {
@@ -49,13 +56,13 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/icon.icns"
+      "icon": "assets/icons/icon.icns"
     },
     "win": {
-      "icon": "build/icons/icon.ico"
+      "icon": "assets/icons/icon.ico"
     },
     "linux": {
-      "icon": "build/icons"
+      "icon": "assets/icons"
     }
   },
   "dependencies": {
@@ -109,6 +116,7 @@
     "electron": "^2.0.7",
     "electron-builder": "^20.28.1",
     "electron-debug": "^2.0.0",
+    "electron-toolkit": "^1.0.24",
     "eslint": "^5.4.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-friendly-formatter": "^4.0.1",
