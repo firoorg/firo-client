@@ -80,13 +80,11 @@
     import ValidationMixin from '@/mixins/ValidationMixin'
     import SpendDenominationSelector from '@/components/SpendZerocoinPage/SpendDenominationSelector'
     import SelectedMintsList from '@/components/SpendZerocoinPage/SelectedMintsList'
-    import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
 
     export default {
         name: 'SpendZerocoinForm',
         components: {
             SelectedMintsList,
-            CurrentMints,
             SpendDenominationSelector
         },
 

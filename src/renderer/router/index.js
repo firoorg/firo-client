@@ -44,6 +44,11 @@ export default new Router({
                     path: 'spend',
                     name: 'spend-zerocoin',
                     component: require('@/components/SpendZerocoinPage').default
+                },
+                {
+                    path: 'settings',
+                    name: 'settings',
+                    component: require('@/components/SettingsPage').default
                 }
             ]
         }
