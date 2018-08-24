@@ -7,28 +7,25 @@
 
 
         <div class="payment-fee-list">
-            <h3>Payments</h3>
-            <!--
-            <fees-and-amount :amount="pendingPaymentsAmount"
-                             :show-fee="false">
-                <template slot-scope="payment">
-                    {{ payment.label }}
-                    {{ payment.amount }}
-                </template>
-            </fees-and-amount>
-            -->
+            <current-mints :current-mints="denominations"
+                           :show-progress="false" />
+            <fees-and-amount :amount="spendFormMintCostsInSatoshi"
+                             :show-fee="false" />
         </div>
     </section>
 </template>
 
 <script>
     import { mapGetters } from 'vuex'
+
     import FeesAndAmount from '@/components/payments/FeesAndAmount'
+    import CurrentMints from '@/components/payments/CurrentMints'
 
     export default {
         name: 'SpendZerocoinStepConfirm',
 
         components: {
+            CurrentMints,
             FeesAndAmount
         },
 
@@ -39,14 +36,15 @@
 
         computed: {
             ...mapGetters({
-                pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
-                pendingPaymentsAmount: 'ZcoinPayment/pendingZcoinPaymentsAmount',
-                fee: 'ZcoinPayment/selectedFee'
+                denominations: 'ZerocoinSpend/spendFormMintsFormatted',
+                spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
             })
         }
     }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .fees-amount {
+        margin-top: emRhythm(2);
+    }
 </style>

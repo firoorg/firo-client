@@ -107,6 +107,7 @@
         .value {
             @include setType(4, $ms-up2);
             @include font-black();
+            padding-right: emRhythm(.25, $ms-up2, $silent: true);
         }
     }
 

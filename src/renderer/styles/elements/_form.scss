@@ -23,6 +23,7 @@
         }
 
         input[type="text"],
+        input[type="password"],
         select,
         .message {
             position: relative;
@@ -33,11 +34,13 @@
             transition: background 0.25s ease-out, border-color 0.15s ease-out;
         }
 
-        input[type="text"] {
+        input[type="text"],
+        input[type="password"] {
             @include setType(5);
         }
 
         input[type="text"],
+        input[type="password"],
         .message {
             @include bleed-h($input-bleed);
         }

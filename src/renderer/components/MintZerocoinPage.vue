@@ -87,7 +87,7 @@
     import { convertToSatoshi } from '#/lib/convert'
 
     import DenominationSelector from '@/components/DenominationSelector'
-    import CurrentMints from '@/components/MintZerocoinPage/CurrentMints'
+    import CurrentMints from '@/components/payments/CurrentMints'
     import FeesAndAmount from '@/components/payments/FeesAndAmount'
     import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
     import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'

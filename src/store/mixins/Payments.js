@@ -1,20 +1,8 @@
 import { convertToCoin } from '#/lib/convert'
-
-const ucfirst = (s) => s.charAt(0).toUpperCase() + s.slice(1)
-const getName = (namespace) => {
-    const name = `pending${ucfirst(namespace)}Payments`
-    const Name = ucfirst(name)
-    const NAME = `PENDING_${namespace.toUpperCase()}_PAYMENTS`
-
-    return {
-        name,
-        Name,
-        NAME
-    }
-}
+import { getName } from '~/mixins/utils'
 
 const types = function (namespace) {
-    const { NAME: PAYMENTS } = getName(namespace)
+    const { NAME: PAYMENTS } = getName(`pending ${namespace} payments`)
 
     return {
         [`ADD_${PAYMENTS}`]: `ADD_${PAYMENTS}`,
@@ -22,8 +10,8 @@ const types = function (namespace) {
     }
 }
 
-const module = function (namespace = '') {
-    const { name: payment, Name: Payments, NAME: PAYMENTS } = getName(namespace)
+const module = function (namespace) {
+    const { name: payment, Name: Payments, NAME: PAYMENTS } = getName(`pending ${namespace} payments`)
 
     return {
         state: {

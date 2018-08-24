@@ -11,7 +11,7 @@
                     <span class="cost">{{ value.cost }} <span class="unit">xzc</span></span>
                 </div>
 
-                <div class="wrapper">
+                <div class="wrapper" v-if="showProgress">
                     <div v-for="item in value.amount" class="item"></div>
                 </div>
             </div>
@@ -27,6 +27,10 @@
             currentMints: {
                 type: Array,
                 required: true
+            },
+            showProgress: {
+                type: Boolean,
+                default: true
             }
         }
     }
@@ -61,6 +65,7 @@
 
             .amount {
                 font-style: italic;
+                opacity: .8;
             }
 
             .label {
@@ -78,8 +83,9 @@
 
                     .cost {
                         position: relative;
-                        color: $color--comet-medium;
+                        //color: $color--comet-medium;
                         @include font-medium();
+                        opacity: .8;
 
                         .unit {
                             position: absolute;
@@ -87,6 +93,7 @@
                             padding-left: 0.25rem;
                             top: 0;
                             font-weight: normal;
+                            opacity: .55;
                         }
                     }
 

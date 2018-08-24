@@ -8,7 +8,7 @@
         <div class="field" :class="getFieldErrorClass('passphrase')">
             <label for="passphrase">Passphrase</label>
             <div class="control">
-                <input type="text"
+                <input type="password"
                        v-model="passphrase"
                        v-validate="{ required: true }"
                        placeholder="Enter your Passphrase"
