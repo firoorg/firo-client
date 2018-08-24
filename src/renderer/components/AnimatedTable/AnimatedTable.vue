@@ -398,15 +398,26 @@
         }
 
         .pagination {
-            border: 1px solid red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-top: emRhythm(3);
+            //border: 1px solid red;
             text-align: center;
 
             a {
                 display: inline-block;
                 padding: emRhythm(1) emRhythm(2);
                 // border: 1px solid green;
-                background-color: rgba($color--polo-medium, 0.5);
+                &:not(.icon) {
+                    background-color: rgba($color--polo-medium, 0.5);
+                }
+
+                /*&.icon + a:not(.icon),
+                &:not(.icon) + :not(.icon) {
+                    border: 1px solid red;
+                }*/
+
                 color: $color--comet;
                 @include font-heavy();
                 cursor: pointer;
