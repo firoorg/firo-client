@@ -36,6 +36,8 @@ export default {
             this.requester.curve_publickey = encryption.client.public
             this.requester.curve_secretkey = encryption.client.private
         } else if (process.env.NODE_ENV !== 'development') {
+            // todo limit error to mainnet?
+            dispatch(types.network.SET_NETWORK_CONNECTION_ERROR, 2)
             throw new Error('no encryption provided.')
         }
 

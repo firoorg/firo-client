@@ -92,7 +92,7 @@ export default {
 
         populateStore({ apiStatus, dispatch })
 
-        const encryption = apiStatus.devauth ? this.setupEncryption(apiStatus) : null
+        const encryption = apiStatus.data && apiStatus.data.devAuth ? this.setupEncryption(apiStatus.data.dataDir) : null
 
         try {
             const warmedUpApiStatus = await waitForApi({
@@ -151,14 +151,14 @@ export default {
         connectedToStore = true
     },
 
-    setupEncryption (apiStatus) {
-        const { datadir } = apiStatus
+    setupEncryption (dataDir) {
+
         const { root, client, server, fileName } = CONFIG.app.folders.encryption
 
         let certificates = {}
 
         for (let endpoint of [client, server]) {
-            const keysPath = join(datadir, root, endpoint, fileName)
+            const keysPath = join(dataDir, root, endpoint, fileName)
             const endpoindCertificates = JSON.parse(fs.readFileSync(keysPath).toString())
 
             certificates = {
