@@ -38,44 +38,23 @@
             <label for="amount">Amount</label>
 
             <div class="control">
-                <base-popover :open="showCanSpendPrivateTooltip"
-                              trigger="manual"
-                              placement="left-end"
-                              :offset="8*3"
-                              popover-class="advice"
-                              :boundaries-element="boundariesElement">
-                    <template slot="target">
-                        <input v-model.lazy="amount"
-                               v-validate="xzcAmountValidationRules"
-                               data-vv-validate-on="change"
-                               v-tooltip="getValidationTooltip('amount')"
-                               type="text"
-                               ref="amount"
-                               name="amount"
-                               id="amount"
-                               class="amount"
-                               tabindex="3"
-                               placeholder="Enter Amount to send publicly">
-                        <div class="prefix">XZC</div>
-                    </template>
-
-                    <template slot="content">
-                        <h2>Note: Private Payment</h2>
-                        <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                        <footer>
-                            <base-button :is-outline="true"
-                                         :is-dark="true"
-                                         @click.prevent="onCanSpendPrivateTooltipCancel">
-                                No, thanks
-                            </base-button>
-                            <base-button color="green"
-                                         :is-dark="true"
-                                         @click.prevent="onCanSpendPrivateTooltipSubmit">
-                                Yes, switch to private
-                            </base-button>
-                        </footer>
-                    </template>
-                </base-popover>
+                <send-private-popover :is-open="showCanSpendPrivateTooltip"
+                                      :boundaries-element="boundariesElement"
+                                      @cancel="onCanSpendPrivateTooltipCancel"
+                                      @submit="onCanSpendPrivateTooltipSubmit">
+                    <input v-model.lazy="amount"
+                           v-validate="xzcAmountValidationRules"
+                           data-vv-validate-on="change"
+                           v-tooltip="getValidationTooltip('amount')"
+                           type="text"
+                           ref="amount"
+                           name="amount"
+                           id="amount"
+                           class="amount"
+                           tabindex="3"
+                           placeholder="Enter Amount to send publicly">
+                    <div class="prefix">XZC</div>
+                </send-private-popover>
             </div>
         </div>
     </fieldset>
@@ -87,9 +66,14 @@
     import { getDenominationsToSpend } from '#/lib/convert'
     import ValidationMixin from '@/mixins/ValidationMixin'
     import types from '~/types'
+    import SendPrivatePopover from '@/components/SendZcoinPage/SendPrivatePopover'
 
     export default {
         name: 'SendZcoinForm',
+        components: {
+            SendPrivatePopover
+        },
+
         mixins: [
             ValidationMixin
         ],
