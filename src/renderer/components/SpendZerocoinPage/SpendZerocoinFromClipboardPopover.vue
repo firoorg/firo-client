@@ -2,9 +2,9 @@
     <base-popover
             :open="isOpen"
             placement="left-start"
-            :popover-class="[ isUsedAddress ? 'warning' : '' ]"
+            :popover-class="[ isUsedAddress ? 'warning advice' : 'advice' ]"
             :boundaries-element="boundariesElement"
-            class="send-from-clipboard-popover advice"
+            class="send-from-clipboard-popover"
             trigger="manually"
     >
         <template slot="target">
@@ -12,12 +12,10 @@
         </template>
 
         <template slot="content">
-            <transition name="fade" mode="out-in">
-                <component :is="newOrUsedAddressComponent"
-                           :key="clipboardAddress"
-                           :mark-as-notified="markAsNotified"
-                           :set-send-form-fields="setSpendFormFields" />
-            </transition>
+            <component :is="newOrUsedAddressComponent"
+                       :key="clipboardAddress"
+                       :mark-as-notified="markAsNotified"
+                       :set-send-form-fields="setSpendFormFields" />
         </template>
     </base-popover>
 </template>

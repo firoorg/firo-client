@@ -1,28 +1,27 @@
 <template>
     <div>
         <header>
-            <h2>Zcoin Address found</h2>
+            <h2>Unused Zcoin Address found</h2>
         </header>
 
         <p>
-            Found a Zcoin address in your clipboard.<br>
-            Would you like to use it as the recipient address to send Zcoin?
+            Found a Zcoin address in your clipboard. <br>
+            Would you like to use it as the recipient address <br>
+            to send Zcoin publicly?
         </p>
 
-        <div>
-            <footer>
-                <base-button :is-outline="true"
-                             :is-dark="true"
-                             @click.prevent="markAsNotified">
-                    Nope
-                </base-button>
-                <base-button color="green"
-                             :is-dark="true"
-                             @click.prevent="setSendFormFields">
-                    Yes, go ahead!
-                </base-button>
-            </footer>
-        </div>
+        <footer>
+            <base-button :is-outline="true"
+                         :is-dark="true"
+                         @click.prevent="markAsNotified">
+                Nope
+            </base-button>
+            <base-button color="green"
+                         :is-dark="true"
+                         @click.prevent="setSendFormFields">
+                Yes, go ahead!
+            </base-button>
+        </footer>
     </div>
 </template>
 

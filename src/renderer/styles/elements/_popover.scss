@@ -235,12 +235,14 @@
                 header {
                     h2,
                     h3 {
-                        margin: 0;
+                        margin: emRhythm(1) 0 0;
+                        color: $color--polo-light;
                     }
                 }
 
-                p {
-                    margin: 0 0 emRhythm(1);
+                .content-wrapper > p,
+                .content {
+                    margin-bottom: emRhythm(2);
                 }
             }
         }

@@ -9,19 +9,17 @@
             ...
         </p>
 
-        <div>
-            <footer>
-                <base-button :is-dark="true"
-                             @click.prevent="markAsNotified">
-                    Nope
-                </base-button>
-                <base-button :is-outline="true"
-                             :is-dark="true"
-                             @click.prevent="setSendFormFields">
-                    Yes, go ahead!
-                </base-button>
-            </footer>
-        </div>
+        <footer>
+            <base-button :is-dark="true"
+                         @click.prevent="markAsNotified">
+                Nope
+            </base-button>
+            <base-button :is-outline="true"
+                         :is-dark="true"
+                         @click.prevent="setSendFormFields">
+                Yes, go ahead!
+            </base-button>
+        </footer>
     </div>
 </template>
 

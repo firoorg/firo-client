@@ -12,8 +12,15 @@
         </template>
 
         <template slot="content">
-            <h2>Note: Private Payment</h2>
-            <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+            <header>
+                <h2>Private Spend</h2>
+            </header>
+
+            <p>
+                You have enough mints available to make that payment privately.<br>
+                Would you like to do so?
+            </p>
+
             <footer>
                 <base-button :is-outline="true"
                              :is-dark="true"
@@ -23,7 +30,7 @@
                 <base-button color="green"
                              :is-dark="true"
                              @click.prevent="$emit('submit')">
-                    Yes, switch to private
+                    Yes, switch to <em>Private Spend</em>
                 </base-button>
             </footer>
         </template>
