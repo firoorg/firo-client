@@ -35,6 +35,10 @@ export default {
             this.requester.curve_serverkey = encryption.server.public
             this.requester.curve_publickey = encryption.client.public
             this.requester.curve_secretkey = encryption.client.private
+
+            this.subscriber.curve_serverkey = encryption.server.public
+            this.subscriber.curve_publickey = encryption.client.public
+            this.subscriber.curve_secretkey = encryption.client.private
         } else if (process.env.NODE_ENV !== 'development') {
             // todo limit error to mainnet?
             dispatch(types.network.SET_NETWORK_CONNECTION_ERROR, 2)
