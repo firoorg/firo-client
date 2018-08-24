@@ -26,7 +26,20 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
+// const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
+const rootFolder = app.getAppPath()
+const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
+const zcoindPath = join(unpackedRootFolder, '/assets/core/zcoind')
+const userDataPath = app.getPath('userData')
+const pathToStorePid = userDataPath
+
+debug({
+    rootFolder,
+    unpackedRootFolder,
+    zcoindPath,
+    userDataPath,
+    pathToStorePid
+})
 
 // build settings via electron-settings module
 
@@ -35,11 +48,6 @@ if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
     app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
 }
 
-// start up core
-debug(process.execPath)
-debug(rootFolder)
-
-const pathToStorePid = rootFolder
 // get core config
 const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
 
@@ -67,8 +75,7 @@ if (stopOnQuit) {
 }
 
 // start it!
-// const testPath = join(__static, '/core/start.sh')
-const zcoindPath = join(__static, '/core/zcoind')
+debug('zcoindPath', zcoindPath)
 coreDaemonManager.start(zcoindPath)
 
 /*
