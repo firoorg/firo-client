@@ -84,7 +84,7 @@ export const getDenominationsToSpend = function (amount, denominations = {}) {
         found = !!denomination
 
         if (!found) {
-            return
+            break
         }
 
         amountToSpend -= denomination
