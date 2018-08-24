@@ -4,7 +4,6 @@
                 :disabled="isDisabled"
                 :auto-hide="true"
                 placement="bottom-end"
-                popover-class="comet"
                 class="pending-payments-popover"
                 :boundaries-element="boundariesElement"
         >
