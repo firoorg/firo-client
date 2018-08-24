@@ -14,8 +14,8 @@
             <label>{{ denomination }}</label>
         </div>
         <div class="buttons">
-            <button :disabled="!canDecrease" @click.stop.prevent="decrease">&minus;</button>
-            <button :disabled="!canIncrease" @click.stop.prevent="increase">&plus;</button>
+            <button :disabled="!canDecrease" @click.stop.prevent="decrease" class="decrease">&minus;</button>
+            <button :disabled="!canIncrease" @click.stop.prevent="increase" class="increase">&plus;</button>
         </div>
     </div>
 </template>
@@ -184,12 +184,19 @@
             border: none;
             @include font-heavy();
             cursor: pointer;
-            color: $color--comet-light;
             outline: none;
             border-radius: 50%;
-            background-color: rgba($color--dark, .55);
+            background-color: rgba($color--dark, .65);
 
             transition: color 0.15s ease-out, background-color 0.15s ease-out;
+
+            &.decrease {
+                color: $color--red-bright;
+            }
+
+            &.increase{
+                color: $color--green;
+            }
 
             &[disabled] {
                 background-color: rgba($color--dark, .35);
@@ -200,9 +207,15 @@
             &:not([disabled]) {
                 &:hover {
                     color: $color--dark;
-                    background-color: rgba($color--white-light, 0.9);
-                    @include glow-small-box($color--green);
-                    background: $gradient--green-bright;
+                    &.decrease {
+                        @include glow-small-box($color--red);
+                        background: $gradient--red-vertical;
+                    }
+
+                    &.increase{
+                        @include glow-small-box($color--green);
+                        background: $gradient--green-bright;
+                    }
                 }
 
                 &:active {

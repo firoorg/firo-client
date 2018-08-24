@@ -12,7 +12,7 @@
                        name="label"
                        id="label"
                        tabindex="1"
-                       placeholder="Enter Title">
+                       placeholder="Spider-Man costume #shopping for #reuben">
             </div>
         </div>
 
@@ -28,7 +28,8 @@
                        ref="address"
                        name="address"
                        id="address"
-                       tabindex="2">
+                       tabindex="2"
+                       placeholder="Add a valid zcoin address">
             </div>
         </div>
 
@@ -55,20 +56,7 @@
                                    :value="spendFormMintCosts"
                                    name="mintCosts"
                                    id="mintCosts" />
-                            <!--
-                            <current-mints :current-mints="formMints" />
-                            -->
                         </div>
-                        <!--
-                        <input v-model.lazy="amount"
-                               type="text"
-                               ref="amount"
-                               name="amount"
-                               id="amount"
-                               class="amount"
-                               tabindex="2">
-                        --->
-                        <!--<div class="prefix">XZC</div>-->
                     </template>
                     <template slot="content">
                         <header class="right">

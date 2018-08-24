@@ -1,7 +1,7 @@
 <template>
     <fieldset :disabled="isDisabled">
         <div class="field" :class="getFieldErrorClass('label')">
-            <label for="label">Title</label>
+            <label for="label">Label</label>
 
             <div class="control">
                 <input v-model.trim="label"
@@ -12,7 +12,7 @@
                        name="label"
                        id="label"
                        tabindex="1"
-                       placeholder="placeholder with #hastag hint">
+                       placeholder="Wonder Woman dress #shopping for #team">
             </div>
         </div>
 
@@ -30,7 +30,7 @@
                        name="address"
                        id="address"
                        tabindex="2"
-                       placeholder="placeholder">
+                       placeholder="Add a valid zcoin address">
             </div>
         </div>
 
@@ -178,6 +178,10 @@
                     return false
                 }
 
+                if (!this.amountConvertedToDenominations) {
+                    return false
+                }
+
                 const { change: canNotSpendCompletely } = this.amountConvertedToDenominations
 
                 return !canNotSpendCompletely
@@ -214,6 +218,10 @@
             },
 
             onCanSpendPrivateTooltipSubmit () {
+                if (!this.amountConvertedToDenominations) {
+                    return
+                }
+
                 const { change: canNotSpendCompletely, toSpend } = this.amountConvertedToDenominations
 
                 this.spendPrivateTooltipAmountSeen = this.amount
