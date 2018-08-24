@@ -1,6 +1,8 @@
 import Payment from '~/mixins/Payments'
+import Response from '~/mixins/Response'
 
 const pendingPayment = Payment.types('zcoin')
+const sendZcoinResponse = Response.types('send zcoin')
 
 // export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
 export const IS_LOADING = 'IS_LOADING'
@@ -21,11 +23,14 @@ export const SET_FEE = 'SET_FEE'
 export const CALC_TX_FEE = 'CALC_TX_FEE'
 export const SET_TX_FEE = 'SET_TX_FEE'
 export const SEND_ZCOIN = 'SEND_ZCOIN'
+/*
 export const SET_SEND_ZCOIN_RESPONSE = 'SET_SEND_ZCOIN_RESPONSE'
 export const ON_SEND_ZCOIN_SUCCESS = 'ON_SEND_ZCOIN_SUCCESS'
 export const ON_SEND_ZCOIN_ERROR = 'ON_SEND_ZCOIN_ERROR'
+*/
 
 // export mixed in types
 export default {
-    ...pendingPayment
+    ...pendingPayment,
+    ...sendZcoinResponse
 }

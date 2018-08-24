@@ -1,13 +1,19 @@
 import * as types from '~/types/ZcoinPayment'
 import allTypes from '~/types'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+
 import Payments from '~/mixins/Payments'
+import Response from '~/mixins/Response'
 
 const pendingPayments = Payments.module('zcoin')
 const pendingPaymentTypes = Payments.types('zcoin')
 
+const sendZcoinResponse = Response.module('send zcoin')
+
 const state = {
     ...pendingPayments.state,
+    ...sendZcoinResponse.state,
+
     selectedFee: {},
     availableFees: [],
     addPaymentForm: {
@@ -27,6 +33,8 @@ const state = {
 
 const mutations = {
     ...pendingPayments.mutations,
+    ...sendZcoinResponse.mutations,
+
     [types.CALC_TX_FEE] () {},
     [types.SEND_ZCOIN] () {},
 
@@ -60,22 +68,12 @@ const mutations = {
     [types.SET_TX_FEE] (state, txFee) {
         console.log('got new tx fee', txFee)
         state.addPaymentForm.totalTxFee = txFee
-    },
-
-    [types.SET_SEND_ZCOIN_RESPONSE] (state, response) {
-        console.log('mutation', types.SET_SEND_ZCOIN_RESPONSE, response)
-        const { _meta, data, error } = response
-        console.log(_meta, data, error)
-        state.sendZcoinResponse = {
-            ...response
-        }
     }
-
-    // --- Payment Queue ---
 }
 
 const actions = {
     ...pendingPayments.actions,
+    ...sendZcoinResponse.actions,
 
     [types.SET_AVAILABLE_FEES] ({ dispatch }, availableFees) {
         /*
@@ -129,11 +127,17 @@ const actions = {
     },
 
     [types.CALC_TX_FEE] ({ commit }, { payments, fee }) {
+        const paymentsMap = payments.map((payment) => ({
+            amount: payment.amount,
+            address: payment.address
+        }))
+
+        if (!paymentsMap.length) {
+            return
+        }
+
         commit(types.CALC_TX_FEE, {
-            payments: payments.map((payment) => ({
-                amount: payment.amount,
-                address: payment.address
-            })),
+            paymentsMap,
             fee
         })
     },
@@ -161,8 +165,9 @@ const actions = {
 
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
         dispatch(pendingPaymentTypes.CLEAR_PENDING_ZCOIN_PAYMENTS)
-    },
+    }
 
+    /*
     [types.ON_SEND_ZCOIN_SUCCESS] ({ commit, dispatch, state }, response) {
         console.log(types.ON_SEND_ZCOIN_SUCCESS)
         console.log(response)
@@ -180,10 +185,13 @@ const actions = {
             console.log(e)
         }
     }
+    */
 }
 
 const getters = {
     ...pendingPayments.getters,
+    ...sendZcoinResponse.getters,
+
     availableFees: (state) => state.availableFees,
     selectedFee: (state) => ({
         ...state.availableFees[state.selectedFee],
@@ -199,11 +207,7 @@ const getters = {
         !getters.createFormLabel &&
         !getters.createFormAmount &&
         !getters.createFormAddress
-    ),
-
-    currentResponse: (state) => state.sendZcoinResponse,
-    currentResponseIsError: (state) => state.sendZcoinResponse._meta ? state.sendZcoinResponse._meta.status !== 200 : false,
-    currentResponseError: (state) => state.sendZcoinResponse.error
+    )
 }
 
 export default {

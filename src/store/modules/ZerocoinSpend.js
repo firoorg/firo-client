@@ -1,8 +1,14 @@
 import Vue from 'vue'
 import * as types from '~/types/ZerocoinSpend'
+import Response from '~/mixins/Response'
+
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 
+const spendZerocoinResponse = Response.module('spend zerocoin')
+
 const state = {
+    ...spendZerocoinResponse.state,
+
     isLoading: false,
     spendForm: {
         label: '',
@@ -13,6 +19,8 @@ const state = {
 }
 
 const mutations = {
+    ...spendZerocoinResponse.mutations,
+
     [types.SPEND_ZEROCOIN] () {},
 
     [types.IS_LOADING] (state, isLoading) {
@@ -39,6 +47,8 @@ const mutations = {
     }
 }
 const actions = {
+    ...spendZerocoinResponse.actions,
+
     [types.SET_FORM_MINTS] ({ commit, state }, mints) {
         console.log(mints)
 
@@ -87,6 +97,8 @@ const actions = {
 }
 
 const getters = {
+    ...spendZerocoinResponse.getters,
+
     isLoading: (state) => state.isLoading,
     spendFormMints: (state) => state.spendForm.mints,
     spendFormLabel: (state) => state.spendForm.label,
