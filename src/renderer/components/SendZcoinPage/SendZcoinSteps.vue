@@ -73,7 +73,7 @@
     import SendStepSelectFee from '@/components/SendZcoinPage/SendStepSelectFee'
     import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
-    import SendStepStatus from '@/components/SendZcoinPage/SendStepStatus'
+    import SpendZerocoinStepStatus from '@/components/SpendZerocoinPage/SpendZerocoinStepStatus'
 
     export default {
         name: 'SendZcoinSteps',
@@ -87,7 +87,7 @@
             SendStepSelectFee,
             PaymentStepPassphrase,
             PaymentStepPassphraseButtons,
-            SendStepStatus
+            SpendZerocoinStepStatus
         },
 
         props: {
@@ -151,7 +151,7 @@
                     },
 
                     done: {
-                        component: SendStepStatus,
+                        component: SpendZerocoinStepStatus,
                         isOpen () {
                             return !this.isLoading
                         },
