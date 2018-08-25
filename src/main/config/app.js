@@ -2,7 +2,7 @@ export default {
     protocolIdentifier: 'zcoin',
     core: {
         autoRestart: true,
-        stopOnQuit: false,
+        stopOnQuit: true,
         heartbeatIntervalInSeconds: 1
     },
     folders: {
