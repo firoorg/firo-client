@@ -4,7 +4,7 @@
             trigger="manual"
             placement="left-end"
             :offset="8*3"
-            popover-class="advice"
+            popover-class="advice private"
             :boundaries-element="boundariesElement"
     >
         <template slot="target">
