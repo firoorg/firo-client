@@ -104,7 +104,7 @@ const actions = {
 
         commit(types.ADD_PAYMENT_REQUEST, {
             address,
-            createdAt: createdAt * 1000,
+            createdAt,
             amount,
             message,
             label,
