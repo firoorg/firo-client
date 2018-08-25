@@ -46,7 +46,6 @@ store.commit = (...args) => {
 }
 
 ipcRenderer.on('vuex-apply-mutation', (event, { type, payload }) => {
-    console.log('mutation recv: %s', type)
     commit(type, payload)
 })
 

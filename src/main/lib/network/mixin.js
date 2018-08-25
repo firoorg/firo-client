@@ -185,7 +185,7 @@ export default {
 
         this.requester.once('message', onMessage)
 
-        console.log('sending data --> ', data)
+        console.log('sending data --> ', Date.now(), data)
         this.setLoading(true)
 
         this.requester.send(JSON.stringify({

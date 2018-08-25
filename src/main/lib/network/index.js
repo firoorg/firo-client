@@ -152,7 +152,6 @@ export default {
     },
 
     setupEncryption (dataDir) {
-
         const { root, client, server, fileName } = CONFIG.app.folders.encryption
 
         let certificates = {}
