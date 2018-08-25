@@ -67,3 +67,7 @@ export const tryUntil = async function ({
 export const sleep = function (ms) {
     return new Promise((resolve, reject) => setTimeout(() => resolve(), ms))
 }
+
+export const ucFirst = function (s) {
+    return s.charAt(0).toUpperCase() + s.slice(1)
+}
