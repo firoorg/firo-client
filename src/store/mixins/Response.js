@@ -52,8 +52,14 @@ const module = function (namespace = '') {
 
         getters: {
             currentResponse: (state) => state[`${name}Response`],
-            currentResponseIsError: (state) => state[`${name}Response`]._meta ? state[`${name}Response`]._meta.status !== 200 : false,
-            currentResponseError: (state) => state[`${name}Response`].error
+            currentResponseIsError: (state) => {
+                if (!state[`${name}Response`] || !state[`${name}Response`]._meta) {
+                    return false
+                }
+
+                return state[`${name}Response`]._meta.status !== 200
+            },
+            currentResponseError: (state, getters) => getters.currentResponseIsError ? state[`${name}Response`].error : null
         }
     }
 }
