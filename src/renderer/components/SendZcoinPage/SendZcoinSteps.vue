@@ -171,7 +171,7 @@
         computed: {
             ...mapGetters({
                 isLoading: 'ZcoinPayment/isLoading',
-                isError: 'ZcoinPayment/currentResponseIsError',
+                isError: 'ZcoinPayment/sendZcoinResponseIsError',
                 fee: 'ZcoinPayment/selectedFee',
                 currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
                 currentFormAddress: 'ZcoinPayment/createFormAddress',

@@ -143,7 +143,7 @@
         computed: {
             ...mapGetters({
                 isLoading: 'ZerocoinSpend/isLoading',
-                isError: 'ZcoinPayment/currentResponseIsError',
+                isError: 'ZerocoinSpend/spendZerocoinResponseIsError',
                 // currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
                 currentFormAddress: 'ZerocoinSpend/spendFormAddress',
                 // currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',

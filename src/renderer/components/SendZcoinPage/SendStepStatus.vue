@@ -32,8 +32,8 @@
         computed: {
             ...mapGetters({
                 isLoading: 'ZcoinPayment/isLoading',
-                isError: 'ZcoinPayment/currentResponseIsError',
-                error: 'ZcoinPayment/currentResponseError'
+                isError: 'ZcoinPayment/sendZcoinResponseIsError',
+                error: 'ZcoinPayment/sendZcoinResponseError'
             })
         }
     }

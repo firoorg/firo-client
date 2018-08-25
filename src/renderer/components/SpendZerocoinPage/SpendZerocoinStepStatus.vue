@@ -31,9 +31,9 @@
 
         computed: {
             ...mapGetters({
-                isLoading: 'SpendZerocoin/isLoading',
-                isError: 'SpendZerocoin/currentResponseIsError',
-                error: 'SpendZerocoin/currentResponseError'
+                isLoading: 'ZerocoinSpend/isLoading',
+                isError: 'ZerocoinSpend/spendZerocoinResponseIsError',
+                error: 'ZerocoinSpend/spendZerocoinResponseError'
             })
         }
     }
