@@ -118,6 +118,7 @@ const getters = {
                     cost: parseInt(denomination) * amount
                 }
             })
+            .filter((denom) => denom.amount)
     },
     spendFormMintCosts (state, getters) {
         return getters.spendFormMintsFormatted
