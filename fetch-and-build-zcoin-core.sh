@@ -33,6 +33,7 @@ make -j${CORES}
 
 # copy binaries to gui assets folder
 echo "- copying binaries to assets folder"
+mkdir -p $DIR/assets/core
 cp $REPO/src/zcoind $DIR/assets/core
 cp $REPO/src/zcoin-cli $DIR/assets/core
 cp $REPO/src/zcoin-tx $DIR/assets/core

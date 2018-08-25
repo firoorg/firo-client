@@ -13,6 +13,3 @@ thumbs.db
 .idea/
 *.pid
 zcoin-repo
-/static/core/zcoin-cli
-/static/core/zcoin-tx
-/static/core/zcoind
