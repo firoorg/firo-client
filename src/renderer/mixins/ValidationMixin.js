@@ -60,7 +60,9 @@ export default {
             let tooltipToShow = ''
 
             for (let key of this.validationFieldOrder) {
-                if (this.validationErrors.has(key) && this.validationFields[key].touched) {
+                console.log(key, (this.validationFields[key]) ? this.validationFields[key].dirty : null)
+                if (this.validationErrors.has(key) && this.validationFields[key].dirty) {
+                    console.log(key)
                     tooltipToShow = key
                     break
                 }
@@ -72,7 +74,7 @@ export default {
         formValidated () {
             const fieldNames = Object.keys(this.validationFields)
 
-            const fieldsAreDirty = fieldNames.some(key => this.validationFields[key].touched)
+            const fieldsAreDirty = fieldNames.some(key => this.validationFields[key].touched || this.validationFields[key].dirty)
             const fieldsValidated = fieldNames.some(key => this.validationFields[key].validated)
             const fieldValuesAreValid = fieldNames.every(key => this.validationFields[key].valid)
 
