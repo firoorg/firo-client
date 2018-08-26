@@ -1,7 +1,7 @@
 <template>
-    <div class="status">
-        <h1 v-if="isLoading">Loading</h1>
-        <template v-else-if="isError">
+    <div class="status" v-if="!isLoading">
+        <!--<h1 v-if="isLoading">Loading</h1>-->
+        <template v-if="isError">
             <div class="icon">
                 <send-confirmation-check />
             </div>
@@ -9,7 +9,7 @@
             <p>{{ error.message }}</p>
             <em>code {{ error.code }}</em>
         </template>
-        <template v-else>
+        <template v-else-if="isValid">
             <div class="icon">
                 <send-confirmation-check />
             </div>
@@ -32,6 +32,7 @@
         computed: {
             ...mapGetters({
                 isLoading: 'ZcoinPayment/isLoading',
+                isValid: 'ZcoinPayment/sendZcoinResponseIsValid',
                 isError: 'ZcoinPayment/sendZcoinResponseIsError',
                 error: 'ZcoinPayment/sendZcoinResponseError'
             })

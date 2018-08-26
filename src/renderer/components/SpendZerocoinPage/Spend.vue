@@ -140,6 +140,8 @@
                         passphrase: this.currentPassphrase
                     }
                 })
+
+                this.cleanupForm()
             }
         }
     }

@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import * as types from '~/types/ZerocoinSpend'
+import allTypes from '~/types'
+
 import Response from '~/mixins/Response'
 
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
@@ -75,7 +77,7 @@ const actions = {
         dispatch(types.SET_FORM_ADDRESS, '')
     },
 
-    [types.SPEND_ZEROCOIN] ({ commit, state }, { address, denominations, label, auth }) {
+    [types.SPEND_ZEROCOIN] ({ commit, dispatch, state }, { address, denominations, label, auth }) {
         commit(types.SPEND_ZEROCOIN, {
             data: {
                 address,
@@ -93,6 +95,8 @@ const actions = {
                 ...auth
             }
         })
+
+        dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
     }
 }
 

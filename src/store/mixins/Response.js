@@ -52,21 +52,21 @@ const module = function (namespace = '') {
 
         getters: {
             [`${name}Response`]: (state) => state[`${name}Response`],
-            [`${name}ResponseIsValid`]: (state) => {
-                if (!state[`${name}Response`] || !state[`${name}Response`]._meta) {
+            [`${name}ResponseIsValid`]: (state, getters) => {
+                if (!getters[`${name}Response`] || !getters[`${name}Response`]._meta) {
                     return false
                 }
 
-                return state[`${name}Response`]._meta.status === 200
+                return getters[`${name}Response`]._meta.status === 200
             },
-            [`${name}ResponseIsError`]: (state) => {
-                if (!state[`${name}Response`] || !state[`${name}Response`]._meta) {
+            [`${name}ResponseIsError`]: (state, getters) => {
+                if (!getters[`${name}Response`] || !getters[`${name}Response`]._meta) {
                     return false
                 }
 
-                return state[`${name}Response`]._meta.status !== 200
+                return getters[`${name}Response`]._meta.status !== 200
             },
-            [`${name}ResponseError`]: (state, getters) => getters.currentResponseIsError ? state[`${name}Response`].error : null
+            [`${name}ResponseError`]: (state, getters) => getters[`${name}ResponseIsError`] ? state[`${name}Response`].error : null
         }
     }
 }
