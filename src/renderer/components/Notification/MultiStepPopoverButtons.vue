@@ -55,10 +55,12 @@
                 return this.steps
             },
 
+            // todo integrate GuideMixin
             stepKeys () {
                 return Object.keys(this.steps)
             },
 
+            // todo integrate GuideMixin
             currentIndex () {
                 return this.stepKeys.indexOf(this.currentStep)
             },
@@ -73,6 +75,7 @@
                 return this.$slots[currentStepTargetSlotName] || this.$scopedSlots[currentStepTargetSlotName] ? currentStepTargetSlotName : 'default'
             },
 
+            // todo integrate GuideMixin
             getTargetActions () {
                 return {
                     prev: this.prevStep,
@@ -87,18 +90,21 @@
                 console.log('can submit!!')
             },
 
+            // todo integrate GuideMixin
             nextStep () {
                 if (this.currentIndex < this.stepKeys.length - 1) {
                     this.$emit('step-change', this.stepKeys[this.currentIndex + 1], this.currentStep)
                 }
             },
 
+            // todo integrate GuideMixin
             prevStep () {
                 if (this.currentIndex > 0) {
                     this.$emit('step-change', this.stepKeys[this.currentIndex - 1], this.currentStep)
                 }
             },
 
+            // todo integrate GuideMixin
             goToStep (stepKey) {
                 console.log('go to step', stepKey)
                 if (!this.steps[stepKey]) {

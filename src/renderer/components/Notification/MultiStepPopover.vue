@@ -6,7 +6,9 @@
             class="timed-popover"
             :boundaries-element="boundariesElement"
             trigger="manually"
-            v-on="$listeners">
+            v-on="$listeners"
+            :can-blur="canBlur"
+            :delay="delay">
         <template slot="target">
             <slot />
         </template>
@@ -20,6 +22,8 @@
 </template>
 
 <script>
+    import isObject from 'lodash/isObject'
+
     // import TestA from '@/components/Notification/TestA'
     // import TestB from '@/components/Notification/TestB'
 
@@ -57,8 +61,16 @@
                 type: Object,
                 required: false
             },
+            delay: {
+                type: Object,
+                required: false
+            },
             componentProps: {
                 type: Object
+            },
+            canBlur: {
+                type: Boolean,
+                default: true
             }
         },
 
@@ -68,7 +80,23 @@
             },
 
             currentStepComponent () {
-                return this.steps[this.currentStep] ? this.steps[this.currentStep] : null
+                return this.stepComponents[this.currentStep] ? this.stepComponents[this.currentStep] : null
+            },
+
+            stepComponents () {
+                let components = {}
+                for (let key of Object.keys(this.steps)) {
+                    const step = this.steps[key]
+
+                    console.log(step)
+                    if (isObject(step) && step.component) {
+                        components[key] = step.component
+                    } else {
+                        components[key] = step
+                    }
+                }
+
+                return components
             }
         }
     }

@@ -1,6 +1,6 @@
 export default {
     props: [
-        'onNext'
+        'actions'
     ],
 
     created () {
@@ -16,7 +16,7 @@ export default {
 
         // skip if not enabled due to the current state
         if (!this.isEnabled()) {
-            this.onNext()
+            this.actions.next()
         }
     },
 

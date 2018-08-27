@@ -60,8 +60,8 @@
 </template>
 
 <script>
-    import isObject from 'lodash/isObject'
     import { mapGetters } from 'vuex'
+    import GuideMixin from '@/mixins/GuideMixin'
 
     // import types from '~/types'
 
@@ -77,6 +77,10 @@
 
     export default {
         name: 'SendZcoinSteps',
+
+        mixins: [
+            GuideMixin
+        ],
 
         components: {
             MultiStepPopoverButtons,
@@ -194,21 +198,6 @@
 
             canAddToQueue () {
                 return !this.currentFormIsEmpty && this.formIsValid
-            },
-
-            stepComponents () {
-                let components = {}
-                for (let key of Object.keys(this.steps)) {
-                    const step = this.steps[key]
-
-                    if (isObject(step)) {
-                        components[key] = step.component
-                    } else {
-                        components[key] = step
-                    }
-                }
-
-                return components
             },
 
             currentPlacement () {

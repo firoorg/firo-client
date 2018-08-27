@@ -16,7 +16,7 @@
             </base-button>
         </template>
 
-        <multi-step-popover-buttons :steps="stepComponents"
+        <multi-step-popover-buttons :steps="steps"
                                     :current-step="currentStep"
                                     @step-change="onStepChange"
                                     @can-submit="onStepCanSubmit"
@@ -53,9 +53,8 @@
 </template>
 
 <script>
-    import isObject from 'lodash/isObject'
     import { mapGetters } from 'vuex'
-
+    import GuideMixin from '@/mixins/GuideMixin'
     // import types from '~/types'
 
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
@@ -70,6 +69,10 @@
     export default {
         name: 'SendZcoinSteps',
 
+        mixins: [
+            GuideMixin
+        ],
+
         components: {
             MultiStepPopoverButtons,
             SendAddToQueueButton,
@@ -82,10 +85,6 @@
         },
 
         props: {
-            boundariesElement: {
-                type: HTMLElement,
-                required: false
-            },
             formIsValid: {
                 type: Boolean,
                 required: true
@@ -133,7 +132,6 @@
                     }
 
                 },
-                currentStep: '',
                 currentStepCanSubmit: false,
                 currentStepCanCancel: false,
                 isConfirmed: false
@@ -158,55 +156,6 @@
                 return this.canStart && this.currentStepCanSubmit
             },
 
-            stepComponents () {
-                let components = {}
-                for (let key of Object.keys(this.steps)) {
-                    const step = this.steps[key]
-
-                    if (isObject(step)) {
-                        components[key] = step.component
-                    } else {
-                        components[key] = step
-                    }
-                }
-
-                return components
-            },
-
-            currentPlacement () {
-                const current = this.steps[this.currentStep]
-
-                return current && current.placement ? current.placement.bind(this)() : 'top-end'
-            },
-
-            currentStepIsOpen () {
-                if (!this.steps[this.currentStep]) {
-                    return false
-                }
-
-                if (!this.steps[this.currentStep].isOpen) {
-                    return false
-                }
-
-                return this.steps[this.currentStep].isOpen.bind(this)()
-            },
-
-            currentComponentProps () {
-                if (!this.steps[this.currentStep]) {
-                    return null
-                }
-
-                if (!this.steps[this.currentStep].props) {
-                    return null
-                }
-
-                return this.steps[this.currentStep].props.bind(this)()
-            },
-
-            currentPopoverClass () {
-                return [this.submitButtonColor, `${'step'}-${this.currentStep}`].join(' ')
-            },
-
             isUsedAddress () {
                 return this.hasAlreadySentToAddress(this.currentFormAddress)
             },
@@ -224,24 +173,7 @@
             }
         },
 
-        watch: {
-            currentStep: {
-                handler (newVal, oldVal) {
-                    window.dispatchEvent(new Event('resize'))
-                },
-                immediate: true
-            }
-        },
-
         methods: {
-            onStepChange (newStep, oldStep) {
-                if (this.currentStep === newStep) {
-                    return
-                }
-
-                this.currentStep = newStep
-            },
-
             onStepCanSubmit (newVal) {
                 console.log('on can submit!', newVal)
                 this.currentStepCanSubmit = newVal
