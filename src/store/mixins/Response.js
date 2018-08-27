@@ -25,10 +25,16 @@ const module = function (namespace = '') {
 
         mutations: {
             [`SET_${NAME}_RESPONSE`] (state, response) {
-                const { _meta, data, error } = response
+                const { _meta, data, txids, error } = response
+                // todo add generic keys like txids dynamically
                 console.log(_meta, data, error)
                 state[`${name}Response`] = {
-                    ...response
+                    _meta,
+                    error,
+                    data: {
+                        txids,
+                        ...data
+                    }
                 }
             }
         },
