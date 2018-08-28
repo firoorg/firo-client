@@ -15,6 +15,10 @@ export default {
         convertToAddressAmountPair (payments) {
             let addresses = {}
 
+            if (!payments || !payments.length) {
+                return addresses
+            }
+
             payments.forEach((payment) => {
                 const { address, amount } = payment
                 addresses[address] = amount
@@ -25,8 +29,8 @@ export default {
 
         getTransactionFee (data) {
             console.log('GETTING TX FEE', data)
-            const { fee, payments } = data
-            const addresses = this.convertToAddressAmountPair(payments)
+            const { fee, paymentsMap } = data
+            const addresses = this.convertToAddressAmountPair(paymentsMap)
 
             this.send({
                 type: 'get',

@@ -131,7 +131,7 @@
             },
 
             dataManager (sortOrder, pagination) {
-                console.log('DATAMANAGER CALLED!')
+                // console.log('DATAMANAGER CALLED!')
                 if (this.data.length < 1) {
                     return {
                         data: []
