@@ -63,7 +63,7 @@
     import { mapGetters } from 'vuex'
     import GuideMixin from '@/mixins/GuideMixin'
 
-    // import types from '~/types'
+    import types from '~/types'
 
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
     import SendStepConfirm from '@/components/SendZcoinPage/SendStepConfirm'
@@ -73,7 +73,7 @@
     import SendStepSelectFee from '@/components/SendZcoinPage/SendStepSelectFee'
     import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
-    import SpendZerocoinStepStatus from '@/components/SpendZerocoinPage/SpendZerocoinStepStatus'
+    import StepResponseStatus from '@/components/payments/StepResponseStatus'
 
     export default {
         name: 'SendZcoinSteps',
@@ -91,7 +91,7 @@
             SendStepSelectFee,
             PaymentStepPassphrase,
             PaymentStepPassphraseButtons,
-            SpendZerocoinStepStatus
+            StepResponseStatus
         },
 
         props: {
@@ -155,12 +155,23 @@
                     },
 
                     done: {
-                        component: SpendZerocoinStepStatus,
+                        component: StepResponseStatus,
                         isOpen () {
                             return !this.isLoading
                         },
                         placement () {
                             return 'top'
+                        },
+                        props () {
+                            return {
+                                isLoading: this.isLoading,
+                                isValid: this.responseIsValid,
+                                isError: this.responseIsError,
+                                error: this.responseError,
+                                onAutoClose: () => {
+                                    this.onCancel()
+                                }
+                            }
                         }
                     }
 
@@ -175,7 +186,9 @@
         computed: {
             ...mapGetters({
                 isLoading: 'ZcoinPayment/isLoading',
-                isError: 'ZcoinPayment/sendZcoinResponseIsError',
+                responseIsValid: 'ZcoinPayment/sendZcoinResponseIsValid',
+                responseIsError: 'ZcoinPayment/sendZcoinResponseIsError',
+                responseError: 'ZcoinPayment/sendZcoinResponseError',
                 fee: 'ZcoinPayment/selectedFee',
                 currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
                 currentFormAddress: 'ZcoinPayment/createFormAddress',
@@ -263,7 +276,7 @@
                     return 'orange'
                 }
 
-                if (this.isError) {
+                if (this.responseIsError) {
                     return 'red'
                 }
 
@@ -322,6 +335,8 @@
                 this.currentStep = null
                 this.currentStepCanSubmit = false
                 this.currentStepCanCancel = false
+
+                this.$store.dispatch(types.zcoinpayment.CLEAR_SEND_ZCOIN_RESPONSE)
             }
         }
     }

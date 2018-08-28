@@ -55,7 +55,7 @@
 <script>
     import { mapGetters } from 'vuex'
     import GuideMixin from '@/mixins/GuideMixin'
-    // import types from '~/types'
+    import types from '~/types'
 
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
     import SpendZerocoinStepConfirm from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirm'
@@ -64,10 +64,10 @@
     import SpendZerocoinStepConfirmButtons from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirmButtons'
     import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
-    import SendStepStatus from '@/components/SendZcoinPage/SendStepStatus'
+    import StepResponseStatus from '@/components/payments/StepResponseStatus'
 
     export default {
-        name: 'SendZcoinSteps',
+        name: 'SpendZerocoinSteps',
 
         mixins: [
             GuideMixin
@@ -81,7 +81,7 @@
             SpendZerocoinStepConfirmButtons,
             PaymentStepPassphrase,
             PaymentStepPassphraseButtons,
-            SendStepStatus
+            StepResponseStatus
         },
 
         props: {
@@ -122,12 +122,23 @@
                     },
 
                     done: {
-                        component: SendStepStatus,
+                        component: StepResponseStatus,
                         isOpen () {
-                            return !this.isLoading
+                            return !this.isLoading && !this.isDone
                         },
                         placement () {
                             return 'top'
+                        },
+                        props () {
+                            return {
+                                isLoading: this.isLoading,
+                                isValid: this.responseIsValid,
+                                isError: this.responseIsError,
+                                error: this.responseError,
+                                onAutoClose: () => {
+                                    this.onCancel()
+                                }
+                            }
                         }
                     }
 
@@ -141,7 +152,9 @@
         computed: {
             ...mapGetters({
                 isLoading: 'ZerocoinSpend/isLoading',
-                isError: 'ZerocoinSpend/spendZerocoinResponseIsError',
+                responseIsValid: 'ZerocoinSpend/spendZerocoinResponseIsValid',
+                responseIsError: 'ZerocoinSpend/spendZerocoinResponseIsError',
+                responseError: 'ZerocoinSpend/spendZerocoinResponseError',
                 // currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
                 currentFormAddress: 'ZerocoinSpend/spendFormAddress',
                 // currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
@@ -165,7 +178,7 @@
                     return 'orange'
                 }
 
-                if (this.isError) {
+                if (this.responseIsError) {
                     return 'red'
                 }
 
@@ -194,6 +207,8 @@
                 this.currentStep = null
                 this.currentStepCanSubmit = false
                 this.currentStepCanCancel = false
+
+                this.$store.dispatch(types.zerocoinspend.CLEAR_SPEND_ZEROCOIN_RESPONSE)
             }
         }
     }

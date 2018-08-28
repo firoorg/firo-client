@@ -31,16 +31,30 @@ const module = function (namespace = '') {
 
                 Vue.set(state, responseName, {})
             },
+
             [`SET_${NAME}_RESPONSE`] (state, response) {
+                const responseName = `${name}Response`
                 const { _meta, data, error } = response
                 // todo add generic keys like txids dynamically and be explicit
                 // console.log(_meta, data, error)
+                console.log('updating', `SET_${NAME}_RESPONSE`, response)
+                /*
                 Vue.set(state, `${name}Response`, {
                     ...response,
                     _meta,
                     data,
                     error
                 })
+                */
+                state[responseName]._meta = _meta
+                state[responseName].data = data
+                state[responseName].error = error
+                /*
+                state[responseName] = {
+                    ...state[responseName],
+                    ...response
+                }
+                */
             }
         },
 

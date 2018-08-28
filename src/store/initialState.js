@@ -82,6 +82,11 @@ module.exports = {
             mints: {
             },
             address: null
+        },
+        spendZerocoinResponse: {
+            _meta: null,
+            data: null,
+            error: null
         }
     },
 

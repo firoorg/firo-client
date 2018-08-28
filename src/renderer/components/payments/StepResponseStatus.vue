@@ -19,24 +19,26 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-
     import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
+    import AutoCloseMixin from '@/mixins/AutoCloseMixin'
 
     export default {
-        name: 'SpendZerocoinStepStatus',
+        name: 'SendStepStatus',
+
+        mixins: [
+            AutoCloseMixin
+        ],
+
         components: {
             SendConfirmationCheck
         },
 
-        computed: {
-            ...mapGetters({
-                isLoading: 'ZerocoinSpend/isLoading',
-                isValid: 'ZerocoinSpend/spendZerocoinResponseIsValid',
-                isError: 'ZerocoinSpend/spendZerocoinResponseIsError',
-                error: 'ZerocoinSpend/spendZerocoinResponseError'
-            })
-        }
+        props: [
+            'isLoading',
+            'isValid',
+            'isError',
+            'error'
+        ]
     }
 </script>
 

@@ -23,12 +23,7 @@ const state = {
         totalTxFee: 0
     },
     isLoading: false,
-    lastSeen: 'blockHeightAsInteger',
-    sendZcoinResponse: {
-        _meta: null,
-        data: null,
-        error: null
-    }
+    lastSeen: 'blockHeightAsInteger'
 }
 
 const mutations = {
