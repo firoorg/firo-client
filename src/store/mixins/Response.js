@@ -6,6 +6,7 @@ const types = function (namespace) {
 
     return {
         [`SET_${NAME}_RESPONSE`]: `SET_${NAME}_RESPONSE`,
+        [`CLEAR_${NAME}_RESPONSE`]: `CLEAR_${NAME}_RESPONSE`,
         [`ON_${NAME}_SUCCESS`]: `ON_${NAME}_SUCCESS`,
         [`ON_${NAME}_ERROR`]: `ON_${NAME}_ERROR`
     }
@@ -25,6 +26,11 @@ const module = function (namespace = '') {
         },
 
         mutations: {
+            [`CLEAR_${NAME}_RESPONSE`] (state) {
+                const responseName = `${name}Response`
+
+                Vue.set(state, responseName, {})
+            },
             [`SET_${NAME}_RESPONSE`] (state, response) {
                 const { _meta, data, error } = response
                 // todo add generic keys like txids dynamically and be explicit
@@ -39,6 +45,14 @@ const module = function (namespace = '') {
         },
 
         actions: {
+            [`CLEAR_${NAME}_RESPONSE`] ({ commit, state }) {
+                if (!state[`${name}Response`] || !state[`${name}Response`]._meta) {
+                    return
+                }
+
+                commit(t[`CLEAR_${NAME}_RESPONSE`])
+            },
+
             [`ON_${NAME}_SUCCESS`] ({ commit, dispatch, state }, response) {
                 commit(t[`SET_${NAME}_RESPONSE`], response)
             },
