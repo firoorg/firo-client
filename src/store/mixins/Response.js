@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { getName } from '~/mixins/utils'
 
 const types = function (namespace) {
@@ -25,17 +26,15 @@ const module = function (namespace = '') {
 
         mutations: {
             [`SET_${NAME}_RESPONSE`] (state, response) {
-                const { _meta, data, txids, error } = response
-                // todo add generic keys like txids dynamically
-                console.log(_meta, data, error)
-                state[`${name}Response`] = {
+                const { _meta, data, error } = response
+                // todo add generic keys like txids dynamically and be explicit
+                // console.log(_meta, data, error)
+                Vue.set(state, `${name}Response`, {
+                    ...response,
                     _meta,
-                    error,
-                    data: {
-                        txids,
-                        ...data
-                    }
-                }
+                    data,
+                    error
+                })
             }
         },
 

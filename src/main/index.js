@@ -30,7 +30,8 @@ if (process.env.NODE_ENV !== 'development') {
 const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
 const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
 const zcoindPath = join(unpackedRootFolder, '/assets/core/zcoind')
-const userDataPath = app.getPath('userData')
+// todo test .pid in application support
+const userDataPath = process.env.NODE_ENV === 'development' ? rootFolder + '/assets/core' : app.getPath('userData')
 const pathToStorePid = userDataPath
 
 debug({
