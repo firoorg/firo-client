@@ -5,17 +5,13 @@
         <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis.</p>
 
         <footer>
-            <BaseButton
-                    v-if="!hasLocation"
-                    color="green"
-                    is-popover
-                    @click="selectFolder"
+            <BaseButton v-if="!hasLocation"
+                        color="green"
+                        @click="selectFolder"
             >Select Location</BaseButton>
-            <BaseButton
-                    v-else
-                    color="green"
-                    is-popover
-                    @click="onNext"
+            <BaseButton v-else
+                        color="green"
+                        @click="actions.next"
             >Done</BaseButton>
         </footer>
     </div>
@@ -62,7 +58,7 @@
 
                 console.log(types)
                 this.$store.dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location: blockchainPath })
-                this.onNext()
+                this.actions.next()
             },
 
             isEnabled () {

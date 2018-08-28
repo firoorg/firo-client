@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Other</h1>
+        <h1>AmountToHoldInZerocoin</h1>
 
         <footer>
             <BaseButton
@@ -15,7 +15,7 @@
     import GuideStepMixin from '@/mixins/GuideStepMixin'
 
     export default {
-        name: 'IntroScreenOther',
+        name: 'IntroScreenAmountToHoldInZerocoin',
         mixins: [
             GuideStepMixin
         ]

@@ -21,6 +21,7 @@
         mixins: [
             GuideStepMixin
         ],
+
         methods: {
             isEnabled () {
                 console.log('App/showIntroScreen', this.$store.getters['App/showIntroScreen'])
