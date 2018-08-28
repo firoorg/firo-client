@@ -19,6 +19,10 @@
         <p>Donec sed odio dui. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum. Sed posuere consectetur est at lobortis. Nulla vitae elit libero, a pharetra augue.</p>
         <p>Maecenas faucibus mollis interdum. Curabitur blandit tempus porttitor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Etiam porta sem malesuada magna mollis euismod. Curabitur blandit tempus porttitor. Donec sed odio dui.</p>
 
+        <loading-bounce></loading-bounce>
+        <div class="dark">
+            <loading-bounce color="dark"></loading-bounce>
+        </div>
     </section>
 </template>
 
@@ -26,10 +30,12 @@
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
     import TestA from '@/components/Notification/TestA'
     import TestB from '@/components/Notification/TestB'
+    import LoadingBounce from '@/components/Icons/LoadingBounce'
 
     export default {
         name: 'test-page',
         components: {
+            LoadingBounce,
             MultiStepPopoverButtons
         },
 
@@ -55,5 +61,11 @@
 <style lang="scss" scoped>
     .test-page {
         padding: emRhythm(5);
+
+        & > .dark {
+            display: inline-block;
+            background: $color--comet-dark-mixed;
+            padding: emRhythm(5);
+        }
     }
 </style>
