@@ -17,7 +17,7 @@
             </base-button>
         </template>
 
-        <multi-step-popover-buttons :steps="stepComponents"
+        <multi-step-popover-buttons :steps="steps"
                                     :current-step="currentStep"
                                     @step-change="onStepChange"
                                     @can-submit="onStepCanSubmit"

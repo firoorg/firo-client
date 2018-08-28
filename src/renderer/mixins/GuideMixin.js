@@ -14,18 +14,6 @@ export default {
     },
 
     computed: {
-        hasCurrentKey (key) {
-            if (!this.steps[this.currentStep]) {
-                return false
-            }
-
-            if (!this.steps[this.currentStep][key]) {
-                return false
-            }
-
-            return true
-        },
-
         stepKeys () {
             return Object.keys(this.steps)
         },
@@ -81,6 +69,18 @@ export default {
     },
 
     methods: {
+        hasCurrentKey (key) {
+            if (!this.steps[this.currentStep]) {
+                return false
+            }
+
+            if (!this.steps[this.currentStep][key]) {
+                return false
+            }
+
+            return true
+        },
+
         onStepChange (newStep, oldStep) {
             if (this.currentStep === newStep) {
                 return
