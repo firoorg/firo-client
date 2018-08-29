@@ -55,6 +55,15 @@ const i18n = new VueI18n({
     messages: languages // set locale messages
 })
 
+if (process.env.SHOW_TRANSLATIONS) {
+    const interpolate = i18n._formatter.interpolate
+
+    i18n._formatter.interpolate = function (message, values) {
+        const result = interpolate.bind(i18n._formatter)(message, values)
+        return result.map((r) => `${r} ✅`)
+    }
+}
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
