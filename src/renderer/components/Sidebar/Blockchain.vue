@@ -100,7 +100,7 @@
             grid-area: status;
             justify-self: start;
             align-self: end;
-            margin-left: emRhythm(2);
+            margin-left: emRhythm(3);
 
             color: $color--comet;
             font-style: italic;
@@ -127,7 +127,7 @@
             grid-area: connections;
             justify-self: end;
             align-self: end;
-            margin-right: emRhythm(2);
+            margin-right: emRhythm(3);
 
             &.error .connections-badge {
                 background: $gradient--red-vertical;
