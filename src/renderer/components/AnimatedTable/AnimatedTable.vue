@@ -2,7 +2,7 @@
     <div class="animated-table">
         <vuetable ref="vuetable"
                   :api-mode="false"
-                  :fields="fields"
+                  :fields="getFieldsWithLocalizedTitle"
                   :per-page="perPage"
                   :track-by="trackBy"
                   :sort-order="sortOrder"
@@ -83,6 +83,17 @@
 
         mounted () {
             console.log('animated table created', this.$scopedSlots)
+        },
+
+        computed: {
+            getFieldsWithLocalizedTitle () {
+                return this.fields.map((field) => {
+                    return {
+                        ...field,
+                        title: this.$t(field.title)
+                    }
+                })
+            }
         },
 
         watch: {
