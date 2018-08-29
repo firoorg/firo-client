@@ -23,3 +23,38 @@ navigation:
     button__settings: Settings
   settings:
     switch__connect-via-tor: Anonymize Connection
+
+
+receive:
+  overview:
+    title: Receive Zcoin
+    # description
+    table__payment-requests:
+      label__amount: Amount
+      label__created: Created
+      label__label: Label
+      placeholder__filter: Filter by label
+  detail-create-request:
+    title__create: Create Payment Request
+    label__label: Label
+    placeholder__label: "some cool #example here"
+    label__amount: Amount
+    placeholder__amount: put some numbers in here
+    label__message: Message
+    placeholder__message: some cool message for the recipient!
+    button__create-payment-request: Create Payment Request
+
+  detail-entry-request:
+    button__primary-action: Create Payment Request
+    label__created: Created
+    label__requested: Requested
+    label__fulfilled: Fulfilled
+    label__received: Received
+    # message__no-amount: no amount requested
+    pending:
+      button__share-via-email--pirmary: Share via E-Mail
+      button__copy-link--secondary: Copy Link
+      message__copy-link--success: Copied Link to your Clipboard
+
+    fulfilled:
+      button__open-explorer: Open in Block Explorer
