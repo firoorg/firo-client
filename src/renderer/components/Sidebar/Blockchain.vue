@@ -6,7 +6,7 @@
                 <span>Synced</span>
             </template>
             <template v-else>
-                <loading-bounce class="icon" color="dark" size="mini"></loading-bounce>
+                <loading-bounce class="icon" color="green" size="mini"></loading-bounce>
                 <span>Syncing...</span>
             </template>
         </div>
@@ -64,8 +64,7 @@
             }),
 
             progress () {
-                // return this.currentBlockHeight / this.tipHeight * 100
-                return 50
+                return this.currentBlockHeight / this.tipHeight * 100
             },
 
             connectionClass () {
