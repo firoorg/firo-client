@@ -249,10 +249,17 @@ const actions = {
 
 const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
+    tipHeight: (state) => state.blockchainTip,
     isTestnet: (state) => state.testnet,
     isMainnet: (state, getters) => !getters.isTestnet,
+    status: (state) => state.status || {},
+    isSynced: (state, getters) => getters.status.isSynced,
+    isBlockchainSynced: (state, getters) => getters.status.isBlockchainSynced,
+    isZnodeListSynced: (state, getters) => getters.status.isZnodeListSynced,
     networkIdentifier: (state, getters) => getters.isMainnet ? 'mainnet' : 'testnet',
-    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime * 1000
+    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime * 1000,
+    connections: (state) => state.connections,
+    hasConnections: (state) => !!state.connections
 }
 
 export default {
