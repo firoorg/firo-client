@@ -1,6 +1,7 @@
 .tooltip {
     $tooltip--padding: emRhythm(2) emRhythm(2);
     $tooltip--arrow-size: emRhythm(1) / 3 * 2;
+    $tooltip--background-transition-duration: .5s;
 
     display: block !important;
     z-index: 10000;
@@ -45,6 +46,8 @@
             left: calc(50% - $tooltip--arrow-size);
             margin-top: 0;
             margin-bottom: 0;
+
+            transition: border-top-color $tooltip--background-transition-duration ease-in-out;
         }
     }
 
@@ -60,6 +63,8 @@
             left: calc(50% - $tooltip--arrow-size);
             margin-top: 0;
             margin-bottom: 0;
+
+            transition: border-bottom-color $tooltip--background-transition-duration ease-in-out;
         }
     }
 
@@ -75,6 +80,8 @@
             top: calc(50% - $tooltip--arrow-size);
             margin-left: 0;
             margin-right: 0;
+
+            transition: border-right-color $tooltip--background-transition-duration ease-in-out;
         }
     }
 
@@ -90,6 +97,8 @@
             top: calc(50% - $tooltip--arrow-size);
             margin-left: 0;
             margin-right: 0;
+
+            transition: border-left-color $tooltip--background-transition-duration ease-in-out;
         }
     }
 
@@ -129,7 +138,7 @@
         box-shadow: none;
 
         .popover-arrow {
-            transition: border-color .5s ease-in-out;
+            //transition: border-color $tooltip--background-transition-duration ease-in-out;
         }
 
         .popover-inner {
@@ -137,7 +146,7 @@
             border-radius: 0;
             @include glow-small-box();
             max-width: none;
-            transition: background-color .5s ease-in-out;
+            transition: background-color $tooltip--background-transition-duration ease-in-out;
 
             header {
                 padding-bottom: emRhythm(2);
