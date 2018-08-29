@@ -146,7 +146,7 @@
 
             .connections-badge {
                 @include font-heavy();
-                @include setType(2.5, $ms-down1);
+                @include setType(2.5, $ms-down1, $silent: true);
                 display: inline-block;
                 border-radius: 50%;
                 background: $color--comet-dark;

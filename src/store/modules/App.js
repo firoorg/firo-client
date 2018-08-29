@@ -55,7 +55,6 @@ const getters = {
     showIntroScreen: (state) => state.showIntroScreen,
     isLocked: (state) => state.clientIsLocked,
     hasOpenOverlay (state, getters, rootState, rootGetters) {
-        console.log(rootGetters)
         const windowHasOpenModal = rootGetters['Window/hasOpenModal']
         const networkIsConnected = rootGetters['Network/isConnected']
         const networkConnectionError = rootGetters['Network/ConnectionError']
