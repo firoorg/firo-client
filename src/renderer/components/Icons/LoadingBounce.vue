@@ -1,5 +1,5 @@
 <template>
-    <div class="spinner" :class="[ color ]">
+    <div class="spinner" :class="[ color, size ]">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
     </div>
@@ -13,6 +13,10 @@ export default {
         color: {
             type: String,
             default: null
+        },
+        size: {
+            type: String,
+            default: ''
         }
     }
 }
@@ -33,6 +37,16 @@ export default {
                 background-color: $color--polo-light;
             }
         }
+
+        &.small {
+            width: emRhythm(3);
+            height: emRhythm(3);
+        }
+
+        &.mini {
+            width: emRhythm(2);
+            height: emRhythm(2);
+        }
     }
 
     .double-bounce1,
@@ -51,6 +65,7 @@ export default {
 
     .double-bounce2 {
         animation-delay: -1.0s;
+        opacity: 0.4;
     }
 
     @keyframes sk-bounce {
