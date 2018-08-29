@@ -10,7 +10,7 @@
         <main-menu class="menu"></main-menu>
 
         <settings class="settings"></settings>
-        <!--<Blockchain class="blockchain"></Blockchain>-->
+        <blockchain class="blockchain"></blockchain>
     </aside>
 </template>
 
@@ -19,7 +19,7 @@
     import Balance from '@/components/Sidebar/Balance'
     import Menu from '@/components/Sidebar/Menu'
     import Settings from '@/components/Sidebar/Settings'
-    // import Blockchain from '@/components/Sidebar/Blockchain'
+    import Blockchain from '@/components/Sidebar/Blockchain'
 
     export default {
         name: 'sidebar',
@@ -27,8 +27,8 @@
             ZcoinLogoText,
             Balance,
             'main-menu': Menu,
-            Settings
-            // Blockchain
+            Settings,
+            Blockchain
         }
     }
 </script>

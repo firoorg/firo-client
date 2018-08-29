@@ -1,90 +1,191 @@
 <template>
     <section class="blockchain">
-        SYNC HERE
-        <div class="status">
-            <i class="el-icon-loading"></i>
+        <div class="status" :class="{ 'is-synced': isSynced }">
+            <template v-if="isSynced">
+                <tick-icon class="icon"></tick-icon>
+                <span>Synced</span>
+            </template>
+            <template v-else>
+                <loading-bounce class="icon" color="dark" size="mini"></loading-bounce>
+                <span>Syncing...</span>
+            </template>
         </div>
-        <div class="network">
-            <i class="el-icon-share"></i>
+        <div class="connections" :class="connectionClass">
+            <base-popover trigger="hover"
+                          boundaries-element="body"
+                          popover-class="advice green"
+                          placement="bottom-end"
+                          :offset="4"
+                          :delay="{ show: 200, hide: 100 }">
+                <blockchain-connection-popover slot="content" />
+                <template slot="target">
+                    <span class="connections-badge">{{ connections }}</span>
+                </template>
+            </base-popover>
+        </div>
+        <div class="sync-progress" :class="{ 'is-synced': isSynced }">
+            <div class="wrap" v-show="!isBlockchainSynced">
+                <div class="loaded" :style="{ width: `${progress}%`}"></div>
+            </div>
+            <!--
+            <div class="wrap">
+                <div class="loaded" :style="{ width: `${1.5 * progress}%`}"></div>
+            </div>
+            -->
         </div>
     </section>
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+
+    import LoadingBounce from '@/components/Icons/LoadingBounce'
+    import TickIcon from '@/components/Icons/TickIcon'
+
+    import BlockchainConnectionPopover from '@/components/Sidebar/BlockchainConnectionPopover'
+
     export default {
-        name: 'blockchain',
-        data () {
-            return {
-                progress: Math.floor(Math.random() * 100),
-                progressUpdateInterval: null
-            }
-        },
-        created () {
-            this.progressUpdateInterval = setInterval(() => {
-                this.progress = (this.progress + Math.floor(Math.random() * 20)) % 100
-            }, 5000)
+        name: 'Blockchain',
+        components: {
+            LoadingBounce,
+            TickIcon,
+            BlockchainConnectionPopover
         },
 
-        beforeDestroy () {
-            if (this.progressUpdateInterval) {
-                clearInterval(this.progressUpdateInterval)
+        computed: {
+            ...mapGetters({
+                currentBlockHeight: 'Blockchain/currentBlockHeight',
+                tipHeight: 'Blockchain/tipHeight',
+                isSynced: 'Blockchain/isSynced',
+                isBlockchainSynced: 'Blockchain/isBlockchainSynced',
+                isZnodeListSynced: 'Blockchain/isZnodeListSynced',
+                hasConnections: 'Blockchain/hasConnections',
+                connections: 'Blockchain/connections'
+            }),
+
+            progress () {
+                // return this.currentBlockHeight / this.tipHeight * 100
+                return 50
+            },
+
+            connectionClass () {
+                if (!this.hasConnections) {
+                    return 'error'
+                }
+
+                // todo implement check if tor and dandelion are activated
+                // return 'public'
+
+                return 'private'
             }
         }
     }
 </script>
 
 <style lang="scss">
-    .blockchain {
+    $loaded-background: $color--green;
+    section.blockchain {
         position: relative;
-        margin-left: emRhythm(3);
-        margin-right: emRhythm(3);
-
-        display: grid;
-        grid-template-areas: "progress status network";
-        grid-template-columns: auto emRhythm(3) emRhythm(3);
-        grid-gap: emRhythm(2);
-
-        &:before {
-            $height: 1px;
-
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: $height;
-            // background: linear-gradient(to right, $color--lila-dark, $color--lila, $color--lila-dark);
-            top:-$height;
-            left: 0;
-            opacity: 0.2;
-        }
-
-        .sync-progress {
-            grid-area: progress;
-        }
-
-        .el-progress-bar__inner,
-        .el-progress-bar__outer{
-            border-radius: 0;
-        }
-
-        .el-progress-bar__outer {
-            background: $color--dark;
-        }
-
-        .el-progress-bar__inner {
-            background: $gradient--green-bright;
-            transition: width 1s ease-out;
-        }
-
-        &> div {
-            align-self: center;
-        }
+        display: grid !important;
+        grid-template-areas: "status connections"
+        "sync sync";
+        grid-template-rows: 1fr auto;
+        grid-row-gap: emRhythm(1);
+        /*
+        display: flex !important;
+        flex-direction: row;
+        align-items: flex-end;
+        */
 
         .status {
             grid-area: status;
+            justify-self: start;
+            align-self: end;
+            margin-left: emRhythm(2);
+
+            color: $color--comet;
+            font-style: italic;
+            // border: 1px solid red;
+            display: flex;
+            align-items: baseline;
+
+            .icon {
+                transform: translate(0px, 20%);
+            }
+
+            span {
+                //@include setType(2);
+                //padding: 0.25em 0 0.5rem;
+                display: inline-block;
+            }
+
+            .icon + span {
+                margin-left: emRhythm(0.75, $silent: true);
+            }
         }
 
-        .network {
-            grid-area: network;
+        .connections {
+            grid-area: connections;
+            justify-self: end;
+            align-self: end;
+            margin-right: emRhythm(2);
+
+            &.error .connections-badge {
+                background: $gradient--red-vertical;
+                color: $color--white;
+            }
+
+            &.public .connections-badge {
+                background: $gradient--orange-vertical;
+                color: $color--dark;
+            }
+
+            &.private .connections-badge {
+                background: $gradient--green-bright;
+                color: $color--dark;
+            }
+
+            .connections-badge {
+                @include font-heavy();
+                @include setType(2.5, $ms-down1);
+                display: inline-block;
+                border-radius: 50%;
+                background: $color--comet-dark;
+                min-width: emRhythm(2.5, $ms-down1, $silent: true);
+                transition: color .25s ease-in-out, background .25s ease-in-out;
+                cursor: help;
+            }
+        }
+
+        .sync-progress {
+            grid-area: sync;
+            background: $color--comet-dark;
+            height: emRhythm(1);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: height 0.5s ease-in-out, background 0.5s ease-in-out;
+
+            &.is-synced {
+                height: emRhythm(0.25, $silent: true);
+                background: $loaded-background;
+
+                .loaded {
+                    background: $color--green;
+                }
+            }
+
+            .wrap {
+                flex-grow: 1;
+                width: 100%;
+                display: flex;
+            }
+
+            .loaded {
+                background: $gradient--green-bright;
+                transition: width 1s ease-in-out;
+            }
         }
     }
 </style>
