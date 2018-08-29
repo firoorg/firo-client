@@ -38,6 +38,13 @@ export default {
             }
         }
 
+        &.green {
+            .double-bounce1,
+            .double-bounce2 {
+                background-color: $color--green;
+            }
+        }
+
         &.small {
             width: emRhythm(3);
             height: emRhythm(3);
