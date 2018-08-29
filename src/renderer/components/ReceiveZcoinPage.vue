@@ -3,15 +3,14 @@
         <div class="scrollable-height">
             <section class="paymentrequest-list">
                 <h1>
-                    Receive<br>
-                    Zcoin
+                    {{ $t('receive.overview.title') }}
                 </h1>
 
                 <div class="table-filter-input-wrap">
                     <base-filter-input type="text"
                                        class="table-filter-input"
                                        v-model="tableFilter"
-                                       placeholder="Filter by label" />
+                                       :placeholder="$t('receive.overview.table__payment-requests.placeholder__filter')" />
                 </div>
 
                 <animated-table :data="filteredPaymentRequests"
@@ -30,7 +29,7 @@
                 <div class="fixed-button-detail-top-wrap" v-if="$route.name != 'receive-zcoin'">
                     <base-button color="comet"
                                  class="create-payment-request" @click="$router.push({ name: 'receive-zcoin' })">
-                        Create Payment Request
+                        {{ $t('receive.detail-entry-request.button__primary-action') }}
                     </base-button>
                 </div>
             </transition>
@@ -59,21 +58,21 @@
         },
         {
             name: RelativeDate,
-            title: 'Created',
+            title: 'receive.overview.table__payment-requests.label__created',
             dateField: 'createdAt',
             sortField: 'createdAt',
             width: '30%'
         },
         {
             name: LabelWithHashTags,
-            title: 'Label',
+            title: 'receive.overview.table__payment-requests.label__label',
             sortField: 'label',
             contentField: 'label',
             width: '50%'
         },
         {
             name: Amount,
-            title: 'Amount',
+            title: 'receive.overview.table__payment-requests.label__amount',
             sortField: 'amount',
             width: '25%'
         }

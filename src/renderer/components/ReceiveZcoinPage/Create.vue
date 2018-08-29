@@ -3,12 +3,13 @@
         <form class="create scrollable-height" @submit.prevent="submitForm">
             <div class="form">
                 <h2>
-                    Create<br>
-                    Payment Request
+                    {{ $t('receive.detail-create-request.title__create') }}
                 </h2>
 
                 <div class="field" :class="getFieldErrorClass('label')">
-                    <label for="label">Title</label>
+                    <label for="label">
+                      {{ $t('receive.detail-create-request.label__label') }}
+                    </label>
 
                     <div class="control">
                         <input v-model.trim="label"
@@ -23,7 +24,9 @@
                 </div>
 
                 <div class="field amount-field" :class="getFieldErrorClass('amount')">
-                    <label for="amount">Amount</label>
+                    <label for="amount">
+                      {{ $t('receive.detail-create-request.label__amount') }}
+                    </label>
 
                     <div class="control">
                         <input v-model.number="amount"
@@ -40,7 +43,9 @@
                 </div>
 
                 <div class="field message-field" :class="getFieldErrorClass('message')">
-                    <label for="message">Message</label>
+                    <label for="message">
+                      {{ $t('receive.detail-create-request.label__message') }}
+                    </label>
                     <div class="control">
                         <base-textarea v-model.lazy="message"
                                        ref="message"
@@ -59,7 +64,7 @@
                              class="submit"
                              ref="submit"
                              :disabled="!canSubmit">
-                    Create Payment Request
+                  {{ $t('receive.detail-create-request.button__create-payment-request') }}
                 </base-button>
             </div>
         </form>

@@ -21,16 +21,16 @@
                 </header>
 
                 <dl>
-                    <dt>Created</dt>
+                    <dt>{{ $t('receive.detail-entry-request.label__created') }}</dt>
                     <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
-                    <dt>Requested</dt>
+                    <dt>{{ $t('receive.detail-entry-request.label__requested') }}</dt>
                     <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
 
                 <dl>
-                    <dt>Fulfilled</dt>
+                    <dt>{{ $t('receive.detail-entry-request.label__fulfilled') }}</dt>
                     <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
-                    <dt>Received</dt>
+                    <dt>{{ $t('receive.detail-entry-request.label__received') }}</dt>
                     <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
                 </dl>
 
@@ -48,18 +48,26 @@
 
             <div class="action-wrap">
                 <div v-if="isFulfilled">
-                    <base-button @click.prevent="openBlockExplorer">Open in Block Explorer</base-button>
+                    <base-button @click.prevent="openBlockExplorer">
+                      {{ $t('receive.detail-entry-request.fulfilled.button__open-explorer') }}
+                    </base-button>
                 </div>
                 <div v-else>
                     <timed-tooltip :is-open="showCopySuccess"
                                    popover-class="green"
                                    :on-timeout="hideCopySuccess">
                         <template slot="content">
-                            <h3>Copied Link to your clipboard</h3>
+                            <h3>
+                              {{ $t('receive.detail-entry-request.pending.message__copy-link--success') }}
+                            </h3>
                         </template>
-                        <base-button :is-outline="true" @click="copyUri">Copy Link</base-button>
+                        <base-button :is-outline="true" @click="copyUri">
+                          {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
+                        </base-button>
                     </timed-tooltip>
-                    <base-button color="green" @click="shareViaMail">Share via E-Mail</base-button>
+                    <base-button color="green" @click="shareViaMail">
+                      {{ $t('receive.detail-entry-request.pending.button__share-via-email--pirmary') }}
+                    </base-button>
                 </div>
 
                 <!-- E-Mail Template -->
