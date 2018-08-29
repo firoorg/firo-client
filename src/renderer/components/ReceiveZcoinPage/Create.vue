@@ -17,7 +17,8 @@
                                type="text"
                                ref="label"
                                name="label"
-                               id="label">
+                               id="label"
+                               :placeholder="$t('receive.detail-create-request.placeholder__label')" >
                     </div>
                 </div>
 
@@ -32,7 +33,8 @@
                                ref="amount"
                                name="amount"
                                id="amount"
-                               class="amount">
+                               class="amount"
+                               :placeholder="$t('receive.detail-create-request.placeholder__amount')" >
                         <div class="prefix">XZC</div>
                     </div>
                 </div>
@@ -44,7 +46,8 @@
                                        ref="message"
                                        name="message"
                                        id="message"
-                                       class="message" />
+                                       class="message"
+                                       :placeholder="$t('receive.detail-create-request.placeholder__message')" />
                     </div>
                 </div>
             </div>
