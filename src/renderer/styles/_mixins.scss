@@ -236,6 +236,31 @@
     }
 }
 
+@mixin medium-input () {
+    background: mix($color--polo-medium, $color--polo-light);
+    color: $color--dark-light;
+
+    &:hover {
+        background: rgba($color--polo-light, 0.7);
+    }
+
+    &:focus {
+        background: rgba($color--polo-light, 1);
+        color: $color--dark;
+    }
+
+    &::placeholder {
+        @include light-placeholder()
+    }
+
+    &:hover,
+    &:focus {
+        &::placeholder {
+            @include light-placeholder-hover();
+        }
+    }
+}
+
 @mixin color-input ($color) {
     background: rgba($color, 0.4);
     color: $color--white-light;
