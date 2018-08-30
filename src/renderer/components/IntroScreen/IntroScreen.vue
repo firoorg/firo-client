@@ -18,8 +18,10 @@
                     </multi-step-popover>
                 </header>
 
-                <div v-show="!goingToHide">
-                    Loading Wallet...
+                <div v-show="!isReady">
+                    <div>
+                        <loading-bounce color="dark" class="loading" />
+                    </div>
                 </div>
 
                 <footer>
@@ -30,12 +32,12 @@
 </template>
 
 <script>
-    // import Vue from 'vue'
-    import { sleep } from '#/lib/utils'
+    import { mapGetters } from 'vuex'
     import GuideMixin from '@/mixins/GuideMixin'
     import types from '~/types'
 
     import ZcoinLogoText from '@/components/Icons/ZcoinLogoText'
+    import LoadingBounce from '@/components/Icons/LoadingBounce'
 
     import MultiStepPopover from '@/components/Notification/MultiStepPopover'
     import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
@@ -51,17 +53,13 @@
         ],
 
         components: {
+            LoadingBounce,
             MultiStepPopover,
             ZcoinLogoText,
             IntroScreenWelcome,
             IntroScreenBlockchainLocation,
             IntroScreenLockWallet,
             IntroScreenOther
-        },
-        async created () {
-            await sleep(2000)
-            // todo check welcome guide status here and start the tour / settings / changelog etc.
-            this.isReady = true
         },
 
         mounted () {
@@ -74,7 +72,6 @@
 
         data () {
             return {
-                isReady: false,
                 goingToHide: false,
                 steps: {
                     welcome: IntroScreenWelcome,
@@ -88,6 +85,11 @@
         },
 
         computed: {
+            ...mapGetters({
+                isReady: 'App/isReady',
+                showIntroScreen: 'App/showIntroScreen'
+            }),
+
             getCurrentSettingsClass () {
                 const classes = [
                     this.showIntro ? 'is-open' : ''
@@ -100,7 +102,7 @@
                 return classes.join(' ')
             },
             showIntro () {
-                return this.isReady && this.$store.getters['App/showIntroScreen']
+                return this.isReady && this.showIntroScreen
             },
             getActions () {
                 return {
@@ -117,7 +119,6 @@
                     return
                 }
 
-                this.isReady = false
                 this.goingToHide = true
 
                 setTimeout(() => {
@@ -133,6 +134,10 @@
     .overlay {
         background: rgba($color--dark, 0.95);
         z-index: 20000;
+    }
+
+    .loading {
+        margin: 0 auto;
     }
 
     .content {
