@@ -2,9 +2,7 @@
     <transition name="slide-down" leave-active-class="slide-up-leave-active">
         <form class="create scrollable-height" @submit.prevent="submitForm">
             <div class="form">
-                <h2>
-                    {{ $t('receive.detail-create-request.title__create') }}
-                </h2>
+                <h2 v-html="$t('receive.detail-create-request.title__create')"></h2>
 
                 <div class="field" :class="getFieldErrorClass('label')">
                     <label for="label">

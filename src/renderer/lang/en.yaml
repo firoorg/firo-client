@@ -27,7 +27,7 @@ navigation:
 
 receive:
   overview:
-    title: Receive Zcoin
+    title: Receive</br>Zcoin
     # description
     table__payment-requests:
       label__amount: Amount
@@ -35,7 +35,7 @@ receive:
       label__label: Label
       placeholder__filter: Filter by label
   detail-create-request:
-    title__create: Create Payment Request
+    title__create: Create</br>Payment Request
     label__label: Label
     placeholder__label: "some cool #example here"
     label__amount: Amount

@@ -2,9 +2,7 @@
     <section class="receive-zcoin">
         <div class="scrollable-height">
             <section class="paymentrequest-list">
-                <h1>
-                    {{ $t('receive.overview.title') }}
-                </h1>
+                <h1 v-html="$t('receive.overview.title')"></h1>
 
                 <div class="table-filter-input-wrap">
                     <base-filter-input type="text"
