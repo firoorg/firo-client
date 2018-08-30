@@ -22,8 +22,12 @@ export default {
             return out
         },
 
-        mint ({ denominations }) {
+        mint (payload) {
+            const { auth, data } = payload
+            const { passphrase = null } = auth
             console.log('MINTING STARTS')
+
+            const { denominations } = data
             const denoms = this.convertToDenominationAmountPair(denominations, 'denomination')
 
             console.log(denoms)
@@ -32,7 +36,13 @@ export default {
                 type: 'create',
                 data: {
                     denominations: denoms
+                },
+                auth: {
+                    passphrase
                 }
+            }, {
+                onSuccess: types.mint.ON_MINT_SUCCESS,
+                onError: types.mint.ON_MINT_ERROR
             })
         }
     })

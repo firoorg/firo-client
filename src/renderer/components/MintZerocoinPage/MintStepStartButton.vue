@@ -1,15 +1,14 @@
 <template>
     <base-button :color="color"
-                 :is-dark="true"
                  @click.prevent="next"
                  :disabled="!canSubmit">
-        Spend Now
+        Mint Now
     </base-button>
 </template>
 
 <script>
     export default {
-        name: 'SpendZerocoinStepStartButton',
+        name: 'MintStepStartButton',
 
         props: {
             canSubmit: {

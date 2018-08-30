@@ -167,7 +167,7 @@
         input[type="text"],
         select,
         .message {
-            @include light-input();
+            @include medium-input();
         }
 
         .prefix {

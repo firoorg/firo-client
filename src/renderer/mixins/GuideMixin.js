@@ -63,6 +63,11 @@ export default {
         currentStep: {
             handler (newVal, oldVal) {
                 window.dispatchEvent(new Event('resize'))
+                if (!newVal) {
+                    this.$emit('steps-close')
+                } else {
+                    this.$emit('steps-open')
+                }
             },
             immediate: false // todo valdate behaviour
         }

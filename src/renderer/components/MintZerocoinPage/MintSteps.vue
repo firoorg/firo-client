@@ -1,15 +1,13 @@
 <template>
     <div class="button-wrap">
         <template v-if="!currentStep">
-            <spend-zerocoin-step-start-button :can-submit="canStart"
+            <mint-step-start-button :can-submit="canStart"
                                     :color="submitButtonColor"
-                                    @pending-payment-added="cleanupForm"
                                     @next="() => onStepChange('confirm')" />
         </template>
         <template v-else-if="currentStep !== 'done'">
             <base-button v-if="currentStepCanCancel"
                          color="red"
-                         :is-dark="true"
                          :is-outline="true"
                          @click.prevent="onCancel">
                 <span>Cancel</span>
@@ -25,21 +23,20 @@
                                     :placement="currentPlacement"
                                     :component-props="currentComponentProps"
                                     :is-open="currentStepIsOpen"
-                                    :boundaries-element="boundariesElement"
                                     :popover-class="currentPopoverClass">
             <template slot="step-confirm" slot-scope="{ actions }">
-                <spend-zerocoin-step-confirm-buttons :actions="actions"
+                <mint-step-confirm-buttons :actions="actions"
                                            :color="submitButtonColor"
                                            :can-submit="canSubmit"
                                            :is-timer-done="isConfirmed">
-                </spend-zerocoin-step-confirm-buttons>
+                </mint-step-confirm-buttons>
             </template>
             <template slot="step-passphrase" slot-scope="{ actions }">
                 <payment-step-passphrase-buttons :actions="actions"
-                                              :color="submitButtonColor"
-                                              :is-dark="true"
-                                              :can-submit="canSubmit">
-                    Unlock and spend
+                                                 :color="submitButtonColor"
+                                                 :is-dark="true"
+                                                 :can-submit="canSubmit">
+                    Unlock and mint
                 </payment-step-passphrase-buttons>
             </template>
             <template slot="step-done" slot-scope="{ actions }">
@@ -56,17 +53,16 @@
     import { mapGetters } from 'vuex'
     import GuideMixin from '@/mixins/GuideMixin'
     import ConfirmPassphraseStepsMixin from '@/mixins/ConfirmPassphraseStepsMixin'
-    import types from '~/types'
 
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
-    import SpendZerocoinStepConfirm from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirm'
-    import SendAddToQueueButton from '@/components/SendZcoinPage/SendAddToQueueButton'
-    import SpendZerocoinStepStartButton from '@/components/SpendZerocoinPage/SpendZerocoinStepStartButton'
-    import SpendZerocoinStepConfirmButtons from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirmButtons'
+
+    import MintStepStartButton from '@/components/MintZerocoinPage/MintStepStartButton'
+    import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm'
+    import MintStepConfirmButtons from '@/components/MintZerocoinPage/MintStepConfirmButtons'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
 
     export default {
-        name: 'SpendZerocoinSteps',
+        name: 'MintSteps',
 
         mixins: [
             GuideMixin,
@@ -75,51 +71,28 @@
 
         components: {
             MultiStepPopoverButtons,
-            SendAddToQueueButton,
-            SpendZerocoinStepStartButton,
-            SpendZerocoinStepConfirm,
-            SpendZerocoinStepConfirmButtons,
+            MintStepStartButton,
+            MintStepConfirm,
+            MintStepConfirmButtons,
             PaymentStepPassphraseButtons
-        },
-
-        data () {
-            return {
-                onCancelActionName: types.zerocoinspend.CLEAR_SPEND_ZEROCOIN_RESPONSE,
-                responseNamespace: 'ZerocoinSpend/spendZerocoin'
-            }
         },
 
         computed: {
             ...mapGetters({
-                isLoading: 'ZerocoinSpend/isLoading',
-                responseIsValid: 'ZerocoinSpend/spendZerocoinResponseIsValid',
-                responseIsError: 'ZerocoinSpend/spendZerocoinResponseIsError',
-                responseError: 'ZerocoinSpend/spendZerocoinResponseError',
-                currentFormAddress: 'ZerocoinSpend/spendFormAddress',
-                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
+                isLoading: 'Mint/isLoading',
+                responseIsValid: 'Mint/mintResponseIsValid',
+                responseIsError: 'Mint/mintResponseIsError',
+                responseError: 'Mint/mintResponseError'
             }),
 
-            isUsedAddress () {
-                return this.hasAlreadySentToAddress(this.currentFormAddress)
-            },
-
-            // mixin override
             submitButtonColor () {
-                if (this.isUsedAddress) {
-                    return 'orange'
-                }
-
-                if (this.responseIsError) {
-                    return 'red'
-                }
-
                 return 'green'
             }
         },
 
         methods: {
             getConfirmStep () {
-                return SpendZerocoinStepConfirm
+                return MintStepConfirm
             }
         }
     }

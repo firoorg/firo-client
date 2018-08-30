@@ -1,5 +1,5 @@
 import { convertToCoin } from '#/lib/convert'
-import { getName } from '~/mixins/utils'
+import { getName } from '~/utils'
 
 const types = function (namespace) {
     const { NAME: PAYMENTS } = getName(`pending ${namespace} payments`)

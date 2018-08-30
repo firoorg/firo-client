@@ -46,7 +46,6 @@ const getters = {
     blockchainLocation: (state) => state.blockchainLocation,
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
     b58Prefixes: (state, getters, rootState, rootGetters) => {
-        console.log(rootGetters)
         // networkIdentifier
         const testOrMainNet = rootState.Blockchain.testnet ? 'testnet' : 'mainnet'
 

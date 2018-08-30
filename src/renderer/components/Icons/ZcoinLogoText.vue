@@ -1,5 +1,5 @@
 <template>
-    <ZcoinLogo class="zcoin-logo-text" />
+    <zcoin-logo class="zcoin-logo-text" />
 </template>
 
 <script>

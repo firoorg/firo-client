@@ -1,12 +1,17 @@
 import * as types from '../types/App'
 
 const state = {
+    isReady: false,
     clientIsLocked: false,
     showIntroScreen: true,
     passphrase: null
 }
 
 const mutations = {
+    [types.IS_READY] (state) {
+        state.isReady = true
+    },
+
     [types.SET_CLIENT_LOCKED] (state, isLocked) {
         state.clientIsLocked = isLocked
     },
@@ -25,6 +30,14 @@ const mutations = {
 }
 
 const actions = {
+    [types.IS_READY] ({ commit, state }) {
+        if (state.isReady) {
+            return
+        }
+
+        commit(types.IS_READY)
+    },
+
     [types.SET_CLIENT_LOCKED] ({ commit, state }, isLocked) {
         if (state.clientIsLocked === isLocked) {
             return
@@ -52,10 +65,10 @@ const actions = {
 }
 
 const getters = {
+    isReady: (state) => state.isReady || false,
     showIntroScreen: (state) => state.showIntroScreen,
     isLocked: (state) => state.clientIsLocked,
     hasOpenOverlay (state, getters, rootState, rootGetters) {
-        console.log(rootGetters)
         const windowHasOpenModal = rootGetters['Window/hasOpenModal']
         const networkIsConnected = rootGetters['Network/isConnected']
         const networkConnectionError = rootGetters['Network/ConnectionError']
