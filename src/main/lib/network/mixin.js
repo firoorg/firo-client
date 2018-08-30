@@ -73,9 +73,11 @@ export default {
                 console.log('topic', topic)
             }
 
+            /*
             if (message) {
                 console.log('message', message)
             }
+            */
 
             try {
                 console.log('processing response -> ', `ON_${topic.toUpperCase()}_SUBSCRIPTION`)

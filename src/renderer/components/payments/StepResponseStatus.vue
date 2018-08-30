@@ -5,7 +5,7 @@
             <div class="icon">
                 <send-confirmation-check />
             </div>
-            <h2>Payment failed! </h2>
+            <h2>TYPE failed! </h2>
             <p>{{ error.message }}</p>
             <em>code {{ error.code }}</em>
         </template>
@@ -13,7 +13,7 @@
             <div class="icon">
                 <send-confirmation-check />
             </div>
-            <h2>Payment successfully sent!</h2>
+            <h2>TYPE successfully sent!</h2>
         </template>
     </div>
 </template>
@@ -23,7 +23,7 @@
     import AutoCloseMixin from '@/mixins/AutoCloseMixin'
 
     export default {
-        name: 'SendStepStatus',
+        name: 'StepResponseStatus',
 
         mixins: [
             AutoCloseMixin

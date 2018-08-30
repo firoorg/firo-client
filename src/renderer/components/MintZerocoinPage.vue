@@ -30,7 +30,7 @@
                         <h2>Create Mint</h2>
                         <div v-show="hasMintsInProgress">
                             <base-popover
-                                    :disabled="showPopover"
+                                    :disabled="!enableProgressList"
                                     :auto-hide="true"
                                     placement="bottom-end"
                                     popover-class="comet"
@@ -67,6 +67,13 @@
                         <fees-and-amount :fee="{ label: 'Fees', amount: totalMintFee }"
                                          :amount="currentMintCostInSatoshi" />
                     </div>
+                    <mint-steps :form-is-valid="canSubmit"
+                                :cleanup-form="cleanupForm"
+                                @steps-started="() => enableProgressList = false"
+                                @steps-close="() => enableProgressList = true"
+                                @steps-done="cleanupForm">
+                    </mint-steps>
+                    <!--
                     <mint-confirm-dialog :can-submit="canSubmit"
                                          :is-open="showPopover"
                                          :on-cancel="onCancel"
@@ -74,6 +81,7 @@
                                          popover-class="notice">
                         <h3>Really?</h3>
                     </mint-confirm-dialog>
+                    -->
                 </form>
             </template>
         </section>
@@ -89,7 +97,8 @@
     import DenominationSelector from '@/components/DenominationSelector'
     import CurrentMints from '@/components/payments/CurrentMints'
     import FeesAndAmount from '@/components/payments/FeesAndAmount'
-    import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
+    // import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
+    import MintSteps from '@/components/MintZerocoinPage/MintSteps'
     import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
     import Stack from '@/components/Icons/Stack'
     import NotificationIndicator from '@/components/Notification/NotificationIndicator'
@@ -99,7 +108,8 @@
         components: {
             NotificationIndicator,
             MintsInProgressList,
-            MintConfirmDialog,
+            MintSteps,
+            // MintConfirmDialog,
             FeesAndAmount,
             CurrentMints,
             DenominationSelector,
@@ -108,12 +118,14 @@
 
         data () {
             return {
-                popoverStatus: ''
+                popoverStatus: '',
+                enableProgressList: true
             }
         },
 
         computed: {
             ...mapGetters({
+                currentPassphrase: 'App/currentPassphrase',
                 denominations: 'Mint/currentDenominations',
                 mintsInProgress: 'Mint/mintsInProgress'
             }),
@@ -154,10 +166,6 @@
                 return !!Object.keys(this.currentMints).length
             },
 
-            showPopover () {
-                return !!this.popoverStatus
-            },
-
             hasMintsInProgress () {
                 return !!this.mintsInProgress.length
             },
@@ -173,20 +181,7 @@
                 doMint: types.mint.DO_MINT
             }),
 
-            onDenominationChange () {
-                this.popoverStatus = ''
-            },
-
-            onSubmit () {
-                console.log('start minting')
-                this.popoverStatus = 'showConfirm'
-            },
-
-            onCancel () {
-                console.log('on cancel')
-                this.popoverStatus = ''
-            },
-
+            /*
             onConfirm (popoverReset) {
                 console.log('on confirm')
                 this.popoverStatus = 'showSuccess'
@@ -205,6 +200,30 @@
                 if (popoverReset) {
                     popoverReset()
                 }
+            },
+            */
+
+            /// -- - - - - - -
+
+            onDenominationChange () {
+                this.isConfimed = false
+            },
+
+            onSubmit () {
+                this.doMint({
+                    denominations: this.currentMints,
+                    auth: {
+                        passphrase: this.currentPassphrase
+                    }
+                })
+
+                // this.resetDenominations()
+                // this.reset(popoverReset)
+            },
+
+            cleanupForm () {
+                console.log('cleaning up mints...')
+                this.resetDenominations()
             }
         }
     }
@@ -214,7 +233,7 @@
     .mint-zerocoin {
         display: grid;
         box-sizing: border-box;
-        grid-template-columns: 3fr  2fr;
+        grid-template-columns: 3fr  minmax(30rem, 2fr);
     }
 
     .mint-selection,

@@ -1,14 +1,16 @@
 import Vue from 'vue'
-import { getName } from '~/mixins/utils'
+import { getName, getTypeName } from '~/utils'
+
+const tn = getTypeName
 
 const types = function (namespace) {
     const { NAME } = getName(namespace)
-
+    tn(`SET ${NAME} RESPONSE`)
     return {
-        [`SET_${NAME}_RESPONSE`]: `SET_${NAME}_RESPONSE`,
-        [`CLEAR_${NAME}_RESPONSE`]: `CLEAR_${NAME}_RESPONSE`,
-        [`ON_${NAME}_SUCCESS`]: `ON_${NAME}_SUCCESS`,
-        [`ON_${NAME}_ERROR`]: `ON_${NAME}_ERROR`
+        [tn(`SET ${NAME} RESPONSE`)]: tn(`SET ${NAME} RESPONSE`),
+        [tn(`CLEAR ${NAME} RESPONSE`)]: tn(`CLEAR ${NAME} RESPONSE`),
+        [tn(`ON ${NAME} SUCCESS`)]: tn(`ON ${NAME} SUCCESS`),
+        [tn(`ON ${NAME} ERROR`)]: tn(`ON ${NAME} ERROR`)
     }
 }
 
@@ -26,18 +28,18 @@ const module = function (namespace = '') {
         },
 
         mutations: {
-            [`CLEAR_${NAME}_RESPONSE`] (state) {
+            [tn(`CLEAR ${NAME} RESPONSE`)] (state) {
                 const responseName = `${name}Response`
 
                 Vue.set(state, responseName, {})
             },
 
-            [`SET_${NAME}_RESPONSE`] (state, response) {
+            [tn(`SET ${NAME} RESPONSE`)] (state, response) {
                 const responseName = `${name}Response`
                 const { _meta, data, error } = response
                 // todo add generic keys like txids dynamically and be explicit
                 // console.log(_meta, data, error)
-                console.log('updating', `SET_${NAME}_RESPONSE`, response)
+                console.log('updating', tn(`SET ${NAME} RESPONSE`), response)
                 /*
                 Vue.set(state, `${name}Response`, {
                     ...response,
@@ -59,24 +61,24 @@ const module = function (namespace = '') {
         },
 
         actions: {
-            [`CLEAR_${NAME}_RESPONSE`] ({ commit, state }) {
+            [tn(`CLEAR ${NAME} RESPONSE`)] ({ commit, state }) {
                 if (!state[`${name}Response`] || !state[`${name}Response`]._meta) {
                     return
                 }
 
-                commit(t[`CLEAR_${NAME}_RESPONSE`])
+                commit(t[tn(`CLEAR ${NAME} RESPONSE`)])
             },
 
-            [`ON_${NAME}_SUCCESS`] ({ commit, dispatch, state }, response) {
-                commit(t[`SET_${NAME}_RESPONSE`], response)
+            [tn(`ON ${NAME} SUCCESS`)] ({ commit, dispatch, state }, response) {
+                commit(t[tn(`SET ${NAME} RESPONSE`)], response)
             },
 
-            [`ON_${NAME}_ERROR`] ({ commit, dispatch, state }, response) {
-                console.log(t[`ON_${NAME}_ERROR`])
+            [tn(`ON ${NAME} ERROR`)] ({ commit, dispatch, state }, response) {
+                console.log(t[tn(`ON ${NAME} ERROR`)])
                 console.log(response)
 
                 try {
-                    commit(t[`SET_${NAME}_RESPONSE`], response)
+                    commit(t[tn(`SET ${NAME} RESPONSE`)], response)
                 } catch (e) {
                     console.log(e)
                 }

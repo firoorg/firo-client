@@ -1,14 +1,18 @@
 import Vue from 'vue'
 import * as types from '~/types/ZerocoinSpend'
 import allTypes from '~/types'
+import { formatDenominationPairs } from '~/utils'
 
+import IsLoading from '~/mixins/IsLoading'
 import Response from '~/mixins/Response'
 
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 
+const isLoading = IsLoading.module('')
 const spendZerocoinResponse = Response.module('spend zerocoin')
 
 const state = {
+    ...isLoading.state,
     ...spendZerocoinResponse.state,
 
     isLoading: false,
@@ -21,13 +25,16 @@ const state = {
 }
 
 const mutations = {
+    ...isLoading.mutations,
     ...spendZerocoinResponse.mutations,
 
     [types.SPEND_ZEROCOIN] () {},
 
+    /*
     [types.IS_LOADING] (state, isLoading) {
         state.isLoading = isLoading
     },
+    */
 
     [types.SET_FORM_MINTS] (state, mints) {
         Vue.set(state.spendForm, 'mints', {
@@ -101,9 +108,10 @@ const actions = {
 }
 
 const getters = {
+    ...isLoading.getters,
     ...spendZerocoinResponse.getters,
 
-    isLoading: (state) => state.isLoading,
+    // isLoading: (state) => state.isLoading,
     spendFormMints: (state) => state.spendForm.mints,
     spendFormLabel: (state) => state.spendForm.label,
     spendFormMintsFormatted (state, getters) {
@@ -111,18 +119,7 @@ const getters = {
             return []
         }
 
-        return Object.entries(getters.spendFormMints)
-        // transform to [{denomination: '25', amount: 1}]
-            .map((pair) => {
-                const [ denomination, amount ] = pair
-
-                return {
-                    denomination,
-                    amount,
-                    cost: parseInt(denomination) * amount
-                }
-            })
-            .filter((denom) => denom.amount)
+        return formatDenominationPairs(getters.spendFormMints)
     },
     spendFormMintCosts (state, getters) {
         return getters.spendFormMintsFormatted

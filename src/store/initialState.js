@@ -70,9 +70,14 @@ module.exports = {
     },
 
     Mint: { // daemon: isSubscription
+        isLoading: false,
         currentDenominations: {},
-        mints: {}
-
+        mints: {},
+        mintResponse: {
+            _meta: null,
+            data: null,
+            error: null
+        }
     },
 
     ZerocoinSpend: {
@@ -171,6 +176,7 @@ module.exports = {
     },
 
     App: { // gui
+        isReady: false,
         showIntroScreen: true,
         clientIsLocked: false,
         lastSeen: {

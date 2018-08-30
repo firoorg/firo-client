@@ -1,13 +1,28 @@
 import Vue from 'vue'
-import * as types from '../types/Mint'
-import { convertToCoin } from '#/lib/convert'
+import * as types from '~/types/Mint'
+import allTypes from '~/types'
+
+import IsLoading from '~/mixins/IsLoading'
+import Response from '~/mixins/Response'
+
+import { formatDenominationPairs } from '~/utils'
+import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+
+const isLoading = IsLoading.module('')
+const mintResponse = Response.module('mint')
 
 const state = {
+    ...isLoading.state,
+    ...mintResponse.state,
+
     currentDenominations: {},
     mints: {}
 }
 
 const mutations = {
+    ...isLoading.mutations,
+    ...mintResponse.mutations,
+
     [types.DO_MINT] () {},
 
     [types.ADD_DENOMINATION] (state, denomination) {
@@ -40,6 +55,8 @@ const mutations = {
 }
 
 const actions = {
+    ...mintResponse.actions,
+
     [types.ADD_DENOMINATION] ({ commit, state }, denomination) {
         commit(types.ADD_DENOMINATION, denomination)
     },
@@ -65,19 +82,44 @@ const actions = {
         })
     },
 
-    [types.DO_MINT] ({ commit, state }, { denominations }) {
-        console.log(denominations)
+    [types.DO_MINT] ({ commit, dispatch, state }, { denominations, auth }) {
+        console.log(denominations, auth)
 
         commit(types.DO_MINT, {
-            denominations
+            data: {
+                denominations
+            },
+            auth: {
+                ...auth
+            }
         })
-        // console.log('sending mint', denominations)
+
+        dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
     }
 }
 
 const getters = {
+    ...isLoading.getters,
+    ...mintResponse.getters,
+
     currentDenominations (state) {
         return state.currentDenominations
+    },
+
+    currentDenominationsFormatted (state, getters) {
+        if (!getters.currentDenominations) {
+            return []
+        }
+
+        return formatDenominationPairs(getters.currentDenominations)
+    },
+
+    currentDenominationCosts (state, getters) {
+        return getters.currentDenominationsFormatted
+            .reduce((accumulator, current) => accumulator + current.cost, 0)
+    },
+    currentDenominationCostsInSatoshi (state, getters) {
+        return convertToSatoshi(getters.currentDenominationCosts)
     },
 
     mints (state, getters, rootState, rootGetters) {
