@@ -8,9 +8,6 @@
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
-    import types from '~/types'
-
     export default {
         name: 'SpendZerocoinStepStartButton',
 
@@ -25,25 +22,7 @@
         },
 
         methods: {
-            ...mapActions({
-                addPendingPayment: types.zcoinpayment.ADD_PENDING_ZCOIN_PAYMENTS
-            }),
-
             next () {
-                /*
-                if (!this.formIsEmpty) {
-                    this.addPendingPayment({
-                        label: this.formLabel,
-                        amount: this.formAmount,
-                        address: this.formAddress
-                    })
-
-                    this.$emit('pending-payment-added', {
-                        address: this.formAddress
-                    })
-                }
-                */
-
                 this.$emit('next')
             }
         }
