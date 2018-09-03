@@ -76,8 +76,8 @@
       },
 
       watch: {
-          isConfirmed (isConfimed, wasConfimed) {
-              if (!isConfimed) {
+          isConfirmed (isConfirmed, wasConfimed) {
+              if (!isConfirmed) {
                   return
               }
               console.log('is confirmed')

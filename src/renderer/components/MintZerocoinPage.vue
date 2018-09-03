@@ -206,7 +206,7 @@
             /// -- - - - - - -
 
             onDenominationChange () {
-                this.isConfimed = false
+                this.isConfirmed = false
             },
 
             onSubmit () {

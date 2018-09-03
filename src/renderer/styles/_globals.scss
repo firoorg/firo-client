@@ -37,6 +37,13 @@ body {
         width: 100%;
     }
 
+    .scrollable-container {
+        box-sizing: border-box;
+        overflow-y: scroll;
+        height: 100%;
+        width: 100%;
+    }
+
     .fixed-button-detail-top-wrap {
         position: absolute;
         top: 0;

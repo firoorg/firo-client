@@ -10,7 +10,8 @@
             <current-mints :current-mints="denominations"
                            :show-progress="false" />
             <fees-and-amount :amount="currentDenominationCostsInSatoshi"
-                             :show-fee="false" />
+                             :fee="{ label: 'Fees', amount: 100000 }"
+                             :show-fee="true" />
         </div>
     </section>
 </template>
@@ -38,6 +39,7 @@
             ...mapGetters({
                 denominations: 'Mint/currentDenominationsFormatted',
                 currentDenominationCostsInSatoshi: 'Mint/currentDenominationCostsInSatoshi'
+                // todo current denomination fees
             })
         }
     }
