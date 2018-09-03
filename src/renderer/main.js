@@ -11,6 +11,7 @@ import { sync } from 'vuex-router-sync'
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 
 import languages from '@/lang'
+import dateTimeFormats from '@/lang/dateTimeFormats'
 
 import App from './App'
 import router from './router'
@@ -32,7 +33,7 @@ customValidationRules.forEach((rule) => {
 Vue.use(VTooltip)
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
-    locale: undefined, // Default locale
+    locale, // Default locale
     locales: {
         // 'zh-CN': require('date-fns/locale/zh_cn'),
         'en': require('date-fns/locale/en')
@@ -51,6 +52,7 @@ console.log('using i18n with', locale)
 
 const i18n = new VueI18n({
     locale, // set locale
+    dateTimeFormats,
     fallbackLocale: process.env.NODE_ENV !== 'production' ? 'structure' : 'en',
     messages: languages // set locale messages
 })
