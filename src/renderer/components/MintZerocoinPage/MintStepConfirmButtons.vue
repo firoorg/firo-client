@@ -3,7 +3,7 @@
                  :disabled="!canSubmit"
                  :color="color"
                  @click.prevent="actions.next" tabindex="4">
-        <span>{{ $t('mint.flyout-confirm-mint.button__start-mint--primary') }}</span>
+        <span>{{ $t('mint.flyout-confirm-mint.button__mint-confirm--primary') }}</span>
     </base-button>
     <circular-timer v-else
                     key="confirm-timer"

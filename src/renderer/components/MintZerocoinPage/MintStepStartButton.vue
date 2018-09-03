@@ -2,7 +2,7 @@
     <base-button :color="color"
                  @click.prevent="next"
                  :disabled="!canSubmit">
-        {{ $t('mint.detail-create-mint.button__mint-now--primary') }}
+        {{ $t('mint.detail-create-mint.button__mint-start--primary') }}
     </base-button>
 </template>
 

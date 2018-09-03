@@ -72,14 +72,14 @@ mint:
     title: Create Mint
     label__fees: Fees
     label__amount: Total
-    button__mint-now--primary: Mint now
+    button__mint-start--primary: Mint now
 
   flyout-confirm-mint:
     title: Confirm Mint
     description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
     label__fees: Fees
     label__amount: Total
-    button__start-mint--primary: Start minting!
+    button__mint-confirm--primary: Start minting!
     button__cancel--secondary: Cancel
 
   flyout-unlock-client:
