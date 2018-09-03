@@ -1,6 +1,8 @@
+import IsLoading from '~/mixins/IsLoading'
 import Payment from '~/mixins/Payments'
 import Response from '~/mixins/Response'
 
+const isLoading = IsLoading.module('')
 const pendingPayment = Payment.types('zcoin')
 const sendZcoinResponse = Response.types('send zcoin')
 
@@ -31,6 +33,7 @@ export const ON_SEND_ZCOIN_ERROR = 'ON_SEND_ZCOIN_ERROR'
 
 // export mixed in types
 export default {
+    ...isLoading,
     ...pendingPayment,
     ...sendZcoinResponse
 }

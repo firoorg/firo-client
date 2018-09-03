@@ -2,31 +2,45 @@ import Vue from 'vue'
 import * as types from '~/types/Address'
 import rootTypes from '~/types'
 
+import LastSeen from '~/mixins/LastSeen'
+
+const lastSeen = LastSeen.module('transaction')
+
 const WALLET_ADDRESS_KEY = 'walletAddresses'
 const THIRD_PARTY_ADDRESS_KEY = 'thirdPartyAddresses'
 
 const getTxBasics = function (tx) {
     const { txid, category, amount, blockHeight, blockHash, blockTime, firstSeenAt } = tx
 
+    let block = null
+
+    if (blockHeight && blockHash) {
+        block = {
+            height: blockHeight,
+            hash: blockHash,
+            time: blockTime * 1000
+        }
+    }
+
     return {
         id: txid,
         category,
         amount,
-        firstSeenAt,
-        block: {
-            height: blockHeight,
-            hash: blockHash,
-            time: blockTime
-        }
+        firstSeenAt: firstSeenAt * 1000,
+        block
     }
 }
 
 const state = {
+    ...lastSeen.state,
+
     [WALLET_ADDRESS_KEY]: {},
     [THIRD_PARTY_ADDRESS_KEY]: {}
 }
 
 const mutations = {
+    ...lastSeen.mutations,
+
     [types.ADD_WALLET_ADDRESS] (state, { address, total }) {
         console.log('adding wallet address', address, total)
 
@@ -55,6 +69,8 @@ const mutations = {
 }
 
 const actions = {
+    ...lastSeen.actions,
+
     [types.SET_INITIAL_STATE] ({ commit, dispatch, state }, initialState) {
         console.log(Object.keys(initialState))
         const { addresses } = initialState
@@ -186,28 +202,30 @@ const actions = {
 
     [types.ADD_SPEND_IN_FROM_TX] ({ commit }, spendTx) {
         const txBasics = getTxBasics(spendTx)
-        const { address, fee } = spendTx
+        const { address } = spendTx
+
+        console.log(types.ADD_SPEND_IN_FROM_TX, txBasics, Object.keys(spendTx))
 
         commit(types.ADD_TRANSACTION, {
             stack: WALLET_ADDRESS_KEY,
             address,
             transaction: {
-                ...txBasics,
-                fee
+                ...txBasics
             }
         })
     },
 
     [types.ADD_SPEND_OUT_FROM_TX] ({ commit }, spendTx) {
         const txBasics = getTxBasics(spendTx)
-        const { address, fee } = spendTx
+        const { address } = spendTx
+
+        console.log(types.ADD_SPEND_OUT_FROM_TX, txBasics, Object.keys(spendTx))
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,
             address,
             transaction: {
-                ...txBasics,
-                fee
+                ...txBasics
             }
         })
     },
@@ -258,17 +276,41 @@ const actions = {
 }
 
 const getters = {
+    ...lastSeen.getters,
+
     walletAddresses (state, getters, rootState, rootGetters) {
+        const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
+
         return Object.values(state[WALLET_ADDRESS_KEY]).map((addr) => {
-            const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
-            const { block, transactions } = addr
-            const confirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
+            let { transactions: txs } = addr
+
+            let confirmations = 0
+
+            if (txs.length) {
+                txs = txs.map((tx) => {
+                    const { block } = tx
+                    const txConfirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
+
+                    return {
+                        ...tx,
+                        confirmations: txConfirmations
+                    }
+                })
+
+                confirmations = txs.reduce((accumulator, tx) => {
+                    return (tx.confirmations > accumulator) ? tx.confirmations : accumulator
+                }, 0)
+            }
+
+            //
+            //
 
             return {
                 ...addr,
-                hasTransactions: !!transactions.length,
-                isReused: transactions.length > 1,
-                isConfimed: confirmations >= 6,
+                transactions: txs,
+                hasTransactions: !!txs.length,
+                isReused: txs.length > 1,
+                isConfirmed: confirmations >= 6,
                 confirmations
             }
         })

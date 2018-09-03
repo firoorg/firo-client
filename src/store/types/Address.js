@@ -1,3 +1,7 @@
+import LastSeen from '~/mixins/LastSeen'
+
+const lastSeen = LastSeen.types('transaction')
+
 export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
 export const ON_ADDRESS_SUBSCRIPTION = 'ON_ADDRESS_SUBSCRIPTION'
 export const ON_TRANSACTION_SUBSCRIPTION = 'ON_TRANSACTION_SUBSCRIPTION'
@@ -16,3 +20,7 @@ export const ADD_TRANSACTION = 'ADD_TRANSACTION'
 export const SET_ADDRESS_CONFIRMED_STATUS = 'SET_ADDRESS_CONFIRMED_STATUS'
 export const MARK_ADDRESS_AS_UNCONFIRMED = 'MARK_ADDRESS_AS_UNCONFIRMED'
 export const MARK_ADDRESS_AS_FULLY_CONFIRMED = 'MARK_ADDRESS_AS_FULLY_CONFIRMED'
+
+export default {
+    ...lastSeen
+}

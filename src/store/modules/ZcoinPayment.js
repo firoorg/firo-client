@@ -2,15 +2,18 @@ import * as types from '~/types/ZcoinPayment'
 import allTypes from '~/types'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 
+import IsLoading from '~/mixins/IsLoading'
 import Payments from '~/mixins/Payments'
 import Response from '~/mixins/Response'
 
+const isLoading = IsLoading.module('')
 const pendingPayments = Payments.module('zcoin')
 const pendingPaymentTypes = Payments.types('zcoin')
 
 const sendZcoinResponse = Response.module('send zcoin')
 
 const state = {
+    ...isLoading.state,
     ...pendingPayments.state,
     ...sendZcoinResponse.state,
 
@@ -21,21 +24,16 @@ const state = {
         label: '',
         address: '',
         totalTxFee: 0
-    },
-    isLoading: false,
-    lastSeen: 'blockHeightAsInteger'
+    }
 }
 
 const mutations = {
+    ...isLoading.mutation,
     ...pendingPayments.mutations,
     ...sendZcoinResponse.mutations,
 
     [types.CALC_TX_FEE] () {},
     [types.SEND_ZCOIN] () {},
-
-    [types.IS_LOADING] (state, isLoading) {
-        state.isLoading = isLoading
-    },
 
     [types.SET_FORM_LABEL] (state, label) {
         state.addPaymentForm.label = label
@@ -163,29 +161,10 @@ const actions = {
         // confirmation per payment/denomination we need some identifier which doesn't exist right now
         dispatch(pendingPaymentTypes.CLEAR_PENDING_ZCOIN_PAYMENTS)
     }
-
-    /*
-    [types.ON_SEND_ZCOIN_SUCCESS] ({ commit, dispatch, state }, response) {
-        console.log(types.ON_SEND_ZCOIN_SUCCESS)
-        console.log(response)
-
-        commit(types.SET_SEND_ZCOIN_RESPONSE, response)
-    },
-
-    [types.ON_SEND_ZCOIN_ERROR] ({ commit, dispatch, state }, response) {
-        console.log(types.ON_SEND_ZCOIN_ERROR)
-        console.log(response)
-
-        try {
-            commit(types.SET_SEND_ZCOIN_RESPONSE, response)
-        } catch (e) {
-            console.log(e)
-        }
-    }
-    */
 }
 
 const getters = {
+    ...isLoading.getters,
     ...pendingPayments.getters,
     ...sendZcoinResponse.getters,
 
@@ -194,7 +173,6 @@ const getters = {
         ...state.availableFees[state.selectedFee],
         key: state.selectedFee
     }),
-    isLoading: (state) => state.isLoading,
 
     createFormLabel: (state) => state.addPaymentForm.label,
     createFormAmount: (state) => state.addPaymentForm.amount,

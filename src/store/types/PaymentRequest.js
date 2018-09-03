@@ -1,3 +1,9 @@
+import IsLoading from '~/mixins/IsLoading'
+import LastSeen from '~/mixins/LastSeen'
+
+const isLoading = IsLoading.types('')
+const lastSeen = LastSeen.types('payment request')
+
 export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
 
 export const SET_PAYMENT_REQUEST_CREATE_FORM_FIELD = 'SET_PAYMENT_REQUEST_CREATE_FORM_FIELD'
@@ -10,6 +16,7 @@ export const SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE = 'SET_PAYMENT_REQUEST_CREA
 export const CREATE_PAYMENT_REQUEST = 'CREATE_PAYMENT_REQUEST'
 export const ADD_PAYMENT_REQUEST = 'ADD_PAYMENT_REQUEST'
 
-export const SET_PAYMENT_REQUEST_TO_VISITED = 'SET_PAYMENT_REQUEST_TO_VISITED'
-
-export const IS_LOADING = 'IS_LOADING'
+export default {
+    ...isLoading,
+    ...lastSeen
+}

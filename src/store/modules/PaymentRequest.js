@@ -1,19 +1,29 @@
 import * as types from '../types/PaymentRequest'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 
+import IsLoading from '~/mixins/IsLoading'
+import LastSeen from '~/mixins/LastSeen'
+
+const isLoading = IsLoading.module('')
+const lastSeen = LastSeen.module('payment request')
+
 const state = {
+    ...isLoading.state,
+    ...lastSeen.state,
+
     paymentRequests: {},
     createPaymentRequestForm: {
         amount: null,
         label: '',
         message: ''
     },
-    isLoading: false,
-    lastSeen: 'blockHeightAsInteger',
     currentPaymentRequest: null
 }
 
 const mutations = {
+    ...isLoading.mutations,
+    ...lastSeen.mutations,
+
     // send create request to the api
     [types.CREATE_PAYMENT_REQUEST] () {},
 
@@ -21,27 +31,25 @@ const mutations = {
         state.createPaymentRequestForm[field] = value
     },
 
-    [types.IS_LOADING] (state, isLoading) {
-        state.isLoading = isLoading
-    },
-
     [types.ADD_PAYMENT_REQUEST] (state, request) {
         state.paymentRequests = {
             ...state.paymentRequests,
             [request.address]: request
         }
-    },
-
-    [types.SET_PAYMENT_REQUEST_TO_VISITED] (state, id) {
-        state.paymentRequests[id].visited = true
     }
 }
 
 const actions = {
+    ...lastSeen.actions,
+
     [types.SET_INITIAL_STATE] ({ dispatch }, initialState) {
         console.log(initialState)
 
         for (let address in initialState) {
+            if (address.charAt(0) === '_') {
+                continue
+            }
+
             dispatch(types.ADD_PAYMENT_REQUEST, {
                 ...initialState[address],
                 address
@@ -91,7 +99,6 @@ const actions = {
     [types.CREATE_PAYMENT_REQUEST] ({ commit, state }) {
         const { label, amount, message } = state.createPaymentRequestForm
 
-        commit(types.IS_LOADING, true)
         commit(types.CREATE_PAYMENT_REQUEST, {
             label,
             amount,
@@ -107,28 +114,18 @@ const actions = {
             createdAt,
             amount,
             message,
-            label,
-            visited: false
+            label
         })
 
         // clean up form fields
         dispatch(types.RESET_PAYMENT_REQUEST_CREATE_FORM)
-    },
-
-    [types.SET_PAYMENT_REQUEST_TO_VISITED] ({ commit, dispatch, state }, id) {
-        if (!state.paymentRequests[id]) {
-            return
-        }
-
-        if (state.paymentRequests[id].visited) {
-            return
-        }
-
-        commit(types.SET_PAYMENT_REQUEST_TO_VISITED, id)
     }
 }
 
 const getters = {
+    ...isLoading.getters,
+    ...lastSeen.getters,
+
     paymentRequests (state, getters, rootState, rootGetters) {
         let requests = []
         const walletAddresses = rootGetters['Address/walletAddresses']
@@ -168,9 +165,6 @@ const getters = {
         }
 
         return requests
-    },
-    isLoading (state) {
-        return state.isLoading
     },
     createFormLabel (state) {
         return state.createPaymentRequestForm.label
