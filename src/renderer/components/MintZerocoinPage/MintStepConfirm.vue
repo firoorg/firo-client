@@ -1,8 +1,8 @@
 <template>
     <section>
         <header>
-            <h2>Confirm Mint</h2>
-            <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+            <h2 v-html="$t('mint.flyout-confirm-mint.title')"></h2>
+            <p v-html="$t('mint.flyout-confirm-mint.description')"></p>
         </header>
 
 
@@ -10,8 +10,9 @@
             <current-mints :current-mints="denominations"
                            :show-progress="false" />
             <fees-and-amount :amount="currentDenominationCostsInSatoshi"
-                             :fee="{ label: 'Fees', amount: 100000 }"
-                             :show-fee="true" />
+                             :fee="{ label: $t('mint.flyout-confirm-mint.label__fees'), amount: 100000 }"
+                             :show-fee="true"
+                             translation-namespace="mint.flyout-confirm-mint" />
         </div>
     </section>
 </template>

@@ -1,17 +1,16 @@
 <template>
     <div class="form">
         <header>
-            <h2>Unlock Client</h2>
-            <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+            <h2 v-html="$t('mint.flyout-unlock-client.title')"></h2>
+            <p v-html="$t('mint.flyout-unlock-client.description')"></p>
         </header>
-
         <div class="field" :class="getFieldErrorClass('passphrase')">
-            <label for="passphrase">Passphrase</label>
+            <label for="passphrase">{{ $t('mint.flyout-unlock-client.label__passphrase') }}</label>
             <div class="control">
                 <input type="password"
                        v-model="passphrase"
                        v-validate="{ required: true }"
-                       placeholder="Enter your Passphrase"
+                       :placeholder="$t('mint.flyout-unlock-client.placeholder__passphrase')"
                        name="passphrase"
                        id="passphrase"
                        ref="input" />

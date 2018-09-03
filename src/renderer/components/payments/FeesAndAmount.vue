@@ -12,7 +12,7 @@
                     <span class="value">{{ feeAmountAsBaseCoin }}</span> <span class="unit">xzc</span>
                 </dd>
             </template>
-            <dt class="amount">Total</dt>
+            <dt class="amount">{{ $t(`${translationNamespace}.label__amount`) }}</dt>
             <dd class="amount">
                 <span class="value">{{ totalAsBaseCoin }}</span> <span class="unit">XZC</span>
             </dd>
@@ -23,9 +23,13 @@
 <script>
     import { convertToCoin } from '#/lib/convert'
     import PendingPayments from '@/components/payments/PendingPayments'
+    import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 
     export default {
         name: 'FeesAndAmount',
+        mixins: [
+            TranslationNamespaceMixin
+        ],
         components: {
             PendingPayments
         },

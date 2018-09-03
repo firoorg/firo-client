@@ -58,3 +58,33 @@ receive:
 
     fulfilled:
       button__open-explorer: Open in Block Explorer
+
+mint:
+  overview:
+    title: Mint</br>Zcoin
+    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+
+  detail-process-mint:
+    title: Mints in Progress
+    description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+
+  detail-create-mint:
+    title: Create Mint
+    label__fees: Fees
+    label__amount: Total
+    button__mint-start--primary: Mint now
+
+  flyout-confirm-mint:
+    title: Confirm Mint
+    description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+    label__fees: Fees
+    label__amount: Total
+    button__mint-confirm--primary: Start minting!
+    button__cancel--secondary: Cancel
+
+  flyout-unlock-client:
+    title: Unlock Client
+    description: Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
+    label__passphrase: Passphrase
+    placeholder__passphrase: Enter your Passphrase
+    button__unlock-mint--primary: Unlock and mint
