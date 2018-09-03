@@ -1,8 +1,8 @@
 <template>
     <div class="is-fulfilled">
-        <div>
-            <h2 class="payments-headline">Payments</h2>
-            <div style="overflow: hidden">
+        <h2 class="payments-headline">Payments</h2>
+        <div style="overflow: hidden" class="testing">
+            <div :style="{ height: '100%' }">
                 <unexpected-transaction-popover :is-reused="isReused" :boundaries-element="null">
                     <transactions-list :transactions="transactions" class="scrollable-container" />
                 </unexpected-transaction-popover>
@@ -73,6 +73,10 @@
 </script>
 
 <style lang="scss" scoped>
+    .testing {
+        overflow: hidden;
+    }
+
     .is-fulfilled {
         display: grid;
         grid-template-rows: 1fr auto;

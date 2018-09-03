@@ -224,6 +224,7 @@
             z-index: 2;
             padding-top: emRhythm(4);
             margin-left: emRhythm(5);
+            mix-blend-mode: multiply;
 
             h2 {
                 @include typo-headline();

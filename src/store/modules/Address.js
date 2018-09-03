@@ -26,7 +26,7 @@ const getTxBasics = function (tx) {
         id: txid,
         category,
         amount,
-        firstSeenAt: firstSeenAt * 1000,
+        firstSeenAt: firstSeenAt,
         block
     }
 }

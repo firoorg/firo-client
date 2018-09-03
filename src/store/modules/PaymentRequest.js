@@ -189,8 +189,11 @@ const getters = {
         walletAddresses.forEach((walletAddress) => {
             const { address, transactions } = walletAddress
 
+            if (!transactions.length) {
+                return
+            }
+
             if (paymentRequestsKeys.includes(address)) {
-                console.log('payment request exists for', address)
                 return
             }
 
@@ -203,18 +206,17 @@ const getters = {
             paymentRequests.push({
                 address,
                 isFulfilled: true,
+                isVirtual: true,
+                transactionsReceived: true,
+                amount: null,
+                message: null,
+                label: 'testing' + (tags.length ? ` ${tags.join(' ')}` : ''),
                 isReused: transactions.length > 1,
-                transactionsReceived: !!transactions.length,
                 createdAt: transactions.reduce((accumulator, tx) => {
                     return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator
-                }, Infinity) / 1000,
-                amount: null,
-                label: 'testing' + (tags.length ? ` ${tags.join(' ')}` : ''),
-                message: null
+                }, Infinity)
             })
         })
-
-        console.log('walletAddresses', walletAddresses)
 
         return paymentRequests
     }
