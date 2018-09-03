@@ -271,6 +271,34 @@
                 font-style: italic;
             }
         }
+
+        &.range-input {
+            .content-wrapper {
+                span {
+                    @include font-heavy();
+                }
+            }
+
+            &.range-input-dark-light .content-wrapper {
+                span:first-child {
+                    color: $color--dark;
+                }
+
+                span:last-child {
+                    color: $color--white;
+                }
+            }
+
+            &.range-input-light-dark .content-wrapper {
+                span:first-child {
+                    color: $color--white;
+                }
+
+                span:last-child {
+                    color: $color--dark;
+                }
+            }
+        }
     }
 
     &[aria-hidden='true'] {

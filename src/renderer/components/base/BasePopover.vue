@@ -5,6 +5,7 @@
             class="popover"
             :popover-class="getPopoverClass"
             :offset="offset"
+            :handle-resize="true"
             :auto-hide="this.$attrs['auto-hide'] !== undefined ? this.$attrs['auto-hide'] : false"
     >
         <!-- This will be the popover target (for the events and position) -->

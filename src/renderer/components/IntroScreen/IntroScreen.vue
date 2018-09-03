@@ -43,6 +43,7 @@
     import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
     import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
     import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
+    import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
     import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 
     export default {
@@ -59,6 +60,7 @@
             IntroScreenWelcome,
             IntroScreenBlockchainLocation,
             IntroScreenLockWallet,
+            IntroScreenAmountToHoldInZerocoin,
             IntroScreenOther
         },
 
@@ -77,6 +79,7 @@
                     welcome: IntroScreenWelcome,
                     location: IntroScreenBlockchainLocation,
                     lock: IntroScreenLockWallet,
+                    amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
                     other: IntroScreenOther
                 },
                 currentStep: 'welcome',
