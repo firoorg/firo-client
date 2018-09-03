@@ -158,8 +158,8 @@
 
     .form {
         ::selection {
-            color: $color--dark;
-            background: $color--white-light;
+            color: $color--white;
+            background: $color--comet-dark-mixed;
         }
 
         input[type="text"],

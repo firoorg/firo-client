@@ -34,7 +34,7 @@
             <transition name="fade" mode="out-in">
                 <router-view v-bind="selectedPaymentRequestWithAddress"
                              :key="$route.path"
-                             class="paymentrequest-detail-route scrollable"></router-view>
+                             class="paymentrequest-detail-route"></router-view>
             </transition>
         </section>
     </section>
@@ -108,17 +108,17 @@
                     return null
                 }
 
-                const filteredAddress = this.walletAddresses.filter((address) => {
+                const filteredAddress = this.walletAddresses.find((address) => {
                     return address.address === this.selectedPaymentRequest
                 })
 
                 console.log(filteredAddress)
 
-                const [ paymentRequest ] = this.paymentRequests.filter((request) => {
+                const paymentRequest = this.paymentRequests.find((request) => {
                     return request.address === this.selectedPaymentRequest
                 })
 
-                const address = filteredAddress.length ? filteredAddress[0] : paymentRequest.address
+                const address = filteredAddress || paymentRequest.address
 
                 return {
                     ...paymentRequest,
@@ -193,7 +193,7 @@
     .receive-zcoin {
         display: grid;
         box-sizing: border-box;
-        grid-template-columns: 1fr $detail-view--min-width;
+        grid-template-columns: 1fr 30rem;
     }
 
     .paymentrequest-list,
@@ -205,10 +205,19 @@
         padding: emRhythm(5) emRhythm(4);
     }
 
+    .create-payment-request {
+        cursor: pointer;
+    }
+
     .paymentrequest-detail {
         //background: $gradient--comet-dark-horizontal;
         //background: $gradient--polo-horizontal;
         background: $color--white;
+    }
+
+    .paymentrequest-detail-route {
+        max-height: 100vh;
+        box-sizing: border-box;
     }
 
     .table-filter-input-wrap {

@@ -1,7 +1,7 @@
 <template>
     <base-popover
             :open="isOpen"
-            placement="right-end"
+            placement="right-auto"
             popover-class="warning"
             boundaries-element="body"
             class="unexpected-transaction-popover advice"
@@ -12,9 +12,20 @@
         </template>
 
         <template slot="content">
-            <h1>Unexpected Payment Received</h1>
+            <header>
+                <h2>Unexpected Payment Received</h2>
+            </header>
 
-            <p>Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam id dolor id nibh ultricies vehicula ut id elit. Nullam quis risus eget urna mollis ornare vel eu leo. Aenean lacinia bibendum nulla sed consectetur. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+            <p>
+                Integer posuere erat a ante venenatis dapibus posuere velit aliquet.<br>
+                Nullam id dolor id nibh ultricies vehicula ut id elit. <br>
+                Nullam quis risus eget urna mollis ornare vel eu leo.
+            </p>
+
+            <footer>
+                <base-button :is-outline="true">Mark as Notified</base-button>
+                <base-button>Change To Subscription</base-button>
+            </footer>
         </template>
     </base-popover>
 </template>
@@ -23,12 +34,13 @@
     export default {
         name: 'UnexpectedTransactionPopover',
         props: [
-            'boundariesElement'
+            'boundariesElement',
+            'isReused'
         ],
 
         computed: {
             isOpen () {
-                return true
+                return this.isReused
             }
         }
     }
