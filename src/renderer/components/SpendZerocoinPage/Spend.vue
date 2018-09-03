@@ -23,7 +23,8 @@
                     <!--<div class="">-->
                     <fees-and-amount class="fees-and-amount"
                                      :amount="spendFormMintCostsInSatoshi"
-                                     :show-fee="false" />
+                                     :show-fee="false"
+                                     translation-namespace="todo" />
                     <!--</div>-->
                     <spend-zerocoin-steps :boundaries-element="boundariesElement"
                                           :form-is-valid="formSectionIsValid"

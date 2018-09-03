@@ -10,7 +10,8 @@
             <current-mints :current-mints="denominations"
                            :show-progress="false" />
             <fees-and-amount :amount="spendFormMintCostsInSatoshi"
-                             :show-fee="false" />
+                             :show-fee="false"
+                             translation-namespace="todo" />
         </div>
     </section>
 </template>
