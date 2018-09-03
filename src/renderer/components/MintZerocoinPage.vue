@@ -64,8 +64,9 @@
                 </section>
                 <form class="checkout" @submit.prevent="onSubmit">
                     <div class="has-divider">
-                        <fees-and-amount :fee="{ label: 'Fees', amount: totalMintFee }"
-                                         :amount="currentMintCostInSatoshi" />
+                        <fees-and-amount :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: totalMintFee }"
+                                         :amount="currentMintCostInSatoshi"
+                                         translation-namespace="mint.detail-create-mint" />
                     </div>
                     <mint-steps :form-is-valid="canSubmit"
                                 :cleanup-form="cleanupForm"

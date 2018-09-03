@@ -10,8 +10,9 @@
             <current-mints :current-mints="denominations"
                            :show-progress="false" />
             <fees-and-amount :amount="currentDenominationCostsInSatoshi"
-                             :fee="{ label: 'Fees', amount: 100000 }"
-                             :show-fee="true" />
+                             :fee="{ label: $t('mint.flyout-confirm-mint.label__fees'), amount: 100000 }"
+                             :show-fee="true"
+                             translation-namespace="mint.flyout-confirm-mint" />
         </div>
     </section>
 </template>

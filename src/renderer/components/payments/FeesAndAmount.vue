@@ -23,9 +23,13 @@
 <script>
     import { convertToCoin } from '#/lib/convert'
     import PendingPayments from '@/components/payments/PendingPayments'
+    import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 
     export default {
         name: 'FeesAndAmount',
+        mixins: [
+            TranslationNamespaceMixin
+        ],
         components: {
             PendingPayments
         },
