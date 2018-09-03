@@ -13,7 +13,8 @@
             <fees-and-amount :amount="pendingPaymentsAmount"
                              :fee="fee"
                              :can-change-fee="true"
-                             :on-change-fee="goToFeeSelector">
+                             :on-change-fee="goToFeeSelector"
+                             translation-namespace="todo" >
                 <template slot-scope="payment">
                     {{ payment.label }}
                     {{ payment.amount }}
