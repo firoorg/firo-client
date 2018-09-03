@@ -132,7 +132,7 @@ const getters = {
 
         for (let key in state.paymentRequests) {
             const { amount: amountRequested } = state.paymentRequests[key]
-            const address = walletAddresses.filter((addr) => addr.address === key).pop()
+            const address = walletAddresses.find((addr) => addr.address === key)
 
             let transactionsReceived = 0
             let isFulfilled = false
@@ -177,6 +177,46 @@ const getters = {
     },
     createFormMessage (state) {
         return state.createPaymentRequestForm.message
+    },
+
+    virtualPaymentRequests (state, getters, rootState, rootGetters) {
+        const paymentRequestsKeys = Object.keys(state.paymentRequests)
+        const walletAddresses = rootGetters['Address/walletAddresses']
+        let paymentRequests = []
+
+        console.log(paymentRequestsKeys)
+
+        walletAddresses.forEach((walletAddress) => {
+            const { address, transactions } = walletAddress
+
+            if (paymentRequestsKeys.includes(address)) {
+                console.log('payment request exists for', address)
+                return
+            }
+
+            const tags = transactions.reduce((accumulator, tx) => {
+                const tag = `#${tx.category}`
+
+                return accumulator.includes(tag) ? accumulator : [...accumulator, tag]
+            }, [])
+
+            paymentRequests.push({
+                address,
+                isFulfilled: true,
+                isReused: transactions.length > 1,
+                transactionsReceived: !!transactions.length,
+                createdAt: transactions.reduce((accumulator, tx) => {
+                    return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator
+                }, Infinity) / 1000,
+                amount: null,
+                label: 'testing' + (tags.length ? ` ${tags.join(' ')}` : ''),
+                message: null
+            })
+        })
+
+        console.log('walletAddresses', walletAddresses)
+
+        return paymentRequests
     }
 }
 

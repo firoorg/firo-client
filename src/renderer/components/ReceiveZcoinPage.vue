@@ -100,6 +100,7 @@
         computed: {
             ...mapGetters({
                 paymentRequests: 'PaymentRequest/paymentRequests',
+                virtualPaymentRequests: 'PaymentRequest/virtualPaymentRequests',
                 walletAddresses: 'Address/walletAddresses'
             }),
 
@@ -114,7 +115,7 @@
 
                 console.log(filteredAddress)
 
-                const paymentRequest = this.paymentRequests.find((request) => {
+                const paymentRequest = this.allPaymentRequests.find((request) => {
                     return request.address === this.selectedPaymentRequest
                 })
 
@@ -126,14 +127,22 @@
                 }
             },
 
+            allPaymentRequests () {
+                return [
+                    ...this.paymentRequests,
+                    ...this.virtualPaymentRequests
+                ]
+            },
+
             filteredPaymentRequests () {
+                console.log(this.virtualPaymentRequests)
                 if (!this.tableFilter) {
-                    return this.paymentRequests
+                    return this.allPaymentRequests
                 }
 
                 const filter = this.tableFilter.toLowerCase()
 
-                return this.paymentRequests.filter((request) => {
+                return this.allPaymentRequests.filter((request) => {
                     return request.label ? request.label.toLowerCase().includes(filter) : false
                 })
             },
