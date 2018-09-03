@@ -9,7 +9,7 @@
                     </h1>
                 </spend-zerocoin-from-clipboard-popover>
 
-                <animated-table :data="paymentRequests"
+                <animated-table :data="transactions"
                                 :fields="tableFields"
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
@@ -88,6 +88,7 @@
         computed: {
             ...mapGetters({
                 paymentRequests: 'PaymentRequest/paymentRequests',
+                transactions: 'Address/getOutgoingTransactions',
                 clipboardNotified: 'Clipboard/isNotified',
                 clipboardAddress: 'Clipboard/address',
                 clipboardAmount: 'Clipboard/amount'
@@ -141,12 +142,14 @@
                 // todo get paymentRequest from store
                 this.selectedPaymentRequest = rowData.address
 
+                /*
                 this.$router.push({
                     name: 'send-zcoin-paymentrequest',
                     params: {
                         address: this.selectedPaymentRequest
                     }
                 })
+                */
             }
         }
     }
