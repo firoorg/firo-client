@@ -15,8 +15,14 @@
             Lottie
         },
         props: {
-            isFulfilled: Boolean,
-            default: false
+            isFulfilled: {
+                type: Boolean,
+                default: false
+            },
+            isReused: {
+                type: Boolean,
+                default: false
+            }
         },
         data () {
             return {
@@ -65,4 +71,12 @@
 </script>
 
 <style lang="scss" scoped>
+    .payment-request-status-animation {
+        height: 100%;
+        display: inline-block;
+    }
+
+    /deep/ svg {
+        width: auto !important;
+    }
 </style>
