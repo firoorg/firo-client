@@ -1,7 +1,7 @@
 <template>
     <section class="blockchain">
-        <div class="status" :class="{ 'is-synced': isSynced }">
-            <template v-if="isSynced">
+        <div class="status" :class="{ 'is-synced': getIsSynced }">
+            <template v-if="getIsSynced">
                 <tick-icon class="icon"></tick-icon>
                 <span>Synced</span>
             </template>
@@ -23,7 +23,7 @@
                 </template>
             </base-popover>
         </div>
-        <div class="sync-progress" :class="{ 'is-synced': isSynced }">
+        <div class="sync-progress" :class="{ 'is-synced': getIsSynced }">
             <div class="wrap" v-show="!isBlockchainSynced">
                 <div class="loaded" :style="{ width: `${progress}%`}"></div>
             </div>
@@ -62,6 +62,11 @@
                 hasConnections: 'Blockchain/hasConnections',
                 connections: 'Blockchain/connections'
             }),
+
+            getIsSynced () {
+                // todo check if wallet has znode
+                return this.isBlockchainSynced // ? this.isBlockchainSynced : this.isSynced
+            },
 
             progress () {
                 return this.currentBlockHeight / this.tipHeight * 100
