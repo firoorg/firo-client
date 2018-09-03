@@ -64,6 +64,10 @@ mint:
     title: Mint</br>Zcoin
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
 
+  detail-process-mint:
+    title: Mints in Progress
+    description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+
   detail-create-mint:
     title: Create Mint
     label__fees: Fees
@@ -84,7 +88,3 @@ mint:
     label__passphrase: Passphrase
     placeholder__passphrase: Enter your Passphrase
     button__unlock-mint--primary: Unlock and mint
-
-  detail-process-mint:
-    title: Mints in Progress
-    description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
