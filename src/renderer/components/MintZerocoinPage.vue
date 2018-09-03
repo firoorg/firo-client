@@ -3,13 +3,8 @@
         <div class="scrollable-height">
             <section class="mint-selection">
                 <header>
-                    <h1>
-                        Anonymize<br>
-                        Zcoin
-                    </h1>
-                    <p>
-                        Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, massa justo sit amet risus.
-                    </p>
+                    <h1 v-html="$t('mint.overview.title')"></h1>
+                    <p v-html="$t('mint.overview.description')"></p>
                 </header>
 
                 <denomination-selector :on-denomination-change="onDenominationChange"
@@ -19,7 +14,7 @@
         <section class="current-mint-detail scrollable-height">
             <template v-if="!hasCurrentMints && hasMintsInProgress">
                 <section class="mints-in-progress">
-                    <h2>Mints in Progress</h2>
+                    <h2 v-html="$t('mint.detail-process-mint.title')"></h2>
 
                     <mints-in-progress-list :mints="mintsInProgress" />
                 </section>
@@ -27,7 +22,7 @@
             <template v-else>
                 <section class="current-mint">
                     <header>
-                        <h2>Create Mint</h2>
+                        <h2 v-html="$t('mint.detail-create-mint.title')"></h2>
                         <div v-show="hasMintsInProgress">
                             <base-popover
                                     :disabled="!enableProgressList"
@@ -50,8 +45,8 @@
 
                                 <template slot="content">
                                     <header>
-                                        <h3>Mints in Progress</h3>
-                                        <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                                        <h3 v-html="$t('mint.detail-process-mint.title')"></h3>
+                                        <p v-html="$t('mint.detail-process-mint.description')"></p>
                                     </header>
 
                                     <mints-in-progress-list :mints="mintsInProgress"

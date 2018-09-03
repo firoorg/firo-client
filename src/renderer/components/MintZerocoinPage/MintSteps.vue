@@ -10,7 +10,7 @@
                          color="red"
                          :is-outline="true"
                          @click.prevent="onCancel">
-                <span>Cancel</span>
+                <span>{{ $t('mint.flyout-confirm-mint.button__cancel--secondary') }}</span>
             </base-button>
         </template>
 
@@ -36,7 +36,7 @@
                                                  :color="submitButtonColor"
                                                  :is-dark="true"
                                                  :can-submit="canSubmit">
-                    Unlock and mint
+                    {{ $t('mint.flyout-unlock-client.button__unlock-mint--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
             <template slot="step-done" slot-scope="{ actions }">

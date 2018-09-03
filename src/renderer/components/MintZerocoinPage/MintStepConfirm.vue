@@ -1,8 +1,8 @@
 <template>
     <section>
         <header>
-            <h2>Confirm Mint</h2>
-            <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+            <h2 v-html="$t('mint.flyout-confirm-mint.title')"></h2>
+            <p v-html="$t('mint.flyout-confirm-mint.description')"></p>
         </header>
 
 
