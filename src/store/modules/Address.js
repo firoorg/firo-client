@@ -330,8 +330,12 @@ const getters = {
     getOutgoingTransactions (state) {
         const addresses = Object.keys(state[THIRD_PARTY_ADDRESS_KEY])
 
-        const txs = addresses.reduce((accumulator, address) => {
-            return [ ...accumulator, ...address.transactions ]
+        const txs = addresses.reduce((accumulator, key) => {
+            const address = state[THIRD_PARTY_ADDRESS_KEY][key]
+
+            console.log(address.transactions)
+            // address && address.transactions
+            return accumulator// return [ ...accumulator, ...address.transactions ]
         }, [])
 
         console.log(txs)
