@@ -239,11 +239,13 @@ const actions = {
     },
 
     [types.SET_AVERAGE_BLOCK_TIME] ({ commit, state }, { averageBlockTime }) {
-        if (state.averageBlockTime === averageBlockTime) {
+        const averageBlockTimeInMs = averageBlockTime * 1000
+
+        if (state.averageBlockTime === averageBlockTimeInMs) {
             return
         }
 
-        commit(types.SET_AVERAGE_BLOCK_TIME, averageBlockTime)
+        commit(types.SET_AVERAGE_BLOCK_TIME, averageBlockTimeInMs)
     }
 }
 
@@ -257,7 +259,7 @@ const getters = {
     isBlockchainSynced: (state, getters) => getters.status.isBlockchainSynced,
     isZnodeListSynced: (state, getters) => getters.status.isZnodeListSynced,
     networkIdentifier: (state, getters) => getters.isMainnet ? 'mainnet' : 'testnet',
-    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime * 1000,
+    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime,
     connections: (state) => state.connections,
     hasConnections: (state) => !!state.connections
 }
