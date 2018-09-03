@@ -58,7 +58,7 @@
                 type: Array,
                 default: () => [
                     {
-                        field: 'created_at',
+                        field: 'createdAt',
                         direction: 'desc'
                     }
                 ]
@@ -153,7 +153,7 @@
 
                 // sortOrder can be empty, so we have to check for that as well
                 if (sortOrder.length > 0) {
-                    console.log('orderBy:', sortOrder[0].sortField, sortOrder[0].direction)
+                    // console.log('orderBy:', sortOrder[0].sortField, sortOrder[0].direction)
                     local = _.orderBy(
                         local,
                         sortOrder[0].sortField,
@@ -165,7 +165,7 @@
                     local.length,
                     this.perPage
                 )
-                console.log('pagination:', pagination)
+                // console.log('pagination:', pagination)
                 let from = pagination.from - 1
                 let to = from + this.perPage
 
