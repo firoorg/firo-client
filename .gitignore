@@ -13,3 +13,4 @@ thumbs.db
 .idea/
 *.pid
 zcoin-repo
+/zcoin-client-api
