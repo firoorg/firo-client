@@ -118,8 +118,15 @@ const getters = {
         return getters.currentDenominationsFormatted
             .reduce((accumulator, current) => accumulator + current.cost, 0)
     },
+
     currentDenominationCostsInSatoshi (state, getters) {
         return convertToSatoshi(getters.currentDenominationCosts)
+    },
+
+    currentDenominationFees (state, getters) {
+        return getters.currentDenominationsFormatted.reduce((accumulator, denom) => {
+            return accumulator + (denom.amount * 100000)
+        }, 0)
     },
 
     mints (state, getters, rootState, rootGetters) {

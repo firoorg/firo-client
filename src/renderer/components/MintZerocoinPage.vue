@@ -59,7 +59,7 @@
                 </section>
                 <form class="checkout" @submit.prevent="onSubmit">
                     <div class="has-divider">
-                        <fees-and-amount :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: totalMintFee }"
+                        <fees-and-amount :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: currentDenominationFees }"
                                          :amount="currentMintCostInSatoshi"
                                          translation-namespace="mint.detail-create-mint" />
                     </div>
@@ -123,6 +123,7 @@
             ...mapGetters({
                 currentPassphrase: 'App/currentPassphrase',
                 denominations: 'Mint/currentDenominations',
+                currentDenominationFees: 'Mint/currentDenominationFees',
                 mintsInProgress: 'Mint/mintsInProgress'
             }),
 
@@ -152,10 +153,6 @@
 
             currentMintCostInSatoshi () {
                 return convertToSatoshi(this.currentMintCost)
-            },
-
-            totalMintFee () {
-                return this.currentMints.reduce((accumulator, current) => accumulator + convertToSatoshi(current.amount), 0) / 1000
             },
 
             canSubmit () {

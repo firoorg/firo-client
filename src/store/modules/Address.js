@@ -333,9 +333,7 @@ const getters = {
         const txs = addresses.reduce((accumulator, key) => {
             const address = state[THIRD_PARTY_ADDRESS_KEY][key]
 
-            console.log(address.transactions)
-            // address && address.transactions
-            return accumulator// return [ ...accumulator, ...address.transactions ]
+            return [ ...accumulator, ...address.transactions ]
         }, [])
 
         console.log(txs)

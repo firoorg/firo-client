@@ -10,7 +10,7 @@
             <current-mints :current-mints="denominations"
                            :show-progress="false" />
             <fees-and-amount :amount="currentDenominationCostsInSatoshi"
-                             :fee="{ label: $t('mint.flyout-confirm-mint.label__fees'), amount: 100000 }"
+                             :fee="{ label: $t('mint.flyout-confirm-mint.label__fees'), amount: currentDenominationFees }"
                              :show-fee="true"
                              translation-namespace="mint.flyout-confirm-mint" />
         </div>
@@ -39,8 +39,8 @@
         computed: {
             ...mapGetters({
                 denominations: 'Mint/currentDenominationsFormatted',
-                currentDenominationCostsInSatoshi: 'Mint/currentDenominationCostsInSatoshi'
-                // todo current denomination fees
+                currentDenominationCostsInSatoshi: 'Mint/currentDenominationCostsInSatoshi',
+                currentDenominationFees: 'Mint/currentDenominationFees'
             })
         }
     }

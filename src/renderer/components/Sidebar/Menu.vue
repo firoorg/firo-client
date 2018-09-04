@@ -8,7 +8,9 @@
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'mint-zerocoin' }" exact>
-                    <span class="text">{{ $t('navigation.menu.button__mint') }}</span>
+                    <percentage-to-hold-in-zerocoin-notification>
+                        <span class="text">{{ $t('navigation.menu.button__mint') }}</span>
+                    </percentage-to-hold-in-zerocoin-notification>
                 </router-link>
             </li>
             <li class="has-divider">
@@ -35,10 +37,12 @@
     import { mapGetters } from 'vuex'
     import AttentionBadge from '@/components/Badge/AttentionBadge'
     import NotificationIndicator from '@/components/Notification/NotificationIndicator'
+    import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
 
     export default {
         name: 'Menu',
         components: {
+            PercentageToHoldInZerocoinNotification,
             NotificationIndicator,
             AttentionBadge
         },
@@ -97,11 +101,6 @@
         @include bleed-h($bleed);
         transition: padding .1s ease-in-out, margin .1s ease-in-out;
 
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-
         &:after {
             position: absolute;
             content: '';
@@ -136,5 +135,17 @@
                 opacity: .3;
             }
         }
+
+        .popover {
+            width: 100%;
+        }
+    }
+
+    a,
+    a /deep/ .trigger {
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
 </style>

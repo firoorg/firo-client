@@ -7,7 +7,7 @@
 
         <div>
             <div class="input">
-                <div :style="{ width: `${publicPercentage}%` }" class="private-side">
+                <div :style="{ width: `${privatePercentage}%` }" class="private-side">
                     <base-popover :open="true"
                                   trigger="manual"
                                   placement="top"
@@ -17,14 +17,14 @@
                                   :popper-options="getPopperOptions"
                                   :boundaries-element="$refs.boundaries">
                         <template slot="content">
-                            <span>{{ publicPercentage }}</span> | <span>{{ privatePercentage }}</span>
+                            <span>{{ privatePercentage }}</span> | <span>{{ publicPercentage }}</span>
                         </template>
                         <template slot="target">
                             <div class="handle"></div>
                         </template>
                     </base-popover>
                 </div>
-                <input type="range" class="slider" min="0" max="100" step="10" v-model="publicPercentage" />
+                <input type="range" class="slider" min="0" max="100" step="10" v-model="privatePercentage" />
             </div>
             <div class="labels">
                 <label>Private</label>
@@ -41,7 +41,10 @@
 </template>
 
 <script>
+    // import { mapGetters } from 'vuex'
+    import types from '~/types'
     import GuideStepMixin from '@/mixins/GuideStepMixin'
+    import { addVuexModel } from '@/utils/store'
 
     export default {
         name: 'IntroScreenAmountToHoldInZerocoin',
@@ -51,13 +54,13 @@
 
         data () {
             return {
-                publicPercentage: 50,
+                // privatePercentage: 50,
                 popper: null
             }
         },
 
         watch: {
-            publicPercentage: {
+            privatePercentage: {
                 handler () {
                     if (!this.popper) {
                         return
@@ -69,8 +72,14 @@
         },
 
         computed: {
-            privatePercentage () {
-                return 100 - this.publicPercentage
+            ...addVuexModel({
+                name: 'privatePercentage',
+                getter: 'Settings/percentageToHoldInZerocoin',
+                action: types.settings.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN
+            }),
+
+            publicPercentage () {
+                return 100 - this.privatePercentage
             },
 
             getPopperOptions () {
