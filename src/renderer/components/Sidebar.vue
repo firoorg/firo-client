@@ -9,7 +9,7 @@
         <Balance class="balance"></Balance>
         <main-menu class="menu"></main-menu>
 
-        <settings class="settings"></settings>
+        <!--<settings class="settings"></settings>-->
         <blockchain class="blockchain"></blockchain>
     </aside>
 </template>
@@ -40,9 +40,9 @@
 
         display: grid;
         grid-row-gap: emRhythm(2);
-        grid-template-areas: "logo" "balance" "menu" "settings" "blockchain";
+        grid-template-areas: "logo" "balance" "menu" "blockchain";
         $logo-height: $sidebar--logo-margin-top + $sidebar--logo-height + $sidebar--logo-margin-bottom;
-        grid-template-rows: emRhythm($logo-height) 5rem auto 2fr 5rem;
+        grid-template-rows: emRhythm($logo-height) 5rem auto 3rem;
         color: #fff;
 
         -webkit-user-select: none;
@@ -85,6 +85,7 @@
     }
 
     .blockchain {
+        align-self: end;
         grid-area: blockchain;
     }
 </style>
