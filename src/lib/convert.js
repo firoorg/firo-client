@@ -106,3 +106,40 @@ export const getDenominationsToSpend = function (amount, denominations = {}) {
         change: amountToSpend
     }
 }
+
+export const getDenominationsToMint = function (amount, denoms = [1, 10, 25, 50, 100]) {
+    const denomsToMint = {}
+    const reversed = denoms.reverse()
+
+    let amountToMint = amount
+    let found = false
+
+    let counter = 0
+
+    do {
+        counter++
+        found = false
+
+        for (let denom of reversed) {
+            if (denom > amountToMint) {
+                continue
+            }
+
+            if (denomsToMint[`${denom}`] >= 10) {
+                continue
+            }
+
+            if (denomsToMint[`${denom}`] === undefined) {
+                denomsToMint[`${denom}`] = 0
+            }
+            denomsToMint[`${denom}`]++
+            amountToMint -= denom
+            found = true
+            break
+        }
+    } while (found && counter < 100)
+    return {
+        toMint: denomsToMint,
+        change: amountToMint
+    }
+}
