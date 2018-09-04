@@ -22,20 +22,5 @@ curl -L -o $REPO.tar.gz http://github.com/zcoinofficial/zcoin/archive/$REPO_BRAN
 tar -zxvf $REPO.tar.gz
 rm $REPO.tar.gz
 
-#git clone --branch $REPO_BRANCH https://github.com/zcoinofficial/zcoin/ $REPO
-cd $REPO
-
-# compile
-echo "- compiling \"$REPO_BRANCH\" branch with $CORES cores"
-./autogen.sh
-./configure --with-boost-libdir=/usr/local/Cellar/boost/1.67.0_1/lib/
-make -j${CORES}
-
-# copy binaries to gui assets folder
-echo "- copying binaries to assets folder"
-mkdir -p $DIR/assets/core
-cp $REPO/src/zcoind $DIR/assets/core
-cp $REPO/src/zcoin-cli $DIR/assets/core
-cp $REPO/src/zcoin-tx $DIR/assets/core
-
-ls -lh $DIR/assets/core
+# build it
+./build-zcoin-core.sh
