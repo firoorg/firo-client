@@ -41,11 +41,15 @@ $color--polo-light: #F5F7FF;
 $color--comet-dark-mixed: mix($color--comet-dark, $color--dark);
 $color--private: $color--comet-dark;
 $color--private-text: $color--white;
+
 // inputs
 $input-bleed: 2;
 
 // detail view
 $detail-view--min-width: 34rem;
+
+// scrollbar
+$scrollbar-padding: 0.5;
 
 // $color--bg-header: #B3C0D1;
 

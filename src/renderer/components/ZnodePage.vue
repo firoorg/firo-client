@@ -85,10 +85,16 @@
         box-sizing: border-box;
         //grid-template-columns: 3fr  minmax(30rem, 2fr);
         background: $color--private;
+        padding-right: 6.25rem;
+
+        & > .scrollable-height {
+            @include scrollbar-on-hover($color--comet-dark-mixed);
+        }
     }
 
     .znode {
-        padding: emRhythm(5) emRhythm(4);
+        background: $color--private;
+        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
     }
 
     .title-bar {

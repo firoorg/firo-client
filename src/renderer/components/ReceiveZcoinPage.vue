@@ -203,6 +203,7 @@
         display: grid;
         box-sizing: border-box;
         grid-template-columns: 1fr 30rem;
+        grid-column-gap: emRhythm($scrollbar-padding, $silent: true);
     }
 
     .paymentrequest-list,
@@ -211,7 +212,11 @@
     }
 
     .paymentrequest-list {
-        padding: emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+    }
+
+    .receive-zcoin > .scrollable-height {
+        @include scrollbar-on-hover();
     }
 
     .create-payment-request {
