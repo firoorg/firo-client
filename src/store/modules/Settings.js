@@ -63,6 +63,7 @@ const actions = {
         }
 
         commit(types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN, percentage)
+        commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, -1)
     },
 
     [types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED] ({ commit, state, rootGetters }) {
