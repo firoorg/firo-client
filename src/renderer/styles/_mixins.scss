@@ -304,3 +304,48 @@
 @mixin red-input () {
     @include color-input($color--red-dark);
 }
+
+// scrollbars
+
+@mixin scrollbar-on-hover ($color: $color--polo-medium) {
+    $width: emRhythm(1);
+
+    background-color: rgba($color, 0);
+    -webkit-background-clip: text;
+    /* uncomment following line to see the trick in actions */
+    //-webkit-text-fill-color: transparent;
+    transition: background-color .5s;
+
+    &::-webkit-scrollbar {
+        //-webkit-appearance: none;
+        width: $width;
+    }
+
+    &::-webkit-scrollbar-track {
+        display: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        width: $width;
+        background-color: inherit;
+        border-radius: emRhythm(1) / 2;
+    }
+
+    &::-webkit-scrollbar-button {
+        /*
+        width: 0;
+        height: 0;
+        display: none;
+        */
+    }
+
+    &::-webkit-scrollbar-corner {
+        /*
+        background-color: transparent;
+        */
+    }
+
+    &:hover {
+        background-color: rgba($color, .5);
+    }
+}

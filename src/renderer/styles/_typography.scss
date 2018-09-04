@@ -22,7 +22,7 @@ $global-init: true; // By default set to false, loaded with typesetted
 // Lato font weights overview
 // @see https://github.com/betsol/lato-font/blob/master/scss/internal/_variables.scss
 $weight--headline: 'black';
-$weight--label: 'bold';
+$weight--label: 'heavy';
 $weight--button: 'heavy'; //$weight--label;
 
 @mixin typo-headline() {
