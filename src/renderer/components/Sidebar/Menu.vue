@@ -25,6 +25,11 @@
                 </router-link>
             </li>
             <li class="has-divider">
+                <router-link :to="{ name: 'znode' }" exact>
+                    <span class="text">{{ $t('navigation.menu.button__znode') }}</span>
+                </router-link>
+            </li>
+            <li class="has-divider">
                 <router-link :to="{ name: 'settings' }" exact>
                     <span class="text">{{ $t('navigation.menu.button__settings') }}</span>
                 </router-link>

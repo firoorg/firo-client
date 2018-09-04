@@ -41,12 +41,17 @@ export default new Router({
                     component: require('@/components/MintZerocoinPage').default
                 },
                 {
-                    path: 'spend',
+                    path: '/spend',
                     name: 'spend-zerocoin',
                     component: require('@/components/SpendZerocoinPage').default
                 },
                 {
-                    path: 'settings',
+                    path: '/znode',
+                    name: 'znode',
+                    component: require('@/components/ZnodePage').default
+                },
+                {
+                    path: '/settings',
                     name: 'settings',
                     component: require('@/components/SettingsPage').default
                 }

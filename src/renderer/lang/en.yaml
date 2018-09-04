@@ -20,6 +20,7 @@ navigation:
     button__send: Public Send
     button__mint: Anonymize Zcoin
     button__spend: Private Spend
+    button__znode: Znodes
     button__settings: Settings
   settings:
     switch__connect-via-tor: Anonymize Connection
