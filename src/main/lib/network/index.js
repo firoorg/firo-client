@@ -18,6 +18,7 @@ import PaymentRequest from './PaymentRequest'
 import SendZcoin from './SendZcoin'
 import SpendZerocoin from './SpendZerocoin'
 import Mint from './Mint'
+import Znode from './Znode'
 
 const modules = {
     Address,
@@ -26,7 +27,8 @@ const modules = {
     PaymentRequest,
     SendZcoin,
     SpendZerocoin,
-    Mint
+    Mint,
+    Znode
 }
 
 const debug = Debug('zcoin:network')
