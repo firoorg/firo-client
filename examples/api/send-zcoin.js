@@ -19,7 +19,10 @@ requester.send(JSON.stringify({
 	},
     data: {
         addresses: {
-            "TBgWnt6ZGqNmkXr1tUsUFNREMQtehLYsVX": 100000000,
+            "TBgWnt6ZGqNmkXr1tUsUFNREMQtehLYsVX": {
+                amount: 100000000,
+                label: "label"
+            } 
         },
         feePerKb: 100000
     }
