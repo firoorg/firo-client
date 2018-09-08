@@ -188,14 +188,15 @@ const actions = {
 
     [types.ADD_SEND_FROM_TX] ({ commit }, sendTx) {
         const txBasics = getTxBasics(sendTx)
-        const { address, fee } = sendTx
+        const { address, fee, label } = sendTx
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,
             address,
             transaction: {
                 ...txBasics,
-                fee
+                fee,
+                label
             }
         })
     },
@@ -217,7 +218,7 @@ const actions = {
 
     [types.ADD_SPEND_OUT_FROM_TX] ({ commit }, spendTx) {
         const txBasics = getTxBasics(spendTx)
-        const { address } = spendTx
+        const { address, label } = spendTx
 
         console.log(types.ADD_SPEND_OUT_FROM_TX, txBasics, Object.keys(spendTx))
 
@@ -225,7 +226,8 @@ const actions = {
             stack: THIRD_PARTY_ADDRESS_KEY,
             address,
             transaction: {
-                ...txBasics
+                ...txBasics,
+                label
             }
         })
     },
