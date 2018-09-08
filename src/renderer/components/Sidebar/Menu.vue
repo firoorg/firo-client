@@ -19,7 +19,7 @@
                 </router-link>
             </li>
             <li>
-                <router-link :to="{ name: 'send-zcoin' }" exact>
+                <router-link :to="{ name: 'send-zcoin' }">
                     <span class="text">{{ $t('navigation.menu.button__send') }}</span>
                     <notification-indicator v-show="hasSendNotification" :has-shadow="true" />
                 </router-link>

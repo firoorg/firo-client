@@ -9,7 +9,7 @@
                     </h1>
                 </spend-zerocoin-from-clipboard-popover>
 
-                <outgoint-payments-list />
+                <outgoing-payments-list />
             </section>
         </div>
         <section class="payment-detail">
@@ -25,12 +25,12 @@
     import SpendZerocoin from '@/components/SpendZerocoinPage/Spend'
 
     import SpendZerocoinFromClipboardPopover from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopover'
-    import OutgointPaymentsList from '@/components/payments/OutgointPaymentsList'
+    import OutgoingPaymentsList from '@/components/payments/OutgoingPaymentsList'
 
     export default {
         name: 'SpendZerocoinPage',
         components: {
-            OutgointPaymentsList,
+            OutgoingPaymentsList,
             SpendZerocoinFromClipboardPopover,
             SpendZerocoin
         },
