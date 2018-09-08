@@ -14,6 +14,9 @@
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
                                 :on-row-select="onTableRowSelect">
+                    <template slot="label" scope="props">
+                        <natural-language-tags :content="addCategoryTagToLabel(props.rowData)"></natural-language-tags>
+                    </template>
                     <!--<template slot="created_at" scope="props">
                         <h1>{{ rowData.name }}</h1>
                     </template>-->
@@ -34,6 +37,8 @@
     import SpendZerocoin from '@/components/SpendZerocoinPage/Spend'
 
     // import types from '~/types'
+    import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
+
     import SpendZerocoinFromClipboardPopover from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopover'
 
     const tableFields = [
@@ -66,7 +71,8 @@
         components: {
             SpendZerocoinFromClipboardPopover,
             AnimatedTable,
-            SpendZerocoin
+            SpendZerocoin,
+            NaturalLanguageTags
         },
 
         props: [
@@ -150,6 +156,19 @@
                     }
                 })
                 */
+            },
+
+            addCategoryTagToLabel (rowData) {
+                const { label: value, category } = rowData
+                const label = value || this.$t('todo__.noLabel')
+
+                if (category === 'send') {
+                    return `${label} #${this.$t('todo__.public')}`
+                } else if (category === 'spend') {
+                    return `${label} #${this.$t('todo__.private')}`
+                }
+
+                return label
             }
         }
     }
