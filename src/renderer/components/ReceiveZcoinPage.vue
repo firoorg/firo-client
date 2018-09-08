@@ -143,7 +143,7 @@
 
             filteredPaymentRequests () {
                 console.log(this.virtualPaymentRequests)
-                return this.getFilteredByUrl(this.allPaymentRequests, 'label')
+                return this.getFilteredByUrl(this.allPaymentRequests, ['label'])
             }
         },
 

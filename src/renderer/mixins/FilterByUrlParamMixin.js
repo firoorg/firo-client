@@ -33,7 +33,7 @@ export default {
         },
 
         getFilteredByUrl () {
-            return (list, keyToFilter) => {
+            return (list, keysToFilter) => {
                 if (!this.urlFilter) {
                     return list
                 }
@@ -41,11 +41,25 @@ export default {
                 const filter = this.urlFilter.toLowerCase()
 
                 return list.filter((item) => {
-                    return item[keyToFilter] ? item[keyToFilter].toLowerCase().includes(filter) : false
+                    for (let key of keysToFilter) {
+                        if (!item[key]) {
+                            continue
+                        }
+
+                        const lower = item[key].toLowerCase()
+
+                        if (lower.includes(filter)) {
+                            return true
+                        }
+                    }
+
+                    return false
                 })
             }
-        },
+        }
+    },
 
+    methods: {
         pushRouterWithFilter (data) {
             this.$router.push({
                 ...data,
