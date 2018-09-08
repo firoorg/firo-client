@@ -7,7 +7,7 @@
                 <div class="table-filter-input-wrap">
                     <base-filter-input type="text"
                                        class="table-filter-input"
-                                       v-model="tableFilter"
+                                       v-model="urlFilter"
                                        :placeholder="$t('receive.overview.table__payment-requests.placeholder__filter')" />
                 </div>
 
@@ -42,6 +42,9 @@
 
 <script>
     import { mapGetters } from 'vuex'
+
+    import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
+
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
@@ -90,6 +93,10 @@
             AnimatedTable
         },
 
+        mixins: [
+            FilterByUrlParamMixin
+        ],
+
         data () {
             return {
                 tableFields,
@@ -136,46 +143,7 @@
 
             filteredPaymentRequests () {
                 console.log(this.virtualPaymentRequests)
-                if (!this.tableFilter) {
-                    return this.allPaymentRequests
-                }
-
-                const filter = this.tableFilter.toLowerCase()
-
-                return this.allPaymentRequests.filter((request) => {
-                    return request.label ? request.label.toLowerCase().includes(filter) : false
-                })
-            },
-
-            tableFilter: {
-                get () {
-                    try {
-                        const { filter } = this.$store.state.AppRouter.query
-
-                        return filter
-                    } catch (e) {
-                        console.error(e)
-                        return ''
-                    }
-                },
-
-                set (newValue) {
-                    const route = {
-                        name: this.$router.currentRoute.name
-                    }
-
-                    if (!newValue) {
-                        this.$router.replace(route)
-                        return
-                    }
-
-                    this.$router.replace({
-                        ...route,
-                        query: {
-                            filter: newValue
-                        }
-                    })
-                }
+                return this.getFilteredByUrl(this.allPaymentRequests, 'label')
             }
         },
 
@@ -184,13 +152,10 @@
                 // todo get paymentRequest from store
                 this.selectedPaymentRequest = rowData.address
 
-                this.$router.push({
+                this.pushRouterWithFilter({
                     name: 'receive-zcoin-paymentrequest',
                     params: {
                         address: this.selectedPaymentRequest
-                    },
-                    query: {
-                        filter: this.tableFilter
                     }
                 })
             }
