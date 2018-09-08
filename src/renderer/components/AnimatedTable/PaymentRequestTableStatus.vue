@@ -26,12 +26,14 @@
         mixins: [
             VuetableFieldMixin
         ],
+
         computed: {
             isFulfilled () {
-                return this.rowData.isFulfilled
+                return this.rowData[this.rowField.isFulfilledKey || 'isFulfilled']
             },
+
             isReused () {
-                return this.rowData.isReused
+                return this.rowData[this.rowField.isReusedKey || 'isReused']
             }
         }
     }

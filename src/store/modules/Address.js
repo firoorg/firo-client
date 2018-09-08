@@ -4,6 +4,8 @@ import rootTypes from '~/types'
 
 import LastSeen from '~/mixins/LastSeen'
 
+import { addConfirmationsToTransaction } from '~/utils'
+
 const lastSeen = LastSeen.module('transaction')
 
 const WALLET_ADDRESS_KEY = 'walletAddresses'
@@ -289,15 +291,7 @@ const getters = {
             let confirmations = 0
 
             if (txs.length) {
-                txs = txs.map((tx) => {
-                    const { block } = tx
-                    const txConfirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
-
-                    return {
-                        ...tx,
-                        confirmations: txConfirmations
-                    }
-                })
+                txs = txs.map((tx) => addConfirmationsToTransaction(tx, currentBlockHeight))
 
                 confirmations = txs.reduce((accumulator, tx) => {
                     return (tx.confirmations > accumulator) ? tx.confirmations : accumulator
@@ -329,13 +323,24 @@ const getters = {
         }
     },
 
-    getOutgoingTransactions (state) {
+    getOutgoingTransactions (state, getters, rootState, rootGetters) {
+        const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
         const addresses = Object.keys(state[THIRD_PARTY_ADDRESS_KEY])
 
         const txs = addresses.reduce((accumulator, key) => {
             const address = state[THIRD_PARTY_ADDRESS_KEY][key]
 
-            return [ ...accumulator, ...address.transactions ]
+            return [
+                ...accumulator,
+                ...address.transactions.map((transaction) => {
+                    const tx = addConfirmationsToTransaction(transaction, currentBlockHeight)
+
+                    return {
+                        ...tx,
+                        isConfirmed: !!tx.confirmations
+                    }
+                })
+            ]
         }, [])
 
         console.log(txs)

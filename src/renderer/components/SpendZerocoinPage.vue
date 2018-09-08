@@ -9,9 +9,17 @@
                     </h1>
                 </spend-zerocoin-from-clipboard-popover>
 
+                <div class="table-filter-input-wrap">
+                    <base-filter-input type="text"
+                                       class="table-filter-input"
+                                       v-model="tableFilter"
+                                       :placeholder="$t('receive.overview.table__payment-requests.placeholder__filter')" />
+                </div>
+
                 <animated-table :data="transactions"
                                 :fields="tableFields"
-                                track-by="address"
+                                track-by="id"
+                                :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
                                 :selected-row="selectedPaymentRequest"
                                 :on-row-select="onTableRowSelect">
                     <template slot="label" scope="props">
@@ -34,22 +42,35 @@
     // import { convertToCoin } from '#/lib/convert'
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
+    import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
+
     import SpendZerocoin from '@/components/SpendZerocoinPage/Spend'
 
     // import types from '~/types'
+    import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
     import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 
     import SpendZerocoinFromClipboardPopover from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopover'
 
     const tableFields = [
         {
-            name: 'amount'
+            name: PaymentRequestTableStatus,
+            isFulfilledKey: 'isConfirmed',
+            sortField: 'isConfirmed',
+            width: '2rem'
+        },
+        {
+            name: Amount,
+            title: 'receive.overview.table__payment-requests.label__amount',
+            sortField: 'amount',
+            width: '25%'
         },
         {
             name: RelativeDate,
-            title: 'Created',
-            dateField: 'created_at',
-            sortField: 'created_at'
+            title: 'Sent',
+            dateField: 'firstSeenAt',
+            sortField: 'firstSeenAt',
+            width: '30%'
         },
         {
             name: 'label',
@@ -164,7 +185,7 @@
 
                 if (category === 'send') {
                     return `${label} #${this.$t('todo__.public')}`
-                } else if (category === 'spend') {
+                } else if (category === 'spendOut') {
                     return `${label} #${this.$t('todo__.private')}`
                 }
 

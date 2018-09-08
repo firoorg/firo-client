@@ -31,3 +31,13 @@ export const formatDenominationPairs = function (denominations) {
         })
         .filter((denom) => denom.amount)
 }
+
+export const addConfirmationsToTransaction = function (tx, currentBlockHeight) {
+    const { block } = tx
+    const txConfirmations = currentBlockHeight && block ? currentBlockHeight - block.height : 0
+
+    return {
+        ...tx,
+        confirmations: txConfirmations
+    }
+}
