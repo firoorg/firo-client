@@ -146,6 +146,7 @@ const actions = {
         commit(types.SEND_ZCOIN, {
             data: {
                 payments: payments.map((payment) => ({
+                    label: payment.label,
                     amount: payment.amount,
                     address: payment.address
                 })),

@@ -27,6 +27,24 @@ export default {
             return addresses
         },
 
+        convertToAmountLabel (payments) {
+            let addresses = {}
+
+            if (!payments || !payments.length) {
+                return addresses
+            }
+
+            payments.forEach((payment) => {
+                const { address, amount, label } = payment
+                addresses[address] = {
+                    amount,
+                    label
+                }
+            })
+
+            return addresses
+        },
+
         getTransactionFee (data) {
             console.log('GETTING TX FEE', data)
             const { fee, paymentsMap } = data
@@ -50,7 +68,7 @@ export default {
 
             console.log('SENDING ZCOIN', data, auth)
 
-            let addresses = this.convertToAddressAmountPair(data.payments)
+            let addresses = this.convertToAmountLabel(data.payments)
 
             this.send({
                 type: 'create',
