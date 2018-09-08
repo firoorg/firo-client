@@ -9,15 +9,7 @@
                     </h1>
                 </send-from-clipboard-popover>
 
-                <animated-table :data="paymentRequests"
-                                :fields="tableFields"
-                                track-by="address"
-                                :selected-row="selectedPaymentRequest"
-                                :on-row-select="onTableRowSelect">
-                    <!--<template slot="created_at" scope="props">
-                        <h1>{{ rowData.name }}</h1>
-                    </template>-->
-                </animated-table>
+                <outgoing-payments-list />
             </section>
         </div>
         <section class="paymentrequest-detail">
@@ -28,44 +20,16 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    // import { convertToCoin } from '#/lib/convert'
-    import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
-    import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import SendZcoin from '@/components/SendZcoinPage/Send'
 
-    // import types from '~/types'
     import SendFromClipboardPopover from '@/components/SendZcoinPage/SendFromClipboardPopover'
-
-    const tableFields = [
-        {
-            name: 'amount'
-        },
-        {
-            name: RelativeDate,
-            title: 'Created',
-            dateField: 'created_at',
-            sortField: 'created_at'
-        },
-        {
-            name: 'label',
-            title: 'Label',
-            sortField: 'label'
-        }
-        /*,
-        {
-            name: 'gender',
-            formatter: (value) => {
-                return value === 'M' ? 'Male' : 'Female'
-            }
-        }
-        */
-    ]
+    import OutgoingPaymentsList from '@/components/payments/OutgoingPaymentsList'
 
     export default {
         name: 'sendZcoinPage',
         components: {
+            OutgoingPaymentsList,
             SendFromClipboardPopover,
-            AnimatedTable,
             SendZcoin
         },
 
@@ -75,7 +39,6 @@
 
         data () {
             return {
-                tableFields,
                 selectedPaymentRequest: null
             }
         },
@@ -130,24 +93,18 @@
 
         methods: {
             /*
-            ...mapActions({
-                setFormAddress: types.zcoinpayment.SET_FORM_ADDRESS,
-                setFormAmount: types.zcoinpayment.SET_FORM_AMOUNT,
-                markAsNotified: types.clipboard.MARK_AS_NOTIFIED
-            }),
-            */
-
             onTableRowSelect (rowData, index, event) {
                 // todo get paymentRequest from store
                 this.selectedPaymentRequest = rowData.address
 
-                this.$router.push({
+                this.pushRouterWithFilter({
                     name: 'send-zcoin-paymentrequest',
                     params: {
                         address: this.selectedPaymentRequest
                     }
                 })
             }
+            */
         }
     }
 </script>
