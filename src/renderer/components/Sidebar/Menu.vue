@@ -14,7 +14,7 @@
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link :to="{ name: 'spend-zerocoin' }" exact>
+                <router-link :to="{ name: 'spend-zerocoin' }">
                     <span class="text">{{ $t('navigation.menu.button__spend') }}</span>
                 </router-link>
             </li>

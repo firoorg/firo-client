@@ -9,26 +9,7 @@
                     </h1>
                 </spend-zerocoin-from-clipboard-popover>
 
-                <div class="table-filter-input-wrap">
-                    <base-filter-input type="text"
-                                       class="table-filter-input"
-                                       v-model="tableFilter"
-                                       :placeholder="$t('receive.overview.table__payment-requests.placeholder__filter')" />
-                </div>
-
-                <animated-table :data="transactions"
-                                :fields="tableFields"
-                                track-by="id"
-                                :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
-                                :selected-row="selectedPaymentRequest"
-                                :on-row-select="onTableRowSelect">
-                    <template slot="label" scope="props">
-                        <natural-language-tags :content="addCategoryTagToLabel(props.rowData)"></natural-language-tags>
-                    </template>
-                    <!--<template slot="created_at" scope="props">
-                        <h1>{{ rowData.name }}</h1>
-                    </template>-->
-                </animated-table>
+                <outgoint-payments-list />
             </section>
         </div>
         <section class="payment-detail">
@@ -40,60 +21,18 @@
 <script>
     import { mapGetters } from 'vuex'
     // import { convertToCoin } from '#/lib/convert'
-    import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
-    import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
-    import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
 
     import SpendZerocoin from '@/components/SpendZerocoinPage/Spend'
 
-    // import types from '~/types'
-    import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
-    import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
-
     import SpendZerocoinFromClipboardPopover from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopover'
-
-    const tableFields = [
-        {
-            name: PaymentRequestTableStatus,
-            isFulfilledKey: 'isConfirmed',
-            sortField: 'isConfirmed',
-            width: '2rem'
-        },
-        {
-            name: Amount,
-            title: 'receive.overview.table__payment-requests.label__amount',
-            sortField: 'amount',
-            width: '25%'
-        },
-        {
-            name: RelativeDate,
-            title: 'Sent',
-            dateField: 'firstSeenAt',
-            sortField: 'firstSeenAt',
-            width: '30%'
-        },
-        {
-            name: 'label',
-            title: 'Label',
-            sortField: 'label'
-        }
-        /*,
-        {
-            name: 'gender',
-            formatter: (value) => {
-                return value === 'M' ? 'Male' : 'Female'
-            }
-        }
-        */
-    ]
+    import OutgointPaymentsList from '@/components/payments/OutgointPaymentsList'
 
     export default {
         name: 'SpendZerocoinPage',
         components: {
+            OutgointPaymentsList,
             SpendZerocoinFromClipboardPopover,
-            AnimatedTable,
-            SpendZerocoin,
-            NaturalLanguageTags
+            SpendZerocoin
         },
 
         props: [
@@ -102,95 +41,16 @@
 
         data () {
             return {
-                tableFields,
                 selectedPaymentRequest: null
             }
         },
 
-        beforeDestroy () {
-            // console.log('mark as notified!')
-            // this.$store.dispatch(types.clipboard.MARK_AS_NOTIFIED)
-        },
-
         computed: {
             ...mapGetters({
-                paymentRequests: 'PaymentRequest/paymentRequests',
-                transactions: 'Address/getOutgoingTransactions',
                 clipboardNotified: 'Clipboard/isNotified',
                 clipboardAddress: 'Clipboard/address',
                 clipboardAmount: 'Clipboard/amount'
-            }),
-
-            /*
-            showAddressFoundInClipboardPopover () {
-                return this.clipboardHasNewAddress && this.clipboardAddress !== this.currentFormAddress
-            },
-            */
-
-            selectedPaymentRequestWithAddress () {
-                if (!this.selectedPaymentRequest) {
-                    return null
-                }
-
-                // console.log(this.$store.state.Address.addresses)
-                const getter = this.$store.state.Address.addresses
-                // const getter = this.$store.state['Zcoin/addresses']
-
-                const filteredAddress = getter.filter((address) => {
-                    return address.address === this.selectedPaymentRequest
-                })
-
-                console.log(filteredAddress)
-
-                const address = filteredAddress.length ? filteredAddress[0] : null
-                const [ paymentRequest ] = this.paymentRequests.filter((request) => {
-                    return request.address === this.selectedPaymentRequest
-                })
-
-                console.log(paymentRequest)
-
-                return {
-                    ...paymentRequest,
-                    address
-                }
-            }
-        },
-
-        methods: {
-            /*
-            ...mapActions({
-                setFormAddress: types.zcoinpayment.SET_FORM_ADDRESS,
-                setFormAmount: types.zcoinpayment.SET_FORM_AMOUNT,
-                markAsNotified: types.clipboard.MARK_AS_NOTIFIED
-            }),
-            */
-
-            onTableRowSelect (rowData, index, event) {
-                // todo get paymentRequest from store
-                this.selectedPaymentRequest = rowData.address
-
-                /*
-                this.$router.push({
-                    name: 'send-zcoin-paymentrequest',
-                    params: {
-                        address: this.selectedPaymentRequest
-                    }
-                })
-                */
-            },
-
-            addCategoryTagToLabel (rowData) {
-                const { label: value, category } = rowData
-                const label = value || this.$t('todo__.noLabel')
-
-                if (category === 'send') {
-                    return `${label} #${this.$t('todo__.public')}`
-                } else if (category === 'spendOut') {
-                    return `${label} #${this.$t('todo__.private')}`
-                }
-
-                return label
-            }
+            })
         }
     }
 </script>
