@@ -1,6 +1,8 @@
 <template>
     <div class="is-fulfilled">
-        <h2 class="payments-headline">Payments</h2>
+        <h2 class="payments-headline">Payments
+            <span v-if="transactions.length > 1">({{ transactions.length }})</span>
+        </h2>
         <div style="overflow: hidden" class="testing">
             <div :style="{ height: '100%' }">
                 <unexpected-transaction-popover :is-reused="isReused" :boundaries-element="null">

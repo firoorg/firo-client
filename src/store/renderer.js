@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { ipcRenderer } from 'electron'
 
-import modules from './modules'
+import modules from '~/modules'
+import types from '~/types'
 
 Vue.use(Vuex)
 
@@ -19,6 +20,7 @@ const store = new Vuex.Store({
 
 if (process.env.NODE_ENV !== 'production') {
     window.vuexStore = store
+    window.vuexTypes = types
 }
 
 // import master state
