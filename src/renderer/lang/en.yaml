@@ -38,11 +38,11 @@ receive:
   detail-create-request:
     title__create: Create</br>Payment Request
     label__label: Label
-    placeholder__label: "some cool #example here"
+    placeholder__label: "You can use #tags in here"
     label__amount: Amount
-    placeholder__amount: put some numbers in here
+    placeholder__amount: Amount to send
     label__message: Message
-    placeholder__message: some cool message for the recipient!
+    placeholder__message: Add a personal message
     button__create-payment-request: Create Payment Request
 
   detail-entry-request:
