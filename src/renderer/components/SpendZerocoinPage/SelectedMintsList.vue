@@ -7,11 +7,11 @@
             <span class="label">{{ denom.denomination }}</span>
         </li>
         <li v-show="!hasMints" class="placeholder">
-            <span v-if="!isOpen">{{$t('send.private.detail-private-send.placeholder__amount-enter')}}</span>
-            <span v-else>{{$t('send.private.detail-private-send.placeholder__amount-select')}}</span>
+            <span v-if="!isOpen">{{ $t('send.private.detail-private-send.placeholder__amount-enter') }}</span>
+            <span v-else>{{ $t('send.private.detail-private-send.placeholder__amount-select') }}</span>
         </li>
         <li class="hover placeholder" v-show="!isOpen && hasMints">
-            <span>{{$t('send.private.detail-private-send.placeholder__amount-edit')}}</span>
+            <span>{{ $t('send.private.detail-private-send.placeholder__amount-edit') }}</span>
         </li>
     </ul>
 </template>
