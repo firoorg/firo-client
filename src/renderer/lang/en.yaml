@@ -89,3 +89,38 @@ mint:
     label__passphrase: Passphrase
     placeholder__passphrase: Enter your Passphrase
     button__unlock-mint--primary: Unlock and mint
+
+spend:
+  overview:
+    title: Private<br>Send
+    table__private-send:
+      label__amount: Amount
+      label__sent: Sent
+      label__label: Label
+      placeholder__filter: Filter by label
+
+  detail-private-send:
+    title__private-send: Private Send
+    description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
+    label__label: Label
+    placeholder__label: "Spider-Man costume #shopping for #reuben"
+    label__address: Address
+    placeholder__address: Add a valid zcoin address
+    label__amount-selection: Amount
+    placeholder__amount-enter: Click to select Mints
+    placeholder__amount-select: Select Mints
+    placeholder__amount-edit: Click to edit Mints
+    label__amount: Total
+    button__private-send--primary: Spend Now
+
+    flyout-amount-selection:
+      title__amount-selection: Select Mints
+      description__amount-selection: Vestibulum id ligula porta felis euismod semper.
+
+    flyout-confirm-private-send:
+      title: Confirm Payment
+      description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+      label__amount: Total
+      button__private-send-confirm--primary: Yes, spend now!
+      button__cancel--secondary: Cancel
+      button__unlock-private-send--primary: Unlock and Spend
