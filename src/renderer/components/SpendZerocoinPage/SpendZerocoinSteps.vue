@@ -12,7 +12,7 @@
                          :is-dark="true"
                          :is-outline="true"
                          @click.prevent="onCancel">
-                <span>{{ $t('spend.detail-private-send.flyout-confirm-private-send.button__cancel--secondary') }}</span>
+                <span>{{ $t('send.private.flyout-confirm-private-send.button__cancel--secondary') }}</span>
             </base-button>
         </template>
 
@@ -39,7 +39,7 @@
                                               :color="submitButtonColor"
                                               :is-dark="true"
                                               :can-submit="canSubmit">
-                    {{ $t('spend.detail-private-send.flyout-confirm-private-send.button__unlock-private-send--primary') }}
+                    {{ $t('send.private.flyout-confirm-private-send.button__unlock-private-send--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
             <template slot="step-done" slot-scope="{ actions }">

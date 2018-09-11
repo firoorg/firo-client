@@ -90,28 +90,30 @@ mint:
     placeholder__passphrase: Enter your Passphrase
     button__unlock-mint--primary: Unlock and mint
 
-spend:
-  overview:
-    title: Private<br>Send
-    table__private-send:
-      label__amount: Amount
-      label__sent: Sent
-      label__label: Label
-      placeholder__filter: Filter by label
-
-  detail-private-send:
-    title__private-send: Private Send
-    description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
+send:
+  table__outgoing-payments:
+    label__amount: Amount
+    label__sent: Sent
     label__label: Label
-    placeholder__label: "Spider-Man costume #shopping for #reuben"
-    label__address: Address
-    placeholder__address: Add a valid zcoin address
-    label__amount-selection: Amount
-    placeholder__amount-enter: Click to select Mints
-    placeholder__amount-select: Select Mints
-    placeholder__amount-edit: Click to edit Mints
-    label__amount: Total
-    button__private-send--primary: Spend Now
+    placeholder__filter: Filter by label
+
+  private:
+    overview:
+      title: Private<br>Send
+
+    detail-private-send:
+      title__private-send: Private Send
+      description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
+      label__label: Label
+      placeholder__label: "Spider-Man costume #shopping for #reuben"
+      label__address: Address
+      placeholder__address: Add a valid zcoin address
+      label__amount-selection: Amount
+      placeholder__amount-enter: Click to select Mints
+      placeholder__amount-select: Select Mints
+      placeholder__amount-edit: Click to edit Mints
+      label__amount: Total
+      button__private-send--primary: Spend Now
 
     flyout-amount-selection:
       title__amount-selection: Select Mints

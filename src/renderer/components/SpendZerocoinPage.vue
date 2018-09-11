@@ -3,7 +3,7 @@
         <div class="scrollable-height">
             <section class="payment-list">
                 <spend-zerocoin-from-clipboard-popover :boundaries-element="boundariesElement">
-                  <h1 v-html="$t('spend.overview.title')"></h1>
+                  <h1 v-html="$t('send.private.overview.title')"></h1>
                 </spend-zerocoin-from-clipboard-popover>
 
                 <outgoing-payments-list />

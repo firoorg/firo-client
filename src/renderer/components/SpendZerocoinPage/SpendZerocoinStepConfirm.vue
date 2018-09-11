@@ -1,8 +1,8 @@
 <template>
     <section>
         <header>
-            <h2 v-html="$t('spend.detail-private-send.flyout-confirm-private-send.title')"></h2>
-            <p v-html="$t('spend.detail-private-send.flyout-confirm-private-send.description')"></p>
+            <h2 v-html="$t('send.private.flyout-confirm-private-send.title')"></h2>
+            <p v-html="$t('send.private.flyout-confirm-private-send.description')"></p>
         </header>
 
 
@@ -11,7 +11,7 @@
                            :show-progress="false" />
             <fees-and-amount :amount="spendFormMintCostsInSatoshi"
                              :show-fee="false"
-                             translation-namespace="spend.detail-private-send.flyout-confirm-private-send" />
+                             translation-namespace="send.private.flyout-confirm-private-send" />
         </div>
     </section>
 </template>

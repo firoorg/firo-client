@@ -4,7 +4,7 @@
             <base-filter-input type="text"
                                class="table-filter-input"
                                v-model="urlFilter"
-                               :placeholder="$t('spend.overview.table__private-send.placeholder__filter')" />
+                               :placeholder="$t('send.table__outgoing-payments.placeholder__filter')" />
         </div>
 
         <animated-table :data="filteredTransations"
@@ -40,20 +40,20 @@
         },
         {
             name: Amount,
-            title: 'spend.overview.table__private-send.label__amount',
+            title: 'send.table__outgoing-payments.label__amount',
             sortField: 'amount',
             width: '25%'
         },
         {
             name: RelativeDate,
-            title: 'spend.overview.table__private-send.label__sent',
+            title: 'send.table__outgoing-payments.label__sent',
             dateField: 'firstSeenAt',
             sortField: 'firstSeenAt',
             width: '30%'
         },
         {
             name: 'label',
-            title: 'spend.overview.table__private-send.label__label',
+            title: 'send.table__outgoing-payments.label__label',
             sortField: 'label'
         }
     ]

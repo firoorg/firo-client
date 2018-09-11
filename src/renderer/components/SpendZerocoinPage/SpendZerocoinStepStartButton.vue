@@ -3,7 +3,7 @@
                  :is-dark="true"
                  @click.prevent="next"
                  :disabled="!canSubmit">
-        {{ $t('spend.detail-private-send.button__private-send--primary') }}
+        {{ $t('send.private.detail-private-send.button__private-send--primary') }}
     </base-button>
 </template>
 
