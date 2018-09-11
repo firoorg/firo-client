@@ -4,7 +4,7 @@
                  :color="color"
                  :is-dark="true"
                  @click.prevent="actions.next" tabindex="4">
-        <span>Yes, spend now!</span>
+        <span> {{ $t('spend.detail-private-send.flyout-confirm-private-send.button__private-send-confirm--primary') }} </span>
     </base-button>
     <circular-timer v-else
                     key="confirm-timer"

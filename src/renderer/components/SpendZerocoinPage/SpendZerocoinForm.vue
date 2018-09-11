@@ -1,7 +1,7 @@
 <template>
     <fieldset :disabled="isDisabled">
         <div class="field" :class="getFieldErrorClass('label')">
-            <label for="label">Title</label>
+            <label for="label"> {{ $t('spend.detail-private-send.label__label') }} </label>
 
             <div class="control">
                 <input v-model.trim="label"
@@ -12,12 +12,12 @@
                        name="label"
                        id="label"
                        tabindex="1"
-                       placeholder="Spider-Man costume #shopping for #reuben">
+                       :placeholder="$t('spend.detail-private-send.placeholder__label')">
             </div>
         </div>
 
         <div class="field" :class="getFieldErrorClass('address')">
-            <label for="address">Address</label>
+            <label for="address">{{ $t('spend.detail-private-send.label__address') }}</label>
 
             <div class="control">
                 <input v-model.trim="address"
@@ -29,12 +29,12 @@
                        name="address"
                        id="address"
                        tabindex="2"
-                       placeholder="Add a valid zcoin address">
+                       :placeholder="$t('spend.detail-private-send.placeholder__address')">
             </div>
         </div>
 
         <div class="field amount-field" :class="getFieldErrorClass('amount')">
-            <label for="amount">Amount</label>
+            <label for="amount">{{ $t('spend.detail-private-send.label__amount-selection') }}</label>
 
             <div class="control">
                 <base-popover :open="amountSelectorIsOpen"
@@ -60,8 +60,8 @@
                     </template>
                     <template slot="content">
                         <header class="right">
-                            <h3>Select Mints</h3>
-                            <p>Vestibulum id ligula porta felis euismod semper.</p>
+                            <h3 v-html="$t('spend.detail-private-send.flyout-amount-selection.title__amount-selection')"></h3>
+                            <p v-html="$t('spend.detail-private-send.flyout-amount-selection.description__amount-selection')"></p>
                         </header>
                         <spend-denomination-selector class="spend-denomination-selector"
                                                      :on-denomination-change="onDenominationChange" />

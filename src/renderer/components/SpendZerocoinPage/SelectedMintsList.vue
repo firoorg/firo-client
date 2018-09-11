@@ -7,11 +7,11 @@
             <span class="label">{{ denom.denomination }}</span>
         </li>
         <li v-show="!hasMints" class="placeholder">
-            <span v-if="!isOpen">Click to select Mints</span>
-            <span v-else>Select Mints</span>
+            <span v-if="!isOpen">{{$t('spend.detail-private-send.placeholder__amount-enter')}}</span>
+            <span v-else>{{$t('spend.detail-private-send.placeholder__amount-select')}}</span>
         </li>
         <li class="hover placeholder" v-show="!isOpen && hasMints">
-            <span>Click to edit Mints</span>
+            <span>{{$t('spend.detail-private-send.placeholder__amount-edit')}}</span>
         </li>
     </ul>
 </template>

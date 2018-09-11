@@ -5,13 +5,8 @@
                 <div class="form">
                     <header>
                         <div>
-                            <h2>
-                                Private Spend
-                            </h2>
-
-                            <p>
-                                Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
-                            </p>
+                            <h2 v-html="$t('spend.detail-private-send.title__private-send')"></h2>
+                            <p v-html="$t('spend.detail-private-send.description')"></p>
                         </div>
                     </header>
 
@@ -24,7 +19,7 @@
                     <fees-and-amount class="fees-and-amount"
                                      :amount="spendFormMintCostsInSatoshi"
                                      :show-fee="false"
-                                     translation-namespace="todo" />
+                                     translation-namespace="spend.detail-private-send" />
                     <!--</div>-->
                     <spend-zerocoin-steps :boundaries-element="boundariesElement"
                                           :form-is-valid="formSectionIsValid"
