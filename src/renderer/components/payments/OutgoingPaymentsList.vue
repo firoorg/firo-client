@@ -4,7 +4,7 @@
             <base-filter-input type="text"
                                class="table-filter-input"
                                v-model="urlFilter"
-                               :placeholder="$t('todo.placeholder__filter')" />
+                               :placeholder="$t('spend.overview.table__private-send.placeholder__filter')" />
         </div>
 
         <animated-table :data="filteredTransations"
@@ -40,20 +40,20 @@
         },
         {
             name: Amount,
-            title: 'todo.label__amount',
+            title: 'spend.overview.table__private-send.label__amount',
             sortField: 'amount',
             width: '25%'
         },
         {
             name: RelativeDate,
-            title: 'Sent',
+            title: 'spend.overview.table__private-send.label__sent',
             dateField: 'firstSeenAt',
             sortField: 'firstSeenAt',
             width: '30%'
         },
         {
             name: 'label',
-            title: 'Label',
+            title: 'spend.overview.table__private-send.label__label',
             sortField: 'label'
         }
     ]
