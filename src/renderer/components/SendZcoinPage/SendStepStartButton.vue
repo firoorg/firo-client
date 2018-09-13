@@ -2,7 +2,7 @@
     <base-button :color="color"
                  @click.prevent="next"
                  :disabled="!canSubmit">
-        <span v-if="!hasPendingPayments">{{ $tc('send.public.detail-public-send.button__send--primary', paymentsToSend, { count: paymentsToSend }) }}</span>
+        <span v-if="!hasPendingPayments">{{ $tc('send.public.detail-public-send.button__send--primary', 1) }}</span>
         <span v-else>{{ $tc('send.public.detail-public-send.button__send--primary', paymentsToSend, { count: paymentsToSend }) }}</span>
     </base-button>
 </template>

@@ -140,7 +140,7 @@ send:
       placeholder__address: Add a valid zcoin address
       label__amount: Amount
       placeholder__amount: Enter amount to send publicly
-      button__send--primary: "Send Now | Send {count} Now | Send {count} Now"
+      button__send--primary: "Send Now | Send Now | Send {count} Now"
       button__send-later--secondary: Send Later
       button__add-to-queue--secondary: Add To Queue
 
