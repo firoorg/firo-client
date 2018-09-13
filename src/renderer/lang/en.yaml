@@ -126,3 +126,39 @@ send:
       button__private-send-confirm--primary: Yes, spend now!
       button__cancel--secondary: Cancel
       button__unlock-private-send--primary: Unlock and Spend
+
+  public:
+    overview:
+      title: Send<br>Zcoin
+
+    detail-public-send:
+      title: Public Send
+      description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
+      label__label: Label
+      placeholder__label: "Wonder Woman dress #shopping for #team"
+      label__address: Address
+      placeholder__address: Add a valid zcoin address
+      label__amount: Amount
+      placeholder__amount: Enter amount to send publicly
+      button__send--primary: "Send Now | Send {count} Now | Send {count} Now"
+      button__send-later--secondary: Send Later
+      button__add-to-queue--secondary: Add To Queue
+
+    flyout-pending-payment-queue:
+      title: Pending Payments
+      description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+
+    flyout-confirm-send:
+      title: Confirm Payment
+      description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+      title__table: Payments
+      title__fees: Fees
+      label__change-fees: change
+      label__amount: Total
+      button__cancel--secondary: Cancel
+      button__unlock-and-send--primary: Unlock and send
+
+    flyout-fee-selector:
+      title: Select Fee
+      description: Etiam porta sem malesuada magna mollis euismod. Praesent commodo cursus magna
+      button__select-fee--primary: Select Fee
