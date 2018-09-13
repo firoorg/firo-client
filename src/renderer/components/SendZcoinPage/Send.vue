@@ -5,13 +5,8 @@
                 <div class="form">
                     <header>
                         <div>
-                            <h2>
-                                Public Send
-                            </h2>
-
-                            <p>
-                                Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
-                            </p>
+                            <h2 v-html="$t('send.public.detail-public-send.title')"></h2>
+                            <p v-html="$t('send.public.detail-public-send.description')"></p>
                         </div>
                         <pending-payments-queue :is-disabled="false"
                                                 :boundariesElement="$refs.grid" />

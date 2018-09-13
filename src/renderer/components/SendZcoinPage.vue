@@ -3,10 +3,7 @@
         <div class="scrollable-height">
             <section class="paymentrequest-list">
                 <send-from-clipboard-popover :boundaries-element="boundariesElement">
-                    <h1>
-                        Send<br>
-                        Zcoin
-                    </h1>
+                    <h1 v-html="$t('send.public.overview.title')"></h1>
                 </send-from-clipboard-popover>
 
                 <outgoing-payments-list />

@@ -1,7 +1,7 @@
 <template>
     <fieldset :disabled="isDisabled">
         <div class="field" :class="getFieldErrorClass('label')">
-            <label for="label">Label</label>
+            <label for="label">{{ $t('send.public.detail-public-send.label__label') }}</label>
 
             <div class="control">
                 <input v-model.trim="label"
@@ -12,12 +12,12 @@
                        name="label"
                        id="label"
                        tabindex="1"
-                       placeholder="Wonder Woman dress #shopping for #team">
+                       :placeholder= "$t('send.public.detail-public-send.placeholder__label')" >
             </div>
         </div>
 
         <div class="field" :class="getFieldErrorClass('address')">
-            <label for="address">Address</label>
+            <label for="address">{{ $t('send.public.detail-public-send.label__address') }}</label>
 
             <div class="control">
                 <!-- Todo add validator to check if address already exists in pending items -->
@@ -30,12 +30,12 @@
                        name="address"
                        id="address"
                        tabindex="2"
-                       placeholder="Add a valid zcoin address">
+                       :placeholder="$t('send.public.detail-public-send.placeholder__address')" >
             </div>
         </div>
 
         <div class="field amount-field" :class="getFieldErrorClass('amount')">
-            <label for="amount">Amount</label>
+            <label for="amount">{{ $t('send.public.detail-public-send.label__amount') }}</label>
 
             <div class="control">
                 <send-private-popover :is-open="showCanSpendPrivateTooltip"
@@ -52,7 +52,7 @@
                            id="amount"
                            class="amount"
                            tabindex="3"
-                           placeholder="Enter Amount to send publicly">
+                           :placeholder="$t('send.public.detail-public-send.placeholder__amount')" >
                     <div class="prefix">XZC</div>
                 </send-private-popover>
             </div>

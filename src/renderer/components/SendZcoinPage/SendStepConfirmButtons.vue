@@ -3,8 +3,8 @@
                  :disabled="!canSubmit"
                  :color="color"
                  @click.prevent="actions.goTo('passphrase')" tabindex="4">
-        <span v-if="!hasPendingPayments">Yes, send now!</span>
-        <span v-else>Yes, Send {{ pendingPaymentsSize }} Now</span>
+        <span v-if="!hasPendingPayments">{{ $tc('send.public.detail-public-send.button__send--primary', pendingPaymentsSize, { count: pendingPaymentsSize }) }}</span>
+        <span v-else>{{ $tc('send.public.detail-public-send.button__send--primary', pendingPaymentsSize, { count: pendingPaymentsSize }) }}</span>
     </base-button>
     <circular-timer v-else
                     key="confirm-timer"

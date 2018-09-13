@@ -1,20 +1,20 @@
 <template>
     <section>
         <header>
-            <h2>Confirm Payment</h2>
-            <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+            <h2 v-html="$t('send.public.flyout-confirm-send.title')"></h2>
+            <p v-html="$t('send.public.flyout-confirm-send.description')"></p>
         </header>
 
 
         <div class="payment-fee-list">
-            <h3>Payments</h3>
+            <h3 v-html="$t('send.public.flyout-confirm-send.title__table')"></h3>
             <pending-payments :payments="pendingPayments"
                               class="pending-payments" />
             <fees-and-amount :amount="pendingPaymentsAmount"
                              :fee="fee"
                              :can-change-fee="true"
                              :on-change-fee="goToFeeSelector"
-                             translation-namespace="todo" >
+                             translation-namespace="send.public.flyout-confirm-send" >
                 <template slot-scope="payment">
                     {{ payment.label }}
                     {{ payment.amount }}

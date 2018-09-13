@@ -2,7 +2,7 @@
     <section class="fees-amount">
         <template v-if="showFee">
             <h3 v-if="canChangeFee">
-                Fees <a href @click.prevent="onChangeFee" class="change-fee">change</a>
+                {{ $t('send.public.flyout-confirm-send.title__fees') }} <a href @click.prevent="onChangeFee" class="change-fee">{{ $t('send.public.flyout-confirm-send.label__change-fees')}}</a>
             </h3>
         </template>
         <dl>

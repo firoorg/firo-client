@@ -1,8 +1,8 @@
 <template>
     <div>
         <header>
-            <h2>Select Fee</h2>
-            <p>Etiam porta sem malesuada magna mollis euismod. Praesent commodo cursus magna</p>
+            <h2 v-html="$t('send.public.flyout-fee-selector.title')"></h2>
+            <p v-html="$t('send.public.flyout-fee-selector.description')"></p>
         </header>
 
         <ul>
@@ -24,7 +24,7 @@
             <base-button :is-outline="true"
                          :is-dark="true"
                          @click.prevent="emitCurrentFee">
-                Select Fee
+                {{ $t('send.public.flyout-fee-selector.button__select-fee--primary') }}
             </base-button>
         </footer>
     </div>

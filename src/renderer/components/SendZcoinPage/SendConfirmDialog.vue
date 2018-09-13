@@ -10,7 +10,7 @@
                                          :is-outline="true"
                                          @click.prevent="onCancelFn"
                                          tabindex="5">
-                                <span>Cancel</span>
+                                <span>{{ $t('send.public.flyout-confirm-send.button__cancel--secondary') }}</span>
                             </base-button>
                             <div v-else></div>
                         </transition>
@@ -21,8 +21,8 @@
                                      :is-outline="true"
                                      @click.prevent="onQueueAddFn"
                                      :disabled="!canSubmit">
-                            <span v-if="!hasQueuedPayments">Send Later</span>
-                            <span v-else>Add To Queue</span>
+                            <span v-if="!hasQueuedPayments">{{ $t('send.public.detail-public-send.button__send-later--secondary') }}</span>
+                            <span v-else>{{ $t('send.public.detail-public-send.button__add-to-queue--secondary') }}</span>
                         </base-button>
                     </div>
                 </transition>

@@ -17,8 +17,8 @@
 
             <template slot="content">
                 <header>
-                    <h2>Pending Payments</h2>
-                    <p>Nulla vitae elit libero, a pharetra augue Integer posuere erat.</p>
+                    <h2 v-html="$t('send.public.flyout-pending-payment-queue.title')"></h2>
+                    <p v-html="$t('send.public.flyout-pending-payment-queue.description')"></p>
                 </header>
 
                 <pending-payments :payments="pendingPayments">

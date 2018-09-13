@@ -2,8 +2,8 @@
     <base-button :is-outline="true"
                  @click.prevent="addToQueue"
                  :disabled="!canSubmit">
-        <span v-if="!hasPendingPayments">Send Later</span>
-        <span v-else>Add To Queue</span>
+        <span v-if="!hasPendingPayments">{{ $t('send.public.detail-public-send.button__send-later--secondary') }}</span>
+        <span v-else>{{ $t('send.public.detail-public-send.button__add-to-queue--secondary') }}</span>
     </base-button>
 </template>
 

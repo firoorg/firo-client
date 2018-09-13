@@ -13,7 +13,7 @@
                          color="red"
                          :is-outline="true"
                          @click.prevent="onCancel">
-                <span>Cancel</span>
+                <span>{{ $t('send.public.flyout-confirm-send.button__cancel--secondary') }}</span>
             </base-button>
         </template>
 
@@ -46,7 +46,7 @@
                 <payment-step-passphrase-buttons :actions="actions"
                                               :color="submitButtonColor"
                                               :can-submit="canSubmit">
-                    Unlock and send
+                    {{ $t('send.public.flyout-confirm-send.button__unlock-and-send--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
             <template slot="step-done" slot-scope="{ actions }">
