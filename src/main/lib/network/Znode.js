@@ -5,12 +5,10 @@ export default {
     ...mixin,
     ...({
         namespace: 'Znode',
-        collection: 'znodeList'
-        /*
+        collection: 'znodeList',
+
         subscriptions: [
-            'address',
-            'transaction'
+            'znode'
         ]
-        */
     })
 }
