@@ -4,7 +4,7 @@
             <div class="heatmap" ref="heatmap"></div>
             <div class="nodes">
                 <div class="node" :style="getNodePositionStyles({ location: { ll: [0,0] } })"></div>
-                <div class="node" v-for="(znode, index) of znodes" :style="getNodePositionStyles(znode)"></div>
+                <div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)"></div>
             </div>
             <world-map class="world-map" />
         </div>
@@ -26,7 +26,7 @@
         },
 
         props: {
-            znodes: {
+            remoteZnodes: {
                 type: Array,
                 required: true
             }
@@ -46,6 +46,7 @@
                 // heatmap
                 heatmap: null,
                 heatmapPoints: [],
+                heatmapPointsMax: 1,
                 debouncedHeatmapUpdate: this.updateHeatmap
             }
         },
@@ -62,19 +63,31 @@
         mounted () {
             this.heatmap = h337.create({
                 container: this.$refs.heatmap,
-                blur: 1,
-                radius: 40,
+                blur: 0.5,
+                radius: 35,
                 minOpacity: 0,
-                maxOpacity: 0.45,
+                maxOpacity: 0.6,
+                /*
                 gradient: {
-                    '0': '#23612F',
-                    '.4': '#23612F',
-                    '.85': '#23B852',
-                    '.98': '#59F979'
+                    '0': '#23622F',
+                    '.2': '#23622F',
+                    '.4': '#23843D',
+                    '.6': '#23A74B',
+                    '.8': '#2EC55A',
+                    '.95': '#43DF69',
+                    '1': '#58F878'
+                },
+                */
+                gradient: {
+                    // '0': '#23A74B',
+                    '0': '#1F1F2E',
+                    '1': '#1F1F2E'
+                    // '1': '#58F878'
                 }
             })
 
             this.heatmap.setData({
+                max: this.heatmapPointsMax,
                 data: this.heatmapPoints
             })
         },
@@ -95,7 +108,7 @@
         },
 
         watch: {
-            znodes: {
+            remoteZnodes: {
                 handler (newVal, oldVal) {
                     console.log('zcoin handler')
                     this.debouncedHeatmapUpdate()
@@ -106,17 +119,41 @@
 
         methods: {
             updateHeatmap () {
+                const gridSize = 25
+                const randomSize = gridSize * 0.15
+                const grid = {}
                 const points = []
 
-                this.znodes.forEach((znode) => {
+                const updateGrid = (x, y) => {
+                    const gridX = Math.round(x / gridSize)
+                    const gridY = Math.round(y / gridSize)
+                    const gridKey = `${gridX}-${gridY}`
+
+                    if (!grid[gridKey]) {
+                        grid[gridKey] = 0
+                    }
+
+                    grid[gridKey]++
+                }
+
+                this.remoteZnodes.forEach((znode) => {
                     const { x, y } = this.getZnodePosition(znode)
 
-                    points.push({
-                        x: Math.round(x),
-                        y: Math.round(y)
-                    })
+                    updateGrid(x, y)
+
+                    for (let i = 0, l = Math.random() * 10; i < l; i++) {
+                        points.push({
+                            x: Math.round(x + Math.random() * randomSize - (randomSize / 2)),
+                            y: Math.round(y + Math.random() * randomSize - (randomSize / 2)),
+                            value: Math.random() * (10 - l)
+                        })
+                    }
                 })
 
+                const gridValues = Object.values(grid)
+                this.heatmapPointsMax = gridValues[0]
+
+                // todo add radius / 2 padding to the heatmap by mapping over the points here
                 this.heatmapPoints = points
 
                 if (!this.heatmap) {
@@ -124,7 +161,8 @@
                 }
 
                 this.heatmap.setData({
-                    data: points
+                    // max: this.heatmapPointsMax,
+                    data: this.heatmapPoints
                 })
             },
 
@@ -142,6 +180,12 @@
 
             getZnodePosition (znode) {
                 const { location } = znode
+                if (!location) {
+                    return {
+                        x: 0,
+                        y: 0
+                    }
+                }
                 const [ lat, lon ] = location.ll
 
                 return this.getNodeMapPosition(lat, lon)
@@ -166,7 +210,7 @@
 
     .znode-map {
         position: relative;
-        max-height: 35rem;
+        // max-height: 35rem;
         max-width: $worldmap-width * 1px;
         box-sizing: border-box;
         margin: 0 auto;
@@ -207,7 +251,7 @@
     .nodes {
         max-width: $worldmap-width * 1px;
         .node {
-            border: 1px solid red;
+            // border: 1px solid red;
             z-index: 2;
         }
     }
@@ -218,8 +262,10 @@
         z-index: 1;
 
         & /deep/ .land {
-            fill: $color--comet-dark-mixed;
-            stroke: $color--comet-dark-mixed;
+            $color: mix($color--comet-dark, $color--comet-dark-mixed);
+
+            fill: $color;
+            stroke: $color;
         }
     }
 </style>
