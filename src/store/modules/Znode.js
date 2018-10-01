@@ -1,3 +1,6 @@
+import Vue from 'vue'
+import geoip from 'geoip-lite'
+
 import * as types from '~/types/Znode'
 
 import Debug from 'debug'
@@ -9,11 +12,13 @@ const state = {
 
 const mutations = {
     [types.ADD_ZNODE] (state, { id, znode }) {
-        state.znodes[id] = znode
+        Vue.set(state.znodes, id, znode)
+        // state.znodes[id] = znode
     }
 }
 
 const actions = {
+    // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response
     [types.SET_INITIAL_STATE] ({ dispatch, state }, initialState) {
         console.log('got initial state from ZNODE')
 
@@ -53,7 +58,7 @@ const actions = {
             return
         }
 
-        console.log('received update from ZNODE subscription')
+        console.log('received update from ZNODE subscription', Object.keys(data))
         const znodeKeys = Object.keys(data)
 
         if (!znodeKeys.length) {
@@ -88,7 +93,15 @@ const actions = {
      * @param znodeData
      */
     [types.ADD_ZNODE] ({ commit, state }, znodeData) {
+        console.log('znode data', znodeData)
         const { id, znode } = znodeData
+        const { authority } = znode
+        const { ip } = authority
+
+        // const ip = authority.split(':')[0]
+
+        const location = geoip.lookup(ip)
+        console.log('location', location)
 
         if (state[id]) {
             debug('TODO: znode already exists -> updating')
@@ -97,13 +110,42 @@ const actions = {
 
         commit(types.ADD_ZNODE, {
             id,
-            znode
+            znode: {
+                ...znode,
+                location
+            }
         })
     }
 }
 
 const getters = {
-    // myZnodes: (state) => Object.entries(state.znodes)
+    allZnodes: (state, getters, rootState, rootGetters) => Object.values(state.znodes).map((znode) => {
+        const lastPayoutTimestamp = 0 // todo get state from address module
+
+        return {
+            ...znode,
+            lastPayoutTimestamp
+        }
+    }),
+
+    myZnodes: (state, getters) => getters.allZnodes.filter((znode) => {
+        const { isMine } = znode
+
+        return isMine
+    }),
+
+    remoteZnodes: (state, getters) => getters.allZnodes.filter((znode) => {
+        const { isMine } = znode
+
+        return !isMine
+    }),
+
+    totalZnodes: (state, getters) => getters.allZnodes.length,
+    znodePaymentCycleInDays: (state, getters, rootState, rootGetters) => {
+        const blocksPerDay = 144 // todo get from avg block
+
+        return getters.totalZnodes / blocksPerDay
+    }
 }
 
 export default {
