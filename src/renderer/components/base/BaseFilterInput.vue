@@ -46,6 +46,7 @@
         width: 100%;
         box-sizing: border-box;
 
+        @include lato-font('normal');
         @include setType(5);
         @include rhythmBorderBottom(1px, 0);
 
