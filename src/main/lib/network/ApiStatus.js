@@ -5,8 +5,8 @@ import { tryUntil } from '#/lib/utils'
 
 let apiStatus = zmq.socket('req')
 
-export const getApiStatus = async function ({ host, ports }) {
-    const uri = `${host}:${ports.status}`
+export const getApiStatus = async function ({ host, port }) {
+    const uri = `${host}:${port}`
     apiStatus.connect(uri)
 
     return new Promise((resolve, reject) => {
@@ -39,7 +39,7 @@ export const closeApiStatus = function () {
     }
 }
 
-export const waitForApi = async function ({ host, ports, apiStatus, ttlInSeconds }) {
+export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds }) {
     const validator = ({ status, data }) => {
         const { modules = {} } = data
 
@@ -54,7 +54,7 @@ export const waitForApi = async function ({ host, ports, apiStatus, ttlInSeconds
 
     return tryUntil({
         functionToTry: async () => {
-            return getApiStatus({ host, ports })
+            return getApiStatus({ host, port })
         },
         validator,
         ttlInSeconds

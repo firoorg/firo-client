@@ -82,13 +82,14 @@ export default {
         debug('connected')
         debug('getting api status')
 
-        const appConfig = CONFIG.network[CONFIG.network.currentNetwork] || {}
-
+        const { host, port } = CONFIG.network.status
         const apiStatus = await getApiStatus({
-            ...appConfig,
-            dispatch,
-            commit
+            host,
+            port
         })
+
+        const { network: NETWORK } = apiStatus.data
+        const appConfig = CONFIG.network.networks[NETWORK] || {}
 
         debug('got api status', apiStatus)
 
@@ -98,7 +99,8 @@ export default {
 
         try {
             const warmedUpApiStatus = await waitForApi({
-                ...appConfig,
+                host,
+                port,
                 apiStatus,
                 ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady
             })
