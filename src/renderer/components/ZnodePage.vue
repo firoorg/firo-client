@@ -1,7 +1,7 @@
 <template>
     <section class="znode-page">
         <div class="scrollable-height">
-            <div class="znode">
+            <div class="znode-page-inner">
                 <section class="title-bar">
                     <header>
                         <h1>Znodes</h1>
@@ -29,44 +29,9 @@
                 </section>
 
                 <section class="my-znodes">
-                    <template v-for="index in 4">
-                        <div class="znode" :key="index">
-                            <header>
-                                <h2>My Znode Name</h2>
-                            </header>
-
-                            <div class="znode-stats">
-                                <section class="status">
-                                    <header>Status</header>
-                                    <main>Enabled</main>
-                                </section>
-                                <section class="last-seen">
-                                    <header>Last Seen</header>
-                                    <main>16 minutes ago</main>
-                                </section>
-                                <section class="active-since">
-                                    <header>Active since</header>
-                                    <main>67 days</main>
-                                </section>
-                                <section class="next-payout"></section>
-                                <section class="last-payout"></section>
-                                <section class="received"></section>
-                                <section class="payee">
-                                    <header>Payee</header>
-                                    <main>TFywBRRpLr3dy2kh9tkf1RwBEsMx3k7BwJ</main>
-                                </section>
-                            </div>
-
-                            <footer>
-                                <base-button :is-outline="true">
-                                    Other
-                                </base-button>
-                                <base-button color="comet">
-                                    Action Name
-                                </base-button>
-                            </footer>
-                        </div>
-                    </template>
+                    <my-znode v-for="(znode, index) in myZnodes"
+                              :key="index"
+                              v-bind="znode"  />
                 </section>
             </div>
         </div>
@@ -74,8 +39,23 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+    // import types from '~/types'
+
+    import MyZnode from '@/components/ZnodePage/MyZnode'
+
     export default {
-        name: 'ZnodePage'
+        name: 'ZnodePage',
+
+        components: {
+            MyZnode
+        },
+
+        computed: {
+            ...mapGetters({
+                myZnodes: 'Znode/myZnodes'
+            })
+        }
     }
 </script>
 
@@ -92,7 +72,7 @@
         }
     }
 
-    .znode {
+    .znode-page-inner {
         background: $color--private;
         padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
     }
@@ -152,36 +132,6 @@
         grid-template-columns: repeat(2, 1fr);
         grid-column-gap: emRhythm(4);
         grid-row-gap: emRhythm(6);
-
-        .znode {
-            background: $color--polo-light;
-            @include box-shadow-large();
-            //@include glow-huge-box();
-            @include glow-small-box();
-
-            .znode-stats {
-                display: grid;
-                grid-template-areas: "status last-seen active-since"
-                                     "next-payout last-payout received"
-                                     "payee payee payee";
-                grid-column-gap: emRhythm(1);
-                grid-row-gap: emRhythm(1);
-
-                header {
-                    @include font-medium();
-                    font-style: italic;
-                    color: $color--comet;
-                }
-
-                .status { grid-area: status; }
-                .last-seen { grid-area: last-seen; }
-                .active-since { grid-area: active-since; }
-                .next-payout { grid-area: next-payout; }
-                .last-payout { grid-area: last-payout; }
-                .received { grid-area: received; }
-                .payee { grid-area: payee; }
-            }
-        }
     }
 
     footer {
