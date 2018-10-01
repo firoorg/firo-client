@@ -13,13 +13,16 @@
                     </form>
                 </section>
 
+                <znode-map class="znodes-map"
+                           :remoteZnodes="remoteZnodes" />
+
                 <section class="stats">
                     <div class="stat">
-                        <div class="value">3402</div>
+                        <div class="value">{{ totalZnodes }}</div>
                         <div class="desc">Total Nodes</div>
                     </div>
                     <div class="stat">
-                        <div class="value">24.82</div>
+                        <div class="value">{{ znodePaymentCycleInDays.toFixed(2) }}</div>
                         <div class="desc">Avgerage Days for Payout</div>
                     </div>
                     <div class="stat">
@@ -43,17 +46,22 @@
     // import types from '~/types'
 
     import MyZnode from '@/components/ZnodePage/MyZnode'
+    import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
 
     export default {
         name: 'ZnodePage',
 
         components: {
-            MyZnode
+            MyZnode,
+            ZnodeMap
         },
 
         computed: {
             ...mapGetters({
-                myZnodes: 'Znode/myZnodes'
+                myZnodes: 'Znode/myZnodes',
+                remoteZnodes: 'Znode/remoteZnodes',
+                totalZnodes: 'Znode/totalZnodes',
+                znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
             })
         }
     }
@@ -73,17 +81,26 @@
     }
 
     .znode-page-inner {
+        position: relative;
         background: $color--private;
         padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
     }
 
     .title-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+
         display: flex;
         justify-content: space-between;
+        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+        z-index: 10;
 
         header {
             display: flex;
             align-items: center;
+            flex-direction: row;
             margin-bottom: emRhythm(7);
 
             h1 {
@@ -104,9 +121,12 @@
     }
 
     .stats {
+        position: relative;
         display: flex;
         justify-content: space-evenly;
+        margin-top: emRhythm(-10);
         margin-bottom: emRhythm(7);
+        z-index: 10;
 
         .stat {
             max-width: 15rem;
