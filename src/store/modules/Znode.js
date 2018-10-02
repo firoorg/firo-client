@@ -4,6 +4,7 @@ import geoip from 'geoip-lite'
 import * as types from '~/types/Znode'
 
 import Debug from 'debug'
+
 const debug = Debug('zcoin:store:znode')
 
 const state = {
@@ -13,7 +14,6 @@ const state = {
 const mutations = {
     [types.ADD_ZNODE] (state, { id, znode }) {
         Vue.set(state.znodes, id, znode)
-        // state.znodes[id] = znode
     }
 }
 
@@ -23,6 +23,7 @@ const actions = {
         console.log('got initial state from ZNODE')
 
         const { status } = initialState._meta
+        delete initialState._meta
 
         if (status !== 200) {
             const { error } = initialState
@@ -36,8 +37,7 @@ const actions = {
             return
         }
 
-        const { data } = initialState
-        const znodeKeys = Object.keys(data)
+        const znodeKeys = Object.keys(initialState)
 
         if (!znodeKeys.length) {
             return
@@ -46,14 +46,12 @@ const actions = {
         znodeKeys.forEach((znodeKey) => {
             dispatch(types.ADD_ZNODE, {
                 id: znodeKey,
-                znode: data[znodeKey]
+                znode: initialState[znodeKey]
             })
         })
     },
 
-    [types.ON_ZNODE_SUBSCRIPTION] ({ dispatch, state }, onSubscriptionData) {
-        const { data } = onSubscriptionData
-
+    [types.ON_ZNODE_SUBSCRIPTION] ({ dispatch, state }, data) {
         if (!data) {
             return
         }
