@@ -78,6 +78,7 @@
     "normalize-scss": "^7.0.1",
     "ps-tree": "^1.1.0",
     "sha.js": "^2.4.11",
+    "supercluster": "^4.1.1",
     "typesettings": "^4.0.0",
     "url-parse": "^1.4.3",
     "v-tooltip": "^2.0.0-rc.33",
