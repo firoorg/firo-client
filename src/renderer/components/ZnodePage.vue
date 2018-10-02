@@ -14,7 +14,8 @@
                 </section>
 
                 <znode-map class="znodes-map"
-                           :remoteZnodes="remoteZnodes" />
+                           :remote-znodes="remoteZnodes"
+                           :my-znodes="myZnodes" />
 
                 <section class="stats">
                     <div class="stat">

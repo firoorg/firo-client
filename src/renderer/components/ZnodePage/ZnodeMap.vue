@@ -4,7 +4,9 @@
             <div class="heatmap" ref="heatmap"></div>
             <div class="nodes">
                 <div class="node" :style="getNodePositionStyles({ location: { ll: [0,0] } })"></div>
-                <div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)"></div>
+                <div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)">
+                    <span>1</span>
+                </div>
             </div>
             <world-map class="world-map" />
         </div>
@@ -13,6 +15,7 @@
 
 <script>
     import h337 from 'heatmap.js'
+    import supercluster from 'supercluster'
     import { debounce } from 'lodash'
 
     import WorldMap from '@/assets/world-low.svg'
@@ -27,6 +30,10 @@
 
         props: {
             remoteZnodes: {
+                type: Array,
+                required: true
+            },
+            myZnodes: {
                 type: Array,
                 required: true
             }
@@ -104,6 +111,47 @@
             },
             mapOffsetY () {
                 return this.worldMapWidth / 2 * Math.log((1 + Math.sin(this.mapLatBottomRad)) / (1 - Math.sin(this.mapLatBottomRad)))
+            },
+
+            myZnodeClusters () {
+                const index = supercluster({
+                    radius: 10
+                })
+
+                const myNodes = this.myZnodes.map((znode) => {
+                    // const { x, y } = this.getZnodePosition(znode)
+                    const { lat, lon } = this.getZnodeLatLon(znode)
+
+                    return {
+                        znodeId: znode.id,
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [lat, lon]
+                        }
+                    }
+                })
+
+                console.log('myNodes', myNodes)
+
+                index.load(myNodes)
+
+                const clusters = index.getClusters([
+                    this.left,
+                    this.bottom,
+                    this.right,
+                    this.top
+                ], 1)
+
+                clusters.forEach((cluster) => {
+                    const { id } = cluster
+
+                    if (!id) {
+                        return
+                    }
+
+                    console.log('cluster children', index.getLeaves(id))
+                })
             }
         },
 
@@ -178,16 +226,24 @@
                 }
             },
 
-            getZnodePosition (znode) {
+            getZnodeLatLon (znode) {
                 const { location } = znode
                 if (!location) {
                     return {
-                        x: 0,
-                        y: 0
+                        lat: 0,
+                        lng: 0
                     }
                 }
                 const [ lat, lon ] = location.ll
 
+                return {
+                    lat,
+                    lon
+                }
+            },
+
+            getZnodePosition (znode) {
+                const { lat, lon } = this.getZnodeLatLon(znode)
                 return this.getNodeMapPosition(lat, lon)
             },
 
@@ -250,9 +306,19 @@
 
     .nodes {
         max-width: $worldmap-width * 1px;
+
         .node {
-            // border: 1px solid red;
-            z-index: 2;
+            //border: 1px solid red;
+            z-index: 4;
+            width: 1.5rem;
+            height: 1.5rem;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            @include font-black();
+            background: $gradient--green-bright;
         }
     }
 

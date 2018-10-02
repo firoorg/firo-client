@@ -120,9 +120,11 @@ const getters = {
     allZnodes: (state, getters, rootState, rootGetters) => Object.values(state.znodes).map((znode) => {
         const lastPayoutTimestamp = 0 // todo get state from address module
 
+        const { payeeAddress: id } = znode
         return {
             ...znode,
-            lastPayoutTimestamp
+            lastPayoutTimestamp,
+            id
         }
     }),
 
