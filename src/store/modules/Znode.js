@@ -93,18 +93,18 @@ const actions = {
     [types.ADD_ZNODE] ({ commit, state }, znodeData) {
         // console.log('znode data', znodeData)
         const { id, znode } = znodeData
-        const { authority } = znode
-        const { ip } = authority
 
         // const ip = authority.split(':')[0]
 
-        const location = geoip.lookup(ip)
-        console.log('location', location)
-
-        if (state[id]) {
+        if (state.znodes[id]) {
             debug('TODO: znode already exists -> updating')
             return
         }
+
+        const { authority } = znode
+        const { ip } = authority
+        const location = geoip.lookup(ip)
+        // console.log('location', location)
 
         commit(types.ADD_ZNODE, {
             id,
