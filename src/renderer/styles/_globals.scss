@@ -30,6 +30,14 @@ body {
         background: rgba(#f00, 0.1);
     }
 
+    .internal-only {
+        background: $color--red-bright;
+        color: $color--white;
+        @include font-heavy();
+        @include box-shadow-large();
+        padding: emRhythm(2) emRhythm(4);
+    }
+
     .scrollable-height {
         box-sizing: border-box;
         overflow-y: scroll;

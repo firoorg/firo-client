@@ -3,7 +3,7 @@
         <div class="map">
             <div class="heatmap" ref="heatmap"></div>
             <div class="nodes">
-                <div class="node" :style="getNodePositionStyles({ location: { ll: [0,0] } })"></div>
+                <!--<div class="node" :style="getNodePositionStyles({ location: { ll: [0,0] } })"></div>-->
                 <!--<div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)">
                     <span>1</span>
                 </div>-->
@@ -38,7 +38,7 @@
 <script>
     import h337 from 'heatmap.js'
     import supercluster from 'supercluster'
-    import { debounce } from 'lodash'
+    import debounce from 'lodash/debounce'
 
     import WorldMap from '@/assets/world-low.svg'
     // import WorldMap from '@/assets/Mercator_Projection.svg'
@@ -76,16 +76,16 @@
                 heatmap: null,
                 heatmapPoints: [],
                 heatmapPointsMax: 1,
-                debouncedHeatmapUpdate: this.updateHeatmap
+                debouncedHeatmapUpdate: null
             }
         },
 
         created () {
             this.debouncedHeatmapUpdate = debounce(() => {
-                console.log('triggering updateHeatmap')
+                console.log('updating headmap -> debounced')
                 this.updateHeatmap()
-            }, 250, {
-                maxWait: 750
+            }, 5000, {
+                maxWait: 30000
             })
         },
 
@@ -146,7 +146,10 @@
             myZnodeClusters () {
                 const znodes = {}
                 const index = supercluster({
-                    radius: 30
+                    radius: 40,
+                    // extent: 96,
+                    // extent: 256,
+                    maxZoom: 10
                 })
 
                 const myNodes = this.myZnodes.map((znode) => {
@@ -167,7 +170,7 @@
                     }
                 })
 
-                console.log('myNodes', myNodes)
+                // console.log('myNodes', myNodes)
 
                 index.load(myNodes)
 
@@ -178,6 +181,7 @@
                     this.top
                 ], 1)
 
+                /*
                 clusters.forEach((cluster) => {
                     const { id } = cluster
 
@@ -187,10 +191,11 @@
 
                     console.log('cluster children', index.getLeaves(id))
                 })
+                */
 
                 return clusters.map((cluster) => {
                     const { properties } = cluster
-                    const { cluster: isCluster, cluster_id: clusterId } = properties
+                    const { cluster: isCluster, cluster_id: clusterId, point_count: clusterAmount } = properties
 
                     const [ lon, lat ] = cluster.geometry.coordinates
 
@@ -210,7 +215,7 @@
                         isCluster,
                         position,
                         nodes,
-                        amount: nodes.length,
+                        amount: isCluster ? clusterAmount : nodes.length,
                         __old: cluster
                     }
                 })
@@ -220,7 +225,15 @@
         watch: {
             remoteZnodes: {
                 handler (newVal, oldVal) {
-                    console.log('zcoin handler')
+                    // console.log('zcoin handler')
+                    if (!this.debouncedHeatmapUpdate) {
+                        // immediate run
+                        if (!oldVal) {
+                            this.updateHeatmap()
+                        }
+                        console.log('could not update heatmap...', oldVal)
+                        return
+                    }
                     this.debouncedHeatmapUpdate()
                 },
                 immediate: true
