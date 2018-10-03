@@ -4,8 +4,30 @@
             <div class="heatmap" ref="heatmap"></div>
             <div class="nodes">
                 <div class="node" :style="getNodePositionStyles({ location: { ll: [0,0] } })"></div>
-                <div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)">
+                <!--<div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)">
                     <span>1</span>
+                </div>-->
+                <div v-for="(cluster) of myZnodeClusters"
+                     class="cluster-wrap"
+                     :style="getClusterPositionStyles(cluster.position)"
+                     :key="cluster.id">
+                    <base-popover :open="false"
+                                  placement="left-auto"
+                                  :popover-class="[ cluster.statusClass, 'dark' ]"
+                                  boundaries-element="boundariesElement"
+                                  class="my-znode-popover"
+                                  trigger="hover">
+                        <template slot="target">
+                            <div class="cluster" :class="{ 'has-multiple': cluster.isCluster }">
+                                <span>{{ cluster.amount }}</span>
+                            </div>
+                        </template>
+                        <template slot="content">
+                            <ul>
+                                <li v-for="znode of cluster.nodes">{{ znode.id }}</li>
+                            </ul>
+                        </template>
+                    </base-popover>
                 </div>
             </div>
             <world-map class="world-map" />
@@ -97,6 +119,8 @@
                 max: this.heatmapPointsMax,
                 data: this.heatmapPoints
             })
+
+            console.log('this.myZnodeClusters', this.myZnodeClusters)
         },
 
         computed: {
@@ -113,21 +137,32 @@
                 return this.worldMapWidth / 2 * Math.log((1 + Math.sin(this.mapLatBottomRad)) / (1 - Math.sin(this.mapLatBottomRad)))
             },
 
+            /*
+            myZnodeMapItems () {
+                const clusters = this.myZnodeClusters()
+            },
+            */
+
             myZnodeClusters () {
+                const znodes = {}
                 const index = supercluster({
-                    radius: 10
+                    radius: 30
                 })
 
                 const myNodes = this.myZnodes.map((znode) => {
                     // const { x, y } = this.getZnodePosition(znode)
                     const { lat, lon } = this.getZnodeLatLon(znode)
+                    znodes[znode.id] = znode
 
                     return {
                         znodeId: znode.id,
                         type: 'Feature',
                         geometry: {
                             type: 'Point',
-                            coordinates: [lat, lon]
+                            coordinates: [lon, lat]
+                        },
+                        properties: {
+                            cluster: false
                         }
                     }
                 })
@@ -151,6 +186,33 @@
                     }
 
                     console.log('cluster children', index.getLeaves(id))
+                })
+
+                return clusters.map((cluster) => {
+                    const { properties } = cluster
+                    const { cluster: isCluster, cluster_id: clusterId } = properties
+
+                    const [ lon, lat ] = cluster.geometry.coordinates
+
+                    let position = { lat, lon }
+                    let nodes = []
+
+                    if (isCluster) {
+                        nodes = index.getLeaves(clusterId).map(({ znodeId }) => znodes[znodeId])
+                    } else {
+                        nodes = [
+                            znodes[cluster.znodeId]
+                        ]
+                    }
+
+                    return {
+                        id: isCluster ? clusterId : cluster.znodeId,
+                        isCluster,
+                        position,
+                        nodes,
+                        amount: nodes.length,
+                        __old: cluster
+                    }
                 })
             }
         },
@@ -254,6 +316,15 @@
                     left: `${x / this.width * 100}%`,
                     top: `${y / this.height * 100}%`
                 }
+            },
+
+            getClusterPositionStyles ({ lat, lon }) {
+                const { x, y } = this.getNodeMapPosition(lat, lon)
+
+                return {
+                    left: `${x / this.width * 100}%`,
+                    top: `${y / this.height * 100}%`
+                }
             }
         }
     }
@@ -286,6 +357,7 @@
 
     .heatmap,
     .nodes .node,
+    .nodes .cluster-wrap,
     .world-map {
         position: absolute;
         top: 0;
@@ -307,11 +379,53 @@
     .nodes {
         max-width: $worldmap-width * 1px;
 
+        .cluster-wrap {
+            z-index: 4;
+        }
+
+        .cluster {
+            $dim: .75rem;
+            min-width: $dim;
+            min-height: $dim;
+            margin-top: -$dim / 2;
+            margin-left: -$dim / 2;
+            border-radius: 50%;
+            background: $gradient--green-bright;
+            cursor: pointer;
+
+            span {
+                display:inline-block;
+
+                padding-top: 50%;
+                padding-bottom: 50%;
+                margin-left: emRhythm(1);
+                margin-right: emRhythm(1);
+                pointer-events: none;
+
+                @include font-heavy();
+
+                display: none;
+            }
+
+            &.has-multiple {
+                display:inline-block;
+                line-height: 0;
+                //margin-top: -50%;
+                margin-left: -50%;
+                transform: translate(0, -48%);
+                overflow: visible;
+
+                span {
+                    display: block;
+                }
+            }
+        }
+
         .node {
             //border: 1px solid red;
             z-index: 4;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
             transform: translate(-50%, -50%);
             border-radius: 50%;
             display: flex;
