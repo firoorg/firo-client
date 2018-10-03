@@ -20,7 +20,7 @@ const mutations = {
 const actions = {
     // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response
     [types.SET_INITIAL_STATE] ({ dispatch, state }, initialState) {
-        console.log('got initial state from ZNODE')
+        // console.log('got initial state from ZNODE', initialState)
 
         const { status } = initialState._meta
         delete initialState._meta
@@ -56,7 +56,7 @@ const actions = {
             return
         }
 
-        console.log('received update from ZNODE subscription', Object.keys(data))
+        // console.log('received update from ZNODE subscription', Object.keys(data))
         const znodeKeys = Object.keys(data)
 
         if (!znodeKeys.length) {
@@ -91,7 +91,7 @@ const actions = {
      * @param znodeData
      */
     [types.ADD_ZNODE] ({ commit, state }, znodeData) {
-        console.log('znode data', znodeData)
+        // console.log('znode data', znodeData)
         const { id, znode } = znodeData
         const { authority } = znode
         const { ip } = authority
