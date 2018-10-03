@@ -18,7 +18,7 @@
                                   class="my-znode-popover"
                                   trigger="hover">
                         <template slot="target">
-                            <div class="cluster" :class="{ 'has-multiple': cluster.isCluster }">
+                            <div class="cluster" :class="[ cluster.isCluster ? 'has-multiple' : '', cluster.clusterStatus  ]">
                                 <span>{{ cluster.amount }}</span>
                             </div>
                         </template>
@@ -58,6 +58,10 @@
             myZnodes: {
                 type: Array,
                 required: true
+            },
+            znodeStates: {
+                type: Array,
+                required: true
             }
         },
 
@@ -75,7 +79,9 @@
                 // heatmap
                 heatmap: null,
                 heatmapPoints: [],
+                heatmapPointsZnodeIds: {}, // cache znode ids already included in the map
                 heatmapPointsMax: 1,
+                heatmapGrid: {}, // grid to create map altitude topology
                 debouncedHeatmapUpdate: null
             }
         },
@@ -92,10 +98,10 @@
         mounted () {
             this.heatmap = h337.create({
                 container: this.$refs.heatmap,
-                blur: 0.5,
+                blur: 0.45,
                 radius: 35,
                 minOpacity: 0,
-                maxOpacity: 0.6,
+                maxOpacity: 0.65,
                 /*
                 gradient: {
                     '0': '#23622F',
@@ -116,11 +122,11 @@
             })
 
             this.heatmap.setData({
-                max: this.heatmapPointsMax,
+                max: this.heatmapPointsMax / 4,
                 data: this.heatmapPoints
             })
 
-            console.log('this.myZnodeClusters', this.myZnodeClusters)
+            // console.log('this.myZnodeClusters', this.myZnodeClusters)
         },
 
         computed: {
@@ -216,6 +222,7 @@
                         position,
                         nodes,
                         amount: isCluster ? clusterAmount : nodes.length,
+                        clusterStatus: this.getClusterStatus(nodes),
                         __old: cluster
                     }
                 })
@@ -230,8 +237,9 @@
                         // immediate run
                         if (!oldVal) {
                             this.updateHeatmap()
+                        } else {
+                            console.log('could not update heatmap...', oldVal)
                         }
-                        console.log('could not update heatmap...', oldVal)
                         return
                     }
                     this.debouncedHeatmapUpdate()
@@ -243,8 +251,8 @@
         methods: {
             updateHeatmap () {
                 const gridSize = 25
-                const randomSize = gridSize * 0.15
-                const grid = {}
+                const randomSize = gridSize * 0.55
+                // const grid = {}
                 const points = []
 
                 const updateGrid = (x, y) => {
@@ -252,14 +260,25 @@
                     const gridY = Math.round(y / gridSize)
                     const gridKey = `${gridX}-${gridY}`
 
-                    if (!grid[gridKey]) {
-                        grid[gridKey] = 0
+                    if (!this.heatmapGrid[gridKey]) {
+                        this.heatmapGrid[gridKey] = 0
                     }
 
-                    grid[gridKey]++
+                    this.heatmapGrid[gridKey]++
+
+                    if (this.heatmapGrid[gridKey] > this.heatmapPointsMax) {
+                        this.heatmapPointsMax = this.heatmapGrid[gridKey]
+                    }
                 }
 
+                // const currentHeatmapData = this.heatmap ? this.heatmap.getData() : []
+                // console.log('currentHeatmapData', currentHeatmapData)
+
                 this.remoteZnodes.forEach((znode) => {
+                    if (this.heatmapPointsZnodeIds[znode.id]) {
+                        return
+                    }
+
                     const { x, y } = this.getZnodePosition(znode)
 
                     updateGrid(x, y)
@@ -268,25 +287,53 @@
                         points.push({
                             x: Math.round(x + Math.random() * randomSize - (randomSize / 2)),
                             y: Math.round(y + Math.random() * randomSize - (randomSize / 2)),
-                            value: Math.random() * (10 - l)
+                            value: Math.random() * (10 - (l / 4))
                         })
                     }
+
+                    this.heatmapPointsZnodeIds[znode.id] = 1
                 })
 
-                const gridValues = Object.values(grid)
+                console.log('points.length', points.length)
+
+                /*
+                let gridValues = Object.values(this.heatmapGrid).slice()
+                gridValues.sort((a, b) => parseInt(a) < parseInt(b))
+                console.log(gridValues)
+                const object1 = {
+                    a: 'somestring',
+                    b: 42,
+                    c: false
+                }
+
+                console.log(Object.values(object1).sort())
                 this.heatmapPointsMax = gridValues[0]
+                console.log('this.heatmapPointsMax', this.heatmapPointsMax)
+                */
 
                 // todo add radius / 2 padding to the heatmap by mapping over the points here
-                this.heatmapPoints = points
+                // this.heatmapPoints = points
 
                 if (!this.heatmap) {
+                    this.heatmapPoints = [
+                        ...this.heatmapPoints,
+                        ...points
+                    ]
                     return
                 }
 
+                /*
                 this.heatmap.setData({
-                    // max: this.heatmapPointsMax,
-                    data: this.heatmapPoints
+                    max: this.heatmapPointsMax / 4,
+                    data: [
+                        ...this.heatmapPoints,
+                        ...points
+                    ]
                 })
+                */
+
+                this.heatmap.setDataMax(this.heatmapPointsMax / 4)
+                this.heatmap.addData(points)
             },
 
             getNodeMapPosition (lat, lon) {
@@ -338,6 +385,30 @@
                     left: `${x / this.width * 100}%`,
                     top: `${y / this.height * 100}%`
                 }
+            },
+
+            getClusterStatus (znodes) {
+                let state = 0
+
+                znodes.forEach((znode) => {
+                    const { status } = znode
+                    // console.log(status)
+
+                    for (let i = this.znodeStates.length; i--;) {
+                        if (i < state) {
+                            break
+                        }
+
+                        if (this.znodeStates[i].states.includes(status)) {
+                            state = i
+                            break
+                        }
+                    }
+
+                    // console.log(status, state)
+                })
+
+                return this.znodeStates[state].name
             }
         }
     }
@@ -418,6 +489,14 @@
                 @include font-heavy();
 
                 display: none;
+            }
+
+            &.pending {
+                opacity: 0.5;
+            }
+
+            &.needs-attention {
+                background: $gradient--red-vertical;
             }
 
             &.has-multiple {

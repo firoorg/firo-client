@@ -66,7 +66,7 @@ const addZnodesThrottled = throttle(function (commit) {
     commit(types.ADD_ZNODES, pendingZnodes)
 
     pendingZnodes = {}
-}, 1000)
+}, 2000)
 
 const actions = {
     // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response

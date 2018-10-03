@@ -9,13 +9,17 @@
                     </header>
 
                     <form>
-                        <input type="text" placeholder="Search for xxx">
+                        <!--<input type="text" placeholder="Search for xxx">-->
+                        <div class="internal-only">
+                            For Internal Use Only!!!
+                        </div>
                     </form>
                 </section>
 
                 <znode-map class="znodes-map"
                            :remote-znodes="remoteZnodes"
-                           :my-znodes="myZnodes" />
+                           :my-znodes="myZnodes"
+                           :znode-states="znodeStates" />
 
                 <section class="stats">
                     <div class="stat">
@@ -33,9 +37,11 @@
                 </section>
 
                 <section class="my-znodes">
+                    <!--
                     <my-znode v-for="(znode, index) in myZnodes"
                               :key="index"
                               v-bind="znode"  />
+                    -->
                 </section>
             </div>
         </div>
@@ -55,6 +61,37 @@
         components: {
             MyZnode,
             ZnodeMap
+        },
+
+        data () {
+            return {
+                znodeStates: [
+                    {
+                        name: 'valid',
+                        states: [
+                            'ENABLED'
+                        ]
+                    },
+                    {
+                        name: 'pending',
+                        states: [
+                            'PRE_ENABLED',
+                            'MISSING'
+                        ]
+                    },
+                    {
+                        name: 'needs-attention',
+                        states: [
+                            'EXPIRED',
+                            'OUTPOINT_SPENT',
+                            'UPDATE_REQUIRED',
+                            'WATCHDOG_EXPIRED',
+                            'NEW_START_REQUIRED',
+                            'POSE_BAN'
+                        ]
+                    }
+                ]
+            }
         },
 
         computed: {
@@ -92,6 +129,7 @@
         top: 0;
         left: 0;
         width: 100%;
+        box-sizing: border-box;
 
         display: flex;
         justify-content: space-between;
