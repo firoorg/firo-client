@@ -1,4 +1,7 @@
 import Vue from 'vue'
+import eachOfLimit from 'async/eachOfLimit'
+import throttle from 'lodash/throttle'
+
 import geoip from 'geoip-lite'
 
 import * as types from '~/types/Znode'
@@ -14,12 +17,60 @@ const state = {
 const mutations = {
     [types.ADD_ZNODE] (state, { id, znode }) {
         Vue.set(state.znodes, id, znode)
+    },
+
+    [types.ADD_ZNODES] (state, newZnodes) {
+        state.znodes = {
+            ...state.znodes,
+            ...newZnodes
+        }
     }
 }
 
+const processZnode = function (id, znode) {
+    if (state.znodes[id]) {
+        debug('TODO: znode already exists -> updating')
+        // todo add other flexible keys here
+        const { status } = znode
+
+        return {
+            ...state.znodes[id],
+            status
+        }
+    }
+
+    const { authority } = znode
+    const { ip } = authority
+    const location = geoip.lookup(ip)
+
+    return {
+        ...znode,
+        location
+    }
+}
+
+// const throttl
+let pendingZnodes = {}
+const addZnodes = function (commit, list) {
+    console.log('adding znodes to pending list')
+    pendingZnodes = {
+        ...pendingZnodes,
+        ...list
+    }
+
+    addZnodesThrottled(commit)
+}
+
+const addZnodesThrottled = throttle(function (commit) {
+    console.log('finally adding znodes')
+    commit(types.ADD_ZNODES, pendingZnodes)
+
+    pendingZnodes = {}
+}, 1000)
+
 const actions = {
     // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response
-    [types.SET_INITIAL_STATE] ({ dispatch, state }, initialState) {
+    [types.SET_INITIAL_STATE] ({ commit, state }, initialState) {
         // console.log('got initial state from ZNODE', initialState)
 
         const { status } = initialState._meta
@@ -37,38 +88,47 @@ const actions = {
             return
         }
 
-        const znodeKeys = Object.keys(initialState)
+        let initialZnodes = {}
 
-        if (!znodeKeys.length) {
-            return
-        }
+        // add maximal 10 nodes at a time
+        eachOfLimit(initialState, 10, async (znode, id) => {
+            // const { id, znode } = znodeData
 
-        znodeKeys.forEach((znodeKey) => {
+            // const ip = authority.split(':')[0]
+
+            initialZnodes[id] = processZnode(id, znode)
+            /*
             dispatch(types.ADD_ZNODE, {
                 id: znodeKey,
-                znode: initialState[znodeKey]
+                znode // : initialState[znodeKey]
             })
+            */
         })
+
+        addZnodes(commit, initialZnodes)
     },
 
-    [types.ON_ZNODE_SUBSCRIPTION] ({ dispatch, state }, data) {
+    [types.ON_ZNODE_SUBSCRIPTION] ({ commit, state }, data) {
         if (!data) {
             return
         }
 
-        // console.log('received update from ZNODE subscription', Object.keys(data))
-        const znodeKeys = Object.keys(data)
+        let onSubscriptionZnodes = {}
 
-        if (!znodeKeys.length) {
-            return
-        }
-
-        znodeKeys.forEach((znodeKey) => {
-            dispatch(types.ADD_ZNODE, {
+        // add maximal 10 nodes at a time
+        eachOfLimit(data, 10, async (znode, id) => {
+            onSubscriptionZnodes[id] = processZnode(id, znode)
+            /*
+            const bar = dispatch(types.ADD_ZNODE, {
                 id: znodeKey,
-                znode: data[znodeKey]
+                znode // : data[znodeKey]
             })
+
+            console.log(bar)
+            */
         })
+
+        addZnodes(commit, onSubscriptionZnodes)
     },
 
     /**
@@ -90,11 +150,8 @@ const actions = {
      * @param state
      * @param znodeData
      */
-    [types.ADD_ZNODE] ({ commit, state }, znodeData) {
-        // console.log('znode data', znodeData)
+    async [types.ADD_ZNODE] ({ commit, state }, znodeData) {
         const { id, znode } = znodeData
-
-        // const ip = authority.split(':')[0]
 
         if (state.znodes[id]) {
             debug('TODO: znode already exists -> updating')
@@ -104,7 +161,6 @@ const actions = {
         const { authority } = znode
         const { ip } = authority
         const location = geoip.lookup(ip)
-        // console.log('location', location)
 
         commit(types.ADD_ZNODE, {
             id,
@@ -128,11 +184,13 @@ const getters = {
         }
     }),
 
-    myZnodes: (state, getters) => getters.allZnodes.filter((znode) => {
-        const { isMine } = znode
+    myZnodes: (state, getters) => getters.allZnodes
+        .slice(0, Math.min(getters.allZnodes.length, 100))
+        .filter((znode) => {
+            const { isMine } = znode
 
-        return isMine
-    }),
+            return !isMine
+        }),
 
     remoteZnodes: (state, getters) => getters.allZnodes.filter((znode) => {
         const { isMine } = znode
