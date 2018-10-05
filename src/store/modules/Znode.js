@@ -49,10 +49,9 @@ const processZnode = function (id, znode) {
     }
 }
 
-// const throttl
 let pendingZnodes = {}
 const addZnodes = function (commit, list) {
-    console.log('adding znodes to pending list')
+    // console.log('adding znodes to pending list')
     pendingZnodes = {
         ...pendingZnodes,
         ...list
@@ -62,7 +61,7 @@ const addZnodes = function (commit, list) {
 }
 
 const addZnodesThrottled = throttle(function (commit) {
-    console.log('finally adding znodes')
+    // console.log('finally adding znodes')
     commit(types.ADD_ZNODES, pendingZnodes)
 
     pendingZnodes = {}
@@ -185,11 +184,11 @@ const getters = {
     }),
 
     myZnodes: (state, getters) => getters.allZnodes
-        .slice(0, Math.min(getters.allZnodes.length, 100))
+        // .slice(0, Math.min(getters.allZnodes.length, 200))
         .filter((znode) => {
             const { isMine } = znode
 
-            return !isMine
+            return isMine
         }),
 
     remoteZnodes: (state, getters) => getters.allZnodes.filter((znode) => {
