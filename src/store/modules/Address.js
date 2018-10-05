@@ -15,6 +15,7 @@ const getTxBasics = function (tx) {
     const { txid, category, amount, blockHeight, blockHash, blockTime, firstSeenAt } = tx
 
     let block = null
+    let seen = firstSeenAt
 
     if (blockHeight && blockHash) {
         block = {
@@ -22,13 +23,15 @@ const getTxBasics = function (tx) {
             hash: blockHash,
             time: blockTime * 1000
         }
+        // on initial sync
+        seen = block.time < seen ? block.time : seen
     }
 
     return {
         id: txid,
         category,
         amount,
-        firstSeenAt: firstSeenAt,
+        firstSeenAt: seen,
         block
     }
 }
