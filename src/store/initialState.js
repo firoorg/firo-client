@@ -170,33 +170,7 @@ module.exports = {
     },
 
     Znode: {
-        znodes: {
-            TNEYe4LACho4xACjf6LMBqVvbxxj3BJEdw: {
-                outpoint: {
-                    txid: '057da4cfd5bfec2ba844e1fc2520fc08c2fd6fc9e5dc5c37f89ddcf4d0709154',
-                    index: 1
-                },
-                status: 'NEW_START_REQUIRED',
-                protocolVersion: 90024,
-                payeeAddress: 'TNEYe4LACho4xACjf6LMBqVvbxxj3BJEdw',
-                lastSeen: 1529940755,
-                activeSeconds: 0,
-                lastPaidTime: 0,
-                lastPaidBlock: 0,
-                authority: {
-                    ip: '51.15.82.184',
-                    port: 18168
-                },
-                location: {
-                    ll: [10, 10]
-                },
-                isMine: true,
-                qualify: {
-                    result: false,
-                    description: 'not valid for payment'
-                }
-            }
-        }
+        znodes: {}
     },
 
     Clipboard: {
