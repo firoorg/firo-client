@@ -37,11 +37,9 @@
                 </section>
 
                 <section class="my-znodes">
-                    <!--
                     <my-znode v-for="(znode, index) in myZnodes"
                               :key="index"
                               v-bind="znode"  />
-                    -->
                 </section>
             </div>
         </div>
