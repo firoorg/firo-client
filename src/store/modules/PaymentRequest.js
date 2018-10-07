@@ -147,6 +147,10 @@ const getters = {
 
                 if (transactionsReceived) {
                     const received = transactions.reduce((accumulator, tx) => {
+                        if (!tx.block) {
+                            return accumulator
+                        }
+
                         return accumulator + tx.amount
                     }, 0)
 
