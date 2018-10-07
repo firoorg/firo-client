@@ -1,5 +1,5 @@
 @import '~lato-font/scss/public-api';
-$lato-font-path: '~lato-font/fonts';
+$lato-font-path: ''; // font-faces are loaded directly via App.vue -> styles.
 
 // Your settings for Typesettings :)
 $font-sans: Lato, Helvetica, Arial, sans-serif;

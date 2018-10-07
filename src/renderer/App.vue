@@ -17,5 +17,5 @@
 </script>
 
 <style>
-    /* CSS */
+    @import '../../node_modules/lato-font/css/lato-font.css';
 </style>
