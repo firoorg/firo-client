@@ -31,7 +31,7 @@ export default {
             requiredAddressValidationRules: {
                 required: true,
                 zcoin_address: {
-                    ...this.$store.getters['Settings/b58Prefixes']
+                    b58Prefixes: this.$store.getters['Settings/b58Prefixes']
                 }
             }
         }
