@@ -6,7 +6,7 @@ Validator.extend('zcoin_address', {
         return 'The ' + field + ' is not a valid zcoin address.'
     },
 
-    validate: (value, [b58Prefixes]) => {
+    validate: (value, { b58Prefixes }) => {
         return isZcoinAddress(value, b58Prefixes)
     }
 })
