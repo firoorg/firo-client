@@ -314,6 +314,19 @@ const getters = {
             }
         })
     },
+
+    getAmountReceivedViaAddress: (state) => {
+        return (address) => {
+            if (!state[WALLET_ADDRESS_KEY][address]) {
+                return -1
+            }
+
+            const { total } = state[WALLET_ADDRESS_KEY][address]
+
+            return total.balance
+        }
+    },
+
     thirdPartyAddresses: (state) => Object.values(state[THIRD_PARTY_ADDRESS_KEY]),
 
     hasAlreadySentToAddress (state) {
