@@ -7,7 +7,7 @@
                                :placeholder="$t('send.table__outgoing-payments.placeholder__filter')" />
         </div>
 
-        <animated-table :data="filteredTransations"
+        <animated-table :data="filteredTransactions"
                         :fields="tableFields"
                         track-by="id"
                         :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
@@ -81,7 +81,7 @@
                 transactions: 'Address/getOutgoingTransactions'
             }),
 
-            filteredTransations () {
+            filteredTransactions () {
                 return this.getFilteredByUrl(this.transactions, ['label', 'category'])
             }
         },
