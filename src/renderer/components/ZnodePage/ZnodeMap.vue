@@ -465,17 +465,22 @@
 
         .cluster-wrap {
             z-index: 4;
+
+            & /deep/ .trigger {
+                transform: translate(-50%, -50%);
+            }
         }
 
         .cluster {
             $dim: .75rem;
             min-width: $dim;
             min-height: $dim;
-            margin-top: -$dim / 2;
-            margin-left: -$dim / 2;
+            //margin-top: -$dim / 2;
+            //margin-left: -$dim / 2;
             border-radius: 50%;
             background: $gradient--green-bright;
             cursor: pointer;
+            transition: opacity 0.5s ease-in-out;
 
             span {
                 display:inline-block;
@@ -503,8 +508,6 @@
                 display:inline-block;
                 line-height: 0;
                 //margin-top: -50%;
-                margin-left: -50%;
-                transform: translate(0, -48%);
                 overflow: visible;
 
                 span {
@@ -518,7 +521,7 @@
             z-index: 4;
             width: 1rem;
             height: 1rem;
-            transform: translate(-50%, -50%);
+            // transform: translate(-50%, -50%);
             border-radius: 50%;
             display: flex;
             justify-content: center;
