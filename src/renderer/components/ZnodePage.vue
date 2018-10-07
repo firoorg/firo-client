@@ -41,6 +41,10 @@
                               :key="index"
                               v-bind="znode"  />
                 </section>
+
+                <section class="remote-znodes">
+                    <remote-znodes-list :remote-znodes="remoteZnodes" />
+                </section>
             </div>
         </div>
     </section>
@@ -52,11 +56,13 @@
 
     import MyZnode from '@/components/ZnodePage/MyZnode'
     import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
+    import RemoteZnodesList from '@/components/ZnodePage/RemoteZnodesList'
 
     export default {
         name: 'ZnodePage',
 
         components: {
+            RemoteZnodesList,
             MyZnode,
             ZnodeMap
         },
