@@ -198,6 +198,14 @@ const getters = {
     }),
 
     totalZnodes: (state, getters) => getters.allZnodes.length,
+    enabledZnodes: (state, getters) => {
+        const enabledZnodes = getters.allZnodes.filter((znode) => {
+            return znode.status === 'ENABLED'
+        })
+
+        return enabledZnodes.length
+    },
+
     znodePaymentCycleInDays: (state, getters, rootState, rootGetters) => {
         const blocksPerDay = 144 // todo get from avg block
 
