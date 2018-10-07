@@ -207,9 +207,13 @@ const getters = {
     },
 
     znodePaymentCycleInDays: (state, getters, rootState, rootGetters) => {
-        const blocksPerDay = 144 // todo get from avg block
+        const avgBlockTimeInMs = rootGetters['Blockchain/averageBlockTimeInMilliSeconds']
+        console.log('avgBlockTimeInMs', avgBlockTimeInMs)
+        // console.log('rootGetters.blockchain.averageBlockTime', rootGetters.blockchain.averageBlockTime)
+        const blocksPerDay = (1000 * 60 * 60 * 24) / avgBlockTimeInMs
 
-        return getters.totalZnodes / blocksPerDay
+        // todo check if only enabled nodes are taken into calculation
+        return getters.enabledZnodes / blocksPerDay
     }
 }
 
