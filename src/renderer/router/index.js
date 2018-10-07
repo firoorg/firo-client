@@ -11,8 +11,9 @@ export default new Router({
             children: [
                 {
                     path: '',
-                    name: 'home',
-                    component: require('@/components/TestPage').default
+                    redirect: { name: 'receive-zcoin' }
+                    // name: 'home',
+                    // component: require('@/components/TestPage').default
                 },
                 {
                     path: '/receive',
