@@ -63,6 +63,10 @@
                     }
                 ]
             },
+            perPage: {
+                type: Number,
+                default: 10
+            },
             selectedRow: {
                 type: String,
                 default: null
@@ -76,7 +80,6 @@
         data () {
             return {
                 interval: null,
-                perPage: 10,
                 rowTransition: 'fade'
             }
         },
