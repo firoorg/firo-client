@@ -40,7 +40,7 @@
 
         computed: {
             isOpen () {
-                return this.isReused
+                return false // this.isReused
             }
         }
     }
