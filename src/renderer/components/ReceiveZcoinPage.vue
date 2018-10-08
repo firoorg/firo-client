@@ -15,11 +15,23 @@
                                 :fields="tableFields"
                                 track-by="address"
                                 :selected-row="selectedPaymentRequest"
-                                :on-row-select="onTableRowSelect">
+                                :on-row-select="onTableRowSelect" class="payment-requests-table">
                     <!--<template slot="created_at" scope="props">
                         <h1>{{ rowData.name }}</h1>
                     </template>-->
                 </animated-table>
+
+                <transition name="fade">
+                    <onboarding-notice v-if="allPaymentRequestsLength <= 3" class="onboarding">
+                        <template slot="header">
+                            <h3>Looks like you do not have any coins.</h3>
+                        </template>
+                        <template slot="content">
+                            <p>To receive some please create a <strong>Payment Request</strong>. Payment Requests are one-time payment channels for specific transactions like transferring funds from an exchange.</p>
+                            <p>To quickly access or group payments, you can use <strong>#hastags</strong> in a Payment Request's label.</p>
+                        </template>
+                    </onboarding-notice>
+                </transition>
             </section>
         </div>
         <section class="paymentrequest-detail">
@@ -50,6 +62,7 @@
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
     import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
+    import OnboardingNotice from '@/components/Notification/OnboardingNotice'
 
     const tableFields = [
         {
@@ -90,6 +103,7 @@
     export default {
         name: 'ReceiveZcoinPage',
         components: {
+            OnboardingNotice,
             AnimatedTable
         },
 
@@ -142,8 +156,11 @@
             },
 
             filteredPaymentRequests () {
-                console.log(this.virtualPaymentRequests)
                 return this.getFilteredByUrl(this.allPaymentRequests, ['label'])
+            },
+
+            allPaymentRequestsLength () {
+                return this.allPaymentRequests.length
             }
         },
 
@@ -178,6 +195,10 @@
 
     .paymentrequest-list {
         padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+    }
+
+    .payment-requests-table + .onboarding {
+        margin-top: emRhythm(8);
     }
 
     .receive-zcoin > .scrollable-height {
