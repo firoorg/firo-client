@@ -1,10 +1,28 @@
-# zcoin-client
+# Zcoin Client
 
-> Official Zcoin Client
+![](.github/github-zcoin-client-header.png)
 
-#### Build Setup
+Curabitur blandit tempus porttitor. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui.
 
-``` bash
+---
+
+## Development
+
+As the clients architecture is split up into two separate components both of them need to set up first.
+The graphical interface is structurally decoupled from the core and communicates through an ZeroMQ API. This is the Repository of the interface only. Head over to https://github.com/zcoinofficial/zcoin/tree/client-api#dependencies where the daemon code lives and setup of dependencies is described.
+
+### Zcoin Daemon
+
+Nevertheless, we provide an easy to us script which pulls the official repo, builds `zcoind` and moves it into the right folders where the gui can pick it up inside this repo. Simply run the following, get a ☕️, and after a couple of minutes you should be good to go.
+
+```bash
+# fetches core from github and compiles it on all cores
+./fetch-and-build-zcoin-core.sh
+``` 
+
+### Graphical User Interface
+
+```bash
 # install dependencies
 npm install
 
@@ -16,16 +34,11 @@ npm run translate
 
 # build electron application for production
 npm run build
-
-# run unit & end-to-end tests
-npm test
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
-
 ```
 
 ---
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+### Build for Production / Release
+
+Make sure authentication is enabled in `zcoinofficial/zcoin`. The Client __enforces__ encrypted communication between the gui and `zcoind` and will be unable to connect otherwise. 
+
