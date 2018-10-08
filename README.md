@@ -15,6 +15,8 @@ The graphical interface is structurally decoupled from the core and communicates
 
 Nevertheless, we provide an easy to us script which pulls the official repo, builds `zcoind` and moves it into the right folders where the gui can pick it up inside this repo. Simply run the following, get a ☕️, and after a couple of minutes you should be good to go.
 
+___NOTE:__ As the development on the Graphical Uer Interface is mainly done on MacOS the following script will not work on other operating systems – it is at least untested, PRs are welcome ;)._
+
 ```bash
 # fetches core from github and compiles it on all cores
 ./fetch-and-build-zcoin-core.sh
