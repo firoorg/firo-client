@@ -99,10 +99,10 @@ send:
 
   private:
     overview:
-      title: Private<br>Send
+      title: Send<br>Zcoin
 
     detail-private-send:
-      title__private-send: Private Send
+      title__private-send: Private Spend
       description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
       label__label: Label
       placeholder__label: "Spider-Man costume #shopping for #reuben"

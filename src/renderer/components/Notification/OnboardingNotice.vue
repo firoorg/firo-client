@@ -18,9 +18,12 @@
 
 <style lang="scss" scoped>
     .onboarding {
-        margin: 0  emRhythm(5);
+        margin-right: emRhythm(5);
+        margin-left: emRhythm(5);
 
         header {
+            color: $color--comet-dark;
+            font-style: italic;
             h1, h2, h3 {
                 &:first-child {
                     margin-top: 0;
@@ -36,11 +39,21 @@
                 margin-bottom: 0;
             }
 
+            a,
             strong {
                 @include font-medium();
                 font-weight: normal;
                 font-style: inherit;
                 color: mix($color--comet-dark, $color--comet);
+            }
+            a {
+                transition: color 0.25s ease-in-out;
+                color: $color--comet-dark;
+
+                &:hover,
+                &:focus {
+                    color: $color--dark;
+                }
             }
         }
         &.notice {

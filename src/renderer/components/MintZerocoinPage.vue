@@ -9,6 +9,17 @@
 
                 <denomination-selector :on-denomination-change="onDenominationChange"
                                        :current-mint-costs="currentMintCostInSatoshi" />
+
+                <transition name="fade">
+                    <onboarding-notice v-if="availableXzc" class="onboarding">
+                        <template slot="header">
+                            <h3>Looks like you do not have any coins.</h3>
+                        </template>
+                        <template slot="content">
+                            <p>If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.</p>
+                        </template>
+                    </onboarding-notice>
+                </transition>
             </section>
         </div>
         <section class="current-mint-detail scrollable-height">
@@ -91,6 +102,7 @@
     import { convertToSatoshi } from '#/lib/convert'
 
     import DenominationSelector from '@/components/DenominationSelector'
+    import OnboardingNotice from '@/components/Notification/OnboardingNotice'
     import CurrentMints from '@/components/payments/CurrentMints'
     import FeesAndAmount from '@/components/payments/FeesAndAmount'
     // import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
@@ -102,6 +114,7 @@
     export default {
         name: 'MintZerocoinPage',
         components: {
+            OnboardingNotice,
             NotificationIndicator,
             MintsInProgressList,
             MintSteps,
@@ -121,6 +134,7 @@
 
         computed: {
             ...mapGetters({
+                availableXzc: 'Balance/availableXzc',
                 currentPassphrase: 'App/currentPassphrase',
                 denominations: 'Mint/currentDenominations',
                 currentDenominationFees: 'Mint/currentDenominationFees',
@@ -311,5 +325,9 @@
             transform: translateX(50%);
             top: 50%;
         }
+    }
+
+    .onboarding {
+        margin-top: emRhythm(5);
     }
 </style>
