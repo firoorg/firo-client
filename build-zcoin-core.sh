@@ -15,7 +15,8 @@ cd $REPO
 # compile
 echo "- compiling \"$REPO_BRANCH\" branch with $CORES cores"
 ./autogen.sh
-./configure --with-boost-libdir=/usr/local/Cellar/boost/1.67.0_1/lib/
+#./configure --with-boost-libdir=/usr/local/Cellar/boost/1.67.0_1/lib/
+./configure
 make -j${CORES}
 
 # copy binaries to gui assets folder
