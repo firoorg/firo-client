@@ -14,7 +14,7 @@
                 <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
                                 track-by="address"
-                                no-data-message="No Payment Requests created"
+                                :no-data-message="getNoDataMessage"
                                 :selected-row="selectedPaymentRequest"
                                 :on-row-select="onTableRowSelect"
                                 class="payment-requests-table">
@@ -163,6 +163,10 @@
 
             allPaymentRequestsLength () {
                 return this.allPaymentRequests.length
+            },
+
+            getNoDataMessage () {
+                return this.allPaymentRequestsLength ? 'No Payment Requests found' : 'No Payment Requests created'
             }
         },
 
