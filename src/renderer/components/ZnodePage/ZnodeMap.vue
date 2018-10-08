@@ -13,7 +13,7 @@
                      :key="cluster.id">
                     <base-popover :open="false"
                                   placement="left-auto"
-                                  :popover-class="[ cluster.statusClass, 'dark' ]"
+                                  :popover-class="[ cluster.statusClass, 'dark', 'advice' ]"
                                   boundaries-element="boundariesElement"
                                   class="my-znode-popover"
                                   trigger="hover">
@@ -23,8 +23,8 @@
                             </div>
                         </template>
                         <template slot="content">
-                            <ul>
-                                <li v-for="znode of cluster.nodes">{{ znode.id }}</li>
+                            <ul class="cluster-nodes">
+                                <li v-for="znode of cluster.nodes">{{ znode.status}} - {{ znode.id }}</li>
                             </ul>
                         </template>
                     </base-popover>
@@ -542,5 +542,11 @@
             fill: $color;
             stroke: $color;
         }
+    }
+
+    .cluster-nodes {
+        list-style: none;
+        margin: 0;
+        padding: 0;
     }
 </style>
