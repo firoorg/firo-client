@@ -14,8 +14,10 @@
                 <animated-table :data="filteredPaymentRequests"
                                 :fields="tableFields"
                                 track-by="address"
+                                no-data-message="No Payment Requests created"
                                 :selected-row="selectedPaymentRequest"
-                                :on-row-select="onTableRowSelect" class="payment-requests-table">
+                                :on-row-select="onTableRowSelect"
+                                class="payment-requests-table">
                     <!--<template slot="created_at" scope="props">
                         <h1>{{ rowData.name }}</h1>
                     </template>-->

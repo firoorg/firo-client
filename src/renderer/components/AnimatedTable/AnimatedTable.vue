@@ -10,6 +10,7 @@
                   pagination-path="pagination"
                   :row-transition-name="rowTransition"
                   :row-class="getRowClass"
+                  :no-data-template="noDataMessage"
                   @vuetable:pagination-data="onPaginationData"
                   @vuetable:row-clicked="onRowClick"
                   v-bind="{ scopedSlots: $scopedSlots }"
@@ -66,6 +67,10 @@
             perPage: {
                 type: Number,
                 default: 10
+            },
+            noDataMessage: {
+                type: String,
+                default: ''
             },
             selectedRow: {
                 type: String,
