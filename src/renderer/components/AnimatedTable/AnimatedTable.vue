@@ -118,6 +118,9 @@
                     classes.push('selected')
                 }
 
+                if (item.isFulfilled) {
+                    classes.push('is-fulfilled')
+                }
                 if (item.isReused) {
                     classes.push('is-reused')
                 }
@@ -345,7 +348,33 @@
                         background: red;
                         border: 10px solid blue;
                     }*/
-                    @include glow-small-box($color--green);
+                    @include glow-small-box($color--comet-dark-mixed);
+
+                    &.is-fulfilled {
+                        @include glow-small-box($color--green);
+
+                        td {
+                            background: $color--green;
+                        }
+
+                        & /deep/ .tag {
+                            border-color: mix($color--comet-dark-mixed, $color--comet-dark);
+                        }
+
+                        &:hover td {
+                            background: mix($color--green-bright, $color--green, (100% * $hover-opacity));
+                        }
+
+                        &:nth-child(odd) {
+                            td {
+                                background: mix($color--green-bright, $color--green, (100% * $odd-opacity / 2));
+                            }
+
+                            &:hover td {
+                                background: mix($color--green-bright, $color--green, (100% * ($hover-opacity + $odd-opacity) / 2));
+                            }
+                        }
+                    }
 
                     &.is-reused {
                         @include glow-small-box($color--orange);
@@ -374,7 +403,7 @@
                     }
 
                     td {
-                        background: $color--green;
+                        background: $color--comet-dark-mixed;
                         color: $color--white;
                     }
 
@@ -393,16 +422,16 @@
                     }
 
                     &:hover td {
-                        background: mix($color--green-bright, $color--green, (100% * $hover-opacity));
+                        background: mix($color--comet, $color--polo, (100% * $hover-opacity));
                     }
 
                     &:nth-child(odd) {
                         td {
-                            background: mix($color--green-bright, $color--green, (100% * $odd-opacity / 2));
+                            background: mix($color--comet, $color--polo, (100% * $odd-opacity / 2));
                         }
 
                         &:hover td {
-                            background: mix($color--green-bright, $color--green, (100% * ($hover-opacity + $odd-opacity) / 2));
+                            background: mix($color--comet, $color--polo, (100% * ($hover-opacity + $odd-opacity) / 2));
                         }
                     }
                 }

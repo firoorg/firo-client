@@ -23,7 +23,8 @@
 
         header {
             color: $color--comet-dark;
-            font-style: italic;
+            //font-style: italic;
+
             h1, h2, h3 {
                 &:first-child {
                     margin-top: 0;

@@ -328,6 +328,6 @@
     }
 
     .onboarding {
-        margin-top: emRhythm(5);
+        margin-top: emRhythm(7);
     }
 </style>
