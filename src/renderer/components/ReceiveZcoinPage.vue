@@ -167,7 +167,19 @@
         methods: {
             onTableRowSelect (rowData, index, event) {
                 // todo get paymentRequest from store
-                this.selectedPaymentRequest = rowData.address
+                const { address } = rowData
+
+                // remove selection
+                if (this.selectedPaymentRequest === address || this.selectedPaymentRequest === address) {
+                    this.selectedPaymentRequest = null
+
+                    this.pushRouterWithFilter({
+                        name: 'receive-zcoin'
+                    })
+                    return
+                }
+
+                this.selectedPaymentRequest = address
 
                 this.pushRouterWithFilter({
                     name: 'receive-zcoin-paymentrequest',

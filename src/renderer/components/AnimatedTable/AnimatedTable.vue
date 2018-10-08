@@ -125,9 +125,11 @@
 
                 console.log(data[this.trackBy], data, this.trackBy)
 
+                /*
                 if (data[this.trackBy] === this.selectedRow) {
                     return
                 }
+                */
 
                 if (this.onRowSelect) {
                     this.onRowSelect(data, index, event)
