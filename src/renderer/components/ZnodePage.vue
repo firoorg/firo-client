@@ -197,6 +197,32 @@
         grid-row-gap: emRhythm(6);
     }
 
+    .remote-znodes {
+        margin-top: emRhythm(12);
+        color: $color--white-light;
+
+        .animated-table {
+            /deep/ {
+                thead th {
+                    color: $color--dark;
+
+                    &.sortable:hover .sort-icon {
+                        color: $color--comet-medium;
+                    }
+                }
+                .vuetable-body tr td {
+                    border-color: $color--comet-dark-mixed;
+                }
+            }
+        }
+
+        & /deep/ .vuetable-td-authority {
+            span {
+                opacity: 0.5;
+            }
+        }
+    }
+
     footer {
         margin-top: emRhythm(6);
         text-align: right;
