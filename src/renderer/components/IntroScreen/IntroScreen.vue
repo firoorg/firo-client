@@ -76,11 +76,11 @@
             return {
                 goingToHide: false,
                 steps: {
-                    welcome: IntroScreenWelcome,
-                    location: IntroScreenBlockchainLocation,
-                    lock: IntroScreenLockWallet,
-                    amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
-                    other: IntroScreenOther
+                    welcome: IntroScreenWelcome
+                    // location: IntroScreenBlockchainLocation,
+                    // lock: IntroScreenLockWallet,
+                    // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
+                    // other: IntroScreenOther
                 },
                 currentStep: 'welcome',
                 currentSettingsValue: ''

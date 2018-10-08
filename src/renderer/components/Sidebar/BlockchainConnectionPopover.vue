@@ -1,8 +1,8 @@
 <template>
     <ul>
-        <li><span class="connections-badge">{{ connections }}</span> Connections</li>
-        <li>Yes/No Tor</li>
-        <li>Yes/No Dandelion</li>
+        <li><strong class="connections-badge">{{ connections }}</strong> Connections</li>
+        <li>(Yes/No) Tor</li>
+        <li>(Yes) Dandelion</li>
     </ul>
 </template>
 

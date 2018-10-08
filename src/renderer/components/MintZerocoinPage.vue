@@ -11,7 +11,7 @@
                                        :current-mint-costs="currentMintCostInSatoshi" />
 
                 <transition name="fade">
-                    <onboarding-notice v-if="availableXzc" class="onboarding">
+                    <onboarding-notice v-if="!availableXzc" class="onboarding">
                         <template slot="header">
                             <h3>Looks like you do not have any coins.</h3>
                         </template>
