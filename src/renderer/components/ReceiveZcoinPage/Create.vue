@@ -27,7 +27,7 @@
                     </label>
 
                     <div class="control">
-                        <input v-model.number="amount"
+                        <input v-model.lazy.number="amount"
                                v-validate="amountValidationRules"
                                v-tooltip="getValidationTooltip('amount')"
                                type="text"

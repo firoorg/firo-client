@@ -7,8 +7,7 @@ export default {
     },
     data () {
         const amountRules = {
-            decimal: 8,
-            min_value: 0.001
+            decimal: 8
         }
 
         return {
@@ -18,10 +17,12 @@ export default {
             },
             requiredAmountValidationRules: {
                 required: true,
+                min_value: 0.001,
                 ...amountRules
             },
             xzcAmountValidationRules: {
                 required: true,
+                min_value: 0.001,
                 ...amountRules,
                 // todo return via callback function. otherwise initial availableXzc state will be used.
                 not_exceeding_balance: {
