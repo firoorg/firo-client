@@ -47,6 +47,7 @@
             </transition>
             <transition name="fade" mode="out-in">
                 <router-view v-bind="selectedPaymentRequestWithAddress"
+                             @route-to-detail="onRouteToDetail"
                              :key="$route.path"
                              class="paymentrequest-detail-route"></router-view>
             </transition>
@@ -171,6 +172,16 @@
         },
 
         methods: {
+            onRouteToDetail ({ address }) {
+                this.selectedPaymentRequest = address
+
+                this.pushRouterWithFilter({
+                    name: 'receive-zcoin-paymentrequest',
+                    params: {
+                        address: this.selectedPaymentRequest
+                    }
+                })
+            },
             onTableRowSelect (rowData, index, event) {
                 // todo get paymentRequest from store
                 const { address } = rowData

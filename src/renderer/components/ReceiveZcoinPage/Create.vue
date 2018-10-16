@@ -86,12 +86,33 @@
 
         data () {
             return {
+                unsubscribeFromPaymentRequestCreate: null,
                 buttonStep: 0,
                 validationFieldOrder: [
                     'label',
                     'amount',
                     'message'
                 ]
+            }
+        },
+
+        mounted () {
+            this.unsubscribeFromPaymentRequestCreate = this.$store.subscribe((mutation, state) => {
+                const { type, payload } = mutation
+
+                if (type !== types.paymentrequest.ADD_PAYMENT_REQUEST) {
+                    return
+                }
+
+                const { address } = payload
+
+                this.$emit('route-to-detail', { address })
+            })
+        },
+
+        beforeDestroy () {
+            if (this.unsubscribeFromPaymentRequestCreate) {
+                this.unsubscribeFromPaymentRequestCreate()
             }
         },
 
