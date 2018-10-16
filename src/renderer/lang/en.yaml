@@ -40,9 +40,9 @@ receive:
     label__label: Label
     placeholder__label: "You can use #tags in here"
     label__amount: Amount
-    placeholder__amount: Amount to send
+    placeholder__amount: Amount to receive
     label__message: Message
-    placeholder__message: Add a personal message
+    placeholder__message: Add a personal message for the recipient of the request.
     button__create-payment-request: Create Payment Request
 
   detail-entry-request:
