@@ -251,7 +251,8 @@ const actions = {
 
 const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
-    tipHeight: (state) => state.blockchainTip,
+    currentBlockTimestamp: (state) => state.currentBlock.timestamp,
+    // tipHeight: (state) => state.blockchainTip,
     isTestnet: (state) => state.testnet,
     isMainnet: (state, getters) => !getters.isTestnet,
     status: (state) => state.status || {},

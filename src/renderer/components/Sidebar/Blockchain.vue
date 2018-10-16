@@ -55,7 +55,8 @@
         computed: {
             ...mapGetters({
                 currentBlockHeight: 'Blockchain/currentBlockHeight',
-                tipHeight: 'Blockchain/tipHeight',
+                currentBlockTimestamp: 'Blockchain/currentBlockTimestamp',
+                avgBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds',
                 isSynced: 'Blockchain/isSynced',
                 isBlockchainSynced: 'Blockchain/isBlockchainSynced',
                 isZnodeListSynced: 'Blockchain/isZnodeListSynced',
@@ -69,7 +70,13 @@
             },
 
             progress () {
-                return this.currentBlockHeight / this.tipHeight * 100
+                const now = Date.now()
+                const remainingTime = now - (this.currentBlockTimestamp * 1000)
+                const remainingBlocks = remainingTime / this.avgBlockTime
+
+                console.log({ remainingTime, remainingBlocks })
+                const estimatedTipHeight = this.currentBlockHeight + remainingBlocks
+                return this.currentBlockHeight / estimatedTipHeight * 100
             },
 
             connectionClass () {
