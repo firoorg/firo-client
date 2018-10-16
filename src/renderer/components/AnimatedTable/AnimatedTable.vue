@@ -402,11 +402,6 @@
                         }
                     }
 
-                    td {
-                        background: $color--comet-dark-mixed;
-                        color: $color--white;
-                    }
-
                     & /deep/ .tag {
                         border-color: mix($color--green, $color--green-dark);
                     }
@@ -421,17 +416,22 @@
                         }
                     }
 
+                    td {
+                        background: $color--comet-dark-mixed;
+                        color: $color--white;
+                    }
+
                     &:hover td {
-                        background: mix($color--comet, $color--polo, (100% * $hover-opacity));
+                        background: mix($color--comet-dark-mixed, $color--polo, (100% * $hover-opacity));
                     }
 
                     &:nth-child(odd) {
                         td {
-                            background: mix($color--comet, $color--polo, (100% * $odd-opacity / 2));
+                            background: rgba($color--comet-dark-mixed, (100% * $odd-opacity / 2));
                         }
 
                         &:hover td {
-                            background: mix($color--comet, $color--polo, (100% * ($hover-opacity + $odd-opacity) / 2));
+                            background: mix($color--comet-dark-mixed, $color--polo, (100% * ($hover-opacity + $odd-opacity) / 2));
                         }
                     }
                 }
