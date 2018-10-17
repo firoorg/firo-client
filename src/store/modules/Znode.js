@@ -208,7 +208,6 @@ const getters = {
 
     znodePaymentCycleInDays: (state, getters, rootState, rootGetters) => {
         const avgBlockTimeInMs = rootGetters['Blockchain/averageBlockTimeInMilliSeconds']
-        console.log('avgBlockTimeInMs', avgBlockTimeInMs)
         // console.log('rootGetters.blockchain.averageBlockTime', rootGetters.blockchain.averageBlockTime)
         const blocksPerDay = (1000 * 60 * 60 * 24) / avgBlockTimeInMs
 

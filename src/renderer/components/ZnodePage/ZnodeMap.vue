@@ -88,7 +88,7 @@
 
         created () {
             this.debouncedHeatmapUpdate = debounce(() => {
-                console.log('updating headmap -> debounced')
+                // console.log('updating headmap -> debounced')
                 this.updateHeatmap()
             }, 5000, {
                 maxWait: 30000
@@ -294,7 +294,7 @@
                     this.heatmapPointsZnodeIds[znode.id] = 1
                 })
 
-                console.log('points.length', points.length)
+                // console.log('points.length', points.length)
 
                 /*
                 let gridValues = Object.values(this.heatmapGrid).slice()

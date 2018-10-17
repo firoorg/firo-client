@@ -89,10 +89,6 @@
             }
         },
 
-        mounted () {
-            console.log('animated table created', this.$scopedSlots)
-        },
-
         computed: {
             getFieldsWithLocalizedTitle () {
                 return this.fields.map((field) => {

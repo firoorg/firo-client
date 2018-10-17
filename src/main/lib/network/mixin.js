@@ -69,18 +69,8 @@ export default {
             const topic = topicBuffer ? topicBuffer.toString() : null
             const message = messageBuffer ? messageBuffer.toString() : null
 
-            if (topic) {
-                console.log('topic', topic)
-            }
-
-            /*
-            if (message) {
-                console.log('message', message)
-            }
-            */
-
             try {
-                console.log('processing response -> ', `ON_${topic.toUpperCase()}_SUBSCRIPTION`)
+                // console.log('processing response -> ', `ON_${topic.toUpperCase()}_SUBSCRIPTION`)
 
                 const json = JSON.parse(message)
                 const { data } = json
