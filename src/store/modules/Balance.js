@@ -77,16 +77,18 @@ const getters = {
     availableTotal: (state) => state.total.available,
     availableXzc: (state) => state.xzc.confirmed - state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed,
-    xzcZerocoinRatio: (state) => {
+    confirmedXzcZerocoinRatio: (state) => {
+        /*
         const xzc = Object.keys(state.xzc).reduce((accumulator, key) => {
             return accumulator + state.xzc[key]
         }, 0)
+        */
 
         const zerocoin = Object.keys(state.zerocoin).reduce((accumulator, key) => {
             return accumulator + state.zerocoin[key]
         }, 0)
 
-        return zerocoin / xzc
+        return zerocoin / state.xzc.confirmed
     }
 }
 

@@ -82,7 +82,7 @@ const getters = {
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
     percentageToHoldInZerocoin: (state) => state.percentageToHoldInZerocoin * 100,
     isOutOfPercentageToHoldInZerocoinRange: (state, getters, rootState, rootGetters) => {
-        const currentRatio = rootGetters['Balance/xzcZerocoinRatio']
+        const currentRatio = rootGetters['Balance/confirmedXzcZerocoinRatio']
         const offset = 0.05
 
         // upper bound
