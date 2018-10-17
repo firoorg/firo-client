@@ -1,0 +1,106 @@
+<template>
+    <div>
+        <timed-tooltip :is-open="showCopySuccess"
+                       popover-class="green"
+                       :on-timeout="hideCopySuccess">
+            <template slot="content">
+                <h3>
+                    {{ $t('receive.detail-entry-request.pending.message__copy-link--success') }}
+                </h3>
+            </template>
+            <base-button :is-outline="true" @click="copyUri">
+                {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
+            </base-button>
+        </timed-tooltip>
+        <base-button color="green" @click="shareViaMail">
+            {{ $t('receive.detail-entry-request.pending.button__share-via-email--pirmary') }}
+        </base-button>
+
+        <!-- E-Mail Template -->
+        <div style="position: absolute; top:0;left:0;height:0;width:0;overflow: hidden">
+            <receive-payment-request-email-template
+                    :message="message"
+                    :amount="amountInBaseCoin"
+                    :uri="getZcoinUri"
+                    ref="emailTemplate">
+                <template slot="qrcode">
+                    <h1>qr code</h1>
+                    <!--<qr-code :text="getZcoinUri"
+                             :size="128"
+                             color="#1F1F2E"
+                             bg-color="#ffffff">
+                    </qr-code>-->
+                </template>
+            </receive-payment-request-email-template>
+        </div>
+    </div>
+</template>
+
+<script>
+    import { clipboard } from 'electron'
+    import { convertToCoin } from '#/lib/convert'
+
+    import TimedTooltip from '@/components/Notification/TimedTooltip'
+    import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
+
+    export default {
+        name: 'ReceivePendingPaymentRequestButtons',
+
+        components: {
+            TimedTooltip,
+            ReceivePaymentRequestEmailTemplate
+        },
+
+        props: [
+            'address',
+            'amount',
+            'message'
+        ],
+
+        data () {
+            return {
+                showCopySuccess: false
+            }
+        },
+
+        computed: {
+            amountInBaseCoin () {
+                return convertToCoin(this.amount)
+            },
+
+            getZcoinUri () {
+                if (!this.address) {
+                    return ''
+                }
+                const address = this.address.address || this.address
+                const params = []
+                params.push(this.amount ? `amount=${this.amount}` : '')
+                params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
+                const paramsString = params.length ? `?${params.join('&')}` : ''
+
+                return `zcoin://${address}${paramsString}`
+            }
+        },
+
+        methods: {
+            shareViaMail () {
+                clipboard.writeHTML(this.$refs.emailTemplate.$el.innerHTML)
+                this.$electron.shell.openExternal('mailto:?subject=Zcoin Payment Request&body=please select this text and press cmd+v ;)')
+            },
+
+            copyUri () {
+                console.log('coping to clipboard', this.getZcoinUri)
+                clipboard.writeText(this.getZcoinUri)
+                this.showCopySuccess = true
+            },
+
+            hideCopySuccess () {
+                this.showCopySuccess = false
+            }
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>

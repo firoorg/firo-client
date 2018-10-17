@@ -15,12 +15,6 @@
                 <div v-html="messageFormatted" />
             </div>
         </div>
-
-        <div class="actions">
-            <base-button @click.prevent="openBlockExplorer">
-                {{ $t('receive.detail-entry-request.fulfilled.button__open-explorer') }}
-            </base-button>
-        </div>
     </div>
 </template>
 
@@ -60,15 +54,6 @@
         computed: {
             messageFormatted () {
                 return nl2br(this.message)
-            }
-        },
-
-        methods: {
-            openBlockExplorer (event) {
-                event.preventDefault()
-
-                // todo get blockchain explorer settings and open browser via electron shell
-                alert(`opening ${this.address.address} in block explorer`)
             }
         }
     }
@@ -111,16 +96,5 @@
             margin: 0 emRhythm(3);
         }*/
 
-        .actions {
-            @include divider-top-with-gradient();
-            padding-bottom: 0;
-            display: flex;
-            justify-content: center;
-
-            button + button,
-            .popover + button {
-                margin-left: emRhythm(2);
-            }
-        }
     }
 </style>

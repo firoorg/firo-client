@@ -1,5 +1,5 @@
 <template>
-        <section class="receive scrollable-height_">
+        <div class="receive scrollable-height_">
             <header class="receive-header">
                 <div class="inner">
                     <span>{{ $d(new Date(createdAt), 'long') }}</span>
@@ -29,73 +29,24 @@
                 </div>
             </header>
 
-
-            <receive-fulfilled-payment-request v-if="isFulfilled"
+            <receive-fulfilled-payment-request v-if="transactionsReceived"
                                                :address="address"
                                                :message="message"
                                                :is-reused="isReused"
+                                               :is-fulfilled="isFulfilled"
                                                :transactions="address.transactions" />
             <receive-pending-payment-request v-else
-                                             :address="address"
-                                             :amount="amount"
                                              :message="message" />
 
-
-
-                <!--
-                <dl>
-                    <dt>{{ $t('receive.detail-entry-request.label__created') }}</dt>
-                    <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
-                    <dt>{{ $t('receive.detail-entry-request.label__requested') }}</dt>
-                    <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
-                </dl>
-
-                <dl>
-                    <dt>{{ $t('receive.detail-entry-request.label__fulfilled') }}</dt>
-                    <dd><timeago :datetime="createdAt" :auto-update="30"></timeago></dd>
-                    <dt>{{ $t('receive.detail-entry-request.label__received') }}</dt>
-                    <dd>{{ amount ? amountInBaseCoin + ' XZC' : 'No Amount Requested' }}</dd>
-                </dl>
-                -->
-
-                <!--
-                <unexpected-transaction-popover :boundaries-element="null">
-                    <h3>Test</h3>
-                </unexpected-transaction-popover>
-                -->
-
-            <!--
-            <div class="message-wrap" v-if="message">
-                <p>{{ message }}</p>
+            <div class="actions">
+                <receive-fulfilled-payment-request-buttons v-if="isFulfilled"
+                                                           :address="address.address" />
+                <receive-pending-payment-request-buttons v-else
+                                                         :address="address"
+                                                         :amount="amount"
+                                                         :message="message" />
             </div>
-            <div v-else></div>
-
-            <div class="action-wrap">
-                <div v-if="isFulfilled">
-                    <base-button @click.prevent="openBlockExplorer">
-                      {{ $t('receive.detail-entry-request.fulfilled.button__open-explorer') }}
-                    </base-button>
-                </div>
-                <div v-else>
-                    <timed-tooltip :is-open="showCopySuccess"
-                                   popover-class="green"
-                                   :on-timeout="hideCopySuccess">
-                        <template slot="content">
-                            <h3>
-                              {{ $t('receive.detail-entry-request.pending.message__copy-link--success') }}
-                            </h3>
-                        </template>
-                        <base-button :is-outline="true" @click="copyUri">
-                          {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
-                        </base-button>
-                    </timed-tooltip>
-                    <base-button color="green" @click="shareViaMail">
-                      {{ $t('receive.detail-entry-request.pending.button__share-via-email--pirmary') }}
-                    </base-button>
-                </div>
-            </div>
-            -->
-        </section>
+        </div>
 </template>
 
 <script>
@@ -107,7 +58,9 @@
     // import VueQRCodeComponent from 'vue-qrcode-component'
 
     import ReceivePendingPaymentRequest from '@/components/ReceiveZcoinPage/ReceivePendingPaymentRequest'
+    import ReceivePendingPaymentRequestButtons from '@/components/ReceiveZcoinPage/ReceivePendingPaymentRequestButtons'
     import ReceiveFulfilledPaymentRequest from '@/components/ReceiveZcoinPage/ReceiveFulfilledPaymentRequest'
+    import ReceiveFulfilledPaymentRequestButtons from '@/components/ReceiveZcoinPage/ReceiveFulfilledPaymentRequestButtons'
 
     import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
     import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
@@ -119,7 +72,9 @@
         name: 'receivePaymentRequest',
         components: {
             ReceivePendingPaymentRequest,
+            ReceivePendingPaymentRequestButtons,
             ReceiveFulfilledPaymentRequest,
+            ReceiveFulfilledPaymentRequestButtons,
 
             UnexpectedTransactionPopover,
             PaymentRequestStatus,
@@ -129,6 +84,7 @@
             TimedTooltip
         },
         props: [
+            'transactionsReceived',
             'isFulfilled',
             'isReused',
             'label',
@@ -257,6 +213,18 @@
                 // border: 1px solid rgba(red, 0.2);
                 margin: auto 0;
             }
+        }
+    }
+
+    .actions {
+        @include divider-top-with-gradient();
+        padding-bottom: 0;
+        display: flex;
+        justify-content: center;
+
+        /deep/ button + button,
+        /deep/ .popover + button {
+            margin-left: emRhythm(2);
         }
     }
 
