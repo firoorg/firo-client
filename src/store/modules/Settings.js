@@ -1,6 +1,8 @@
 import fs from 'fs'
 import * as types from '../types/Settings'
 
+import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
+
 import Debug from 'debug'
 const debug = Debug('zcoin:store:settings')
 
@@ -97,9 +99,22 @@ const getters = {
 
         return false
     },
-    showIsOutOfPercentageToHoldInZerocoinNotification (state, getters, rootState, rootGetters) {
+    isOutOfPercentageToHoldInZerocoin (state, getters, rootState, rootGetters) {
         return getters.isOutOfPercentageToHoldInZerocoinRange &&
+            rootGetters['Balance/availableXzc'] > convertToSatoshi(10)
+    },
+    showIsOutOfPercentageToHoldInZerocoinNotification (state, getters, rootState, rootGetters) {
+        return getters.isOutOfPercentageToHoldInZerocoin &&
             rootGetters['Balance/xzcZerocoinRatio'] !== state.xzcZerocoinRatioNotified
+    },
+    remainingXzcToFulFillPercentageToHoldInZerocoin (state, getters, rootState, rootGetters) {
+        return Math.floor((rootGetters['Balance/availableXzc'] * (state.percentageToHoldInZerocoin - rootGetters['Balance/confirmedXzcZerocoinRatio'])) / 100000000)
+    },
+
+    suggestedMintsToFulfillRatio (state, getters) {
+        const { toMint } = getDenominationsToMint(getters.remainingXzcToFulFillPercentageToHoldInZerocoin)
+
+        return toMint
     },
     b58Prefixes: (state, getters, rootState, rootGetters) => {
         // networkIdentifier

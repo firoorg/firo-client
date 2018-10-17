@@ -19,6 +19,15 @@
                             <p>If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.</p>
                         </template>
                     </onboarding-notice>
+                    <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
+                        <template slot="header">
+                            <h3>Stay Private, Stay Flexible</h3>
+                        </template>
+                        <template slot="content">
+                            <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – with the latest change this ratio got undershot.</p>
+                            <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> now to be able to spend funds privately without delay and extra waiting times in the future.</p>
+                        </template>
+                    </onboarding-notice>
                 </transition>
             </section>
         </div>
@@ -138,7 +147,10 @@
                 currentPassphrase: 'App/currentPassphrase',
                 denominations: 'Mint/currentDenominations',
                 currentDenominationFees: 'Mint/currentDenominationFees',
-                mintsInProgress: 'Mint/mintsInProgress'
+                mintsInProgress: 'Mint/mintsInProgress',
+                isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
+                percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
+                remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
             }),
 
             currentMints () {

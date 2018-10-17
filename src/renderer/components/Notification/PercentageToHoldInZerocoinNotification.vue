@@ -13,21 +13,23 @@
 
         <template slot="content">
             <header>
-                <h2>Percentage to hold in Zerocoin</h2>
+                <h2>Stay Private, Stay Flexibe</h2>
             </header>
 
-            <p>Aenean lacinia bibendum nulla sed consectetur. Donec sed odio dui.</p>
+            <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – with the latest change this ratio got undershot.</p>
+            <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> now to be able to spend funds privately without delay and extra waiting times in the future.</p>
+
 
             <footer>
                 <base-button :is-outline="true"
                              :is-dark="true"
                              @click.prevent="markAsNotified">
-                    Not now
+                    No, I will do it later
                 </base-button>
                 <base-button color="green"
                              :is-dark="true"
                              @click.prevent="fillAndRouteToMint">
-                    Mint now
+                    Yes, review suggestion
                 </base-button>
             </footer>
         </template>
@@ -37,7 +39,6 @@
 <script>
     import types from '~/types'
     import { mapGetters, mapActions } from 'vuex'
-    import { getDenominationsToMint } from '#/lib/convert'
 
     import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 
@@ -51,10 +52,12 @@
         computed: {
             ...mapGetters({
                 availableXzc: 'Balance/availableXzc',
-                xzcZerocoinRatio: 'Balance/xzcZerocoinRatio',
+                confirmedXzcZerocoinRatio: 'Balance/confirmedXzcZerocoinRatio',
                 percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
                 isOutOfPercentageToHoldInZerocoinRange: 'Settings/isOutOfPercentageToHoldInZerocoinRange',
-                showIsOutOfPercentageToHoldInZerocoinNotification: 'Settings/showIsOutOfPercentageToHoldInZerocoinNotification'
+                showIsOutOfPercentageToHoldInZerocoinNotification: 'Settings/showIsOutOfPercentageToHoldInZerocoinNotification',
+                remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin',
+                suggestedMintsToFulfillRatio: 'Settings/suggestedMintsToFulfillRatio'
             })
         },
 
@@ -65,10 +68,10 @@
             }),
 
             fillAndRouteToMint () {
-                const remaining = Math.floor((this.availableXzc * ((this.percentageToHoldInZerocoin / 100) - this.xzcZerocoinRatio)) / 100000000)
-                const { toMint } = getDenominationsToMint(remaining)
+                console.log('remainingXzcToMint', this.remainingXzcToFulFillPercentageToHoldInZerocoin)
+                console.log(this.suggestedMintsToFulfillRatio)
 
-                Object.entries(toMint).forEach((pairs) => {
+                Object.entries(this.suggestedMintsToFulfillRatio).forEach((pairs) => {
                     const [ denom, amount ] = pairs
 
                     for (let i = 0; i < amount; i++) {
