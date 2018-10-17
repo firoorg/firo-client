@@ -39,7 +39,7 @@
                                              :message="message" />
 
             <div class="actions">
-                <receive-fulfilled-payment-request-buttons v-if="isFulfilled"
+                <receive-fulfilled-payment-request-buttons v-if="hasAmountReceived"
                                                            :address="address.address" />
                 <receive-pending-payment-request-buttons v-else
                                                          :address="address"
@@ -126,6 +126,10 @@
                 const paramsString = params.length ? `?${params.join('&')}` : ''
 
                 return `zcoin://${address}${paramsString}`
+            },
+
+            hasAmountReceived () {
+                return this.address.total.balance >= this.amount
             }
         },
         methods: {
