@@ -1,4 +1,5 @@
 import fs from 'fs'
+import allTypes from '~/types'
 import * as types from '../types/Settings'
 
 import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
@@ -76,6 +77,23 @@ const actions = {
         }
 
         commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, ratio)
+    },
+
+    [types.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ dispatch, getters, rootGetters }) {
+        console.log(getters.suggestedMintsToFulfillRatio)
+        const currentDenomination = rootGetters['Mint/currentDenominations']
+
+        Object.entries(getters.suggestedMintsToFulfillRatio).forEach((pairs) => {
+            const [ denom, amount ] = pairs
+            const current = currentDenomination[denom] ? currentDenomination[denom] : 0
+
+            for (let i = 0; i < amount - current; i++) {
+                dispatch(allTypes.mint.ADD_DENOMINATION, denom, {
+                    root: true
+                })
+                // this.addDenomination(denom)
+            }
+        })
     }
 }
 

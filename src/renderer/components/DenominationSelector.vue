@@ -87,6 +87,6 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        height: 250px;
+        height: 200px;
     }
 </style>

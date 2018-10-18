@@ -56,29 +56,18 @@
                 percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
                 isOutOfPercentageToHoldInZerocoinRange: 'Settings/isOutOfPercentageToHoldInZerocoinRange',
                 showIsOutOfPercentageToHoldInZerocoinNotification: 'Settings/showIsOutOfPercentageToHoldInZerocoinNotification',
-                remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin',
-                suggestedMintsToFulfillRatio: 'Settings/suggestedMintsToFulfillRatio'
+                remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
             })
         },
 
         methods: {
             ...mapActions({
                 markAsNotified: types.settings.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED,
-                addDenomination: types.mint.ADD_DENOMINATION
+                fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN
             }),
 
             fillAndRouteToMint () {
-                console.log('remainingXzcToMint', this.remainingXzcToFulFillPercentageToHoldInZerocoin)
-                console.log(this.suggestedMintsToFulfillRatio)
-
-                Object.entries(this.suggestedMintsToFulfillRatio).forEach((pairs) => {
-                    const [ denom, amount ] = pairs
-
-                    for (let i = 0; i < amount; i++) {
-                        this.addDenomination(denom)
-                    }
-                })
-
+                this.fillUpPercentateToHoldInZerocoin()
                 this.markAsNotified()
                 this.$router.push({ name: 'mint-zerocoin' })
             }

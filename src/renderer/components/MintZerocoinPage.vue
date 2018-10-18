@@ -27,6 +27,11 @@
                             <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – with the latest change this ratio got undershot.</p>
                             <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> now to be able to spend funds privately without delay and extra waiting times in the future.</p>
                         </template>
+                        <template slot="actions">
+                            <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
+                                Fill up denominations now
+                            </base-onboarding-button>
+                        </template>
                     </onboarding-notice>
                 </transition>
             </section>
@@ -197,6 +202,7 @@
         methods: {
             ...mapActions({
                 resetDenominations: types.mint.RESET_DENOMINATIONS,
+                fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
                 doMint: types.mint.DO_MINT
             }),
 
