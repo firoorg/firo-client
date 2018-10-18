@@ -129,6 +129,10 @@
             },
 
             hasAmountReceived () {
+                if (typeof this.address === 'string' || !this.address.total) {
+                    return false
+                }
+
                 return this.address.total.balance >= this.amount
             }
         },
