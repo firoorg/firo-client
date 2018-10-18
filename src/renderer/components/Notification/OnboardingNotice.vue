@@ -7,6 +7,10 @@
         <main>
             <slot name="content" />
         </main>
+
+        <footer>
+            <slot name="actions" />
+        </footer>
     </section>
 </template>
 
@@ -57,6 +61,7 @@
                 }
             }
         }
+
         &.notice {
             background: mix($color--polo-light, $color--white);
             padding: emRhythm(4);
@@ -67,6 +72,11 @@
                 @include lato-font('regular');
                 font-style: italic;
             }
+        }
+
+        footer {
+            margin-top: emRhythm(3);
+            text-align: right;
         }
     }
 </style>
