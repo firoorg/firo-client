@@ -84,7 +84,27 @@ const getters = {
     message: (state) => state.message,
     canSend: (state, getters, rootState, rootGetters) => false,
     canSpend: (state, getters, rootState, rootGetters) => false,
-    hasNewAddress: (state, getters) => !!getters.address && !getters.isNotified
+    hasNewAddress: (state, getters) => !!getters.address && !getters.isNotified,
+    hasIncomingPaymentRequest: (state, getters) => !!getters.incomingPaymentRequest,
+    incomingPaymentRequest: (state, getters, rootState, rootGetters) => {
+        const { address, amount, message } = getters
+
+        if (!(address && (amount || message))) {
+            return null
+        }
+
+        console.log('App/addressBelongsToWallet', rootGetters['App/addressBelongsToWallet'](address))
+
+        if (rootGetters['App/addressBelongsToWallet'](address)) {
+            return
+        }
+
+        return {
+            address,
+            amount,
+            message
+        }
+    }
 }
 
 export default {

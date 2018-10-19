@@ -60,6 +60,9 @@ receive:
     fulfilled:
       button__open-explorer: Open in Block Explorer
 
+  incoming-request:
+    label__amount: Amount
+
 mint:
   overview:
     title: Mint</br>Zcoin

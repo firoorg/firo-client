@@ -73,7 +73,7 @@
 <style lang="scss" scoped>
     dl {
         display: grid;
-        grid-template-rows: 1fr 1fr;
+        // grid-template-rows: 1fr 1fr;
         grid-template-columns: auto auto;
         margin: 0;
     }

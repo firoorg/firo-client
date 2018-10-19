@@ -36,6 +36,19 @@
         }
     }
 
+    &.top {
+        .grid {
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr;
+            grid-gap: emRhythm(5);
+            height: 100%;
+
+            justify-items: center;
+            align-items: flex-start;
+        }
+    }
+
     .content {
         position: relative;
         color: $color--white;

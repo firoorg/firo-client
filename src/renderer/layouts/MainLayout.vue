@@ -2,14 +2,13 @@
     <transition name="fade">
         <div class="main-layout wrapper" :class="{ 'has-overlay': hasOpenOverlay }" v-if="show">
             <transition name="fade" :duration="overlayDuration">
-                <IntroScreen v-if="showIntro" />
+                <ConnectivityOverlay v-if="showConnectivityOverlay" />
+                <IntroScreen v-else-if="showIntro" />
+                <incoming-payment-request-overlay v-else-if="showIncomingPaymentRequest" />
             </transition>
 
             <NotificationCenter />
 
-            <transition name="fade" :duration="overlayDuration">
-                <ConnectivityOverlay v-if="showConnectivityOverlay" />
-            </transition>
             <transition name="fade" :duration="overlayDuration">
                 <div class="active-window-overlay" v-if="hasOpenModal"></div>
             </transition>
@@ -36,6 +35,7 @@
     import NotificationCenter from '@/components/NotificationCenter'
     import ConnectivityOverlay from '@/components/ConnectivityOverlay'
     import IntroScreen from '@/components/IntroScreen/IntroScreen'
+    import IncomingPaymentRequestOverlay from '@/components/IncomingPaymentRequestOverlay'
 
     export default {
         name: 'MainLayout',
@@ -43,7 +43,8 @@
             IntroScreen,
             Sidebar,
             NotificationCenter,
-            ConnectivityOverlay
+            ConnectivityOverlay,
+            IncomingPaymentRequestOverlay
         },
 
         data () {
@@ -70,6 +71,7 @@
                 networkIsConnected: 'Network/isConnected',
                 networkConnectionError: 'Network/connectionError',
                 showIntroScreen: 'App/showIntroScreen',
+                showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
                 hasOpenOverlay: 'App/hasOpenOverlay'
             }),
 

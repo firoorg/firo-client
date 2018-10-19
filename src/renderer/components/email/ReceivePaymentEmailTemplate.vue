@@ -80,7 +80,7 @@
                                     <tbody><tr>
                                         <td style="border-radius: 3px; background: #23B852; text-align: center;" class="button-td">
                                             <a :href="uri" :style="baseStyle" style="background: #23B852; border: 16px solid #23B852; text-decoration: none; display: block; border-radius: 3px; font-weight: bold;" class="button-a">
-                                                <span style="color:#ffffff;" class="button-link">Pay With Zcoin</span>
+                                                <span style="color:#ffffff;" class="button-link">Open in Zcoin Client</span>
                                             </a>
                                         </td>
                                     </tr>

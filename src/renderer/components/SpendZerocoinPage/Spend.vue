@@ -234,6 +234,7 @@
 
         .fees-and-amount {
             margin-top: 0;
+            margin-bottom: emRhythm(5);
         }
     }
 </style>

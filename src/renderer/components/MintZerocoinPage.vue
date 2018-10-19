@@ -24,12 +24,12 @@
                             <h3>Stay Private, Stay Flexible</h3>
                         </template>
                         <template slot="content">
-                            <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – with the latest change this ratio got undershot.</p>
-                            <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> now to be able to spend funds privately without delay and extra waiting times in the future.</p>
+                            <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – currently this ratio is undershot.</p>
+                            <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible to be able to spend funds privately without delay and extra waiting times in the future.</p>
                         </template>
                         <template slot="actions">
                             <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
-                                Fill up denominations now
+                                Fill up mints now
                             </base-onboarding-button>
                         </template>
                     </onboarding-notice>

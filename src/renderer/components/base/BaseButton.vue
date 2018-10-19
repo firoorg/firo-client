@@ -53,7 +53,7 @@
         color: $color--dark;
         border: 1px solid $color--dark;
         display: inline-block;
-        // outline: none;
+        outline: none;
 
         @include rhythmBorderTop(1px, $padding-v);
         @include rhythmBorderBottom(1px, $padding-v);

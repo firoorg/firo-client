@@ -68,6 +68,32 @@ const getters = {
     isReady: (state) => state.isReady || false,
     showIntroScreen: (state) => state.showIntroScreen,
     isLocked: (state) => state.clientIsLocked,
+    addressBelongsToWallet: (state, getters, rootState, rootGetters) => {
+        return (address) => {
+            console.log('---- validating address ', address, ' ----')
+            const isPaymentRequestAddress = !!rootGetters['PaymentRequest/paymentRequests'].find((el) => {
+                if (typeof el.address === 'string') {
+                    return el.address === address
+                }
+
+                return el.address && el.address.address === address
+            })
+
+            if (isPaymentRequestAddress) {
+                return true
+            }
+
+            const isWalledAddress = rootGetters['Address/walletAddresses'].find((addr) => {
+                return addr.address === address
+            })
+
+            return !!isWalledAddress
+        }
+    },
+    showIncomingPaymentRequest (state, getters, rootState, rootGetters) {
+        return rootGetters['Clipboard/hasIncomingPaymentRequest'] &&
+            !rootGetters['Clipboard/isNotified']
+    },
     hasOpenOverlay (state, getters, rootState, rootGetters) {
         const windowHasOpenModal = rootGetters['Window/hasOpenModal']
         const networkIsConnected = rootGetters['Network/isConnected']
@@ -76,7 +102,8 @@ const getters = {
         return windowHasOpenModal ||
             !networkIsConnected ||
             getters.showIntroScreen ||
-            networkConnectionError
+            networkConnectionError ||
+            getters.showIncomingPaymentRequest
     },
     currentPassphrase: (state) => state.passphrase
 }
