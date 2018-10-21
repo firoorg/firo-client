@@ -5,7 +5,7 @@
             <div class="icon">
                 <send-confirmation-check />
             </div>
-            <h2>TYPE failed! </h2>
+            <h2>Failed! </h2>
             <p>{{ error.message }}</p>
             <em>code {{ error.code }}</em>
         </template>
@@ -13,7 +13,7 @@
             <div class="icon">
                 <send-confirmation-check />
             </div>
-            <h2>TYPE successfully sent!</h2>
+            <h2>Successfully sent!</h2>
         </template>
     </div>
 </template>

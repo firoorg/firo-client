@@ -65,7 +65,7 @@ receive:
 
 mint:
   overview:
-    title: Mint</br>Zcoin
+    title: Anonymize</br>Zcoin
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
 
   detail-process-mint:
@@ -99,6 +99,9 @@ send:
     label__sent: Sent
     label__label: Label
     placeholder__filter: Filter by label
+    label__tx-nolabel: No transaction label set
+    label__tx-category-send: public
+    label__tx-category-spendOut: private
 
   private:
     overview:

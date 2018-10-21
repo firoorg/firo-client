@@ -214,7 +214,7 @@ const getters = {
                 transactionsReceived: true,
                 amount: null,
                 message: null,
-                label: 'testing' + (tags.length ? ` ${tags.join(' ')}` : ''),
+                label: '#virtual Payment Request' + (tags.length ? ` ${tags.join(' ')}` : ''),
                 isReused: transactions.length > 1,
                 createdAt: transactions.reduce((accumulator, tx) => {
                     return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator

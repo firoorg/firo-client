@@ -14,7 +14,7 @@
                         _selected-row="selectedPaymentRequest"
                         _on-row-select="onTableRowSelect">
             <template slot="label" slot-scope="props">
-                <natural-language-tags :content="addCategoryTagToLabel(props.rowData)"></natural-language-tags>
+                <natural-language-tags :content="props.rowData.label"></natural-language-tags>
             </template>
         </animated-table>
     </section>
@@ -81,8 +81,17 @@
                 transactions: 'Address/getOutgoingTransactions'
             }),
 
+            transactionsWithCategoryTags () {
+                return this.transactions.map((tx) => {
+                    return {
+                        ...tx,
+                        label: this.addCategoryTagToLabel(tx)
+                    }
+                })
+            },
+
             filteredTransactions () {
-                return this.getFilteredByUrl(this.transactions, ['label', 'category'])
+                return this.getFilteredByUrl(this.transactionsWithCategoryTags, ['label', 'category'])
             }
         },
 
@@ -105,12 +114,12 @@
 
             addCategoryTagToLabel (rowData) {
                 const { label: value, category } = rowData
-                const label = value || this.$t('todo__.noLabel')
+                const label = value || this.$t('send.table__outgoing-payments.label__tx-nolabel')
 
                 if (category === 'send') {
-                    return `${label} #${this.$t('todo__.public')}`
+                    return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
                 } else if (category === 'spendOut') {
-                    return `${label} #${this.$t('todo__.private')}`
+                    return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
                 }
 
                 return label
