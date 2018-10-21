@@ -74,11 +74,11 @@ const actions = {
     },
 
     [types.UPDATE_MINT] ({ commit, state }, mint) {
-        const { id, txid, index } = mint
+        const { id, index } = mint
 
         commit(types.UPDATE_MINT, {
-            id: (id || txid) + index,
-            ...mint
+            ...mint,
+            id: `${id}-${index}`
         })
     },
 
