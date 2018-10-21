@@ -162,7 +162,7 @@ const actions = {
     },
 
     [types.SET_CONNECTIONS] ({ commit, state }, connections) {
-        if (!connections || isNaN(connections) || connections === state.connections) {
+        if (connections === undefined || isNaN(connections) || connections === state.connections) {
             return
         }
 
