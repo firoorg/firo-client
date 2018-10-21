@@ -24,7 +24,7 @@
                 </animated-table>
 
                 <transition name="fade">
-                    <onboarding-notice v-if="allPaymentRequestsLength <= 3" class="onboarding">
+                    <onboarding-notice v-if="allPaymentRequestsLength < 1" class="onboarding">
                         <template slot="header">
                             <h3>Looks like you do not have any coins.</h3>
                         </template>
