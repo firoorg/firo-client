@@ -12,7 +12,8 @@ const WALLET_ADDRESS_KEY = 'walletAddresses'
 const THIRD_PARTY_ADDRESS_KEY = 'thirdPartyAddresses'
 
 const getTxBasics = function (tx) {
-    const { txid, category, amount, blockHeight, blockHash, blockTime, firstSeenAt } = tx
+    const { txid, txIndex, category, amount, blockHeight, blockHash, blockTime, firstSeenAt } = tx
+    // txIndex
 
     let block = null
     let seen = firstSeenAt
@@ -29,6 +30,7 @@ const getTxBasics = function (tx) {
 
     return {
         id: txid,
+        index: txIndex || 0,
         category,
         amount,
         firstSeenAt: seen,
@@ -67,7 +69,7 @@ const mutations = {
 
     [types.ADD_TRANSACTION] (state, { stack, address, transaction }) {
         state[stack][address].transactions = [
-            ...state[stack][address].transactions.filter((tx) => tx.id !== transaction.id),
+            ...state[stack][address].transactions.filter((tx) => tx.id !== transaction.id && tx.index !== transaction.index),
             transaction
         ]
     }
@@ -96,9 +98,9 @@ const actions = {
 
             console.log('total:', total)
 
-            for (let txCategory of Object.keys(txids)) {
-                for (let txid of Object.keys(txids[txCategory])) {
-                    const tx = txids[txCategory][txid]
+            for (let txIndex of Object.keys(txids)) {
+                for (let txid of Object.keys(txids[txIndex])) {
+                    const tx = txids[txIndex][txid]
                     const { category } = tx
 
                     if (!category) {
