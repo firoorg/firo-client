@@ -13,7 +13,7 @@
         <div class="connections" :class="connectionClass">
             <base-popover trigger="hover"
                           boundaries-element="body"
-                          popover-class="advice green"
+                          :popover-class="['advice', connectionClass]"
                           placement="bottom-end"
                           :offset="4"
                           :delay="{ show: 200, hide: 100 }">
