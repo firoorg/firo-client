@@ -74,7 +74,7 @@ export default class PidManager {
         // const ls = spawn('bash', [...arguments])
         // this.child = spawn('exec', [pathToSpawn])
         this.child = spawn(this.pathToSpawn, {
-            detached: true,
+            // detached: true,
             stdio: 'ignore'
         })
 
