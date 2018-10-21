@@ -13,7 +13,7 @@
         <div class="connections" :class="connectionClass">
             <base-popover trigger="hover"
                           boundaries-element="body"
-                          :popover-class="['advice', connectionClass]"
+                          :popover-class="['advice', connectionPopoverClass]"
                           placement="bottom-end"
                           :offset="4"
                           :delay="{ show: 200, hide: 100 }">
@@ -77,6 +77,14 @@
                 console.log({ remainingTime, remainingBlocks })
                 const estimatedTipHeight = this.currentBlockHeight + remainingBlocks
                 return this.currentBlockHeight / estimatedTipHeight * 100
+            },
+
+            connectionPopoverClass () {
+                if (!this.hasConnections) {
+                    return 'error'
+                }
+
+                return 'green'
             },
 
             connectionClass () {
