@@ -4,6 +4,7 @@ dist/web/*
 build/*
 assets/*
 !assets/icons
+!assets/core
 coverage
 node_modules/
 npm-debug.log
