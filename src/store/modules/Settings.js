@@ -119,7 +119,7 @@ const getters = {
     },
     isOutOfPercentageToHoldInZerocoin (state, getters, rootState, rootGetters) {
         return getters.isOutOfPercentageToHoldInZerocoinRange &&
-            rootGetters['Balance/availableXzc'] > convertToSatoshi(10)
+            rootGetters['Balance/availableXzc'] > convertToSatoshi(2)
     },
     showIsOutOfPercentageToHoldInZerocoinNotification (state, getters, rootState, rootGetters) {
         return getters.isOutOfPercentageToHoldInZerocoin &&
