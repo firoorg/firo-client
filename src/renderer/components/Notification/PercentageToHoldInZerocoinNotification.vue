@@ -8,7 +8,7 @@
             trigger="manually"
     >
         <template slot="target">
-            <slot /> <notification-indicator v-show="isOutOfPercentageToHoldInZerocoinRange" :has-shadow="true" />
+            <slot /> <notification-indicator v-show="isOutOfPercentageToHoldInZerocoin" :has-shadow="true" />
         </template>
 
         <template slot="content">
@@ -54,7 +54,7 @@
                 availableXzc: 'Balance/availableXzc',
                 confirmedXzcZerocoinRatio: 'Balance/confirmedXzcZerocoinRatio',
                 percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
-                isOutOfPercentageToHoldInZerocoinRange: 'Settings/isOutOfPercentageToHoldInZerocoinRange',
+                isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
                 showIsOutOfPercentageToHoldInZerocoinNotification: 'Settings/showIsOutOfPercentageToHoldInZerocoinNotification',
                 remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
             })
