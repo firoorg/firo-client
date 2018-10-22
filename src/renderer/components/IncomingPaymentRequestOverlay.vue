@@ -5,10 +5,12 @@
                 <div>
                     <h1>Incoming <br>Payment Request</h1>
 
-                    <div v-if="incomingPaymentRequest.message" v-html="messageFormatted" />
+                    <div v-if="incomingPaymentRequest.message">
+                        <h3>Message</h3>
+                        <div v-html="messageFormatted" />
+                    </div>
                     <div v-else class="no-message">
-                        This Payment Request does not have a message attached. If it's unclear to you head back to the
-                        originator of the request for clarification.
+                        This <strong>Payment Request</strong> does not have a message attached. If it's unclear to you what this request is all about, please head back to the originator for clarification.
                     </div>
 
                     <fees-and-amount :show-fee="false"
@@ -109,6 +111,18 @@
         .amount {
             margin-top: emRhythm(3);
             color: $color--comet-dark-mixed;
+        }
+
+        h3 {
+            color: $color--dark;
+        }
+
+        .no-message {
+            padding: emRhythm(2);
+            @include bleed-h(4);
+            color: $color--comet-dark;
+
+            background: $color--polo-medium;
         }
 
         footer {
