@@ -8,9 +8,20 @@
                     {{ $t('receive.detail-entry-request.pending.message__copy-link--success') }}
                 </h3>
             </template>
-            <base-button :is-outline="true" @click="copyUri">
-                {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
-            </base-button>
+            <base-split-button :is-outline="true">
+                <template slot="button" slot-scope="{ button }">
+                    <base-button @click="copyUri" v-bind="button">
+                        {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
+                    </base-button>
+                </template>
+                <template slot="flyout">
+                    <base-button :is-dark="true" :is-outline="true">Copy Address</base-button>
+                    <!--
+                    <h3>Copy Address</h3>
+                    <p>Copies the address to send Zcoin to only. Try to use is as rarely as possible, almost only when receiving from legacy wallets or external services like exchanges.</p>
+                    -->
+                </template>
+            </base-split-button>
         </timed-tooltip>
         <base-button color="green" @click="shareViaMail">
             {{ $t('receive.detail-entry-request.pending.button__share-via-email--pirmary') }}

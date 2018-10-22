@@ -230,8 +230,9 @@
         display: flex;
         justify-content: center;
 
-        /deep/ button + button,
-        /deep/ .popover + button {
+        &> div > /deep/ button + button,
+        &> div > /deep/ .popover + button,
+        &> div > /deep/ .split-button + button {
             margin-left: emRhythm(2);
         }
     }
