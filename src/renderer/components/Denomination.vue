@@ -66,7 +66,7 @@
 
             canIncrease () {
                 // fees for this increase are already subtracted by the parent element
-                return (this.current + 1) * convertToSatoshi(this.denomination) < this.availableBalance
+                return convertToSatoshi(this.denomination) < this.availableBalance
             },
 
             canDecrease () {
