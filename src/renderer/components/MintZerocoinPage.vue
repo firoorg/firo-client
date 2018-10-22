@@ -7,33 +7,35 @@
                     <p v-html="$t('mint.overview.description')"></p>
                 </header>
 
-                <denomination-selector :on-denomination-change="onDenominationChange"
-                                       :current-mint-costs="currentMintCostInSatoshi" />
+                <div class="content-wrapper">
+                    <denomination-selector :on-denomination-change="onDenominationChange"
+                                           :current-mint-costs="currentMintCostInSatoshi" />
 
-                <transition name="fade">
-                    <onboarding-notice v-if="!availableXzc" class="onboarding">
-                        <template slot="header">
-                            <h3>Looks like you do not have any coins.</h3>
-                        </template>
-                        <template slot="content">
-                            <p>If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.</p>
-                        </template>
-                    </onboarding-notice>
-                    <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
-                        <template slot="header">
-                            <h3>Stay Private, Stay Flexible</h3>
-                        </template>
-                        <template slot="content">
-                            <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – currently this ratio is undershot.</p>
-                            <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible to be able to spend funds privately without delay and extra waiting times in the future.</p>
-                        </template>
-                        <template slot="actions">
-                            <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
-                                Fill up mints now
-                            </base-onboarding-button>
-                        </template>
-                    </onboarding-notice>
-                </transition>
+                    <transition name="fade">
+                        <onboarding-notice v-if="!availableXzc" class="onboarding">
+                            <template slot="header">
+                                <h3>Looks like you do not have any coins.</h3>
+                            </template>
+                            <template slot="content">
+                                <p>If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.</p>
+                            </template>
+                        </onboarding-notice>
+                        <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
+                            <template slot="header">
+                                <h3>Stay Private, Stay Flexible</h3>
+                            </template>
+                            <template slot="content">
+                                <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – currently this ratio is undershot.</p>
+                                <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible to be able to spend funds privately without delay and extra waiting times in the future.</p>
+                            </template>
+                            <template slot="actions">
+                                <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
+                                    Fill up mints now
+                                </base-onboarding-button>
+                            </template>
+                        </onboarding-notice>
+                    </transition>
+                </div>
             </section>
         </div>
         <section class="current-mint-detail scrollable-height">
@@ -268,6 +270,10 @@
 
     .mint-selection {
         padding: emRhythm(5) emRhythm(4);
+        min-height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
 
         header {
             display: flex;
@@ -283,6 +289,13 @@
                 margin-left: emRhythm(4);
                 color: $color--polo-dark;
             }
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
     }
 
