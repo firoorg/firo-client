@@ -8,6 +8,7 @@
         class="vuetable-td-component-relative-date"
     >
         <payment-request-status :is-fulfilled="isFulfilled"
+                                :is-incoming="isIncoming"
                                 :is-reused="isReused"
                                 class="icon"
                                 :key="rowData.id" />
@@ -30,6 +31,10 @@
         computed: {
             isFulfilled () {
                 return this.rowData[this.rowField.isFulfilledKey || 'isFulfilled']
+            },
+
+            isIncoming () {
+                return this.rowData[this.rowField.transationsReceivedKey || 'isIncoming']
             },
 
             isReused () {

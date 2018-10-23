@@ -3,7 +3,7 @@
         <li v-for="(tx) in transactionsFormatted" :key="tx.id" :class="tx.className">
             <div class="icon">
                 <tick-icon v-if="tx.isConfirmed" :color="tx.className"></tick-icon>
-                <svg v-else height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><g fill="#53537a" fill-rule="evenodd"><circle cx="12.5" cy="9" r="1.25"/><circle cx="3.5" cy="9" r="1.25"/><circle cx="8" cy="9" r="1.25"/></g></svg>
+                <incoming-icon v-else />
             </div>
             <div>
                 <div class="label">
@@ -35,10 +35,12 @@
 <script>
     import { convertToCoin } from '#/lib/convert'
     import TickIcon from '@/components/Icons/TickIcon'
+    import IncomingIcon from '@/components/Icons/IncomingIcon'
 
     export default {
         name: 'TransactionsList',
         components: {
+            IncomingIcon,
             TickIcon
         },
         props: {

@@ -117,6 +117,9 @@
                 if (item.isFulfilled) {
                     classes.push('is-fulfilled')
                 }
+                if (item.isIncoming) {
+                    classes.push('is-incoming')
+                }
                 if (item.isReused) {
                     classes.push('is-reused')
                 }
@@ -369,6 +372,12 @@
                             &:hover td {
                                 background: mix($color--green-bright, $color--green, (100% * ($hover-opacity + $odd-opacity) / 2));
                             }
+                        }
+                    }
+
+                    &.is-incoming {
+                        /deep/ .payment-request-table-status path {
+                            fill: $color--white;
                         }
                     }
 
