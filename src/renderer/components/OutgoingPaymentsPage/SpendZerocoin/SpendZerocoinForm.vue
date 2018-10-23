@@ -78,8 +78,8 @@
 
     import { addVuexModel } from '@/utils/store'
     import ValidationMixin from '@/mixins/ValidationMixin'
-    import SpendDenominationSelector from '@/components/SpendZerocoinPage/SpendDenominationSelector'
-    import SelectedMintsList from '@/components/SpendZerocoinPage/SelectedMintsList'
+    import SpendDenominationSelector from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendDenominationSelector'
+    import SelectedMintsList from '@/components/OutgoingPaymentsPage/SpendZerocoin/SelectedMintsList'
 
     export default {
         name: 'SpendZerocoinForm',

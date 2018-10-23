@@ -31,12 +31,12 @@
     // import isEmpty from 'lodash/isEmpty'
     import types from '~/types'
 
-    import SendZcoinForm from '@/components/SendZcoinPage/SendZcoinForm'
-    import SendZcoinSteps from '@/components/SendZcoinPage/SendZcoinSteps'
+    import SendZcoinForm from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinForm'
+    import SendZcoinSteps from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinSteps'
 
     // import FeesAndAmount from '@/components/FeesAndAmount'
-    import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
-    import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
+    import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
+    import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
     // import PendingPayments from '@/components/payments/PendingPayments'
 
     import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'

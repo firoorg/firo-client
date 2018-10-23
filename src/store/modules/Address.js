@@ -28,13 +28,17 @@ const getTxBasics = function (tx) {
         seen = block.time < seen ? block.time : seen
     }
 
+    const index = txIndex || 0
+
     return {
-        id: txid,
-        index: txIndex || 0,
+        id: `${txid}-${index}`,
+        txid,
+        index,
         category,
         amount,
         firstSeenAt: seen,
-        block
+        block,
+        isPrivate: false
     }
 }
 
@@ -218,7 +222,8 @@ const actions = {
             stack: WALLET_ADDRESS_KEY,
             address,
             transaction: {
-                ...txBasics
+                ...txBasics,
+                isPrivate: true
             }
         })
     },
@@ -234,7 +239,8 @@ const actions = {
             address,
             transaction: {
                 ...txBasics,
-                label
+                label,
+                isPrivate: true
             }
         })
     },
@@ -360,8 +366,6 @@ const getters = {
                 })
             ]
         }, [])
-
-        console.log(txs)
 
         return txs
     }

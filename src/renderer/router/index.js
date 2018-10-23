@@ -32,20 +32,39 @@ export default new Router({
                     ]
                 },
                 {
-                    path: '/send',
-                    name: 'send-zcoin',
-                    component: require('@/components/SendZcoinPage').default
+                    path: '/payment',
+                    // component: require('@/components/SendZcoinPage').default,
+                    component: require('@/components/OutgoingPaymentsPage').default,
+                    children: [
+                        {
+                            path: ':id',
+                            name: 'outgoing-payment',
+                            component: require('@/components/OutgoingPaymentsPage/OutgoingPaymentDetail').default
+                        },
+                        {
+                            path: 'send',
+                            name: 'send-zcoin',
+                            component: require('@/components/OutgoingPaymentsPage/SendZcoin/Send.vue').default
+                        },
+                        {
+                            path: 'spend',
+                            name: 'spend-zerocoin',
+                            component: require('@/components/OutgoingPaymentsPage/SpendZerocoin/Spend.vue').default
+                        }
+                    ]
                 },
                 {
                     path: '/mint',
                     name: 'mint-zerocoin',
                     component: require('@/components/MintZerocoinPage').default
                 },
+                /*
                 {
                     path: '/spend',
                     name: 'spend-zerocoin',
                     component: require('@/components/SpendZerocoinPage').default
                 },
+                */
                 {
                     path: '/znode',
                     name: 'znode',

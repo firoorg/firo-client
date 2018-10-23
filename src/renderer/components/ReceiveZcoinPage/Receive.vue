@@ -167,74 +167,15 @@
 
 <style lang="scss" scoped>
     .receive {
-        background: $color--white;
-        padding: emRhythm(10) emRhythm(5) emRhythm(5);
-        // text-align: center;
-        color: $color--dark;
-
-        display: grid;
-        height: 100%;
-        grid-template-rows: auto 1fr;
+        @include detail-wrap();
     }
 
     .receive-header {
-        position: relative;
-        padding: 0 0 emRhythm(4);
-        margin-top: emRhythm(-1);
-
-        .inner {
-            position: relative;
-            // text-align: left;
-            z-index: 2;
-            padding-top: emRhythm(4);
-            margin-left: emRhythm(5);
-            mix-blend-mode: multiply;
-
-            h2 {
-                @include typo-headline();
-                margin: emRhythm(1, $ms-up2) 0;
-                mix-blend-mode: multiply;
-                // color: $heading-color;
-            }
-
-            & > span {
-                @include font-medium();
-                font-style: italic;
-                color: $color--comet-dark;
-            }
-        }
-
-        .status {
-            //max-width: emRhythm(25);
-            //margin: 0 auto;
-            opacity: 1;
-            display: flex;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            z-index: 1;
-            //max-height: 4rem;
-
-            & > div {
-                max-height: 7rem;
-                // border: 1px solid rgba(red, 0.2);
-                margin: auto 0;
-            }
-        }
+        @include detail-header();
     }
 
     .actions {
-        @include divider-top-with-gradient();
-        padding-bottom: 0;
-        display: flex;
-        justify-content: center;
-
-        &> div > /deep/ button + button,
-        &> div > /deep/ .popover + button,
-        &> div > /deep/ .split-button + button {
-            margin-left: emRhythm(2);
-        }
+        @include detail-actions();
     }
 
     // - - - - - - -

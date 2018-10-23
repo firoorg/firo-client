@@ -25,8 +25,8 @@
     import types from '~/types'
     import { convertToCoin } from '#/lib/convert'
 
-    import SendFromClipboardPopoverNewAddress from '@/components/SendZcoinPage/SendFromClipboardPopoverNewAddress'
-    import SendFromClipboardPopoverUsedAddress from '@/components/SendZcoinPage/SendFromClipboardPopoverUsedAddress'
+    import SendFromClipboardPopoverNewAddress from '@/components/OutgoingPaymentsPage/SendZcoin/SendFromClipboardPopoverNewAddress'
+    import SendFromClipboardPopoverUsedAddress from '@/components/OutgoingPaymentsPage/SendZcoin/SendFromClipboardPopoverUsedAddress'
 
     export default {
         name: 'SendFromClipboardPopover',

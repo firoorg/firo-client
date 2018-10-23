@@ -5,7 +5,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
+    import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
     import types from '~/types'
 
     export default {

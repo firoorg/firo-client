@@ -35,13 +35,13 @@
     // import isEmpty from 'lodash/isEmpty'
     import types from '~/types'
 
-    import SpendZerocoinForm from '@/components/SpendZerocoinPage/SpendZerocoinForm'
+    import SpendZerocoinForm from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinForm'
     import FeesAndAmount from '@/components/payments/FeesAndAmount'
-    import SpendZerocoinSteps from '@/components/SpendZerocoinPage/SpendZerocoinSteps'
+    import SpendZerocoinSteps from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinSteps'
 
     // import FeesAndAmount from '@/components/FeesAndAmount'
-    import SendConfirmDialog from '@/components/SendZcoinPage/SendConfirmDialog'
-    import SendFeeSelection from '@/components/SendZcoinPage/SendFeeSelection'
+    import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
+    import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
     // import PendingPayments from '@/components/payments/PendingPayments'
 
     import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'

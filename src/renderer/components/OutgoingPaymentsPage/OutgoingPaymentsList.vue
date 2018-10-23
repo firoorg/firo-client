@@ -11,8 +11,8 @@
                         :fields="tableFields"
                         track-by="id"
                         :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
-                        _selected-row="selectedPaymentRequest"
-                        _on-row-select="onTableRowSelect">
+                        :selected-row="selectedPayment"
+                        :on-row-select="onTableRowSelect">
             <template slot="label" slot-scope="props">
                 <natural-language-tags :content="props.rowData.label"></natural-language-tags>
             </template>
@@ -70,6 +70,12 @@
             FilterByUrlParamMixin
         ],
 
+        props: {
+            selectedPayment: {
+                default: null
+            }
+        },
+
         data () {
             return {
                 tableFields
@@ -96,6 +102,36 @@
         },
 
         methods: {
+            onTableRowSelect (rowData, index, event) {
+                console.log('rowData', rowData)
+                const { id } = rowData
+
+                console.log(this.$route)
+
+                const { id: currentRouterId } = this.$route.params
+
+                console.log(currentRouterId, id, currentRouterId === id)
+                // deselect
+                if (currentRouterId === id) {
+                    console.log('returning to send form')
+                    this.$emit('selection-change', {
+                        name: 'send-zcoin'
+                    })
+                } else {
+                    this.$emit('selection-change', {
+                        name: 'outgoing-payment',
+                        id
+                    })
+                }
+                /*
+                this.$router.push({
+                    name: 'outgoing-payment',
+                    params: {
+                        id
+                    }
+                })
+                */
+            },
             /*
             onTableRowSelect (rowData, index, event) {
                 // todo get paymentRequest from store

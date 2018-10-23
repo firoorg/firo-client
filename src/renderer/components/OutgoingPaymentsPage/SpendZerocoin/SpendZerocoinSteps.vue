@@ -59,10 +59,10 @@
     import types from '~/types'
 
     import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
-    import SpendZerocoinStepConfirm from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirm'
-    import SendAddToQueueButton from '@/components/SendZcoinPage/SendAddToQueueButton'
-    import SpendZerocoinStepStartButton from '@/components/SpendZerocoinPage/SpendZerocoinStepStartButton'
-    import SpendZerocoinStepConfirmButtons from '@/components/SpendZerocoinPage/SpendZerocoinStepConfirmButtons'
+    import SpendZerocoinStepConfirm from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinStepConfirm'
+    import SendAddToQueueButton from '@/components/OutgoingPaymentsPage/SendZcoin/SendAddToQueueButton'
+    import SpendZerocoinStepStartButton from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinStepStartButton'
+    import SpendZerocoinStepConfirmButtons from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinStepConfirmButtons'
     import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
 
     export default {

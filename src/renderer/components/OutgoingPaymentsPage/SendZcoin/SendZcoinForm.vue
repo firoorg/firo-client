@@ -66,7 +66,7 @@
     import { getDenominationsToSpend } from '#/lib/convert'
     import ValidationMixin from '@/mixins/ValidationMixin'
     import types from '~/types'
-    import SendPrivatePopover from '@/components/SendZcoinPage/SendPrivatePopover'
+    import SendPrivatePopover from '@/components/OutgoingPaymentsPage/SendZcoin/SendPrivatePopover'
 
     export default {
         name: 'SendZcoinForm',

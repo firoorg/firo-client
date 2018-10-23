@@ -12,7 +12,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import SpendDenomination from '@/components/SpendZerocoinPage/SpendDenomination'
+    import SpendDenomination from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendDenomination'
 
     export default {
         name: 'DenominationSelector',

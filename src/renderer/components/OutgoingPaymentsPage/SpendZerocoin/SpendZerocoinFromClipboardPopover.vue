@@ -25,8 +25,8 @@
     import types from '~/types'
     // import { convertToCoin } from '#/lib/convert'
 
-    import SpendZerocoinFromClipboardPopoverNewAddress from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopoverNewAddress'
-    import SpendZerocoinFromClipboardPopoverUsedAddress from '@/components/SpendZerocoinPage/SpendZerocoinFromClipboardPopoverUsedAddress'
+    import SpendZerocoinFromClipboardPopoverNewAddress from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinFromClipboardPopoverNewAddress'
+    import SpendZerocoinFromClipboardPopoverUsedAddress from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinFromClipboardPopoverUsedAddress'
 
     export default {
         name: 'SpendZerocoinFromClipboardPopover',

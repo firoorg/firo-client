@@ -3,7 +3,7 @@
         <h2 class="payments-headline">Payments
             <span v-if="transactions.length > 1">({{ transactions.length }})</span>
         </h2>
-        <div style="overflow: hidden" class="testing">
+        <div style="overflow: hidden" class="scrollable-container-wrap">
             <div :style="{ height: '100%' }">
                 <unexpected-transaction-popover :is-reused="isReused" :boundaries-element="null">
                     <transactions-list :transactions="transactions" class="scrollable-container" />
@@ -22,7 +22,7 @@
     import { nl2br } from '@/utils/format'
 
     import UnexpectedTransactionPopover from '@/components/ReceiveZcoinPage/UnexpectedTransactionPopover'
-    import TransactionsList from '@/components/ReceiveZcoinPage/TransactionsList'
+    import TransactionsList from '@/components/payments/TransactionsList'
 
     export default {
         name: 'ReceiveFulfilledPaymentRequest',
@@ -60,7 +60,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .testing {
+    .scrollable-container-wrap {
         overflow: hidden;
     }
 
