@@ -6,8 +6,9 @@
                 <span>Synced</span>
             </template>
             <template v-else>
-                <loading-bounce class="icon" color="green" size="mini"></loading-bounce>
-                <span>Syncing...</span>
+                <loading-bounce class="icon" :color="connections ? 'green' : 'comet'" size="mini"></loading-bounce>
+                <span v-if="connections">Syncing...</span>
+                <span v-else>Looking for Peers...</span>
             </template>
         </div>
         <div class="connections" :class="connectionClass">

@@ -45,6 +45,13 @@ export default {
             }
         }
 
+        &.comet {
+            .double-bounce1,
+            .double-bounce2 {
+                background-color: $color--comet-dark;
+            }
+        }
+
         &.small {
             width: emRhythm(3);
             height: emRhythm(3);
