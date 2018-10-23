@@ -16,3 +16,4 @@ thumbs.db
 *.pid
 zcoin-repo
 /zcoin-client-api
+/zcoin-client-api-development
