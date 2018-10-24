@@ -4,8 +4,11 @@
                        popover-class="green"
                        :on-timeout="hideCopySuccess">
             <template slot="content">
-                <h3>
+                <h3 v-if="showCopyType == 'link'">
                     {{ $t('receive.detail-entry-request.pending.message__copy-link--success') }}
+                </h3>
+                <h3 v-if="showCopyType == 'address'">
+                    {{ $t('receive.detail-entry-request.pending.message__copy-address--success') }}
                 </h3>
             </template>
             <base-split-button :is-outline="true">
@@ -15,7 +18,16 @@
                     </base-button>
                 </template>
                 <template slot="flyout">
-                    <base-button :is-dark="true" :is-outline="true">Copy Address</base-button>
+                    <nav class="menu">
+                        <ul>
+                            <li>
+                                <a href="#" v-close-popover @click.prevent="copyAddress">
+                                    {{ $t('receive.detail-entry-request.pending.button__copy-address--secondary') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <!--<base-button :is-dark="true" :is-outline="true">Copy Address</base-button>-->
                     <!--
                     <h3>Copy Address</h3>
                     <p>Copies the address to send Zcoin to only. Try to use is as rarely as possible, almost only when receiving from legacy wallets or external services like exchanges.</p>
@@ -70,7 +82,8 @@
 
         data () {
             return {
-                showCopySuccess: false
+                showCopySuccess: false,
+                showCopyType: ''
             }
         },
 
@@ -96,17 +109,25 @@
         methods: {
             shareViaMail () {
                 clipboard.writeHTML(this.$refs.emailTemplate.$el.innerHTML)
-                this.$electron.shell.openExternal('mailto:?subject=Zcoin Payment Request&body=please select this text and press cmd+v ;)')
+                this.$electron.shell.openExternal('mailto:?subject=Zcoin Payment Request&body=please select this text and paste the content of your clipboard ;)')
             },
 
             copyUri () {
-                console.log('coping to clipboard', this.getZcoinUri)
                 clipboard.writeText(this.getZcoinUri)
                 this.showCopySuccess = true
+                this.showCopyType = 'link'
+            },
+
+            copyAddress () {
+                const address = this.address.address || this.address
+                clipboard.writeText(address)
+                this.showCopySuccess = true
+                this.showCopyType = 'address'
             },
 
             hideCopySuccess () {
                 this.showCopySuccess = false
+                this.showCopyType = ''
             }
         }
     }

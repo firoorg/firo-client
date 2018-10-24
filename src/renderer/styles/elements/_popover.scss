@@ -186,6 +186,37 @@
                 }
             }
 
+            nav.menu {
+                ul {
+                    margin: emRhythm(-1.5, $silent: true) 0;
+                    padding: 0;
+                    list-style-type: none;
+
+                    li a {
+                        border: none;
+                        padding: emRhythm(1) emRhythm(1.5, $silent: true);
+                        margin: 0 emRhythm(-1.5, $silent: true);
+                    }
+                    li + li a {
+                        border-width: 0;
+                        @include rhythmBorderTop(1px, 1);
+                        border-color: $color--comet;
+                        border-style: solid;
+                    }
+
+                    a {
+                        display: block;
+                        color: $color--white-light;
+                        text-decoration: none;
+
+                        &:hover {
+                            color: $color--white;
+                            background: $color--comet-dark;
+                        }
+                    }
+                }
+            }
+
         }
 
         &.dark {

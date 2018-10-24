@@ -3,6 +3,7 @@
         <slot name="button" :button="$attrs" />
         <base-popover :open="false"
                       placement="auto-end"
+                      popover-class="advice"
                       :auto-hide="true">
             <template slot="content">
                 <slot name="flyout" />
