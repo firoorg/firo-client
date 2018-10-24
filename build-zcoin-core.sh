@@ -3,7 +3,7 @@
 # @see https://stackoverflow.com/a/246128/520544
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 REPO_NAME=zcoin
-REPO_BRANCH=client-api
+REPO_BRANCH=client-api-development
 REPO=$DIR/$REPO_NAME-$REPO_BRANCH
 
 NUMBER_OF_PROCESSORS=1
