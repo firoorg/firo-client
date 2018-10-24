@@ -7,7 +7,8 @@
 
 <script>
     import Lottie from 'vue-lottie'
-    import animationData from '@/assets/animations/pending-to-check-v3.json'
+    // import animationData from '@/assets/animations/pending-to-check-v3.json'
+    import animationData from '@/assets/animations/arrow_incoming.json'
 
     export default {
         name: 'PaymentRequestStatus',
@@ -16,6 +17,10 @@
         },
         props: {
             isFulfilled: {
+                type: Boolean,
+                default: false
+            },
+            isIncoming: {
                 type: Boolean,
                 default: false
             },
@@ -38,7 +43,7 @@
                 this.anim = anim
 
                 if (this.isFulfilled) {
-                    this.anim.goToAndStop(this.anim.getDuration(true), true)
+                    // this.anim.goToAndStop(this.anim.getDuration(true), true)
                 }
             },
 
@@ -78,5 +83,6 @@
 
     /deep/ svg {
         width: auto !important;
+        // background: rgba(255,0,0,0.2);
     }
 </style>
