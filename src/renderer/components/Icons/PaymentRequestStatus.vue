@@ -34,14 +34,16 @@
                 defaultOptions: {
                     animationData,
                     loop: false,
-                    autoplay: false
+                    autoplay: false,
+                    autoloadSegments: false
                 },
                 frames: {
                     isPending: 60,
                     isIncoming: 143,
                     isFulfilled: 182,
                     isReused: 215
-                }
+                },
+                stopAtFrame: 60
             }
         },
         methods: {
@@ -57,47 +59,40 @@
                 } else {
                     this.anim.goToAndStop(this.frames.isPending, true)
                 }
-            },
 
-            stop () {
-                this.anim.stop()
-            },
-
-            play () {
-                this.anim.play()
-            },
-
-            pause () {
-                this.anim.pause()
-            },
-
-            onSpeedChange () {
-                this.anim.setSpeed(this.animationSpeed)
+                this.anim.addEventListener('enterFrame', (el) => {
+                    if (el.currentTime > this.stopAtFrame) {
+                        this.anim.pause()
+                    }
+                })
             }
         },
 
         watch: {
             isIncoming (newVal) {
-                const { isPending, isIncoming } = this.frames
+                const { isIncoming } = this.frames
 
                 if (newVal) {
-                    this.anim.playSegments([ isPending, isIncoming ])
+                    this.stopAtFrame = isIncoming
+                    this.anim.play()
                 }
             },
 
             isFulfilled (newVal) {
-                const { isIncoming, isFulfilled } = this.frames
+                const { isFulfilled } = this.frames
 
                 if (newVal) {
-                    this.anim.playSegments([ isIncoming, isFulfilled ])
+                    this.stopAtFrame = isFulfilled
+                    this.anim.play()
                 }
             },
 
             isReused (newVal) {
-                const { isFulfulled, isReused } = this.frames
+                const { isReused } = this.frames
 
                 if (newVal) {
-                    this.anim.playSegments([ isFulfulled, isReused ])
+                    this.stopAtFrame = isReused
+                    this.anim.play()
                 }
             }
         }
