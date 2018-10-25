@@ -170,3 +170,7 @@ send:
       title: Select Fee
       description: Etiam porta sem malesuada magna mollis euismod. Praesent commodo cursus magna
       button__select-fee--primary: Select Fee
+
+    flyout-done:
+      title: Sucessfully send!
+      description: The payment is now on its way and will be confirmed by the network depending on your fee selection.

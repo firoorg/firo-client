@@ -12,6 +12,7 @@
                         track-by="id"
                         :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
                         :selected-row="selectedPayment"
+                        no-data-message="No Payments made yet."
                         :on-row-select="onTableRowSelect">
             <template slot="label" slot-scope="props">
                 <natural-language-tags :content="props.rowData.label"></natural-language-tags>
