@@ -11,6 +11,9 @@
                     <span v-if="isPrivate">{{ amountInBaseCoin }} XZC spend</span>
                     <span v-else>{{ amountInBaseCoin }} XZC send</span>
                 </div>
+                <div class="status outgoing-icon">
+                    <payment-status :is-confirmed="isConfirmed" />
+                </div>
             </header>
 
             <div>
@@ -33,14 +36,14 @@
     import { convertToCoin } from '#/lib/convert'
 
     import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
-    import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
+    import PaymentStatus from '@/components/Icons/PaymentStatus'
     import TransactionsList from '@/components/payments/TransactionsList'
 
     export default {
         name: 'outgoingPaymentDetail',
         components: {
 
-            PaymentRequestStatus,
+            PaymentStatus,
             NaturalLanguageTags,
             TransactionsList
             // 'qr-code': VueQRCodeComponent,

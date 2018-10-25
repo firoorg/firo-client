@@ -62,8 +62,15 @@
     .status {
         //border: 1px solid green;
         width: emRhythm(15);
-        margin-left: emRhythm(-1.25);
+        margin-left: emRhythm(-1.25, $silent: true);
         margin-bottom: emRhythm(-1);
+
+        &.outgoing-icon {
+            &> div {
+                margin-top: emRhythm(-4, $silent: true);
+                margin-bottom: emRhythm(4, $silent: true);
+            }
+        }
     }
 }
 
