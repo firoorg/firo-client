@@ -3,6 +3,7 @@
         <li v-for="(tx) in transactionsFormatted" :key="tx.id" :class="tx.className">
             <div class="icon">
                 <tick-icon v-if="tx.isConfirmed" :color="tx.className"></tick-icon>
+                <outgoing-icon v-else-if="tx.isOutgoing" />
                 <incoming-icon v-else />
             </div>
             <div>
@@ -36,10 +37,12 @@
     import { convertToCoin } from '#/lib/convert'
     import TickIcon from '@/components/Icons/TickIcon'
     import IncomingIcon from '@/components/Icons/IncomingIcon'
+    import OutgoingIcon from '@/components/Icons/OutgoingIcon'
 
     export default {
         name: 'TransactionsList',
         components: {
+            OutgoingIcon,
             IncomingIcon,
             TickIcon
         },
@@ -59,7 +62,7 @@
                 return this.transactions
                     .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
                     .map((tx, index) => {
-                        const { id, amount, firstSeenAt, confirmations } = tx
+                        const { id, amount, firstSeenAt, confirmations, category } = tx
                         const order = this.transactions.length - index - 1
 
                         return {
@@ -68,6 +71,7 @@
                             amount: convertToCoin(amount),
                             order,
                             isConfirmed: confirmations > 1,
+                            isOutgoing: category === 'send' || category === 'spendOut',
                             className: !order ? 'green' : 'warning' // order === index, 0 first received -> valid
                         }
                     })
