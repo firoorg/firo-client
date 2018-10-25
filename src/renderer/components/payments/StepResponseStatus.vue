@@ -3,34 +3,40 @@
         <!--<h1 v-if="isLoading">Loading</h1>-->
         <template v-if="isError">
             <div class="icon">
-                <send-confirmation-check />
+                <send-error />
             </div>
-            <h2>Failed! </h2>
+            <h2>An Error occurred!</h2>
             <p>{{ error.message }}</p>
             <em>code {{ error.code }}</em>
         </template>
         <template v-else-if="isValid">
             <div class="icon">
-                <send-confirmation-check />
+                <successfully-send />
             </div>
-            <h2>Successfully sent!</h2>
+            <h2>{{ $t(`${translationNamespace}.title`) }}</h2>
+            <p>{{ $t(`${translationNamespace}.description`) }}</p>
         </template>
     </div>
 </template>
 
 <script>
-    import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
     import AutoCloseMixin from '@/mixins/AutoCloseMixin'
+    import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
+
+    import SendError from '@/components/Icons/SendError'
+    import SuccessfullySend from '@/components/Icons/SucessfullySend'
 
     export default {
         name: 'StepResponseStatus',
 
         mixins: [
-            AutoCloseMixin
+            AutoCloseMixin,
+            TranslationNamespaceMixin
         ],
 
         components: {
-            SendConfirmationCheck
+            SendError,
+            SuccessfullySend
         },
 
         props: [
@@ -44,8 +50,8 @@
 
 <style lang="scss" scoped>
     .icon {
-        max-width: emRhythm(15);
-        margin: 0 auto emRhythm(2);
+        max-width: emRhythm(13);
+        margin: emRhythm(-6) auto emRhythm(2);
 
         & + h2 {
             margin-bottom: 0;
@@ -54,5 +60,9 @@
 
     .status {
         text-align: center;
+
+        p:last-child {
+            margin-bottom: 0;
+        }
     }
 </style>

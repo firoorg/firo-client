@@ -170,7 +170,8 @@
                                 error: this.responseError,
                                 onAutoClose: () => {
                                     this.onCancel()
-                                }
+                                },
+                                translationNamespace: 'send.public.flyout-done'
                             }
                         }
                     }
