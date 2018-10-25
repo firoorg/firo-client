@@ -27,7 +27,7 @@
                                  :is-outline="true">
                         <span>Pay anyway!</span>
                     </base-button>
-                    <base-button @click="goToPaymentDetail" color="comet">
+                    <base-button @click.prevent="goToPaymentDetail" color="comet">
                         <span>View Payment</span>
                     </base-button>
                 </footer>
@@ -102,9 +102,13 @@
 
                 console.log(tx)
 
+                const { id } = tx
+
                 this.$router.push({
                     name: 'outgoing-payment',
-                    id: tx.id
+                    params: {
+                        id
+                    }
                 })
             },
 
