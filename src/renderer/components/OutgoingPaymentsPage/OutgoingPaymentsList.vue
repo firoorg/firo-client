@@ -29,12 +29,12 @@
     import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
     import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
     import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
-    import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
+    import OutgoingPaymentTableStatus from '@/components/AnimatedTable/OutgoingPaymentTableStatus'
     import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 
     const tableFields = [
         {
-            name: PaymentRequestTableStatus,
+            name: OutgoingPaymentTableStatus,
             isFulfilledKey: 'isConfirmed',
             sortField: 'isConfirmed',
             width: '2rem'
