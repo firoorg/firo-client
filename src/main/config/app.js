@@ -3,7 +3,7 @@ export default {
     core: {
         autoRestart: false,
         stopOnQuit: true, // process.env.NODE_ENV === 'production',
-        heartbeatIntervalInSeconds: 10
+        heartbeatIntervalInSeconds: 5
     },
     folders: {
         encryption: {
