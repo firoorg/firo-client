@@ -25,6 +25,7 @@
                      class="status"
                      :class="{ 'is-fulfilled': isFulfilled }">
                     <payment-request-status :is-fulfilled="isFulfilled"
+                                            :is-incoming="isIncoming"
                                             :is-reused="isReused" />
                 </div>
             </header>
@@ -86,6 +87,7 @@
         props: [
             'transactionsReceived',
             'isFulfilled',
+            'isIncoming',
             'isReused',
             'label',
             'amount',
