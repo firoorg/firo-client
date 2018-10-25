@@ -43,14 +43,14 @@
             name: Amount,
             title: 'send.table__outgoing-payments.label__amount',
             sortField: 'amount',
-            width: '25%'
+            width: '20%'
         },
         {
             name: RelativeDate,
             title: 'send.table__outgoing-payments.label__sent',
             dateField: 'firstSeenAt',
             sortField: 'firstSeenAt',
-            width: '30%'
+            width: '25%'
         },
         {
             name: 'label',

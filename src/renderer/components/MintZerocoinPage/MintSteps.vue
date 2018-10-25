@@ -87,6 +87,13 @@
 
             submitButtonColor () {
                 return 'green'
+            },
+
+            getDoneStepProps () {
+                return {
+                    successIconComponentName: 'MintStarted',
+                    translationNamespace: 'mint.flyout-done'
+                }
             }
         },
 

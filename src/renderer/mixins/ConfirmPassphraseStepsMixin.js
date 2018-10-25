@@ -55,7 +55,8 @@ export default {
                             error: this.responseError,
                             onAutoClose: () => {
                                 this.onAutoClose()
-                            }
+                            },
+                            ...this.getDoneStepProps
                         }
                     }
                 }
@@ -85,6 +86,10 @@ export default {
             }
 
             return 'green'
+        },
+
+        getDoneStepProps () {
+            return {}
         }
     },
 

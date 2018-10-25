@@ -95,6 +95,10 @@ mint:
     placeholder__passphrase: Enter your Passphrase
     button__unlock-mint--primary: Unlock and mint
 
+  flyout-done:
+    title: Mint started!
+    description: The mint will now procecessed by the network.
+
 send:
   table__outgoing-payments:
     label__amount: Amount

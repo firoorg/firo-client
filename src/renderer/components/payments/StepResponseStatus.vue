@@ -11,7 +11,7 @@
         </template>
         <template v-else-if="isValid">
             <div class="icon">
-                <successfully-send />
+                <component :is="successIconComponentName" />
             </div>
             <h2>{{ $t(`${translationNamespace}.title`) }}</h2>
             <p>{{ $t(`${translationNamespace}.description`) }}</p>
@@ -25,6 +25,7 @@
 
     import SendError from '@/components/Icons/SendError'
     import SuccessfullySend from '@/components/Icons/SucessfullySend'
+    import MintStarted from '@/components/Icons/MintStarted'
 
     export default {
         name: 'StepResponseStatus',
@@ -36,15 +37,31 @@
 
         components: {
             SendError,
-            SuccessfullySend
+            SuccessfullySend,
+            MintStarted
         },
 
-        props: [
-            'isLoading',
-            'isValid',
-            'isError',
-            'error'
-        ]
+        props: {
+            successIconComponentName: {
+                type: String,
+                default: 'SuccessfullySend'
+            },
+            isLoading: {
+                type: Boolean,
+                default: false
+            },
+            isValid: {
+                type: Boolean,
+                default: false
+            },
+            isError: {
+                type: Boolean,
+                default: false
+            },
+            error: {
+                type: Object
+            }
+        }
     }
 </script>
 
