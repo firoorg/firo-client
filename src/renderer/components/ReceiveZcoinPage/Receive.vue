@@ -180,13 +180,6 @@
         @include detail-actions();
     }
 
-    .status {
-        //border: 1px solid green;
-        width: emRhythm(15);
-        margin-left: emRhythm(-1.25);
-        margin-bottom: emRhythm(-1);
-    }
-
     // - - - - - - -
 
     /*
