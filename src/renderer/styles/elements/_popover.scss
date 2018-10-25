@@ -356,6 +356,10 @@
 .popover {
     &.step-done {
         max-width: emRhythm(42);
+
+        .popover-inner {
+            padding-top: 0;
+        }
     }
 
     &.is-blurred {
