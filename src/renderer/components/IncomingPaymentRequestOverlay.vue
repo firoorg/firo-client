@@ -63,7 +63,8 @@
         computed: {
             ...mapGetters({
                 incomingPaymentRequest: 'Clipboard/incomingPaymentRequest',
-                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
+                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress',
+                getFirstPaymentToAddress: 'Address/getFirstPaymentToAddress'
             }),
 
             messageFormatted () {
@@ -92,6 +93,19 @@
 
             goToPaymentDetail () {
                 this.markAsNotified()
+
+                const tx = this.getFirstPaymentToAddress(this.incomingPaymentRequest.address)
+
+                if (!tx) {
+                    return
+                }
+
+                console.log(tx)
+
+                this.$router.push({
+                    name: 'outgoing-payment',
+                    id: tx.id
+                })
             },
 
             onSumbit () {

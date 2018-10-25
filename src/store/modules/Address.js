@@ -347,6 +347,19 @@ const getters = {
         }
     },
 
+    getFirstPaymentToAddress (state, getters, rootState, rootGetters) {
+        return (address) => {
+            if (!getters.hasAlreadySentToAddress(address)) {
+                return null
+            }
+
+            const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
+            const [ transaction ] = state[THIRD_PARTY_ADDRESS_KEY][address].transactions
+
+            return addConfirmationsToTransaction(transaction, currentBlockHeight)
+        }
+    },
+
     getOutgoingTransactions (state, getters, rootState, rootGetters) {
         const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
         const addresses = Object.keys(state[THIRD_PARTY_ADDRESS_KEY])
