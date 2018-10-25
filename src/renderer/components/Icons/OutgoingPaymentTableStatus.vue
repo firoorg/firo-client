@@ -1,5 +1,5 @@
 <template>
-    <div class="payment-request-table-status" :class="{ 'is-fulfilled': isFulfilled }">
+    <div class="payment-request-table-status" :class="{ 'is-confirmed': isConfirmed }">
         <tick-icon v-if="isConfirmed" />
         <outgoing-icon v-else />
     </div>
