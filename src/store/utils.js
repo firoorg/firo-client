@@ -38,6 +38,7 @@ export const addConfirmationsToTransaction = function (tx, currentBlockHeight) {
 
     return {
         ...tx,
-        confirmations: txConfirmations
+        confirmations: txConfirmations,
+        isConfirmed: !!txConfirmations
     }
 }

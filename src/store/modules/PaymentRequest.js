@@ -193,8 +193,6 @@ const getters = {
         const walletAddresses = rootGetters['Address/walletAddresses']
         let paymentRequests = []
 
-        console.log(paymentRequestsKeys)
-
         walletAddresses.forEach((walletAddress) => {
             const { address, transactions } = walletAddress
 
@@ -206,6 +204,11 @@ const getters = {
                 return
             }
 
+            const isFulfilled = transactions.some((tx) => {
+                // return tx.confirmations && tx.confirmations > 0
+                return tx.isConfirmed
+            })
+
             const tags = transactions.reduce((accumulator, tx) => {
                 const tag = `#${tx.category}`
 
@@ -214,7 +217,8 @@ const getters = {
 
             paymentRequests.push({
                 address,
-                isFulfilled: true,
+                isFulfilled,
+                isIncoming: !isFulfilled,
                 isVirtual: true,
                 transactionsReceived: true,
                 amount: null,

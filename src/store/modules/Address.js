@@ -317,7 +317,7 @@ const getters = {
                 transactions: txs,
                 hasTransactions: !!txs.length,
                 isReused: txs.length > 1,
-                isConfirmed: confirmations >= 6,
+                isConfirmed: confirmations >= 1,
                 confirmations
             }
         })
@@ -359,10 +359,7 @@ const getters = {
                 ...address.transactions.map((transaction) => {
                     const tx = addConfirmationsToTransaction(transaction, currentBlockHeight)
 
-                    return {
-                        ...tx,
-                        isConfirmed: !!tx.confirmations
-                    }
+                    return tx
                 })
             ]
         }, [])

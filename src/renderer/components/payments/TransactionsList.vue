@@ -62,7 +62,7 @@
                 return this.transactions
                     .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
                     .map((tx, index) => {
-                        const { id, amount, firstSeenAt, confirmations, category } = tx
+                        const { id, amount, firstSeenAt, confirmations, isConfirmed, category } = tx
                         const order = this.transactions.length - index - 1
 
                         return {
@@ -70,7 +70,8 @@
                             firstSeenAt,
                             amount: convertToCoin(amount),
                             order,
-                            isConfirmed: confirmations > 1,
+                            confirmations,
+                            isConfirmed,
                             isOutgoing: category === 'send' || category === 'spendOut',
                             className: !order ? 'green' : 'warning' // order === index, 0 first received -> valid
                         }
