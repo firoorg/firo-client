@@ -8,7 +8,7 @@
 <script>
     import Lottie from 'vue-lottie'
     // import animationData from '@/assets/animations/pending-to-check-v3.json'
-    import animationData from '@/assets/animations/arrow_incoming.json'
+    import animationData from '@/assets/animations/payment-request-states.json'
 
     export default {
         name: 'PaymentRequestStatus',
@@ -35,6 +35,12 @@
                     animationData,
                     loop: false,
                     autoplay: false
+                },
+                frames: {
+                    isPending: 60,
+                    isIncoming: 143,
+                    isFulfilled: 182,
+                    isReused: 215
                 }
             }
         },
@@ -42,8 +48,14 @@
             handleAnimation (anim) {
                 this.anim = anim
 
-                if (this.isFulfilled) {
-                    // this.anim.goToAndStop(this.anim.getDuration(true), true)
+                if (this.isIncoming) {
+                    this.anim.goToAndStop(this.frames.isIncoming, true)
+                } else if (this.isFulfilled) {
+                    this.anim.goToAndStop(this.frames.isFulfilled, true)
+                } else if (this.isReused) {
+                    this.anim.goToAndStop(this.frames.isReused, true)
+                } else {
+                    this.anim.goToAndStop(this.frames.isPending, true)
                 }
             },
 
@@ -65,10 +77,27 @@
         },
 
         watch: {
-            isFulfilled (newVal, oldVal) {
-                console.log('isFulfilled changed from', oldVal, newVal)
+            isIncoming (newVal) {
+                const { isPending, isIncoming } = this.frames
+
                 if (newVal) {
-                    this.anim.play()
+                    this.anim.playSegments([ isPending, isIncoming ])
+                }
+            },
+
+            isFulfilled (newVal) {
+                const { isIncoming, isFulfilled } = this.frames
+
+                if (newVal) {
+                    this.anim.playSegments([ isIncoming, isFulfilled ])
+                }
+            },
+
+            isReused (newVal) {
+                const { isFulfulled, isReused } = this.frames
+
+                if (newVal) {
+                    this.anim.playSegments([ isFulfulled, isReused ])
                 }
             }
         }
@@ -79,6 +108,7 @@
     .payment-request-status-animation {
         height: 100%;
         display: inline-block;
+        padding-left: emRhythm(1);
     }
 
     /deep/ svg {
