@@ -2,9 +2,11 @@
     <section class="outgoing-payments">
         <div class="scrollable-height">
             <section class="outgoing-requests-list">
-                <send-from-clipboard-popover :boundaries-element="boundariesElement">
+                <component :is="fromClipboardPopoverName"
+                           :boundaries-element="boundariesElement"
+                            @update-form="onFormUpdateFromClipboardPopover">
                     <h1 v-html="$t('send.public.overview.title')"></h1>
-                </send-from-clipboard-popover>
+                </component>
 
                 <outgoing-payments-list :selected-payment="selectedPaymentId"
                                         @selection-change="onRowSelect" />
@@ -27,6 +29,7 @@
     import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
 
     import SendFromClipboardPopover from '@/components/OutgoingPaymentsPage/SendZcoin/SendFromClipboardPopover'
+    import SpendZerocoinFromClipboardPopover from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinFromClipboardPopover'
     import OutgoingPaymentsList from '@/components/OutgoingPaymentsPage/OutgoingPaymentsList'
 
     export default {
@@ -34,7 +37,8 @@
 
         components: {
             OutgoingPaymentsList,
-            SendFromClipboardPopover
+            SendFromClipboardPopover,
+            SpendZerocoinFromClipboardPopover
         },
 
         mixins: [
@@ -55,6 +59,12 @@
                 const { id } = this.$route.params
 
                 return id || null
+            },
+
+            fromClipboardPopoverName () {
+                const prefix = this.$route.meta.isPublic ? 'Send' : 'SpendZerocoin'
+
+                return `${prefix}FromClipboardPopover`
             }
         },
 
@@ -67,6 +77,13 @@
                     params: {
                         id
                     }
+                })
+            },
+            onFormUpdateFromClipboardPopover (event) {
+                const { name } = event
+
+                this.pushRouterWithFilter({
+                    name
                 })
             }
         }

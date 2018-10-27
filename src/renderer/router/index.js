@@ -43,12 +43,18 @@ export default new Router({
                                 {
                                     path: ':id',
                                     name: 'public-payment',
-                                    component: require('@/components/OutgoingPaymentsPage/OutgoingPaymentDetail').default
+                                    component: require('@/components/OutgoingPaymentsPage/OutgoingPaymentDetail').default,
+                                    meta: {
+                                        isPublic: true
+                                    }
                                 },
                                 {
                                     path: '',
                                     name: 'send-zcoin',
-                                    component: require('@/components/OutgoingPaymentsPage/SendZcoin/Send.vue').default
+                                    component: require('@/components/OutgoingPaymentsPage/SendZcoin/Send.vue').default,
+                                    meta: {
+                                        isPublic: true
+                                    }
                                 }
                             ]
                         },
@@ -59,12 +65,18 @@ export default new Router({
                                 {
                                     path: ':id',
                                     name: 'private-payment',
-                                    component: require('@/components/OutgoingPaymentsPage/OutgoingPaymentDetail').default
+                                    component: require('@/components/OutgoingPaymentsPage/OutgoingPaymentDetail').default,
+                                    meta: {
+                                        isPublic: false
+                                    }
                                 },
                                 {
                                     path: '',
                                     name: 'spend-zerocoin',
-                                    component: require('@/components/OutgoingPaymentsPage/SpendZerocoin/Spend.vue').default
+                                    component: require('@/components/OutgoingPaymentsPage/SpendZerocoin/Spend.vue').default,
+                                    meta: {
+                                        isPublic: false
+                                    }
                                 }
                             ]
                         }

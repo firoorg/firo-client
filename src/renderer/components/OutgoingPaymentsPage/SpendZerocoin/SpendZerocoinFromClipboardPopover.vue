@@ -87,6 +87,10 @@
                 */
 
                 this.markAsNotified()
+
+                this.$emit('update-form', {
+                    name: 'spend-zerocoin'
+                })
             }
         }
     }
