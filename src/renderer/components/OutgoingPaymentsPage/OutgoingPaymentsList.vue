@@ -105,13 +105,14 @@
         methods: {
             onTableRowSelect (rowData, index, event) {
                 console.log('rowData', rowData)
-                const { id } = rowData
+                const { id, isPrivate } = rowData
 
                 console.log(this.$route)
 
                 const { id: currentRouterId } = this.$route.params
 
-                console.log(currentRouterId, id, currentRouterId === id)
+                // console.log(currentRouterId, id, currentRouterId === id)
+                console.log('isPrivate', isPrivate)
                 // deselect
                 if (currentRouterId === id) {
                     console.log('returning to send form')
@@ -120,7 +121,7 @@
                     })
                 } else {
                     this.$emit('selection-change', {
-                        name: 'outgoing-payment',
+                        name: 'public-payment',
                         id
                     })
                 }

@@ -13,7 +13,6 @@
         <section class="paymentrequest-detail">
             <transition name="fade" mode="out-in">
                 <router-view :key="$route.path"
-                             v-bind="selectedPayment"
                              :boundaries-element="boundariesElement"
                              class="paymentrequest-detail-route" />
             </transition>
@@ -43,7 +42,8 @@
         ],
 
         props: [
-            'boundariesElement'
+            'boundariesElement',
+            'isPrivate'
         ],
 
         computed: {
@@ -52,51 +52,9 @@
             }),
 
             selectedPaymentId () {
-                return this.selectedPayment ? this.selectedPayment.id : null
-            },
+                const { id } = this.$route.params
 
-            selectedPayment () {
-                const { id: detailId } = this.$route.params
-
-                console.log(detailId)
-
-                if (!detailId) {
-                    return null
-                }
-
-                const detailTx = this.transactions.find((tx) => {
-                    const { id } = tx
-
-                    return id === detailId
-                })
-
-                console.log(detailTx)
-
-                return detailTx
-
-                /*
-                // console.log(this.$store.state.Address.addresses)
-                const getter = this.$store.state.Address.addresses
-                // const getter = this.$store.state['Zcoin/addresses']
-
-                const filteredAddress = getter.filter((address) => {
-                    return address.address === this.selectedPaymentRequest
-                })
-
-                console.log(filteredAddress)
-
-                const address = filteredAddress.length ? filteredAddress[0] : null
-                const [ paymentRequest ] = this.paymentRequests.filter((request) => {
-                    return request.address === this.selectedPaymentRequest
-                })
-
-                console.log(paymentRequest)
-
-                return {
-                    ...paymentRequest,
-                    address
-                }
-                */
+                return id || null
             }
         },
 
@@ -111,19 +69,6 @@
                     }
                 })
             }
-            /*
-            onTableRowSelect (rowData, index, event) {
-                // todo get paymentRequest from store
-                this.selectedPaymentRequest = rowData.address
-
-                this.pushRouterWithFilter({
-                    name: 'send-zcoin-paymentrequest',
-                    params: {
-                        address: this.selectedPaymentRequest
-                    }
-                })
-            }
-            */
         }
     }
 </script>
