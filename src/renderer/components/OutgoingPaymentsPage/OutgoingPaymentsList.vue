@@ -107,13 +107,9 @@
                 console.log('rowData', rowData)
                 const { id, isPrivate } = rowData
 
-                console.log(this.$route)
-
                 const { id: currentRouterId } = this.$route.params
 
-                // console.log(currentRouterId, id, currentRouterId === id)
-                console.log('isPrivate', isPrivate)
-                // deselect
+                // already selected. removing selection
                 if (currentRouterId === id) {
                     console.log('returning to send form')
                     this.$emit('selection-change', {
@@ -121,7 +117,7 @@
                     })
                 } else {
                     this.$emit('selection-change', {
-                        name: 'public-payment',
+                        name: `${isPrivate ? 'private' : 'public'}-payment`,
                         id
                     })
                 }
