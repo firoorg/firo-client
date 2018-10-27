@@ -69,6 +69,10 @@ module.exports = {
         thirdPartyAddresses: {}
     },
 
+    AddressValidation: {
+        addressToValidate: ''
+    },
+
     Mint: { // daemon: isSubscription
         isLoading: false,
         currentDenominations: {},

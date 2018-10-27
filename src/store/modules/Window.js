@@ -1,6 +1,7 @@
 const state = {
     welcomeGuide: false,
-    settings: false
+    settings: false,
+    validateAddress: false
 }
 
 const mutations = {

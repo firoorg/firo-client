@@ -1,4 +1,5 @@
 @import '~lato-font/scss/public-api';
+
 $lato-font-path: ''; // font-faces are loaded directly via App.vue -> styles.
 
 // Your settings for Typesettings :)
@@ -36,6 +37,33 @@ $weight--button: 'heavy'; //$weight--label;
 
 @mixin typo-button() {
     @include lato-font($weight--btton);
+}
+
+@mixin popover-inline-button() {
+    color: $color--white-light;
+    font-style: normal;
+    text-decoration: none;
+    background: rgba($color--dark, 0.3);
+    @include setType(2, $ms-down2);
+    text-transform: uppercase;
+    letter-spacing: 0.025rem;
+    display: inline-block;
+    padding: emRhythm(0.75, $silent: true) emRhythm(1);
+    margin: -1 * emRhythm(0.75, $silent: true) 0;
+    border-radius: emRhythm(0.25, $silent: true);
+
+    transition: color 0.15s ease-out, background 0.15s ease-out;
+
+    //position: absolute;
+    //right: 0;
+    //margin-right: -50%;
+    //top: 0;
+
+    &:hover,
+    &:focus {
+        color: $color--white;
+        background: rgba($color--dark, 0.85);
+    }
 }
 
 h1, h2, h3, h4, h5, h6 {

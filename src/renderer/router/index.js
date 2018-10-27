@@ -98,6 +98,16 @@ export default new Router({
                     component: require('@/components/SettingsPage').default
                 }
             ]
+        },
+        {
+            path: '/validate-address',
+            component: require('@/layouts/ValidateAddress').default,
+            children: [
+                {
+                    path: '',
+                    component: require('@/components/payments/AddressToValidate.vue').default
+                }
+            ]
         }
     ]
 })

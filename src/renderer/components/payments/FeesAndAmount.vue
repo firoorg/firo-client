@@ -120,29 +120,6 @@
     }
 
     .change-fee {
-        color: $color--white-light;
-        font-style: normal;
-        text-decoration: none;
-        background: rgba($color--dark, 0.3);
-        @include setType(2, $ms-down2);
-        text-transform: uppercase;
-        letter-spacing: 0.025rem;
-        display: inline-block;
-        padding: emRhythm(0.75, $silent: true) emRhythm(1);
-        margin: -1 * emRhythm(0.75, $silent: true) 0;
-        border-radius: emRhythm(0.25, $silent: true);
-
-        transition: color 0.15s ease-out, background 0.15s ease-out;
-
-        //position: absolute;
-        //right: 0;
-        //margin-right: -50%;
-        //top: 0;
-
-        &:hover,
-        &:focus {
-            color: $color--white;
-            background: rgba($color--dark, 0.85);
-        }
+        @include popover-inline-button();
     }
 </style>

@@ -112,11 +112,18 @@ export default {
             parent = currentWindows.get(parent)
         }
 
+        // custom setters
+        const { aspectRatio } = windowProps
+
         const window = new BrowserWindow({
             ...windowProps,
             parent,
             show: !!windowProps.modal // windows will be auto-opened on ready-to-show to prevent flickering
         })
+
+        if (aspectRatio) {
+            window.setAspectRatio(aspectRatio)
+        }
         this.addWindowEvents(name, window)
         window.loadURL(this.getWindowUrl(url))
 

@@ -18,4 +18,5 @@
 
 <style>
     @import '../../node_modules/lato-font/css/lato-font.css';
+    @import '../../node_modules/typeface-overpass-mono/index.css';
 </style>

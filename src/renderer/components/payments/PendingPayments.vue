@@ -1,9 +1,12 @@
 <template>
-    <ul class="payments">
+    <ul class="payments" :class="{ 'show-validate': showValidate }">
         <li v-for="(value, key) in payments" :key="key">
             <div class="label">
                 <!--<slot v-bind="value" />-->
                 {{ value.label }}
+            </div>
+            <div class="validate" v-if="showValidate">
+                <a href="#" class="validate-address" @click.prevent.blur="() => validateAddress(value.address)">Show Address</a>
             </div>
             <div class="amount">
                 {{ value.amountAsBaseCoin }} <span class="unit">xzc</span>
@@ -13,12 +16,33 @@
 </template>
 
 <script>
+    import { mapActions } from 'vuex'
+    import types from '~/types'
+
+    console.log(types)
+
     export default {
         name: 'PendingPayments',
         props: {
+            showValidate: {
+                type: Boolean,
+                default: true
+            },
+
             payments: {
                 type: Array,
                 required: true
+            }
+        },
+
+        methods: {
+            ...mapActions({
+                showAddressValidation: types.addressvalidation.SHOW_ADDRESS_VALIDATION
+            }),
+
+            validateAddress (address) {
+                console.log('validate address', address)
+                this.showAddressValidation(address)
             }
         }
     }
@@ -32,6 +56,29 @@
         border-bottom-style: solid;
         @include rhythmBorderBottom(1px, 1);
         margin: 0;
+
+        &.show-validate li {
+            grid-template-areas: "label label"
+                                 "validate amount";
+
+            .label {
+                grid-area: label;
+                margin-bottom: emRhythm(0.5, $silent: true);
+
+            }
+
+            .validate {
+                grid-area: validate;
+
+                a {
+                    @include popover-inline-button();
+                }
+            }
+
+            .amount {
+                grid-area: amount;
+            }
+        }
 
         li {
             padding-top: emRhythm(1);
@@ -48,9 +95,16 @@
                 padding-bottom: emRhythm(1);
             };
 
+            .validate-address {
+            }
+
             .amount {
                 align-self: end;
                 text-align: right;
+
+                .unit {
+                    opacity: 0.55;
+                }
             }
         }
     }
