@@ -10,9 +10,9 @@
 
                     <form>
                         <!--<input type="text" placeholder="Search for xxx">-->
-                        <div class="internal-only">
+                        <!--<div class="internal-only">
                             For Internal Use Only!!!
-                        </div>
+                        </div>-->
                     </form>
                 </section>
 

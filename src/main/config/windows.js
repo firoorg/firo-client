@@ -11,9 +11,8 @@ export default {
     },
     validateAddress: {
         url: 'validate-address',
-        show: true,
+        show: false,
         window: {
-            // parent: 'main',
             backgroundColor: '#1F1F2E',
             center: true,
             maximizable: false,

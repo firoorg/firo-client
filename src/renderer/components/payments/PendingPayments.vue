@@ -19,8 +19,6 @@
     import { mapActions } from 'vuex'
     import types from '~/types'
 
-    console.log(types)
-
     export default {
         name: 'PendingPayments',
         props: {
@@ -41,7 +39,6 @@
             }),
 
             validateAddress (address) {
-                console.log('validate address', address)
                 this.showAddressValidation(address)
             }
         }
