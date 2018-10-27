@@ -126,11 +126,15 @@
         }
 
         label {
+            //@include glow-huge-box();
+            // @include glow-small-box();
+            // @include glow-small-box ($color: rgba($color--dark, 0.5), $yOff: 0.5rem, $blur: 2.5rem);
             position: relative;
             z-index: 2;
             cursor: pointer;
             text-align: center;
-            background: rgba($color--white, 0.1);
+            background: rgba($color--dark, 0.15);
+            color: $color--comet-light;
             display: block;
             padding: emRhythm(1);
             box-sizing: border-box;
@@ -144,7 +148,7 @@
 
             &:hover {
                 border: 1px solid rgba($color--dark, 0.6);
-                background: rgba($color--dark, 0.2);
+                background: rgba($color--dark, 0.3);
                 color: $color--comet-light;
             }
 
