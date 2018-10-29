@@ -144,8 +144,6 @@ const actions = {
     },
 
     [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch }, block) {
-        console.log('ON_BLOCK_SUBSCRIPTION')
-
         dispatch(types.SET_INITIAL_STATE, block)
     },
 
