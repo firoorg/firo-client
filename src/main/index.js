@@ -1,6 +1,7 @@
 'use strict'
 
 import Debug from 'debug'
+import os from 'os'
 import { app } from 'electron'
 import { join } from 'path'
 
@@ -29,7 +30,11 @@ if (process.env.NODE_ENV !== 'development') {
 // const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
 const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
 const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
-const zcoindPath = join(unpackedRootFolder, '/assets/core/zcoind')
+// todo add .exe for windows binaries
+const platform = os.platform()
+console.log('ELECTRON RUNNING ON', platform)
+const zcoindName = platform === 'win32' ? 'zcoind.exe' : 'zcoind'
+const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindName}`)
 // todo test .pid in application support
 const userDataPath = process.env.NODE_ENV === 'development' ? rootFolder + '/assets/core' : app.getPath('userData')
 const pathToStorePid = userDataPath

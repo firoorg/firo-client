@@ -6,7 +6,7 @@
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
-    "build": "node .electron-vue/build.js && electron-builder",
+    "build": "node .electron-vue/build.js && electron-builder build -mlw",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
@@ -37,7 +37,7 @@
       "assets/core/**/*"
     ],
     "asarUnpack": [
-      "**/assets/core/*"
+      "**/assets/core/**/*"
     ],
     "dmg": {
       "background": "assets/images/background.png",
@@ -57,13 +57,25 @@
       ]
     },
     "mac": {
-      "icon": "assets/icons/icon.icns"
+      "icon": "assets/icons/icon.icns",
+      "files": [
+        "!assets/core/linux",
+        "!assets/core/win32"
+      ]
     },
     "win": {
-      "icon": "assets/icons/icon.ico"
+      "icon": "assets/icons/icon.ico",
+      "files": [
+        "!assets/core/linux",
+        "!assets/core/darwin"
+      ]
     },
     "linux": {
-      "icon": "assets/icons"
+      "icon": "assets/icons",
+      "files": [
+        "!assets/core/darwin",
+        "!assets/core/win32"
+      ]
     }
   },
   "dependencies": {
