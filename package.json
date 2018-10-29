@@ -1,7 +1,7 @@
 {
   "name": "zcoin-client",
-  "version": "0.0.1",
   "author": "Jörn Röder <kontakt@joernroeder.de>",
+  "version": "0.1.0",
   "description": "Official Zcoin Client",
   "license": null,
   "main": "./dist/electron/main.js",
