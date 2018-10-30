@@ -79,7 +79,7 @@ mint:
 
   detail-process-mint:
     title: Mints in Progress
-    description: This shows the progress of your mints. Each mint needs 6 confirmations before it can be spent.
+    description: This shows the progress of your mint. A mint needs 6 confirmations before it can be spent. | This shows the progress of your mints. Each mint needs 6 confirmations before it can be spent.
 
   detail-create-mint:
     title: Create Mint
@@ -89,7 +89,7 @@ mint:
 
   flyout-confirm-mint:
     title: Confirm Mint
-    description: Here's a breakdown of your mints along with the fee. Looks OK?
+    description: Here's a breakdown of your mint along with the fee. Looks OK? | Here's a breakdown of your mints along with the fee. Looks OK?
     label__fees: Fees
     label__amount: Total
     button__mint-confirm--primary: Start minting!
@@ -104,7 +104,7 @@ mint:
 
   flyout-done:
     title: Minting in Progress
-    description: The mint(s) are now being procecessed by the network.
+    description: The mint is now being procecessed by the network. | The mints are now being procecessed by the network.
 
 
   flyout-process-mints:
