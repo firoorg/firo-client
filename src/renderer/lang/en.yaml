@@ -1,4 +1,5 @@
 #
+#
 # Naming follows [BEM](http://getbem.com) (Block Element Modifier) naming conventions
 # nested in logical groups of visually related elements.
 #
@@ -75,11 +76,11 @@ receive:
 mint:
   overview:
     title: Anonymize</br>Zcoin
-    description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
+    description: Here's where you can anonymize your coins. We call this minting because when you destroy your old coin, a new Zerocoin is created or minted. This Zerocoin can later be redeemed for a new coin with no transaction history in a Private Spend.
 
   detail-process-mint:
     title: Mints in Progress
-    description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+    description: This shows the progress of your mints. Each mint needs 6 confirmations before it can be spent.
 
   detail-create-mint:
     title: Create Mint
@@ -89,7 +90,7 @@ mint:
 
   flyout-confirm-mint:
     title: Confirm Mint
-    description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+    description: Here's a breakdown of your mints along with the fee. Looks OK?
     label__fees: Fees
     label__amount: Total
     button__mint-confirm--primary: Start minting!
@@ -97,14 +98,14 @@ mint:
 
   flyout-unlock-client:
     title: Unlock Client
-    description: Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
+    description: Mints are transactions so your wallet needs to be unlocked. Please enter your passphrase.
     label__passphrase: Passphrase
     placeholder__passphrase: Enter your Passphrase
     button__unlock-mint--primary: Unlock and mint
 
   flyout-done:
-    title: Mint started!
-    description: The mint will now procecessed by the network.
+    title: Minting in Progress
+    description: The mint(s) are now being procecessed by the network.
 
 
   flyout-process-mints:
