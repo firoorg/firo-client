@@ -83,21 +83,25 @@ export default {
         debug('getting api status')
 
         const { host, port } = CONFIG.network.status
-        const apiStatus = await getApiStatus({
-            host,
-            port
-        })
 
-        const { network: NETWORK } = apiStatus.data
-        const appConfig = CONFIG.network.networks[NETWORK] || {}
-
-        debug('got api status', apiStatus)
-
-        populateStore({ apiStatus, dispatch })
-
-        const encryption = apiStatus.data && apiStatus.data.devAuth ? this.setupEncryption(apiStatus.data.dataDir) : null
+        let appConfig = null
+        let encryption = null
 
         try {
+            const apiStatus = await getApiStatus({
+                host,
+                port
+            })
+
+            const {network: NETWORK} = apiStatus.data
+            appConfig = CONFIG.network.networks[NETWORK] || {}
+
+            debug('got api status', apiStatus)
+
+            populateStore({apiStatus, dispatch})
+
+            encryption = apiStatus.data && apiStatus.data.devAuth ? this.setupEncryption(apiStatus.data.dataDir) : null
+
             const warmedUpApiStatus = await waitForApi({
                 host,
                 port,
@@ -106,7 +110,7 @@ export default {
             })
 
             // update store with warmed up values
-            populateStore({ apiStatus: warmedUpApiStatus, dispatch })
+            populateStore({apiStatus: warmedUpApiStatus, dispatch})
         } catch (e) {
             debug('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...
@@ -114,8 +118,17 @@ export default {
             return
         }
 
-        debug('api loaded! setting up modules...')
+        try {
+            debug('api loaded! setting up modules...', encryption)
+            this.setupNetworkModules({appConfig, encryption})
+        } catch (e) {
+            console.log('------------------------------------------')
+            console.log(e)
+            console.log('------------------------------------------')
+        }
+    },
 
+    setupNetworkModules ({ appConfig, encryption }) {
         Object.keys(modules).forEach((moduleName) => {
             const config = {
                 ...appConfig,

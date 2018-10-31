@@ -39,7 +39,7 @@ export const tryUntil = async function ({
     functionToTry,
     validator,
     ttlInSeconds,
-    retryInterval = 100,
+    retryInterval = 200,
     errorMessage = 'tryUntil timed out'
 }) {
     let start = Date.now()

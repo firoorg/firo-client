@@ -3,10 +3,12 @@ import types from '~/types'
 
 import { tryUntil } from '#/lib/utils'
 
-let apiStatus = zmq.socket('req')
+// let apiStatus = zmq.socket('req')
 
 export const getApiStatus = async function ({ host, port }) {
+    let apiStatus = zmq.socket('req')
     const uri = `${host}:${port}`
+
     apiStatus.connect(uri)
 
     return new Promise((resolve, reject) => {
@@ -20,7 +22,10 @@ export const getApiStatus = async function ({ host, port }) {
                 }
                 resolve({ data, meta })
             } catch (e) {
-
+                reject(new Error('error occured during api status fetching.', e))
+            } finally {
+                console.log('closig api status')
+                apiStatus.close()
             }
         })
 
@@ -33,7 +38,8 @@ export const getApiStatus = async function ({ host, port }) {
 
 export const closeApiStatus = function () {
     try {
-        apiStatus.close()
+        console.log('deprecated...')
+        // apiStatus.close()
     } catch (e) {
         console.log('api status close', e)
     }
@@ -43,7 +49,9 @@ export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds 
     const validator = ({ status, data }) => {
         const { modules = {} } = data
 
-        return status === 200 && modules.API
+        console.log('validating --------->', status, data)
+
+        return status === 200 && modules.API && false
     }
 
     const { meta, data } = apiStatus
