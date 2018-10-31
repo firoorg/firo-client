@@ -3,12 +3,17 @@ import * as types from '../types/Network'
 
 const state = {
     isConnected: false,
+    connectionSeemsLost: false,
     connectionErrorCode: 0
 }
 
 const mutations = {
     [types.NETWORK_IS_CONNECTED] (state) {
         state.isConnected = true
+    },
+
+    [types.NETWORK_CONNECTION_SEEMS_LOST] (state, value) {
+        state.connectionSeemsLost = !!value
     },
 
     [types.NETWORK_CONNECTION_LOST] (state) {
@@ -22,6 +27,10 @@ const mutations = {
 
 const actions = {
     [types.NETWORK_IS_CONNECTED] ({ commit, state }) {
+        if (state.connectionSeemsLost) {
+            commit(types.NETWORK_CONNECTION_SEEMS_LOST, false)
+        }
+
         if (!state.isConnected) {
             commit(types.NETWORK_IS_CONNECTED)
         }
@@ -35,11 +44,13 @@ const actions = {
         commit(types.SET_NETWORK_CONNECTION_ERROR, errorCode)
     },
 
-    // todo delay connection lost commitment to prevent flickering of the "not connected view"
     async [types.NETWORK_CONNECTION_LOST] ({ commit }) {
+        commit(types.NETWORK_CONNECTION_SEEMS_LOST, true)
         await sleep(500)
 
-        if (state.isConnected) {
+        // "connection seems lost" could be reset to false by now
+        // if the heartbeat was just delayed for some reason.
+        if (state.isConnected && state.connectionSeemsLost) {
             commit(types.NETWORK_CONNECTION_LOST)
         }
     }
