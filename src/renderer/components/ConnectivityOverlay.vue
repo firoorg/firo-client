@@ -11,8 +11,12 @@
                 <p> Vestibulum id ligula porta felis euismod semper.</p>
 
                 <footer>
-                    <BaseButton color="red" is-dark is-outline @click="closeApp">Quit Zcoin</BaseButton>
-                    <BaseButton>Restart Daemon</BaseButton>
+                    <BaseButton color="red"
+                                @click="closeApp"
+                                is-dark>
+                        Quit Zcoin
+                    </BaseButton>
+                    <!--<BaseButton>Restart Daemon</BaseButton>-->
                 </footer>
             </main>
         </div>
@@ -20,6 +24,7 @@
 </template>
 
 <script>
+    import { remote } from 'electron'
     import Warning from '@/components/Icons/Warning'
 
     export default {
@@ -29,9 +34,7 @@
         },
         methods: {
             closeApp () {
-                console.log('closing app')
-                // todo change to app quit
-                window.close()
+                remote.app.quit()
             }
             // todo implement daemon restart.
         }
