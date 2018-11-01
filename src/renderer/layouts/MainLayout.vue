@@ -72,8 +72,16 @@
                 networkConnectionError: 'Network/connectionError',
                 showIntroScreen: 'App/showIntroScreen',
                 showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
-                hasOpenOverlay: 'App/hasOpenOverlay'
+                hasOpenAppOverlay: 'App/hasOpenOverlay'
             }),
+
+            // todo do some clean up and combine getters here
+            hasOpenOverlay () {
+                return this.hasOpenModal ||
+                    this.hasOpenAppOverlay ||
+                    this.showConnectivityOverlay ||
+                    this.showIntro
+            },
 
             showConnectivityOverlay () {
                 return !!(!this.networkIsConnected || this.networkConnectionError)
@@ -82,28 +90,7 @@
             showIntro () {
                 return this.showIntroScreen && !this.showConnectivityOverlay
             }
-
-            /*
-            hasOpenOverlay () {
-                return this.hasOpenModal ||
-                    !this.networkIsConnected ||
-                    this.showIntroScreen ||
-                    this.networkConnectionError
-            }
-            */
         }
-
-        /*
-        watch: {
-            showConnectivityOverlay: {
-                handler (newVal, oldVal) {
-                    console.log('showConnectivityOverlay', newVal)
-                    this.showIntroScreen = !newVal
-                },
-                immediate: true
-            }
-        }
-        */
     }
 </script>
 

@@ -51,7 +51,7 @@ export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds 
 
         console.log('validating --------->', status, data)
 
-        return status === 200 && modules.API && false
+        return status === 200 && modules.API
     }
 
     const { meta, data } = apiStatus
