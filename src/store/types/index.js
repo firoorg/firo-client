@@ -18,7 +18,6 @@ files.keys().forEach(key => {
 
     const addKeys = (obj) => {
         Object.keys(obj).forEach((key) => {
-            console.log(key)
             if (key === 'default' && isObject(obj[key])) {
                 addKeys(obj[key])
             } else {

@@ -39,7 +39,6 @@ store.commit = (...args) => {
     const indexOfSlash = type.indexOf('/')
     const namespace = (~indexOfSlash) ? type.substr(0, indexOfSlash) : type
 
-    console.log(type, namespace)
     if (localModules.includes(namespace)) {
         commit(type, payload)
     } else {
