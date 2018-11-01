@@ -22,14 +22,16 @@ const state = {
     averageBlockTime: 0
 }
 
-const mutations = {
+export const mutations = {
     [types.SET_CONNECTIONS] (state, connections) {
         state.connections = connections
     },
 
+    /*
     [types.SET_BLOCKCHAIN_TIP] (state, height) {
         state.blockchainTip = height
     },
+    */
 
     [types.SET_CURRENT_BLOCK] (state, { height, timestamp }) {
         state.currentBlock = {
@@ -91,7 +93,7 @@ const mutations = {
     }
 }
 
-const actions = {
+export const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType, avgBlockTime } = initialState
         const { height, timestamp } = currentBlock
@@ -176,7 +178,7 @@ const actions = {
             return
         }
 
-        dispatch(types.SET_BLOCKCHAIN_TIP, height)
+        // dispatch(types.SET_BLOCKCHAIN_TIP, height)
         commit(types.SET_CURRENT_BLOCK, { height, timestamp })
     },
 
@@ -247,7 +249,7 @@ const actions = {
     }
 }
 
-const getters = {
+export const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
     currentBlockTimestamp: (state) => state.currentBlock.timestamp,
     // tipHeight: (state) => state.blockchainTip,
