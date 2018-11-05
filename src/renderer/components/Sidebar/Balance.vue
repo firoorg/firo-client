@@ -6,7 +6,7 @@
 <template>
     <section class="balance" :class="{'is-confirmed': isConfirmed }">
         <div class="label">
-            Zcoin Balance
+            {{ $t('navigation.balance.title')}}
             <span>
             </span>
         </div>

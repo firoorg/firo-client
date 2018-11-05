@@ -1,18 +1,18 @@
 <template>
     <div>
-        <h1>Select Blockchain Location</h1>
+        <h1 v-html="$t('onboarding.set-blockchain-location.title')"></h1>
 
-        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis.</p>
+        <p v-html="$t('onboarding.set-blockchain-location.description')"></p>
 
         <footer>
             <BaseButton v-if="!hasLocation"
                         color="green"
                         @click="selectFolder"
-            >Select Location</BaseButton>
+            >{{ $t('onboarding.set-blockchain-location.button__select-folder--primary') }}</BaseButton>
             <BaseButton v-else
                         color="green"
                         @click="actions.next"
-            >Done</BaseButton>
+            >{{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}</BaseButton>
         </footer>
     </div>
 </template>

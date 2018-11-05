@@ -1,7 +1,7 @@
 <template>
     <div class="is-pending">
         <div class="message-wrap">
-            <h3>Message</h3>
+            <h3>{{ $t('receive.detail-entry-request.title__message') }}</h3>
             <div v-html="messageFormatted" />
         </div>
     </div>

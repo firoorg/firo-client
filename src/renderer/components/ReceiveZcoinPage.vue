@@ -26,11 +26,10 @@
                 <transition name="fade">
                     <onboarding-notice v-if="allPaymentRequestsLength < 1" class="onboarding">
                         <template slot="header">
-                            <h3>Looks like you do not have any coins.</h3>
+                            <h3 v-html="$t('onboarding.on-request.title')"></h3>
                         </template>
                         <template slot="content">
-                            <p>To receive some please create a <strong>Payment Request</strong>. Payment Requests are one-time payment channels for specific transactions like transferring funds from an exchange.</p>
-                            <p>To quickly access or group payments, you can use <strong>#hastags</strong> in a Payment Request's label.</p>
+                            <p v-html="$t('onboarding.on-request.description')"></p>
                         </template>
                     </onboarding-notice>
                 </transition>

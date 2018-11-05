@@ -1,14 +1,14 @@
 <template>
     <div>
-        <h1>Welcome!</h1>
+        <h1 v-html="$t('onboarding.intro-screen.title')"></h1>
 
-        <p>Thank you for downloading the Zcoin Client! You have taken the first step towards financial privacy. Click Next to begin setting up your client</p>
+        <p v-html="$t('onboarding.intro-screen.description')"></p>
 
         <footer>
             <BaseButton
                     color="green"
                     @click="actions.next"
-            >Let's go!</BaseButton>
+            >{{ $t('onboarding.intro-screen.button__start--primary') }}</BaseButton>
         </footer>
     </div>
 </template>

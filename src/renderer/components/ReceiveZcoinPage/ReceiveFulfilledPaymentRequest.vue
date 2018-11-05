@@ -1,6 +1,6 @@
 <template>
     <div class="is-fulfilled">
-        <h2 class="payments-headline">Payments
+        <h2 class="payments-headline">{{ $t('receive.detail-entry-request.title__payments') }}
             <span v-if="transactions.length > 1">({{ transactions.length }})</span>
         </h2>
         <div style="overflow: hidden" class="scrollable-container-wrap">
@@ -11,7 +11,7 @@
             </div>
 
             <div class="message-wrap">
-                <h2>Message</h2>
+                <h2 v-html="t('receive.detail-entry-request.title__message')"></h2>
                 <div v-html="messageFormatted" />
             </div>
         </div>

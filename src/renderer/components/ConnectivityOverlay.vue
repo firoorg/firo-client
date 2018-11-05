@@ -4,17 +4,16 @@
             <main class="content">
                 <header>
                     <Warning class="status" :has-shadow="true" />
-                    <h1>Connection to the<br>Zcoin Deamon lost!</h1>
+                    <h1 v-html="$t('error.connection-lost.title')"></h1>
                 </header>
 
-                <p>Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum</p>
-                <p> Vestibulum id ligula porta felis euismod semper.</p>
+                <p v-html="$t('error.connection-lost.description')"></p>
 
                 <footer>
                     <BaseButton color="red"
                                 @click="closeApp"
                                 is-dark>
-                        Quit Zcoin
+                        {{ $t('error-connection-lost.button__quit--primary')}}
                     </BaseButton>
                     <!--<BaseButton>Restart Daemon</BaseButton>-->
                 </footer>

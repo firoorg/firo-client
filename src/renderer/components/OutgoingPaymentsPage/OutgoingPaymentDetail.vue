@@ -8,8 +8,8 @@
                                                tag-size="large"
                                                :on-tag-click="tagClicked" />
                     </h2>
-                    <span v-if="isPrivate">{{ amountInBaseCoin }} XZC spend</span>
-                    <span v-else>{{ amountInBaseCoin }} XZC send</span>
+                    <span v-if="isPrivate">{{ amountInBaseCoin }} XZC {{ $t('send.detail-entry-transaction.label__spend') }}</span>
+                    <span v-else>{{ amountInBaseCoin }} XZC {{ $t('send.detail-entry-transaction.label__send') }}</span>
                 </div>
                 <div class="status outgoing-icon">
                     <payment-status :is-confirmed="isConfirmed" />
@@ -17,13 +17,13 @@
             </header>
 
             <div>
-                <h3 class="tx-headline">Transaction</h3>
+                <h3 class="tx-headline" v-html="$t('send.detail-entry-transaction.title__transaction')"></h3>
                 <transactions-list :transactions="transaction" />
             </div>
 
             <div class="actions">
                 <base-button @click.prevent="openBlockExplorer">
-                    View in Blockchain Explorer
+                    {{ $t('send.detail-entry-transaction.button__open-explorer--primary') }}
                 </base-button>
             </div>
         </div>

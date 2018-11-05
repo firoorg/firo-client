@@ -1,9 +1,9 @@
 <template>
     <div>
-        <h1>Secure your funds!</h1>
+        <h1 v-html="$t('onboarding.create-passphrase.title')"></h1>
 
         <template v-if="!showConfirm">
-            <p>Vestibulum id ligula porta felis euismod semper. Donec ullamcorper nulla non metus auctor fringilla.</p>
+            <p v-html="$t('onboarding.create-passphrase.description')"></p>
 
             <div class="form">
                 <div class="control passphrase">
@@ -13,7 +13,7 @@
                     <div>
                         <base-button v-if="!passphrase"
                                      color="comet">
-                            Generate Passphrase
+                            {{ $t('onboarding.create-passphrase.button__generate-passphrase--primary') }}
                         </base-button>
                     </div>
                 </div>
@@ -23,13 +23,13 @@
                 <base-button color="green"
                              :disabled="!passphrase"
                              @click="goToConfirm">
-                    Confirm Passphrase
+                    {{ $t('onboarding.confirm-passphrase.button__confirm-passphrase--primary') }}
                 </base-button>
             </footer>
         </template>
 
         <template v-else-if="!isConfirmed">
-            <p>Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+            <p v-html="$('onboarding.confirm-passphrase.description')"></p>
 
             <div class="form">
                 <div class="control confirm">
@@ -42,28 +42,27 @@
             <footer>
                 <base-button is-outline
                              @click="() => this.showConfirm = false">
-                    Go Back
+                    {{ $t('onboarding.confirm-passphrase.button__create-other-passphrase--secondary') }}
                 </base-button>
                 <base-button :disabled="!isEqual"
                             color="green"
                             @click="onConfirm">
-                    Set Passphrase
+                    {{ $t('onboarding.create-passphrase.button__set-passphrase--primary') }}
                 </base-button>
             </footer>
         </template>
         <template v-else>
-            <h2>warning lose all of your coins! old backup useless.<br/>
-                change background to green</h2>
+            <h2 v-html="$t('onboarding.final-confirmation.description')"></h2>
 
             <footer>
                 <base-button color="red"
                              is-outline
                              @click="actions.prev">
-                    No, create new passphrase
+                    {{ $t('onboarding.final-confirmation.button__create-other-passphrase--secondary') }}
                 </base-button>
                 <base-button color="green"
                              @click="actions.next">
-                    Ok, go ahead!
+                    {{ $t('onboarding.final-confirmation.button__confirm-passphrase--primary') }}
                 </base-button>
             </footer>
         </template>

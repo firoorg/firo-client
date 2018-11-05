@@ -14,23 +14,22 @@
                     <transition name="fade">
                         <onboarding-notice v-if="!availableXzc" class="onboarding">
                             <template slot="header">
-                                <h3>Looks like you do not have any coins.</h3>
+                                <h3 v-html="$t('onboarding.make-request-first.mint.title')"></h3>
                             </template>
                             <template slot="content">
-                                <p>If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.</p>
+                                <p v-html="$t('onboarding.make-request-first.mint.description')"></p>
                             </template>
                         </onboarding-notice>
                         <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
                             <template slot="header">
-                                <h3>Stay Private, Stay Flexible</h3>
+                                <h3 v-html="$t('onboarding.process-mints.title')"></h3>
                             </template>
                             <template slot="content">
-                                <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – currently this ratio is undershot.</p>
-                                <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible to be able to spend funds privately without delay and extra waiting times in the future.</p>
+                                <p v-html="$t('onboarding.process-mints.description')"></p>
                             </template>
                             <template slot="actions">
                                 <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
-                                    Fill up mints now
+                                   {{ $t('onboarding.process-mints.button__add-selection--primary') }}
                                 </base-onboarding-button>
                             </template>
                         </onboarding-notice>

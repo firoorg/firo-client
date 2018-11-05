@@ -14,7 +14,7 @@
 #
 navigation:
   balance:
-    title: Balance
+    title: Zcoin Balance
   menu:
     button__receive: Receive Zcoin
     button__send: Public Send
@@ -24,6 +24,11 @@ navigation:
     button__settings: Settings
   settings:
     switch__connect-via-tor: Anonymize Connection
+  network:
+    label__synced: Synced!
+    label__syncing: Syncing...
+    label__peers: Looking for Peers!
+
 
 
 receive:
@@ -47,11 +52,13 @@ receive:
 
   detail-entry-request:
     button__primary-action: Create Payment Request
-    label__created: Created
-    label__requested: Requested
-    label__fulfilled: Fulfilled
-    label__received: Received
-    # message__no-amount: no amount requested
+    title__payments: Payments
+    title__message: Message
+    label__created: created
+    label__requested: requested
+    label__fulfilled: fulfilled
+    label__received: received
+    label__no-amount: No Amount specified
     pending:
       button__share-via-email--pirmary: Share via E-Mail
       button__copy-link--secondary: Copy Link
@@ -99,6 +106,14 @@ mint:
     title: Mint started!
     description: The mint will now procecessed by the network.
 
+
+  flyout-process-mints:
+    title: onboarding.process-mints.title
+    description: onboarding.process-mints.description
+    button__review-suggestion--primary: Yes, review suggestion
+    button__cancel--secondary: No, I will do it later
+
+
 send:
   table__outgoing-payments:
     label__amount: Amount
@@ -108,6 +123,12 @@ send:
     label__tx-nolabel: No transaction label set
     label__tx-category-send: public
     label__tx-category-spendOut: private
+
+  detail-entry-transaction:
+    label__spend: spend
+    label__send: send
+    title__transaction: Transaction
+    button__open-explorer--primary: Open in Block Explorer
 
   private:
     overview:
@@ -138,6 +159,11 @@ send:
       button__private-send-confirm--primary: Yes, spend now!
       button__cancel--secondary: Cancel
       button__unlock-private-send--primary: Unlock and Spend
+
+    flyout-unused-address:
+      title: Unused Zcoin Address found
+      description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
+
 
   public:
     overview:
@@ -178,3 +204,120 @@ send:
     flyout-done:
       title: Sucessfully send!
       description: The payment is now on its way and will be confirmed by the network depending on your fee selection.
+
+    flyout-unused-address:
+      title: Unused Zcoin Address found
+      description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
+
+onboarding:
+  intro-screen:
+    title: Welcome!
+    description: Thank you for downloading the Zcoin Client! You have taken the first step towards financial privacy. Click Next to begin setting up your client!
+    button__start--primary: Let's go!
+
+  # create-new-wallet:
+    # title:
+    # description: Ready to create a new wallet? If you have used Zcoin before, just drop your existing wallet backup in this window.
+    # button__primary:
+    # button__secondary:
+
+  set-blockchain-location:
+    title: Select Blockchain Location
+    description: Please pick a location where the blockchain will be stored. It is around 1 GB in size right now but will be growing in the future. You can also store the blockchain on an external hard drive. Just make sure it's connected before you launch the client!
+    button__select-folder--primary: Select Location
+    button__confirm-selection--primary: Done
+    # button__secondary: back / cancel?
+
+  create-passphrase:
+    title: Secure your funds!
+    description: To protect your funds it is crucial to pick a strong passphrase. Please make sure your passphrase contains lowercase and uppercase letters, numbers or special characters. We recommend using a password manager.
+    button__generate-passphrase--primary: Generate Passphrase
+    button__set-passphrase--primary: Set Passphrase
+    # button__secondary: back / cancel?
+
+  confirm-passphrase:
+    # title: Secure your funds! # inside create-passphrase, restructure?
+    description: Please confirm your passphrase to make sure you typed it correctly. From now on your passphrase will be needed to confirm any transactions that you make.
+    button__confirm-passphrase--primary: Confirm Passphrase
+    button__create-other-passphrase--secondary: Go Back
+
+  final-confirmation:
+    description: warning lose all of your coins! old backup useless.<br/>change background to green #maybe key should be notice or warning
+    button__confirm-passphrase--primary: Ok, go ahead!
+    button__create-other-passphrase--secondary: No, create new passphrase
+
+  # keep-it-safe:
+    # title:
+    # description: Make sure to keep your password in a secure location. If you want to write it down, make sure to write clearly and keep it in a secure location like a fire-proof safe. If you use a password manager, make sure you have offline backups of your master password or keyfiles in a secure location. If you feel you didn't pick strong enough a password, you can repeat the process now.
+    # button__--primary:
+    # button__--secondary:
+
+  # create-external-backup:
+    # title:
+    # description:  Almost done! Finally, please create a backup of your wallet. It is advisable to store this in a secure location such as multiple USB flash or hard drives. If you picked a strong password, this file will be safe from hackers but better not try your luck!
+    # button__--primary:
+    # button__--secondary:
+
+  set-private-amount:
+    title: Stay private, stay flexible
+    description: Donec id elit non mi porta gravida at eget metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    label__private: Private
+    label__public: Public
+    button__confirm-selection--primary: Let's o!
+    # button__--secondary:
+
+  # on-initial-setup:
+    # title: High five!
+    # description: Congrats, you are now part of the Zcoin network. Let's go straight to the client!
+    # button__--primary:
+    # button__--secondary:
+
+  on-request:
+    title: Looks like you do not have any coins.
+    description: To receive some please create a <strong>Payment Request</strong>. Payment Requests are one-time payment channels for specific transactions like transferring funds from an exchange.
+                 <br>To quickly access or group payments, you can use <strong>#hastags</strong> in a Payment Request's label.
+  make-request-first:
+    mint:
+      title: Looks like you do not have any coins.
+      description:  If you want to anonymize coins, please create a <strong>Payment Request</strong> to receive some coins first.
+                  # If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.
+
+    # send:
+      # public:
+        # title: Looks like you do not have any coins.
+        # description: No coins to send 😔 Please create a Payment Request first to receive some coins!
+      # private:
+        # title: Looks like you do not have any coins.
+        # description: No coins to send privately 😔 Please create a Payment Request first to receive some coins and then head over to Anonymize Zcoin.
+
+  process-mints:
+    title: Stay Private, Stay Flexible # test variables
+    description: According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – currently this ratio is undershot.<br>
+                 Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible to be able to spend funds privately without delay and extra waiting times in the future.
+    button__add-selection--primary: Fill up mints now
+
+  # first-payment-received:
+    # title:
+    # description: Woo! You received your first payment! Please wait for 6 confirmations before you anonymize these coins or make a transfer
+
+  # ready-to-spend:
+    # title:
+    # description: You are now ready to privately send coins! There will be no link between you and the receiver visible anywhere. If you don't have a Payment Request already, please ask the receiver to create one.
+
+overlay:
+  incoming-payment-request:
+    title: Incoming <br>Payment Request
+    notice: It seems as if you have <strong>already fulfilled</strong> this <em>Payment Request</em>
+    label__message: Message
+    placeholder__message: This <strong>Payment Request</strong> does not have a message attached. If it's unclear to you what this request is all about, please head back to the originator for clarification.
+    button__view-payment--primary: View Payment
+    button__reuse-payment-request--secondary: Pay anyway!
+    button__make-payment--primary: Pay now!
+    button__cancel--secondary: Cancel
+
+  error:
+    connection-lost:
+      title: Connection to the<br>Zcoin Deamon lost!
+      description: Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum<br>
+                   Vestibulum id ligula porta felis euismod semper.
+      button__quit--primary: Quit Zcoin

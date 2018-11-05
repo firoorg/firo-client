@@ -1,8 +1,8 @@
 <template>
     <div ref="boundaries">
         <header>
-            <h1>Stay private, stay flexible</h1>
-            <p>Donec id elit non mi porta gravida at eget metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <h1 v-hmtl="$('onboarding.set-private-amount.title')"></h1>
+            <p v-hmtl="$('onboarding.set-private-amount.description')"></p>
         </header>
 
         <div>
@@ -27,15 +27,15 @@
                 <input type="range" class="slider" min="0" max="100" step="10" v-model="privatePercentage" />
             </div>
             <div class="labels">
-                <label>Private</label>
-                <span>Public</span>
+                <label>{{ $t('onboarding.set-private-amount.label__private') }}</label>
+                <span>{{ $t('onboarding.set-private-amount.label__public') }}</span>
             </div>
         </div>
         <footer>
             <BaseButton
                     color="green"
                     @click="actions.next"
-            >Let's go!</BaseButton>
+            >{{ $t('onboarding.set-private-amount.button__confirm-selection--primary') }}</BaseButton>
         </footer>
     </div>
 </template>

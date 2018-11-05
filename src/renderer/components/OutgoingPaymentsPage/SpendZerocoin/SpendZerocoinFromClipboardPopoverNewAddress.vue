@@ -1,14 +1,10 @@
 <template>
     <div>
         <header>
-            <h2>Unused Zcoin Address found</h2>
+            <h2 v-html="$t('send.private.flyout-unused-address.title')"></h2>
         </header>
 
-        <p>
-            Found an unused Zcoin address in your clipboard. <br>
-            Would you like to use it as the recipient address <br>
-            to spend Zcoin privately?
-        </p>
+        <p v-html="$t('send.private.flyout-unused-address.description')"></p>
 
         <footer>
             <base-button :is-outline="true"

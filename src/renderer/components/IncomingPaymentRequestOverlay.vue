@@ -3,18 +3,18 @@
         <form class="grid" @submit.prevent="onSumbit">
             <main class="content">
                 <div>
-                    <h1>Incoming <br>Payment Request</h1>
+                    <h1 v-html="$t('overlay.incoming-payment-request.title')"></h1>
 
                     <div v-if="alreadyFulfilled" class="already-fulfilled notice">
-                        It seems as if you have <strong>already fulfilled</strong> this <em>Payment Request</em>
+                       {{ $t('overlay.incoming-payment-request.notice') }}
                     </div>
 
                     <div v-if="incomingPaymentRequest.message">
-                        <h3>Message</h3>
+                        <h3 v-html="$t('overlay.incoming-payment-request.label__message')"></h3>
                         <div v-html="messageFormatted" />
                     </div>
                     <div v-else class="no-message">
-                        This <strong>Payment Request</strong> does not have a message attached. If it's unclear to you what this request is all about, please head back to the originator for clarification.
+                        {{ $t('overlay.incoming-payment-request.placeholder__message') }}
                     </div>
 
                     <fees-and-amount :show-fee="false"
@@ -25,20 +25,20 @@
                 <footer v-if="alreadyFulfilled">
                     <base-button type="submit"
                                  :is-outline="true">
-                        <span>Pay anyway!</span>
+                        <span> {{ $t('overlay.incoming-payment-request.button__reuse-payment-request--secondary') }}</span>
                     </base-button>
                     <base-button @click.prevent="goToPaymentDetail" color="comet">
-                        <span>View Payment</span>
+                        <span> {{ $t('overlay.incoming-payment-request.button__view-payment--primary') }}</span>
                     </base-button>
                 </footer>
                 <footer v-else>
                     <base-button type="reset"
                                  :is-outline="true"
                                  @click="onCancel">
-                        Cancel
+                      {{ $t('overlay.incoming-payment-request.button__cancel--secondary') }}
                     </base-button>
                     <base-button type="submit" color="green">
-                        <span>Pay Now!</span>
+                        <span>{{ $t('overlay.incoming-payment-request.button__make-payment--primary') }}</span>
                     </base-button>
                 </footer>
             </main>

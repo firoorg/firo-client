@@ -3,12 +3,12 @@
         <div class="status" :class="{ 'is-synced': getIsSynced }">
             <template v-if="getIsSynced">
                 <tick-icon class="icon"></tick-icon>
-                <span>Synced</span>
+                <span>{{ $t('navigation.network.label__synced') }}</span>
             </template>
             <template v-else>
                 <loading-bounce class="icon" :color="connections ? 'green' : 'comet'" size="mini"></loading-bounce>
-                <span v-if="connections">Syncing...</span>
-                <span v-else>Looking for Peers...</span>
+                <span v-if="connections">{{ $t('navigation.network.label__syncing') }}</span>
+                <span v-else>{{ $t('navigation.network.label__peers') }}</span>
             </template>
         </div>
         <div class="connections" :class="connectionClass">

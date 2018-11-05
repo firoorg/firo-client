@@ -9,10 +9,10 @@
                                                :on-tag-click="tagClicked" />
                     </h2>
                     <span v-if="amount">
-                        {{ amountInBaseCoin }} XZC requested
+                        {{ amountInBaseCoin }} XZC {{ $t('receive.detail-entry-request.label__requested') }}
                     </span>
                     <span v-else>
-                        No Amount specified
+                        {{ $t('receive.detail-entry-request.label__no-amount') }}
                     </span>
                     <!--
                     <i v-if="!isFulfilled"

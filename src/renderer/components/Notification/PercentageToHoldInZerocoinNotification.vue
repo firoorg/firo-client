@@ -13,23 +13,21 @@
 
         <template slot="content">
             <header>
-                <h2>Stay Private, Stay Flexibe</h2>
+                <h2 v-html="$t('mint.flyout-process-mints.title')"></h2>
             </header>
 
-            <p>According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – with the latest change this ratio got undershot.</p>
-            <p>Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> now to be able to spend funds privately without delay and extra waiting times in the future.</p>
-
+            <p v-html="$t('mint.flyout-process-mints.description')"></p>
 
             <footer>
                 <base-button :is-outline="true"
                              :is-dark="true"
                              @click.prevent="markAsNotified">
-                    No, I will do it later
+                    {{ $t('mint.flyout-process-mints.button__cancel--secondary') }}
                 </base-button>
                 <base-button color="green"
                              :is-dark="true"
                              @click.prevent="fillAndRouteToMint">
-                    Yes, review suggestion
+                    {{ $t('mint.flyout-process-mints.button__review-suggestion--primary') }}
                 </base-button>
             </footer>
         </template>
