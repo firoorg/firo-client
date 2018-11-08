@@ -1,8 +1,8 @@
 <template>
     <div ref="boundaries">
         <header>
-            <h1 v-hmtl="$('onboarding.set-private-amount.title')"></h1>
-            <p v-hmtl="$('onboarding.set-private-amount.description')"></p>
+            <h1 v-hmtl="$t('onboarding.set-private-amount.title')"></h1>
+            <p v-hmtl="$t('onboarding.set-private-amount.description')"></p>
         </header>
 
         <div>

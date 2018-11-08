@@ -263,7 +263,7 @@ onboarding:
     description: Donec id elit non mi porta gravida at eget metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     label__private: Private
     label__public: Public
-    button__confirm-selection--primary: Let's o!
+    button__confirm-selection--primary: Let's go!
     # button__--secondary:
 
   # on-initial-setup:

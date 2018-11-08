@@ -11,7 +11,7 @@
             </div>
 
             <div class="message-wrap">
-                <h2 v-html="t('receive.detail-entry-request.title__message')"></h2>
+                <h2 v-html="$t('receive.detail-entry-request.title__message')"></h2>
                 <div v-html="messageFormatted" />
             </div>
         </div>
