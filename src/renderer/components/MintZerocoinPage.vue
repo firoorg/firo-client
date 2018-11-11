@@ -18,6 +18,12 @@
                             </template>
                             <template slot="content">
                                 <p v-html="$t('onboarding.make-request-first.mint.description')"></p>
+                                <i18n path="onboarding.make-request-first.mint.description" tag="p">
+                                    <router-link :to="{ name: 'receive-zcoin' }"
+                                                 place="linkToCreatePaymentRequest">
+                                        {{ $t('onboarding.make-request-first.mint.button__linkToCreatePaymentRequest') }}
+                                    </router-link>
+                                </i18n>
                             </template>
                         </onboarding-notice>
                         <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">

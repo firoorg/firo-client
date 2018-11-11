@@ -279,8 +279,8 @@ onboarding:
   make-request-first:
     mint:
       title: Looks like you do not have any coins.
-      description:  If you want to anonymize coins, please create a <strong>Payment Request</strong> to receive some coins first.
-                  # If you want to anonymize coins, please create a <router-link :to="{ name: 'receive-zcoin' }">Payment Request</router-link> to receive some coins&nbsp;first.
+      description:  If you want to anonymize coins, please create a {linkToCreatePaymentRequest} to receive some coins first.
+      button__linkToCreatePaymentRequest: Payment Request
 
     # send:
       # public:
