@@ -29,6 +29,11 @@ export default {
         debug(`connecting to requester at ${ports.request}`)
 
         this.requester = zmq.socket('req')
+
+        // set timeout for requester socket
+        this.requester.setsockopt(zmq.ZMQ_RCVTIMEO, 2000)
+        // this.requester.setsockopt(zmq.ZMQ_SNDTIMEO, 1000)
+
         this.subscriber = zmq.socket('sub')
 
         if (encryption) {
