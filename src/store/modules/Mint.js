@@ -126,6 +126,12 @@ const getters = {
         }, 0)
     },
 
+    currentDenominationAmount (state, getters) {
+        return getters.currentDenominationsFormatted.reduce((accumulator, denom) => {
+            return accumulator + denom.amount
+        }, 0)
+    },
+
     mints (state, getters, rootState, rootGetters) {
         return Object.values(state.mints)
             .filter((mint) => !mint.used)
