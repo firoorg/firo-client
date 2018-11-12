@@ -82,7 +82,8 @@
                 isLoading: 'Mint/isLoading',
                 responseIsValid: 'Mint/mintResponseIsValid',
                 responseIsError: 'Mint/mintResponseIsError',
-                responseError: 'Mint/mintResponseError'
+                responseError: 'Mint/mintResponseError',
+                currentDenominationAmount: 'Mint/currentDenominationAmount'
             }),
 
             submitButtonColor () {
@@ -92,7 +93,9 @@
             getDoneStepProps () {
                 return {
                     successIconComponentName: 'MintStarted',
-                    translationNamespace: 'mint.flyout-done'
+                    translationNamespace: 'mint.flyout-done',
+                    translationMode: 'plural',
+                    translationPluralCount: this.currentDenominationAmount
                 }
             }
         },

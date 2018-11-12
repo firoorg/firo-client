@@ -14,13 +14,14 @@
                 <component :is="successIconComponentName" />
             </div>
             <h2>{{ $t(`${translationNamespace}.title`) }}</h2>
-            <p>{{ $t(`${translationNamespace}.description`) }}</p>
+            <p v-if="translationIsPlural">{{ $tc(`${translationNamespace}.description`, translationPluralCount) }}</p>
+            <p v-else>{{ $t(`${translationNamespace}.description`) }}</p>
         </template>
     </div>
 </template>
 
 <script>
-    import AutoCloseMixin from '@/mixins/AutoCloseMixin'
+    // import AutoCloseMixin from '@/mixins/AutoCloseMixin'
     import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 
     import SendError from '@/components/Icons/SendError'
@@ -31,7 +32,7 @@
         name: 'StepResponseStatus',
 
         mixins: [
-            AutoCloseMixin,
+            // AutoCloseMixin,
             TranslationNamespaceMixin
         ],
 
