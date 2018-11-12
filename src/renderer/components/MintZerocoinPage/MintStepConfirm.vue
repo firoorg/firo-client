@@ -2,7 +2,7 @@
     <section>
         <header>
             <h2 v-html="$t('mint.flyout-confirm-mint.title')"></h2>
-            <p v-html="$t('mint.flyout-confirm-mint.description')"></p>
+            <p>{{ $tc('mint.flyout-confirm-mint.description', currentDenominationAmount) }}</p>
         </header>
 
 
@@ -40,7 +40,8 @@
             ...mapGetters({
                 denominations: 'Mint/currentDenominationsFormatted',
                 currentDenominationCostsInSatoshi: 'Mint/currentDenominationCostsInSatoshi',
-                currentDenominationFees: 'Mint/currentDenominationFees'
+                currentDenominationFees: 'Mint/currentDenominationFees',
+                currentDenominationAmount: 'Mint/currentDenominationAmount'
             })
         }
     }
