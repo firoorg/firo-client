@@ -60,11 +60,11 @@ receive:
     label__received: received
     label__no-amount: No Amount specified
     pending:
-      button__share-via-email--pirmary: Share via E-Mail
-      button__copy-link--secondary: Copy Link
-      message__copy-link--success: Copied Link to your Clipboard
-      button__copy-address--secondary: Copy Address
-      message__copy-address--success: Copied Address to your Clipboard
+      button__share-via-email--pirmary: Share via email
+      button__copy-link--secondary: Copy link
+      message__copy-link--success: Copied link to your clipboard
+      button__copy-address--secondary: Copy address
+      message__copy-address--success: Copied address to your clipboard
 
     fulfilled:
       button__open-explorer: Open in Block Explorer
