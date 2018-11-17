@@ -309,15 +309,14 @@ overlay:
     title: Incoming <br>Payment Request
     notice: It seems as if you have <strong>already fulfilled</strong> this <em>Payment Request</em>
     label__message: Message
-    placeholder__message: This <strong>Payment Request</strong> does not have a message attached. If it's unclear to you what this request is all about, please head back to the originator for clarification.
-    button__view-payment--primary: View Payment
-    button__reuse-payment-request--secondary: Pay anyway!
-    button__make-payment--primary: Pay now!
+    placeholder__message: This <strong>Payment Request</strong> does not include a message. If it is unclear to you why you have received these coins, please ask the sender for clarification.
+    button__view-payment--primary: View payment
+    button__reuse-payment-request--secondary: Pay anyway
+    button__make-payment--primary: Pay now
     button__cancel--secondary: Cancel
 
   error:
     connection-lost:
-      title: Connection to the<br>Zcoin Deamon lost!
-      description: Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum<br>
-                   Vestibulum id ligula porta felis euismod semper.
+      title: Connection to the<br>Zcoin Deamon lost
+      description: The client has lost its connection to the Zcoin Daemon. Please restart the client. 
       button__quit--primary: Quit Zcoin
