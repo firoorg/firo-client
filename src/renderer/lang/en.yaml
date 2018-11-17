@@ -223,28 +223,28 @@ onboarding:
 
   set-blockchain-location:
     title: Select Blockchain Location
-    description: Please pick a location where the blockchain will be stored. It is around 1 GB in size right now but will be growing in the future. You can also store the blockchain on an external hard drive. Just make sure it's connected before you launch the client!
-    button__select-folder--primary: Select Location
+    description: Please pick a location where the blockchain will be stored. As it will be growing over time, please make sure to have plenty of space available. You can also store the blockchain on an external hard drive. Just make sure it is connected before you launch the client!
+    button__select-folder--primary: Select location
     button__confirm-selection--primary: Done
     # button__secondary: back / cancel?
 
   create-passphrase:
-    title: Secure your funds!
-    description: To protect your funds it is crucial to pick a strong passphrase. Please make sure your passphrase contains lowercase and uppercase letters, numbers or special characters. We recommend using a password manager.
-    button__generate-passphrase--primary: Generate Passphrase
-    button__set-passphrase--primary: Set Passphrase
+    title: Secure Your Funds!
+    description: To protect your funds it is crucial to pick a strong passphrase. Please make sure it contains lowercase and uppercase letters, numbers and special characters. We recommend using a password manager.
+    button__generate-passphrase--primary: Generate passphrase
+    button__set-passphrase--primary: Set passphrase
     # button__secondary: back / cancel?
 
   confirm-passphrase:
     # title: Secure your funds! # inside create-passphrase, restructure?
-    description: Please confirm your passphrase to make sure you typed it correctly. From now on your passphrase will be needed to confirm any transactions that you make.
-    button__confirm-passphrase--primary: Confirm Passphrase
-    button__create-other-passphrase--secondary: Go Back
+    description: Please confirm your passphrase to make sure you typed it correctly. From now on this passphrase will be needed to authorize any transactions that you make.
+    button__confirm-passphrase--primary: Confirm passphrase
+    button__create-other-passphrase--secondary: Go back
 
   final-confirmation:
-    description: warning lose all of your coins! old backup useless.<br/>change background to green #maybe key should be notice or warning
-    button__confirm-passphrase--primary: Ok, go ahead!
-    button__create-other-passphrase--secondary: No, create new passphrase
+    description: Warning! Losing your passphrase means losing access to your coins! Please make sure you can remember your passphrase or store it in a secure location! #maybe key should be notice or warning
+    button__confirm-passphrase--primary: OK, I got this
+    button__create-other-passphrase--secondary: Let me do that again
 
   # keep-it-safe:
     # title:
@@ -259,8 +259,8 @@ onboarding:
     # button__--secondary:
 
   set-private-amount:
-    title: Stay private, stay flexible
-    description: Donec id elit non mi porta gravida at eget metus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    title: Stay Private, Stay Flexible
+    description: Please select which percentage of your funds should be kept in private and public coins. Public transactions are visible on the public blockchain just like with any other coin but can be turned into private coins at any time. These private coins will have their transaction history removed and, as a result, appear to come out of nowhere.
     label__private: Private
     label__public: Public
     button__confirm-selection--primary: Let's go!
@@ -284,25 +284,25 @@ onboarding:
 
     # send:
       # public:
-        # title: Looks like you do not have any coins.
-        # description: No coins to send 😔 Please create a Payment Request first to receive some coins!
+        # title: Looks like you do not have any coins 😕
+        # description: No coins to send. Please create a {linkToCreatePaymentRequest} first to receive some coins!
       # private:
         # title: Looks like you do not have any coins.
-        # description: No coins to send privately 😔 Please create a Payment Request first to receive some coins and then head over to Anonymize Zcoin.
+        # description: No coins to send privately. Please create a {linkToCreatePaymentRequest} first to receive some coins and then head over to {linkToAnonymizeZcoin}.
 
   process-mints:
     title: Stay Private, Stay Flexible # test variables
-    description: According to your settings you'd like to keep ratio between your private and public funds around <strong>{{ percentageToHoldInZerocoin }}%</strong> – currently this ratio is undershot.<br>
-                 Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible to be able to spend funds privately without delay and extra waiting times in the future.
-    button__add-selection--primary: Fill up mints now
+    description: According to your settings you would like to keep a <strong>{{ percentageToHoldInZerocoin }}%</strong> ratio between your private and public coins. Due to recent transactions, this ratio is now out of balance.<br>
+                 Therefore, we suggest to mint <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }} XZC</strong> as soon as possible. This will make sure you can spend private coins without any delays in the future.
+    button__add-selection--primary: Restore ratio now
 
   # first-payment-received:
     # title:
-    # description: Woo! You received your first payment! Please wait for 6 confirmations before you anonymize these coins or make a transfer
+    # description: Woo! You received your first payment! 🎉<br />Please wait for 6 confirmations before you anonymize these coins or make a transfer
 
   # ready-to-spend:
     # title:
-    # description: You are now ready to privately send coins! There will be no link between you and the receiver visible anywhere. If you don't have a Payment Request already, please ask the receiver to create one.
+    # description: You are now ready to privately send coins! There will be no link between you and the receiver visible anywhere. If you did not get a Payment Request already, please ask the receiver to create one.
 
 overlay:
   incoming-payment-request:
