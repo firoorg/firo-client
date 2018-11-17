@@ -75,6 +75,10 @@ receive:
 mint:
   overview:
     title: Anonymize</br>Zcoin
+    description: Anonymize coins now to privately send them later
+
+  detail-process-mint:
+    title: Anonymization in Progress
     description: Here's where you can anonymize your coins. We call this minting because when you destroy your old coin, a new Zerocoin is created or minted. This Zerocoin can later be redeemed for a new coin with no transaction history in a Private Spend.
 
   detail-process-mint:
@@ -82,25 +86,26 @@ mint:
     description: This shows the progress of your mint. A mint needs 6 confirmations before it can be spent. | This shows the progress of your mints. Each mint needs 6 confirmations before it can be spent.
 
   detail-create-mint:
-    title: Create Mint
+    title: Anonymize
     label__fees: Fees
     label__amount: Total
-    button__mint-start--primary: Mint now
+    button__mint-start--primary: Anonymize now
 
   flyout-confirm-mint:
-    title: Confirm Mint
+    title: Confirm Anonymization
     description: Here's a breakdown of your mint along with the fee. Looks OK? | Here's a breakdown of your mints along with the fee. Looks OK?
+
     label__fees: Fees
     label__amount: Total
-    button__mint-confirm--primary: Start minting!
+    button__mint-confirm--primary: Start anonymizing!
     button__cancel--secondary: Cancel
 
   flyout-unlock-client:
     title: Unlock Client
     description: Mints are transactions so your wallet needs to be unlocked. Please enter your passphrase.
     label__passphrase: Passphrase
-    placeholder__passphrase: Enter your Passphrase
-    button__unlock-mint--primary: Unlock and mint
+    placeholder__passphrase: Enter your passphrase
+    button__unlock-mint--primary: Unlock and anonymize
 
   flyout-done:
     title: Minting in Progress
