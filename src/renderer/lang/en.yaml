@@ -78,10 +78,6 @@ mint:
     description: Anonymize coins now to privately send them later
 
   detail-process-mint:
-    title: Anonymization in Progress
-    description: Here's where you can anonymize your coins. We call this minting because when you destroy your old coin, a new Zerocoin is created or minted. This Zerocoin can later be redeemed for a new coin with no transaction history in a Private Spend.
-
-  detail-process-mint:
     title: Mints in Progress
     description: This shows the progress of your mint. A mint needs 6 confirmations before it can be spent. | This shows the progress of your mints. Each mint needs 6 confirmations before it can be spent.
 
