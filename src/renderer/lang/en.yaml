@@ -133,13 +133,13 @@ send:
 
   private:
     overview:
-      title: Send<br>Zcoin
+      title: Private<br>Spend
 
     detail-private-send:
       title__private-send: Private Spend
-      description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
+      description: Here you can privately send coins with no transaction history on the blockchain. You can combine anonymized coins to spend any amount in multiples of 1 XZC.
       label__label: Label
-      placeholder__label: "Spider-Man costume #shopping for #reuben"
+      placeholder__label: "You can use #tags in here"
       label__address: Address
       placeholder__address: Add a valid Zcoin address
       label__amount-selection: Amount
@@ -147,19 +147,19 @@ send:
       placeholder__amount-select: Select Mints
       placeholder__amount-edit: Click to edit Mints
       label__amount: Total
-      button__private-send--primary: Spend Now
+      button__private-send--primary: Spend now
 
     flyout-amount-selection:
       title__amount-selection: Select Mints
-      description__amount-selection: Vestibulum id ligula porta felis euismod semper.
+      description__amount-selection: Please select previously-minted coins to be spend privately.
 
     flyout-confirm-private-send:
       title: Confirm Payment
-      description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+      description: Here's a breakdown of your Private Spend along with the fees. OK?
       label__amount: Total
       button__private-send-confirm--primary: Yes, spend now!
       button__cancel--secondary: Cancel
-      button__unlock-private-send--primary: Unlock and Spend
+      button__unlock-private-send--primary: Unlock and spend
 
     flyout-unused-address:
       title: Unused Zcoin Address found
