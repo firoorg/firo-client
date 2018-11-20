@@ -172,24 +172,24 @@ send:
 
     detail-public-send:
       title: Public Send
-      description: Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Curabitur blandit tempus
+      description: You can send one or more payments in one transaction. <p>All transactions send via this screen will be visible on the blockchain.</p>
       label__label: Label
-      placeholder__label: "Wonder Woman dress #shopping for #team"
+      placeholder__label: "You can use #tags in here"
       label__address: Address
       placeholder__address: Add a valid Zcoin address
       label__amount: Amount
       placeholder__amount: Enter amount to send publicly
-      button__send--primary: "Send Now | Send Now | Send {count} Now"
-      button__send-later--secondary: Send Later
-      button__add-to-queue--secondary: Add To Queue
+      button__send--primary: "Send now | Send now | Send {count} now"
+      button__send-later--secondary: Add to queue
+      button__add-to-queue--secondary: Add to queue
 
     flyout-pending-payment-queue:
       title: Pending Payments
-      description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+      description: These payments are currently queued up. Once you have finished adding payments, you can send them via "Send now"
 
     flyout-confirm-send:
       title: Confirm Payment
-      description: Nulla vitae elit libero, a pharetra augue Integer posuere erat.
+      description: "Here's a breakdown of your payment including the fee. OK? | Here's a breakdown of your payments including the fee. OK?"
       title__table: Payments
       title__fees: Fees
       label__change-fees: change
@@ -199,12 +199,12 @@ send:
 
     flyout-fee-selector:
       title: Select Fee
-      description: Etiam porta sem malesuada magna mollis euismod. Praesent commodo cursus magna
-      button__select-fee--primary: Select Fee
+      description: Change transaction fee. When the network is congested, transactions with higher fees will be processed faster than those with lower fees. 
+      button__select-fee--primary: Select fee
 
     flyout-done:
-      title: Sucessfully send!
-      description: The payment is now on its way and will be confirmed by the network depending on your fee selection.
+      title: Successfully sent!
+      description: The payment is now on its way and will shortly be confirmed by the network.
 
     flyout-unused-address:
       title: Unused Zcoin Address found
