@@ -141,7 +141,7 @@ send:
       label__label: Label
       placeholder__label: "Spider-Man costume #shopping for #reuben"
       label__address: Address
-      placeholder__address: Add a valid zcoin address
+      placeholder__address: Add a valid Zcoin address
       label__amount-selection: Amount
       placeholder__amount-enter: Click to select Mints
       placeholder__amount-select: Select Mints
@@ -176,7 +176,7 @@ send:
       label__label: Label
       placeholder__label: "Wonder Woman dress #shopping for #team"
       label__address: Address
-      placeholder__address: Add a valid zcoin address
+      placeholder__address: Add a valid Zcoin address
       label__amount: Amount
       placeholder__amount: Enter amount to send publicly
       button__send--primary: "Send Now | Send Now | Send {count} Now"
@@ -319,5 +319,5 @@ overlay:
   error:
     connection-lost:
       title: Connection to the<br>Zcoin Deamon lost
-      description: The client has lost its connection to the Zcoin Daemon. Please restart the client. 
+      description: The client has lost its connection to the Zcoin Daemon. Please restart the client.
       button__quit--primary: Quit Zcoin
