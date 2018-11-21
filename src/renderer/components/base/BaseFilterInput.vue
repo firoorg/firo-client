@@ -60,6 +60,7 @@
 
         &::placeholder {
             color: $color--comet;
+            font-style: italic;
         }
 
         &:hover,
