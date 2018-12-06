@@ -1,7 +1,7 @@
 <template>
     <th
         v-if="isHeader"
-        class="vuetable-th-component-relative-date"
+        class="vuetable-th-component-outgoing-status"
         @click="$emit('click', rowField, $event)"
         v-html="title"
     />
@@ -39,6 +39,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .vuetable-th-component-outgoing-status {
+        padding-left: 0.85rem;
+        padding-right: 0;
+    }
+
     .icon {
         width: emRhythm(2);
         margin-right: emRhythm(1);
