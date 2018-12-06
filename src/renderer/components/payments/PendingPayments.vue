@@ -18,7 +18,7 @@
                 <a
                     href="#"
                     class="validate-address"
-                    @click.prevent.blur="() => validateAddress(value.address)"
+                    @click.prevent="() => validateAddress(value.address)"
                 >
                     Show Address
                 </a>

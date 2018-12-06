@@ -18,7 +18,7 @@
                         popover-class="overlay-popover notice green range-input range-input-dark-light"
                         :can-blur="false"
                         :delay="1000"
-                        :popper-options="getPopperOptions"
+                        :popper-options="getPopperOptions()"
                         :boundaries-element="$refs.boundaries"
                     >
                         <template slot="content">
@@ -94,8 +94,9 @@ export default {
 
         publicPercentage () {
             return 100 - this.privatePercentage
-        },
-
+        }
+    },
+    methods: {
         getPopperOptions () {
             return {
                 onCreate: (instance) => {

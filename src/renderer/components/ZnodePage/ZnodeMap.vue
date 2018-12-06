@@ -34,7 +34,10 @@
                         </template>
                         <template slot="content">
                             <ul class="cluster-nodes">
-                                <li v-for="znode of cluster.nodes">
+                                <li
+                                    v-for="znode of cluster.nodes"
+                                    :key="znode.id"
+                                >
                                     {{ znode.status }} - {{ znode.id }}
                                 </li>
                             </ul>

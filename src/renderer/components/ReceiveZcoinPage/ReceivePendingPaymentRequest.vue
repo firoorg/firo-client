@@ -13,9 +13,12 @@ import { nl2br } from '@/utils/format'
 export default {
     name: 'ReceivePendingPaymentRequest',
 
-    props: [
-        'message'
-    ],
+    props: {
+        message: {
+            type: String,
+            default: ''
+        }
+    },
 
     computed: {
         messageFormatted () {

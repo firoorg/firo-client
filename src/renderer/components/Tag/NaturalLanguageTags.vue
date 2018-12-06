@@ -2,6 +2,7 @@
     <span :class="{ interactive: hasTagClick }">
         <span
             v-for="(word, index) in parsedContent"
+            :key="index"
             class="word"
         >
             <a
@@ -37,7 +38,8 @@ export default {
         },
         onTagClick: {
             required: false,
-            type: Function
+            type: Function,
+            default: undefined
         }
     },
 

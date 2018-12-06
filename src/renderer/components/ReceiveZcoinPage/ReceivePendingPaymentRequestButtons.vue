@@ -90,11 +90,20 @@ export default {
         ReceivePaymentRequestEmailTemplate
     },
 
-    props: [
-        'address',
-        'amount',
-        'message'
-    ],
+    props: {
+        address: {
+            type: String,
+            required: true
+        },
+        amount: {
+            type: Number,
+            default: 0
+        },
+        message: {
+            type: String,
+            default: ''
+        }
+    },
 
     data () {
         return {

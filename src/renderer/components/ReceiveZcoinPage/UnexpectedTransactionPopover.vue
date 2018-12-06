@@ -35,10 +35,16 @@
 <script>
 export default {
     name: 'UnexpectedTransactionPopover',
-    props: [
-        'boundariesElement',
-        'isReused'
-    ],
+    props: {
+        boundariesElement: {
+            type: HTMLElement,
+            required: true
+        },
+        isReused: {
+            type: Boolean,
+            required: true
+        }
+    },
 
     computed: {
         isOpen () {

@@ -4,8 +4,7 @@
         :class="{ 'is-open': isOpen }"
     >
         <li
-            v-for="denom in mints"
-            v-if="denom.amount"
+            v-for="denom in mintsWithAmount"
             :key="denom.denomination"
         >
             <span class="amount">
@@ -56,6 +55,10 @@ export default {
             return this.mints.reduce((accumulator, current) => {
                 return !!current.cost || accumulator
             }, false)
+        },
+
+        mintsWithAmount () {
+            return this.mints.filter(denom => denom.amount)
         }
     }
 }

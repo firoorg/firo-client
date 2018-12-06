@@ -127,6 +127,8 @@ export default {
 
                 return now + estPayoutInMs
             }
+
+            return 0
         }
     }
 }

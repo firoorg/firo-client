@@ -18,7 +18,7 @@ export default {
     },
     props: {
         received: Boolean,
-        default: false
+        default: () => false
     },
     data () {
         return {

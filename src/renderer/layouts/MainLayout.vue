@@ -73,17 +73,6 @@ export default {
         }
     },
 
-    async created () {
-        await sleep(1000)
-        this.overlayDuration = 1000
-        // this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
-        console.log(types.app.HIDE_INTRO_SCREEN)
-    },
-
-    mounted () {
-        this.show = true
-    },
-
     computed: {
         ...mapGetters({
             hasOpenModal: 'Window/hasOpenModal',
@@ -109,7 +98,18 @@ export default {
         showIntro () {
             return this.showIntroScreen && !this.showConnectivityOverlay
         }
-    }
+    },
+
+    mounted () {
+        this.show = true
+    },
+
+    async created () {
+        await sleep(1000)
+        this.overlayDuration = 1000
+        // this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
+        console.log(types.app.HIDE_INTRO_SCREEN)
+    },
 }
 </script>
 

@@ -54,10 +54,7 @@
                     {{ $t('mint.flyout-unlock-client.button__unlock-mint--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
-            <template
-                slot="step-done"
-                slot-scope="{ actions }"
-            >
+            <template slot="step-done">
                 <base-button
                     :color="submitButtonColor"
                     :is-dark="true"

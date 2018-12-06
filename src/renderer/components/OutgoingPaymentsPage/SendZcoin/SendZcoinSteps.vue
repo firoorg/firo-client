@@ -70,10 +70,7 @@
                     {{ $t('send.public.flyout-confirm-send.button__unlock-and-send--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
-            <template
-                slot="step-done"
-                slot-scope="{ actions }"
-            >
+            <template slot="step-done">
                 <base-button
                     :color="submitButtonColor"
                     :disabled="true"

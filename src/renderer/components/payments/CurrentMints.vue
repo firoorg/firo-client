@@ -25,7 +25,8 @@
                     class="wrapper"
                 >
                     <div
-                        v-for="item in value.amount"
+                        v-for="(item, index) in value.amount"
+                        :key="index"
                         class="item"
                     />
                 </div>

@@ -76,7 +76,7 @@ export default {
                 return []
             }
 
-            return this.transactions
+            return [...this.transactions]
                 .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
                 .map((tx, index) => {
                     const { id, amount, firstSeenAt, confirmations, isConfirmed, category } = tx

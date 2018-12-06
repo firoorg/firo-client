@@ -61,7 +61,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import AttentionBadge from '@/components/Badge/AttentionBadge'
 import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
 
@@ -69,8 +68,7 @@ export default {
     name: 'Menu',
     components: {
         PercentageToHoldInZerocoinNotification,
-        NotificationIndicator,
-        AttentionBadge
+        NotificationIndicator
     },
 
     computed: {

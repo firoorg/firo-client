@@ -9,6 +9,7 @@
 </template>
 
 <script>
+/* eslint-disable vue/no-unused-components */
 import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
 

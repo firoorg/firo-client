@@ -36,6 +36,8 @@ export default {
             case 'success':
             case 'green':
                 return '#23b852'
+            default:
+                return '#000'
             }
         }
     }

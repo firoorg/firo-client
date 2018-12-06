@@ -57,10 +57,7 @@
                     {{ $t('send.private.flyout-confirm-private-send.button__unlock-private-send--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
-            <template
-                slot="step-done"
-                slot-scope="{ actions }"
-            >
+            <template slot="step-done">
                 <base-button
                     :color="submitButtonColor"
                     :is-dark="true"

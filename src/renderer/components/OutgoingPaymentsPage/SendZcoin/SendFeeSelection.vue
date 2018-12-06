@@ -6,7 +6,10 @@
         </header>
 
         <ul>
-            <li v-for="(fee, key) in availableFeesWithAmount">
+            <li
+                v-for="(fee, key) in availableFeesWithAmount"
+                :key="key"
+            >
                 <input
                     :id="key"
                     v-model="currentFee"

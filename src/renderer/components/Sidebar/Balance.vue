@@ -20,7 +20,7 @@
             class="amount"
             @click="toggleBalance"
         >
-            {{ this.balance }}
+            {{ balance }}
         </span>
     </section>
 </template>
