@@ -139,6 +139,8 @@ const getters = {
             let isIncoming = false
             let isReused = false
 
+            let amountToDisplay = amountRequested
+
             // address found in wallet addresses. validating status
             if (address) {
                 const { transactions, isReused: addressIsReused } = address
@@ -160,12 +162,14 @@ const getters = {
                     if (received >= amountRequested) {
                         isIncoming = false
                         isFulfilled = true
+                        amountToDisplay = received
                     }
                 }
             }
 
             requests.push({
                 ...state.paymentRequests[key],
+                amount: amountToDisplay,
                 isFulfilled,
                 isIncoming,
                 isReused,
@@ -194,12 +198,13 @@ const getters = {
         let paymentRequests = []
 
         walletAddresses.forEach((walletAddress) => {
-            const { address, transactions } = walletAddress
+            const { address, transactions, total } = walletAddress
 
             if (!transactions.length) {
                 return
             }
 
+            // payment request for this address exists
             if (paymentRequestsKeys.includes(address)) {
                 return
             }
@@ -221,7 +226,7 @@ const getters = {
                 isIncoming: !isFulfilled,
                 isVirtual: true,
                 transactionsReceived: true,
-                amount: null,
+                amount: total.balance,
                 message: null,
                 label: '#virtual Payment Request' + (tags.length ? ` ${tags.join(' ')}` : ''),
                 isReused: transactions.length > 1,
