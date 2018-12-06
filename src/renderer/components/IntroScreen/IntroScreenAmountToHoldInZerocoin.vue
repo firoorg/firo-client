@@ -73,6 +73,18 @@ export default {
         }
     },
 
+    computed: {
+        ...addVuexModel({
+            name: 'privatePercentage',
+            getter: 'Settings/percentageToHoldInZerocoin',
+            action: types.settings.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN
+        }),
+
+        publicPercentage () {
+            return 100 - this.privatePercentage
+        }
+    },
+
     watch: {
         privatePercentage: {
             handler () {
@@ -85,17 +97,6 @@ export default {
         }
     },
 
-    computed: {
-        ...addVuexModel({
-            name: 'privatePercentage',
-            getter: 'Settings/percentageToHoldInZerocoin',
-            action: types.settings.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN
-        }),
-
-        publicPercentage () {
-            return 100 - this.privatePercentage
-        }
-    },
     methods: {
         getPopperOptions () {
             return {

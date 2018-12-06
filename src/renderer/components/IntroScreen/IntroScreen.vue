@@ -97,14 +97,6 @@ export default {
         }
     },
 
-    mounted () {
-        this.$on('step-change', this.onStepChange)
-    },
-
-    beforeDestroy () {
-        this.$off('step-change', this.onStepChange)
-    },
-
     computed: {
         ...mapGetters({
             isReady: 'App/isReady',
@@ -132,6 +124,14 @@ export default {
                 goTo: this.goToStep
             }
         }
+    },
+
+    mounted () {
+        this.$on('step-change', this.onStepChange)
+    },
+
+    beforeDestroy () {
+        this.$off('step-change', this.onStepChange)
     },
 
     methods: {

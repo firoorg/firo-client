@@ -121,26 +121,6 @@ export default {
         }
     },
 
-    mounted () {
-        this.unsubscribeFromPaymentRequestCreate = this.$store.subscribe((mutation, state) => {
-            const { type, payload } = mutation
-
-            if (type !== types.paymentrequest.ADD_PAYMENT_REQUEST) {
-                return
-            }
-
-            const { address } = payload
-
-            this.$emit('route-to-detail', { address })
-        })
-    },
-
-    beforeDestroy () {
-        if (this.unsubscribeFromPaymentRequestCreate) {
-            this.unsubscribeFromPaymentRequestCreate()
-        }
-    },
-
     computed: {
         ...addVuexModel({
             name: 'label',
@@ -164,6 +144,26 @@ export default {
 
         canSubmit () {
             return this.formValidated && !this.isLoading
+        }
+    },
+
+    mounted () {
+        this.unsubscribeFromPaymentRequestCreate = this.$store.subscribe((mutation, state) => {
+            const { type, payload } = mutation
+
+            if (type !== types.paymentrequest.ADD_PAYMENT_REQUEST) {
+                return
+            }
+
+            const { address } = payload
+
+            this.$emit('route-to-detail', { address })
+        })
+    },
+
+    beforeDestroy () {
+        if (this.unsubscribeFromPaymentRequestCreate) {
+            this.unsubscribeFromPaymentRequestCreate()
         }
     },
 

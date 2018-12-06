@@ -34,12 +34,7 @@ export default {
     data () {
         return {
             denominations: [1, 10, 25, 50, 100]
-            // maxHeight: 0
         }
-    },
-
-    mounted () {
-        // this.maxHeight = this.$el.clientHeight
     },
 
     computed: {

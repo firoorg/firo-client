@@ -42,14 +42,6 @@ export default {
         validator: 'new' // give me my own validator instance.
     },
 
-    beforeCreate () {
-        this.$parent.$emit('can-submit', false)
-    },
-
-    mounted () {
-        this.$refs.input.focus()
-    },
-
     computed: {
         ...addVuexModel({
             name: 'passphrase',
@@ -74,6 +66,14 @@ export default {
             },
             immediate: true
         }
+    },
+
+    beforeCreate () {
+        this.$parent.$emit('can-submit', false)
+    },
+
+    mounted () {
+        this.$refs.input.focus()
     }
 }
 </script>

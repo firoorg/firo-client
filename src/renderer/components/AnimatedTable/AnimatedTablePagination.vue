@@ -63,6 +63,7 @@ export default {
 
     props: {
         css: {
+            type: Object,
             default: () => ({
                 wrapperClass: 'ui right floated pagination menu',
                 activeClass: 'active',

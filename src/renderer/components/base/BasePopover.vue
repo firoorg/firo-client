@@ -50,19 +50,6 @@ export default {
         }
     },
 
-    mounted () {
-        console.log(this.$attrs)
-        this.$smoothReflow({
-            el: this.$refs.container
-        })
-    },
-
-    beforeDestroy () {
-        this.$smoothReflow({
-            el: this.$refs.container
-        })
-    },
-
     computed: {
         ...mapGetters({
             hasOpenOverlay: 'App/hasOpenOverlay'
@@ -78,6 +65,19 @@ export default {
 
             return this.isBlurred ? [...classes, 'is-blurred'] : classes
         }
+    },
+
+    mounted () {
+        console.log(this.$attrs)
+        this.$smoothReflow({
+            el: this.$refs.container
+        })
+    },
+
+    beforeDestroy () {
+        this.$smoothReflow({
+            el: this.$refs.container
+        })
     }
 }
 </script>

@@ -61,10 +61,6 @@ export default {
         }
     },
 
-    mounted () {
-        this.$emit('can-cancel', true) // currentStepCanCancel
-    },
-
     computed: {
         ...mapGetters({
             availableFees: 'ZcoinPayment/availableFees'
@@ -88,6 +84,10 @@ export default {
 
             return fees
         }
+    },
+
+    mounted () {
+        this.$emit('can-cancel', true) // currentStepCanCancel
     },
 
     methods: {

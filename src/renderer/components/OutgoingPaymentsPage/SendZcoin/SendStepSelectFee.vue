@@ -23,15 +23,15 @@ export default {
         'updateTransactionFee'
     ],
 
-    beforeCreate () {
-        this.$parent.$emit('can-submit', false)
-    },
-
     computed: {
         ...mapGetters({
             fee: 'ZcoinPayment/selectedFee',
             pendingPayments: 'ZcoinPayment/pendingZcoinPayments'
         })
+    },
+
+    beforeCreate () {
+        this.$parent.$emit('can-submit', false)
     },
 
     methods: {

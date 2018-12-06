@@ -44,10 +44,6 @@ export default {
         }
     },
 
-    mounted () {
-        this.maxHeight = this.$el.clientHeight
-    },
-
     computed: {
         ...mapGetters({
             currentDenominations: 'Mint/currentDenominations',
@@ -82,6 +78,10 @@ export default {
 
             return available > 0 ? available : 0
         }
+    },
+
+    mounted () {
+        this.maxHeight = this.$el.clientHeight
     }
 }
 </script>
