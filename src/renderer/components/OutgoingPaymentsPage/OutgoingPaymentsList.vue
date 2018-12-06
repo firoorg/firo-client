@@ -13,7 +13,6 @@
             :data="filteredTransactions"
             :fields="tableFields"
             track-by="id"
-            :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
             :selected-row="selectedPayment"
             no-data-message="No Payments made yet."
             :on-row-select="onTableRowSelect"
@@ -47,12 +46,6 @@ const tableFields = [
         width: '2rem'
     },
     {
-        name: Amount,
-        title: 'send.table__outgoing-payments.label__amount',
-        sortField: 'amount',
-        width: '20%'
-    },
-    {
         name: RelativeDate,
         title: 'send.table__outgoing-payments.label__sent',
         dateField: 'firstSeenAt',
@@ -63,6 +56,12 @@ const tableFields = [
         name: 'label',
         title: 'send.table__outgoing-payments.label__label',
         sortField: 'label'
+    },
+    {
+        name: Amount,
+        title: 'send.table__outgoing-payments.label__amount',
+        sortField: 'amount',
+        width: '20%'
     }
 ]
 
@@ -106,6 +105,7 @@ export default {
 
         filteredTransactions () {
             return this.getFilteredByUrl(this.transactionsWithCategoryTags, ['label', 'category'])
+                .sort((a, b) => a.firstSeenAt < b.firstSeenAt)
         }
     },
 
