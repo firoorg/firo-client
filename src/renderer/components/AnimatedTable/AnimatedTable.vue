@@ -28,14 +28,7 @@
 
 <script>
 import { Vuetable, VuetablePagination } from 'vuetable-2'
-// import Vuetable from 'vuetable-2/src/index'
-// import VuetablePagination from 'vuetable-2/src/components/VuetablePagination'
-// import VuetableFieldHandle from 'vuetable-2/src/components/VuetableFieldHandle.vue'
 import _ from 'lodash'
-
-// import AnimatedTableRelativeDate from '@/components/AnimatedTableRelativeDate'
-
-// Vue.component('vuetable-field-component:relative-date', AnimatedTableRelativeDate)
 
 export default {
     name: 'AnimatedTable',
@@ -155,7 +148,6 @@ export default {
         },
 
         dataManager (sortOrder, pagination) {
-            // console.log('DATAMANAGER CALLED!')
             if (this.data.length < 1) {
                 return {
                     data: []
@@ -213,6 +205,7 @@ export default {
 
                 &.sortable {
                     transition: color 0.15s ease-out;
+                    position: relative;
 
                     &:hover {
                         color: $color--dark;
@@ -226,38 +219,60 @@ export default {
                         float: none !important;
                         display: inline-block;
                         color: $color--comet;
-                        padding-left: 0.25rem;
+                        padding-left: 0.5rem;
                         // border: 1px solid blue;
+                        position: absolute !important;
 
                         @include setType(1);
-                        transition: transform 0.25s ease-in-out;
+                        font-style: normal;
+                        //transition: transform 0.25s ease-in-out;
 
                         &:after {
-                            // border: 1px solid red;
+                            transition: all 0.25s ease-in-out;
+                        }
 
-                            //@include setType(1, $ms-up1);
-                            display: block;
-                            content: '‹›';
-                            transform: rotate(90deg);
-                            font-style: normal;
+
+                        &.sort {
+                            top: 0.75rem;
+                            padding-left: 0.35rem;
+
+                            &:after {
+                                // border: 1px solid red;
+
+                                //@include setType(1, $ms-up1);
+                                display: block;
+                                content: '‹›';
+                                transform: rotate(90deg);
+                            }
                         }
 
                         &.up,
                         &.down {
-                            @include setType(1, $ms-up3);
+                            @include setType(1, $ms-up2);
                             //height: 1.25rem;
-                            padding-top: 0.25rem;
+                            top: 0.45rem;
+                            padding-left: 0.75rem;
                             box-sizing: border-box;
+                            position: relative;
+
 
                             &:after {
-                                content: '›';
-                                height: 1rem;
+                                top: 50%;
+                                left: 50%;
+                                display: block;
+                                position: absolute;
+                                //border: 1px solid red;
+                                width: 0.5rem;
+                                height: 0.75rem;
+                                content: '‹';
                                 transform: rotate(270deg);
                             }
                         }
 
-                        &.down:after {
-                            transform: rotate(90deg);
+                        &.down {
+                            &:after {
+                                transform: rotate(90deg);
+                            }
                         }
 
                     }
