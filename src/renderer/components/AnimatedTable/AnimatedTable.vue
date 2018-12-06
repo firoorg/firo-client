@@ -18,7 +18,7 @@
         />
 
         <div>
-            <vuetable-pagination
+            <animated-table-pagination
                 ref="pagination"
                 @vuetable-pagination:change-page="onChangePage"
             />
@@ -27,14 +27,15 @@
 </template>
 
 <script>
-import { Vuetable, VuetablePagination } from 'vuetable-2'
+import { Vuetable } from 'vuetable-2'
+import AnimatedTablePagination from './AnimatedTablePagination'
 import _ from 'lodash'
 
 export default {
     name: 'AnimatedTable',
     components: {
         Vuetable,
-        VuetablePagination
+        AnimatedTablePagination
     },
     props: {
         fields: {
@@ -465,38 +466,6 @@ export default {
 
             &.fade-leave-to {
                 background: blue;
-            }
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: emRhythm(3);
-            //border: 1px solid red;
-            text-align: center;
-
-            a {
-                display: inline-block;
-                padding: emRhythm(1) emRhythm(2);
-                // border: 1px solid green;
-                &:not(.icon) {
-                    background-color: rgba($color--polo-medium, 0.5);
-                }
-
-                /*&.icon + a:not(.icon),
-                &:not(.icon) + :not(.icon) {
-                    border: 1px solid red;
-                }*/
-
-                color: $color--comet;
-                @include font-heavy();
-                cursor: pointer;
-
-                &.active {
-                    color: $color--comet-dark;
-                    @include font-black();
-                }
             }
         }
     }
