@@ -4,7 +4,6 @@
         :placement="placement"
         :popover-class="popoverClass + ' multi-step-popover'"
         class="timed-popover"
-        :boundaries-element="boundariesElement"
         trigger="manually"
         :can-blur="canBlur"
         :delay="delay"
@@ -42,9 +41,6 @@ export default {
         isOpen: {
             type: Boolean,
             required: true
-        },
-        boundariesElement: {
-            required: false
         },
         popoverClass: {
             type: String

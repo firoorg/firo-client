@@ -3,7 +3,6 @@
         :open="isOpen"
         placement="right-auto"
         popover-class="warning"
-        boundaries-element="body"
         class="unexpected-transaction-popover advice"
         trigger="manually"
     >
@@ -36,10 +35,6 @@
 export default {
     name: 'UnexpectedTransactionPopover',
     props: {
-        boundariesElement: {
-            type: HTMLElement,
-            required: true
-        },
         isReused: {
             type: Boolean,
             required: true

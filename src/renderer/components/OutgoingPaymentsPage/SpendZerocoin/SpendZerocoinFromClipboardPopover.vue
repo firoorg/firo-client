@@ -3,7 +3,6 @@
         :open="isOpen"
         placement="left-start"
         :popover-class="[ isUsedAddress ? 'warning advice' : 'advice' ]"
-        :boundaries-element="boundariesElement"
         class="send-from-clipboard-popover"
         trigger="manually"
     >
@@ -36,10 +35,6 @@ export default {
         SpendZerocoinFromClipboardPopoverNewAddress,
         SpendZerocoinFromClipboardPopoverUsedAddress
     },
-
-    props: [
-        'boundariesElement'
-    ],
 
     computed: {
         ...mapGetters({

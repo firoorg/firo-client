@@ -31,13 +31,10 @@
             <Sidebar class="aside" />
             <main
                 ref="main"
-                class="main"
+                class="main default-tooltip-boundary"
             >
                 <transition name="fade">
-                    <router-view
-                        class="child"
-                        :boundaries-element="$refs.main"
-                    />
+                    <router-view class="child" />
                 </transition>
             </main>
             <!--<footer class="footer"></footer>-->

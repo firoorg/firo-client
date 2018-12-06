@@ -61,7 +61,6 @@
                     trigger="manual"
                     placement="left-auto"
                     :offset="8*3"
-                    :boundaries-element="boundariesElement"
                 >
                     <template slot="target">
                         <!-- todo validate if amount is available in balance to spend -->
@@ -129,10 +128,6 @@ export default {
     props: {
         isDisabled: {
             type: Boolean,
-            required: true
-        },
-        boundariesElement: {
-            type: HTMLElement,
             required: true
         }
     },

@@ -22,13 +22,11 @@
 
                     <send-zcoin-form
                         :is-disabled="false"
-                        :boundaries-element="boundariesElement"
                         @form-validated="setFormValidationStatus"
                     />
                 </div>
 
                 <send-zcoin-steps
-                    :boundaries-element="boundariesElement"
                     :form-is-valid="formSectionIsValid"
                     :cleanup-form="cleanupForm"
                     :update-transaction-fee="updateTransactionFee"
@@ -63,24 +61,10 @@ export default {
         SendConfirmationCheck,
         SendFeeSelection,
         SendConfirmDialog
-        // FeesAndAmount,
-        // PendingPayments,
     },
 
     $_veeValidate: {
         validator: 'new' // give me my own validator instance.
-    },
-
-    /*
-        inject: [
-            'mainRef'
-        ],
-        */
-    props: {
-        boundariesElement: {
-            type: HTMLElement,
-            required: false
-        }
     },
 
     data () {
@@ -90,18 +74,6 @@ export default {
                 'amount',
                 'address'
             ],
-
-            /*
-                hasSent: false,
-                pendingPayments: {},
-                popoverStatus: '',
-                popoverTimeout: null,
-                containsUsedAddressOnSend: null,
-                */
-            // showSendConfirmation: false
-            // showFeeSelection: false
-
-            // --------- new --------
 
             formValidated: false
         }
@@ -119,14 +91,6 @@ export default {
         formSectionIsValid () {
             return !!(this.formValidated || this.currentFormIsEmpty)
         }
-        /*
-            canSubmit () {
-                // todo check (spend + fees) < available balance
-                // return this.formValidated && !this.showFeeSelection && !this.hasSent
-                return !!((this.formValidated || this.currentFormIsEmpty) && this.currentStepCanSubmit)
-            }
-            */
-        // ---
     },
 
     watch: {

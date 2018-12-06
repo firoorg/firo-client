@@ -11,10 +11,7 @@
             class="scrollable-container-wrap"
         >
             <div :style="{ height: '100%' }">
-                <unexpected-transaction-popover
-                    :is-reused="isReused"
-                    :boundaries-element="null"
-                >
+                <unexpected-transaction-popover :is-reused="isReused">
                     <transactions-list
                         :transactions="transactions"
                         class="scrollable-container"

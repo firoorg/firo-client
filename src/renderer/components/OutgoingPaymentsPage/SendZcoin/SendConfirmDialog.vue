@@ -59,7 +59,6 @@
                     placement="top"
                     :popover-class="popoverClass"
                     class="confirmation-popover"
-                    :boundaries-element="boundariesElement"
                     trigger="manually"
                 >
                     <template slot="target">
@@ -143,9 +142,6 @@ export default {
         isOpen: {
             type: Boolean,
             required: true
-        },
-        boundariesElement: {
-            required: false
         },
         onQueueAdd: {
             type: Function,

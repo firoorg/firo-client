@@ -5,7 +5,6 @@
         placement="left-end"
         :offset="8*3"
         popover-class="advice private"
-        :boundaries-element="boundariesElement"
     >
         <template slot="target">
             <slot />
@@ -46,11 +45,6 @@ export default {
     name: 'SendPrivatePopover',
 
     props: {
-        boundariesElement: {
-            type: HTMLElement,
-            required: true
-        },
-
         isOpen: {
             type: Boolean,
             required: true

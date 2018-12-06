@@ -5,7 +5,6 @@
             :auto-hide="true"
             placement="bottom-end"
             class="pending-payments-popover"
-            :boundaries-element="boundariesElement"
         >
             <!-- :trigger="showSendConfirmation ? 'manually' : 'click'" -->
             <template slot="target">
@@ -45,9 +44,6 @@ export default {
     props: {
         isDisabled: {
             type: Boolean,
-            required: true
-        },
-        boundariesElement: {
             required: true
         }
     },

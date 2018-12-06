@@ -29,7 +29,6 @@
             :placement="currentPlacement"
             :component-props="currentComponentProps"
             :is-open="currentStepIsOpen"
-            :boundaries-element="boundariesElement"
             :popover-class="currentPopoverClass"
             @step-change="onStepChange"
             @can-submit="onStepCanSubmit"
@@ -123,10 +122,6 @@ export default {
     ],
 
     props: {
-        boundariesElement: {
-            type: HTMLElement,
-            required: false
-        },
         formIsValid: {
             type: Boolean,
             required: true

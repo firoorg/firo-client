@@ -59,7 +59,6 @@
             <div class="control">
                 <send-private-popover
                     :is-open="showCanSpendPrivateTooltip"
-                    :boundaries-element="boundariesElement"
                     @cancel="onCanSpendPrivateTooltipCancel"
                     @submit="onCanSpendPrivateTooltipSubmit"
                 >
@@ -110,10 +109,6 @@ export default {
     props: {
         isDisabled: {
             type: Boolean,
-            required: true
-        },
-        boundariesElement: {
-            type: HTMLElement,
             required: true
         }
     },

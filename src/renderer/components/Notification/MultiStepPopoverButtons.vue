@@ -4,7 +4,6 @@
         :current-step="currentStep"
         :is-open="existsAndIsOpen"
         :placement="placement"
-        :boundaries-element="boundariesElement"
         :actions="getTargetActions"
         :component-props="componentProps"
         :popover-class="popoverClass"
@@ -41,9 +40,6 @@ export default {
         isOpen: {
             type: Boolean,
             default: true
-        },
-        boundariesElement: {
-            required: false
         },
         popoverClass: {
             type: String

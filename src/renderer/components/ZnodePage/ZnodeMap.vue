@@ -20,7 +20,6 @@
                         :open="false"
                         placement="left-auto"
                         :popover-class="[ cluster.statusClass, 'dark', 'advice' ]"
-                        boundaries-element="boundariesElement"
                         class="my-znode-popover"
                         trigger="hover"
                     >

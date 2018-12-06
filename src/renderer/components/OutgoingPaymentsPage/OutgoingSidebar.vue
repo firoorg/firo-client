@@ -1,7 +1,6 @@
 <template>
     <router-view
         v-bind="selectedPayment"
-        :boundaries-element="boundariesElement"
     />
 </template>
 
@@ -10,10 +9,6 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'OutgoingSidebar',
-
-    props: [
-        'boundariesElement'
-    ],
 
     computed: {
         ...mapGetters({

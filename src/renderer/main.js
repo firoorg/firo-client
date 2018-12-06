@@ -30,7 +30,9 @@ customValidationRules.forEach((rule) => {
     require('./utils/validationRules/' + rule)
 })
 
-Vue.use(VTooltip)
+Vue.use(VTooltip, {
+    defaultBoundariesElement: 'default-tooltip-boundary'
+})
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
     locale, // Default locale

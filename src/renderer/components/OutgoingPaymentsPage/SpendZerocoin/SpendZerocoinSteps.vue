@@ -26,7 +26,6 @@
             :placement="currentPlacement"
             :component-props="currentComponentProps"
             :is-open="currentStepIsOpen"
-            :boundaries-element="boundariesElement"
             :popover-class="currentPopoverClass"
             @step-change="onStepChange"
             @can-submit="onStepCanSubmit"

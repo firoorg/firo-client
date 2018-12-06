@@ -4,7 +4,6 @@
         placement="top"
         :popover-class="popoverClass + ' notice'"
         class="timed-popover"
-        :boundaries-element="boundariesElement"
         trigger="manually"
     >
         <template slot="target">
@@ -24,9 +23,6 @@ export default {
         isOpen: {
             type: Boolean,
             required: true
-        },
-        boundariesElement: {
-            required: false
         },
         popoverClass: {
             type: String

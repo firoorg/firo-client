@@ -72,7 +72,6 @@
                                 placement="bottom-end"
                                 popover-class="comet"
                                 class="mints-in-process-popover"
-                                :boundaries-element="this.$refs.grid"
                                 trigger="click"
                             >
                                 <template slot="target">

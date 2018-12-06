@@ -18,7 +18,6 @@
 
                     <spend-zerocoin-form
                         :is-disabled="false"
-                        :boundaries-element="boundariesElement"
                         @form-validated="setFormValidationStatus"
                     />
                 </div>
@@ -32,7 +31,6 @@
                     />
                     <!--</div>-->
                     <spend-zerocoin-steps
-                        :boundaries-element="boundariesElement"
                         :form-is-valid="formSectionIsValid"
                         :cleanup-form="cleanupForm"
                     />
@@ -71,13 +69,6 @@ export default {
 
     $_veeValidate: {
         validator: 'new' // give me my own validator instance.
-    },
-
-    props: {
-        boundariesElement: {
-            type: HTMLElement,
-            required: false
-        }
     },
 
     data () {

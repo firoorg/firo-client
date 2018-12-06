@@ -4,7 +4,6 @@
             <section class="outgoing-requests-list">
                 <component
                     :is="fromClipboardPopoverName"
-                    :boundaries-element="boundariesElement"
                     @update-form="onFormUpdateFromClipboardPopover"
                 >
                     <h1 v-html="$t('send.public.overview.title')" />
@@ -23,7 +22,6 @@
             >
                 <router-view
                     :key="$route.path"
-                    :boundaries-element="boundariesElement"
                     class="paymentrequest-detail-route"
                 />
             </transition>
@@ -55,7 +53,6 @@ export default {
     ],
 
     props: [
-        'boundariesElement',
         'isPrivate'
     ],
 
