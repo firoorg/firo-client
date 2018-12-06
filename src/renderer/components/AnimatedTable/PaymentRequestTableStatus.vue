@@ -1,47 +1,51 @@
 <template>
-    <th v-if="isHeader"
+    <th
+        v-if="isHeader"
         class="vuetable-th-component-relative-date"
-        v-html="title"
         @click="$emit('click', rowField, $event)"
-    ></th>
-    <td v-else
+        v-html="title"
+    />
+    <td
+        v-else
         class="vuetable-td-component-relative-date"
     >
-        <payment-request-status :is-fulfilled="isFulfilled"
-                                :is-incoming="isIncoming"
-                                :is-reused="isReused"
-                                class="icon"
-                                :key="rowData.id" />
+        <payment-request-status
+            :key="rowData.id"
+            :is-fulfilled="isFulfilled"
+            :is-incoming="isIncoming"
+            :is-reused="isReused"
+            class="icon"
+        />
     </td>
 </template>
 
 <script>
-    import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
-    import PaymentRequestStatus from '@/components/Icons/PaymentRequestTableStatus'
+import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import PaymentRequestStatus from '@/components/Icons/PaymentRequestTableStatus'
 
-    export default {
-        name: 'PaymentRequestTableStatus',
-        components: {
-            PaymentRequestStatus
+export default {
+    name: 'PaymentRequestTableStatus',
+    components: {
+        PaymentRequestStatus
+    },
+    mixins: [
+        VuetableFieldMixin
+    ],
+
+    computed: {
+        isFulfilled () {
+            return this.rowData[this.rowField.isFulfilledKey || 'isFulfilled']
         },
-        mixins: [
-            VuetableFieldMixin
-        ],
 
-        computed: {
-            isFulfilled () {
-                return this.rowData[this.rowField.isFulfilledKey || 'isFulfilled']
-            },
+        isIncoming () {
+            return this.rowData[this.rowField.transationsReceivedKey || 'isIncoming']
+        },
 
-            isIncoming () {
-                return this.rowData[this.rowField.transationsReceivedKey || 'isIncoming']
-            },
-
-            isReused () {
-                return this.rowData[this.rowField.isReusedKey || 'isReused']
-            }
+        isReused () {
+            return this.rowData[this.rowField.isReusedKey || 'isReused']
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

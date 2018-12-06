@@ -1,29 +1,41 @@
 <template>
     <section class="spend-zerocoin-queue-form">
-        <form class="send scrollable-height" @submit.prevent="submitForm">
-            <div class="grid" ref="grid">
+        <form
+            class="send scrollable-height"
+            @submit.prevent="submitForm"
+        >
+            <div
+                ref="grid"
+                class="grid"
+            >
                 <div class="form">
                     <header>
                         <div>
-                            <h2 v-html="$t('send.private.detail-private-send.title__private-send')"></h2>
-                            <p v-html="$t('send.private.detail-private-send.description')"></p>
+                            <h2 v-html="$t('send.private.detail-private-send.title__private-send')" />
+                            <p v-html="$t('send.private.detail-private-send.description')" />
                         </div>
                     </header>
 
-                    <spend-zerocoin-form :is-disabled="false"
-                                         @form-validated="setFormValidationStatus"
-                                         :boundaries-element="boundariesElement" />
+                    <spend-zerocoin-form
+                        :is-disabled="false"
+                        :boundaries-element="boundariesElement"
+                        @form-validated="setFormValidationStatus"
+                    />
                 </div>
                 <section class="checkout has-divider">
                     <!--<div class="">-->
-                    <fees-and-amount class="fees-and-amount"
-                                     :amount="spendFormMintCostsInSatoshi"
-                                     :show-fee="false"
-                                     translation-namespace="send.private.detail-private-send" />
+                    <fees-and-amount
+                        class="fees-and-amount"
+                        :amount="spendFormMintCostsInSatoshi"
+                        :show-fee="false"
+                        translation-namespace="send.private.detail-private-send"
+                    />
                     <!--</div>-->
-                    <spend-zerocoin-steps :boundaries-element="boundariesElement"
-                                          :form-is-valid="formSectionIsValid"
-                                          :cleanup-form="cleanupForm" />
+                    <spend-zerocoin-steps
+                        :boundaries-element="boundariesElement"
+                        :form-is-valid="formSectionIsValid"
+                        :cleanup-form="cleanupForm"
+                    />
                 </section>
             </div>
         </form>
@@ -31,116 +43,116 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
-    // import isEmpty from 'lodash/isEmpty'
-    import types from '~/types'
+import { mapGetters, mapActions } from 'vuex'
+// import isEmpty from 'lodash/isEmpty'
+import types from '~/types'
 
-    import SpendZerocoinForm from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinForm'
-    import FeesAndAmount from '@/components/payments/FeesAndAmount'
-    import SpendZerocoinSteps from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinSteps'
+import SpendZerocoinForm from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinForm'
+import FeesAndAmount from '@/components/payments/FeesAndAmount'
+import SpendZerocoinSteps from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinSteps'
 
-    // import FeesAndAmount from '@/components/FeesAndAmount'
-    import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
-    import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
-    // import PendingPayments from '@/components/payments/PendingPayments'
+// import FeesAndAmount from '@/components/FeesAndAmount'
+import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
+import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
+// import PendingPayments from '@/components/payments/PendingPayments'
 
-    import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
+import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
 
-    export default {
-        name: 'SpendZerocoin',
-        components: {
-            FeesAndAmount,
-            SpendZerocoinForm,
-            SpendZerocoinSteps,
-            SendConfirmationCheck,
-            SendFeeSelection,
-            SendConfirmDialog
-        },
+export default {
+    name: 'SpendZerocoin',
+    components: {
+        FeesAndAmount,
+        SpendZerocoinForm,
+        SpendZerocoinSteps,
+        SendConfirmationCheck,
+        SendFeeSelection,
+        SendConfirmDialog
+    },
 
-        $_veeValidate: {
-            validator: 'new' // give me my own validator instance.
-        },
+    $_veeValidate: {
+        validator: 'new' // give me my own validator instance.
+    },
 
-        props: {
-            boundariesElement: {
-                type: HTMLElement,
-                required: false
-            }
-        },
+    props: {
+        boundariesElement: {
+            type: HTMLElement,
+            required: false
+        }
+    },
 
-        data () {
-            return {
-                validationFieldOrder: [
-                    'label',
-                    'amount',
-                    'address'
-                ],
+    data () {
+        return {
+            validationFieldOrder: [
+                'label',
+                'amount',
+                'address'
+            ],
 
-                formValidated: false
-            }
-        },
+            formValidated: false
+        }
+    },
 
-        computed: {
-            ...mapGetters({
-                currentPassphrase: 'App/currentPassphrase',
-                spendFormLabel: 'ZerocoinSpend/spendFormLabel',
-                spendFormAddress: 'ZerocoinSpend/spendFormAddress',
-                spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted',
-                spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
-            }),
-            formSectionIsValid () {
-                return this.formValidated
-            }
-        },
+    computed: {
+        ...mapGetters({
+            currentPassphrase: 'App/currentPassphrase',
+            spendFormLabel: 'ZerocoinSpend/spendFormLabel',
+            spendFormAddress: 'ZerocoinSpend/spendFormAddress',
+            spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted',
+            spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
+        }),
+        formSectionIsValid () {
+            return this.formValidated
+        }
+    },
 
-        watch: {
-            currentStep: {
-                handler (newVal, oldVal) {
-                    window.dispatchEvent(new Event('resize'))
-                },
-                immediate: true
-            }
-        },
-
-        methods: {
-            ...mapActions({
-                clearForm: types.zerocoinspend.CLEAR_FORM
-            }),
-
-            setFormValidationStatus (isValid) {
-                this.formValidated = isValid
+    watch: {
+        currentStep: {
+            handler (newVal, oldVal) {
+                window.dispatchEvent(new Event('resize'))
             },
+            immediate: true
+        }
+    },
 
-            resetValidator () {
-                this.$nextTick(() => this.$validator.reset())
-            },
+    methods: {
+        ...mapActions({
+            clearForm: types.zerocoinspend.CLEAR_FORM
+        }),
 
-            cleanupForm () {
-                console.log('cleaning up...')
-                this.clearForm()
+        setFormValidationStatus (isValid) {
+            this.formValidated = isValid
+        },
 
-                this.resetValidator()
-            },
+        resetValidator () {
+            this.$nextTick(() => this.$validator.reset())
+        },
 
-            submitForm () {
-                if (!this.currentPassphrase) {
-                    console.log('no passphrase')
-                    return
+        cleanupForm () {
+            console.log('cleaning up...')
+            this.clearForm()
+
+            this.resetValidator()
+        },
+
+        submitForm () {
+            if (!this.currentPassphrase) {
+                console.log('no passphrase')
+                return
+            }
+
+            this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
+                address: this.spendFormAddress,
+                denominations: this.spendFormMintsFormatted,
+                label: this.spendFormLabel,
+                auth: {
+                    passphrase: this.currentPassphrase
                 }
+            })
 
-                this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
-                    address: this.spendFormAddress,
-                    denominations: this.spendFormMintsFormatted,
-                    label: this.spendFormLabel,
-                    auth: {
-                        passphrase: this.currentPassphrase
-                    }
-                })
-
-                this.cleanupForm()
-            }
+            this.cleanupForm()
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

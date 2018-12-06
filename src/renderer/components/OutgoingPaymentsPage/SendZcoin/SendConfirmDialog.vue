@@ -1,68 +1,118 @@
 <template>
     <div class="send-confirm-dialog">
-        <div  key="confirm-buttons" class="button-wrap">
+        <div
+            key="confirm-buttons"
+            class="button-wrap"
+        >
             <div class="first-cell">
-                <transition name="fade" mode="out-in">
-                    <div v-if="isOpen" key="cancel-send">
-                        <transition name="fade" mode="out-in">
-                            <base-button v-if="timerDone && !confirmed"
-                                         color="red"
-                                         :is-outline="true"
-                                         @click.prevent="onCancelFn"
-                                         tabindex="5">
+                <transition
+                    name="fade"
+                    mode="out-in"
+                >
+                    <div
+                        v-if="isOpen"
+                        key="cancel-send"
+                    >
+                        <transition
+                            name="fade"
+                            mode="out-in"
+                        >
+                            <base-button
+                                v-if="timerDone && !confirmed"
+                                color="red"
+                                :is-outline="true"
+                                tabindex="5"
+                                @click.prevent="onCancelFn"
+                            >
                                 <span>{{ $t('send.public.flyout-confirm-send.button__cancel--secondary') }}</span>
                             </base-button>
-                            <div v-else></div>
+                            <div v-else />
                         </transition>
                     </div>
-                    <div v-else key="send-later">
-                        <base-button class="add-to-queue"
-                                     ref="addToQueue"
-                                     :is-outline="true"
-                                     @click.prevent="onQueueAddFn"
-                                     :disabled="!canSubmit">
-                            <span v-if="!hasQueuedPayments">{{ $t('send.public.detail-public-send.button__send-later--secondary') }}</span>
-                            <span v-else>{{ $t('send.public.detail-public-send.button__add-to-queue--secondary') }}</span>
+                    <div
+                        v-else
+                        key="send-later"
+                    >
+                        <base-button
+                            ref="addToQueue"
+                            class="add-to-queue"
+                            :is-outline="true"
+                            :disabled="!canSubmit"
+                            @click.prevent="onQueueAddFn"
+                        >
+                            <span v-if="!hasQueuedPayments">
+                                {{ $t('send.public.detail-public-send.button__send-later--secondary') }}
+                            </span>
+                            <span v-else>
+                                {{ $t('send.public.detail-public-send.button__add-to-queue--secondary') }}
+                            </span>
                         </base-button>
                     </div>
                 </transition>
             </div>
-            <div class="second-cell" :style="{ minWidth: `${this.minCellWidth}px` }">
+            <div
+                class="second-cell"
+                :style="{ minWidth: `${this.minCellWidth}px` }"
+            >
                 <base-popover
-                        :open="isOpen"
-                        placement="top"
-                        :popover-class="popoverClass"
-                        class="confirmation-popover"
-                        :boundaries-element="boundariesElement"
-                        trigger="manually"
+                    :open="isOpen"
+                    placement="top"
+                    :popover-class="popoverClass"
+                    class="confirmation-popover"
+                    :boundaries-element="boundariesElement"
+                    trigger="manually"
                 >
                     <template slot="target">
-                        <transition name="fade" mode="out-in">
-                            <div v-if="isOpen" key="wait-confirm" class="wait-confirm">
-                                <transition name="fade" mode="out-in">
-                                    <base-button v-if="timerDone"
-                                                 :disabled="!canSubmit"
-                                                 key="confirm-send"
-                                                 :color="greenOrWarning"
-                                                 @click.prevent="onConfirmFn" tabindex="4">
+                        <transition
+                            name="fade"
+                            mode="out-in"
+                        >
+                            <div
+                                v-if="isOpen"
+                                key="wait-confirm"
+                                class="wait-confirm"
+                            >
+                                <transition
+                                    name="fade"
+                                    mode="out-in"
+                                >
+                                    <base-button
+                                        v-if="timerDone"
+                                        key="confirm-send"
+                                        :disabled="!canSubmit"
+                                        :color="greenOrWarning"
+                                        tabindex="4"
+                                        @click.prevent="onConfirmFn"
+                                    >
                                         <span>Yes, send now!</span>
                                     </base-button>
-                                    <circular-timer v-else
-                                                    key="confirm-timer"
-                                                    class="circular-timer"
-                                                    :complete="onTimerDone" />
+                                    <circular-timer
+                                        v-else
+                                        key="confirm-timer"
+                                        class="circular-timer"
+                                        :complete="onTimerDone"
+                                    />
                                 </transition>
                             </div>
-                            <div v-else key="send">
-                                <base-button key="confirm-trigger"
-                                             :color="greenOrWarning"
-                                             type="submit"
-                                             class="submit"
-                                             ref="submit"
-                                             :disabled="!canSubmit"
-                                             :tabindex="tabindex">
-                                    <span v-if="!hasQueuedPayments">Send Now</span>
-                                    <span v-else>Send Now</span>
+                            <div
+                                v-else
+                                key="send"
+                            >
+                                <base-button
+                                    key="confirm-trigger"
+                                    ref="submit"
+                                    :color="greenOrWarning"
+                                    type="submit"
+                                    class="submit"
+                                    :disabled="!canSubmit"
+                                    :tabindex="tabindex"
+                                >
+                                    <span v-if="!hasQueuedPayments">
+                                        Send Now
+                                    </span>
+                                    <span v-else>
+                                        Send Now
+                                    </span>
                                 </base-button>
                             </div>
                         </transition>
@@ -78,102 +128,102 @@
 </template>
 
 <script>
-    import CircularTimer from '@/components/Icons/CircularTimer'
+import CircularTimer from '@/components/Icons/CircularTimer'
 
-    export default {
-        name: 'SendConfirmDialog',
-        components: {
-            CircularTimer
+export default {
+    name: 'SendConfirmDialog',
+    components: {
+        CircularTimer
+    },
+    props: {
+        canSubmit: {
+            type: Boolean,
+            required: true
         },
-        props: {
-            canSubmit: {
-                type: Boolean,
-                required: true
-            },
-            isOpen: {
-                type: Boolean,
-                required: true
-            },
-            boundariesElement: {
-                required: false
-            },
-            onQueueAdd: {
-                type: Function,
-                required: true
-            },
-            onCancel: {
-                type: Function,
-                required: true
-            },
-            onConfirm: {
-                type: Function,
-                required: true
-            },
-            queuedPayments: {
-                type: Number,
-                required: false,
-                default: 0
-            },
-            popoverClass: {
-                type: String
-            },
-            tabindex: {
-                type: String
-            },
-            containsUsedAddress: {
-                type: Boolean,
-                required: true
-            }
+        isOpen: {
+            type: Boolean,
+            required: true
+        },
+        boundariesElement: {
+            required: false
+        },
+        onQueueAdd: {
+            type: Function,
+            required: true
+        },
+        onCancel: {
+            type: Function,
+            required: true
+        },
+        onConfirm: {
+            type: Function,
+            required: true
+        },
+        queuedPayments: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+        popoverClass: {
+            type: String
+        },
+        tabindex: {
+            type: String
+        },
+        containsUsedAddress: {
+            type: Boolean,
+            required: true
+        }
+    },
+
+    data () {
+        return {
+            timerDone: false,
+            confirmed: false,
+            minCellWidth: 0
+        }
+    },
+
+    computed: {
+        hasQueuedPayments () {
+            return this.queuedPayments > 0
+        },
+        greenOrWarning () {
+            return this.containsUsedAddress ? 'orange' : 'green'
+        }
+    },
+
+    mounted () {
+        this.minCellWidth = this.$refs.submit.$el.clientWidth
+    },
+
+    methods: {
+        onTimerDone () {
+            this.timerDone = true
         },
 
-        data () {
-            return {
-                timerDone: false,
-                confirmed: false,
-                minCellWidth: 0
-            }
+        onCancelFn () {
+            this.reset()
+            this.onCancel()
         },
 
-        mounted () {
-            this.minCellWidth = this.$refs.submit.$el.clientWidth
+        onConfirmFn () {
+            // this.reset()
+            this.confirmed = true
+
+            this.onConfirm(this.reset)
         },
 
-        computed: {
-            hasQueuedPayments () {
-                return this.queuedPayments > 0
-            },
-            greenOrWarning () {
-                return this.containsUsedAddress ? 'orange' : 'green'
-            }
+        onQueueAddFn () {
+            this.reset()
+            this.onQueueAdd()
         },
 
-        methods: {
-            onTimerDone () {
-                this.timerDone = true
-            },
-
-            onCancelFn () {
-                this.reset()
-                this.onCancel()
-            },
-
-            onConfirmFn () {
-                // this.reset()
-                this.confirmed = true
-
-                this.onConfirm(this.reset)
-            },
-
-            onQueueAddFn () {
-                this.reset()
-                this.onQueueAdd()
-            },
-
-            reset () {
-                this.timerDone = false
-            }
+        reset () {
+            this.timerDone = false
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

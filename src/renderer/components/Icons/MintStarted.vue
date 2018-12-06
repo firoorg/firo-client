@@ -5,31 +5,31 @@
 </template>
 
 <script>
-    import Lottie from 'vue-lottie'
-    import animationData from '@/assets/animations/mint-success.json'
+import Lottie from 'vue-lottie'
+import animationData from '@/assets/animations/mint-success.json'
 
-    export default {
-        name: 'MintStarted',
-        components: {
-            Lottie
-        },
-        props: {
-            onAnimationEnd: {
-                type: Function,
-                default: () => {}
-            }
-        },
+export default {
+    name: 'MintStarted',
+    components: {
+        Lottie
+    },
+    props: {
+        onAnimationEnd: {
+            type: Function,
+            default: () => {}
+        }
+    },
 
-        data () {
-            return {
-                defaultOptions: {
-                    animationData,
-                    loop: false,
-                    autoplay: true
-                }
+    data () {
+        return {
+            defaultOptions: {
+                animationData,
+                loop: false,
+                autoplay: true
             }
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

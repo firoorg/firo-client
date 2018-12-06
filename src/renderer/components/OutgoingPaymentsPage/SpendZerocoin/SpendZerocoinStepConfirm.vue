@@ -1,47 +1,51 @@
 <template>
     <section>
         <header>
-            <h2 v-html="$t('send.private.flyout-confirm-private-send.title')"></h2>
-            <p v-html="$t('send.private.flyout-confirm-private-send.description')"></p>
+            <h2 v-html="$t('send.private.flyout-confirm-private-send.title')" />
+            <p v-html="$t('send.private.flyout-confirm-private-send.description')" />
         </header>
 
 
         <div class="payment-fee-list">
-            <current-mints :current-mints="denominations"
-                           :show-progress="false" />
-            <fees-and-amount :amount="spendFormMintCostsInSatoshi"
-                             :show-fee="false"
-                             translation-namespace="send.private.flyout-confirm-private-send" />
+            <current-mints
+                :current-mints="denominations"
+                :show-progress="false"
+            />
+            <fees-and-amount
+                :amount="spendFormMintCostsInSatoshi"
+                :show-fee="false"
+                translation-namespace="send.private.flyout-confirm-private-send"
+            />
         </div>
     </section>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-    import FeesAndAmount from '@/components/payments/FeesAndAmount'
-    import CurrentMints from '@/components/payments/CurrentMints'
+import FeesAndAmount from '@/components/payments/FeesAndAmount'
+import CurrentMints from '@/components/payments/CurrentMints'
 
-    export default {
-        name: 'SpendZerocoinStepConfirm',
+export default {
+    name: 'SpendZerocoinStepConfirm',
 
-        components: {
-            CurrentMints,
-            FeesAndAmount
-        },
+    components: {
+        CurrentMints,
+        FeesAndAmount
+    },
 
-        props: [
-            'actions',
-            'isConfirmed'
-        ],
+    props: [
+        'actions',
+        'isConfirmed'
+    ],
 
-        computed: {
-            ...mapGetters({
-                denominations: 'ZerocoinSpend/spendFormMintsFormatted',
-                spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
-            })
-        }
+    computed: {
+        ...mapGetters({
+            denominations: 'ZerocoinSpend/spendFormMintsFormatted',
+            spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
+        })
     }
+}
 </script>
 
 <style lang="scss" scoped>

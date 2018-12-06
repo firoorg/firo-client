@@ -1,196 +1,208 @@
 <template>
     <section class="send-zcoin-queue-form">
-        <form class="send scrollable-height" @submit.prevent="submitForm">
-            <div class="grid" ref="grid">
+        <form
+            class="send scrollable-height"
+            @submit.prevent="submitForm"
+        >
+            <div
+                ref="grid"
+                class="grid"
+            >
                 <div class="form">
                     <header>
                         <div>
-                            <h2 v-html="$t('send.public.detail-public-send.title')"></h2>
-                            <p v-html="$t('send.public.detail-public-send.description')"></p>
+                            <h2 v-html="$t('send.public.detail-public-send.title')" />
+                            <p v-html="$t('send.public.detail-public-send.description')" />
                         </div>
-                        <pending-payments-queue :is-disabled="false"
-                                                :boundariesElement="$refs.grid" />
+                        <pending-payments-queue
+                            :is-disabled="false"
+                            :boundaries-element="$refs.grid"
+                        />
                     </header>
 
-                    <send-zcoin-form :is-disabled="false"
-                                     @form-validated="setFormValidationStatus"
-                                     :boundaries-element="boundariesElement" />
+                    <send-zcoin-form
+                        :is-disabled="false"
+                        :boundaries-element="boundariesElement"
+                        @form-validated="setFormValidationStatus"
+                    />
                 </div>
 
-                <send-zcoin-steps :boundaries-element="boundariesElement"
-                                  :form-is-valid="formSectionIsValid"
-                                  :cleanup-form="cleanupForm"
-                                  :update-transaction-fee="updateTransactionFee" />
+                <send-zcoin-steps
+                    :boundaries-element="boundariesElement"
+                    :form-is-valid="formSectionIsValid"
+                    :cleanup-form="cleanupForm"
+                    :update-transaction-fee="updateTransactionFee"
+                />
             </div>
         </form>
     </section>
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
-    // import isEmpty from 'lodash/isEmpty'
-    import types from '~/types'
+import { mapGetters, mapActions } from 'vuex'
+// import isEmpty from 'lodash/isEmpty'
+import types from '~/types'
 
-    import SendZcoinForm from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinForm'
-    import SendZcoinSteps from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinSteps'
+import SendZcoinForm from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinForm'
+import SendZcoinSteps from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinSteps'
 
-    // import FeesAndAmount from '@/components/FeesAndAmount'
-    import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
-    import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
-    // import PendingPayments from '@/components/payments/PendingPayments'
+// import FeesAndAmount from '@/components/FeesAndAmount'
+import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
+import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
+// import PendingPayments from '@/components/payments/PendingPayments'
 
-    import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
-    import PendingPaymentsQueue from '@/components/payments/PendingPaymentsQueue'
+import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
+import PendingPaymentsQueue from '@/components/payments/PendingPaymentsQueue'
 
-    export default {
-        name: 'SendZcoin',
-        components: {
-            PendingPaymentsQueue,
-            SendZcoinForm,
-            SendZcoinSteps,
-            SendConfirmationCheck,
-            SendFeeSelection,
-            SendConfirmDialog
-            // FeesAndAmount,
-            // PendingPayments,
-        },
+export default {
+    name: 'SendZcoin',
+    components: {
+        PendingPaymentsQueue,
+        SendZcoinForm,
+        SendZcoinSteps,
+        SendConfirmationCheck,
+        SendFeeSelection,
+        SendConfirmDialog
+        // FeesAndAmount,
+        // PendingPayments,
+    },
 
-        $_veeValidate: {
-            validator: 'new' // give me my own validator instance.
-        },
+    $_veeValidate: {
+        validator: 'new' // give me my own validator instance.
+    },
 
-        /*
+    /*
         inject: [
             'mainRef'
         ],
         */
-        props: {
-            boundariesElement: {
-                type: HTMLElement,
-                required: false
-            }
-        },
+    props: {
+        boundariesElement: {
+            type: HTMLElement,
+            required: false
+        }
+    },
 
-        data () {
-            return {
-                validationFieldOrder: [
-                    'label',
-                    'amount',
-                    'address'
-                ],
+    data () {
+        return {
+            validationFieldOrder: [
+                'label',
+                'amount',
+                'address'
+            ],
 
-                /*
+            /*
                 hasSent: false,
                 pendingPayments: {},
                 popoverStatus: '',
                 popoverTimeout: null,
                 containsUsedAddressOnSend: null,
                 */
-                // showSendConfirmation: false
-                // showFeeSelection: false
+            // showSendConfirmation: false
+            // showFeeSelection: false
 
-                // --------- new --------
+            // --------- new --------
 
-                formValidated: false
-            }
-        },
+            formValidated: false
+        }
+    },
 
-        computed: {
-            ...mapGetters({
-                currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
-                hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments',
-                pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
-                selectedFee: 'ZcoinPayment/selectedFee',
-                currentPassphrase: 'App/currentPassphrase',
-                pendingPaymentsSize: 'ZcoinPayment/pendingZcoinPaymentsSize'
-            }),
-            formSectionIsValid () {
-                return !!(this.formValidated || this.currentFormIsEmpty)
-            }
-            /*
+    computed: {
+        ...mapGetters({
+            currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
+            hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments',
+            pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
+            selectedFee: 'ZcoinPayment/selectedFee',
+            currentPassphrase: 'App/currentPassphrase',
+            pendingPaymentsSize: 'ZcoinPayment/pendingZcoinPaymentsSize'
+        }),
+        formSectionIsValid () {
+            return !!(this.formValidated || this.currentFormIsEmpty)
+        }
+        /*
             canSubmit () {
                 // todo check (spend + fees) < available balance
                 // return this.formValidated && !this.showFeeSelection && !this.hasSent
                 return !!((this.formValidated || this.currentFormIsEmpty) && this.currentStepCanSubmit)
             }
             */
-            // ---
+        // ---
+    },
+
+    watch: {
+        currentStep: {
+            handler (newVal, oldVal) {
+                window.dispatchEvent(new Event('resize'))
+                this.currentStepCanSubmit = !newVal
+            },
+            immediate: true
+        },
+        pendingPaymentsSize (newVal, oldVal) {
+            this.updateTransactionFee()
+        }
+    },
+
+    methods: {
+        ...mapActions({
+            clearForm: types.zcoinpayment.CLEAR_FORM
+        }),
+
+        setFormValidationStatus (isValid) {
+            this.formValidated = isValid
         },
 
-        watch: {
-            currentStep: {
-                handler (newVal, oldVal) {
-                    window.dispatchEvent(new Event('resize'))
-                    this.currentStepCanSubmit = !newVal
-                },
-                immediate: true
-            },
-            pendingPaymentsSize (newVal, oldVal) {
-                this.updateTransactionFee()
+        resetValidator () {
+            this.$nextTick(() => this.$validator.reset())
+        },
+
+        cleanupForm () {
+            console.log('cleaning up...')
+            this.clearForm()
+
+            // this.hasSent = false
+            // this.containsUsedAddressOnSend = null
+            this.resetValidator()
+        },
+
+        updateTransactionFee () {
+            this.$store.dispatch(types.zcoinpayment.CALC_TX_FEE, {
+                payments: this.pendingPayments,
+                fee: this.selectedFee.amount
+            })
+        },
+
+        submitForm () {
+            if (!this.hasPendingPayments) {
+                console.log('no pending payments')
+                return
             }
-        },
 
-        methods: {
-            ...mapActions({
-                clearForm: types.zcoinpayment.CLEAR_FORM
-            }),
+            if (!this.selectedFee) {
+                console.log('no fee selected')
+                return
+            }
 
-            setFormValidationStatus (isValid) {
-                this.formValidated = isValid
-            },
+            if (!this.currentPassphrase) {
+                console.log('no passphrase')
+                return
+            }
 
-            resetValidator () {
-                this.$nextTick(() => this.$validator.reset())
-            },
-
-            cleanupForm () {
-                console.log('cleaning up...')
-                this.clearForm()
-
-                // this.hasSent = false
-                // this.containsUsedAddressOnSend = null
-                this.resetValidator()
-            },
-
-            updateTransactionFee () {
-                this.$store.dispatch(types.zcoinpayment.CALC_TX_FEE, {
-                    payments: this.pendingPayments,
-                    fee: this.selectedFee.amount
-                })
-            },
-
-            submitForm () {
-                if (!this.hasPendingPayments) {
-                    console.log('no pending payments')
-                    return
+            this.$store.dispatch(types.zcoinpayment.SEND_ZCOIN, {
+                payments: this.pendingPayments,
+                fee: this.selectedFee.amount,
+                auth: {
+                    passphrase: this.currentPassphrase
                 }
-
-                if (!this.selectedFee) {
-                    console.log('no fee selected')
-                    return
-                }
-
-                if (!this.currentPassphrase) {
-                    console.log('no passphrase')
-                    return
-                }
-
-                this.$store.dispatch(types.zcoinpayment.SEND_ZCOIN, {
-                    payments: this.pendingPayments,
-                    fee: this.selectedFee.amount,
-                    auth: {
-                        passphrase: this.currentPassphrase
-                    }
-                })
-                this.resetValidator()
-                /*
+            })
+            this.resetValidator()
+            /*
                 if (!this.formSectionIsValid) {
                     return
                 }
                 */
-            }
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

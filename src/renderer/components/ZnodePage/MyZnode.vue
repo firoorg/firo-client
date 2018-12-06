@@ -13,27 +13,42 @@
                 <section class="last-seen">
                     <header>Last Seen</header>
                     <main>
-                        <timeago :datetime="lastSeen" :auto-update="30" />
+                        <timeago
+                            :datetime="lastSeen"
+                            :auto-update="30"
+                        />
                     </main>
                 </section>
                 <section class="active-since">
                     <header>Active since</header>
                     <main>
-                        <timeago :datetime="activeSince" :auto-update="30" />
+                        <timeago
+                            :datetime="activeSince"
+                            :auto-update="30"
+                        />
                     </main>
                 </section>
                 <section class="next-payout">
                     <header>Next Payout</header>
                     <main>
-                        <timeago v-if="lastPaidTime" :datetime="nextEstPayout" :auto-update="30" />
+                        <timeago
+                            v-if="lastPaidTime"
+                            :datetime="nextEstPayout"
+                            :auto-update="30"
+                        />
                     </main>
                 </section>
                 <section class="last-payout">
                     <header>Last Payout</header>
                     <main>
-
-                        <timeago v-if="lastPaidTime" :datetime="lastPaidTime" :auto-update="30" />
-                        <span v-else>No Payout yet!</span>
+                        <timeago
+                            v-if="lastPaidTime"
+                            :datetime="lastPaidTime"
+                            :auto-update="30"
+                        />
+                        <span v-else>
+                            No Payout yet!
+                        </span>
                     </main>
                 </section>
                 <section class="received">
@@ -58,63 +73,63 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-    export default {
-        name: 'MyZnode',
+export default {
+    name: 'MyZnode',
 
-        props: {
-            payeeAddress: {
-                type: String,
-                required: true
-            },
-            lastSeen: {
-                type: Number,
-                default: -1
-            },
-            activeSince: {
-                type: Number,
-                default: -1
-            },
-            status: {
-                type: String,
-                default: 'MISSING'
-            },
-            lastPaidTime: {
-                type: Number,
-                default: 0
+    props: {
+        payeeAddress: {
+            type: String,
+            required: true
+        },
+        lastSeen: {
+            type: Number,
+            default: -1
+        },
+        activeSince: {
+            type: Number,
+            default: -1
+        },
+        status: {
+            type: String,
+            default: 'MISSING'
+        },
+        lastPaidTime: {
+            type: Number,
+            default: 0
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
+        }),
+
+        payoutsReceived () {
+            const received = this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress)
+
+            if (received === -1) {
+                return `It seems that the masternode collateral is not an address of this wallet.`
             }
+
+            return `${received} XZC`
         },
 
-        computed: {
-            ...mapGetters({
-                znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
-            }),
+        nextEstPayout () {
+            const znodePaymentCycleInMs = Math.ceil(this.znodePaymentCycleInDays * 24 * 60 * 60 * 1000)
+            const now = Date.now()
 
-            payoutsReceived () {
-                const received = this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress)
+            // const foo = now - this.lastPaidTime
 
-                if (received === -1) {
-                    return `It seems that the masternode collateral is not an address of this wallet.`
-                }
+            if (this.lastPaidTime) {
+                const estPayoutInMs = (now - this.lastPaidTime) - znodePaymentCycleInMs
 
-                return `${received} XZC`
-            },
-
-            nextEstPayout () {
-                const znodePaymentCycleInMs = Math.ceil(this.znodePaymentCycleInDays * 24 * 60 * 60 * 1000)
-                const now = Date.now()
-
-                // const foo = now - this.lastPaidTime
-
-                if (this.lastPaidTime) {
-                    const estPayoutInMs = (now - this.lastPaidTime) - znodePaymentCycleInMs
-
-                    return now + estPayoutInMs
-                }
+                return now + estPayoutInMs
             }
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

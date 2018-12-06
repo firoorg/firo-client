@@ -1,18 +1,33 @@
 <template>
     <ul class="mints">
-        <li v-for="(value, key) in currentMints" :key="key">
+        <li
+            v-for="(value, key) in currentMints"
+            :key="key"
+        >
             <div class="amount">
                 {{ value.amount }}&MediumSpace;x
             </div>
             <div class="label">
                 <!--<slot v-bind="value" />-->
                 <div>
-                    <span class="name">Mint {{ value.denomination }}</span>
-                    <span class="cost">{{ value.cost }} <span class="unit">xzc</span></span>
+                    <span class="name">
+                        Mint {{ value.denomination }}
+                    </span>
+                    <span class="cost">
+                        {{ value.cost }} <span class="unit">
+                            xzc
+                        </span>
+                    </span>
                 </div>
 
-                <div class="wrapper" v-if="showProgress">
-                    <div v-for="item in value.amount" class="item"></div>
+                <div
+                    v-if="showProgress"
+                    class="wrapper"
+                >
+                    <div
+                        v-for="item in value.amount"
+                        class="item"
+                    />
                 </div>
             </div>
         </li>
@@ -20,20 +35,20 @@
 </template>
 
 <script>
-    export default {
-        name: 'CurrentMints',
+export default {
+    name: 'CurrentMints',
 
-        props: {
-            currentMints: {
-                type: Array,
-                required: true
-            },
-            showProgress: {
-                type: Boolean,
-                default: true
-            }
+    props: {
+        currentMints: {
+            type: Array,
+            required: true
+        },
+        showProgress: {
+            type: Boolean,
+            default: true
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,13 +1,13 @@
 <template>
     <div class="button-wrap">
-        <slot name="button"></slot>
+        <slot name="button" />
     </div>
 </template>
 
 <script>
-    export default {
-        name: 'SendTestStep'
-    }
+export default {
+    name: 'SendTestStep'
+}
 </script>
 
 <style scoped>

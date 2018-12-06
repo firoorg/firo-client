@@ -1,32 +1,59 @@
 <template>
     <section class="blockchain">
-        <div class="status" :class="{ 'is-synced': getIsSynced }">
+        <div
+            class="status"
+            :class="{ 'is-synced': getIsSynced }"
+        >
             <template v-if="getIsSynced">
-                <tick-icon class="icon"></tick-icon>
+                <tick-icon class="icon" />
                 <span>{{ $t('navigation.network.label__synced') }}</span>
             </template>
             <template v-else>
-                <loading-bounce class="icon" :color="connections ? 'green' : 'comet'" size="mini"></loading-bounce>
-                <span v-if="connections">{{ $t('navigation.network.label__syncing') }}</span>
-                <span v-else>{{ $t('navigation.network.label__peers') }}</span>
+                <loading-bounce
+                    class="icon"
+                    :color="connections ? 'green' : 'comet'"
+                    size="mini"
+                />
+                <span v-if="connections">
+                    {{ $t('navigation.network.label__syncing') }}
+                </span>
+                <span v-else>
+                    {{ $t('navigation.network.label__peers') }}
+                </span>
             </template>
         </div>
-        <div class="connections" :class="connectionClass">
-            <base-popover trigger="hover"
-                          boundaries-element="body"
-                          :popover-class="['advice', connectionPopoverClass]"
-                          placement="bottom-end"
-                          :offset="4"
-                          :delay="{ show: 200, hide: 100 }">
+        <div
+            class="connections"
+            :class="connectionClass"
+        >
+            <base-popover
+                trigger="hover"
+                boundaries-element="body"
+                :popover-class="['advice', connectionPopoverClass]"
+                placement="bottom-end"
+                :offset="4"
+                :delay="{ show: 200, hide: 100 }"
+            >
                 <blockchain-connection-popover slot="content" />
                 <template slot="target">
-                    <span class="connections-badge">{{ connections }}</span>
+                    <span class="connections-badge">
+                        {{ connections }}
+                    </span>
                 </template>
             </base-popover>
         </div>
-        <div class="sync-progress" :class="{ 'is-synced': getIsSynced }">
-            <div class="wrap" v-show="!isBlockchainSynced">
-                <div class="loaded" :style="{ width: `${progress}%`}"></div>
+        <div
+            class="sync-progress"
+            :class="{ 'is-synced': getIsSynced }"
+        >
+            <div
+                v-show="!isBlockchainSynced"
+                class="wrap"
+            >
+                <div
+                    class="loaded"
+                    :style="{ width: `${progress}%`}"
+                />
             </div>
             <!--
             <div class="wrap">
@@ -38,68 +65,68 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-    import LoadingBounce from '@/components/Icons/LoadingBounce'
-    import TickIcon from '@/components/Icons/TickIcon'
+import LoadingBounce from '@/components/Icons/LoadingBounce'
+import TickIcon from '@/components/Icons/TickIcon'
 
-    import BlockchainConnectionPopover from '@/components/Sidebar/BlockchainConnectionPopover'
+import BlockchainConnectionPopover from '@/components/Sidebar/BlockchainConnectionPopover'
 
-    export default {
-        name: 'Blockchain',
-        components: {
-            LoadingBounce,
-            TickIcon,
-            BlockchainConnectionPopover
+export default {
+    name: 'Blockchain',
+    components: {
+        LoadingBounce,
+        TickIcon,
+        BlockchainConnectionPopover
+    },
+
+    computed: {
+        ...mapGetters({
+            currentBlockHeight: 'Blockchain/currentBlockHeight',
+            currentBlockTimestamp: 'Blockchain/currentBlockTimestamp',
+            avgBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds',
+            isSynced: 'Blockchain/isSynced',
+            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
+            isZnodeListSynced: 'Blockchain/isZnodeListSynced',
+            hasConnections: 'Blockchain/hasConnections',
+            connections: 'Blockchain/connections'
+        }),
+
+        getIsSynced () {
+            // todo check if wallet has znode
+            return this.isBlockchainSynced // ? this.isBlockchainSynced : this.isSynced
         },
 
-        computed: {
-            ...mapGetters({
-                currentBlockHeight: 'Blockchain/currentBlockHeight',
-                currentBlockTimestamp: 'Blockchain/currentBlockTimestamp',
-                avgBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds',
-                isSynced: 'Blockchain/isSynced',
-                isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-                isZnodeListSynced: 'Blockchain/isZnodeListSynced',
-                hasConnections: 'Blockchain/hasConnections',
-                connections: 'Blockchain/connections'
-            }),
+        progress () {
+            const now = Date.now()
+            const remainingTime = now - (this.currentBlockTimestamp * 1000)
+            const remainingBlocks = remainingTime / this.avgBlockTime
 
-            getIsSynced () {
-                // todo check if wallet has znode
-                return this.isBlockchainSynced // ? this.isBlockchainSynced : this.isSynced
-            },
+            console.log({ remainingTime, remainingBlocks })
+            const estimatedTipHeight = this.currentBlockHeight + remainingBlocks
+            return this.currentBlockHeight / estimatedTipHeight * 100
+        },
 
-            progress () {
-                const now = Date.now()
-                const remainingTime = now - (this.currentBlockTimestamp * 1000)
-                const remainingBlocks = remainingTime / this.avgBlockTime
-
-                console.log({ remainingTime, remainingBlocks })
-                const estimatedTipHeight = this.currentBlockHeight + remainingBlocks
-                return this.currentBlockHeight / estimatedTipHeight * 100
-            },
-
-            connectionPopoverClass () {
-                if (!this.hasConnections) {
-                    return 'error'
-                }
-
-                return 'green'
-            },
-
-            connectionClass () {
-                if (!this.hasConnections) {
-                    return 'error'
-                }
-
-                // todo implement check if tor and dandelion are activated
-                // return 'public'
-
-                return 'private'
+        connectionPopoverClass () {
+            if (!this.hasConnections) {
+                return 'error'
             }
+
+            return 'green'
+        },
+
+        connectionClass () {
+            if (!this.hasConnections) {
+                return 'error'
+            }
+
+            // todo implement check if tor and dandelion are activated
+            // return 'public'
+
+            return 'private'
         }
     }
+}
 </script>
 
 <style lang="scss">

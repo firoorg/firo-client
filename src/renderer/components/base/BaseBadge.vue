@@ -1,25 +1,30 @@
 <template>
     <span class="badge-wrap">
         <slot />
-        <span class="badge" v-show="visible">{{ count }}</span>
+        <span
+            v-show="visible"
+            class="badge"
+        >
+            {{ count }}
+        </span>
     </span>
 </template>
 
 <script>
-    export default {
-        name: 'BaseBadge',
+export default {
+    name: 'BaseBadge',
 
-        props: {
-            visible: {
-                type: Boolean,
-                default: true
-            },
-            count: {
-                type: Number,
-                default: 0
-            }
+    props: {
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        count: {
+            type: Number,
+            default: 0
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

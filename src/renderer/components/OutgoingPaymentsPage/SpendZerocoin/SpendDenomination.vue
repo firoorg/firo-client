@@ -2,103 +2,121 @@
     <div class="denomination">
         <div class="bar-wrap">
             <transition name="fade">
-                <span v-show="available">{{ currentLabel }}</span>
+                <span v-show="available">
+                    {{ currentLabel }}
+                </span>
             </transition>
-            <div class="bar"
-                 :class="{ 'is-empty': !available }"
-                 :style="{ width: availableWidth }">
-                <div class="mint"
-                     :class="{ 'is-available': available }"
-                     :style="{ width: currentWidth }"></div>
+            <div
+                class="bar"
+                :class="{ 'is-empty': !available }"
+                :style="{ width: availableWidth }"
+            >
+                <div
+                    class="mint"
+                    :class="{ 'is-available': available }"
+                    :style="{ width: currentWidth }"
+                />
             </div>
             <label>{{ denomination }}</label>
         </div>
         <div class="buttons">
-            <button :disabled="!canDecrease" @click.stop.prevent="decrease" class="decrease">&minus;</button>
-            <button :disabled="!canIncrease" @click.stop.prevent="increase" class="increase">&plus;</button>
+            <button
+                :disabled="!canDecrease"
+                class="decrease"
+                @click.stop.prevent="decrease"
+            >
+                &minus;
+            </button>
+            <button
+                :disabled="!canIncrease"
+                class="increase"
+                @click.stop.prevent="increase"
+            >
+                &plus;
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-    export default {
-        name: 'SpendDenomination',
-        props: {
-            denomination: {
-                type: Number,
-                required: true
-            },
-            available: {
-                type: Number,
-                required: true
-            },
-
-            current: {
-                type: Number,
-                required: true
-            }
+export default {
+    name: 'SpendDenomination',
+    props: {
+        denomination: {
+            type: Number,
+            required: true
+        },
+        available: {
+            type: Number,
+            required: true
         },
 
-        computed: {
-            availableWidth () {
-                return (Math.log(this.calcWidth(this.available + 1)) * (8 * 4)) + 'px'
-                // return this.calcHeight(this.current + this.minted) - this.calcHeight(this.current) + 'px'
-                // return (this.minted ? (Math.log(this.calcHeight(this.minted + 1)) + (8 * 3)) : 0) + 'px'
-            },
+        current: {
+            type: Number,
+            required: true
+        }
+    },
 
-            currentWidth () {
-                // const all = this.calcHeight(this.current + this.minted)
-                // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
-                // return all - this.calcHeight(this.minted) + 'px'
-                // return this.mapHeight(all) + 'px'
-                console.log(this.available - this.current)
-                return (Math.log(this.calcWidth(this.available + 1 - this.current)) * (8 * 4)) + 'px'
-            },
-
-            canIncrease () {
-                // fees for this increase are already subtracted by the parent element
-                return (this.current) < this.available
-            },
-
-            canDecrease () {
-                return this.current > 0
-            },
-
-            currentLabel () {
-                return this.available - this.current
-            }
+    computed: {
+        availableWidth () {
+            return (Math.log(this.calcWidth(this.available + 1)) * (8 * 4)) + 'px'
+            // return this.calcHeight(this.current + this.minted) - this.calcHeight(this.current) + 'px'
+            // return (this.minted ? (Math.log(this.calcHeight(this.minted + 1)) + (8 * 3)) : 0) + 'px'
         },
 
-        methods: {
-            calcWidth (amount) {
-                return !amount ? 0 : Math.ceil(amount)
-            },
+        currentWidth () {
+            // const all = this.calcHeight(this.current + this.minted)
+            // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
+            // return all - this.calcHeight(this.minted) + 'px'
+            // return this.mapHeight(all) + 'px'
+            console.log(this.available - this.current)
+            return (Math.log(this.calcWidth(this.available + 1 - this.current)) * (8 * 4)) + 'px'
+        },
 
-            onChange (val) {
-                this.$emit('change', {
-                    [`${this.denomination}`]: this.current + val
-                })
-            },
+        canIncrease () {
+            // fees for this increase are already subtracted by the parent element
+            return (this.current) < this.available
+        },
 
-            increase () {
-                if (!this.canIncrease) {
-                    return
-                }
+        canDecrease () {
+            return this.current > 0
+        },
 
-                // this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
-                this.onChange(+1)
-            },
+        currentLabel () {
+            return this.available - this.current
+        }
+    },
 
-            decrease () {
-                if (!this.canDecrease) {
-                    return
-                }
+    methods: {
+        calcWidth (amount) {
+            return !amount ? 0 : Math.ceil(amount)
+        },
 
-                // this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
-                this.onChange(-1)
+        onChange (val) {
+            this.$emit('change', {
+                [`${this.denomination}`]: this.current + val
+            })
+        },
+
+        increase () {
+            if (!this.canIncrease) {
+                return
             }
+
+            // this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
+            this.onChange(+1)
+        },
+
+        decrease () {
+            if (!this.canDecrease) {
+                return
+            }
+
+            // this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
+            this.onChange(-1)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

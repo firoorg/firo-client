@@ -1,11 +1,11 @@
 <template>
     <base-popover
-            :open="isOpen"
-            placement="right-auto"
-            popover-class="warning"
-            boundaries-element="body"
-            class="unexpected-transaction-popover advice"
-            trigger="manually"
+        :open="isOpen"
+        placement="right-auto"
+        popover-class="warning"
+        boundaries-element="body"
+        class="unexpected-transaction-popover advice"
+        trigger="manually"
     >
         <template slot="target">
             <slot />
@@ -23,7 +23,9 @@
             </p>
 
             <footer>
-                <base-button :is-outline="true">Mark as Notified</base-button>
+                <base-button :is-outline="true">
+                    Mark as Notified
+                </base-button>
                 <base-button>Change To Subscription</base-button>
             </footer>
         </template>
@@ -31,19 +33,19 @@
 </template>
 
 <script>
-    export default {
-        name: 'UnexpectedTransactionPopover',
-        props: [
-            'boundariesElement',
-            'isReused'
-        ],
+export default {
+    name: 'UnexpectedTransactionPopover',
+    props: [
+        'boundariesElement',
+        'isReused'
+    ],
 
-        computed: {
-            isOpen () {
-                return false // this.isReused
-            }
+    computed: {
+        isOpen () {
+            return false // this.isReused
         }
     }
+}
 </script>
 
 <style scoped>

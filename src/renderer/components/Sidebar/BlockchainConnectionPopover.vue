@@ -1,22 +1,26 @@
 <template>
     <ul>
-        <li><strong class="connections-badge">{{ connections }}</strong> Connections</li>
+        <li>
+            <strong class="connections-badge">
+                {{ connections }}
+            </strong> Connections
+        </li>
         <li>(Yes/No) Tor</li>
         <li>(Yes) Dandelion</li>
     </ul>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-    export default {
-        name: 'BlockchainConnectionPopover',
-        computed: {
-            ...mapGetters({
-                connections: 'Blockchain/connections'
-            })
-        }
+export default {
+    name: 'BlockchainConnectionPopover',
+    computed: {
+        ...mapGetters({
+            connections: 'Blockchain/connections'
+        })
     }
+}
 </script>
 
 <style lang="scss" scoped>

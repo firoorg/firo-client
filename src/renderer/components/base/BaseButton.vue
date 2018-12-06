@@ -1,8 +1,9 @@
 <template>
     <button
-            v-bind="$attrs"
-            :class="[color, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
-            @click="$emit('click', $event)">
+        v-bind="$attrs"
+        :class="[color, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
+        @click="$emit('click', $event)"
+    >
         <span>
             <slot />
         </span>
@@ -10,35 +11,35 @@
 </template>
 
 <script>
-    export default {
-        name: 'BaseButton',
-        inheritAttrs: false,
-        props: {
-            isOutline: {
-                type: Boolean,
-                required: false,
-                default: false
-            },
+export default {
+    name: 'BaseButton',
+    inheritAttrs: false,
+    props: {
+        isOutline: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
 
-            isPopover: {
-                type: Boolean,
-                required: false,
-                default: false
-            },
+        isPopover: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
 
-            isDark: {
-                type: Boolean,
-                required: false,
-                default: false
-            },
+        isDark: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
 
-            color: {
-                type: String,
-                required: false,
-                default: ''
-            }
+        color: {
+            type: String,
+            required: false,
+            default: ''
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

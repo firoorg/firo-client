@@ -10,14 +10,16 @@
             </li>
         </ul>
 
-        <base-button color="green">Send All</base-button>
+        <base-button color="green">
+            Send All
+        </base-button>
     </div>
 </template>
 
 <script>
-    export default {
-        name: 'SendQueue'
-    }
+export default {
+    name: 'SendQueue'
+}
 </script>
 
 <style scoped>

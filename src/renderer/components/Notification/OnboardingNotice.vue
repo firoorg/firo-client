@@ -15,9 +15,9 @@
 </template>
 
 <script>
-    export default {
-        name: 'OnboardingNotice'
-    }
+export default {
+    name: 'OnboardingNotice'
+}
 </script>
 
 <style lang="scss" scoped>

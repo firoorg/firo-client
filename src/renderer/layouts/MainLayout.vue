@@ -1,7 +1,14 @@
 <template>
     <transition name="fade">
-        <div class="main-layout wrapper" :class="{ 'has-overlay': hasOpenOverlay }" v-if="show">
-            <transition name="fade" :duration="overlayDuration">
+        <div
+            v-if="show"
+            class="main-layout wrapper"
+            :class="{ 'has-overlay': hasOpenOverlay }"
+        >
+            <transition
+                name="fade"
+                :duration="overlayDuration"
+            >
                 <ConnectivityOverlay v-if="showConnectivityOverlay" />
                 <IntroScreen v-else-if="showIntro" />
                 <incoming-payment-request-overlay v-else-if="showIncomingPaymentRequest" />
@@ -9,16 +16,28 @@
 
             <NotificationCenter />
 
-            <transition name="fade" :duration="overlayDuration">
-                <div class="active-window-overlay" v-if="hasOpenModal"></div>
+            <transition
+                name="fade"
+                :duration="overlayDuration"
+            >
+                <div
+                    v-if="hasOpenModal"
+                    class="active-window-overlay"
+                />
             </transition>
             <!--<header class="header">
                 Header
             </header>-->
-            <Sidebar class="aside"></Sidebar>
-            <main class="main" ref="main">
+            <Sidebar class="aside" />
+            <main
+                ref="main"
+                class="main"
+            >
                 <transition name="fade">
-                    <router-view class="child" :boundaries-element="$refs.main"></router-view>
+                    <router-view
+                        class="child"
+                        :boundaries-element="$refs.main"
+                    />
                 </transition>
             </main>
             <!--<footer class="footer"></footer>-->
@@ -27,71 +46,71 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import { sleep } from '../../lib/utils'
-    import types from '~/types'
+import { mapGetters } from 'vuex'
+import { sleep } from '../../lib/utils'
+import types from '~/types'
 
-    import Sidebar from '@/components/Sidebar'
-    import NotificationCenter from '@/components/NotificationCenter'
-    import ConnectivityOverlay from '@/components/ConnectivityOverlay'
-    import IntroScreen from '@/components/IntroScreen/IntroScreen'
-    import IncomingPaymentRequestOverlay from '@/components/IncomingPaymentRequestOverlay'
+import Sidebar from '@/components/Sidebar'
+import NotificationCenter from '@/components/NotificationCenter'
+import ConnectivityOverlay from '@/components/ConnectivityOverlay'
+import IntroScreen from '@/components/IntroScreen/IntroScreen'
+import IncomingPaymentRequestOverlay from '@/components/IncomingPaymentRequestOverlay'
 
-    export default {
-        name: 'MainLayout',
-        components: {
-            IntroScreen,
-            Sidebar,
-            NotificationCenter,
-            ConnectivityOverlay,
-            IncomingPaymentRequestOverlay
-        },
+export default {
+    name: 'MainLayout',
+    components: {
+        IntroScreen,
+        Sidebar,
+        NotificationCenter,
+        ConnectivityOverlay,
+        IncomingPaymentRequestOverlay
+    },
 
-        data () {
-            return {
-                show: false,
-                overlayDuration: 100
-            }
-        },
+    data () {
+        return {
+            show: false,
+            overlayDuration: 100
+        }
+    },
 
-        async created () {
-            await sleep(1000)
-            this.overlayDuration = 1000
-            // this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
-            console.log(types.app.HIDE_INTRO_SCREEN)
-        },
+    async created () {
+        await sleep(1000)
+        this.overlayDuration = 1000
+        // this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
+        console.log(types.app.HIDE_INTRO_SCREEN)
+    },
 
-        mounted () {
-            this.show = true
-        },
+    mounted () {
+        this.show = true
+    },
 
-        computed: {
-            ...mapGetters({
-                hasOpenModal: 'Window/hasOpenModal',
-                networkIsConnected: 'Network/isConnected',
-                networkConnectionError: 'Network/connectionError',
-                showIntroScreen: 'App/showIntroScreen',
-                showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
-                hasOpenAppOverlay: 'App/hasOpenOverlay'
-            }),
+    computed: {
+        ...mapGetters({
+            hasOpenModal: 'Window/hasOpenModal',
+            networkIsConnected: 'Network/isConnected',
+            networkConnectionError: 'Network/connectionError',
+            showIntroScreen: 'App/showIntroScreen',
+            showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
+            hasOpenAppOverlay: 'App/hasOpenOverlay'
+        }),
 
-            // todo do some clean up and combine getters here
-            hasOpenOverlay () {
-                return this.hasOpenModal ||
+        // todo do some clean up and combine getters here
+        hasOpenOverlay () {
+            return this.hasOpenModal ||
                     this.hasOpenAppOverlay ||
                     this.showConnectivityOverlay ||
                     this.showIntro
-            },
+        },
 
-            showConnectivityOverlay () {
-                return !!(!this.networkIsConnected || this.networkConnectionError)
-            },
+        showConnectivityOverlay () {
+            return !!(!this.networkIsConnected || this.networkConnectionError)
+        },
 
-            showIntro () {
-                return this.showIntroScreen && !this.showConnectivityOverlay
-            }
+        showIntro () {
+            return this.showIntroScreen && !this.showConnectivityOverlay
         }
     }
+}
 </script>
 
 <style lang="scss">

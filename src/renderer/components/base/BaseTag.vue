@@ -5,21 +5,21 @@
 </template>
 
 <script>
-    export default {
-        name: 'BaseTag',
-        props: {
-            size: {
-                type: String,
-                default: ''
-            }
-        },
+export default {
+    name: 'BaseTag',
+    props: {
+        size: {
+            type: String,
+            default: ''
+        }
+    },
 
-        computed: {
-            sizeClassName () {
-                return this.size ? 'tag-' + this.size : null
-            }
+    computed: {
+        sizeClassName () {
+            return this.size ? 'tag-' + this.size : null
         }
     }
+}
 </script>
 
 <style scoped>

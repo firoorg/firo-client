@@ -2,72 +2,90 @@
     <section class="fees-amount">
         <template v-if="showFee">
             <h3 v-if="canChangeFee">
-                {{ $t('send.public.flyout-confirm-send.title__fees') }} <a href @click.prevent="onChangeFee" class="change-fee">{{ $t('send.public.flyout-confirm-send.label__change-fees')}}</a>
+                {{ $t('send.public.flyout-confirm-send.title__fees') }} <a
+                    href
+                    class="change-fee"
+                    @click.prevent="onChangeFee"
+                >
+                    {{ $t('send.public.flyout-confirm-send.label__change-fees') }}
+                </a>
             </h3>
         </template>
         <dl>
             <template v-if="showFee">
-                <dt class="fees">{{ fee.label }}</dt>
+                <dt class="fees">
+                    {{ fee.label }}
+                </dt>
                 <dd class="fees">
-                    <span class="value">{{ feeAmountAsBaseCoin }}</span> <span class="unit">xzc</span>
+                    <span class="value">
+                        {{ feeAmountAsBaseCoin }}
+                    </span> <span class="unit">
+                        xzc
+                    </span>
                 </dd>
             </template>
-            <dt class="amount">{{ $t(`${translationNamespace}.label__amount`) }}</dt>
+            <dt class="amount">
+                {{ $t(`${translationNamespace}.label__amount`) }}
+            </dt>
             <dd class="amount">
-                <span class="value">{{ totalAsBaseCoin }}</span> <span class="unit">XZC</span>
+                <span class="value">
+                    {{ totalAsBaseCoin }}
+                </span> <span class="unit">
+                    XZC
+                </span>
             </dd>
         </dl>
     </section>
 </template>
 
 <script>
-    import { convertToCoin } from '#/lib/convert'
-    import PendingPayments from '@/components/payments/PendingPayments'
-    import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
+import { convertToCoin } from '#/lib/convert'
+import PendingPayments from '@/components/payments/PendingPayments'
+import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 
-    export default {
-        name: 'FeesAndAmount',
-        mixins: [
-            TranslationNamespaceMixin
-        ],
-        components: {
-            PendingPayments
+export default {
+    name: 'FeesAndAmount',
+    components: {
+        PendingPayments
+    },
+    mixins: [
+        TranslationNamespaceMixin
+    ],
+    props: {
+        amount: {
+            type: Number,
+            required: true
         },
-        props: {
-            amount: {
-                type: Number,
-                required: true
-            },
-            fee: {
-                type: Object,
-                default: () => ({ amount: 0, label: '' })
-            },
-            canChangeFee: {
-                type: Boolean,
-                default: false
-            },
-            onChangeFee: {
-                type: Function,
-                default: () => {}
-            },
-            showFee: {
-                type: Boolean,
-                default: true
-            }
+        fee: {
+            type: Object,
+            default: () => ({ amount: 0, label: '' })
         },
+        canChangeFee: {
+            type: Boolean,
+            default: false
+        },
+        onChangeFee: {
+            type: Function,
+            default: () => {}
+        },
+        showFee: {
+            type: Boolean,
+            default: true
+        }
+    },
 
-        computed: {
-            total () {
-                return this.amount + this.fee.amount
-            },
-            totalAsBaseCoin () {
-                return convertToCoin(this.total)
-            },
-            feeAmountAsBaseCoin () {
-                return convertToCoin(this.fee.amount)
-            }
+    computed: {
+        total () {
+            return this.amount + this.fee.amount
+        },
+        totalAsBaseCoin () {
+            return convertToCoin(this.total)
+        },
+        feeAmountAsBaseCoin () {
+            return convertToCoin(this.fee.amount)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

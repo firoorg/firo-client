@@ -1,18 +1,21 @@
 <template>
     <v-popover
-            v-bind="$attrs"
-            v-on="$listeners"
-            class="popover"
-            :popover-class="getPopoverClass"
-            :offset="offset"
-            :handle-resize="true"
-            :auto-hide="this.$attrs['auto-hide'] !== undefined ? this.$attrs['auto-hide'] : false"
+        v-bind="$attrs"
+        class="popover"
+        :popover-class="getPopoverClass"
+        :offset="offset"
+        :handle-resize="true"
+        :auto-hide="this.$attrs['auto-hide'] !== undefined ? this.$attrs['auto-hide'] : false"
+        v-on="$listeners"
     >
         <!-- This will be the popover target (for the events and position) -->
         <slot name="target" />
 
         <template slot="popover">
-            <div class="content-wrapper" ref="container">
+            <div
+                ref="container"
+                class="content-wrapper"
+            >
                 <slot name="content" />
             </div>
         </template>
@@ -20,63 +23,63 @@
 </template>
 
 <script>
-    import smoothReflow from 'vue-smooth-reflow'
-    import { mapGetters } from 'vuex'
+import smoothReflow from 'vue-smooth-reflow'
+import { mapGetters } from 'vuex'
 
-    export default {
-        name: 'BasePopover',
-        inheritAttrs: false,
-        mixins: [
-            smoothReflow
-        ],
+export default {
+    name: 'BasePopover',
+    mixins: [
+        smoothReflow
+    ],
+    inheritAttrs: false,
 
-        props: {
-            canBlur: {
-                type: Boolean,
-                default: true
-            },
-            offset: {
-                type: Number,
-                default: 12
-            }
+    props: {
+        canBlur: {
+            type: Boolean,
+            default: true
+        },
+        offset: {
+            type: Number,
+            default: 12
+        }
+    },
+
+    data () {
+        return {
+            msg: ''
+        }
+    },
+
+    mounted () {
+        console.log(this.$attrs)
+        this.$smoothReflow({
+            el: this.$refs.container
+        })
+    },
+
+    beforeDestroy () {
+        this.$smoothReflow({
+            el: this.$refs.container
+        })
+    },
+
+    computed: {
+        ...mapGetters({
+            hasOpenOverlay: 'App/hasOpenOverlay'
+        }),
+
+        isBlurred () {
+            return this.canBlur && this.hasOpenOverlay
         },
 
-        mounted () {
-            console.log(this.$attrs)
-            this.$smoothReflow({
-                el: this.$refs.container
-            })
-        },
+        getPopoverClass () {
+            const parent = this.$attrs['popover-class'] || ''
+            const classes = parent ? [parent] : []
 
-        beforeDestroy () {
-            this.$smoothReflow({
-                el: this.$refs.container
-            })
-        },
-
-        data () {
-            return {
-                msg: ''
-            }
-        },
-
-        computed: {
-            ...mapGetters({
-                hasOpenOverlay: 'App/hasOpenOverlay'
-            }),
-
-            isBlurred () {
-                return this.canBlur && this.hasOpenOverlay
-            },
-
-            getPopoverClass () {
-                const parent = this.$attrs['popover-class'] || ''
-                const classes = parent ? [parent] : []
-
-                return this.isBlurred ? [...classes, 'is-blurred'] : classes
-            }
+            return this.isBlurred ? [...classes, 'is-blurred'] : classes
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

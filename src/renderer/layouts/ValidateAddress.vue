@@ -5,17 +5,17 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-    export default {
-        name: 'ValidateAddress',
+export default {
+    name: 'ValidateAddress',
 
-        computed: {
-            ...mapGetters({
-                address: 'AddressValidation/currentAddressToValidate'
-            })
-        }
+    computed: {
+        ...mapGetters({
+            address: 'AddressValidation/currentAddressToValidate'
+        })
     }
+}
 </script>
 
 <style lang="scss" scoped>

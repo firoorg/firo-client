@@ -1,8 +1,15 @@
 <template>
     <ul class="transactions">
-        <li v-for="(tx) in transactionsFormatted" :key="tx.id" :class="tx.className">
+        <li
+            v-for="(tx) in transactionsFormatted"
+            :key="tx.id"
+            :class="tx.className"
+        >
             <div class="icon">
-                <tick-icon v-if="tx.isConfirmed" :color="tx.className"></tick-icon>
+                <tick-icon
+                    v-if="tx.isConfirmed"
+                    :color="tx.className"
+                />
                 <outgoing-icon v-else-if="tx.isOutgoing" />
                 <incoming-icon v-else />
             </div>
@@ -10,18 +17,28 @@
                 <div class="label">
                     <!--<slot v-bind="value" />-->
                     <span class="amount">
-                        <span class="name">{{ tx.amount }}</span>
-                        <span class="unit">XZC</span>
+                        <span class="name">
+                            {{ tx.amount }}
+                        </span>
+                        <span class="unit">
+                            XZC
+                        </span>
                     </span>
 
                     <span class="timestamp">
-                        <timeago :datetime="tx.firstSeenAt" :auto-update="30" />
+                        <timeago
+                            :datetime="tx.firstSeenAt"
+                            :auto-update="30"
+                        />
                     </span>
                 </div>
 
                 <div class="wrapper">
                     <!--<span class="progress" :style="{ width: calcProcessInPercent(tx) + '%' }"></span>-->
-                    <div class="progress" v-if="tx.isConfirmed"></div>
+                    <div
+                        v-if="tx.isConfirmed"
+                        class="progress"
+                    />
                     <!--
                     <div v-for="(confirmations, id) in tx" class="item" :key="id">
 
@@ -34,51 +51,51 @@
 </template>
 
 <script>
-    import { convertToCoin } from '#/lib/convert'
-    import TickIcon from '@/components/Icons/TickIcon'
-    import IncomingIcon from '@/components/Icons/IncomingIcon'
-    import OutgoingIcon from '@/components/Icons/OutgoingIcon'
+import { convertToCoin } from '#/lib/convert'
+import TickIcon from '@/components/Icons/TickIcon'
+import IncomingIcon from '@/components/Icons/IncomingIcon'
+import OutgoingIcon from '@/components/Icons/OutgoingIcon'
 
-    export default {
-        name: 'TransactionsList',
-        components: {
-            OutgoingIcon,
-            IncomingIcon,
-            TickIcon
-        },
-        props: {
-            transactions: {
-                type: Array,
-                required: true
+export default {
+    name: 'TransactionsList',
+    components: {
+        OutgoingIcon,
+        IncomingIcon,
+        TickIcon
+    },
+    props: {
+        transactions: {
+            type: Array,
+            required: true
+        }
+    },
+
+    computed: {
+        transactionsFormatted () {
+            if (!this.transactions) {
+                return []
             }
-        },
 
-        computed: {
-            transactionsFormatted () {
-                if (!this.transactions) {
-                    return []
-                }
+            return this.transactions
+                .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
+                .map((tx, index) => {
+                    const { id, amount, firstSeenAt, confirmations, isConfirmed, category } = tx
+                    const order = this.transactions.length - index - 1
 
-                return this.transactions
-                    .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
-                    .map((tx, index) => {
-                        const { id, amount, firstSeenAt, confirmations, isConfirmed, category } = tx
-                        const order = this.transactions.length - index - 1
-
-                        return {
-                            id,
-                            firstSeenAt,
-                            amount: convertToCoin(amount),
-                            order,
-                            confirmations,
-                            isConfirmed,
-                            isOutgoing: category === 'send' || category === 'spendOut',
-                            className: !order ? 'green' : 'warning' // order === index, 0 first received -> valid
-                        }
-                    })
-            }
+                    return {
+                        id,
+                        firstSeenAt,
+                        amount: convertToCoin(amount),
+                        order,
+                        confirmations,
+                        isConfirmed,
+                        isOutgoing: category === 'send' || category === 'spendOut',
+                        className: !order ? 'green' : 'warning' // order === index, 0 first received -> valid
+                    }
+                })
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

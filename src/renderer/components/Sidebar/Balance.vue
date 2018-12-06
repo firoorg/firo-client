@@ -4,46 +4,53 @@
 </i18n>
 
 <template>
-    <section class="balance" :class="{'is-confirmed': isConfirmed }">
+    <section
+        class="balance"
+        :class="{'is-confirmed': isConfirmed }"
+    >
         <div class="label">
-            {{ $t('navigation.balance.title')}}
-            <span>
-            </span>
+            {{ $t('navigation.balance.title') }}
+            <span />
         </div>
         <!-- TODO animate change of current balance
         @inspiration https://josex2r.github.io/jQuery-SlotMachine/
         @inspiration http://preview.codecanyon.net/item/jcountdown-mega-package/full_screen_preview/3443480
         -->
-        <span class="amount" @click="toggleBalance">{{ this.balance }}</span>
+        <span
+            class="amount"
+            @click="toggleBalance"
+        >
+            {{ this.balance }}
+        </span>
     </section>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex' /* , mapActions */
-  import { convertToCoin } from '#/lib/convert'
-  // import ConfirmationBadge from '@/components/Badge/ConfirmationBadge'
+import { mapGetters } from 'vuex' /* , mapActions */
+import { convertToCoin } from '#/lib/convert'
+// import ConfirmationBadge from '@/components/Badge/ConfirmationBadge'
 
-  export default {
-      name: 'Balance',
-      components: {
-          // ConfirmationBadge
-      },
+export default {
+    name: 'Balance',
+    components: {
+        // ConfirmationBadge
+    },
 
-      data () {
-          return {
-              pendingConfirmations: 1,
-              requiredConfirmations: 6,
-              confirmationsInterval: null,
-              showBalanceInCurrency: false,
-              exchange: {
-                  factor: 50,
-                  unit: 'USD',
-                  decimals: 2
-              }
-          }
-      },
+    data () {
+        return {
+            pendingConfirmations: 1,
+            requiredConfirmations: 6,
+            confirmationsInterval: null,
+            showBalanceInCurrency: false,
+            exchange: {
+                factor: 50,
+                unit: 'USD',
+                decimals: 2
+            }
+        }
+    },
 
-      /*
+    /*
       created () {
           this.confirmationsInterval = setInterval(() => {
               this.pendingConfirmations--
@@ -59,64 +66,64 @@
       },
       */
 
-      computed: {
-          ...mapGetters({
-              totalBalance: 'Balance/total'
-          }),
+    computed: {
+        ...mapGetters({
+            totalBalance: 'Balance/total'
+        }),
 
-          isConfirmed () {
-              return this.pendingConfirmations === 0
-          },
+        isConfirmed () {
+            return this.pendingConfirmations === 0
+        },
 
-          balance () {
-              const {factor, unit, decimals} = this.exchange
+        balance () {
+            const {factor, unit, decimals} = this.exchange
 
-              return this.showBalanceInCurrency ? `${(this.totalBalance * factor).toFixed(decimals)} ${unit}` : `${convertToCoin(this.totalBalance)} XZC`
-          }
-      },
+            return this.showBalanceInCurrency ? `${(this.totalBalance * factor).toFixed(decimals)} ${unit}` : `${convertToCoin(this.totalBalance)} XZC`
+        }
+    },
 
-      watch: {
-          isConfirmed (isConfirmed, wasConfimed) {
-              if (!isConfirmed) {
-                  return
-              }
-              console.log('is confirmed')
-              /*
+    watch: {
+        isConfirmed (isConfirmed, wasConfimed) {
+            if (!isConfirmed) {
+                return
+            }
+            console.log('is confirmed')
+            /*
               this.sendNotification({
                   title: 'Balance Confirmed',
                   message: 'Your balance is now fully confirmed 👍',
                   type: 'success'
               })
               */
-          },
-          pendingConfirmations (newPending, oldPending) {
-              if (this.isConfirmed) {
-                  return
-              }
+        },
+        pendingConfirmations (newPending, oldPending) {
+            if (this.isConfirmed) {
+                return
+            }
 
-              console.log(`Confirmations update ${this.requiredConfirmations - newPending}/${this.requiredConfirmations}. @todo`)
+            console.log(`Confirmations update ${this.requiredConfirmations - newPending}/${this.requiredConfirmations}. @todo`)
 
-              /*
+            /*
               this.showMessage({
                   message: `Confirmations update ${this.requiredConfirmations - newPending}/${this.requiredConfirmations}. @todo`
               })
               */
-          }
-      },
+        }
+    },
 
-      methods: {
-          /*
+    methods: {
+        /*
           ...mapActions({
               showMessage: 'Notification/showMessage',
               sendNotification: 'Notification/sendNotification'
           }),
           */
 
-          toggleBalance () {
-              this.showBalanceInCurrency = !this.showBalanceInCurrency
-          }
-      }
-  }
+        toggleBalance () {
+            this.showBalanceInCurrency = !this.showBalanceInCurrency
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>

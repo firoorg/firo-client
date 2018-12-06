@@ -1,196 +1,197 @@
 <template>
     <div class="animated-table">
-        <vuetable ref="vuetable"
-                  :api-mode="false"
-                  :fields="getFieldsWithLocalizedTitle"
-                  :per-page="perPage"
-                  :track-by="trackBy"
-                  :sort-order="sortOrder"
-                  :data-manager="dataManager"
-                  pagination-path="pagination"
-                  :row-transition-name="rowTransition"
-                  :row-class="getRowClass"
-                  :no-data-template="noDataMessage"
-                  @vuetable:pagination-data="onPaginationData"
-                  @vuetable:row-clicked="onRowClick"
-                  v-bind="{ scopedSlots: $scopedSlots }"
-        >
-        </vuetable>
+        <vuetable
+            ref="vuetable"
+            :api-mode="false"
+            :fields="getFieldsWithLocalizedTitle"
+            :per-page="perPage"
+            :track-by="trackBy"
+            :sort-order="sortOrder"
+            :data-manager="dataManager"
+            pagination-path="pagination"
+            :row-transition-name="rowTransition"
+            :row-class="getRowClass"
+            :no-data-template="noDataMessage"
+            v-bind="{ scopedSlots: $scopedSlots }"
+            @vuetable:pagination-data="onPaginationData"
+            @vuetable:row-clicked="onRowClick"
+        />
 
         <div>
-            <vuetable-pagination ref="pagination"
-                                 @vuetable-pagination:change-page="onChangePage"
-            ></vuetable-pagination>
+            <vuetable-pagination
+                ref="pagination"
+                @vuetable-pagination:change-page="onChangePage"
+            />
         </div>
     </div>
 </template>
 
 <script>
-    import { Vuetable, VuetablePagination } from 'vuetable-2'
-    // import Vuetable from 'vuetable-2/src/index'
-    // import VuetablePagination from 'vuetable-2/src/components/VuetablePagination'
-    // import VuetableFieldHandle from 'vuetable-2/src/components/VuetableFieldHandle.vue'
-    import _ from 'lodash'
+import { Vuetable, VuetablePagination } from 'vuetable-2'
+// import Vuetable from 'vuetable-2/src/index'
+// import VuetablePagination from 'vuetable-2/src/components/VuetablePagination'
+// import VuetableFieldHandle from 'vuetable-2/src/components/VuetableFieldHandle.vue'
+import _ from 'lodash'
 
-    // import AnimatedTableRelativeDate from '@/components/AnimatedTableRelativeDate'
+// import AnimatedTableRelativeDate from '@/components/AnimatedTableRelativeDate'
 
-    // Vue.component('vuetable-field-component:relative-date', AnimatedTableRelativeDate)
+// Vue.component('vuetable-field-component:relative-date', AnimatedTableRelativeDate)
 
-    export default {
-        name: 'AnimatedTable',
-        components: {
-            Vuetable,
-            VuetablePagination
+export default {
+    name: 'AnimatedTable',
+    components: {
+        Vuetable,
+        VuetablePagination
+    },
+    props: {
+        fields: {
+            type: Array,
+            required: true
         },
-        props: {
-            fields: {
-                type: Array,
-                required: true
-            },
-            data: {
-                type: Array,
-                required: true
-            },
-            trackBy: {
-                type: String,
-                default: 'id'
-            },
-            sortOrder: {
-                type: Array,
-                default: () => [
-                    {
-                        field: 'createdAt',
-                        direction: 'desc'
-                    }
-                ]
-            },
-            perPage: {
-                type: Number,
-                default: 10
-            },
-            noDataMessage: {
-                type: String,
-                default: ''
-            },
-            selectedRow: {
-                type: String,
-                default: null
-            },
-            onRowSelect: {
-                type: Function,
-                default: null
-            }
+        data: {
+            type: Array,
+            required: true
         },
-
-        data () {
-            return {
-                interval: null,
-                rowTransition: 'fade'
-            }
+        trackBy: {
+            type: String,
+            default: 'id'
         },
-
-        computed: {
-            getFieldsWithLocalizedTitle () {
-                return this.fields.map((field) => {
-                    return {
-                        ...field,
-                        title: this.$t(field.title)
-                    }
-                })
-            }
-        },
-
-        watch: {
-            data (newVal, oldVal) {
-                this.$refs.vuetable.refresh()
-            }
-        },
-
-        methods: {
-            getRowClass (item, index) {
-                const classes = []
-
-                if (item[this.trackBy] === this.selectedRow) {
-                    classes.push('selected')
+        sortOrder: {
+            type: Array,
+            default: () => [
+                {
+                    field: 'createdAt',
+                    direction: 'desc'
                 }
+            ]
+        },
+        perPage: {
+            type: Number,
+            default: 10
+        },
+        noDataMessage: {
+            type: String,
+            default: ''
+        },
+        selectedRow: {
+            type: String,
+            default: null
+        },
+        onRowSelect: {
+            type: Function,
+            default: null
+        }
+    },
 
-                if (item.isFulfilled) {
-                    classes.push('is-fulfilled')
+    data () {
+        return {
+            interval: null,
+            rowTransition: 'fade'
+        }
+    },
+
+    computed: {
+        getFieldsWithLocalizedTitle () {
+            return this.fields.map((field) => {
+                return {
+                    ...field,
+                    title: this.$t(field.title)
                 }
-                if (item.isIncoming) {
-                    classes.push('is-incoming')
-                }
-                if (item.isReused) {
-                    classes.push('is-reused')
-                }
+            })
+        }
+    },
 
-                return classes.join(' ')
-            },
+    watch: {
+        data (newVal, oldVal) {
+            this.$refs.vuetable.refresh()
+        }
+    },
 
-            onRowClick (rowData) {
-                const { data, index, event } = rowData
+    methods: {
+        getRowClass (item, index) {
+            const classes = []
 
-                console.log(data[this.trackBy], data, this.trackBy)
+            if (item[this.trackBy] === this.selectedRow) {
+                classes.push('selected')
+            }
 
-                /*
+            if (item.isFulfilled) {
+                classes.push('is-fulfilled')
+            }
+            if (item.isIncoming) {
+                classes.push('is-incoming')
+            }
+            if (item.isReused) {
+                classes.push('is-reused')
+            }
+
+            return classes.join(' ')
+        },
+
+        onRowClick (rowData) {
+            const { data, index, event } = rowData
+
+            console.log(data[this.trackBy], data, this.trackBy)
+
+            /*
                 if (data[this.trackBy] === this.selectedRow) {
                     return
                 }
                 */
 
-                if (this.onRowSelect) {
-                    this.onRowSelect(data, index, event)
-                }
-            },
-
-            onPaginationData (paginationData) {
-                this.$refs.pagination.setPaginationData(paginationData)
-            },
-
-            onChangePage (page) {
-                this.rowTransition = ''
-                this.$refs.vuetable.changePage(page)
-                this.rowTransition = 'fade'
-            },
-
-            dataManager (sortOrder, pagination) {
-                // console.log('DATAMANAGER CALLED!')
-                if (this.data.length < 1) {
-                    return {
-                        data: []
-                    }
-                }
-
-                let local = this.data
-
-                // sortOrder can be empty, so we have to check for that as well
-                if (sortOrder.length > 0) {
-                    // console.log('orderBy:', sortOrder[0].sortField, sortOrder[0].direction)
-                    local = _.orderBy(
-                        local,
-                        sortOrder[0].sortField,
-                        sortOrder[0].direction
-                    )
-                }
-
-                pagination = this.$refs.vuetable.makePagination(
-                    local.length,
-                    this.perPage
-                )
-                // console.log('pagination:', pagination)
-                let from = pagination.from - 1
-                let to = from + this.perPage
-
-                return {
-                    pagination: pagination,
-                    data: _.slice(local, from, to)
-                }
-            },
-            onActionClicked (action, data) {
-                console.log('slot actions: on-click', data.name)
+            if (this.onRowSelect) {
+                this.onRowSelect(data, index, event)
             }
+        },
+
+        onPaginationData (paginationData) {
+            this.$refs.pagination.setPaginationData(paginationData)
+        },
+
+        onChangePage (page) {
+            this.rowTransition = ''
+            this.$refs.vuetable.changePage(page)
+            this.rowTransition = 'fade'
+        },
+
+        dataManager (sortOrder, pagination) {
+            // console.log('DATAMANAGER CALLED!')
+            if (this.data.length < 1) {
+                return {
+                    data: []
+                }
+            }
+
+            let local = this.data
+
+            // sortOrder can be empty, so we have to check for that as well
+            if (sortOrder.length > 0) {
+                // console.log('orderBy:', sortOrder[0].sortField, sortOrder[0].direction)
+                local = _.orderBy(
+                    local,
+                    sortOrder[0].sortField,
+                    sortOrder[0].direction
+                )
+            }
+
+            pagination = this.$refs.vuetable.makePagination(
+                local.length,
+                this.perPage
+            )
+            // console.log('pagination:', pagination)
+            let from = pagination.from - 1
+            let to = from + this.perPage
+
+            return {
+                pagination: pagination,
+                data: _.slice(local, from, to)
+            }
+        },
+        onActionClicked (action, data) {
+            console.log('slot actions: on-click', data.name)
         }
     }
+}
 </script>
 
 <style lang="scss">

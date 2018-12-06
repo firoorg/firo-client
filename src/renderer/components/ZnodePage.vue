@@ -16,30 +16,46 @@
                     </form>
                 </section>
 
-                <znode-map class="znodes-map"
-                           :remote-znodes="remoteZnodes"
-                           :my-znodes="myZnodes"
-                           :znode-states="znodeStates" />
+                <znode-map
+                    class="znodes-map"
+                    :remote-znodes="remoteZnodes"
+                    :my-znodes="myZnodes"
+                    :znode-states="znodeStates"
+                />
 
                 <section class="stats">
                     <div class="stat">
-                        <div class="value">{{ totalZnodes }}</div>
-                        <div class="desc">Total Nodes</div>
+                        <div class="value">
+                            {{ totalZnodes }}
+                        </div>
+                        <div class="desc">
+                            Total Nodes
+                        </div>
                     </div>
                     <div class="stat">
-                        <div class="value">{{ znodePaymentCycleInDays.toFixed(2) }}</div>
-                        <div class="desc">Avgerage Days for Payout</div>
+                        <div class="value">
+                            {{ znodePaymentCycleInDays.toFixed(2) }}
+                        </div>
+                        <div class="desc">
+                            Avgerage Days for Payout
+                        </div>
                     </div>
                     <div class="stat">
-                        <div class="value">17.23</div>
-                        <div class="desc">days until your next Payout</div>
+                        <div class="value">
+                            17.23
+                        </div>
+                        <div class="desc">
+                            days until your next Payout
+                        </div>
                     </div>
                 </section>
 
                 <section class="my-znodes">
-                    <my-znode v-for="(znode, index) in myZnodes"
-                              :key="index"
-                              v-bind="znode"  />
+                    <my-znode
+                        v-for="(znode, index) in myZnodes"
+                        :key="index"
+                        v-bind="znode"
+                    />
                 </section>
 
                 <section class="remote-znodes">
@@ -51,62 +67,62 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    // import types from '~/types'
+import { mapGetters } from 'vuex'
+// import types from '~/types'
 
-    import MyZnode from '@/components/ZnodePage/MyZnode'
-    import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
-    import RemoteZnodesList from '@/components/ZnodePage/RemoteZnodesList'
+import MyZnode from '@/components/ZnodePage/MyZnode'
+import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
+import RemoteZnodesList from '@/components/ZnodePage/RemoteZnodesList'
 
-    export default {
-        name: 'ZnodePage',
+export default {
+    name: 'ZnodePage',
 
-        components: {
-            RemoteZnodesList,
-            MyZnode,
-            ZnodeMap
-        },
+    components: {
+        RemoteZnodesList,
+        MyZnode,
+        ZnodeMap
+    },
 
-        data () {
-            return {
-                znodeStates: [
-                    {
-                        name: 'valid',
-                        states: [
-                            'ENABLED'
-                        ]
-                    },
-                    {
-                        name: 'pending',
-                        states: [
-                            'PRE_ENABLED',
-                            'MISSING'
-                        ]
-                    },
-                    {
-                        name: 'needs-attention',
-                        states: [
-                            'EXPIRED',
-                            'OUTPOINT_SPENT',
-                            'UPDATE_REQUIRED',
-                            'WATCHDOG_EXPIRED',
-                            'NEW_START_REQUIRED',
-                            'POSE_BAN'
-                        ]
-                    }
-                ]
-            }
-        },
-
-        computed: {
-            ...mapGetters({
-                myZnodes: 'Znode/myZnodes',
-                remoteZnodes: 'Znode/remoteZnodes',
-                totalZnodes: 'Znode/totalZnodes',
-                znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
-            })
+    data () {
+        return {
+            znodeStates: [
+                {
+                    name: 'valid',
+                    states: [
+                        'ENABLED'
+                    ]
+                },
+                {
+                    name: 'pending',
+                    states: [
+                        'PRE_ENABLED',
+                        'MISSING'
+                    ]
+                },
+                {
+                    name: 'needs-attention',
+                    states: [
+                        'EXPIRED',
+                        'OUTPOINT_SPENT',
+                        'UPDATE_REQUIRED',
+                        'WATCHDOG_EXPIRED',
+                        'NEW_START_REQUIRED',
+                        'POSE_BAN'
+                    ]
+                }
+            ]
         }
+    },
+
+    computed: {
+        ...mapGetters({
+            myZnodes: 'Znode/myZnodes',
+            remoteZnodes: 'Znode/remoteZnodes',
+            totalZnodes: 'Znode/totalZnodes',
+            znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
+        })
     }
+}
 </script>
 
 <style lang="scss" scoped>

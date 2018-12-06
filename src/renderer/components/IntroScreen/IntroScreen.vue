@@ -1,136 +1,154 @@
 <template>
     <div class="overlay centered">
-        <div class="grid" ref="grid">
-            <main class="content" :class="getCurrentSettingsClass">
+        <div
+            ref="grid"
+            class="grid"
+        >
+            <main
+                class="content"
+                :class="getCurrentSettingsClass"
+            >
                 <header>
-                    <zcoin-logo-text class="logo" v-show="!goingToHide" />
-                    <multi-step-popover :is-open="showIntro"
-                                        placement="right-center"
-                                        :steps="steps"
-                                        :current-step="currentStep"
-                                        :boundaries-element="$refs.grid"
-                                        :actions="getActions"
-                                        :delay="{ show: 350, hide: 0 }"
-                                        popover-class="dark overlay-popover"
-                                        :can-blur="false"
-                                        @step-change="onStepChange">
-                        <a href="#" class="logo-trigger">click</a>
+                    <zcoin-logo-text
+                        v-show="!goingToHide"
+                        class="logo"
+                    />
+                    <multi-step-popover
+                        :is-open="showIntro"
+                        placement="right-center"
+                        :steps="steps"
+                        :current-step="currentStep"
+                        :boundaries-element="$refs.grid"
+                        :actions="getActions"
+                        :delay="{ show: 350, hide: 0 }"
+                        popover-class="dark overlay-popover"
+                        :can-blur="false"
+                        @step-change="onStepChange"
+                    >
+                        <a
+                            href="#"
+                            class="logo-trigger"
+                        >
+                            click
+                        </a>
                     </multi-step-popover>
                 </header>
 
                 <div v-show="!isReady">
                     <div>
-                        <loading-bounce color="dark" class="loading" />
+                        <loading-bounce
+                            color="dark"
+                            class="loading"
+                        />
                     </div>
                 </div>
 
-                <footer>
-                </footer>
+                <footer />
             </main>
         </div>
     </div>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import GuideMixin from '@/mixins/GuideMixin'
-    import types from '~/types'
+import { mapGetters } from 'vuex'
+import GuideMixin from '@/mixins/GuideMixin'
+import types from '~/types'
 
-    import ZcoinLogoText from '@/components/Icons/ZcoinLogoText'
-    import LoadingBounce from '@/components/Icons/LoadingBounce'
+import ZcoinLogoText from '@/components/Icons/ZcoinLogoText'
+import LoadingBounce from '@/components/Icons/LoadingBounce'
 
-    import MultiStepPopover from '@/components/Notification/MultiStepPopover'
-    import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
-    import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
-    import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
-    import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
-    import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
+import MultiStepPopover from '@/components/Notification/MultiStepPopover'
+import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
+import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
+import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
+import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
+import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 
-    export default {
-        name: 'IntroScreen',
+export default {
+    name: 'IntroScreen',
 
-        mixins: [
-            GuideMixin
-        ],
+    components: {
+        LoadingBounce,
+        MultiStepPopover,
+        ZcoinLogoText,
+        IntroScreenWelcome,
+        IntroScreenBlockchainLocation,
+        IntroScreenLockWallet,
+        IntroScreenAmountToHoldInZerocoin,
+        IntroScreenOther
+    },
 
-        components: {
-            LoadingBounce,
-            MultiStepPopover,
-            ZcoinLogoText,
-            IntroScreenWelcome,
-            IntroScreenBlockchainLocation,
-            IntroScreenLockWallet,
-            IntroScreenAmountToHoldInZerocoin,
-            IntroScreenOther
+    mixins: [
+        GuideMixin
+    ],
+
+    data () {
+        return {
+            goingToHide: false,
+            steps: {
+                welcome: IntroScreenWelcome
+                // location: IntroScreenBlockchainLocation,
+                // lock: IntroScreenLockWallet,
+                // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
+                // other: IntroScreenOther
+            },
+            currentStep: 'welcome',
+            currentSettingsValue: ''
+        }
+    },
+
+    mounted () {
+        this.$on('step-change', this.onStepChange)
+    },
+
+    beforeDestroy () {
+        this.$off('step-change', this.onStepChange)
+    },
+
+    computed: {
+        ...mapGetters({
+            isReady: 'App/isReady',
+            showIntroScreen: 'App/showIntroScreen'
+        }),
+
+        getCurrentSettingsClass () {
+            const classes = [
+                this.showIntro ? 'is-open' : ''
+            ]
+
+            classes.push('setting-' + this.currentSettingsValue
+                .replace('IntroScreen', '')
+                .toLowerCase())
+
+            return classes.join(' ')
         },
-
-        mounted () {
-            this.$on('step-change', this.onStepChange)
+        showIntro () {
+            return this.isReady && this.showIntroScreen
         },
-
-        beforeDestroy () {
-            this.$off('step-change', this.onStepChange)
-        },
-
-        data () {
+        getActions () {
             return {
-                goingToHide: false,
-                steps: {
-                    welcome: IntroScreenWelcome
-                    // location: IntroScreenBlockchainLocation,
-                    // lock: IntroScreenLockWallet,
-                    // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
-                    // other: IntroScreenOther
-                },
-                currentStep: 'welcome',
-                currentSettingsValue: ''
-            }
-        },
-
-        computed: {
-            ...mapGetters({
-                isReady: 'App/isReady',
-                showIntroScreen: 'App/showIntroScreen'
-            }),
-
-            getCurrentSettingsClass () {
-                const classes = [
-                    this.showIntro ? 'is-open' : ''
-                ]
-
-                classes.push('setting-' + this.currentSettingsValue
-                    .replace('IntroScreen', '')
-                    .toLowerCase())
-
-                return classes.join(' ')
-            },
-            showIntro () {
-                return this.isReady && this.showIntroScreen
-            },
-            getActions () {
-                return {
-                    prev: this.prevStep,
-                    next: this.nextSettingsStep,
-                    goTo: this.goToStep
-                }
-            }
-        },
-
-        methods: {
-            nextSettingsStep () {
-                if (this.nextStep()) {
-                    return
-                }
-
-                this.goingToHide = true
-
-                setTimeout(() => {
-                    console.log(types.app.HIDE_INTRO_SCREEN)
-                    this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
-                }, 500)
+                prev: this.prevStep,
+                next: this.nextSettingsStep,
+                goTo: this.goToStep
             }
         }
+    },
+
+    methods: {
+        nextSettingsStep () {
+            if (this.nextStep()) {
+                return
+            }
+
+            this.goingToHide = true
+
+            setTimeout(() => {
+                console.log(types.app.HIDE_INTRO_SCREEN)
+                this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
+            }, 500)
+        }
     }
+}
 </script>
 
 <style lang="scss" scoped>

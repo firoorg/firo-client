@@ -1,18 +1,36 @@
 <template>
-    <ul class="mints-in-progress" :class="{ monochrome: isMonochrome }">
-        <li v-for="(value, key) in items" :key="key">
+    <ul
+        class="mints-in-progress"
+        :class="{ monochrome: isMonochrome }"
+    >
+        <li
+            v-for="(value, key) in items"
+            :key="key"
+        >
             <div class="label">
                 <!--<slot v-bind="value" />-->
                 <div>
-                    <span class="name">Mint {{ value.denomination }}</span>
+                    <span class="name">
+                        Mint {{ value.denomination }}
+                    </span>
                     <span class="eta">
-                        <timeago :datetime="value.eta" :auto-update="30" />
+                        <timeago
+                            :datetime="value.eta"
+                            :auto-update="30"
+                        />
                     </span>
                 </div>
 
                 <div class="wrapper">
-                    <div v-for="(confirmations, id) in value.tx" class="item" :key="id">
-                        <span class="progress" :style="{ width: calcProcessInPercent(confirmations) + '%' }"></span>
+                    <div
+                        v-for="(confirmations, id) in value.tx"
+                        :key="id"
+                        class="item"
+                    >
+                        <span
+                            class="progress"
+                            :style="{ width: calcProcessInPercent(confirmations) + '%' }"
+                        />
                     </div>
                 </div>
             </div>
@@ -21,64 +39,64 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import { convertToCoin } from '#/lib/convert'
+import { mapGetters } from 'vuex'
+import { convertToCoin } from '#/lib/convert'
 
-    export default {
-        name: 'MintsInProgressList',
-        props: {
-            mints: {
-                type: Array,
-                required: true
-            },
-            isMonochrome: {
-                type: Boolean,
-                default: false
-            }
+export default {
+    name: 'MintsInProgressList',
+    props: {
+        mints: {
+            type: Array,
+            required: true
         },
+        isMonochrome: {
+            type: Boolean,
+            default: false
+        }
+    },
 
-        computed: {
-            ...mapGetters({
-                averageBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds'
-            }),
+    computed: {
+        ...mapGetters({
+            averageBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds'
+        }),
 
-            items () {
-                let list = {}
-                const now = Date.now()
+        items () {
+            let list = {}
+            const now = Date.now()
 
-                for (let mint of this.mints) {
-                    const { amount, id, confirmations } = mint
-                    const eta = now + ((6 - confirmations) * this.averageBlockTime)
-                    const key = amount + '-' + eta
+            for (let mint of this.mints) {
+                const { amount, id, confirmations } = mint
+                const eta = now + ((6 - confirmations) * this.averageBlockTime)
+                const key = amount + '-' + eta
 
-                    if (!list[key]) {
-                        list[key] = {
-                            denomination: parseInt(convertToCoin(amount)),
-                            eta: eta,
-                            tx: {}
-                        }
-                    }
-
+                if (!list[key]) {
                     list[key] = {
-                        ...list[key],
-                        tx: {
-                            ...list[key].tx,
-                            [id]: confirmations
-                        }
+                        denomination: parseInt(convertToCoin(amount)),
+                        eta: eta,
+                        tx: {}
                     }
                 }
 
-                return list
+                list[key] = {
+                    ...list[key],
+                    tx: {
+                        ...list[key].tx,
+                        [id]: confirmations
+                    }
+                }
             }
-        },
 
-        methods: {
-            calcProcessInPercent (confirmations) {
-                // todo get confirmations required from store
-                return confirmations / 6 * 100
-            }
+            return list
+        }
+    },
+
+    methods: {
+        calcProcessInPercent (confirmations) {
+            // todo get confirmations required from store
+            return confirmations / 6 * 100
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

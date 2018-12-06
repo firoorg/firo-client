@@ -3,24 +3,34 @@
         <div class="scrollable-height">
             <section class="mint-selection">
                 <header>
-                    <h1 v-html="$t('mint.overview.title')"></h1>
-                    <p v-html="$t('mint.overview.description')"></p>
+                    <h1 v-html="$t('mint.overview.title')" />
+                    <p v-html="$t('mint.overview.description')" />
                 </header>
 
                 <div class="content-wrapper">
-                    <denomination-selector :on-denomination-change="onDenominationChange"
-                                           :current-mint-costs="currentMintCostInSatoshi" />
+                    <denomination-selector
+                        :on-denomination-change="onDenominationChange"
+                        :current-mint-costs="currentMintCostInSatoshi"
+                    />
 
                     <transition name="fade">
-                        <onboarding-notice v-if="!availableXzc" class="onboarding">
+                        <onboarding-notice
+                            v-if="!availableXzc"
+                            class="onboarding"
+                        >
                             <template slot="header">
-                                <h3 v-html="$t('onboarding.make-request-first.mint.title')"></h3>
+                                <h3 v-html="$t('onboarding.make-request-first.mint.title')" />
                             </template>
                             <template slot="content">
-                                <p v-html="$t('onboarding.make-request-first.mint.description')"></p>
-                                <i18n path="onboarding.make-request-first.mint.description" tag="p">
-                                    <router-link :to="{ name: 'receive-zcoin' }"
-                                                 place="linkToCreatePaymentRequest">
+                                <p v-html="$t('onboarding.make-request-first.mint.description')" />
+                                <i18n
+                                    path="onboarding.make-request-first.mint.description"
+                                    tag="p"
+                                >
+                                    <router-link
+                                        :to="{ name: 'receive-zcoin' }"
+                                        place="linkToCreatePaymentRequest"
+                                    >
                                         {{ $t('onboarding.make-request-first.mint.button__linkToCreatePaymentRequest') }}
                                     </router-link>
                                 </i18n>
@@ -28,14 +38,14 @@
                         </onboarding-notice>
                         <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
                             <template slot="header">
-                                <h3 v-html="$t('onboarding.process-mints.title')"></h3>
+                                <h3 v-html="$t('onboarding.process-mints.title')" />
                             </template>
                             <template slot="content">
-                                <p v-html="$t('onboarding.process-mints.description')"></p>
+                                <p v-html="$t('onboarding.process-mints.description')" />
                             </template>
                             <template slot="actions">
                                 <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
-                                   {{ $t('onboarding.process-mints.button__add-selection--primary') }}
+                                    {{ $t('onboarding.process-mints.button__add-selection--primary') }}
                                 </base-onboarding-button>
                             </template>
                         </onboarding-notice>
@@ -46,7 +56,7 @@
         <section class="current-mint-detail scrollable-height">
             <template v-if="!hasCurrentMints && hasMintsInProgress">
                 <section class="mints-in-progress">
-                    <h2 v-html="$t('mint.detail-process-mint.title')"></h2>
+                    <h2 v-html="$t('mint.detail-process-mint.title')" />
 
                     <mints-in-progress-list :mints="mintsInProgress" />
                 </section>
@@ -54,53 +64,63 @@
             <template v-else>
                 <section class="current-mint">
                     <header>
-                        <h2 v-html="$t('mint.detail-create-mint.title')"></h2>
+                        <h2 v-html="$t('mint.detail-create-mint.title')" />
                         <div v-show="hasMintsInProgress">
                             <base-popover
-                                    :disabled="!enableProgressList"
-                                    :auto-hide="true"
-                                    placement="bottom-end"
-                                    popover-class="comet"
-                                    class="mints-in-process-popover"
-                                    :boundaries-element="this.$refs.grid"
-                                    trigger="click"
+                                :disabled="!enableProgressList"
+                                :auto-hide="true"
+                                placement="bottom-end"
+                                popover-class="comet"
+                                class="mints-in-process-popover"
+                                :boundaries-element="this.$refs.grid"
+                                trigger="click"
                             >
                                 <template slot="target">
                                     <div class="list-icon">
                                         <stack />
                                         <transition name="fade">
-                                            <notification-indicator class="indicator"
-                                                                    v-show="hasMintsInProgress" />
+                                            <notification-indicator
+                                                v-show="hasMintsInProgress"
+                                                class="indicator"
+                                            />
                                         </transition>
                                     </div>
                                 </template>
 
                                 <template slot="content">
                                     <header>
-                                        <h3 v-html="$t('mint.detail-process-mint.title')"></h3>
-                                        <p v-html="$t('mint.detail-process-mint.description')"></p>
+                                        <h3 v-html="$t('mint.detail-process-mint.title')" />
+                                        <p v-html="$t('mint.detail-process-mint.description')" />
                                     </header>
 
-                                    <mints-in-progress-list :mints="mintsInProgress"
-                                                            :is-monochrome="true" />
+                                    <mints-in-progress-list
+                                        :mints="mintsInProgress"
+                                        :is-monochrome="true"
+                                    />
                                 </template>
                             </base-popover>
                         </div>
                     </header>
                     <current-mints :current-mints="currentMints" />
                 </section>
-                <form class="checkout" @submit.prevent="onSubmit">
+                <form
+                    class="checkout"
+                    @submit.prevent="onSubmit"
+                >
                     <div class="has-divider">
-                        <fees-and-amount :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: currentDenominationFees }"
-                                         :amount="currentMintCostInSatoshi"
-                                         translation-namespace="mint.detail-create-mint" />
+                        <fees-and-amount
+                            :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: currentDenominationFees }"
+                            :amount="currentMintCostInSatoshi"
+                            translation-namespace="mint.detail-create-mint"
+                        />
                     </div>
-                    <mint-steps :form-is-valid="canSubmit"
-                                :cleanup-form="cleanupForm"
-                                @steps-started="() => enableProgressList = false"
-                                @steps-close="() => enableProgressList = true"
-                                @steps-done="cleanupForm">
-                    </mint-steps>
+                    <mint-steps
+                        :form-is-valid="canSubmit"
+                        :cleanup-form="cleanupForm"
+                        @steps-started="() => enableProgressList = false"
+                        @steps-close="() => enableProgressList = true"
+                        @steps-done="cleanupForm"
+                    />
                     <!--
                     <mint-confirm-dialog :can-submit="canSubmit"
                                          :is-open="showPopover"
@@ -117,103 +137,103 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
-    import types from '~/types'
+import { mapGetters, mapActions } from 'vuex'
+import types from '~/types'
 
-    import { convertToSatoshi } from '#/lib/convert'
+import { convertToSatoshi } from '#/lib/convert'
 
-    import DenominationSelector from '@/components/DenominationSelector'
-    import OnboardingNotice from '@/components/Notification/OnboardingNotice'
-    import CurrentMints from '@/components/payments/CurrentMints'
-    import FeesAndAmount from '@/components/payments/FeesAndAmount'
-    // import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
-    import MintSteps from '@/components/MintZerocoinPage/MintSteps'
-    import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
-    import Stack from '@/components/Icons/Stack'
-    import NotificationIndicator from '@/components/Notification/NotificationIndicator'
+import DenominationSelector from '@/components/DenominationSelector'
+import OnboardingNotice from '@/components/Notification/OnboardingNotice'
+import CurrentMints from '@/components/payments/CurrentMints'
+import FeesAndAmount from '@/components/payments/FeesAndAmount'
+// import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
+import MintSteps from '@/components/MintZerocoinPage/MintSteps'
+import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
+import Stack from '@/components/Icons/Stack'
+import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 
-    export default {
-        name: 'MintZerocoinPage',
-        components: {
-            OnboardingNotice,
-            NotificationIndicator,
-            MintsInProgressList,
-            MintSteps,
-            // MintConfirmDialog,
-            FeesAndAmount,
-            CurrentMints,
-            DenominationSelector,
-            Stack
+export default {
+    name: 'MintZerocoinPage',
+    components: {
+        OnboardingNotice,
+        NotificationIndicator,
+        MintsInProgressList,
+        MintSteps,
+        // MintConfirmDialog,
+        FeesAndAmount,
+        CurrentMints,
+        DenominationSelector,
+        Stack
+    },
+
+    data () {
+        return {
+            popoverStatus: '',
+            enableProgressList: true
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            availableXzc: 'Balance/availableXzc',
+            currentPassphrase: 'App/currentPassphrase',
+            denominations: 'Mint/currentDenominations',
+            currentDenominationFees: 'Mint/currentDenominationFees',
+            mintsInProgress: 'Mint/mintsInProgress',
+            isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
+            percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
+            remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
+        }),
+
+        currentMints () {
+            return Object.entries(this.denominations)
+            // filter out unused
+                .filter((pair) => pair[1])
+            // transform to [{denomination: '25', amount: 1}]
+                .map((pair) => {
+                    const [ denomination, amount ] = pair
+
+                    return {
+                        denomination,
+                        amount,
+                        cost: parseInt(denomination) * amount
+                    }
+                })
         },
 
-        data () {
-            return {
-                popoverStatus: '',
-                enableProgressList: true
-            }
+        hasCurrentMints () {
+            return !!this.currentMints.length
         },
 
-        computed: {
-            ...mapGetters({
-                availableXzc: 'Balance/availableXzc',
-                currentPassphrase: 'App/currentPassphrase',
-                denominations: 'Mint/currentDenominations',
-                currentDenominationFees: 'Mint/currentDenominationFees',
-                mintsInProgress: 'Mint/mintsInProgress',
-                isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
-                percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
-                remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
-            }),
-
-            currentMints () {
-                return Object.entries(this.denominations)
-                    // filter out unused
-                    .filter((pair) => pair[1])
-                    // transform to [{denomination: '25', amount: 1}]
-                    .map((pair) => {
-                        const [ denomination, amount ] = pair
-
-                        return {
-                            denomination,
-                            amount,
-                            cost: parseInt(denomination) * amount
-                        }
-                    })
-            },
-
-            hasCurrentMints () {
-                return !!this.currentMints.length
-            },
-
-            currentMintCost () {
-                return this.currentMints.reduce((accumulator, current) => accumulator + current.cost, 0)
-            },
-
-            currentMintCostInSatoshi () {
-                return convertToSatoshi(this.currentMintCost)
-            },
-
-            canSubmit () {
-                return !!Object.keys(this.currentMints).length
-            },
-
-            hasMintsInProgress () {
-                return !!this.mintsInProgress.length
-            },
-
-            mintsInProgressLength () {
-                return this.mintsInProgress.length
-            }
+        currentMintCost () {
+            return this.currentMints.reduce((accumulator, current) => accumulator + current.cost, 0)
         },
 
-        methods: {
-            ...mapActions({
-                resetDenominations: types.mint.RESET_DENOMINATIONS,
-                fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
-                doMint: types.mint.DO_MINT
-            }),
+        currentMintCostInSatoshi () {
+            return convertToSatoshi(this.currentMintCost)
+        },
 
-            /*
+        canSubmit () {
+            return !!Object.keys(this.currentMints).length
+        },
+
+        hasMintsInProgress () {
+            return !!this.mintsInProgress.length
+        },
+
+        mintsInProgressLength () {
+            return this.mintsInProgress.length
+        }
+    },
+
+    methods: {
+        ...mapActions({
+            resetDenominations: types.mint.RESET_DENOMINATIONS,
+            fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
+            doMint: types.mint.DO_MINT
+        }),
+
+        /*
             onConfirm (popoverReset) {
                 console.log('on confirm')
                 this.popoverStatus = 'showSuccess'
@@ -235,30 +255,30 @@
             },
             */
 
-            /// -- - - - - - -
+        /// -- - - - - - -
 
-            onDenominationChange () {
-                this.isConfirmed = false
-            },
+        onDenominationChange () {
+            this.isConfirmed = false
+        },
 
-            onSubmit () {
-                this.doMint({
-                    denominations: this.currentMints,
-                    auth: {
-                        passphrase: this.currentPassphrase
-                    }
-                })
+        onSubmit () {
+            this.doMint({
+                denominations: this.currentMints,
+                auth: {
+                    passphrase: this.currentPassphrase
+                }
+            })
 
-                // this.resetDenominations()
-                // this.reset(popoverReset)
-            },
+            // this.resetDenominations()
+            // this.reset(popoverReset)
+        },
 
-            cleanupForm () {
-                console.log('cleaning up mints...')
-                this.resetDenominations()
-            }
+        cleanupForm () {
+            console.log('cleaning up mints...')
+            this.resetDenominations()
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

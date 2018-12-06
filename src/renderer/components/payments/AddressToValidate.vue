@@ -5,22 +5,22 @@
 </template>
 
 <script>
-    export default {
-        name: 'AddressToValidate',
+export default {
+    name: 'AddressToValidate',
 
-        props: {
-            address: {
-                type: String,
-                required: true
-            }
-        },
+    props: {
+        address: {
+            type: String,
+            required: true
+        }
+    },
 
-        computed: {
-            formattedAddress () {
-                return this.address.match(/.{1,5}/g).join('&puncsp;')
-            }
+    computed: {
+        formattedAddress () {
+            return this.address.match(/.{1,5}/g).join('&puncsp;')
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

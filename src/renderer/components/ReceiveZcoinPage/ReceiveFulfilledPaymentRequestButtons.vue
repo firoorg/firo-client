@@ -7,35 +7,35 @@
 </template>
 
 <script>
-    import { shell } from 'electron'
-    import { mapGetters } from 'vuex'
+import { shell } from 'electron'
+import { mapGetters } from 'vuex'
 
-    export default {
-        name: 'ReceiveFulfilledPaymentRequestButtons',
+export default {
+    name: 'ReceiveFulfilledPaymentRequestButtons',
 
-        props: {
-            address: {
-                type: String,
-                required: true
-            }
-        },
+    props: {
+        address: {
+            type: String,
+            required: true
+        }
+    },
 
-        computed: {
-            ...mapGetters({
-                isTestnet: 'Blockchain/isTestnet'
-            })
-        },
+    computed: {
+        ...mapGetters({
+            isTestnet: 'Blockchain/isTestnet'
+        })
+    },
 
-        methods: {
-            openBlockExplorer (event) {
-                event.preventDefault()
+    methods: {
+        openBlockExplorer (event) {
+            event.preventDefault()
 
-                const explorerUrl = this.isTestnet ? 'https://testexplorer.zcoin.io/address/' : 'https://explorer.zcoin.io/address/'
+            const explorerUrl = this.isTestnet ? 'https://testexplorer.zcoin.io/address/' : 'https://explorer.zcoin.io/address/'
 
-                shell.openExternal(`${explorerUrl}${this.address}`)
-            }
+            shell.openExternal(`${explorerUrl}${this.address}`)
         }
     }
+}
 </script>
 
 <style scoped>

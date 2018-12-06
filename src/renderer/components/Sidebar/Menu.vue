@@ -3,35 +3,56 @@
         <ul>
             <li>
                 <router-link :to="{ name: 'receive-zcoin' }">
-                    <span class="text">{{ $t('navigation.menu.button__receive') }}</span>
+                    <span class="text">
+                        {{ $t('navigation.menu.button__receive') }}
+                    </span>
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link :to="{ name: 'mint-zerocoin' }" exact>
+                <router-link
+                    :to="{ name: 'mint-zerocoin' }"
+                    exact
+                >
                     <percentage-to-hold-in-zerocoin-notification>
-                        <span class="text">{{ $t('navigation.menu.button__mint') }}</span>
+                        <span class="text">
+                            {{ $t('navigation.menu.button__mint') }}
+                        </span>
                     </percentage-to-hold-in-zerocoin-notification>
                 </router-link>
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'spend-zerocoin' }">
-                    <span class="text">{{ $t('navigation.menu.button__spend') }}</span>
+                    <span class="text">
+                        {{ $t('navigation.menu.button__spend') }}
+                    </span>
                 </router-link>
             </li>
             <li>
                 <router-link :to="{ name: 'send-zcoin' }">
-                    <span class="text">{{ $t('navigation.menu.button__send') }}</span>
-                    <notification-indicator v-show="hasSendNotification" :has-shadow="true" />
+                    <span class="text">
+                        {{ $t('navigation.menu.button__send') }}
+                    </span>
+                    <notification-indicator
+                        v-show="hasSendNotification"
+                        :has-shadow="true"
+                    />
                 </router-link>
             </li>
             <li class="has-divider">
                 <router-link :to="{ name: 'znode' }">
-                    <span class="text">{{ $t('navigation.menu.button__znode') }}</span>
+                    <span class="text">
+                        {{ $t('navigation.menu.button__znode') }}
+                    </span>
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link :to="{ name: 'settings' }" exact>
-                    <span class="text">{{ $t('navigation.menu.button__settings') }}</span>
+                <router-link
+                    :to="{ name: 'settings' }"
+                    exact
+                >
+                    <span class="text">
+                        {{ $t('navigation.menu.button__settings') }}
+                    </span>
                 </router-link>
             </li>
         </ul>
@@ -39,30 +60,30 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import AttentionBadge from '@/components/Badge/AttentionBadge'
-    import NotificationIndicator from '@/components/Notification/NotificationIndicator'
-    import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
+import { mapGetters } from 'vuex'
+import AttentionBadge from '@/components/Badge/AttentionBadge'
+import NotificationIndicator from '@/components/Notification/NotificationIndicator'
+import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
 
-    export default {
-        name: 'Menu',
-        components: {
-            PercentageToHoldInZerocoinNotification,
-            NotificationIndicator,
-            AttentionBadge
-        },
+export default {
+    name: 'Menu',
+    components: {
+        PercentageToHoldInZerocoinNotification,
+        NotificationIndicator,
+        AttentionBadge
+    },
 
-        computed: {
-            ...mapGetters({
-                clipboardAddress: 'Clipboard/address',
-                clipboardHasNewAddress: 'Clipboard/hasNewAddress',
-                currentSendFormAddress: 'ZcoinPayment/createFormAddress'
-            }),
-            hasSendNotification () {
-                return this.clipboardHasNewAddress && this.currentSendFormAddress !== this.clipboardAddress
-            }
+    computed: {
+        ...mapGetters({
+            clipboardAddress: 'Clipboard/address',
+            clipboardHasNewAddress: 'Clipboard/hasNewAddress',
+            currentSendFormAddress: 'ZcoinPayment/createFormAddress'
+        }),
+        hasSendNotification () {
+            return this.clipboardHasNewAddress && this.currentSendFormAddress !== this.clipboardAddress
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

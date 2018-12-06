@@ -5,31 +5,31 @@
 </template>
 
 <script>
-    import Lottie from 'vue-lottie'
-    import animationData from '@/assets/animations/confirmation-check.json'
+import Lottie from 'vue-lottie'
+import animationData from '@/assets/animations/confirmation-check.json'
 
-    export default {
-        name: 'SendConfirmationCheck',
-        components: {
-            Lottie
-        },
-        props: {
-            onAnimationEnd: {
-                type: Function,
-                default: () => {}
-            }
-        },
+export default {
+    name: 'SendConfirmationCheck',
+    components: {
+        Lottie
+    },
+    props: {
+        onAnimationEnd: {
+            type: Function,
+            default: () => {}
+        }
+    },
 
-        data () {
-            return {
-                defaultOptions: {
-                    animationData,
-                    loop: false,
-                    autoplay: true
-                }
+    data () {
+        return {
+            defaultOptions: {
+                animationData,
+                loop: false,
+                autoplay: true
             }
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,48 +1,65 @@
 <template>
-    <ul class="payments" :class="{ 'show-validate': showValidate }">
-        <li v-for="(value, key) in payments" :key="key">
+    <ul
+        class="payments"
+        :class="{ 'show-validate': showValidate }"
+    >
+        <li
+            v-for="(value, key) in payments"
+            :key="key"
+        >
             <div class="label">
                 <!--<slot v-bind="value" />-->
                 {{ value.label }}
             </div>
-            <div class="validate" v-if="showValidate">
-                <a href="#" class="validate-address" @click.prevent.blur="() => validateAddress(value.address)">Show Address</a>
+            <div
+                v-if="showValidate"
+                class="validate"
+            >
+                <a
+                    href="#"
+                    class="validate-address"
+                    @click.prevent.blur="() => validateAddress(value.address)"
+                >
+                    Show Address
+                </a>
             </div>
             <div class="amount">
-                {{ value.amountAsBaseCoin }} <span class="unit">xzc</span>
+                {{ value.amountAsBaseCoin }} <span class="unit">
+                    xzc
+                </span>
             </div>
         </li>
     </ul>
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
-    import types from '~/types'
+import { mapActions } from 'vuex'
+import types from '~/types'
 
-    export default {
-        name: 'PendingPayments',
-        props: {
-            showValidate: {
-                type: Boolean,
-                default: true
-            },
-
-            payments: {
-                type: Array,
-                required: true
-            }
+export default {
+    name: 'PendingPayments',
+    props: {
+        showValidate: {
+            type: Boolean,
+            default: true
         },
 
-        methods: {
-            ...mapActions({
-                showAddressValidation: types.addressvalidation.SHOW_ADDRESS_VALIDATION
-            }),
+        payments: {
+            type: Array,
+            required: true
+        }
+    },
 
-            validateAddress (address) {
-                this.showAddressValidation(address)
-            }
+    methods: {
+        ...mapActions({
+            showAddressValidation: types.addressvalidation.SHOW_ADDRESS_VALIDATION
+        }),
+
+        validateAddress (address) {
+            this.showAddressValidation(address)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

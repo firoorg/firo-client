@@ -1,29 +1,39 @@
 <template>
     <div>
         <header>
-            <h2 v-html="$t('send.public.flyout-fee-selector.title')"></h2>
-            <p v-html="$t('send.public.flyout-fee-selector.description')"></p>
+            <h2 v-html="$t('send.public.flyout-fee-selector.title')" />
+            <p v-html="$t('send.public.flyout-fee-selector.description')" />
         </header>
 
         <ul>
             <li v-for="(fee, key) in availableFeesWithAmount">
-                <input type="radio"
-                       v-model="currentFee"
-                       :value="key"
-                       :id="key">
+                <input
+                    :id="key"
+                    v-model="currentFee"
+                    type="radio"
+                    :value="key"
+                >
 
                 <label :for="key">
-                    <span class="title">{{ fee.label }}</span>
-                    <span class="desc">{{ fee.description }}</span>
-                    <span class="amount">{{ fee.amountInBaseCoin }} xzc</span>
+                    <span class="title">
+                        {{ fee.label }}
+                    </span>
+                    <span class="desc">
+                        {{ fee.description }}
+                    </span>
+                    <span class="amount">
+                        {{ fee.amountInBaseCoin }} xzc
+                    </span>
                 </label>
             </li>
         </ul>
 
         <footer>
-            <base-button :is-outline="true"
-                         :is-dark="true"
-                         @click.prevent="emitCurrentFee">
+            <base-button
+                :is-outline="true"
+                :is-dark="true"
+                @click.prevent="emitCurrentFee"
+            >
                 {{ $t('send.public.flyout-fee-selector.button__select-fee--primary') }}
             </base-button>
         </footer>
@@ -31,63 +41,63 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import { convertToCoin } from '#/lib/convert'
+import { mapGetters } from 'vuex'
+import { convertToCoin } from '#/lib/convert'
 
-    export default {
-        name: 'SendFeeSelection',
-        props: {
-            selectedFee: {
-                type: String,
-                default: 'fast'
-            }
-        },
-        data () {
-            return {
-                currentFee: this.$props.selectedFee
-            }
-        },
+export default {
+    name: 'SendFeeSelection',
+    props: {
+        selectedFee: {
+            type: String,
+            default: 'fast'
+        }
+    },
+    data () {
+        return {
+            currentFee: this.$props.selectedFee
+        }
+    },
 
-        mounted () {
-            this.$emit('can-cancel', true) // currentStepCanCancel
-        },
+    mounted () {
+        this.$emit('can-cancel', true) // currentStepCanCancel
+    },
 
-        computed: {
-            ...mapGetters({
-                availableFees: 'ZcoinPayment/availableFees'
-            }),
+    computed: {
+        ...mapGetters({
+            availableFees: 'ZcoinPayment/availableFees'
+        }),
 
-            availableFeesWithAmount () {
-                let fees = {}
+        availableFeesWithAmount () {
+            let fees = {}
 
-                for (let key of Object.keys(this.availableFees)) {
-                    const fee = this.availableFees[key]
-                    const { amount } = fee
+            for (let key of Object.keys(this.availableFees)) {
+                const fee = this.availableFees[key]
+                const { amount } = fee
 
-                    fees = {
-                        ...fees,
-                        [key]: {
-                            ...fee,
-                            amountInBaseCoin: convertToCoin(amount)
-                        }
+                fees = {
+                    ...fees,
+                    [key]: {
+                        ...fee,
+                        amountInBaseCoin: convertToCoin(amount)
                     }
                 }
-
-                return fees
             }
-        },
 
-        methods: {
-            emitCurrentFee () {
-                const current = this.availableFees[this.currentFee]
+            return fees
+        }
+    },
 
-                this.$emit('fee-change', {
-                    ...current,
-                    key: this.currentFee
-                })
-            }
+    methods: {
+        emitCurrentFee () {
+            const current = this.availableFees[this.currentFee]
+
+            this.$emit('fee-change', {
+                ...current,
+                key: this.currentFee
+            })
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

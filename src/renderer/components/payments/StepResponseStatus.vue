@@ -1,5 +1,8 @@
 <template>
-    <div class="status" v-if="!isLoading">
+    <div
+        v-if="!isLoading"
+        class="status"
+    >
         <!--<h1 v-if="isLoading">Loading</h1>-->
         <template v-if="isError">
             <div class="icon">
@@ -14,56 +17,60 @@
                 <component :is="successIconComponentName" />
             </div>
             <h2>{{ $t(`${translationNamespace}.title`) }}</h2>
-            <p v-if="translationIsPlural">{{ $tc(`${translationNamespace}.description`, translationPluralCount) }}</p>
-            <p v-else>{{ $t(`${translationNamespace}.description`) }}</p>
+            <p v-if="translationIsPlural">
+                {{ $tc(`${translationNamespace}.description`, translationPluralCount) }}
+            </p>
+            <p v-else>
+                {{ $t(`${translationNamespace}.description`) }}
+            </p>
         </template>
     </div>
 </template>
 
 <script>
-    // import AutoCloseMixin from '@/mixins/AutoCloseMixin'
-    import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
+// import AutoCloseMixin from '@/mixins/AutoCloseMixin'
+import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 
-    import SendError from '@/components/Icons/SendError'
-    import SuccessfullySend from '@/components/Icons/SucessfullySend'
-    import MintStarted from '@/components/Icons/MintStarted'
+import SendError from '@/components/Icons/SendError'
+import SuccessfullySend from '@/components/Icons/SucessfullySend'
+import MintStarted from '@/components/Icons/MintStarted'
 
-    export default {
-        name: 'StepResponseStatus',
+export default {
+    name: 'StepResponseStatus',
 
-        mixins: [
-            // AutoCloseMixin,
-            TranslationNamespaceMixin
-        ],
+    components: {
+        SendError,
+        SuccessfullySend,
+        MintStarted
+    },
 
-        components: {
-            SendError,
-            SuccessfullySend,
-            MintStarted
+    mixins: [
+        // AutoCloseMixin,
+        TranslationNamespaceMixin
+    ],
+
+    props: {
+        successIconComponentName: {
+            type: String,
+            default: 'SuccessfullySend'
         },
-
-        props: {
-            successIconComponentName: {
-                type: String,
-                default: 'SuccessfullySend'
-            },
-            isLoading: {
-                type: Boolean,
-                default: false
-            },
-            isValid: {
-                type: Boolean,
-                default: false
-            },
-            isError: {
-                type: Boolean,
-                default: false
-            },
-            error: {
-                type: Object
-            }
+        isLoading: {
+            type: Boolean,
+            default: false
+        },
+        isValid: {
+            type: Boolean,
+            default: false
+        },
+        isError: {
+            type: Boolean,
+            default: false
+        },
+        error: {
+            type: Object
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

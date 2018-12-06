@@ -10,13 +10,17 @@
         </p>
 
         <footer>
-            <base-button :is-dark="true"
-                         @click.prevent="markAsNotified">
+            <base-button
+                :is-dark="true"
+                @click.prevent="markAsNotified"
+            >
                 Nope
             </base-button>
-            <base-button :is-outline="true"
-                         :is-dark="true"
-                         @click.prevent="setSendFormFields">
+            <base-button
+                :is-outline="true"
+                :is-dark="true"
+                @click.prevent="setSendFormFields"
+            >
                 Yes, go ahead!
             </base-button>
         </footer>
@@ -24,20 +28,20 @@
 </template>
 
 <script>
-    export default {
-        name: 'SpendZerocoinFromClipboardPopoverUsedAddress',
-        props: {
-            markAsNotified: {
-                type: Function,
-                required: true
-            },
+export default {
+    name: 'SpendZerocoinFromClipboardPopoverUsedAddress',
+    props: {
+        markAsNotified: {
+            type: Function,
+            required: true
+        },
 
-            setSendFormFields: {
-                type: Function,
-                required: true
-            }
+        setSendFormFields: {
+            type: Function,
+            required: true
         }
     }
+}
 </script>
 
 <style scoped>

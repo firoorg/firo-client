@@ -1,17 +1,20 @@
 <template>
-    <div class="notification-indicator" :class="{ shadow: hasShadow }"></div>
+    <div
+        class="notification-indicator"
+        :class="{ shadow: hasShadow }"
+    />
 </template>
 
 <script>
-    export default {
-        name: 'NotificationIndicator',
-        props: {
-            hasShadow: {
-                type: Boolean,
-                default: false
-            }
+export default {
+    name: 'NotificationIndicator',
+    props: {
+        hasShadow: {
+            type: Boolean,
+            default: false
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

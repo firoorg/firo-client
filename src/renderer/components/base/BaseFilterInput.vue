@@ -1,12 +1,20 @@
 <template>
     <div class="filter-input">
-        <input type="text"
-               v-bind="$attrs"
-               :value="value"
-               @input="$emit('input', $event.target.value)"
-        />
-        <transition name="fade" :duration="150">
-            <button class="clear-me" v-show="hasValue" @click="clear">
+        <input
+            type="text"
+            v-bind="$attrs"
+            :value="value"
+            @input="$emit('input', $event.target.value)"
+        >
+        <transition
+            name="fade"
+            :duration="150"
+        >
+            <button
+                v-show="hasValue"
+                class="clear-me"
+                @click="clear"
+            >
                 <span>&times;</span>
             </button>
         </transition>
@@ -14,25 +22,25 @@
 </template>
 
 <script>
-    export default {
-        name: 'BaseFilterInput',
-        inheritAttrs: false,
-        props: [
-            'value'
-        ],
+export default {
+    name: 'BaseFilterInput',
+    inheritAttrs: false,
+    props: [
+        'value'
+    ],
 
-        computed: {
-            hasValue () {
-                return this.value && this.value.length
-            }
-        },
+    computed: {
+        hasValue () {
+            return this.value && this.value.length
+        }
+    },
 
-        methods: {
-            clear () {
-                this.$emit('input', null)
-            }
+    methods: {
+        clear () {
+            this.$emit('input', null)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

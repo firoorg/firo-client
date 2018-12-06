@@ -3,14 +3,14 @@
 </template>
 
 <script>
-    import ZcoinLogo from '@/assets/zcoin-logo-text.svg'
+import ZcoinLogo from '@/assets/zcoin-logo-text.svg'
 
-    export default {
-        name: 'LogoText',
-        components: {
-            ZcoinLogo
-        }
+export default {
+    name: 'LogoText',
+    components: {
+        ZcoinLogo
     }
+}
 </script>
 
 <style scoped>

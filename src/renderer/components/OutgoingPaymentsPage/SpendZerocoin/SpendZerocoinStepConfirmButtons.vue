@@ -1,67 +1,72 @@
 <template>
-    <base-button v-if="isTimerDone"
-                 :disabled="!canSubmit"
-                 :color="color"
-                 :is-dark="true"
-                 @click.prevent="actions.next" tabindex="4">
+    <base-button
+        v-if="isTimerDone"
+        :disabled="!canSubmit"
+        :color="color"
+        :is-dark="true"
+        tabindex="4"
+        @click.prevent="actions.next"
+    >
         <span> {{ $t('send.private.flyout-confirm-private-send.button__private-send-confirm--primary') }} </span>
     </base-button>
-    <circular-timer v-else
-                    key="confirm-timer"
-                    class="circular-timer"
-                    :is-dark="true"
-                    :complete="onTimerDone" />
+    <circular-timer
+        v-else
+        key="confirm-timer"
+        class="circular-timer"
+        :is-dark="true"
+        :complete="onTimerDone"
+    />
 </template>
 
 <script>
-    import CircularTimer from '@/components/Icons/CircularTimer'
+import CircularTimer from '@/components/Icons/CircularTimer'
 
-    export default {
-        name: 'SpendZerocoinStepConfirmButtons',
-        components: {
-            CircularTimer
+export default {
+    name: 'SpendZerocoinStepConfirmButtons',
+    components: {
+        CircularTimer
+    },
+    props: {
+        actions: {
+            type: Object,
+            required: true
         },
-        props: {
-            actions: {
-                type: Object,
-                required: true
-            },
-            canSubmit: {
-                type: Boolean,
-                default: false
-            },
-            color: {
-                type: String
-            },
-            isTimerDone: {
-                type: Boolean,
-                default: false
-            }
+        canSubmit: {
+            type: Boolean,
+            default: false
         },
-
-        data () {
-            return {
-                // timerDone: false
-                // confirmed: false,
-                // minCellWidth: 0
-            }
+        color: {
+            type: String
         },
-
-        beforeCreate () {
-            this.$parent.$emit('can-submit', false)
-            this.$parent.$emit('can-cancel', false)
-        },
-
-        methods: {
-            onTimerDone () {
-                this.$parent.$emit('is-confirmed', true)
-                this.$parent.$emit('can-submit', true)
-                this.$parent.$emit('can-cancel', true)
-                window.dispatchEvent(new Event('resize'))
-            }
+        isTimerDone: {
+            type: Boolean,
+            default: false
         }
+    },
 
+    data () {
+        return {
+            // timerDone: false
+            // confirmed: false,
+            // minCellWidth: 0
+        }
+    },
+
+    beforeCreate () {
+        this.$parent.$emit('can-submit', false)
+        this.$parent.$emit('can-cancel', false)
+    },
+
+    methods: {
+        onTimerDone () {
+            this.$parent.$emit('is-confirmed', true)
+            this.$parent.$emit('can-submit', true)
+            this.$parent.$emit('can-cancel', true)
+            window.dispatchEvent(new Event('resize'))
+        }
     }
+
+}
 </script>
 
 <style scoped>

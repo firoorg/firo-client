@@ -1,17 +1,29 @@
 <template>
     <div class="is-fulfilled">
-        <h2 class="payments-headline">{{ $t('receive.detail-entry-request.title__payments') }}
-            <span v-if="transactions.length > 1">({{ transactions.length }})</span>
+        <h2 class="payments-headline">
+            {{ $t('receive.detail-entry-request.title__payments') }}
+            <span v-if="transactions.length > 1">
+                ({{ transactions.length }})
+            </span>
         </h2>
-        <div style="overflow: hidden" class="scrollable-container-wrap">
+        <div
+            style="overflow: hidden"
+            class="scrollable-container-wrap"
+        >
             <div :style="{ height: '100%' }">
-                <unexpected-transaction-popover :is-reused="isReused" :boundaries-element="null">
-                    <transactions-list :transactions="transactions" class="scrollable-container" />
+                <unexpected-transaction-popover
+                    :is-reused="isReused"
+                    :boundaries-element="null"
+                >
+                    <transactions-list
+                        :transactions="transactions"
+                        class="scrollable-container"
+                    />
                 </unexpected-transaction-popover>
             </div>
 
             <div class="message-wrap">
-                <h2 v-html="$t('receive.detail-entry-request.title__message')"></h2>
+                <h2 v-html="$t('receive.detail-entry-request.title__message')" />
                 <div v-html="messageFormatted" />
             </div>
         </div>
@@ -19,44 +31,44 @@
 </template>
 
 <script>
-    import { nl2br } from '@/utils/format'
+import { nl2br } from '@/utils/format'
 
-    import UnexpectedTransactionPopover from '@/components/ReceiveZcoinPage/UnexpectedTransactionPopover'
-    import TransactionsList from '@/components/payments/TransactionsList'
+import UnexpectedTransactionPopover from '@/components/ReceiveZcoinPage/UnexpectedTransactionPopover'
+import TransactionsList from '@/components/payments/TransactionsList'
 
-    export default {
-        name: 'ReceiveFulfilledPaymentRequest',
+export default {
+    name: 'ReceiveFulfilledPaymentRequest',
 
-        components: {
-            UnexpectedTransactionPopover,
-            TransactionsList
+    components: {
+        UnexpectedTransactionPopover,
+        TransactionsList
+    },
+
+    props: {
+        transactions: {
+            type: Array,
+            required: true
         },
-
-        props: {
-            transactions: {
-                type: Array,
-                required: true
-            },
-            isReused: {
-                type: Boolean,
-                required: true
-            },
-            address: {
-                type: Object,
-                required: true
-            },
-            message: {
-                type: String,
-                default: null
-            }
+        isReused: {
+            type: Boolean,
+            required: true
         },
+        address: {
+            type: Object,
+            required: true
+        },
+        message: {
+            type: String,
+            default: null
+        }
+    },
 
-        computed: {
-            messageFormatted () {
-                return nl2br(this.message)
-            }
+    computed: {
+        messageFormatted () {
+            return nl2br(this.message)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

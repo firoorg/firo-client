@@ -1,21 +1,27 @@
 <template>
-    <div class="debug-grid" :class="{ active: isVisible }">
+    <div
+        class="debug-grid"
+        :class="{ active: isVisible }"
+    >
         <form>
-            <input type="checkbox" v-model="isVisible" />
+            <input
+                v-model="isVisible"
+                type="checkbox"
+            >
         </form>
-        <div class="grid va-debug"></div>
+        <div class="grid va-debug" />
     </div>
 </template>
 
 <script>
-  export default {
-      name: 'DebugGrid',
-      data () {
-          return {
-              isVisible: false
-          }
-      }
-  }
+export default {
+    name: 'DebugGrid',
+    data () {
+        return {
+            isVisible: false
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,30 +1,42 @@
 <template>
     <section class="znode-map">
         <div class="map">
-            <div class="heatmap" ref="heatmap"></div>
+            <div
+                ref="heatmap"
+                class="heatmap"
+            />
             <div class="nodes">
                 <!--<div class="node" :style="getNodePositionStyles({ location: { ll: [0,0] } })"></div>-->
                 <!--<div class="node" v-for="(znode, index) of remoteZnodes" :style="getNodePositionStyles(znode)">
                     <span>1</span>
                 </div>-->
-                <div v-for="(cluster) of myZnodeClusters"
-                     class="cluster-wrap"
-                     :style="getClusterPositionStyles(cluster.position)"
-                     :key="cluster.id">
-                    <base-popover :open="false"
-                                  placement="left-auto"
-                                  :popover-class="[ cluster.statusClass, 'dark', 'advice' ]"
-                                  boundaries-element="boundariesElement"
-                                  class="my-znode-popover"
-                                  trigger="hover">
+                <div
+                    v-for="(cluster) of myZnodeClusters"
+                    :key="cluster.id"
+                    class="cluster-wrap"
+                    :style="getClusterPositionStyles(cluster.position)"
+                >
+                    <base-popover
+                        :open="false"
+                        placement="left-auto"
+                        :popover-class="[ cluster.statusClass, 'dark', 'advice' ]"
+                        boundaries-element="boundariesElement"
+                        class="my-znode-popover"
+                        trigger="hover"
+                    >
                         <template slot="target">
-                            <div class="cluster" :class="[ cluster.isCluster ? 'has-multiple' : '', cluster.clusterStatus  ]">
+                            <div
+                                class="cluster"
+                                :class="[ cluster.isCluster ? 'has-multiple' : '', cluster.clusterStatus ]"
+                            >
                                 <span>{{ cluster.amount }}</span>
                             </div>
                         </template>
                         <template slot="content">
                             <ul class="cluster-nodes">
-                                <li v-for="znode of cluster.nodes">{{ znode.status}} - {{ znode.id }}</li>
+                                <li v-for="znode of cluster.nodes">
+                                    {{ znode.status }} - {{ znode.id }}
+                                </li>
                             </ul>
                         </template>
                     </base-popover>
@@ -36,158 +48,115 @@
 </template>
 
 <script>
-    import h337 from 'heatmap.js'
-    import supercluster from 'supercluster'
-    import debounce from 'lodash/debounce'
+import h337 from 'heatmap.js'
+import supercluster from 'supercluster'
+import debounce from 'lodash/debounce'
 
-    import WorldMap from '@/assets/world-low.svg'
-    // import WorldMap from '@/assets/Mercator_Projection.svg'
+import WorldMap from '@/assets/world-low.svg'
+// import WorldMap from '@/assets/Mercator_Projection.svg'
 
-    export default {
-        name: 'ZnodeMap',
+export default {
+    name: 'ZnodeMap',
 
-        components: {
-            WorldMap
+    components: {
+        WorldMap
+    },
+
+    props: {
+        remoteZnodes: {
+            type: Array,
+            required: true
+        },
+        myZnodes: {
+            type: Array,
+            required: true
+        },
+        znodeStates: {
+            type: Array,
+            required: true
+        }
+    },
+
+    data () {
+        return {
+            // This also controls the aspect ratio of the projection
+            width: 1009,
+            height: 651,
+
+            left: -169.6,
+            top: 83.68,
+            right: 190.25,
+            bottom: -55.55,
+
+            // heatmap
+            heatmap: null,
+            heatmapPoints: [],
+            heatmapPointsZnodeIds: {}, // cache znode ids already included in the map
+            heatmapPointsMax: 1,
+            heatmapGrid: {}, // grid to create map altitude topology
+            debouncedHeatmapUpdate: null
+        }
+    },
+
+    computed: {
+        mapLatBottomRad () {
+            return this.bottom * Math.PI / 180
+        },
+        mapLngDelta () {
+            return this.right - this.left
+        },
+        worldMapWidth () {
+            return ((this.width / this.mapLngDelta) * 360) / (2 * Math.PI)
+        },
+        mapOffsetY () {
+            return this.worldMapWidth / 2 * Math.log((1 + Math.sin(this.mapLatBottomRad)) / (1 - Math.sin(this.mapLatBottomRad)))
         },
 
-        props: {
-            remoteZnodes: {
-                type: Array,
-                required: true
-            },
-            myZnodes: {
-                type: Array,
-                required: true
-            },
-            znodeStates: {
-                type: Array,
-                required: true
-            }
-        },
-
-        data () {
-            return {
-                // This also controls the aspect ratio of the projection
-                width: 1009,
-                height: 651,
-
-                left: -169.6,
-                top: 83.68,
-                right: 190.25,
-                bottom: -55.55,
-
-                // heatmap
-                heatmap: null,
-                heatmapPoints: [],
-                heatmapPointsZnodeIds: {}, // cache znode ids already included in the map
-                heatmapPointsMax: 1,
-                heatmapGrid: {}, // grid to create map altitude topology
-                debouncedHeatmapUpdate: null
-            }
-        },
-
-        created () {
-            this.debouncedHeatmapUpdate = debounce(() => {
-                // console.log('updating headmap -> debounced')
-                this.updateHeatmap()
-            }, 5000, {
-                maxWait: 30000
-            })
-        },
-
-        mounted () {
-            this.heatmap = h337.create({
-                container: this.$refs.heatmap,
-                blur: 0.45,
-                radius: 35,
-                minOpacity: 0,
-                maxOpacity: 0.65,
-                /*
-                gradient: {
-                    '0': '#23622F',
-                    '.2': '#23622F',
-                    '.4': '#23843D',
-                    '.6': '#23A74B',
-                    '.8': '#2EC55A',
-                    '.95': '#43DF69',
-                    '1': '#58F878'
-                },
-                */
-                gradient: {
-                    // '0': '#23A74B',
-                    '0': '#1F1F2E',
-                    '1': '#1F1F2E'
-                    // '1': '#58F878'
-                }
-            })
-
-            this.heatmap.setData({
-                max: this.heatmapPointsMax / 4,
-                data: this.heatmapPoints
-            })
-
-            // console.log('this.myZnodeClusters', this.myZnodeClusters)
-        },
-
-        computed: {
-            mapLatBottomRad () {
-                return this.bottom * Math.PI / 180
-            },
-            mapLngDelta () {
-                return this.right - this.left
-            },
-            worldMapWidth () {
-                return ((this.width / this.mapLngDelta) * 360) / (2 * Math.PI)
-            },
-            mapOffsetY () {
-                return this.worldMapWidth / 2 * Math.log((1 + Math.sin(this.mapLatBottomRad)) / (1 - Math.sin(this.mapLatBottomRad)))
-            },
-
-            /*
+        /*
             myZnodeMapItems () {
                 const clusters = this.myZnodeClusters()
             },
             */
 
-            myZnodeClusters () {
-                const znodes = {}
-                const index = supercluster({
-                    radius: 40,
-                    // extent: 96,
-                    // extent: 256,
-                    maxZoom: 10
-                })
+        myZnodeClusters () {
+            const znodes = {}
+            const index = supercluster({
+                radius: 40,
+                // extent: 96,
+                // extent: 256,
+                maxZoom: 10
+            })
 
-                const myNodes = this.myZnodes.map((znode) => {
-                    // const { x, y } = this.getZnodePosition(znode)
-                    const { lat, lon } = this.getZnodeLatLon(znode)
-                    znodes[znode.id] = znode
+            const myNodes = this.myZnodes.map((znode) => {
+                // const { x, y } = this.getZnodePosition(znode)
+                const { lat, lon } = this.getZnodeLatLon(znode)
+                znodes[znode.id] = znode
 
-                    return {
-                        znodeId: znode.id,
-                        type: 'Feature',
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [lon, lat]
-                        },
-                        properties: {
-                            cluster: false
-                        }
+                return {
+                    znodeId: znode.id,
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [lon, lat]
+                    },
+                    properties: {
+                        cluster: false
                     }
-                })
+                }
+            })
 
-                // console.log('myNodes', myNodes)
+            // console.log('myNodes', myNodes)
 
-                index.load(myNodes)
+            index.load(myNodes)
 
-                const clusters = index.getClusters([
-                    this.left,
-                    this.bottom,
-                    this.right,
-                    this.top
-                ], 1)
+            const clusters = index.getClusters([
+                this.left,
+                this.bottom,
+                this.right,
+                this.top
+            ], 1)
 
-                /*
+            /*
                 clusters.forEach((cluster) => {
                     const { id } = cluster
 
@@ -199,104 +168,147 @@
                 })
                 */
 
-                return clusters.map((cluster) => {
-                    const { properties } = cluster
-                    const { cluster: isCluster, cluster_id: clusterId, point_count: clusterAmount } = properties
+            return clusters.map((cluster) => {
+                const { properties } = cluster
+                const { cluster: isCluster, cluster_id: clusterId, point_count: clusterAmount } = properties
 
-                    const [ lon, lat ] = cluster.geometry.coordinates
+                const [ lon, lat ] = cluster.geometry.coordinates
 
-                    let position = { lat, lon }
-                    let nodes = []
+                let position = { lat, lon }
+                let nodes = []
 
-                    if (isCluster) {
-                        nodes = index.getLeaves(clusterId).map(({ znodeId }) => znodes[znodeId])
-                    } else {
-                        nodes = [
-                            znodes[cluster.znodeId]
-                        ]
-                    }
-
-                    return {
-                        id: isCluster ? clusterId : cluster.znodeId,
-                        isCluster,
-                        position,
-                        nodes,
-                        amount: isCluster ? clusterAmount : nodes.length,
-                        clusterStatus: this.getClusterStatus(nodes),
-                        __old: cluster
-                    }
-                })
-            }
-        },
-
-        watch: {
-            remoteZnodes: {
-                handler (newVal, oldVal) {
-                    // console.log('zcoin handler')
-                    if (!this.debouncedHeatmapUpdate) {
-                        // immediate run
-                        if (!oldVal) {
-                            this.updateHeatmap()
-                        } else {
-                            console.log('could not update heatmap...', oldVal)
-                        }
-                        return
-                    }
-                    this.debouncedHeatmapUpdate()
-                },
-                immediate: true
-            }
-        },
-
-        methods: {
-            updateHeatmap () {
-                const gridSize = 25
-                const randomSize = gridSize * 0.55
-                // const grid = {}
-                const points = []
-
-                const updateGrid = (x, y) => {
-                    const gridX = Math.round(x / gridSize)
-                    const gridY = Math.round(y / gridSize)
-                    const gridKey = `${gridX}-${gridY}`
-
-                    if (!this.heatmapGrid[gridKey]) {
-                        this.heatmapGrid[gridKey] = 0
-                    }
-
-                    this.heatmapGrid[gridKey]++
-
-                    if (this.heatmapGrid[gridKey] > this.heatmapPointsMax) {
-                        this.heatmapPointsMax = this.heatmapGrid[gridKey]
-                    }
+                if (isCluster) {
+                    nodes = index.getLeaves(clusterId).map(({ znodeId }) => znodes[znodeId])
+                } else {
+                    nodes = [
+                        znodes[cluster.znodeId]
+                    ]
                 }
 
-                // const currentHeatmapData = this.heatmap ? this.heatmap.getData() : []
-                // console.log('currentHeatmapData', currentHeatmapData)
+                return {
+                    id: isCluster ? clusterId : cluster.znodeId,
+                    isCluster,
+                    position,
+                    nodes,
+                    amount: isCluster ? clusterAmount : nodes.length,
+                    clusterStatus: this.getClusterStatus(nodes),
+                    __old: cluster
+                }
+            })
+        }
+    },
 
-                this.remoteZnodes.forEach((znode) => {
-                    if (this.heatmapPointsZnodeIds[znode.id]) {
-                        return
+    watch: {
+        remoteZnodes: {
+            handler (newVal, oldVal) {
+                // console.log('zcoin handler')
+                if (!this.debouncedHeatmapUpdate) {
+                    // immediate run
+                    if (!oldVal) {
+                        this.updateHeatmap()
+                    } else {
+                        console.log('could not update heatmap...', oldVal)
                     }
+                    return
+                }
+                this.debouncedHeatmapUpdate()
+            },
+            immediate: true
+        }
+    },
 
-                    const { x, y } = this.getZnodePosition(znode)
+    created () {
+        this.debouncedHeatmapUpdate = debounce(() => {
+            // console.log('updating headmap -> debounced')
+            this.updateHeatmap()
+        }, 5000, {
+            maxWait: 30000
+        })
+    },
 
-                    updateGrid(x, y)
+    mounted () {
+        this.heatmap = h337.create({
+            container: this.$refs.heatmap,
+            blur: 0.45,
+            radius: 35,
+            minOpacity: 0,
+            maxOpacity: 0.65,
+            /*
+                gradient: {
+                    '0': '#23622F',
+                    '.2': '#23622F',
+                    '.4': '#23843D',
+                    '.6': '#23A74B',
+                    '.8': '#2EC55A',
+                    '.95': '#43DF69',
+                    '1': '#58F878'
+                },
+                */
+            gradient: {
+                // '0': '#23A74B',
+                '0': '#1F1F2E',
+                '1': '#1F1F2E'
+                // '1': '#58F878'
+            }
+        })
 
-                    for (let i = 0, l = Math.random() * 10; i < l; i++) {
-                        points.push({
-                            x: Math.round(x + Math.random() * randomSize - (randomSize / 2)),
-                            y: Math.round(y + Math.random() * randomSize - (randomSize / 2)),
-                            value: Math.random() * (10 - (l / 4))
-                        })
-                    }
+        this.heatmap.setData({
+            max: this.heatmapPointsMax / 4,
+            data: this.heatmapPoints
+        })
 
-                    this.heatmapPointsZnodeIds[znode.id] = 1
-                })
+        // console.log('this.myZnodeClusters', this.myZnodeClusters)
+    },
 
-                // console.log('points.length', points.length)
+    methods: {
+        updateHeatmap () {
+            const gridSize = 25
+            const randomSize = gridSize * 0.55
+            // const grid = {}
+            const points = []
 
-                /*
+            const updateGrid = (x, y) => {
+                const gridX = Math.round(x / gridSize)
+                const gridY = Math.round(y / gridSize)
+                const gridKey = `${gridX}-${gridY}`
+
+                if (!this.heatmapGrid[gridKey]) {
+                    this.heatmapGrid[gridKey] = 0
+                }
+
+                this.heatmapGrid[gridKey]++
+
+                if (this.heatmapGrid[gridKey] > this.heatmapPointsMax) {
+                    this.heatmapPointsMax = this.heatmapGrid[gridKey]
+                }
+            }
+
+            // const currentHeatmapData = this.heatmap ? this.heatmap.getData() : []
+            // console.log('currentHeatmapData', currentHeatmapData)
+
+            this.remoteZnodes.forEach((znode) => {
+                if (this.heatmapPointsZnodeIds[znode.id]) {
+                    return
+                }
+
+                const { x, y } = this.getZnodePosition(znode)
+
+                updateGrid(x, y)
+
+                for (let i = 0, l = Math.random() * 10; i < l; i++) {
+                    points.push({
+                        x: Math.round(x + Math.random() * randomSize - (randomSize / 2)),
+                        y: Math.round(y + Math.random() * randomSize - (randomSize / 2)),
+                        value: Math.random() * (10 - (l / 4))
+                    })
+                }
+
+                this.heatmapPointsZnodeIds[znode.id] = 1
+            })
+
+            // console.log('points.length', points.length)
+
+            /*
                 let gridValues = Object.values(this.heatmapGrid).slice()
                 gridValues.sort((a, b) => parseInt(a) < parseInt(b))
                 console.log(gridValues)
@@ -311,18 +323,18 @@
                 console.log('this.heatmapPointsMax', this.heatmapPointsMax)
                 */
 
-                // todo add radius / 2 padding to the heatmap by mapping over the points here
-                // this.heatmapPoints = points
+            // todo add radius / 2 padding to the heatmap by mapping over the points here
+            // this.heatmapPoints = points
 
-                if (!this.heatmap) {
-                    this.heatmapPoints = [
-                        ...this.heatmapPoints,
-                        ...points
-                    ]
-                    return
-                }
+            if (!this.heatmap) {
+                this.heatmapPoints = [
+                    ...this.heatmapPoints,
+                    ...points
+                ]
+                return
+            }
 
-                /*
+            /*
                 this.heatmap.setData({
                     max: this.heatmapPointsMax / 4,
                     data: [
@@ -332,86 +344,86 @@
                 })
                 */
 
-                this.heatmap.setDataMax(this.heatmapPointsMax / 4)
-                this.heatmap.addData(points)
-            },
+            this.heatmap.setDataMax(this.heatmapPointsMax / 4)
+            this.heatmap.addData(points)
+        },
 
-            getNodeMapPosition (lat, lon) {
-                const latitudeRad = lat * Math.PI / 180
-                const x = (lon - this.left) * (this.width / this.mapLngDelta)
-                const y = this.height - ((this.worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) / (1 - Math.sin(latitudeRad)))) - this.mapOffsetY)
+        getNodeMapPosition (lat, lon) {
+            const latitudeRad = lat * Math.PI / 180
+            const x = (lon - this.left) * (this.width / this.mapLngDelta)
+            const y = this.height - ((this.worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) / (1 - Math.sin(latitudeRad)))) - this.mapOffsetY)
 
-                // the pixel x,y value of this point on the map image normalized
-                return {
-                    x: x,
-                    y: y
-                }
-            },
-
-            getZnodeLatLon (znode) {
-                const { location } = znode
-                if (!location) {
-                    return {
-                        lat: 0,
-                        lng: 0
-                    }
-                }
-                const [ lat, lon ] = location.ll
-
-                return {
-                    lat,
-                    lon
-                }
-            },
-
-            getZnodePosition (znode) {
-                const { lat, lon } = this.getZnodeLatLon(znode)
-                return this.getNodeMapPosition(lat, lon)
-            },
-
-            getNodePositionStyles (znode) {
-                const { x, y } = this.getZnodePosition(znode)
-
-                return {
-                    left: `${x / this.width * 100}%`,
-                    top: `${y / this.height * 100}%`
-                }
-            },
-
-            getClusterPositionStyles ({ lat, lon }) {
-                const { x, y } = this.getNodeMapPosition(lat, lon)
-
-                return {
-                    left: `${x / this.width * 100}%`,
-                    top: `${y / this.height * 100}%`
-                }
-            },
-
-            getClusterStatus (znodes) {
-                let state = 0
-
-                znodes.forEach((znode) => {
-                    const { status } = znode
-                    // console.log(status)
-
-                    for (let i = this.znodeStates.length; i--;) {
-                        if (i < state) {
-                            break
-                        }
-
-                        if (this.znodeStates[i].states.includes(status)) {
-                            state = i
-                            break
-                        }
-                    }
-
-                    // console.log(status, state)
-                })
-
-                return this.znodeStates[state].name
+            // the pixel x,y value of this point on the map image normalized
+            return {
+                x: x,
+                y: y
             }
+        },
+
+        getZnodeLatLon (znode) {
+            const { location } = znode
+            if (!location) {
+                return {
+                    lat: 0,
+                    lng: 0
+                }
+            }
+            const [ lat, lon ] = location.ll
+
+            return {
+                lat,
+                lon
+            }
+        },
+
+        getZnodePosition (znode) {
+            const { lat, lon } = this.getZnodeLatLon(znode)
+            return this.getNodeMapPosition(lat, lon)
+        },
+
+        getNodePositionStyles (znode) {
+            const { x, y } = this.getZnodePosition(znode)
+
+            return {
+                left: `${x / this.width * 100}%`,
+                top: `${y / this.height * 100}%`
+            }
+        },
+
+        getClusterPositionStyles ({ lat, lon }) {
+            const { x, y } = this.getNodeMapPosition(lat, lon)
+
+            return {
+                left: `${x / this.width * 100}%`,
+                top: `${y / this.height * 100}%`
+            }
+        },
+
+        getClusterStatus (znodes) {
+            let state = 0
+
+            znodes.forEach((znode) => {
+                const { status } = znode
+                // console.log(status)
+
+                for (let i = this.znodeStates.length; i--;) {
+                    if (i < state) {
+                        break
+                    }
+
+                    if (this.znodeStates[i].states.includes(status)) {
+                        state = i
+                        break
+                    }
+                }
+
+                // console.log(status, state)
+            })
+
+            return this.znodeStates[state].name
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

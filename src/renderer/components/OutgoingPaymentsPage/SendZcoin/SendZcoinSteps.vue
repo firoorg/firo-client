@@ -1,58 +1,89 @@
 <template>
     <div class="button-wrap">
         <template v-if="!currentStep">
-            <send-add-to-queue-button :can-submit="canAddToQueue"
-                                      @pending-payment-added="cleanupForm" />
-            <send-step-start-button :can-submit="canStart"
-                                    :color="submitButtonColor"
-                                    @pending-payment-added="cleanupForm"
-                                    @next="() => onStepChange('confirm')" />
+            <send-add-to-queue-button
+                :can-submit="canAddToQueue"
+                @pending-payment-added="cleanupForm"
+            />
+            <send-step-start-button
+                :can-submit="canStart"
+                :color="submitButtonColor"
+                @pending-payment-added="cleanupForm"
+                @next="() => onStepChange('confirm')"
+            />
         </template>
         <template v-else-if="currentStep !== 'done'">
-            <base-button v-if="currentStepCanCancel"
-                         color="red"
-                         :is-outline="true"
-                         @click.prevent="onCancel">
+            <base-button
+                v-if="currentStepCanCancel"
+                color="red"
+                :is-outline="true"
+                @click.prevent="onCancel"
+            >
                 <span>{{ $t('send.public.flyout-confirm-send.button__cancel--secondary') }}</span>
             </base-button>
         </template>
 
-        <multi-step-popover-buttons :steps="steps"
-                                    :current-step="currentStep"
-                                    @step-change="onStepChange"
-                                    @can-submit="onStepCanSubmit"
-                                    @can-cancel="onStepCanCancel"
-                                    @is-confirmed="onConfirm"
-                                    :placement="currentPlacement"
-                                    :component-props="currentComponentProps"
-                                    :is-open="currentStepIsOpen"
-                                    :boundaries-element="boundariesElement"
-                                    :popover-class="currentPopoverClass">
-            <template slot="step-confirm" slot-scope="{ actions }">
-                <send-step-confirm-buttons :actions="actions"
-                                           :color="submitButtonColor"
-                                           :can-submit="canSubmit"
-                                           :is-timer-done="isConfirmed">
-                </send-step-confirm-buttons>
+        <multi-step-popover-buttons
+            :steps="steps"
+            :current-step="currentStep"
+            :placement="currentPlacement"
+            :component-props="currentComponentProps"
+            :is-open="currentStepIsOpen"
+            :boundaries-element="boundariesElement"
+            :popover-class="currentPopoverClass"
+            @step-change="onStepChange"
+            @can-submit="onStepCanSubmit"
+            @can-cancel="onStepCanCancel"
+            @is-confirmed="onConfirm"
+        >
+            <template
+                slot="step-confirm"
+                slot-scope="{ actions }"
+            >
+                <send-step-confirm-buttons
+                    :actions="actions"
+                    :color="submitButtonColor"
+                    :can-submit="canSubmit"
+                    :is-timer-done="isConfirmed"
+                />
             </template>
-            <template slot="step-selectFee" slot-scope="{ actions }">
-                <send-step-confirm-buttons :actions="actions"
-                                           :color="submitButtonColor"
-                                           :can-submit="canSubmit"
-                                           :is-timer-done="isConfirmed">
-                </send-step-confirm-buttons>
+            <template
+                slot="step-selectFee"
+                slot-scope="{ actions }"
+            >
+                <send-step-confirm-buttons
+                    :actions="actions"
+                    :color="submitButtonColor"
+                    :can-submit="canSubmit"
+                    :is-timer-done="isConfirmed"
+                />
             </template>
-            <template slot="step-passphrase" slot-scope="{ actions }">
-                <payment-step-passphrase-buttons :actions="actions"
-                                              :color="submitButtonColor"
-                                              :can-submit="canSubmit">
+            <template
+                slot="step-passphrase"
+                slot-scope="{ actions }"
+            >
+                <payment-step-passphrase-buttons
+                    :actions="actions"
+                    :color="submitButtonColor"
+                    :can-submit="canSubmit"
+                >
                     {{ $t('send.public.flyout-confirm-send.button__unlock-and-send--primary') }}
                 </payment-step-passphrase-buttons>
             </template>
-            <template slot="step-done" slot-scope="{ actions }">
-                <base-button :color="submitButtonColor" :disabled="true">
-                    <span v-if="isLoading">Sending...</span>
-                    <span v-else>Sent!</span>
+            <template
+                slot="step-done"
+                slot-scope="{ actions }"
+            >
+                <base-button
+                    :color="submitButtonColor"
+                    :disabled="true"
+                >
+                    <span v-if="isLoading">
+                        Sending...
+                    </span>
+                    <span v-else>
+                        Sent!
+                    </span>
                 </base-button>
             </template>
         </multi-step-popover-buttons>
@@ -60,243 +91,243 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import GuideMixin from '@/mixins/GuideMixin'
+import { mapGetters } from 'vuex'
+import GuideMixin from '@/mixins/GuideMixin'
 
-    import types from '~/types'
+import types from '~/types'
 
-    import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
-    import SendStepConfirm from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepConfirm'
-    import SendAddToQueueButton from '@/components/OutgoingPaymentsPage/SendZcoin/SendAddToQueueButton'
-    import SendStepStartButton from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepStartButton'
-    import SendStepConfirmButtons from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepConfirmButtons'
-    import SendStepSelectFee from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepSelectFee'
-    import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
-    import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
-    import StepResponseStatus from '@/components/payments/StepResponseStatus'
+import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
+import SendStepConfirm from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepConfirm'
+import SendAddToQueueButton from '@/components/OutgoingPaymentsPage/SendZcoin/SendAddToQueueButton'
+import SendStepStartButton from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepStartButton'
+import SendStepConfirmButtons from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepConfirmButtons'
+import SendStepSelectFee from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepSelectFee'
+import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
+import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
+import StepResponseStatus from '@/components/payments/StepResponseStatus'
 
-    export default {
-        name: 'SendZcoinSteps',
+export default {
+    name: 'SendZcoinSteps',
 
-        mixins: [
-            GuideMixin
-        ],
+    components: {
+        MultiStepPopoverButtons,
+        SendAddToQueueButton,
+        SendStepStartButton,
+        SendStepConfirm,
+        SendStepConfirmButtons,
+        SendStepSelectFee,
+        PaymentStepPassphrase,
+        PaymentStepPassphraseButtons,
+        StepResponseStatus
+    },
 
-        components: {
-            MultiStepPopoverButtons,
-            SendAddToQueueButton,
-            SendStepStartButton,
-            SendStepConfirm,
-            SendStepConfirmButtons,
-            SendStepSelectFee,
-            PaymentStepPassphrase,
-            PaymentStepPassphraseButtons,
-            StepResponseStatus
+    mixins: [
+        GuideMixin
+    ],
+
+    props: {
+        boundariesElement: {
+            type: HTMLElement,
+            required: false
         },
-
-        props: {
-            boundariesElement: {
-                type: HTMLElement,
-                required: false
-            },
-            formIsValid: {
-                type: Boolean,
-                required: true
-            },
-            cleanupForm: {
-                type: Function,
-                required: true
-            },
-            updateTransactionFee: {
-                type: Function,
-                required: true
-            }
+        formIsValid: {
+            type: Boolean,
+            required: true
         },
+        cleanupForm: {
+            type: Function,
+            required: true
+        },
+        updateTransactionFee: {
+            type: Function,
+            required: true
+        }
+    },
 
-        data () {
-            return {
-                steps: {
-                    confirm: {
-                        component: SendStepConfirm,
-                        isOpen () {
-                            console.log('is open ->', this, this.currentStepCanSubmit)
-                            // return this.currentStepCanSubmit
-                            return true
-                        },
-                        placement () {
-                            return this.currentStepCanSubmit ? 'top-end' : 'top'
-                        },
-                        props () {
-                            return {
-                                isTimerDone: this.isConfirmed
-                            }
-                        }
+    data () {
+        return {
+            steps: {
+                confirm: {
+                    component: SendStepConfirm,
+                    isOpen () {
+                        console.log('is open ->', this, this.currentStepCanSubmit)
+                        // return this.currentStepCanSubmit
+                        return true
                     },
-                    selectFee: {
-                        component: SendStepSelectFee,
-                        isOpen () {
-                            return true
-                        },
-                        placement () {
-                            return this.isConfirmed ? 'top-end' : 'top'
-                        },
-                        props () {
-                            return {
-                                updateTransactionFee: this.updateTransactionFee,
-                                isConfirmed: this.isConfirmed
-                            }
-                        }
+                    placement () {
+                        return this.currentStepCanSubmit ? 'top-end' : 'top'
                     },
-                    passphrase: {
-                        component: PaymentStepPassphrase,
-                        isOpen () {
-                            return true
-                        }
-                    },
-
-                    done: {
-                        component: StepResponseStatus,
-                        isOpen () {
-                            return !this.isLoading
-                        },
-                        placement () {
-                            return 'top'
-                        },
-                        props () {
-                            return {
-                                isLoading: this.isLoading,
-                                isValid: this.responseIsValid,
-                                isError: this.responseIsError,
-                                error: this.responseError,
-                                onAutoClose: () => {
-                                    this.onCancel()
-                                },
-                                translationNamespace: 'send.public.flyout-done'
-                            }
+                    props () {
+                        return {
+                            isTimerDone: this.isConfirmed
                         }
                     }
-
                 },
-                currentStep: '',
-                currentStepCanSubmit: false,
-                currentStepCanCancel: false,
-                isConfirmed: false
-            }
+                selectFee: {
+                    component: SendStepSelectFee,
+                    isOpen () {
+                        return true
+                    },
+                    placement () {
+                        return this.isConfirmed ? 'top-end' : 'top'
+                    },
+                    props () {
+                        return {
+                            updateTransactionFee: this.updateTransactionFee,
+                            isConfirmed: this.isConfirmed
+                        }
+                    }
+                },
+                passphrase: {
+                    component: PaymentStepPassphrase,
+                    isOpen () {
+                        return true
+                    }
+                },
+
+                done: {
+                    component: StepResponseStatus,
+                    isOpen () {
+                        return !this.isLoading
+                    },
+                    placement () {
+                        return 'top'
+                    },
+                    props () {
+                        return {
+                            isLoading: this.isLoading,
+                            isValid: this.responseIsValid,
+                            isError: this.responseIsError,
+                            error: this.responseError,
+                            onAutoClose: () => {
+                                this.onCancel()
+                            },
+                            translationNamespace: 'send.public.flyout-done'
+                        }
+                    }
+                }
+
+            },
+            currentStep: '',
+            currentStepCanSubmit: false,
+            currentStepCanCancel: false,
+            isConfirmed: false
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            isLoading: 'ZcoinPayment/isLoading',
+            responseIsValid: 'ZcoinPayment/sendZcoinResponseIsValid',
+            responseIsError: 'ZcoinPayment/sendZcoinResponseIsError',
+            responseError: 'ZcoinPayment/sendZcoinResponseError',
+            fee: 'ZcoinPayment/selectedFee',
+            currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
+            currentFormAddress: 'ZcoinPayment/createFormAddress',
+            currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
+            hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress',
+            pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
+            hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments'
+        }),
+
+        canStart () {
+            return (
+                (this.currentFormIsEmpty && this.hasPendingPayments) ||
+                    (!this.currentFormIsEmpty && this.formIsValid)
+            )
         },
 
-        computed: {
-            ...mapGetters({
-                isLoading: 'ZcoinPayment/isLoading',
-                responseIsValid: 'ZcoinPayment/sendZcoinResponseIsValid',
-                responseIsError: 'ZcoinPayment/sendZcoinResponseIsError',
-                responseError: 'ZcoinPayment/sendZcoinResponseError',
-                fee: 'ZcoinPayment/selectedFee',
-                currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
-                currentFormAddress: 'ZcoinPayment/createFormAddress',
-                currentFormIsEmpty: 'ZcoinPayment/createFormIsEmpty',
-                hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress',
-                pendingPayments: 'ZcoinPayment/pendingZcoinPayments',
-                hasPendingPayments: 'ZcoinPayment/hasPendingZcoinPayments'
-            }),
+        canSubmit () {
+            return this.canStart && this.currentStepCanSubmit
+        },
 
-            canStart () {
-                return (
-                    (this.currentFormIsEmpty && this.hasPendingPayments) ||
-                    (!this.currentFormIsEmpty && this.formIsValid)
-                )
-            },
+        canAddToQueue () {
+            return !this.currentFormIsEmpty && this.formIsValid
+        },
 
-            canSubmit () {
-                return this.canStart && this.currentStepCanSubmit
-            },
+        currentPlacement () {
+            const current = this.steps[this.currentStep]
 
-            canAddToQueue () {
-                return !this.currentFormIsEmpty && this.formIsValid
-            },
+            return current && current.placement ? current.placement.bind(this)() : 'top-end'
+        },
 
-            currentPlacement () {
-                const current = this.steps[this.currentStep]
+        currentStepIsOpen () {
+            if (!this.steps[this.currentStep]) {
+                return false
+            }
 
-                return current && current.placement ? current.placement.bind(this)() : 'top-end'
-            },
+            if (!this.steps[this.currentStep].isOpen) {
+                return false
+            }
 
-            currentStepIsOpen () {
-                if (!this.steps[this.currentStep]) {
-                    return false
-                }
+            return this.steps[this.currentStep].isOpen.bind(this)()
+        },
 
-                if (!this.steps[this.currentStep].isOpen) {
-                    return false
-                }
+        currentComponentProps () {
+            if (!this.steps[this.currentStep]) {
+                return null
+            }
 
-                return this.steps[this.currentStep].isOpen.bind(this)()
-            },
+            if (!this.steps[this.currentStep].props) {
+                return null
+            }
 
-            currentComponentProps () {
-                if (!this.steps[this.currentStep]) {
-                    return null
-                }
+            return this.steps[this.currentStep].props.bind(this)()
+        },
 
-                if (!this.steps[this.currentStep].props) {
-                    return null
-                }
+        currentPopoverClass () {
+            return [this.submitButtonColor, `${'step'}-${this.currentStep}`].join(' ')
+        },
 
-                return this.steps[this.currentStep].props.bind(this)()
-            },
-
-            currentPopoverClass () {
-                return [this.submitButtonColor, `${'step'}-${this.currentStep}`].join(' ')
-            },
-
-            containsUsedAddress () {
-                /*
+        containsUsedAddress () {
+            /*
                 if (this.containsUsedAddressOnSend !== null) {
                     return this.containsUsedAddressOnSend
                 }
                 */
 
-                if (this.hasAlreadySentToAddress(this.currentFormAddress)) {
+            if (this.hasAlreadySentToAddress(this.currentFormAddress)) {
+                return true
+            }
+
+            for (let payment of this.pendingPayments) {
+                const { address } = payment
+                console.log('let address in this.pendingPayments', address)
+                const usedAddress = this.hasAlreadySentToAddress(address)
+
+                if (usedAddress) {
                     return true
                 }
-
-                for (let payment of this.pendingPayments) {
-                    const { address } = payment
-                    console.log('let address in this.pendingPayments', address)
-                    const usedAddress = this.hasAlreadySentToAddress(address)
-
-                    if (usedAddress) {
-                        return true
-                    }
-                }
-
-                return false
-            },
-
-            submitButtonColor () {
-                if (this.containsUsedAddress) {
-                    return 'orange'
-                }
-
-                if (this.responseIsError) {
-                    return 'red'
-                }
-
-                return 'green'
             }
+
+            return false
         },
 
-        watch: {
-            currentStep: {
-                handler (newVal, oldVal) {
-                    window.dispatchEvent(new Event('resize'))
-                    // this.currentStepCanSubmit = false
-                    // this.currentStepCanCancel = false
-                    // console.log('- - - foo - - -')
-                },
-                immediate: true
+        submitButtonColor () {
+            if (this.containsUsedAddress) {
+                return 'orange'
             }
 
-            /*
+            if (this.responseIsError) {
+                return 'red'
+            }
+
+            return 'green'
+        }
+    },
+
+    watch: {
+        currentStep: {
+            handler (newVal, oldVal) {
+                window.dispatchEvent(new Event('resize'))
+                // this.currentStepCanSubmit = false
+                // this.currentStepCanCancel = false
+                // console.log('- - - foo - - -')
+            },
+            immediate: true
+        }
+
+        /*
             currentStepCanSubmit: {
                 handler (newVal, oldVal) {
                     if (newVal) {
@@ -305,42 +336,42 @@
                 }
             }
             */
+    },
+
+    methods: {
+        onStepChange (newStep, oldStep) {
+            if (this.currentStep === newStep) {
+                return
+            }
+
+            this.currentStep = newStep
         },
 
-        methods: {
-            onStepChange (newStep, oldStep) {
-                if (this.currentStep === newStep) {
-                    return
-                }
+        onStepCanSubmit (newVal) {
+            console.log('on can submit!', newVal)
+            this.currentStepCanSubmit = newVal
+        },
 
-                this.currentStep = newStep
-            },
+        onStepCanCancel (newVal) {
+            console.log('on can cancel!', newVal)
+            this.currentStepCanCancel = newVal
+        },
 
-            onStepCanSubmit (newVal) {
-                console.log('on can submit!', newVal)
-                this.currentStepCanSubmit = newVal
-            },
+        onConfirm (newVal) {
+            console.log('confirmed!!!', newVal)
+            this.isConfirmed = newVal
+        },
 
-            onStepCanCancel (newVal) {
-                console.log('on can cancel!', newVal)
-                this.currentStepCanCancel = newVal
-            },
+        onCancel () {
+            this.isConfirmed = false
+            this.currentStep = null
+            this.currentStepCanSubmit = false
+            this.currentStepCanCancel = false
 
-            onConfirm (newVal) {
-                console.log('confirmed!!!', newVal)
-                this.isConfirmed = newVal
-            },
-
-            onCancel () {
-                this.isConfirmed = false
-                this.currentStep = null
-                this.currentStepCanSubmit = false
-                this.currentStepCanCancel = false
-
-                this.$store.dispatch(types.zcoinpayment.CLEAR_SEND_ZCOIN_RESPONSE)
-            }
+            this.$store.dispatch(types.zcoinpayment.CLEAR_SEND_ZCOIN_RESPONSE)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

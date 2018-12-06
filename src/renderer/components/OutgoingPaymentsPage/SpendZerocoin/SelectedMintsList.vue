@@ -1,45 +1,64 @@
 <template>
-    <ul class="selected-mints-list" :class="{ 'is-open': isOpen }">
-        <li v-for="denom in mints"
+    <ul
+        class="selected-mints-list"
+        :class="{ 'is-open': isOpen }"
+    >
+        <li
+            v-for="denom in mints"
             v-if="denom.amount"
-            :key="denom.denomination">
-            <span class="amount">{{ denom.amount }}&MediumSpace;x</span>
-            <span class="label">{{ denom.denomination }}</span>
+            :key="denom.denomination"
+        >
+            <span class="amount">
+                {{ denom.amount }}&MediumSpace;x
+            </span>
+            <span class="label">
+                {{ denom.denomination }}
+            </span>
         </li>
-        <li v-show="!hasMints" class="placeholder">
-            <span v-if="!isOpen">{{ $t('send.private.detail-private-send.placeholder__amount-enter') }}</span>
-            <span v-else>{{ $t('send.private.detail-private-send.placeholder__amount-select') }}</span>
+        <li
+            v-show="!hasMints"
+            class="placeholder"
+        >
+            <span v-if="!isOpen">
+                {{ $t('send.private.detail-private-send.placeholder__amount-enter') }}
+            </span>
+            <span v-else>
+                {{ $t('send.private.detail-private-send.placeholder__amount-select') }}
+            </span>
         </li>
-        <li class="hover placeholder" v-show="!isOpen && hasMints">
+        <li
+            v-show="!isOpen && hasMints"
+            class="hover placeholder"
+        >
             <span>{{ $t('send.private.detail-private-send.placeholder__amount-edit') }}</span>
         </li>
     </ul>
 </template>
 
 <script>
-    export default {
-        name: 'SelectedMintsList',
+export default {
+    name: 'SelectedMintsList',
 
-        props: {
-            mints: {
-                type: Array,
-                required: true
-            },
-
-            isOpen: {
-                type: Boolean,
-                required: true
-            }
+    props: {
+        mints: {
+            type: Array,
+            required: true
         },
 
-        computed: {
-            hasMints () {
-                return this.mints.reduce((accumulator, current) => {
-                    return !!current.cost || accumulator
-                }, false)
-            }
+        isOpen: {
+            type: Boolean,
+            required: true
+        }
+    },
+
+    computed: {
+        hasMints () {
+            return this.mints.reduce((accumulator, current) => {
+                return !!current.cost || accumulator
+            }, false)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

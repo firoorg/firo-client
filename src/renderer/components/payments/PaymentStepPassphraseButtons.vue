@@ -1,29 +1,31 @@
 <template>
-    <base-button :color="color"
-                 :disabled="!canSubmit"
-                 @click="actions.next">
+    <base-button
+        :color="color"
+        :disabled="!canSubmit"
+        @click="actions.next"
+    >
         <slot />
     </base-button>
 </template>
 
 <script>
-    export default {
-        name: 'PaymentStepPassphraseButtons',
+export default {
+    name: 'PaymentStepPassphraseButtons',
 
-        props: {
-            actions: {
-                type: Object,
-                required: true
-            },
-            canSubmit: {
-                type: Boolean,
-                default: false
-            },
-            color: {
-                type: String
-            }
+    props: {
+        actions: {
+            type: Object,
+            required: true
+        },
+        canSubmit: {
+            type: Boolean,
+            default: false
+        },
+        color: {
+            type: String
         }
     }
+}
 </script>
 
 <style scoped>

@@ -1,56 +1,69 @@
 <template>
     <span :class="{ interactive: hasTagClick }">
-        <span v-for="(word, index) in parsedContent" class="word">
-            <a v-if="word.type === 'tag'" @click="() => onClick(word.content)">
-                <BaseTag :size="tagSize" class="tag">{{ word.content }}</BaseTag>
+        <span
+            v-for="(word, index) in parsedContent"
+            class="word"
+        >
+            <a
+                v-if="word.type === 'tag'"
+                @click="() => onClick(word.content)"
+            >
+                <BaseTag
+                    :size="tagSize"
+                    class="tag"
+                >
+                    {{ word.content }}
+                </BaseTag>
             </a>
-            <span v-else>{{ word.content }}</span>
+            <span v-else>
+                {{ word.content }}
+            </span>
         </span>
     </span>
 </template>
 
 <script>
-  export default {
-      name: 'natural-language-tags',
-      props: {
-          content: {
-              required: true,
-              type: String,
-              default: ''
-          },
-          tagSize: {
-              type: String,
-              default: 'medium'
-          },
-          onTagClick: {
-              required: false,
-              type: Function
-          }
-      },
+export default {
+    name: 'NaturalLanguageTags',
+    props: {
+        content: {
+            required: true,
+            type: String,
+            default: ''
+        },
+        tagSize: {
+            type: String,
+            default: 'medium'
+        },
+        onTagClick: {
+            required: false,
+            type: Function
+        }
+    },
 
-      computed: {
-          parsedContent () {
-              // todo proper hashtag extraction -> http://geekcoder.org/js-extract-hashtags-from-text/
-              return this.content.split(' ').map((content) => {
-                  // tags = #+char(:not(number))
-                  const isTag = (content.charAt(0) === '#' && isNaN(parseInt(content.charAt(1))))
+    computed: {
+        parsedContent () {
+            // todo proper hashtag extraction -> http://geekcoder.org/js-extract-hashtags-from-text/
+            return this.content.split(' ').map((content) => {
+                // tags = #+char(:not(number))
+                const isTag = (content.charAt(0) === '#' && isNaN(parseInt(content.charAt(1))))
 
-                  return {
-                      type: isTag ? 'tag' : 'word',
-                      content: isTag ? content.substr(1) : content
-                  }
-              })
-          },
+                return {
+                    type: isTag ? 'tag' : 'word',
+                    content: isTag ? content.substr(1) : content
+                }
+            })
+        },
 
-          hasTagClick () {
-              return this.onTagClick !== undefined
-          },
+        hasTagClick () {
+            return this.onTagClick !== undefined
+        },
 
-          onClick () {
-              return this.onTagClick || function () {}
-          }
-      }
-  }
+        onClick () {
+            return this.onTagClick || function () {}
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>

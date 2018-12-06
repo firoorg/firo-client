@@ -5,12 +5,12 @@
 </template>
 
 <script>
-  export default {
-      name: 'AttentionBadge',
-      props: {
-          amount: Number
-      }
-  }
+export default {
+    name: 'AttentionBadge',
+    props: {
+        amount: Number
+    }
+}
 </script>
 
 <style lang="scss">

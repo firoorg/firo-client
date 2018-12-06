@@ -1,10 +1,12 @@
 <template>
-    <th v-if="isHeader"
+    <th
+        v-if="isHeader"
         class="vuetable-th-component-amount"
-        v-html="title"
         @click="$emit('click', rowField, $event)"
-    ></th>
-    <td v-else
+        v-html="title"
+    />
+    <td
+        v-else
         class="vuetable-td-component-amount"
     >
         {{ amount }}
@@ -12,20 +14,20 @@
 </template>
 
 <script>
-    import { convertToCoin } from '#/lib/convert'
-    import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import { convertToCoin } from '#/lib/convert'
+import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
 
-    export default {
-        name: 'AnimatedTableAmount',
-        mixins: [
-            VuetableFieldMixin
-        ],
-        computed: {
-            amount () {
-                return convertToCoin(this.rowData.amount)
-            }
+export default {
+    name: 'AnimatedTableAmount',
+    mixins: [
+        VuetableFieldMixin
+    ],
+    computed: {
+        amount () {
+            return convertToCoin(this.rowData.amount)
         }
     }
+}
 </script>
 
 <style scoped>

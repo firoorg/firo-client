@@ -2,21 +2,30 @@
     <section class="outgoing-payments">
         <div class="scrollable-height">
             <section class="outgoing-requests-list">
-                <component :is="fromClipboardPopoverName"
-                           :boundaries-element="boundariesElement"
-                            @update-form="onFormUpdateFromClipboardPopover">
-                    <h1 v-html="$t('send.public.overview.title')"></h1>
+                <component
+                    :is="fromClipboardPopoverName"
+                    :boundaries-element="boundariesElement"
+                    @update-form="onFormUpdateFromClipboardPopover"
+                >
+                    <h1 v-html="$t('send.public.overview.title')" />
                 </component>
 
-                <outgoing-payments-list :selected-payment="selectedPaymentId"
-                                        @selection-change="onRowSelect" />
+                <outgoing-payments-list
+                    :selected-payment="selectedPaymentId"
+                    @selection-change="onRowSelect"
+                />
             </section>
         </div>
         <section class="paymentrequest-detail">
-            <transition name="fade" mode="out-in">
-                <router-view :key="$route.path"
-                             :boundaries-element="boundariesElement"
-                             class="paymentrequest-detail-route" />
+            <transition
+                name="fade"
+                mode="out-in"
+            >
+                <router-view
+                    :key="$route.path"
+                    :boundaries-element="boundariesElement"
+                    class="paymentrequest-detail-route"
+                />
             </transition>
             <!--<send-zcoin :boundaries-element="boundariesElement" />-->
         </section>
@@ -24,70 +33,70 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-    import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
+import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
 
-    import SendFromClipboardPopover from '@/components/OutgoingPaymentsPage/SendZcoin/SendFromClipboardPopover'
-    import SpendZerocoinFromClipboardPopover from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinFromClipboardPopover'
-    import OutgoingPaymentsList from '@/components/OutgoingPaymentsPage/OutgoingPaymentsList'
+import SendFromClipboardPopover from '@/components/OutgoingPaymentsPage/SendZcoin/SendFromClipboardPopover'
+import SpendZerocoinFromClipboardPopover from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinFromClipboardPopover'
+import OutgoingPaymentsList from '@/components/OutgoingPaymentsPage/OutgoingPaymentsList'
 
-    export default {
-        name: 'outgoingPaymentsPage',
+export default {
+    name: 'OutgoingPaymentsPage',
 
-        components: {
-            OutgoingPaymentsList,
-            SendFromClipboardPopover,
-            SpendZerocoinFromClipboardPopover
+    components: {
+        OutgoingPaymentsList,
+        SendFromClipboardPopover,
+        SpendZerocoinFromClipboardPopover
+    },
+
+    mixins: [
+        FilterByUrlParamMixin
+    ],
+
+    props: [
+        'boundariesElement',
+        'isPrivate'
+    ],
+
+    computed: {
+        ...mapGetters({
+            transactions: 'Address/getOutgoingTransactions'
+        }),
+
+        selectedPaymentId () {
+            const { id } = this.$route.params
+
+            return id || null
         },
 
-        mixins: [
-            FilterByUrlParamMixin
-        ],
+        fromClipboardPopoverName () {
+            const prefix = this.$route.meta.isPublic ? 'Send' : 'SpendZerocoin'
 
-        props: [
-            'boundariesElement',
-            'isPrivate'
-        ],
+            return `${prefix}FromClipboardPopover`
+        }
+    },
 
-        computed: {
-            ...mapGetters({
-                transactions: 'Address/getOutgoingTransactions'
-            }),
+    methods: {
+        onRowSelect ({ name, id }) {
+            console.log(name, id)
 
-            selectedPaymentId () {
-                const { id } = this.$route.params
-
-                return id || null
-            },
-
-            fromClipboardPopoverName () {
-                const prefix = this.$route.meta.isPublic ? 'Send' : 'SpendZerocoin'
-
-                return `${prefix}FromClipboardPopover`
-            }
+            this.pushRouterWithFilter({
+                name,
+                params: {
+                    id
+                }
+            })
         },
+        onFormUpdateFromClipboardPopover (event) {
+            const { name } = event
 
-        methods: {
-            onRowSelect ({ name, id }) {
-                console.log(name, id)
-
-                this.pushRouterWithFilter({
-                    name,
-                    params: {
-                        id
-                    }
-                })
-            },
-            onFormUpdateFromClipboardPopover (event) {
-                const { name } = event
-
-                this.pushRouterWithFilter({
-                    name
-                })
-            }
+            this.pushRouterWithFilter({
+                name
+            })
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

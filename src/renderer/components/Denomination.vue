@@ -1,140 +1,159 @@
 <template>
     <div class="denomination">
-        <div class="bar" :class="{ 'is-empty': !minted && !current }">
-            <div class="current"
-                 :class="{ 'has-current': current }"
-                 :style="{ height: currentHeight }">
+        <div
+            class="bar"
+            :class="{ 'is-empty': !minted && !current }"
+        >
+            <div
+                class="current"
+                :class="{ 'has-current': current }"
+                :style="{ height: currentHeight }"
+            >
                 <!--<span v-show="current">{{ current }}</span>-->
             </div>
-            <div class="minted"
-                 :class="{ 'has-minted': minted }"
-                 :style="{ height: mintHeight }">
+            <div
+                class="minted"
+                :class="{ 'has-minted': minted }"
+                :style="{ height: mintHeight }"
+            >
                 <transition name="fade">
-                    <span v-show="minted">{{ minted }}</span>
+                    <span v-show="minted">
+                        {{ minted }}
+                    </span>
                 </transition>
             </div>
             <label>{{ denomination }}</label>
         </div>
         <div class="buttons">
-            <button :disabled="!canDecrease" @click="decrease">&minus;</button>
-            <button :disabled="!canIncrease" @click="increase">&plus;</button>
+            <button
+                :disabled="!canDecrease"
+                @click="decrease"
+            >
+                &minus;
+            </button>
+            <button
+                :disabled="!canIncrease"
+                @click="increase"
+            >
+                &plus;
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import { convertToSatoshi } from '#/lib/convert'
-    // import { addVuexModel } from '@/utils/store'
-    import types from '~/types'
+import { mapGetters } from 'vuex'
+import { convertToSatoshi } from '#/lib/convert'
+// import { addVuexModel } from '@/utils/store'
+import types from '~/types'
 
-    export default {
-        name: 'Denomination',
-        props: {
-            denomination: {
-                type: Number,
-                required: true
-            },
-            availableBalance: {
-                type: Number,
-                required: true
-            },
-            maxValue: {
-                type: Number,
-                required: true
-            },
-            maxHeight: {
-                type: Number,
-                required: true
-            },
-            onChange: {
-                type: Function,
-                default: () => {}
-            }
+export default {
+    name: 'Denomination',
+    props: {
+        denomination: {
+            type: Number,
+            required: true
+        },
+        availableBalance: {
+            type: Number,
+            required: true
+        },
+        maxValue: {
+            type: Number,
+            required: true
+        },
+        maxHeight: {
+            type: Number,
+            required: true
+        },
+        onChange: {
+            type: Function,
+            default: () => {}
+        }
+    },
+
+    data () {
+        return {
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            denominations: 'Mint/currentDenominations',
+            mints: 'Mint/confirmedMintsPerDenomination'
+        }),
+
+        canIncrease () {
+            // fees for this increase are already subtracted by the parent element
+            return convertToSatoshi(this.denomination) < this.availableBalance
         },
 
-        data () {
-            return {
-            }
+        canDecrease () {
+            return this.current > 0
         },
 
-        computed: {
-            ...mapGetters({
-                denominations: 'Mint/currentDenominations',
-                mints: 'Mint/confirmedMintsPerDenomination'
-            }),
-
-            canIncrease () {
-                // fees for this increase are already subtracted by the parent element
-                return convertToSatoshi(this.denomination) < this.availableBalance
-            },
-
-            canDecrease () {
-                return this.current > 0
-            },
-
-            currentHeight () {
-                // const all = this.calcHeight(this.current + this.minted)
-                // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
-                // return all - this.calcHeight(this.minted) + 'px'
-                // return this.mapHeight(all) + 'px'
-                return this.calcHeight(this.current) * (8 * 3) + 'px'
-            },
-
-            mintHeight () {
-                return (Math.log(this.calcHeight(this.minted + 1)) * (8 * 4)) + 'px'
-                // return this.calcHeight(this.current + this.minted) - this.calcHeight(this.current) + 'px'
-                // return (this.minted ? (Math.log(this.calcHeight(this.minted + 1)) + (8 * 3)) : 0) + 'px'
-            },
-
-            current () {
-                return this.denominations[`${this.denomination}`] || 0
-            },
-
-            minted () {
-                return this.mints[`${this.denomination}`] || 0 // Math.ceil(Math.random() * 10)
-            }
+        currentHeight () {
+            // const all = this.calcHeight(this.current + this.minted)
+            // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
+            // return all - this.calcHeight(this.minted) + 'px'
+            // return this.mapHeight(all) + 'px'
+            return this.calcHeight(this.current) * (8 * 3) + 'px'
         },
 
-        methods: {
-            mapHeight (amount) {
-                const map = (value, low1, high1, low2, high2) => {
-                    return low2 + (high2 - low2) * (value - low1) / (high1 - low1)
-                }
+        mintHeight () {
+            return (Math.log(this.calcHeight(this.minted + 1)) * (8 * 4)) + 'px'
+            // return this.calcHeight(this.current + this.minted) - this.calcHeight(this.current) + 'px'
+            // return (this.minted ? (Math.log(this.calcHeight(this.minted + 1)) + (8 * 3)) : 0) + 'px'
+        },
 
-                return map(amount, 0, Math.log(this.maxValue + 1), 30, this.maxHeight)
-            },
+        current () {
+            return this.denominations[`${this.denomination}`] || 0
+        },
 
-            calcHeight (amount) {
-                /*
+        minted () {
+            return this.mints[`${this.denomination}`] || 0 // Math.ceil(Math.random() * 10)
+        }
+    },
+
+    methods: {
+        mapHeight (amount) {
+            const map = (value, low1, high1, low2, high2) => {
+                return low2 + (high2 - low2) * (value - low1) / (high1 - low1)
+            }
+
+            return map(amount, 0, Math.log(this.maxValue + 1), 30, this.maxHeight)
+        },
+
+        calcHeight (amount) {
+            /*
 
                 */
 
-                return !amount ? 0 : Math.ceil((amount)/* *  this.denomination */) // * (8 * 3)
+            return !amount ? 0 : Math.ceil((amount)/* *  this.denomination */) // * (8 * 3)
 
-                // return !amount ? 0 : Math.ceil(map(Math.log(amount + 1), 0, Math.log(this.maxValue + 1) || 1, 30, this.maxHeight))
-                // return !amount ? 0 : Math.log(amount + 1)
-            },
+            // return !amount ? 0 : Math.ceil(map(Math.log(amount + 1), 0, Math.log(this.maxValue + 1) || 1, 30, this.maxHeight))
+            // return !amount ? 0 : Math.log(amount + 1)
+        },
 
-            increase () {
-                if (!this.canIncrease) {
-                    return
-                }
-
-                this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
-                this.onChange()
-            },
-
-            decrease () {
-                if (!this.canDecrease) {
-                    return
-                }
-
-                this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
-                this.onChange()
+        increase () {
+            if (!this.canIncrease) {
+                return
             }
+
+            this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
+            this.onChange()
+        },
+
+        decrease () {
+            if (!this.canDecrease) {
+                return
+            }
+
+            this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
+            this.onChange()
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

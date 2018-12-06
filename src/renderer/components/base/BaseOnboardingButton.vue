@@ -1,8 +1,9 @@
 <template>
     <button
-            v-bind="$attrs"
-            :class="[{ 'is-light' : isLight }]"
-            @click="$emit('click', $event)">
+        v-bind="$attrs"
+        :class="[{ 'is-light' : isLight }]"
+        @click="$emit('click', $event)"
+    >
         <span>
             <slot />
         </span>
@@ -10,17 +11,17 @@
 </template>
 
 <script>
-    export default {
-        name: 'BaseButton',
-        inheritAttrs: false,
-        props: {
-            isLight: {
-                type: Boolean,
-                required: false,
-                default: false
-            }
+export default {
+    name: 'BaseButton',
+    inheritAttrs: false,
+    props: {
+        isLight: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

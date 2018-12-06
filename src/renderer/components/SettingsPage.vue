@@ -6,9 +6,9 @@
 </template>
 
 <script>
-    export default {
-        name: 'SettingsPage'
-    }
+export default {
+    name: 'SettingsPage'
+}
 </script>
 
 <style lang="scss" scoped>

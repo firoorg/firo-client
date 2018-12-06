@@ -8,21 +8,21 @@
 </template>
 
 <script>
-    import { nl2br } from '@/utils/format'
+import { nl2br } from '@/utils/format'
 
-    export default {
-        name: 'ReceivePendingPaymentRequest',
+export default {
+    name: 'ReceivePendingPaymentRequest',
 
-        props: [
-            'message'
-        ],
+    props: [
+        'message'
+    ],
 
-        computed: {
-            messageFormatted () {
-                return nl2br(this.message)
-            }
+    computed: {
+        messageFormatted () {
+            return nl2br(this.message)
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>

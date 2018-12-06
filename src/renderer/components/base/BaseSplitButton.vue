@@ -1,15 +1,23 @@
 <template>
     <div class="split-button">
-        <slot name="button" :button="$attrs" />
-        <base-popover :open="false"
-                      placement="auto-end"
-                      popover-class="advice"
-                      :auto-hide="true">
+        <slot
+            name="button"
+            :button="$attrs"
+        />
+        <base-popover
+            :open="false"
+            placement="auto-end"
+            popover-class="advice"
+            :auto-hide="true"
+        >
             <template slot="content">
                 <slot name="flyout" />
             </template>
             <template slot="target">
-                <base-button v-bind="$attrs" class="options-handle">
+                <base-button
+                    v-bind="$attrs"
+                    class="options-handle"
+                >
                     ‹
                 </base-button>
             </template>
@@ -18,10 +26,10 @@
 </template>
 
 <script>
-    export default {
-        name: 'BaseSplitButton',
-        inheritAttrs: false
-        /*
+export default {
+    name: 'BaseSplitButton',
+    inheritAttrs: false
+    /*
         props: {
             isOutline: {
                 type: Boolean,
@@ -48,7 +56,7 @@
             }
         }
         */
-    }
+}
 </script>
 
 <style lang="scss" scoped>
