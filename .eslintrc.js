@@ -24,6 +24,10 @@ module.exports = {
         'vue/no-v-html': 0,
         'vue/component-name-in-template-casing': 'kebab-case',
 
+        'vue/no-unused-components': ['error', {
+            'ignoreWhenBindingPresent': false
+        }],
+
 // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
     }
