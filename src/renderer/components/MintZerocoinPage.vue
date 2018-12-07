@@ -22,7 +22,6 @@
                                 <h3 v-html="$t('onboarding.make-request-first.mint.title')" />
                             </template>
                             <template slot="content">
-                                <p v-html="$t('onboarding.make-request-first.mint.description')" />
                                 <i18n
                                     path="onboarding.make-request-first.mint.description"
                                     tag="p"
@@ -41,7 +40,18 @@
                                 <h3 v-html="$t('onboarding.process-mints.title')" />
                             </template>
                             <template slot="content">
-                                <p v-html="$t('onboarding.process-mints.description')" />
+                                <i18n
+                                    path="onboarding.process-mints.description"
+                                    tag="p"
+                                    :places="{ percentageToHoldInZerocoin, remainingXzcToFulFillPercentageToHoldInZerocoin }"
+                                >
+                                    <nobr place="percentageToHoldInZerocoin">
+                                        <strong>{{ percentageToHoldInZerocoin }}&#8201;%</strong>
+                                    </nobr>
+                                    <nobr place="remainingXzcToFulFillPercentageToHoldInZerocoin">
+                                        <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }}&#8201;XZC</strong>
+                                    </nobr>
+                                </i18n>
                             </template>
                             <template slot="actions">
                                 <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
