@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h3>Network</h3>
+        <h3>{{ $t('navigation.flyout-connections.title') }}</h3>
         <ul>
             <li>
                 <i18n
@@ -13,12 +13,12 @@
             </li>
             <li>
                 <span>
-                    <tick-icon color="white" /> {{ $t('navigation.flyout-connections.label__is-connected-via-tor') }}
+                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__is-connected-via-tor')" />
                 </span>
             </li>
             <li>
                 <span>
-                    <tick-icon color="white" /> {{ $t('navigation.flyout-connections.label__dandelion') }}
+                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__dandelion')" />
                 </span>
             </li>
         </ul>
@@ -52,6 +52,7 @@ export default {
 <style lang="scss" scoped>
     h3 {
         margin-top: 0;
+        margin-left: 2.5rem;
     }
 
     ul {
@@ -72,6 +73,10 @@ export default {
                 justify-self: center;
                 align-self: center;
             }
+        }
+
+        strong {
+            color: $color--white;
         }
     }
 
