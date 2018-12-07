@@ -19,7 +19,12 @@ const state = {
     },
     testnet: true,
     type: 'full',
-    averageBlockTime: 0
+    averageBlockTime: 0,
+    syncBlocksPerSecond: {
+        startBlockHeight: 0,
+        startTimestamp: 0,
+        currentTimestamp: 0
+    }
 }
 
 export const mutations = {
@@ -90,11 +95,22 @@ export const mutations = {
 
     [types.SET_AVERAGE_BLOCK_TIME] (state, averageBlockTime) {
         state.averageBlockTime = averageBlockTime
+    },
+
+    [types.UPDATE_SYNC_BLOCKS_PER_SECOND] (state, { height, timestamp }) {
+        if (!state.syncBlocksPerSecond.startBlockHeight) {
+            state.syncBlocksPerSecond.startBlockHeight = height
+            state.syncBlocksPerSecond.startTimestamp = timestamp
+        }
+
+        console.log('UPDATE_SYNC_BLOCKS_PER_SECOND', { height, timestamp })
+        state.syncBlocksPerSecond.currentTimestamp = timestamp
     }
 }
 
 export const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
+        console.log(initialState)
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType, avgBlockTime } = initialState
         const { height, timestamp } = currentBlock
 
@@ -103,6 +119,11 @@ export const actions = {
         dispatch(types.SET_CURRENT_BLOCK, {
             height,
             timestamp
+        })
+
+        commit(types.UPDATE_SYNC_BLOCKS_PER_SECOND, {
+            height,
+            timestamp: Date.now()
         })
 
         if (isTestnet) {
@@ -149,6 +170,7 @@ export const actions = {
         dispatch(types.SET_INITIAL_STATE, block)
     },
 
+    /*
     [types.SET_BLOCKCHAIN_TIP] ({ commit, state }, height) {
         if (!height) {
             return
@@ -160,6 +182,7 @@ export const actions = {
 
         commit(types.SET_BLOCKCHAIN_TIP, height)
     },
+    */
 
     [types.SET_CONNECTIONS] ({ commit, state }, connections) {
         if (connections === undefined || isNaN(connections) || connections === state.connections) {
@@ -262,7 +285,32 @@ export const getters = {
     networkIdentifier: (state, getters) => getters.isMainnet ? 'mainnet' : 'testnet',
     averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime,
     connections: (state) => state.connections,
-    hasConnections: (state) => !!state.connections
+    hasConnections: (state) => !!state.connections,
+    // prototype only
+    syncBlocksPerSecond: (state) => {
+        const { startTimestamp, startBlockHeight, currentTimestamp } = state.syncBlocksPerSecond
+        const { height: currentHeight } = state.currentBlock
+
+        const blocksLoaded = currentHeight - startBlockHeight
+        const time = currentTimestamp - startTimestamp
+
+        return blocksLoaded / (time / 1000)
+    },
+    // prototype only
+    estimatedTimeUntilSynced: (state, getters) => {
+        const { height: currentHeight, timestamp: currentTimestamp } = state.currentBlock
+        const estimatedTimestampWhenSynced = Date.now() + ((getters.estimatedBlockHeight - currentHeight) * getters.syncBlocksPerSecond * 1000)
+
+        return isFinite(getters.estimatedBlockHeight) ? estimatedTimestampWhenSynced : 0
+    },
+    estimatedBlockHeight: (state, getters) => {
+        const now = Date.now()
+        const remainingTime = now - (getters.currentBlockTimestamp * 1000)
+        const remainingBlocks = remainingTime / getters.averageBlockTimeInMilliSeconds
+
+        return Math.floor(getters.currentBlockHeight + remainingBlocks)
+    }
+
 }
 
 export default {

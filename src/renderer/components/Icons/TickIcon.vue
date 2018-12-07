@@ -30,14 +30,15 @@ export default {
     computed: {
         strokeColor () {
             switch (this.color.toLowerCase()) {
+            case 'white':
+                return '#fff'
             case 'warning':
             case 'orange':
                 return '#FA8C0F'
             case 'success':
             case 'green':
-                return '#23b852'
             default:
-                return '#000'
+                return '#23b852'
             }
         }
     }

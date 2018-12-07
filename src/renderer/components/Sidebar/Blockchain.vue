@@ -30,11 +30,11 @@
                 trigger="hover"
                 boundaries-element="body"
                 :popover-class="['advice', connectionPopoverClass]"
-                placement="bottom-end"
+                placement="bottom"
                 :offset="4"
                 :delay="{ show: 200, hide: 100 }"
             >
-                <blockchain-connection-popover slot="content" />
+                <blockchain-connection-popover slot="content" :connection-class="connectionClass" />
                 <template slot="target">
                     <span class="connections-badge">
                         {{ connections }}
@@ -42,24 +42,40 @@
                 </template>
             </base-popover>
         </div>
-        <div
-            class="sync-progress"
-            :class="{ 'is-synced': getIsSynced }"
-        >
-            <div
-                v-show="!isBlockchainSynced"
-                class="wrap"
+
+        <div class="sync-progress-wrap">
+            <base-popover
+                trigger="hover"
+                :disabled="isSynced"
+                boundaries-element="body"
+                :popover-class="['advice', connectionPopoverClass]"
+                placement="bottom-start"
+                :offset="'12,-8'"
+                :delay="{ show: 200, hide: 100 }"
             >
-                <div
-                    class="loaded"
-                    :style="{ width: `${progress}%`}"
-                />
-            </div>
-            <!--
-            <div class="wrap">
-                <div class="loaded" :style="{ width: `${1.5 * progress}%`}"></div>
-            </div>
-            -->
+                <blockchain-sync-progress-popover slot="content" />
+                <template slot="target">
+                    <div
+                        class="sync-progress"
+                        :class="{ 'is-synced': getIsSynced }"
+                    >
+                        <div
+                            v-show="!isBlockchainSynced"
+                            class="wrap"
+                        >
+                            <div
+                                class="loaded"
+                                :style="{ width: `${progress}%`}"
+                            />
+                        </div>
+                        <!--
+                        <div class="wrap">
+                            <div class="loaded" :style="{ width: `${1.5 * progress}%`}"></div>
+                        </div>
+                        -->
+                    </div>
+                </template>
+            </base-popover>
         </div>
     </section>
 </template>
@@ -71,17 +87,20 @@ import LoadingBounce from '@/components/Icons/LoadingBounce'
 import TickIcon from '@/components/Icons/TickIcon'
 
 import BlockchainConnectionPopover from '@/components/Sidebar/BlockchainConnectionPopover'
+import BlockchainSyncProgressPopover from '@/components/Sidebar/BlockchainSyncProgressPopover'
 
 export default {
     name: 'Blockchain',
     components: {
         LoadingBounce,
         TickIcon,
-        BlockchainConnectionPopover
+        BlockchainConnectionPopover,
+        BlockchainSyncProgressPopover
     },
 
     computed: {
         ...mapGetters({
+            estimatedBlockHeight: 'Blockchain/estimatedBlockHeight',
             currentBlockHeight: 'Blockchain/currentBlockHeight',
             currentBlockTimestamp: 'Blockchain/currentBlockTimestamp',
             avgBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds',
@@ -98,13 +117,7 @@ export default {
         },
 
         progress () {
-            const now = Date.now()
-            const remainingTime = now - (this.currentBlockTimestamp * 1000)
-            const remainingBlocks = remainingTime / this.avgBlockTime
-
-            console.log({ remainingTime, remainingBlocks })
-            const estimatedTipHeight = this.currentBlockHeight + remainingBlocks
-            return this.currentBlockHeight / estimatedTipHeight * 100
+            return this.currentBlockHeight / this.estimatedBlockHeight * 100
         },
 
         connectionPopoverClass () {
@@ -204,8 +217,17 @@ export default {
             }
         }
 
-        .sync-progress {
+        .sync-progress-wrap {
             grid-area: sync;
+
+            & /deep/ .trigger {
+                display: block !important;
+                padding-top: 1rem;
+                margin-top: -1rem;
+            }
+        }
+
+        .sync-progress {
             background: $color--comet-dark;
             height: emRhythm(1);
             width: 100%;

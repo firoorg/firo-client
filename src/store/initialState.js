@@ -131,7 +131,12 @@ module.exports = {
         },
         testnet: true,
         type: 'full',
-        averageBlockTime: 0
+        averageBlockTime: 0,
+        syncBlocksPerSecond: {
+            startBlockHeight: 0,
+            startTimestamp: 0,
+            currentTimestamp: 0
+        }
     },
 
     Settings: { // daemon: isSubscription

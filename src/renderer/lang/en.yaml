@@ -28,8 +28,17 @@ navigation:
     label__synced: Synced!
     label__syncing: Syncing...
     label__peers: Looking for Peers!
-
-
+  flyout-connections:
+    label__connections: "{0} Connections"
+    label__is-connected-via-tor: "Connected via Tor"
+    label__not-connected-via-tor: "Tor disabled"
+    label__dandelion: "Dandelion++ activated"
+  flyout-blockchain-sync-progress:
+    title: Blockchain is catching up!
+    label__blocks-processed: Processed {blockAmount} blocks of transaction history so far.
+    label__blocks-timestamp: The last block received was generated {blockTimeago}.
+    label__estimated-time-until-synced: Blockchain sync will finish in {estimatedTimestamp}
+    label__blocks-not-visible: Transactions after this will not yet be visible.
 
 receive:
   overview:

@@ -39,7 +39,7 @@ export default {
             default: true
         },
         offset: {
-            type: Number,
+            type: [Number, String],
             default: 12
         }
     },
