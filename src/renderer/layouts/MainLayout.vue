@@ -136,7 +136,7 @@ export default {
         "sidebar main main main main main main main main";
         // "sidebar footer footer footer footer footer footer footer footer";
         grid-template-rows: emRhythm(3*$base-line-multi) auto emRhythm($base-line-multi);
-        grid-template-columns: minmax(min-content, 15rem) auto;
+        grid-template-columns: minmax(min-content, 14rem) auto;
 
         overflow: hidden;
 
