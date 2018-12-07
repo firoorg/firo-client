@@ -20,7 +20,7 @@
             class="amount"
             @click="toggleBalance"
         >
-            {{ balance }}
+            {{ balance }}&#8201;XZC
         </span>
     </section>
 </template>
@@ -78,7 +78,7 @@ export default {
         balance () {
             const {factor, unit, decimals} = this.exchange
 
-            return this.showBalanceInCurrency ? `${(this.totalBalance * factor).toFixed(decimals)} ${unit}` : `${convertToCoin(this.totalBalance)} XZC`
+            return this.showBalanceInCurrency ? `${(this.totalBalance * factor).toFixed(decimals)} ${unit}` : `${convertToCoin(this.totalBalance)}`
         }
     },
 
