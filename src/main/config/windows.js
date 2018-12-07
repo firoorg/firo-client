@@ -6,7 +6,9 @@ export default {
             useContentSize: true,
             titleBarStyle: 'hiddenInset',
             height: 750,
-            width: 1930
+            width: 1400,
+            minWidth: 1200,
+            minHeight: 450
         }
     },
     validateAddress: {
