@@ -122,7 +122,8 @@ export default {
 
         myZnodeClusters () {
             const znodes = {}
-            const index = supercluster({
+
+            const index = new supercluster({
                 radius: 40,
                 // extent: 96,
                 // extent: 256,
