@@ -19,7 +19,7 @@
                             class="onboarding"
                         >
                             <template slot="header">
-                                <h3 v-html="$t('onboarding.make-request-first.mint.title')" />
+                                <h3>{{ $t('onboarding.make-request-first.mint.title') }}</h3>
                             </template>
                             <template slot="content">
                                 <i18n
@@ -37,7 +37,7 @@
                         </onboarding-notice>
                         <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
                             <template slot="header">
-                                <h3 v-html="$t('onboarding.process-mints.title')" />
+                                <h3>{{ $t('onboarding.process-mints.title') }}</h3>
                             </template>
                             <template slot="content">
                                 <i18n
