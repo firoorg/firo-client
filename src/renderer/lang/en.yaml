@@ -16,9 +16,9 @@ navigation:
   balance:
     title: Zcoin Balance
   menu:
-    button__receive: Receive Zcoin
+    button__receive: Receive
     button__send: Public Send
-    button__mint: Anonymize Zcoin
+    button__mint: Anonymize
     button__spend: Private Spend
     button__znode: Znodes
     button__settings: Settings
@@ -199,7 +199,7 @@ send:
 
     flyout-fee-selector:
       title: Select Fee
-      description: Change transaction fee. When the network is congested, transactions with higher fees will be processed faster than those with lower fees. 
+      description: Change transaction fee. When the network is congested, transactions with higher fees will be processed faster than those with lower fees.
       button__select-fee--primary: Select fee
 
     flyout-done:
