@@ -85,7 +85,6 @@ export default {
         justify-content: center;
         align-items: center;
         margin-top: emRhythm(5);
-        //border: 1px solid red;
         text-align: center;
 
     }
@@ -123,15 +122,16 @@ export default {
 
         a {
             padding: emRhythm(0.5, $silent: true) emRhythm(1.5, $silent: true);
+            color: $color--polo;
 
             &:hover,
             &:focus {
                 background: $color--white;
-                color: $color--comet-dark;
+                color: $color--polo-dark;
             }
 
             &.active {
-                background: $color--comet-dark;
+                background: $color--polo;
                 color: $color--white;
             }
         }
