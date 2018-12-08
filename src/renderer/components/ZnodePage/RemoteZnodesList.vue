@@ -1,10 +1,9 @@
 <template>
     <animated-table
-        :data="remoteZnodes"
+        :data="remoteZnodesSorted"
         :fields="tableFields"
         track-by="id"
         :per-page="100"
-        :sort-order="[{ field: 'firstSeenAt', direction: 'desc' }]"
     />
 </template>
 
@@ -69,15 +68,23 @@ export default {
         AnimatedTable,
         RelativeDate
     },
+
     props: {
         remoteZnodes: {
             type: Array,
             default: () => []
         }
     },
+
     data () {
         return {
             tableFields
+        }
+    },
+
+    computed: {
+        remoteZnodesSorted() {
+            return [...this.remoteZnodes].sort((a, b) => a.firstSeenAt < b.firstSeenAt)
         }
     }
 }
