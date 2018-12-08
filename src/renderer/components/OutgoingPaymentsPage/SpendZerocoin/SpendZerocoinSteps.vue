@@ -136,6 +136,12 @@ export default {
             }
 
             return 'green'
+        },
+
+        getPassphraseStepProps() {
+            return {
+                translationNamespace: 'send.private.flyout-unlock-client'
+            }
         }
     },
 

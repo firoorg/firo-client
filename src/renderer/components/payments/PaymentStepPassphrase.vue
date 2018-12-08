@@ -1,15 +1,15 @@
 <template>
     <div class="form">
         <header>
-            <h2 v-html="$t('mint.flyout-unlock-client.title')" />
-            <p v-html="$t('mint.flyout-unlock-client.description')" />
+            <h2 v-html="$t(`${translationNamespace}.title`)" />
+            <p v-html="$t(`${translationNamespace}.description`)" />
         </header>
         <div
             class="field"
             :class="getFieldErrorClass('passphrase')"
         >
             <label for="passphrase">
-                {{ $t('mint.flyout-unlock-client.label__passphrase') }}
+                {{ $t(`${translationNamespace}.label__passphrase`) }}
             </label>
             <div class="control">
                 <input
@@ -18,7 +18,7 @@
                     v-model="passphrase"
                     v-validate="{ required: true }"
                     type="password"
-                    :placeholder="$t('mint.flyout-unlock-client.placeholder__passphrase')"
+                    :placeholder="$t(`${translationNamespace}.placeholder__passphrase`)"
                     name="passphrase"
                 >
             </div>
@@ -29,13 +29,16 @@
 <script>
 import { addVuexModel } from '@/utils/store'
 import types from '~/types'
+
+import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 import ValidationMixin from '@/mixins/ValidationMixin'
 
 export default {
     name: 'PaymentStepPassphrase',
 
     mixins: [
-        ValidationMixin
+        ValidationMixin,
+        TranslationNamespaceMixin
     ],
 
     $_veeValidate: {

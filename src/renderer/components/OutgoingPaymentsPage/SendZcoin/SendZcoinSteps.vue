@@ -174,6 +174,11 @@ export default {
                     component: PaymentStepPassphrase,
                     isOpen () {
                         return true
+                    },
+                    props () {
+                        return {
+                            translationNamespace: 'send.public.flyout-unlock-client'
+                        }
                     }
                 },
 

@@ -1,13 +1,13 @@
 <template>
     <section>
         <header>
-            <h2 v-html="$t('send.public.flyout-confirm-send.title')" />
-            <p v-html="$t('send.public.flyout-confirm-send.description')" />
+            <h2>{{ $t('send.public.flyout-confirm-send.title') }}</h2>
+            <p v-html="$tc('send.public.flyout-confirm-send.description', pendingPayments.length)" />
         </header>
 
 
         <div class="payment-fee-list">
-            <h3 v-html="$t('send.public.flyout-confirm-send.title__table')" />
+            <h3 v-html="$tc('send.public.flyout-confirm-send.title__table', pendingPayments.length)" />
             <pending-payments
                 :payments="pendingPayments"
                 class="pending-payments"

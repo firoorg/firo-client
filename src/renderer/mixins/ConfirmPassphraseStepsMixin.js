@@ -36,6 +36,11 @@ export default {
                     component: PaymentStepPassphrase,
                     isOpen () {
                         return true
+                    },
+                    props () {
+                        return {
+                            ...this.getPassphraseStepProps
+                        }
                     }
                 },
 
@@ -86,6 +91,10 @@ export default {
             }
 
             return 'green'
+        },
+
+        getPassphraseStepProps () {
+            return {}
         },
 
         getDoneStepProps () {

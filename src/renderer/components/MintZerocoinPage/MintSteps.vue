@@ -113,6 +113,12 @@ export default {
             return 'green'
         },
 
+        getPassphraseStepProps() {
+            return {
+                translationNamespace: 'mint.flyout-unlock-client'
+            }
+        },
+
         getDoneStepProps () {
             return {
                 successIconComponentName: 'MintStarted',

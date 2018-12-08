@@ -171,9 +171,16 @@ send:
       button__cancel--secondary: Cancel
       button__unlock-private-send--primary: Unlock and spend
 
+    flyout-unlock-client:
+      title: Unlock Client to spend
+      description: Etiam porta sem malesuada magna mollis euismod.
+      label__passphrase: Passphrase
+      placeholder__passphrase: Enter your passphrase
+
     flyout-unused-address:
       title: Unused Zcoin Address found
       description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
+      label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
 
 
   public:
@@ -200,7 +207,7 @@ send:
     flyout-confirm-send:
       title: Confirm Payment
       description: "Here's a breakdown of your payment including the fee. OK? | Here's a breakdown of your payments including the fee. OK?"
-      title__table: Payments
+      title__table: Payment | Payments
       title__fees: Fees
       label__change-fees: change
       label__amount: Total
@@ -212,6 +219,12 @@ send:
       description: Change transaction fee. When the network is congested, transactions with higher fees will be processed faster than those with lower fees.
       button__select-fee--primary: Select fee
 
+    flyout-unlock-client:
+      title: Unlock Client to send
+      description: Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+      label__passphrase: Passphrase
+      placeholder__passphrase: Enter your passphrase
+
     flyout-done:
       title: Successfully sent!
       description: The payment is now on its way and will shortly be confirmed by the network.
@@ -219,6 +232,7 @@ send:
     flyout-unused-address:
       title: Unused Zcoin Address found
       description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
+      label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
 
 onboarding:
   intro-screen:
