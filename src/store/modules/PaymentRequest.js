@@ -179,6 +179,14 @@ const getters = {
 
         return requests
     },
+    getPaymentRequestForAddress (state, getters) {
+        return (address) => {
+            return getters.paymentRequests.find((paymentRequest) => {
+                console.log('paymentRequest.address', paymentRequest.address, address)
+                return paymentRequest.address === address
+            })
+        }
+    },
     createFormLabel (state) {
         return state.createPaymentRequestForm.label
     },

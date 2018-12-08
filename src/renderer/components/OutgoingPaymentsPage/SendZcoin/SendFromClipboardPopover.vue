@@ -42,7 +42,10 @@ export default {
             clipboardAddress: 'Clipboard/address',
             clipboardAmount: 'Clipboard/amount',
             currentFormAddress: 'ZcoinPayment/createFormAddress',
-            hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
+            currentFormLabel: 'ZcoinPayment/createFormLabel',
+            hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress',
+            addressBelongsToWallet: 'App/addressBelongsToWallet',
+            getPaymentRequestForAddress: 'PaymentRequest/getPaymentRequestForAddress'
         }),
 
         isOpen () {
@@ -65,14 +68,33 @@ export default {
 
     methods: {
         ...mapActions({
+            setFormLabel: types.zcoinpayment.SET_FORM_LABEL,
+
             setFormAddress: types.zcoinpayment.SET_FORM_ADDRESS,
             setFormAmount: types.zcoinpayment.SET_FORM_AMOUNT,
             markAsNotified: types.clipboard.MARK_AS_NOTIFIED
         }),
 
         setSendFormFields () {
+            const newOrUsed = this.isUsedAddress ? 'used' : 'unused'
+
             if (!this.clipboardAddress) {
                 return
+            }
+
+            if (this.addressBelongsToWallet(this.clipboardAddress)) {
+                const paymentRequest = this.getPaymentRequestForAddress(this.clipboardAddress)
+                console.log(paymentRequest, this.clipboardAddress)
+
+                if (paymentRequest) {
+                    const proposedLabel = this.$t(`send.public.flyout-${newOrUsed}-address.label__payment-request-form-label-to-fulfill` , {
+                        label: paymentRequest.label
+                    })
+
+                    if (!currentFormLabel) {
+                        this.setFormLabel(proposedLabel)
+                    }
+                }
             }
 
             this.setFormAddress(this.clipboardAddress)
