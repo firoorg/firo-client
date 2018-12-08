@@ -9,7 +9,9 @@
                 :class="{ 'has-current': current }"
                 :style="{ height: currentHeight }"
             >
-                <!--<span v-show="current">{{ current }}</span>-->
+                <transition name="fade" duration="250ms">
+                    <span v-show="current">{{ current ? current : '' }}</span>
+                </transition>
             </div>
             <div
                 class="minted"
@@ -29,13 +31,13 @@
                 :disabled="!canDecrease"
                 @click="decrease"
             >
-                &minus;
+                <span>&minus;</span>
             </button>
             <button
                 :disabled="!canIncrease"
                 @click="increase"
             >
-                &plus;
+                <span>&plus;</span>
             </button>
         </div>
     </div>
@@ -179,6 +181,14 @@ export default {
             opacity: 0;
             height: 0;
             overflow: hidden;
+
+            span {
+                position: absolute;
+                top: 0;
+                right: emRhythm(1);
+                @include font-heavy();
+                font-style: italic;
+            }
         }
 
         .current {
@@ -189,6 +199,12 @@ export default {
 
             &.has-current {
                 opacity: 1;
+            }
+
+            span {
+                @include font-regular();
+                font-style: italic;
+                color: $color--polo-dark;
             }
         }
 
@@ -205,11 +221,6 @@ export default {
             }
 
             span {
-                position: absolute;
-                top: 0;
-                right: emRhythm(1);
-                @include font-heavy();
-                font-style: italic;
                 color: $color--white;
             }
         }
@@ -227,7 +238,8 @@ export default {
     .buttons {
         position: relative;
         z-index: 2;
-        display: inline-block;
+        display: flex;
+        justify-content: center;
         margin-top: emRhythm(1);
 
         button {
@@ -238,6 +250,12 @@ export default {
             outline: none;
             border-radius: 50%;
             background-color: rgba($color--polo-medium, 0);
+            position: relative;
+            height: 1.5rem;
+            width: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             transition: color 0.15s ease-out, background-color 0.15s ease-out;
 
@@ -256,6 +274,10 @@ export default {
                     background-color: rgba($color--polo-medium, 1);
                 }
             }
+        }
+
+        button + button {
+            margin-left: 0.25rem;
         }
     }
 </style>
