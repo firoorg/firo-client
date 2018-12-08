@@ -34,7 +34,10 @@
                 :offset="4"
                 :delay="{ show: 200, hide: 100 }"
             >
-                <blockchain-connection-popover slot="content" :connection-class="connectionClass" />
+                <blockchain-connection-popover
+                    slot="content"
+                    :connection-class="connectionClass"
+                />
                 <template slot="target">
                     <span class="connections-badge">
                         {{ connections }}
@@ -68,11 +71,12 @@
                                 :style="{ width: `${progress}%`}"
                             />
                         </div>
-                        <!--
                         <div class="wrap">
-                            <div class="loaded" :style="{ width: `${1.5 * progress}%`}"></div>
+                            <div
+                                class="loaded"
+                                :style="{ width: `${1.5 * progress}%`}"
+                            />
                         </div>
-                        -->
                     </div>
                 </template>
             </base-popover>

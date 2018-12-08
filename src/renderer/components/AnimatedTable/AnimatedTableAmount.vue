@@ -9,8 +9,12 @@
         v-else
         class="vuetable-td-component-amount"
     >
-        <span v-if="amount">{{ amount }}</span>
-        <span v-else>not specified</span>
+        <span v-if="amount">
+            {{ amount }}
+        </span>
+        <span v-else>
+            not specified
+        </span>
     </td>
 </template>
 

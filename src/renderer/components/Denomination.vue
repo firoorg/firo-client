@@ -9,8 +9,13 @@
                 :class="{ 'has-current': current }"
                 :style="{ height: currentHeight }"
             >
-                <transition name="fade" duration="250ms">
-                    <span v-show="current">{{ current ? current : '' }}</span>
+                <transition
+                    name="fade"
+                    duration="250ms"
+                >
+                    <span v-show="current">
+                        {{ current ? current : '' }}
+                    </span>
                 </transition>
             </div>
             <div

@@ -5,8 +5,12 @@
             <li>
                 <i18n
                     path="navigation.flyout-connections.label__connections"
-                    tag="span">
-                    <strong class="connections-badge" :class="connectionClass">
+                    tag="span"
+                >
+                    <strong
+                        class="connections-badge"
+                        :class="connectionClass"
+                    >
                         {{ connections }}
                     </strong>
                 </i18n>

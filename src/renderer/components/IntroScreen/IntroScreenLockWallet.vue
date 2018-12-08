@@ -50,7 +50,7 @@
             <footer>
                 <base-button
                     is-outline
-                    @click="() => this.showConfirm = false"
+                    @click="() => showConfirm = false"
                 >
                     {{ $t('onboarding.confirm-passphrase.button__create-other-passphrase--secondary') }}
                 </base-button>

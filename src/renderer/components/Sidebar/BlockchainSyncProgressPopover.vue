@@ -3,17 +3,24 @@
         <template v-if="!isBlockchainSynced">
             <h3>{{ $t('navigation.flyout-blockchain-sync-progress.title') }}</h3>
             <p>
-                <i18n path="navigation.flyout-blockchain-sync-progress.label__blocks-processed" tag="span">
+                <i18n
+                    path="navigation.flyout-blockchain-sync-progress.label__blocks-processed"
+                    tag="span"
+                >
                     <span place="blockAmount">
                         <strong>{{ currentBlockHeight }}</strong>
                     </span>
                 </i18n>
-                <br/>
-                <i18n path="navigation.flyout-blockchain-sync-progress.label__blocks-timestamp" tag="span">
+                <br>
+                <i18n
+                    path="navigation.flyout-blockchain-sync-progress.label__blocks-timestamp"
+                    tag="span"
+                >
                     <span place="blockTimeago">
                         <timeago
                             :datetime="currentBlockTimestamp * 1000"
-                            :auto-update="10" />
+                            :auto-update="10"
+                        />
                     </span>
                 </i18n>
                 <!--
