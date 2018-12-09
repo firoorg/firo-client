@@ -258,6 +258,7 @@ onboarding:
     description: To protect your funds it is crucial to pick a strong passphrase. Please make sure it contains lowercase and uppercase letters, numbers and special characters. We recommend using a password manager.
     button__generate-passphrase--primary: Generate passphrase
     button__set-passphrase--primary: Set passphrase
+    placeholder__enter-passphrase: Enter passphrase
     # button__secondary: back / cancel?
 
   confirm-passphrase:
@@ -265,6 +266,7 @@ onboarding:
     description: Please confirm your passphrase to make sure you typed it correctly. From now on this passphrase will be needed to authorize any transactions that you make.
     button__confirm-passphrase--primary: Confirm passphrase
     button__create-other-passphrase--secondary: Go back
+    placeholder__confirm-passphrase: Confirm passphrase
 
   final-confirmation:
     description: Warning! Losing your passphrase means losing access to your coins! Please make sure you can remember your passphrase or store it in a secure location! #maybe key should be notice or warning

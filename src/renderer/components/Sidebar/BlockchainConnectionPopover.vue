@@ -7,12 +7,11 @@
                     path="navigation.flyout-connections.label__connections"
                     tag="span"
                 >
-                    <strong
+                    <circular-badge
                         class="connections-badge"
-                        :class="connectionClass"
-                    >
-                        {{ connections }}
-                    </strong>
+                        :color="connectionClass"
+                        :content="connections"
+                    />
                 </i18n>
             </li>
             <li>
@@ -32,11 +31,15 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import CircularBadge from '@/components/Badge/CircularBadge'
 import TickIcon from '@/components/Icons/TickIcon'
 
 export default {
     name: 'BlockchainConnectionPopover',
-    components: {TickIcon},
+    components: {
+        CircularBadge,
+        TickIcon
+    },
 
     props: {
         connectionClass: {
@@ -89,17 +92,10 @@ export default {
     }
 
     .connections-badge {
-        @include font-heavy();
-        @include setType(2.5, $ms-down1, $silent: true);
-        display: inline-block;
-        border-radius: 50%;
-        background: $color--white;
-        text-align: center;
-        min-width: emRhythm(2.5, $ms-down1, $silent: true);
-        transition: color .25s ease-in-out, background .25s ease-in-out;
+        background: $color--white !important;
 
         &.error {
-            color: $color--red;
+            color: $color--red-bright;
         }
 
         &.public {

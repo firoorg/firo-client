@@ -39,9 +39,11 @@
                     :connection-class="connectionClass"
                 />
                 <template slot="target">
-                    <span class="connections-badge">
-                        {{ connections }}
-                    </span>
+                    <circular-badge
+                        class="connections-badge"
+                        :color="connectionClass"
+                        :content="connections"
+                    />
                 </template>
             </base-popover>
         </div>
@@ -92,10 +94,12 @@ import TickIcon from '@/components/Icons/TickIcon'
 
 import BlockchainConnectionPopover from '@/components/Sidebar/BlockchainConnectionPopover'
 import BlockchainSyncProgressPopover from '@/components/Sidebar/BlockchainSyncProgressPopover'
+import CircularBadge from '@/components/Badge/CircularBadge'
 
 export default {
     name: 'Blockchain',
     components: {
+        CircularBadge,
         LoadingBounce,
         TickIcon,
         BlockchainConnectionPopover,
@@ -194,6 +198,7 @@ export default {
             align-self: end;
             margin-right: emRhythm(3);
 
+            /*
             &.error .connections-badge {
                 background: $gradient--red-vertical;
                 color: $color--white;
@@ -219,6 +224,7 @@ export default {
                 transition: color .25s ease-in-out, background .25s ease-in-out;
                 cursor: help;
             }
+            */
         }
 
         .sync-progress-wrap {

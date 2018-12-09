@@ -103,6 +103,10 @@
 
 // @include lato-include-font('semibold');
 
+@mixin font-regular () {
+    @include lato-font('normal');
+}
+
 @mixin font-medium () {
     @include lato-font('semibold');
 }
@@ -234,6 +238,10 @@
             @include light-placeholder-hover();
         }
     }
+}
+
+@mixin light-prefix () {
+    color: $color--polo-dark;
 }
 
 @mixin medium-input () {

@@ -8,7 +8,10 @@
 export default {
     name: 'AttentionBadge',
     props: {
-        amount: Number
+        amount: {
+            type: Number,
+            required: true
+        }
     }
 }
 </script>

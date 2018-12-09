@@ -215,7 +215,7 @@ export default {
         }
 
         .prefix {
-            color: $color--polo-dark;
+            @include light-prefix();
         }
     }
 

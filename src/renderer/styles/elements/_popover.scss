@@ -19,7 +19,12 @@
             padding-right: emRhythm($input-bleed);
 
             input {
-                @include dark-input();
+                @include light-input();
+            }
+
+            .prefix {
+                @include light-prefix();
+                right: 0;
             }
         }
     }
@@ -148,6 +153,10 @@
             max-width: none;
             transition: background-color $tooltip--background-transition-duration ease-in-out;
 
+            h1 {
+                margin-bottom: emRhythm(3, $ms-up5);
+            }
+
             header {
                 padding-bottom: emRhythm(2);
 
@@ -186,6 +195,12 @@
                 }
             }
 
+            .content-list {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
             nav.menu {
                 ul {
                     margin: emRhythm(-1.5, $silent: true) 0;
@@ -220,7 +235,7 @@
         }
 
         &.dark {
-            $color: $color--polo-light;
+            $color: $color--white;
 
             .popover-inner {
                 background: $color;
