@@ -86,9 +86,9 @@ export default {
         return {
             goingToHide: false,
             steps: {
-                welcome: IntroScreenWelcome
-                // location: IntroScreenBlockchainLocation,
-                // lock: IntroScreenLockWallet,
+                welcome: IntroScreenWelcome,
+                location: IntroScreenBlockchainLocation,
+                lock: IntroScreenLockWallet
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
                 // other: IntroScreenOther
             },
