@@ -10,8 +10,8 @@
     .tooltip-inner {
         background: $color--comet-dark-mixed;
         color: $color--white;
-        padding: $tooltip--padding;
-        max-width: emRhythm(30);
+        //padding: $tooltip--padding;
+        max-width: emRhythm(42);
         overflow: hidden;
 
         .control {
@@ -147,7 +147,6 @@
         }
 
         .popover-inner {
-            padding: emRhythm(6);
             border-radius: 0;
             @include glow-small-box();
             max-width: none;
@@ -185,8 +184,13 @@
                 }
             }
 
+            .content-wrapper > * {
+                padding: emRhythm(6);
+            }
+
             .content-wrapper > div > footer,
-            .content-wrapper > footer {
+            .content-wrapper > footer,
+            .content-wrapper .footer {
                 padding-top: emRhythm(3);
                 text-align: right;
 
@@ -289,7 +293,9 @@
 
         &.advice {
             .popover-inner {
-                padding: emRhythm(3);
+                .content-wrapper > * {
+                    padding: emRhythm(3);
+                }
 
                 header {
                     h2,
@@ -308,7 +314,9 @@
 
         &.notice {
             .popover-inner {
-                padding: emRhythm(2)
+                .content-wrapper > * {
+                    padding: emRhythm(2)
+                }
             }
 
             header,
@@ -372,7 +380,7 @@
     &.step-done {
         max-width: emRhythm(42);
 
-        .popover-inner {
+        .popover-content > * {
             padding-top: 0;
         }
     }

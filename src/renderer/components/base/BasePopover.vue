@@ -88,6 +88,6 @@ export default {
 <style lang="scss" scoped>
     .content-wrapper {
         position: relative;
-        max-width: 35rem;
+        max-width: 40rem;
     }
 </style>
