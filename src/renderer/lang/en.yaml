@@ -263,16 +263,22 @@ onboarding:
     # button__secondary: back / cancel?
 
   confirm-passphrase:
-    # title: Secure your funds! # inside create-passphrase, restructure?
+    title: Confirm your passphrase
     description: Please confirm your passphrase to make sure you typed it correctly. From now on this passphrase will be needed to authorize any transactions that you make.
     button__confirm-passphrase--primary: Confirm passphrase
     button__create-other-passphrase--secondary: Go back
     placeholder__confirm-passphrase: Confirm passphrase
 
-  final-confirmation:
-    description: Warning! Losing your passphrase means losing access to your coins! Please make sure you can remember your passphrase or store it in a secure location! #maybe key should be notice or warning
-    button__confirm-passphrase--primary: OK, I got this
+  final-passphrase-confirmation:
+    title: Warning!
+    warning__loose-coins: Losing your passphrase means losing access to your coins! Please make sure you can remember your passphrase or store it in a secure location!
+    description: The client will lock and restart your wallet in the background.
+    button__confirm-passphrase--primary: OK, lock it.
     button__create-other-passphrase--secondary: Let me do that again
+
+  passphrase-daemon-restart:
+    title: Securing Funds
+    description: This might take a minute or two...
 
   # keep-it-safe:
     # title:
