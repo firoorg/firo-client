@@ -1,70 +1,42 @@
 <template>
     <component
+        :is="'IntroScreenLockWalletCreate'"
         v-if="!showConfirm"
-        :is="currentComponent"
         :passphrase.sync="passphrase"
         :go-to-confirm="goToConfirm"
     />
-    <div v-else-if="!isConfirmed">
-        <h1>{{ $t('onboarding.create-passphrase.title') }}</h1>
-        <p v-html="$t('onboarding.confirm-passphrase.description')" />
-
-        <div class="form">
-            <div class="control confirm">
-                <input
-                    v-model="confirm"
-                    type="text"
-                    :placeholder="$t('onboarding.confirm-passphrase.placeholder__confirm-passphrase')"
-                >
-            </div>
-        </div>
-
-        <footer>
-            <base-button
-                is-outline
-                @click="() => showConfirm = false"
-            >
-                {{ $t('onboarding.confirm-passphrase.button__create-other-passphrase--secondary') }}
-            </base-button>
-            <base-button
-                :disabled="!isEqual"
-                color="green"
-                @click="onConfirm"
-            >
-                {{ $t('onboarding.create-passphrase.button__set-passphrase--primary') }}
-            </base-button>
-        </footer>
-    </div>
-    <div v-else>
-        <h1>{{ $t('onboarding.create-passphrase.title') }}</h1>
-        <h2 v-html="$t('onboarding.final-confirmation.description')" />
-
-        <footer>
-            <base-button
-                color="red"
-                is-outline
-                @click="actions.prev"
-            >
-                {{ $t('onboarding.final-confirmation.button__create-other-passphrase--secondary') }}
-            </base-button>
-            <base-button
-                color="green"
-                @click="actions.next"
-            >
-                {{ $t('onboarding.final-confirmation.button__confirm-passphrase--primary') }}
-            </base-button>
-        </footer>
-    </div>
+    <component
+        :is="'IntroScreenLockWalletConfirm'"
+        v-else-if="!isConfirmed"
+        :on-cancel="onConfirmCancel"
+        :on-confirm="onConfirm"
+        :confirm.sync="confirm"
+        :is-equal="isEqual"
+    />
+    <component
+        :is="'IntroScreenLockWalletWarning'"
+        v-else
+        :prev="actions.prev"
+        :next="onLockWallet"
+    />
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import types from '~/types'
+
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 import IntroScreenLockWalletCreate from './IntroScreenLockWalletCreate'
+import IntroScreenLockWalletConfirm from './IntroScreenLockWalletConfirm'
+import IntroScreenLockWalletWarning from './IntroScreenLockWalletWarning'
 
 export default {
     name: 'IntroScreenLockWallet',
-    components: {IntroScreenLockWalletCreate},
+    components: {
+        IntroScreenLockWalletCreate,
+        IntroScreenLockWalletConfirm,
+        IntroScreenLockWalletWarning
+    },
     mixins: [
         GuideStepMixin
     ],
@@ -83,22 +55,27 @@ export default {
         }),
         isEqual () {
             return this.passphrase === this.confirm
-        },
-        currentComponent () {
-            const base = 'IntroScreenLockWallet'
-
-            let name = 'Create'
-
-            return `${base}${name}`
         }
     },
     methods: {
+        ...mapActions({
+            lockWallet: types.app.LOCK_WALLET
+        }),
         goToConfirm () {
             this.showConfirm = true
-            this.confirm = null
+            this.confirm = ''
         },
         onConfirm () {
             this.isConfirmed = true
+        },
+        onConfirmCancel () {
+            this.showConfirm = false
+            this.confirm = ''
+            this.passphrase = ''
+        },
+        onLockWallet () {
+            //this.lockWallet(this.passphrase)
+            this.actions.next()
         },
         isEnabled () {
             return !this.isLocked
@@ -118,7 +95,6 @@ export default {
     .form .control.passphrase {
         display: flex;
         padding-right: 0;
-
     }
 
     .form .control.passphrase input[type="text"] {

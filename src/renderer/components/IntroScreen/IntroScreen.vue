@@ -61,6 +61,7 @@ import MultiStepPopover from '@/components/Notification/MultiStepPopover'
 import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
 import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
 import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
+import IntroScreenRestartingDaemon from '@/components/IntroScreen/IntroScreenRestartingDaemon'
 import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
 import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 
@@ -74,6 +75,7 @@ export default {
         IntroScreenWelcome,
         IntroScreenBlockchainLocation,
         IntroScreenLockWallet,
+        IntroScreenRestartingDaemon,
         IntroScreenAmountToHoldInZerocoin,
         IntroScreenOther
     },
@@ -88,7 +90,8 @@ export default {
             steps: {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
-                lock: IntroScreenLockWallet
+                lock: IntroScreenLockWallet,
+                restart: IntroScreenRestartingDaemon
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
                 // other: IntroScreenOther
             },

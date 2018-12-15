@@ -173,14 +173,20 @@ export default {
         },
 
         calculateStrength() {
-            console.log('calculateStrength')
             this.strength = {}
 
             if (this.passphraseLength) {
                 this.strength = zxcvbn(this.passphrase, [])
             }
 
-            this.isValidPassphrase = this.currentScore >= this.scoreToReach
+            // dont check for password strength in development
+            if (process.env.NODE_ENV !== 'production') {
+                this.isValidPassphrase = this.currentScore > 0
+            }
+            else {
+                this.isValidPassphrase = this.currentScore >= this.scoreToReach
+            }
+
             console.log('this.isValidPassphrase', this.isValidPassphrase)
         }
     }
