@@ -16,7 +16,10 @@
                 ref="container"
                 class="content-wrapper"
             >
-                <slot name="content" />
+                <slot
+                    name="content"
+                    class="popover-content"
+                />
             </div>
         </template>
     </v-popover>

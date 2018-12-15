@@ -1,7 +1,10 @@
 export default {
-    props: [
-        'actions'
-    ],
+    props: {
+        actions: {
+            type: Object,
+            required: true
+        }
+    },
 
     created () {
         const options = this.$options

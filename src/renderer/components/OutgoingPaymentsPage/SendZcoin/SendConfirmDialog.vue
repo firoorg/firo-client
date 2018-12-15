@@ -52,7 +52,7 @@
             </div>
             <div
                 class="second-cell"
-                :style="{ minWidth: `${this.minCellWidth}px` }"
+                :style="{ minWidth: `${minCellWidth}px` }"
             >
                 <base-popover
                     :open="isOpen"

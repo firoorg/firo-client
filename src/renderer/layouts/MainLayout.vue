@@ -119,8 +119,7 @@ export default {
         &.has-overlay {
             .header,
             .sidebar,
-            .main,
-            .footer {
+            .main {
                 filter: blur(1rem);
                 transition: filter 1s linear;
             }
@@ -157,10 +156,6 @@ export default {
         transition: opacity 0.15s ease-out;
     }
 
-    .header {
-        grid-area: header;
-    }
-
     .aside {
         grid-area: sidebar;
     }
@@ -176,17 +171,6 @@ export default {
 
         margin-bottom: $overlay--blur-offset-neg;
         padding-bottom: $overlay--blur-offset;
-    }
-
-    .footer {
-        grid-area: footer;
-    }
-
-    .header, .footer {
-        background-color: $color--polo;
-        color: #333;
-        text-align: center;
-        line-height: 60px;
     }
 
     .aside {

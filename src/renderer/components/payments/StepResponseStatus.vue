@@ -28,7 +28,7 @@
 </template>
 
 <script>
-// import AutoCloseMixin from '@/mixins/AutoCloseMixin'
+import AutoCloseMixin from '@/mixins/AutoCloseMixin'
 import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
 
 import SendError from '@/components/Icons/SendError'
@@ -45,7 +45,7 @@ export default {
     },
 
     mixins: [
-        // AutoCloseMixin,
+        AutoCloseMixin,
         TranslationNamespaceMixin
     ],
 
