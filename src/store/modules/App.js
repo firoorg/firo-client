@@ -2,6 +2,7 @@ import * as types from '../types/App'
 
 const state = {
     isReady: false,
+    isRestarting: false,
     clientIsLocked: false,
     showIntroScreen: true,
     passphrase: null
@@ -10,10 +11,22 @@ const state = {
 const mutations = {
     [types.IS_READY] (state) {
         state.isReady = true
+        state.isRestarting = false
     },
 
     [types.SET_CLIENT_LOCKED] (state, isLocked) {
         state.clientIsLocked = isLocked
+    },
+
+    [types.LOCK_WALLET] (state, passphrase) {
+        // picked up by main
+        console.log('locking wallet', passphrase)
+    },
+
+    [types.DAEMON_RESTART] (state) {
+        console.log('daemon restart')
+        state.isReady = false
+        state.isRestarting = true
     },
 
     [types.HIDE_INTRO_SCREEN] (state) {
@@ -44,6 +57,24 @@ const actions = {
         }
 
         commit(types.SET_CLIENT_LOCKED, isLocked)
+    },
+
+    [types.LOCK_WALLET] ({ commit, state }, passphrase) {
+        // already locked. returning
+        if (state.clientIsLocked) {
+            console.log('already locked')
+            return
+        }
+
+        commit(types.LOCK_WALLET, { passphrase })
+    },
+
+    [types.DAEMON_RESTART] ({ commit, state }) {
+        if (state.isRestarting) {
+            return
+        }
+
+        commit(types.DAEMON_RESTART)
     },
 
     [types.HIDE_INTRO_SCREEN] ({ commit, state }) {

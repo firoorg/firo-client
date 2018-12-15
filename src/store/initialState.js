@@ -192,6 +192,7 @@ module.exports = {
     },
 
     App: { // gui
+        isRestarting: false,
         isReady: false,
         showIntroScreen: true,
         clientIsLocked: false,
