@@ -1,7 +1,7 @@
 <template>
     <div>
         <h3>{{ $t('navigation.flyout-connections.title') }}</h3>
-        <ul>
+        <ul v-if="connections">
             <li>
                 <i18n
                     path="navigation.flyout-connections.label__connections"
@@ -25,6 +25,9 @@
                 </span>
             </li>
         </ul>
+        <p v-else>
+            {{ $t('navigation.flyout-connections.description__not-connected') }}
+        </p>
     </div>
 </template>
 

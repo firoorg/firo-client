@@ -34,6 +34,7 @@ navigation:
     label__is-connected-via-tor: "Connected via <strong>Tor</strong>"
     label__not-connected-via-tor: "Tor disabled"
     label__dandelion: "<strong>Dandelion++</strong> activated"
+    description__not-connected: Currently not connected to the network
   flyout-blockchain-sync-progress:
     title: Blockchain is catching up!
     label__blocks-processed: Processed {blockAmount} blocks of transaction history so far.
