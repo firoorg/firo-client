@@ -19,7 +19,8 @@ export default {
             default: false
         },
         color: {
-            type: String
+            type: String,
+            default: ''
         }
     },
 

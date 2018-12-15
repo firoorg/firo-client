@@ -52,9 +52,12 @@ export default {
         FilterByUrlParamMixin
     ],
 
-    props: [
-        'isPrivate'
-    ],
+    props: {
+        isPrivate: {
+            type: Boolean,
+            required: true
+        }
+    },
 
     computed: {
         ...mapGetters({

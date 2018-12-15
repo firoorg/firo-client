@@ -26,31 +26,25 @@
 <script>
 import isObject from 'lodash/isObject'
 
-// import TestA from '@/components/Notification/TestA'
-// import TestB from '@/components/Notification/TestB'
-
 export default {
     name: 'MultiStepPopover',
-    /*
-        components: {
-            TestA,
-            TestB
-        },
-        */
+
     props: {
         isOpen: {
             type: Boolean,
             required: true
         },
         popoverClass: {
-            type: String
+            type: String,
+            default: ''
         },
         steps: {
             type: Object,
             required: true
         },
         currentStep: {
-            type: String
+            type: String,
+            required: true
         },
         placement: {
             type: String,
@@ -58,14 +52,15 @@ export default {
         },
         actions: {
             type: Object,
-            required: false
+            default: () =>({})
         },
         delay: {
             type: Object,
-            required: false
+            default: () => ({})
         },
         componentProps: {
-            type: Object
+            type: Object,
+            default: () => ({})
         },
         canBlur: {
             type: Boolean,

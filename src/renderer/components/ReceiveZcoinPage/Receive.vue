@@ -98,17 +98,44 @@ export default {
         // 'qr-code': VueQRCodeComponent,
         TimedTooltip
     },
-    props: [
-        'transactionsReceived',
-        'isFulfilled',
-        'isIncoming',
-        'isReused',
-        'label',
-        'amount',
-        'message',
-        'createdAt',
-        'address'
-    ],
+    props: {
+        transactionsReceived: {
+            type: Number,
+            default: 0
+        },
+        isFulfilled: {
+            type: Boolean,
+            required: true
+        },
+        isIncoming: {
+            type: Boolean,
+            required: true
+        },
+        isReused: {
+            type: Boolean,
+            required: true
+        },
+        label: {
+            type: String,
+            required: true
+        },
+        amount: {
+            type: Number,
+            default: null
+        },
+        message: {
+            type: String,
+            default: ''
+        },
+        createdAt: {
+            type: Number,
+            required: true
+        },
+        address: {
+            type: String,
+            required: true
+        }
+    },
     data () {
         return {
             showQrCode: false,
