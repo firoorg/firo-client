@@ -1,11 +1,12 @@
 <template>
     <div>
         <div class="warning">
-            <h1>{{ $t('onboarding.final-passphrase-confirmation.title') }}</h1>
+            <div>
+                <h1>{{ $t('onboarding.final-passphrase-confirmation.title') }}</h1>
 
-            <div class="content">
-                <p v-html="$t('onboarding.final-passphrase-confirmation.warning__loose-coins')" />
-                <p v-html="$t('onboarding.final-passphrase-confirmation.description')" />
+                <div class="content">
+                    <p v-html="$t('onboarding.final-passphrase-confirmation.warning__loose-coins')" />
+                </div>
             </div>
 
             <footer class="footer">
@@ -47,9 +48,13 @@ export default {
 <style lang="scss" scoped>
 .warning {
     background: $color--orange;
-    color: $color--dark;
-    padding: emRhythm(4) emRhythm(4) emRhythm(6);
-    margin: emRhythm(-4) emRhythm(-4);
+    color: $color--white;
+    padding: emRhythm(5);
+    margin: emRhythm(-5);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .icon {
         width: emRhythm(20, $ms-up1);
@@ -58,6 +63,8 @@ export default {
 
     .content {
         @include setType(3, $ms-up1);
+        @include font-heavy();
+
         margin-bottom: emRhythm(3);
     }
 

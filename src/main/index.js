@@ -5,11 +5,8 @@ import os from 'os'
 import { app } from 'electron'
 import { join } from 'path'
 
-// import settings from 'electron-settings'
-
 import PidManager from './lib/core/PidManager'
 import network from './lib/network'
-// import wallet from './lib/wallet'
 
 import store from '../store/main'
 import windowManager from './lib/windows'
@@ -30,12 +27,11 @@ if (process.env.NODE_ENV !== 'development') {
 // const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
 const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
 const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
-// todo add .exe for windows binaries
+
 const platform = os.platform()
-console.log('ELECTRON RUNNING ON', platform)
 const zcoindName = platform === 'win32' ? 'zcoind.exe' : 'zcoind'
 const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindName}`)
-// todo test .pid in application support
+
 const userDataPath = process.env.NODE_ENV === 'development' ? rootFolder + '/assets/core' : app.getPath('userData')
 const pathToStorePid = userDataPath
 
@@ -48,7 +44,6 @@ debug({
 })
 
 // build settings via electron-settings module
-
 if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
     debug('registering protocol handler "%s"', CONFIG.app.protocolIdentifier)
     app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
@@ -112,11 +107,6 @@ const interval = setInterval(() => {
 // https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 // app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
 
-// coreDaemonManager.on
-// console.log('STARTING NETWORK')
-// network.init({ store })
-
-// wallet.init({ store, namespace: 'Wallet' })
 deeplink.init({ windowManager, store })
 
 windowManager.connectToStore({ store, namespace: 'Window' })
@@ -129,17 +119,18 @@ app.on('ready', () => {
     // store.dispatch('Window/show', 'welcomeGuide')
 })
 
-app.on('before-quit', () => {
+app.on('before-quit', async (event) => {
     console.log('app before quit')
-    network.close()
+    const isRunning = await coreDaemonManager.isRunning()
+
+    if (stopOnQuit && isRunning) {
+        coreDaemonManager.stop()
+    }
 })
 
 app.on('will-quit', () => {
     console.log('app will quit')
-    // network.close()
-    if (stopOnQuit) {
-        coreDaemonManager.stop()
-    }
+    network.close()
 })
 
 /**

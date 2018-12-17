@@ -62,19 +62,22 @@ export default {
             lockWallet: types.app.LOCK_WALLET
         }),
         goToConfirm () {
+            window.dispatchEvent(new Event('resize'))
             this.showConfirm = true
             this.confirm = ''
         },
         onConfirm () {
+            window.dispatchEvent(new Event('resize'))
             this.isConfirmed = true
         },
         onConfirmCancel () {
+            window.dispatchEvent(new Event('resize'))
             this.showConfirm = false
             this.confirm = ''
             this.passphrase = ''
         },
         onLockWallet () {
-            //this.lockWallet(this.passphrase)
+            this.lockWallet(this.passphrase)
             this.actions.next()
         },
         isEnabled () {

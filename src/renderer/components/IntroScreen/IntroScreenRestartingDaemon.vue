@@ -25,7 +25,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            isLocked: 'App/isLocked'
+            isLocked: 'App/isLocked',
+            isRestarting: 'App/isRestarting'
         })
     },
 
@@ -34,6 +35,13 @@ export default {
             if (newVal) {
                 this.actions.next()
             }
+        }
+    },
+
+    methods: {
+        isEnabled() {
+            return !this.isLocked && this.isRestarting
+
         }
     }
 }

@@ -2,36 +2,27 @@ import { promisify } from 'util'
 import { exec, spawn } from 'child_process'
 import { join } from 'path'
 import fs from 'fs'
-import psTree from 'ps-tree'
+
 import Debug from 'debug'
+import { sleep, connectToStore } from '#/lib/utils'
 
 import types from '~/types'
 
 const debug = Debug('zcoin:core:manager')
 
-psTree[promisify.custom] = function (pid) {
-    return new Promise((resolve, reject) => {
-        psTree(pid, (err, child) => {
-            if (err) {
-                return reject(err)
-            }
-
-            return resolve(child)
-        })
-    })
-}
-const processTree = promisify(psTree)
+const terminate = promisify(Terminate)
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 const unlink = promisify(fs.unlink)
 
-const IS_WINDOWS = /^win/.test(process.platform)
-
 export default class PidManager {
-    constructor ({ path: filePath, name, store, onStarted, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
+    constructor ({ path: filePath, name, store, onStarted, onStop, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
         debug('setting up a new PidManager for %s', name)
         debug('going to write pid file to "%s"', filePath)
+
+        this.pid = -1
+        this.child = null
 
         this.filePath = filePath
         this.name = name
@@ -44,6 +35,8 @@ export default class PidManager {
         autoRestart ? this.enableAutoRestart() : this.disableAutoRestart()
 
         this.onStarted = onStarted || (() => {})
+
+        this.connectToStore()
     }
 
     async start (pathToSpawn) {
@@ -70,9 +63,6 @@ export default class PidManager {
             return
         }
 
-        // todo test abstact spawning by passing in ...arguments
-        // const ls = spawn('bash', [...arguments])
-        // this.child = spawn('exec', [pathToSpawn])
         this.child = spawn(this.pathToSpawn, {
             // detached: true,
             stdio: 'ignore'
@@ -83,13 +73,13 @@ export default class PidManager {
 
         this.pid = this.child.pid
 
+        // not using detached at the moment
         this.child.unref()
 
         debug('started managed process with pid id', this.pid)
 
         await this.write()
         this.onStart()
-        this.store.dispatch(types.network.NETWORK_IS_CONNECTED)
 
         return this.pid
     }
@@ -102,28 +92,21 @@ export default class PidManager {
         })
     }
 
-    async stop () {
-        if (!await this.isRunning()) {
-            debug('- not running')
-            return
-        }
-
-        // npm i tree-kill
-        debug('- stopping core...')
-        await this.kill()
-        debug('- cleaning up')
-        await this.cleanup()
+    stop () {
+        this.store.dispatch(types.app.DAEMON_STOP)
     }
 
     enableAutoRestart () {
         this.autoRestart = true
-        // todo set up auto restart listener if already running
         debug('auto start enabled')
+    }
+
+    isAutoRestartEnabled () {
+        return this.autoRestart && this.autoRestartCounter < this.maxAutoRestartTries
     }
 
     disableAutoRestart () {
         this.autoRestart = false
-        // todo remove auto restart listener
         debug('auto start disabled')
     }
 
@@ -135,61 +118,17 @@ export default class PidManager {
 
         try {
             process.kill(this.pid, 0) // testing existence of pid
+
+            this.store.dispatch(types.app.DAEMON_IS_RUNNING)
             this.store.dispatch(types.network.NETWORK_IS_CONNECTED)
             return true
         } catch (e) {
             await this.cleanup()
+
+            this.store.dispatch(types.app.DAEMON_STOPPED)
         }
 
         return false
-    }
-
-    // ---
-
-    async killProcess (pid, signal = 'SIGTERM') {
-        debug('killing process %d with signal %s', pid, signal)
-
-        if (pid === -1) {
-            return
-        }
-
-        try {
-            if (IS_WINDOWS) {
-                await exec('taskkill /PID ' + pid + ' /T /F')
-            } else {
-                process.kill(pid, signal)
-            }
-        } catch (e) {
-            // already killed
-            if (e.code !== 'ESRCH') {
-                debug(e)
-            }
-        }
-    }
-
-    async kill (signal) {
-        debug('killing', this.name)
-
-        if (this.pid === -1) {
-            debug('not running...', this.name)
-            return
-        }
-
-        try {
-            console.log('doo')
-            const children = await processTree(this.pid)
-            console.log('foo', children)
-            let pids = [this.pid]
-
-            console.log(pids)
-
-            pids = pids.concat(children.map(p => p.PID))
-            for (let pid of pids) {
-                await this.killProcess(pid, signal)
-            }
-        } catch (e) {
-            console.log(e)
-        }
     }
 
     getFileSystemPath () {
@@ -237,8 +176,6 @@ export default class PidManager {
         return -1
     }
 
-    // --- private
-
     setHeartbeatIntervalInSeconds (value) {
         if (!value || value === this.heartbeatInterval) {
             return
@@ -282,34 +219,33 @@ export default class PidManager {
     }
 
     doAutoRestart () {
-        debug('do auto restart:', this.autoRestart)
+        const isRestarting  = this.store.getters['App/isRestarting']
 
-        if (!this.autoRestart || this.autoRestartCounter >= this.maxAutoRestartTries) {
+        if (!isRestarting && !this.isAutoRestartEnabled()) {
             return
         }
 
-        debug('daemon died. restarting it...')
+        debug('restarting daemon...')
         this.start()
-        this.autoRestartCounter++
+
+        if (this.isAutoRestartEnabled()) {
+            this.autoRestartCounter++
+        }
     }
 
-    /*
-  setupEvents () {
-    debug('setting up events')
+    connectToStore () {
+        connectToStore({
+            store: this.store,
+            namespace: 'App',
 
-    // todo as we do not get any events from a previously started daemon this should be handled via the heartbeat
-    this.child.on('close', async (code) => {
-      console.log(`child process exited with code ${code}`)
-      this.cleanup()
+            onStoreMutation: async (mutation) => {
+                const { type } = mutation
 
-      // todo check if exit code signals clean shutdown -> @see node-forever
-      if (this.autoRestart && this.autoRestartCounter < this.maxAutoRestartTries) {
-        debug('daemon died. restarting it...')
-        // todo handle failed starts
-        this.start()
-        this.autoRestartCounter++
-      }
-    })
-  }
-  */
+                if (type === types.app.DAEMON_START) {
+                    await this.start()
+                }
+            }
+        })
+    }
+
 }

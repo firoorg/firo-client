@@ -11,6 +11,8 @@ import * as utils from '../../../lib/utils'
 // import blockchain from './blockchain'
 import { getApiStatus, closeApiStatus, waitForApi, populateStore } from './ApiStatus'
 
+
+import App from './App'
 import Address from './Address'
 import Balance from './Balance'
 import Blockchain from './Blockchain'
@@ -21,6 +23,7 @@ import Mint from './Mint'
 import Znode from './Znode'
 
 const modules = {
+    App,
     Address,
     Balance,
     Blockchain,
@@ -76,10 +79,10 @@ export default {
 
     async init ({ store: vuexStore, /* namespace, */ moduleNames }) {
         store = vuexStore
-
+        this.connectToStore()
         // todo whitelist modules via moduleNames
-
         debug('connected')
+
         debug('getting api status')
 
         const { host, port } = CONFIG.network.status
@@ -140,7 +143,7 @@ export default {
 
             // todo check if multiple listeners will be bound on hot reload / daemon restart
             if (!connectedToStore) {
-                debug('connecting newtork to store')
+                debug('connecting network to store')
                 utils.connectToStore({
                     store,
                     namespace,
@@ -207,6 +210,25 @@ export default {
 
         Object.keys(modules).forEach((module) => {
             modules[module].close()
+        })
+    },
+
+    connectToStore () {
+        if (connectedToStore) {
+            return
+        }
+
+        utils.connectToStore({
+            store,
+            namespace: 'App',
+            // mutations to the store are done by the user/gui
+            onStoreMutation: async (mutation) => {
+                const { type } = mutation
+
+                if (type === types.app.DAEMON_STOPPED) {
+                    this.close()
+                }
+            }
         })
     }
 }

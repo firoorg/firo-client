@@ -2,6 +2,8 @@ import * as types from '../types/App'
 
 const state = {
     isReady: false,
+    isRunning: false,
+    isStopping: false,
     isRestarting: false,
     clientIsLocked: false,
     showIntroScreen: true,
@@ -12,6 +14,26 @@ const mutations = {
     [types.IS_READY] (state) {
         state.isReady = true
         state.isRestarting = false
+        state.isStopping = false
+    },
+
+    [types.DAEMON_IS_RUNNING] (state) {
+        state.isRunning = true
+    },
+
+    [types.DAEMON_STOPPED] (state) {
+        state.isReady = false
+        state.isRunning = false
+        state.isStopping = false
+    },
+
+    [types.DAEMON_STOP] (state) {
+        state.isReady = false
+        state.isStopping = true
+    },
+
+    [types.DAEMON_RESTART] (state) {
+        state.isRestarting = true
     },
 
     [types.SET_CLIENT_LOCKED] (state, isLocked) {
@@ -21,12 +43,6 @@ const mutations = {
     [types.LOCK_WALLET] (state, passphrase) {
         // picked up by main
         console.log('locking wallet', passphrase)
-    },
-
-    [types.DAEMON_RESTART] (state) {
-        console.log('daemon restart')
-        state.isReady = false
-        state.isRestarting = true
     },
 
     [types.HIDE_INTRO_SCREEN] (state) {
@@ -69,12 +85,36 @@ const actions = {
         commit(types.LOCK_WALLET, { passphrase })
     },
 
+    [types.DAEMON_IS_RUNNING] ({ commit }) {
+        commit(types.DAEMON_IS_RUNNING)
+    },
+
+    [types.DAEMON_STOP] ({ commit, state }) {
+        if (state.isStopping || !state.isRunning) {
+            return
+        }
+
+        commit(types.DAEMON_STOP)
+    },
+
+    [types.DAEMON_STOPPED] ({ commit, state }) {
+        if (!state.isRunning) {
+            return
+        }
+
+        commit(types.DAEMON_STOPPED)
+    },
+
     [types.DAEMON_RESTART] ({ commit, state }) {
         if (state.isRestarting) {
             return
         }
 
+        // set restart flag
         commit(types.DAEMON_RESTART)
+
+        // stop daemon
+        commit(types.DAEMON_STOP)
     },
 
     [types.HIDE_INTRO_SCREEN] ({ commit, state }) {
@@ -97,6 +137,10 @@ const actions = {
 
 const getters = {
     isReady: (state) => state.isReady || false,
+    isStopping: (state) => state.isStopping || false,
+    isRunning: (state) => state.isRunning || false,
+    isRestarting: (state) => state.isRestarting || false,
+
     showIntroScreen: (state) => state.showIntroScreen,
     isLocked: (state) => state.clientIsLocked,
     addressBelongsToWallet: (state, getters, rootState, rootGetters) => {

@@ -192,6 +192,8 @@ module.exports = {
     },
 
     App: { // gui
+        isStopping: false,
+        isRunning: false,
         isRestarting: false,
         isReady: false,
         showIntroScreen: true,

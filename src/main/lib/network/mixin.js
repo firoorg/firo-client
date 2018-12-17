@@ -1,5 +1,7 @@
 import Debug from 'debug'
 import zmq from 'zeromq'
+import { isString, isFunction } from 'lodash'
+
 import types from '../../../store/types'
 
 const debug = Debug('zcoin:network:mixin')
@@ -144,8 +146,13 @@ export default {
         if (!meta || meta.status < 200 || meta.status >= 400) {
             console.warn(response)
             if (onError) {
-                debug('dispatching action', onError)
-                this.dispatchAction(onError, { _meta: meta, error })
+                if (isString(onError)) {
+                    debug('dispatching action', onError)
+                    this.dispatchAction(onError, { _meta: meta, error })
+                } else if (isFunction(onError)) {
+                    debug('invoking onError callback')
+                    onError({ _meta: meta, error })
+                }
             }
             return
         }
@@ -156,12 +163,17 @@ export default {
         }
 
         if (onSuccess) {
-            debug('dispatching action', onSuccess)
-            this.dispatchAction(onSuccess, { _meta: meta, ...data })
+            if (isString(onSuccess)) {
+                debug('dispatching action', onSuccess)
+                this.dispatchAction(onSuccess, { _meta: meta, ...data })
+            } else if (isFunction(onSuccess)) {
+                debug('invoking onSuccess callback')
+                onSuccess({ _meta: meta, ...data })
+            }
         }
     },
 
-    send ({ type, collection, data, auth = {} }, actionsToDispatch = {}) {
+    send ({ type, collection, data, auth = null }, actionsToDispatch = {}) {
         if (!collection && !this.collection) {
             debug('can not send. no collection given!', {
                 type,
