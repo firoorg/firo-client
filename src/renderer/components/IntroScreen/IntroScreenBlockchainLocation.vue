@@ -62,7 +62,6 @@ export default {
                 return
             }
 
-            console.log(types)
             this.$store.dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location: blockchainPath })
             this.actions.next()
         },

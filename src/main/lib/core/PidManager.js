@@ -10,8 +10,6 @@ import types from '~/types'
 
 const debug = Debug('zcoin:core:manager')
 
-const terminate = promisify(Terminate)
-
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 const unlink = promisify(fs.unlink)

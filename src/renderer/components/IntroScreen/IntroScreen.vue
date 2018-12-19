@@ -146,7 +146,6 @@ export default {
             this.goingToHide = true
 
             setTimeout(() => {
-                console.log(types.app.HIDE_INTRO_SCREEN)
                 this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
             }, 500)
         }
