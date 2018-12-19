@@ -3,24 +3,29 @@
         <div class="grid">
             <main class="content">
                 <header>
-                    <Warning
+                    <warning
                         class="status"
                         :has-shadow="true"
                     />
-                    <h1 v-html="$t('error.connection-lost.title')" />
+                    <h1 v-html="$t('overlay.error.connection-lost.title')" />
                 </header>
 
-                <p v-html="$t('error.connection-lost.description')" />
+                <p v-html="$t('overlay.error.connection-lost.description')" />
 
                 <footer>
-                    <BaseButton
+                    <base-button
                         color="red"
                         is-dark
                         @click="closeApp"
                     >
-                        {{ $t('error-connection-lost.button__quit--primary') }}
-                    </BaseButton>
-                    <!--<BaseButton>Restart Daemon</BaseButton>-->
+                        {{ $t('overlay.error.connection-lost.button__quit--secondary') }}
+                    </base-button>
+                    <base-button
+                        is-dark
+                        @click="restartDaemon"
+                    >
+                        {{ $t('overlay.error.connection-lost.button__restart-daemon--primary') }}
+                    </base-button>
                 </footer>
             </main>
         </div>
@@ -28,7 +33,11 @@
 </template>
 
 <script>
+import types from '~/types'
+
 import { remote } from 'electron'
+import { mapActions } from 'vuex'
+
 import Warning from '@/components/Icons/Warning'
 
 export default {
@@ -37,10 +46,13 @@ export default {
         Warning
     },
     methods: {
+        ...mapActions({
+            restartDaemon: types.app.DAEMON_RESTART
+        }),
+
         closeApp () {
             remote.app.quit()
         }
-        // todo implement daemon restart.
     }
 }
 </script>
