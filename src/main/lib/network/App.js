@@ -36,7 +36,7 @@ export default {
                 passphrase
             }
         }, {
-            onSuccess: types.app.DAEMON_STOP,
+            onSuccess: types.app.DAEMON_RESTART,
             onError: ({ _meta, error }) => {
                 console.log('on setPassphrase error!', _meta, error)
                 // this.dispatchAction(types.app.DAEMON_RESTART)

@@ -114,6 +114,7 @@ export default {
 
             // update store with warmed up values
             populateStore({apiStatus: warmedUpApiStatus, dispatch})
+            store.dispatch(types.network.NETWORK_IS_CONNECTED)
         } catch (e) {
             debug('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...

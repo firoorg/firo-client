@@ -48,7 +48,7 @@ export const tryUntil = async function ({
         const { status } = meta
 
         if (validator({ status, data })) {
-            resolve(data)
+            resolve({ meta, data })
             return
         }
 
