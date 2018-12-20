@@ -29,6 +29,7 @@ export default class PidManager {
         this.heartbeat = null
         this.setHeartbeatIntervalInSeconds(heartbeatIntervalInSeconds)
 
+        this.autoRestartCounter = 0
         this.maxAutoRestartTries = maxAutoRestartTries
         autoRestart ? this.enableAutoRestart() : this.disableAutoRestart()
 
