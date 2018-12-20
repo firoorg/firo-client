@@ -84,14 +84,13 @@ export default {
 
             if (this.addressBelongsToWallet(this.clipboardAddress)) {
                 const paymentRequest = this.getPaymentRequestForAddress(this.clipboardAddress)
-                console.log(paymentRequest, this.clipboardAddress)
 
                 if (paymentRequest) {
                     const proposedLabel = this.$t(`send.public.flyout-${newOrUsed}-address.label__payment-request-form-label-to-fulfill` , {
                         label: paymentRequest.label
                     })
 
-                    if (!currentFormLabel) {
+                    if (!this.currentFormLabel) {
                         this.setFormLabel(proposedLabel)
                     }
                 }
