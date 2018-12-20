@@ -10,12 +10,10 @@ requester.on('message', (msg) => {
     console.log(JSON.parse(msg.toString()))
 })
 
-// send stringified json
 requester.send(JSON.stringify({
     type: 'create',
     collection: 'backup',
     data: {
-        directory: "/absolute/path/without/filename"
-        filename: "filename-without-filetype-ending"
+        directory: "/absolute/path/without/filename/",
     }
 }))
