@@ -186,6 +186,8 @@
 
             .content-wrapper > * {
                 padding: emRhythm(6);
+                height: 100%;
+                box-sizing: border-box;
             }
 
             .content-wrapper > div > footer,

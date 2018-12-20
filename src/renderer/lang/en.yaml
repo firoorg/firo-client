@@ -280,6 +280,10 @@ onboarding:
     title: Securing Funds
     description: This might take a minute or two...
 
+  passphrase-daemon-restart-success:
+    title: Wallet successfully locked!
+    description: Your wallet is now encrypted and the given passphrase is always required to move funds.
+
   # keep-it-safe:
     # title:
     # description: Make sure to keep your password in a secure location. If you want to write it down, make sure to write clearly and keep it in a secure location like a fire-proof safe. If you use a password manager, make sure you have offline backups of your master password or keyfiles in a secure location. If you feel you didn't pick strong enough a password, you can repeat the process now.

@@ -1,6 +1,8 @@
 <template>
     <div class="overlay-success-animation">
-        <lottie :options="defaultOptions" />
+        <lottie
+            :options="defaultOptions"
+            @animCreated="handleAnimation" />
     </div>
 </template>
 
@@ -22,12 +24,29 @@ export default {
 
     data () {
         return {
+            anim: null,
             defaultOptions: {
                 animationData,
                 loop: false,
                 autoplay: true
             }
         }
+    },
+
+    beforeDestroy() {
+        if (!this.anim) {
+            return
+        }
+
+        this.anim.removeEventListener('complete', this.onAnimationEnd)
+    },
+
+    methods: {
+        handleAnimation (anim) {
+            this.anim = anim
+
+            this.anim.addEventListener('complete', this.onAnimationEnd)
+        },
     }
 }
 </script>

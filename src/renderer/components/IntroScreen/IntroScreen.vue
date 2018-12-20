@@ -23,6 +23,7 @@
                         :delay="{ show: 350, hide: 0 }"
                         popover-class="dark overlay-popover"
                         :can-blur="false"
+                        event-bus-name="popover:intro"
                         @step-change="onStepChange"
                     >
                         <a
@@ -34,7 +35,7 @@
                     </multi-step-popover>
                 </header>
 
-                <div v-show="!isReady">
+                <div v-show="!isReadyOrRestarting">
                     <div>
                         <loading-bounce
                             color="dark"
@@ -103,6 +104,7 @@ export default {
     computed: {
         ...mapGetters({
             isReady: 'App/isReady',
+            isRestarting: 'App/isRestarting',
             showIntroScreen: 'App/showIntroScreen'
         }),
 
@@ -117,8 +119,12 @@ export default {
 
             return classes.join(' ')
         },
+        isReadyOrRestarting () {
+            return this.isReady || this.isRestarting
+        },
+
         showIntro () {
-            return this.isReady && this.showIntroScreen
+            return this.isReadyOrRestarting && this.showIntroScreen
         },
         getActions () {
             return {

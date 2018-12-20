@@ -23,9 +23,12 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+
 import types from '~/types'
 
 import GuideStepMixin from '@/mixins/GuideStepMixin'
+import EventBusMixin from '@/mixins/EventBusMixin'
+
 import IntroScreenLockWalletCreate from './IntroScreenLockWalletCreate'
 import IntroScreenLockWalletConfirm from './IntroScreenLockWalletConfirm'
 import IntroScreenLockWalletWarning from './IntroScreenLockWalletWarning'
@@ -38,10 +41,12 @@ export default {
         IntroScreenLockWalletWarning
     },
     mixins: [
-        GuideStepMixin
+        GuideStepMixin,
+        EventBusMixin
     ],
     data () {
         return {
+            eventBusName: 'popover:intro',
             passphrase: '',
             isValidPassphrase: false,
             confirm: '',
@@ -49,6 +54,7 @@ export default {
             isConfirmed: false
         }
     },
+
     computed: {
         ...mapGetters({
             isLocked: 'App/isLocked'
@@ -62,16 +68,16 @@ export default {
             lockWallet: types.app.LOCK_WALLET
         }),
         goToConfirm () {
-            window.dispatchEvent(new Event('resize'))
+            this.eventBus.$emit('reflow')
             this.showConfirm = true
             this.confirm = ''
         },
         onConfirm () {
-            window.dispatchEvent(new Event('resize'))
+            this.eventBus.$emit('reflow')
             this.isConfirmed = true
         },
         onConfirmCancel () {
-            window.dispatchEvent(new Event('resize'))
+            this.eventBus.$emit('reflow')
             this.showConfirm = false
             this.confirm = ''
             this.passphrase = ''

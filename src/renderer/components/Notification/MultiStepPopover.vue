@@ -7,6 +7,7 @@
         trigger="manually"
         :can-blur="canBlur"
         :delay="delay"
+        :event-bus-name="eventBusName"
         v-on="$listeners"
     >
         <template slot="target">
@@ -65,6 +66,10 @@ export default {
         canBlur: {
             type: Boolean,
             default: true
+        },
+        eventBusName: {
+            type: String,
+            default: ''
         }
     },
 

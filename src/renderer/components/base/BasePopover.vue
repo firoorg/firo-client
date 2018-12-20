@@ -19,6 +19,7 @@
                 <slot
                     name="content"
                     class="popover-content"
+                    @reflow="reflow"
                 />
             </div>
         </template>
@@ -28,6 +29,8 @@
 <script>
 import smoothReflow from 'vue-smooth-reflow'
 import { mapGetters } from 'vuex'
+
+import { getEventBus } from '@/utils/eventBus'
 
 export default {
     name: 'BasePopover',
@@ -40,6 +43,10 @@ export default {
         canBlur: {
             type: Boolean,
             default: true
+        },
+        eventBusName: {
+            type: String,
+            default: 'popover'
         },
         offset: {
             type: [Number, String],
@@ -70,17 +77,37 @@ export default {
         }
     },
 
+    /*
+    created() {
+        this.eventBus = getEventBus(this.eventBusName)
+        this.eventBus.$on('reflow', () => {
+            this.reflowSymbol = Date.now()
+        })
+    },
+    */
+
     mounted () {
-        console.log(this.$attrs)
-        this.$smoothReflow({
+        this.reflow()
+    },
+
+    beforeDestroy () {
+        //this.eventBus.$off('reflow')
+        this.$unsmoothReflow({
             el: this.$refs.container
         })
     },
 
-    beforeDestroy () {
-        this.$smoothReflow({
-            el: this.$refs.container
-        })
+    methods: {
+        reflow () {
+            console.log('reflow')
+            this.$smoothReflow({
+                el: this.$refs.container,
+                debug: true,
+                transitionEvent: {
+                    selector: '.popover-content',
+                }
+            })
+        }
     }
 }
 </script>
