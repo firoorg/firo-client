@@ -81,6 +81,7 @@ export default {
                 .map((tx, index) => {
                     const { id, amount, firstSeenAt, confirmations, isConfirmed, category } = tx
                     const order = this.transactions.length - index - 1
+                    const isGreen = !order || ['spendIn', 'spendOut', 'mined'].includes(category)
 
                     return {
                         id,
@@ -90,7 +91,7 @@ export default {
                         confirmations,
                         isConfirmed,
                         isOutgoing: category === 'send' || category === 'spendOut',
-                        className: !order ? 'green' : 'warning' // order === index, 0 first received -> valid
+                        className: isGreen ? 'green' : 'warning' // order === index, 0 first received -> valid
                     }
                 })
         }

@@ -206,7 +206,7 @@ const getters = {
         let paymentRequests = []
 
         walletAddresses.forEach((walletAddress) => {
-            const { address, transactions, total } = walletAddress
+            const { address, transactions, total, isReused } = walletAddress
 
             if (!transactions.length) {
                 return
@@ -231,13 +231,13 @@ const getters = {
             paymentRequests.push({
                 address,
                 isFulfilled,
+                isReused,
                 isIncoming: !isFulfilled,
                 isVirtual: true,
                 transactionsReceived: true,
                 amount: total.balance,
                 message: null,
                 label: '#virtual Payment Request' + (tags.length ? ` ${tags.join(' ')}` : ''),
-                isReused: transactions.length > 1,
                 createdAt: transactions.reduce((accumulator, tx) => {
                     return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator
                 }, Infinity)

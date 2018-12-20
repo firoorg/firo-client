@@ -309,14 +309,13 @@ const getters = {
                 }, 0)
             }
 
-            //
-            //
+            const publicTxs = txs.filter((tx) => !['mined', 'spendIn'].includes(tx.category))
 
             return {
                 ...addr,
                 transactions: txs,
                 hasTransactions: !!txs.length,
-                isReused: txs.length > 1,
+                isReused: publicTxs.length > 1,
                 isConfirmed: confirmations >= 1,
                 confirmations
             }
