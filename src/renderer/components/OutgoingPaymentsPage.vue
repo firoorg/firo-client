@@ -16,15 +16,15 @@
             </section>
         </div>
         <section class="paymentrequest-detail">
-            <transition
+            <!--<transition
                 name="fade"
                 mode="out-in"
-            >
-                <router-view
-                    :key="$route.path"
-                    class="paymentrequest-detail-route"
-                />
-            </transition>
+            >-->
+            <router-view
+                :key="$route.path"
+                class="paymentrequest-detail-route"
+            />
+            <!--</transition>-->
             <!--<send-zcoin :boundaries-element="boundariesElement" />-->
         </section>
     </section>

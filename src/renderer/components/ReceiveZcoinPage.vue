@@ -57,17 +57,17 @@
                     </base-button>
                 </div>
             </transition>
-            <transition
+            <!--<transition
                 name="fade"
                 mode="out-in"
-            >
-                <router-view
-                    :key="$route.path"
-                    v-bind="selectedPaymentRequestWithAddress"
-                    class="paymentrequest-detail-route"
-                    @route-to-detail="onRouteToDetail"
-                />
-            </transition>
+            >-->
+            <router-view
+                :key="$route.path"
+                v-bind="selectedPaymentRequestWithAddress"
+                class="paymentrequest-detail-route"
+                @route-to-detail="onRouteToDetail"
+            />
+            <!--</transition>-->
         </section>
     </section>
 </template>
