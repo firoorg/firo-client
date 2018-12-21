@@ -38,9 +38,18 @@ npm run translate
 npm run build
 ```
 
+We're currently using `Electron ^3.0.0` to run the interface. It is recommended to use the same node version during development on your machine. 
+
+```
+# Electron   3.0.8
+# Node       10.2.0
+# Chromium   66.0.3359.181
+
+// copied from https://electronjs.org/
+```
 ---
 
 ### Build for Production / Release
 
-Make sure authentication is enabled in `zcoinofficial/zcoin`. The Client __enforces__ encrypted communication between the gui and `zcoind` and will be unable to connect otherwise. 
+Make sure authentication is enabled in `zcoinofficial/zcoin`. The Client __enforces__ encrypted communication between the interface and `zcoind` and will be unable to connect otherwise. 
 
