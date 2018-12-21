@@ -26,10 +26,18 @@ export default {
         this.cancelAutoClose()
     },
 
+    computed: {
+        shouldAutoClose () {
+            return true
+        }
+    },
+
     methods: {
         startAutoClose () {
             this.autoCloseTimeout = setTimeout(() => {
-                this.close()
+                if (this.shouldAutoClose) {
+                    this.close()
+                }
             }, this.closeAfterInSeconds * 1000)
             console.log('started auto close timeout')
         },
