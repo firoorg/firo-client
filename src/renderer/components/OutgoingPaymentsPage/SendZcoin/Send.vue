@@ -29,6 +29,7 @@
                 <send-zcoin-steps
                     :form-is-valid="formSectionIsValid"
                     :cleanup-form="cleanupForm"
+                    @steps-done="clearPendingPayments"
                     :update-transaction-fee="updateTransactionFee"
                 />
             </div>
@@ -38,16 +39,13 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-// import isEmpty from 'lodash/isEmpty'
 import types from '~/types'
 
 import SendZcoinForm from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinForm'
 import SendZcoinSteps from '@/components/OutgoingPaymentsPage/SendZcoin/SendZcoinSteps'
 
-// import FeesAndAmount from '@/components/FeesAndAmount'
 import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
 import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
-// import PendingPayments from '@/components/payments/PendingPayments'
 
 import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
 import PendingPaymentsQueue from '@/components/payments/PendingPaymentsQueue'
@@ -108,7 +106,8 @@ export default {
 
     methods: {
         ...mapActions({
-            clearForm: types.zcoinpayment.CLEAR_FORM
+            clearForm: types.zcoinpayment.CLEAR_FORM,
+            clearPendingPayments: types.zcoinpayment.CLEAR_PENDING_ZCOIN_PAYMENTS
         }),
 
         setFormValidationStatus (isValid) {

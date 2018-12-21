@@ -238,6 +238,9 @@ send:
     flyout-done:
       title: Successfully sent!
       description: The payment is now on its way and will shortly be confirmed by the network.
+      button__is-loading--primary: Sending…
+      button__is-done--primary: Sent!
+      button__has-error--primary: Try Again
 
     flyout-unused-address:
       title: Unused Zcoin Address found

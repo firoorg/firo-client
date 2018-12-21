@@ -8,7 +8,6 @@ import Response from '~/mixins/Response'
 
 const isLoading = IsLoading.module('')
 const pendingPayments = Payments.module('zcoin')
-const pendingPaymentTypes = Payments.types('zcoin')
 
 const sendZcoinResponse = Response.module('send zcoin')
 
@@ -160,7 +159,6 @@ const actions = {
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
         // todo think about when to clear pending payments and if we're waiting for a
         // confirmation per payment/denomination we need some identifier which doesn't exist right now
-        dispatch(pendingPaymentTypes.CLEAR_PENDING_ZCOIN_PAYMENTS)
     }
 }
 

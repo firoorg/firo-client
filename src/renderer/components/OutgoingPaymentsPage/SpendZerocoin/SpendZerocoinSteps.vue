@@ -88,7 +88,6 @@
 import { mapGetters } from 'vuex'
 import GuideMixin from '@/mixins/GuideMixin'
 import ConfirmPassphraseStepsMixin from '@/mixins/ConfirmPassphraseStepsMixin'
-import types from '~/types'
 
 import MultiStepPopoverButtons from '@/components/Notification/MultiStepPopoverButtons'
 import SpendZerocoinStepConfirm from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinStepConfirm'
@@ -116,7 +115,6 @@ export default {
 
     data () {
         return {
-            //onCancelActionName: types.zerocoinspend.CLEAR_SPEND_ZEROCOIN_RESPONSE,
             responseNamespace: 'ZerocoinSpend/spend zerocoin'
         }
     },

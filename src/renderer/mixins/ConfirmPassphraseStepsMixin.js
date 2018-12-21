@@ -35,6 +35,7 @@ export default {
                         }
                     }
                 },
+                ...this.getAdditionalSteps(),
                 passphrase: {
                     component: PaymentStepPassphrase,
                     isOpen () {
@@ -203,6 +204,10 @@ export default {
             this.currentStepCanCancel = true
             this.isConfirmed = true
             this.currentStep = 'passphrase'
+        },
+
+        getAdditionalSteps () {
+            return {}
         }
     }
 }

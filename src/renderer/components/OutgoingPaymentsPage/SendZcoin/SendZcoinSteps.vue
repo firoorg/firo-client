@@ -71,15 +71,23 @@
             </template>
             <template slot="step-done">
                 <base-button
+                    v-if="!responseIsError"
                     :color="submitButtonColor"
                     :disabled="true"
                 >
                     <span v-if="isLoading">
-                        Sending...
+                        {{ $t('send.public.flyout-done.button__is-loading--primary') }}
                     </span>
                     <span v-else>
-                        Sent!
+                        {{ $t('send.public.flyout-done.button__is-done--primary') }}
                     </span>
+                </base-button>
+                <base-button
+                    v-else
+                    color="red"
+                    @click.prevent="goToPassphraseStep"
+                >
+                    {{ $t('send.public.flyout-done.button__has-error--primary') }}
                 </base-button>
             </template>
         </multi-step-popover-buttons>
@@ -89,6 +97,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import GuideMixin from '@/mixins/GuideMixin'
+import ConfirmPassphraseStepsMixin from '@/mixins/ConfirmPassphraseStepsMixin'
 
 import types from '~/types'
 
@@ -98,9 +107,9 @@ import SendAddToQueueButton from '@/components/OutgoingPaymentsPage/SendZcoin/Se
 import SendStepStartButton from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepStartButton'
 import SendStepConfirmButtons from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepConfirmButtons'
 import SendStepSelectFee from '@/components/OutgoingPaymentsPage/SendZcoin/SendStepSelectFee'
-import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
+//import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
 import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
-import StepResponseStatus from '@/components/payments/StepResponseStatus'
+//import StepResponseStatus from '@/components/payments/StepResponseStatus'
 
 export default {
     name: 'SendZcoinSteps',
@@ -112,13 +121,14 @@ export default {
         SendStepConfirm,
         SendStepConfirmButtons,
         SendStepSelectFee,
-        PaymentStepPassphrase,
+        //PaymentStepPassphrase,
         PaymentStepPassphraseButtons,
-        StepResponseStatus
+        //StepResponseStatus
     },
 
     mixins: [
-        GuideMixin
+        GuideMixin,
+        ConfirmPassphraseStepsMixin
     ],
 
     props: {
@@ -138,86 +148,24 @@ export default {
 
     data () {
         return {
-            steps: {
-                confirm: {
-                    component: SendStepConfirm,
-                    isOpen () {
-                        console.log('is open ->', this, this.currentStepCanSubmit)
-                        // return this.currentStepCanSubmit
-                        return true
-                    },
-                    placement () {
-                        return this.currentStepCanSubmit ? 'top-end' : 'top'
-                    },
-                    props () {
-                        return {
-                            isTimerDone: this.isConfirmed
-                        }
-                    }
-                },
-                selectFee: {
-                    component: SendStepSelectFee,
-                    isOpen () {
-                        return true
-                    },
-                    placement () {
-                        return this.isConfirmed ? 'top-end' : 'top'
-                    },
-                    props () {
-                        return {
-                            updateTransactionFee: this.updateTransactionFee,
-                            isConfirmed: this.isConfirmed
-                        }
-                    }
-                },
-                passphrase: {
-                    component: PaymentStepPassphrase,
-                    isOpen () {
-                        return true
-                    },
-                    props () {
-                        return {
-                            translationNamespace: 'send.public.flyout-unlock-client'
-                        }
-                    }
-                },
-
-                done: {
-                    component: StepResponseStatus,
-                    isOpen () {
-                        return !this.isLoading
-                    },
-                    placement () {
-                        return 'top'
-                    },
-                    props () {
-                        return {
-                            isLoading: this.isLoading,
-                            isValid: this.responseIsValid,
-                            isError: this.responseIsError,
-                            error: this.responseError,
-                            onAutoClose: () => {
-                                this.onCancel()
-                            },
-                            translationNamespace: 'send.public.flyout-done'
-                        }
-                    }
-                }
-
-            },
-            currentStep: '',
-            currentStepCanSubmit: false,
-            currentStepCanCancel: false,
-            isConfirmed: false
+            isUsedAddressCache: undefined,
+            responseNamespace: 'ZcoinPayment/send zcoin'
         }
+    },
+
+    mounted () {
+        this.$on('step-done', () => {
+            this.isUsedAddressCache = undefined
+        })
+    },
+
+    beforeDestroy () {
+        this.$off('step-done')
     },
 
     computed: {
         ...mapGetters({
             isLoading: 'ZcoinPayment/isLoading',
-            responseIsValid: 'ZcoinPayment/sendZcoinResponseIsValid',
-            responseIsError: 'ZcoinPayment/sendZcoinResponseIsError',
-            responseError: 'ZcoinPayment/sendZcoinResponseError',
             fee: 'ZcoinPayment/selectedFee',
             currentFormAmountAsSatoshi: 'ZcoinPayment/createFormAmount',
             currentFormAddress: 'ZcoinPayment/createFormAddress',
@@ -260,28 +208,22 @@ export default {
             return this.steps[this.currentStep].isOpen.bind(this)()
         },
 
-        currentComponentProps () {
-            if (!this.steps[this.currentStep]) {
-                return null
+        getPassphraseStepProps() {
+            return {
+                translationNamespace: 'send.public.flyout-unlock-client'
             }
-
-            if (!this.steps[this.currentStep].props) {
-                return null
-            }
-
-            return this.steps[this.currentStep].props.bind(this)()
         },
 
-        currentPopoverClass () {
-            return [this.submitButtonColor, `${'step'}-${this.currentStep}`].join(' ')
+        getDoneStepProps () {
+            return {
+                translationNamespace: 'send.public.flyout-done'
+            }
         },
 
         containsUsedAddress () {
-            /*
-                if (this.containsUsedAddressOnSend !== null) {
-                    return this.containsUsedAddressOnSend
-                }
-                */
+            if (this.isUsedAddressCache !== undefined) {
+                return this.isUsedAddressCache
+            }
 
             if (this.hasAlreadySentToAddress(this.currentFormAddress)) {
                 return true
@@ -313,59 +255,35 @@ export default {
         }
     },
 
-    watch: {
-        currentStep: {
-            handler (newVal, oldVal) {
-                window.dispatchEvent(new Event('resize'))
-                // this.currentStepCanSubmit = false
-                // this.currentStepCanCancel = false
-                // console.log('- - - foo - - -')
-            },
-            immediate: true
-        }
+    methods: {
+        // override mixin
+        onConfirm () {
+            this.isConfirmed = true
+            this.isUsedAddressCache = !!this.containsUsedAddress
+        },
 
-        /*
-            currentStepCanSubmit: {
-                handler (newVal, oldVal) {
-                    if (newVal) {
-                        this.currentStepCanCancel = true
+        getAdditionalSteps() {
+            return {
+                selectFee: {
+                    component: SendStepSelectFee,
+                    isOpen () {
+                        return true
+                    },
+                    placement () {
+                        return this.isConfirmed ? 'top-end' : 'top'
+                    },
+                    props () {
+                        return {
+                            updateTransactionFee: this.updateTransactionFee,
+                            isConfirmed: this.isConfirmed
+                        }
                     }
                 }
             }
-            */
-    },
-
-    methods: {
-        onStepChange (newStep, oldStep) {
-            if (this.currentStep === newStep) {
-                return
-            }
-
-            this.currentStep = newStep
         },
 
-        onStepCanSubmit (newVal) {
-            console.log('on can submit!', newVal)
-            this.currentStepCanSubmit = newVal
-        },
-
-        onStepCanCancel (newVal) {
-            console.log('on can cancel!', newVal)
-            this.currentStepCanCancel = newVal
-        },
-
-        onConfirm (newVal) {
-            console.log('confirmed!!!', newVal)
-            this.isConfirmed = newVal
-        },
-
-        onCancel () {
-            this.isConfirmed = false
-            this.currentStep = ''
-            this.currentStepCanSubmit = false
-            this.currentStepCanCancel = false
-
-            this.$store.dispatch(types.zcoinpayment.CLEAR_SEND_ZCOIN_RESPONSE)
+        getConfirmStep() {
+            return SendStepConfirm
         }
     }
 }
