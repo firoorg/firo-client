@@ -72,7 +72,8 @@
                     v-else
                     color="red"
                     :is-dark="true"
-                    @click.prevent="goToPassphraseStep">
+                    @click.prevent="goToPassphraseStep"
+                >
                     {{ $t('mint.flyout-done.button__has-error--primary') }}
                 </base-button>
             </template>

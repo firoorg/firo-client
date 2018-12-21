@@ -59,6 +59,7 @@
             <receive-payment-request-email-template
                 ref="emailTemplate"
                 :message="message"
+                :address="getAddress"
                 :amount="amountInBaseCoin"
                 :uri="getZcoinUri"
             >
@@ -92,7 +93,7 @@ export default {
 
     props: {
         address: {
-            type: String,
+            type: [Object, String],
             required: true
         },
         amount: {
@@ -117,11 +118,20 @@ export default {
             return convertToCoin(this.amount)
         },
 
-        getZcoinUri () {
+        getAddress () {
             if (!this.address) {
                 return ''
             }
-            const address = this.address.address || this.address
+            return this.address.address || this.address
+        },
+
+        getZcoinUri () {
+            const address = this.getAddress
+
+            if (!address) {
+                return ''
+            }
+
             const params = []
             params.push(this.amount ? `amount=${this.amount}` : '')
             params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')

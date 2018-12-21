@@ -78,7 +78,6 @@
                 >
                     {{ $t('send.private.flyout-done.button__has-error--primary') }}
                 </base-button>
-
             </template>
         </multi-step-popover-buttons>
     </div>

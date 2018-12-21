@@ -17,8 +17,10 @@ export default {
         Lottie
     },
     props: {
-        received: Boolean,
-        default: () => false
+        received: {
+            type: Boolean,
+            default: false
+        }
     },
     data () {
         return {

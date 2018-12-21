@@ -226,12 +226,24 @@
 <script>
 export default {
     name: 'ReceivePaymentRequestEmailTemplate',
-    props: [
-        'message',
-        'address',
-        'amount',
-        'uri'
-    ],
+    props: {
+        message: {
+            type: String,
+            required: true
+        },
+        address: {
+            type: String,
+            required: true
+        },
+        amount: {
+            type: String,
+            default: ''
+        },
+        uri: {
+            type: String,
+            required: true
+        }
+    },
 
     computed: {
         fixedAmount () {

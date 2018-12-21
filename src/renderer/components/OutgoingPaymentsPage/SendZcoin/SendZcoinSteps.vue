@@ -153,16 +153,6 @@ export default {
         }
     },
 
-    mounted () {
-        this.$on('step-done', () => {
-            this.isUsedAddressCache = undefined
-        })
-    },
-
-    beforeDestroy () {
-        this.$off('step-done')
-    },
-
     computed: {
         ...mapGetters({
             isLoading: 'ZcoinPayment/isLoading',
@@ -253,6 +243,16 @@ export default {
 
             return 'green'
         }
+    },
+
+    mounted () {
+        this.$on('step-done', () => {
+            this.isUsedAddressCache = undefined
+        })
+    },
+
+    beforeDestroy () {
+        this.$off('step-done')
     },
 
     methods: {

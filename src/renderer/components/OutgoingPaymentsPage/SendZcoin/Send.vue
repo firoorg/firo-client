@@ -29,8 +29,8 @@
                 <send-zcoin-steps
                     :form-is-valid="formSectionIsValid"
                     :cleanup-form="cleanupForm"
-                    @steps-done="clearPendingPayments"
                     :update-transaction-fee="updateTransactionFee"
+                    @steps-done="clearPendingPayments"
                 />
             </div>
         </form>

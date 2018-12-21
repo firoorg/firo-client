@@ -25,10 +25,12 @@ export default {
             required: true
         },
         popoverClass: {
-            type: String
+            type: String,
+            default: ''
         },
         tabindex: {
-            type: String
+            type: String,
+            default: '-1'
         },
         timeout: {
             type: Number,

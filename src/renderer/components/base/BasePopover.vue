@@ -102,7 +102,7 @@ export default {
             console.log('reflow')
             this.$smoothReflow({
                 el: this.$refs.container,
-                debug: true,
+                // debug: true,
                 transitionEvent: {
                     selector: '.popover-content',
                 }

@@ -17,11 +17,17 @@ export default {
         SendFeeSelection
     },
 
-    props: [
-        'actions',
-        'confirmed',
-        'updateTransactionFee'
-    ],
+    props: {
+        actions: {
+            type: Object,
+            required: true
+        },
+        // 'confirmed',
+        updateTransactionFee: {
+            type: Function,
+            required: true
+        }
+    },
 
     computed: {
         ...mapGetters({

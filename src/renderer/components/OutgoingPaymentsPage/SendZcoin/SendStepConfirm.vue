@@ -41,10 +41,12 @@ export default {
         PendingPayments
     },
 
-    props: [
-        'actions',
-        'isConfirmed'
-    ],
+    props: {
+        actions: {
+            type: Object,
+            required: true
+        }
+    },
 
     computed: {
         ...mapGetters({

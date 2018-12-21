@@ -161,10 +161,12 @@ export default {
             default: 0
         },
         popoverClass: {
-            type: String
+            type: String,
+            default: '',
         },
         tabindex: {
-            type: String
+            type: String,
+            default: '-1'
         },
         containsUsedAddress: {
             type: Boolean,

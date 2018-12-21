@@ -42,13 +42,16 @@ export default {
             default: true
         },
         popoverClass: {
-            type: String
+            type: String,
+            default: ''
         },
         placement: {
-            type: String
+            type: String,
+            default: 'top'
         },
         componentProps: {
-            type: Object
+            type: Object,
+            default: () => ({})
         }
     },
 
