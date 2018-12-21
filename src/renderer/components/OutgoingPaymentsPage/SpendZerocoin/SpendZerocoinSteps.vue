@@ -106,17 +106,14 @@ export default {
 
     data () {
         return {
-            onCancelActionName: types.zerocoinspend.CLEAR_SPEND_ZEROCOIN_RESPONSE,
-            responseNamespace: 'ZerocoinSpend/spendZerocoin'
+            //onCancelActionName: types.zerocoinspend.CLEAR_SPEND_ZEROCOIN_RESPONSE,
+            responseNamespace: 'ZerocoinSpend/spend zerocoin'
         }
     },
 
     computed: {
         ...mapGetters({
             isLoading: 'ZerocoinSpend/isLoading',
-            responseIsValid: 'ZerocoinSpend/spendZerocoinResponseIsValid',
-            responseIsError: 'ZerocoinSpend/spendZerocoinResponseIsError',
-            responseError: 'ZerocoinSpend/spendZerocoinResponseError',
             currentFormAddress: 'ZerocoinSpend/spendFormAddress',
             hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
         }),

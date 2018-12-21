@@ -56,16 +56,24 @@
             </template>
             <template slot="step-done">
                 <base-button
+                    v-if="!responseIsError"
                     :color="submitButtonColor"
                     :is-dark="true"
                     :disabled="true"
                 >
                     <span v-if="isLoading">
-                        Sending...
+                        {{ $t('mint.flyout-done.button__is-loading--primary') }}
                     </span>
                     <span v-else>
-                        Sent!
+                        {{ $t('mint.flyout-done.button__is-done--primary') }}
                     </span>
+                </base-button>
+                <base-button
+                    v-else
+                    color="red"
+                    :is-dark="true"
+                    @click.prevent="goToPassphraseStep">
+                    {{ $t('mint.flyout-done.button__has-error--primary') }}
                 </base-button>
             </template>
         </multi-step-popover-buttons>
@@ -74,6 +82,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+
 import GuideMixin from '@/mixins/GuideMixin'
 import ConfirmPassphraseStepsMixin from '@/mixins/ConfirmPassphraseStepsMixin'
 
@@ -100,18 +109,17 @@ export default {
         ConfirmPassphraseStepsMixin
     ],
 
+    data () {
+        return {
+            responseNamespace: 'Mint/mint'
+        }
+    },
+
     computed: {
         ...mapGetters({
             isLoading: 'Mint/isLoading',
-            responseIsValid: 'Mint/mintResponseIsValid',
-            responseIsError: 'Mint/mintResponseIsError',
-            responseError: 'Mint/mintResponseError',
             currentDenominationAmount: 'Mint/currentDenominationAmount'
         }),
-
-        submitButtonColor () {
-            return 'green'
-        },
 
         getPassphraseStepProps() {
             return {

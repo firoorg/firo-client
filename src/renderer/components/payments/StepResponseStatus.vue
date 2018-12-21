@@ -69,14 +69,20 @@ export default {
         error: {
             type: Object
         }
-    }
+    },
+
+    computed: {
+        shouldAutoClose () {
+            return !this.isError
+        }
+    },
 }
 </script>
 
 <style lang="scss" scoped>
     .icon {
         max-width: emRhythm(13);
-        margin: 0 auto emRhythm(2);
+        margin: emRhythm(-6) auto emRhythm(2);
 
         & + h2 {
             margin-bottom: 0;

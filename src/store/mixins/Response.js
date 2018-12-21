@@ -5,7 +5,7 @@ const tn = getTypeName
 
 const types = function (namespace) {
     const { NAME } = getName(namespace)
-    tn(`SET ${NAME} RESPONSE`)
+
     return {
         [tn(`SET ${NAME} RESPONSE`)]: tn(`SET ${NAME} RESPONSE`),
         [tn(`CLEAR ${NAME} RESPONSE`)]: tn(`CLEAR ${NAME} RESPONSE`),
@@ -31,7 +31,11 @@ const module = function (namespace = '') {
             [tn(`CLEAR ${NAME} RESPONSE`)] (state) {
                 const responseName = `${name}Response`
 
-                Vue.set(state, responseName, {})
+                Vue.set(state, responseName, {
+                    _meta: null,
+                    data: null,
+                    error: null
+                })
             },
 
             [tn(`SET ${NAME} RESPONSE`)] (state, response) {

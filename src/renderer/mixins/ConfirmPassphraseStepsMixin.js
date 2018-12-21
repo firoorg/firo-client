@@ -1,3 +1,6 @@
+import { getName, getTypeName } from '~/utils'
+import types from '~/types'
+
 import PaymentStepPassphrase from '@/components/payments/PaymentStepPassphrase'
 import StepResponseStatus from '@/components/payments/StepResponseStatus'
 
@@ -76,6 +79,16 @@ export default {
     },
 
     computed: {
+        responseIsValid () {
+            return this.$store.getters[this.responseGetterName + 'ResponseIsValid']
+        },
+        responseIsError () {
+            return this.$store.getters[this.responseGetterName + 'ResponseIsError']
+        },
+        responseError () {
+            return this.$store.getters[this.responseGetterName+ 'ResponseError']
+        },
+
         // mixin override
         canStart () {
             return this.formIsValid
@@ -99,7 +112,36 @@ export default {
 
         getDoneStepProps () {
             return {}
-        }
+        },
+
+        responseGetterName () {
+            if (!this.responseNamespace) {
+                return ''
+            }
+
+            const [mod, namespace] = this.responseNamespace.split('/')
+
+            const { name } = getName(namespace.toLowerCase())
+
+            return `${mod}/${name}`
+        },
+
+        responseActionName () {
+            if (!this.responseNamespace) {
+                return ''
+            }
+
+            const [mod, namespace] = this.responseNamespace.toLowerCase().split('/')
+
+            const { NAME } = getName(namespace)
+            const actionName = getTypeName(`CLEAR ${NAME} RESPONSE`)
+
+            if (mod && actionName && types[mod] && types[mod][actionName]) {
+                return types[mod][actionName]
+            }
+
+            return ''
+        },
     },
 
     methods: {
@@ -120,9 +162,11 @@ export default {
 
         onClose () {
             this.isConfirmed = false
-            this.currentStep = null
+            this.currentStep = ''
             this.currentStepCanSubmit = false
             this.currentStepCanCancel = false
+
+            this.clearResponse()
         },
 
         onAutoClose () {
@@ -130,12 +174,35 @@ export default {
             this.$emit('steps-done')
         },
 
+        clearResponse () {
+            console.log('clearResponse')
+            if (this.responseActionName) {
+                console.log('clearResponse dispatch!!')
+                this.$store.dispatch(this.responseActionName)
+            }
+        },
+
         onCancel () {
             this.onAutoClose()
+            this.clearResponse()
 
             if (this.onCancelActionName) {
                 this.$store.dispatch(this.onCancelActionName)
             }
+        },
+
+        goToPassphraseStep () {
+            if (!this.goToStep) {
+                return
+            }
+
+            //this.isConfirmed = false
+            this.clearResponse()
+
+            this.currentStepCanSubmit = false
+            this.currentStepCanCancel = true
+            this.isConfirmed = true
+            this.currentStep = 'passphrase'
         }
     }
 }

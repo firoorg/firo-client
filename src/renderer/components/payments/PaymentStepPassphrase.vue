@@ -84,7 +84,8 @@ export default {
 <style lang="scss" scoped>
     @include h2-with-description();
 
-    .field {
+    .form .field {
         margin-top: emRhythm(5);
+        margin-bottom: 0;
     }
 </style>
