@@ -134,7 +134,7 @@ const getters = {
             const { amount: amountRequested } = state.paymentRequests[key]
             const address = walletAddresses.find((addr) => addr.address === key)
 
-            let transactionsReceived = 0
+            let transactionsReceived = false
             let isFulfilled = false
             let isIncoming = false
             let isReused = false

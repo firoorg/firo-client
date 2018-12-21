@@ -2,7 +2,8 @@
     <div class="overlay-success-animation">
         <lottie
             :options="defaultOptions"
-            @animCreated="handleAnimation" />
+            @animCreated="handleAnimation"
+        />
     </div>
 </template>
 

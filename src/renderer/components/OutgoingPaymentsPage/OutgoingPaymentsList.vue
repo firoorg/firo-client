@@ -79,6 +79,7 @@ export default {
 
     props: {
         selectedPayment: {
+            type: String,
             default: null
         }
     },

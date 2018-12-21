@@ -100,8 +100,8 @@ export default {
     },
     props: {
         transactionsReceived: {
-            type: Number,
-            default: 0
+            type: Boolean,
+            default: false
         },
         isFulfilled: {
             type: Boolean,
@@ -132,7 +132,7 @@ export default {
             required: true
         },
         address: {
-            type: String,
+            type: [String, Object],
             required: true
         }
     },

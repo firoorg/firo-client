@@ -361,7 +361,7 @@ export default {
 
         onCancel () {
             this.isConfirmed = false
-            this.currentStep = null
+            this.currentStep = ''
             this.currentStepCanSubmit = false
             this.currentStepCanCancel = false
 

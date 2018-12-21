@@ -35,10 +35,12 @@ export default {
         FeesAndAmount
     },
 
+    /*
     props: [
         'actions',
         'isConfirmed'
     ],
+    */
 
     computed: {
         ...mapGetters({

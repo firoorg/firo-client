@@ -52,13 +52,6 @@ export default {
         FilterByUrlParamMixin
     ],
 
-    props: {
-        isPrivate: {
-            type: Boolean,
-            required: true
-        }
-    },
-
     computed: {
         ...mapGetters({
             transactions: 'Address/getOutgoingTransactions'
