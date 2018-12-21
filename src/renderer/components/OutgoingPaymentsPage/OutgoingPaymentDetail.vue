@@ -5,7 +5,7 @@
                 <span>{{ $d(new Date(firstSeenAt), 'long') }}</span>
                 <h2>
                     <natural-language-tags
-                        :content="label"
+                        :content="labelOrPlaceholder"
                         tag-size="large"
                         :on-tag-click="tagClicked"
                     />
@@ -82,15 +82,13 @@ export default {
             type: Boolean,
             default: false
         },
-        /*
-            category: {
-                type: String,
-                required: true
-            },
-            */
-        label: {
+        category: {
             type: String,
             required: true
+        },
+        label: {
+            type: String,
+            default: ''
         }
     },
 
@@ -110,6 +108,18 @@ export default {
 
                 return id === this.id
             })
+        },
+
+        labelOrPlaceholder () {
+            const label = this.label || this.$t('send.table__outgoing-payments.label__tx-nolabel')
+
+            if (this.category === 'send') {
+                return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
+            } else if (this.category === 'spendOut') {
+                return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
+            }
+
+            return label
         }
     },
     methods: {
