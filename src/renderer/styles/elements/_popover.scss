@@ -7,10 +7,15 @@
     z-index: 10000;
     @include box-shadow-large();
 
+    &:not(.popover) {
+        .tooltip-inner {
+            padding: $tooltip--padding;
+        }
+    }
+
     .tooltip-inner {
         background: $color--comet-dark-mixed;
         color: $color--white;
-        //padding: $tooltip--padding;
         max-width: emRhythm(42);
         overflow: hidden;
 
