@@ -180,6 +180,13 @@ send:
       label__passphrase: Passphrase
       placeholder__passphrase: Enter your passphrase
 
+    flyout-done:
+      title: Successfully spent!
+      description: The private payment is now on its way and will shortly be confirmed by the network.
+      button__is-loading--primary: Spending…
+      button__is-done--primary: Spent!
+      button__has-error--primary: Try Again
+
     flyout-unused-address:
       title: Unused Zcoin Address found
       description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?

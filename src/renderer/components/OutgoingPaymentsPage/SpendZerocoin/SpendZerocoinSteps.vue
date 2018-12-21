@@ -58,17 +58,27 @@
             </template>
             <template slot="step-done">
                 <base-button
+                    v-if="!responseIsError"
                     :color="submitButtonColor"
                     :is-dark="true"
                     :disabled="true"
                 >
                     <span v-if="isLoading">
-                        Sending...
+                        {{ $t('send.private.flyout-done.button__is-loading--primary') }}
                     </span>
                     <span v-else>
-                        Sent!
+                        {{ $t('send.private.flyout-done.button__is-done--primary') }}
                     </span>
                 </base-button>
+                <base-button
+                    v-else
+                    color="red"
+                    :is-dark="true"
+                    @click.prevent="goToPassphraseStep"
+                >
+                    {{ $t('send.private.flyout-done.button__has-error--primary') }}
+                </base-button>
+
             </template>
         </multi-step-popover-buttons>
     </div>
@@ -138,6 +148,12 @@ export default {
         getPassphraseStepProps() {
             return {
                 translationNamespace: 'send.private.flyout-unlock-client'
+            }
+        },
+
+        getDoneStepProps () {
+            return {
+                translationNamespace: 'send.private.flyout-done'
             }
         }
     },

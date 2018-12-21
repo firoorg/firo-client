@@ -33,6 +33,7 @@
                     <spend-zerocoin-steps
                         :form-is-valid="formSectionIsValid"
                         :cleanup-form="cleanupForm"
+                        @steps-done="cleanupForm"
                     />
                 </section>
             </div>
@@ -139,8 +140,6 @@ export default {
                     passphrase: this.currentPassphrase
                 }
             })
-
-            this.cleanupForm()
         }
     }
 }
