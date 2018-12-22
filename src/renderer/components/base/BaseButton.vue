@@ -1,7 +1,7 @@
 <template>
     <button
         v-bind="$attrs"
-        :class="[color, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
+        :class="[color, size, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
         @click="$emit('click', $event)"
     >
         <span>
@@ -37,6 +37,11 @@ export default {
             type: String,
             required: false,
             default: ''
+        },
+
+        size: {
+            type: String,
+            default: ''
         }
     }
 }
@@ -45,6 +50,9 @@ export default {
 <style lang="scss" scoped>
     $padding-v: 2;
     $padding-h: 4;
+
+    $padding-small-v: 1.5;
+    $padding-small-h: 2.5;
 
     button {
         position: relative;
@@ -98,6 +106,12 @@ export default {
 
         .has-shadow {
             @include box-shadow();
+        }
+
+        &.small {
+            padding: emRhythm($padding-small-v, $silent: true) emRhythm($padding-small-h, $silent: true);
+            @include rhythmBorderTop(1px, $padding-small-v);
+            @include rhythmBorderBottom(1px, $padding-small-v);
         }
 
         &.is-outline {
