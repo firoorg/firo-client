@@ -25,7 +25,7 @@
         margin-left: emRhythm(5);
         mix-blend-mode: multiply;
 
-        h2 {
+        /deep/ h2 {
             @include typo-headline();
             margin: emRhythm(1, $ms-up2) 0;
             mix-blend-mode: multiply;
