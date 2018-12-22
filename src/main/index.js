@@ -116,7 +116,7 @@ windowManager.setupAppEvents()
 clipboard.watch({ store, deeplink })
 
 app.on('ready', () => {
-    // store.dispatch('Window/show', 'welcomeGuide')
+    store.dispatch('Window/show', 'main')
 })
 
 app.on('before-quit', async (event) => {

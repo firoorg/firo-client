@@ -1,7 +1,7 @@
 export default {
     main: {
         url: 'main',
-        show: true,
+        show: false,
         window: {
             useContentSize: true,
             titleBarStyle: 'hiddenInset',
