@@ -32,18 +32,18 @@
             <label>{{ denomination }}</label>
         </div>
         <div class="buttons">
-            <button
+            <base-round-button
                 :disabled="!canDecrease"
                 @click="decrease"
             >
-                <span>&minus;</span>
-            </button>
-            <button
+                &minus;
+            </base-round-button>
+            <base-round-button
                 :disabled="!canIncrease"
                 @click="increase"
             >
-                <span>&plus;</span>
-            </button>
+                &plus;
+            </base-round-button>
         </div>
     </div>
 </template>
@@ -247,6 +247,7 @@ export default {
         justify-content: center;
         margin-top: emRhythm(1);
 
+        /*
         button {
             border: none;
             @include font-heavy();
@@ -280,6 +281,7 @@ export default {
                 }
             }
         }
+        */
 
         button + button {
             margin-left: 0.25rem;

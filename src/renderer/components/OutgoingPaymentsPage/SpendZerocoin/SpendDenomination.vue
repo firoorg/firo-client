@@ -1,11 +1,12 @@
 <template>
     <div class="denomination">
         <div class="bar-wrap">
-            <transition name="fade">
-                <span v-show="available">
-                    {{ currentLabel }}
-                </span>
-            </transition>
+            <span
+                :class="{ 'is-visible' : available }"
+                class="current-label"
+            >
+                {{ currentLabel }}
+            </span>
             <div
                 class="bar"
                 :class="{ 'is-empty': !available }"
@@ -20,20 +21,22 @@
             <label>{{ denomination }}</label>
         </div>
         <div class="buttons">
-            <button
+            <base-round-button
                 :disabled="!canDecrease"
-                class="decrease"
-                @click.stop.prevent="decrease"
+                :is-dark="true"
+                color="red"
+                @click="decrease"
             >
                 &minus;
-            </button>
-            <button
+            </base-round-button>
+            <base-round-button
                 :disabled="!canIncrease"
-                class="increase"
-                @click.stop.prevent="increase"
+                :is-dark="true"
+                color="green"
+                @click="increase"
             >
                 &plus;
-            </button>
+            </base-round-button>
         </div>
     </div>
 </template>
@@ -138,7 +141,7 @@ export default {
         align-items: center;
 
         //
-        span {
+        .current-label {
             //position: absolute;
             top: 0;
             left: emRhythm(1);
@@ -149,6 +152,12 @@ export default {
             padding-bottom: 0.125rem;
             min-width: emRhythm(5);
             text-align: right;
+            opacity: 0;
+            transition: opacity 0.25s ease-out;
+
+            &.is-visible {
+                opacity: 1
+            }
         }
     }
 
@@ -195,55 +204,12 @@ export default {
     .buttons {
         position: relative;
         z-index: 2;
+        display: flex;
         //display: inline-block;
         //margin-top: emRhythm(1);
 
-        button {
-            border: none;
-            @include font-heavy();
-            cursor: pointer;
-            outline: none;
-            border-radius: 50%;
-            background-color: rgba($color--dark, .65);
-
-            transition: color 0.15s ease-out, background-color 0.15s ease-out;
-
-            &.decrease {
-                color: $color--red-bright;
-            }
-
-            &.increase{
-                color: $color--green;
-            }
-
-            &[disabled] {
-                background-color: rgba($color--dark, .35);
-                color: $color--comet;
-                cursor: default;
-            }
-
-            &:not([disabled]) {
-                &:hover {
-                    color: $color--dark;
-                    &.decrease {
-                        @include glow-small-box($color--red);
-                        background: $gradient--red-vertical;
-                    }
-
-                    &.increase{
-                        @include glow-small-box($color--green);
-                        background: $gradient--green-bright;
-                    }
-                }
-
-                &:active {
-                    background-color: rgba($color--comet-light, 1);
-                }
-            }
-
-            &+ button {
-                margin-left: emRhythm(0.5, $silent: true);
-            }
+        /deep/ .base-round-button + .base-round-button {
+            margin-left: emRhythm(0.5, $silent: true);
         }
     }
 </style>
