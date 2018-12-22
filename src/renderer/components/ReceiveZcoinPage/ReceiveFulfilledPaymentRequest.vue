@@ -1,11 +1,14 @@
 <template>
     <div class="is-fulfilled">
-        <h2 class="payments-headline">
-            {{ $t('receive.detail-entry-request.title__payments') }}
-            <span v-if="transactions.length > 1">
-                ({{ transactions.length }})
-            </span>
-        </h2>
+        <div>
+            <h2 class="payments-headline">
+                {{ $t('receive.detail-entry-request.title__payments') }}
+                <span v-if="transactions.length > 1">
+                    ({{ transactions.length }})
+                    <!-- <circular-badge :content="transactions.length" class="badge" /> -->
+                </span>
+            </h2>
+        </div>
         <div
             style="overflow: hidden"
             class="scrollable-container-wrap"
@@ -32,11 +35,13 @@ import { nl2br } from '@/utils/format'
 
 import UnexpectedTransactionPopover from '@/components/ReceiveZcoinPage/UnexpectedTransactionPopover'
 import TransactionsList from '@/components/payments/TransactionsList'
+import CircularBadge from "../Badge/CircularBadge";
 
 export default {
     name: 'ReceiveFulfilledPaymentRequest',
 
     components: {
+        CircularBadge,
         UnexpectedTransactionPopover,
         TransactionsList
     },

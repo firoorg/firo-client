@@ -1,8 +1,8 @@
 <template>
     <div
         class="base-round-button"
+        :class="[isDark ? 'dark' : '', {'is-active': isActive}, color, size]"
         @click="$emit('click')"
-        :class="[isDark ? 'dark' : '', color]"
     >
         <span>
             <slot />
@@ -23,6 +23,16 @@ export default {
         color: {
             type: String,
             default: ''
+        },
+
+        size: {
+            type: String,
+            default: ''
+        },
+
+        isActive: {
+            type: Boolean,
+            default: false
         }
     }
 }
@@ -46,6 +56,16 @@ export default {
 
         transition: color 0.15s ease-out, background-color 0.15s ease-out;
 
+        // sizes
+
+        &.large {
+            height: 2.5rem;
+            width: 2.5rem;
+            //background: $gradient--green-bright;
+        }
+
+        // dark mode
+
         &.dark {
             background-color: rgba($color--dark, .65);
             color: $color--comet-medium;
@@ -61,6 +81,12 @@ export default {
             }
         }
 
+        &.light {
+            background-color: rgba($color--polo-medium, 0.7);
+        }
+
+        // colors
+
         &.red {
             color: $color--red-bright;
         }
@@ -70,6 +96,7 @@ export default {
         }
 
         &:not([disabled]) {
+            &.is-active,
             &:hover {
                 color: $color--dark;
                 background-color: rgba($color--polo-medium, 0.7);
@@ -78,13 +105,23 @@ export default {
                     background-color: $color--polo-light;
                 }
 
+                &.light {
+                    background-color: $color--comet-dark-mixed;
+                }
+
                 &.red {
-                    @include glow-small-box($color--red);
+                    &.dark {
+                        @include glow-small-box($color--red);
+                    }
+
                     background: $gradient--red-vertical;
                 }
 
                 &.green {
-                    @include glow-small-box($color--green);
+                    &.dark {
+                        @include glow-small-box($color--green);
+                    }
+
                     background: $gradient--green-bright;
                 }
             }

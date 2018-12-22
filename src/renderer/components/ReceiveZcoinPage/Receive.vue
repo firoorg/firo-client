@@ -3,13 +3,13 @@
         <header class="receive-header">
             <div class="inner">
                 <span>{{ $d(new Date(createdAt), 'long') }}</span>
-                <h2>
+                <editable-label :label="label">
                     <natural-language-tags
                         :content="label"
                         tag-size="large"
                         :on-tag-click="tagClicked"
                     />
-                </h2>
+                </editable-label>
                 <span v-if="amount">
                     {{ amountInBaseCoin }} XZC {{ $t('receive.detail-entry-request.label__requested') }}
                 </span>
@@ -78,6 +78,7 @@ import ReceiveFulfilledPaymentRequest from '@/components/ReceiveZcoinPage/Receiv
 import ReceiveFulfilledPaymentRequestButtons from '@/components/ReceiveZcoinPage/ReceiveFulfilledPaymentRequestButtons'
 
 import ReceivePaymentRequestEmailTemplate from '@/components/email/ReceivePaymentEmailTemplate'
+import EditableLabel from '@/components/payments/Detail/EditableLabel'
 import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
 import TimedTooltip from '@/components/Notification/TimedTooltip'
@@ -93,6 +94,7 @@ export default {
 
         UnexpectedTransactionPopover,
         PaymentRequestStatus,
+        EditableLabel,
         NaturalLanguageTags,
         ReceivePaymentRequestEmailTemplate,
         // 'qr-code': VueQRCodeComponent,
