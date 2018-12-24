@@ -6,18 +6,16 @@ import { tryUntil } from '#/lib/utils'
 // let apiStatus = zmq.socket('req')
 
 export const getApiStatus = async function ({ host, port }) {
-    let apiStatus = zmq.socket('req')
-    const uri = `${host}:${port}`
-
-    apiStatus.connect(uri)
+    let apiStatus = null
 
     return new Promise((resolve, reject) => {
         let requestStatusInterval = null
         let counter = 0
 
-        apiStatus.once('message', (msg) => {
+        const onMessage = (msg) => {
             console.log('got message back from api status', counter)
             clearInterval(requestStatusInterval)
+
             try {
                 const { data, meta, error } = JSON.parse(msg.toString())
 
@@ -32,15 +30,33 @@ export const getApiStatus = async function ({ host, port }) {
                 console.log('closing api status')
                 apiStatus.close()
             }
-        })
+        }
 
-        requestStatusInterval = setInterval(() => {
-            console.log('requesting initial api status', counter)
+        requestStatusInterval = setInterval(function () {
+
+            if (apiStatus) {
+                apiStatus.close()
+                apiStatus.removeListener('message', onMessage)
+                apiStatus = null
+            }
+
+            apiStatus = zmq.socket('req')
+
+            const uri = `${host}:${port}`
+
+            apiStatus.connect(uri)
+            apiStatus.setsockopt(zmq.ZMQ_RCVTIMEO, 100)
+            apiStatus.setsockopt(zmq.ZMQ_SNDTIMEO, 100)
+
+            console.log('requesting initial api status', counter, new Date())
             counter++
+
             apiStatus.send(JSON.stringify({
                 type: 'initial',
                 collection: 'apiStatus'
             }))
+
+            apiStatus.once('message', onMessage)
         }, 200)
     })
 }

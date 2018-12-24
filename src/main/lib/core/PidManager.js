@@ -59,7 +59,7 @@ export default class PidManager {
         if (await this.isRunning()) {
             debug('daemon is still running. no need to start it...')
             this.onStart()
-            return
+            return this.pid
         }
 
         this.child = spawn(this.pathToSpawn, {

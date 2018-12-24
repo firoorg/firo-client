@@ -54,6 +54,12 @@ const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
 
 store.replaceState(require('../store/initialState'))
 
+const startNetwork = function () {
+    debug('STARTING NETWORK')
+
+    network.init({ store })
+}
+
 // set up the manager
 const coreDaemonManager = new PidManager({
     name: 'core',
@@ -61,12 +67,7 @@ const coreDaemonManager = new PidManager({
     autoRestart,
     heartbeatIntervalInSeconds,
     store,
-    onStarted: () => {
-        console.log('STARTING NETWORK')
-        // network.disconnect()
-        // network.close()
-        network.init({ store })
-    }
+    onStarted: startNetwork
 })
 
 if (stopOnQuit) {
@@ -79,29 +80,6 @@ if (stopOnQuit) {
 debug('zcoindPath', zcoindPath)
 coreDaemonManager.start(zcoindPath)
 
-/*
-// daemon testing...
-let startStop = 0
-let started = 0
-let stopped = 0
-const interval = setInterval(() => {
-  startStop++
-  // startStop % 0 === 0 ? coreDaemonManager.stop() : coreDaemonManager.start()
-  if (startStop % 2 === 0) {
-    coreDaemonManager.stop()
-    stopped++
-  } else {
-    coreDaemonManager.start()
-    started++
-  }
-
-  if (startStop >= 100) {
-    clearInterval(interval)
-    debug('CORE TESTS DONE! started: %d, stopped: %d', started, stopped)
-  }
-}, 2000)
-*/
-
 // tor proxy
 // https://electronjs.org/docs/api/app#appcommandlineappendswitchswitch-value
 // https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
@@ -113,10 +91,10 @@ windowManager.connectToStore({ store, namespace: 'Window' })
 windowManager.registerWindows(CONFIG.windows)
 windowManager.setupAppEvents()
 
-clipboard.watch({ store, deeplink })
-
 app.on('ready', () => {
     store.dispatch('Window/show', 'main')
+
+    clipboard.watch({ store, deeplink })
 })
 
 app.on('before-quit', async (event) => {
@@ -131,6 +109,7 @@ app.on('before-quit', async (event) => {
 app.on('will-quit', () => {
     console.log('app will quit')
     network.close()
+    clipboard.unwatch()
 })
 
 /**
