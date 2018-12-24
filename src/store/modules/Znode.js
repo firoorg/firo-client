@@ -11,7 +11,8 @@ import Debug from 'debug'
 const debug = Debug('zcoin:store:znode')
 
 const state = {
-    znodes: {}
+    znodes: {},
+    total: 0
 }
 
 const mutations = {
@@ -24,6 +25,10 @@ const mutations = {
             ...state.znodes,
             ...newZnodes
         }
+    },
+
+    [types.SET_TOTAL] (state, total) {
+        state.total = total
     }
 }
 
@@ -40,6 +45,11 @@ const processZnode = function (id, znode) {
     }
 
     const { authority } = znode
+
+    if (!authority) {
+        console.log(znode)
+    }
+
     const { ip } = authority
     const location = geoip.lookup(ip)
 
@@ -89,8 +99,10 @@ const actions = {
 
         let initialZnodes = {}
 
+        commit(types.SET_TOTAL, initialState.total)
+        
         // add maximal 10 nodes at a time
-        eachOfLimit(initialState, 10, async (znode, id) => {
+        eachOfLimit(initialState.nodes, 10, async (znode, id) => {
             // const { id, znode } = znodeData
 
             // const ip = authority.split(':')[0]
@@ -168,6 +180,14 @@ const actions = {
                 location
             }
         })
+    },
+
+    [types.SET_TOTAL] ({ commit, state }, total) {
+        if (state.total === total) {
+            return
+        }
+
+        commit(types.SET_TOTAL, total)
     }
 }
 
@@ -197,7 +217,7 @@ const getters = {
         return !isMine
     }),
 
-    totalZnodes: (state, getters) => getters.allZnodes.length,
+    totalZnodes: (state, getters) => state.total > getters.allZnodes.length ? state.total : getters.allZnodes.length,
     enabledZnodes: (state, getters) => {
         const enabledZnodes = getters.allZnodes.filter((znode) => {
             return znode.status === 'ENABLED'
