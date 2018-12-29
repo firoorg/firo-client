@@ -9,36 +9,15 @@
                 placement="left"
                 :auto-hide="true"
                 popover-class="notice"
-                @apply-show="focusInput"
+                @apply-show="() => resetAndSelectInput = true"
+                @hide="() => resetAndSelectInput = false"
             >
                 <template slot="content">
-                    <div>
-                        <label>
-                            <div>Change Label</div>
-                            <input
-                                ref="input"
-                                v-model="content"
-                                type="text"
-                                autofocus
-                            >
-                        </label>
-                        <footer>
-                            <base-button
-                                size="small"
-                                is-dark
-                                is-outline
-                            >
-                                Discard
-                            </base-button>
-                            <base-button
-                                size="small"
-                                color="green"
-                                is-dark
-                            >
-                                Update
-                            </base-button>
-                        </footer>
-                    </div>
+                    <editable-label-popover-content
+                        :label="label"
+                        :reset-label-and-select-input="resetAndSelectInput"
+                        @submit="onSubmitForm"
+                    />
                 </template>
 
                 <template slot="target">
@@ -47,7 +26,12 @@
                         size="large"
                         :is-active="isOpen"
                     >
-                        <tick-icon color="white" />
+                        <tick-icon
+                            v-if="sentLabel && !isLoading"
+                            color="white"
+                        />
+                        <edit-icon v-else />
+
                     </base-round-button>
                 </template>
             </base-popover>
@@ -56,35 +40,61 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
+import types from '~/types'
+
 import TickIcon from '@/components/Icons/TickIcon'
-import BasePopover from "../../base/BasePopover";
+import LoadingBounce from '@/components/Icons/LoadingBounce'
+import EditableLabelPopoverContent from './EditableLabelPopoverContent'
+import EditIcon from '@/components/Icons/EditIcon'
 
 export default {
     name: 'EditableLabel',
     components: {
-        BasePopover,
+        EditIcon,
+        LoadingBounce,
+        EditableLabelPopoverContent,
         TickIcon
     },
+
     props: {
         label: {
             type: String,
             default: ''
+        },
+
+        address: {
+            type: String,
+            required: true
         }
     },
 
     data () {
         return {
             isOpen: false,
-            content: this.label || ''
+            resetAndSelectInput: false,
+            sentLabel: false
         }
     },
 
+    computed: {
+        ...mapGetters({
+            isLoading: 'PaymentRequest/isLoading'
+        })
+    },
+
     methods: {
-        focusInput () {
-            console.log('hoohohoho huu')
-            this.$nextTick(() => {
-                this.$refs.input.focus()
+        ...mapActions({
+            updateLabel: types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL
+        }),
+
+        onSubmitForm({ label }) {
+            this.updateLabel({
+                label,
+                address: this.address
             })
+            this.sentLabel = true
         }
     }
 }
@@ -97,7 +107,7 @@ export default {
 
         h2 {
             max-width: 90%;
-            border: 1px solid red;
+            // border: 1px solid red;
         }
     }
 

@@ -27,6 +27,9 @@ const mutations = {
     // send create request to the api
     [types.CREATE_PAYMENT_REQUEST] () {},
 
+    // send update label request to the API
+    [types.UPDATE_PAYMENT_REQUEST_LABEL] () {},
+
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD] (state, { field, value }) {
         state.createPaymentRequestForm[field] = value
     },
@@ -119,6 +122,41 @@ const actions = {
 
         // clean up form fields
         dispatch(types.RESET_PAYMENT_REQUEST_CREATE_FORM)
+    },
+
+    [types.UPDATED_PAYMENT_REQUEST] ({ commit, dispatch, state }, paymentRequest) {
+        const { address, createdAt, amount, message, label } = paymentRequest
+
+        const paymentRequestToUpdate = getters.getPaymentRequestForAddress(address)
+
+        if (!paymentRequestToUpdate) {
+            return
+        }
+
+        commit(types.ADD_PAYMENT_REQUEST, {
+            address,
+            createdAt,
+            amount,
+            message,
+            label
+        })
+    },
+
+    [types.UPDATE_PAYMENT_REQUEST_LABEL] ({ commit, state, getters }, { label, address }) {
+        const paymentRequestToUpdate = getters.getPaymentRequestForAddress(address)
+
+        if (!paymentRequestToUpdate) {
+            return
+        }
+
+        if (paymentRequestToUpdate.label === label) {
+            return
+        }
+
+        commit(types.UPDATE_PAYMENT_REQUEST_LABEL, {
+            label,
+            address
+        })
     }
 }
 
