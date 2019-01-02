@@ -34,6 +34,10 @@ let mainConfig = {
         exclude: /node_modules/
       },
       {
+        test: /\.ya?ml$/,
+        use: ['json-loader', 'yaml-loader']
+      },
+      {
         test: /\.node$/,
         use: 'node-loader'
       }

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
-import VueI18n from 'vue-i18n'
+import i18n from '#/lib/i18n'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
@@ -10,16 +10,11 @@ import { sync } from 'vuex-router-sync'
 
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 
-import languages from '@/lang'
-import dateTimeFormats from '@/lang/dateTimeFormats'
-
 import App from './App'
 import router from './router'
 import store from '../store/renderer'
 
 const app = require('electron').remote.app
-
-const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
 
 const customValidationRules = [
     'isZcoinAddress',
@@ -35,7 +30,7 @@ Vue.use(VTooltip, {
 })
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
-    locale, // Default locale
+    locale: i18n.getLocale(app), // Default locale
     locales: {
         // 'zh-CN': require('date-fns/locale/zh_cn'),
         'en': require('date-fns/locale/en')
@@ -47,26 +42,6 @@ Vue.use(VeeValidate, {
     inject: false
 })
 Vue.use(BindScopedSlotsPlugin)
-Vue.use(VueI18n)
-
-// Create VueI18n instance with options
-console.log('using i18n with', locale)
-
-const i18n = new VueI18n({
-    locale, // set locale
-    dateTimeFormats,
-    fallbackLocale: process.env.NODE_ENV !== 'production' ? 'structure' : 'en',
-    messages: languages // set locale messages
-})
-
-if (process.env.SHOW_TRANSLATIONS) {
-    const interpolate = i18n._formatter.interpolate
-
-    i18n._formatter.interpolate = function (message, values) {
-        const result = interpolate.bind(i18n._formatter)(message, values)
-        return result.map((r) => `${r} ✅`)
-    }
-}
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
@@ -107,6 +82,6 @@ new Vue({
     components: { App },
     router,
     store,
-    i18n,
+    i18n: i18n.getModule(app),
     template: '<App/>'
 }).$mount('#app')

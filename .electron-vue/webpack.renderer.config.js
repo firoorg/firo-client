@@ -74,7 +74,6 @@ let rendererConfig = {
             },
             {
                 test: /\.ya?ml$/,
-                // include: path.resolve('data'),
                 use: ['json-loader', 'yaml-loader']
             },
             {
