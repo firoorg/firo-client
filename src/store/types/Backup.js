@@ -1,0 +1,3 @@
+export const CREATE_BACKUP = 'CREATE_BACKUP'
+export const BACKUP_CREATED = 'BACKUP_CREATED'
+export const BACKUP_FAILED = 'BACKUP_FAILED'
