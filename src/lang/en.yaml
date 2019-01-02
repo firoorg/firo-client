@@ -12,6 +12,18 @@
 # Desv should consider wisely as this can lead to confusion in cases where you have a `label__label`
 # surrounded by e.g. `error__label` and `placeholder__label`.
 #
+application-menu:
+  preferences:
+    title: Preferences
+  client:
+    title: Client
+    label__create-wallet-backup: Create Wallet Backup
+  payments:
+    title: Payments
+    label__create-payment-request: Create Payment Request
+    label__show-private-payments: Show Private Payments
+    label__show-public-payments: Show Public Payments
+
 navigation:
   balance:
     title: Zcoin Balance
@@ -272,6 +284,7 @@ onboarding:
     button__generate-passphrase--primary: Generate passphrase
     button__set-passphrase--primary: Set passphrase
     placeholder__enter-passphrase: Enter passphrase
+    dictionary__passphrase: "Zcoin"
     # button__secondary: back / cancel?
 
   confirm-passphrase:
