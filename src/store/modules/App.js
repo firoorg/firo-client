@@ -145,7 +145,6 @@ const getters = {
     isLocked: (state) => state.clientIsLocked,
     addressBelongsToWallet: (state, getters, rootState, rootGetters) => {
         return (address) => {
-            console.log('---- validating address ', address, ' ----')
             const isPaymentRequestAddress = !!rootGetters['PaymentRequest/paymentRequests'].find((el) => {
                 if (typeof el.address === 'string') {
                     return el.address === address

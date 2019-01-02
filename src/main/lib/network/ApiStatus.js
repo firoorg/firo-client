@@ -25,6 +25,7 @@ export const getApiStatus = async function ({ host, port }) {
                 }
                 resolve({ data, meta })
             } catch (e) {
+                console.log(e)
                 reject(new Error('error occured during api status fetching.', e))
             } finally {
                 console.log('closing api status')
@@ -73,8 +74,6 @@ export const closeApiStatus = function () {
 export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds }) {
     const validator = ({ status, data }) => {
         const { modules = {}, walletVersion } = data
-
-        console.log('validating --------->', status, data)
 
         return status === 200 && modules.API && walletVersion
     }
