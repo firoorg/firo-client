@@ -82,7 +82,7 @@ export default {
         }
 
         &.light {
-            background-color: rgba($color--polo-medium, 0.7);
+            background: mix($color--comet-light, $color--comet-medium);
         }
 
         // colors
@@ -106,7 +106,7 @@ export default {
                 }
 
                 &.light {
-                    background-color: $color--comet-dark-mixed;
+                    background-color: $color--comet;
                 }
 
                 &.red {

@@ -26,12 +26,8 @@
                         size="large"
                         :is-active="isOpen"
                     >
-                        <tick-icon
-                            v-if="sentLabel && !isLoading"
-                            color="white"
-                        />
-                        <edit-icon v-else />
-
+                        <!-- todo update icon and animate success error state -->
+                        <edit-icon />
                     </base-round-button>
                 </template>
             </base-popover>
