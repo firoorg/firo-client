@@ -1,5 +1,6 @@
 import * as types from '../types/PaymentRequest'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+import { getLabelForPaymentRequest } from '~/utils/i18n'
 
 import IsLoading from '~/mixins/IsLoading'
 import LastSeen from '~/mixins/LastSeen'
@@ -205,13 +206,20 @@ const getters = {
                 }
             }
 
+            const { createdAt } = state.paymentRequests[key]
+
+            const updatedAt = transactions.reduce((accumulator, tx) => {
+                return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
+            }, createdAt)
+
             requests.push({
                 ...state.paymentRequests[key],
                 amount: amountToDisplay,
                 isFulfilled,
                 isIncoming,
                 isReused,
-                transactionsReceived
+                transactionsReceived,
+                updatedAt
             })
         }
 
@@ -260,13 +268,15 @@ const getters = {
                 return tx.isConfirmed
             })
 
-            const tags = transactions.reduce((accumulator, tx) => {
-                const tag = `#${tx.category}`
+            const createdAt = transactions.reduce((accumulator, tx) => {
+                return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator
+            }, Infinity)
 
-                return accumulator.includes(tag) ? accumulator : [...accumulator, tag]
-            }, [])
+            const updatedAt = transactions.reduce((accumulator, tx) => {
+                return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
+            }, createdAt)
 
-            paymentRequests.push({
+            const request = {
                 address,
                 isFulfilled,
                 isReused,
@@ -275,10 +285,20 @@ const getters = {
                 transactionsReceived: true,
                 amount: total.balance,
                 message: null,
-                label: '#virtual Payment Request' + (tags.length ? ` ${tags.join(' ')}` : ''),
-                createdAt: transactions.reduce((accumulator, tx) => {
-                    return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator
-                }, Infinity)
+                createdAt,
+                updatedAt
+            }
+
+            const label = getLabelForPaymentRequest({
+                request,
+                transactions,
+                rootState,
+                rootGetters
+            })
+
+            paymentRequests.push({
+                ...request,
+                label
             })
         })
 
