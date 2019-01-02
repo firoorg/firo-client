@@ -74,6 +74,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { convertToCoin } from '#/lib/convert'
 
 export default {
     name: 'MyZnode',
@@ -113,7 +114,7 @@ export default {
                 return `It seems that the masternode collateral is not an address of this wallet.`
             }
 
-            return `${received} XZC`
+            return `${convertToCoin(received)} XZC`
         },
 
         nextEstPayout () {
