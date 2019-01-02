@@ -14,6 +14,7 @@ import { getApiStatus, closeApiStatus, waitForApi, populateStore } from './ApiSt
 
 import App from './App'
 import Address from './Address'
+import Backup from './Backup'
 import Balance from './Balance'
 import Blockchain from './Blockchain'
 import PaymentRequest from './PaymentRequest'
@@ -25,6 +26,7 @@ import Znode from './Znode'
 const modules = {
     App,
     Address,
+    Backup,
     Balance,
     Blockchain,
     PaymentRequest,
