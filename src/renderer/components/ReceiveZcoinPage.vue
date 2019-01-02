@@ -93,8 +93,8 @@ const tableFields = [
     {
         name: RelativeDate,
         title: 'receive.overview.table__payment-requests.label__created',
-        dateField: 'createdAt',
-        sortField: 'createdAt',
+        dateField: 'updatedAt',
+        sortField: 'updatedAt',
         width: '30%'
     },
     {

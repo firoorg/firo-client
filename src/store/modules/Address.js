@@ -302,7 +302,9 @@ const getters = {
             let confirmations = 0
 
             if (txs.length) {
-                txs = txs.map((tx) => addConfirmationsToTransaction(tx, currentBlockHeight))
+                txs = txs
+                    .map((tx) => addConfirmationsToTransaction(tx, currentBlockHeight))
+                    .sort((a, b) => a.firstSeenAt > b.firstSeenAt)
 
                 confirmations = txs.reduce((accumulator, tx) => {
                     return (tx.confirmations > accumulator) ? tx.confirmations : accumulator
