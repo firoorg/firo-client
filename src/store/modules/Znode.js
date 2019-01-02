@@ -100,7 +100,7 @@ const actions = {
         let initialZnodes = {}
 
         commit(types.SET_TOTAL, initialState.total)
-        
+
         // add maximal 10 nodes at a time
         eachOfLimit(initialState.nodes, 10, async (znode, id) => {
             // const { id, znode } = znodeData
@@ -203,21 +203,32 @@ const getters = {
         }
     }),
 
-    myZnodes: (state, getters) => getters.allZnodes
-        // .slice(0, Math.min(getters.allZnodes.length, 200))
-        .filter((znode) => {
-            const { isMine } = znode
+    myZnodes: (state, getters) => {
+        return getters.allZnodes
+            .filter((znode) => {
+                const { isMine } = znode
 
-            return isMine
-        }),
+                return isMine
+            })
+    },
 
-    remoteZnodes: (state, getters) => getters.allZnodes.filter((znode) => {
-        const { isMine } = znode
+    isZnodeAddress: (state, getters) => {
+        return (address) => {
+            return !!getters.myZnodes.find(({ payeeAddress }) => payeeAddress === address)
+        }
+    },
 
-        return !isMine
-    }),
+    remoteZnodes: (state, getters) => {
+        return getters.allZnodes
+            .filter((znode) => {
+                const { isMine } = znode
+
+                return !isMine
+            })
+    },
 
     totalZnodes: (state, getters) => state.total > getters.allZnodes.length ? state.total : getters.allZnodes.length,
+
     enabledZnodes: (state, getters) => {
         const enabledZnodes = getters.allZnodes.filter((znode) => {
             return znode.status === 'ENABLED'
