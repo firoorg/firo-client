@@ -6,6 +6,7 @@ import { app } from 'electron'
 import { join } from 'path'
 
 import PidManager from './lib/core/PidManager'
+import menu from './lib/Menu'
 import network from './lib/network'
 
 import store from '../store/main'
@@ -92,8 +93,9 @@ windowManager.registerWindows(CONFIG.windows)
 windowManager.setupAppEvents()
 
 app.on('ready', () => {
-    store.dispatch('Window/show', 'main')
+    menu.init({ app, store })
 
+    store.dispatch('Window/show', 'main')
     clipboard.watch({ store, deeplink })
 })
 

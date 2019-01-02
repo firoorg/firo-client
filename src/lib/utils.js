@@ -71,3 +71,8 @@ export const sleep = function (ms) {
 export const ucFirst = function (s) {
     return s.charAt(0).toUpperCase() + s.slice(1)
 }
+
+export const isRenderer = function () {
+    return (process && process.type === 'renderer')
+}
+
