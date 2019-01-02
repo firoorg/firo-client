@@ -154,17 +154,20 @@ export default {
             return convertToCoin(this.amount)
         },
 
+        getAddress () {
+            return this.address.address || this.address
+        },
+
         getZcoinUri () {
             if (!this.address) {
                 return ''
             }
-            const address = this.address.address || this.address
             const params = []
             params.push(this.amount ? `amount=${this.amount}` : '')
             params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
             const paramsString = params.length ? `?${params.join('&')}` : ''
 
-            return `zcoin://${address}${paramsString}`
+            return `zcoin://${this.getAddress}${paramsString}`
         },
 
         hasAmountReceived () {
