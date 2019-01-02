@@ -21,6 +21,7 @@
                     :selected-row="selectedPaymentRequest"
                     :on-row-select="onTableRowSelect"
                     class="payment-requests-table"
+                    :sort-order="sortOrder"
                 >
                     <!--<template slot="created_at" scope="props">
                         <h1>{{ rowData.name }}</h1>
@@ -176,7 +177,9 @@ export default {
         },
 
         filteredPaymentRequests () {
-            return this.getFilteredByUrl(this.allPaymentRequests, ['label'])
+            return this
+                .getFilteredByUrl(this.allPaymentRequests, ['label'])
+                // .sort((a, b) => a.updatedAt > b.updatedAt)
         },
 
         allPaymentRequestsLength () {
@@ -185,7 +188,16 @@ export default {
 
         getNoDataMessage () {
             return this.allPaymentRequestsLength ? 'No Payment Requests found' : 'No Payment Requests created'
-        }
+        },
+
+        sortOrder () {
+            return [
+                {
+                    field: 'updatedAt',
+                    direction: 'desc'
+                }
+            ]
+        },
     },
 
     methods: {
