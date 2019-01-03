@@ -173,6 +173,9 @@ const getters = {
             const { amount: amountRequested } = state.paymentRequests[key]
             const address = walletAddresses.find((addr) => addr.address === key)
 
+            const { createdAt } = state.paymentRequests[key]
+            let updatedAt = createdAt
+
             let transactionsReceived = false
             let isFulfilled = false
             let isIncoming = false
@@ -203,6 +206,10 @@ const getters = {
                         isFulfilled = true
                         amountToDisplay = received
                     }
+
+                    updatedAt = transactions.reduce((accumulator, tx) => {
+                        return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
+                    }, updatedAt)
                 }
             }
 
