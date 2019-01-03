@@ -213,12 +213,6 @@ const getters = {
                 }
             }
 
-            const { createdAt } = state.paymentRequests[key]
-
-            const updatedAt = transactions.reduce((accumulator, tx) => {
-                return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
-            }, createdAt)
-
             requests.push({
                 ...state.paymentRequests[key],
                 amount: amountToDisplay,
