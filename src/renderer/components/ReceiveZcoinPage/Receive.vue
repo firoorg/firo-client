@@ -3,7 +3,10 @@
         <header class="receive-header">
             <div class="inner">
                 <span>{{ $d(new Date(createdAt), 'long') }}</span>
-                <editable-label :label="label">
+                <editable-label
+                    :label="label"
+                    :address="getAddress"
+                >
                     <natural-language-tags
                         :content="label"
                         tag-size="large"
