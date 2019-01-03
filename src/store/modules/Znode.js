@@ -212,6 +212,17 @@ const getters = {
             })
     },
 
+    getMyZnode: (state, getters) => {
+        return (address) => {
+            return getters.myZnodes
+                .find((znode) => {
+                    const { payeeAddress } = znode
+
+                    return payeeAddress === address
+                })
+        }
+    },
+
     isZnodeAddress: (state, getters) => {
         return (address) => {
             return !!getters.myZnodes.find(({ payeeAddress }) => payeeAddress === address)

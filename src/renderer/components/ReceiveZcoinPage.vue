@@ -177,9 +177,7 @@ export default {
         },
 
         filteredPaymentRequests () {
-            return this
-                .getFilteredByUrl(this.allPaymentRequests, ['label'])
-                // .sort((a, b) => a.updatedAt > b.updatedAt)
+            return this.getFilteredByUrl(this.allPaymentRequests, ['label'])
         },
 
         allPaymentRequestsLength () {

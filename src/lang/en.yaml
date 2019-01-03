@@ -259,6 +259,20 @@ send:
       description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
       label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
 
+znodes:
+  overview:
+    title: Znodes
+    description: Integer posuere erat a ante venenatis dapibus velit aliquet. Etiam porta sem magna mollis euismod.
+  my-znode:
+    label__status: Status
+    label__last-seen: Last Seen
+    label__active-since: Active Since
+    label__next-payout: Next Payout
+    label__last-payout: Last Payout
+    description__last-payout--nothing-received: No Payout yet!
+    label__amount-received: Received
+    label__payee: Payee
+
 onboarding:
   intro-screen:
     title: Welcome!

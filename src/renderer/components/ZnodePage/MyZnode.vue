@@ -2,16 +2,16 @@
     <div class="znode">
         <div>
             <header>
-                <h2>My Znode Name</h2>
+                <h2>{{ label }}</h2>
             </header>
 
             <div class="znode-stats">
                 <section class="status">
-                    <header>Status</header>
+                    <header>{{ $t('znodes.my-znode.label__status') }}</header>
                     <main>{{ status }}</main>
                 </section>
                 <section class="last-seen">
-                    <header>Last Seen</header>
+                    <header>{{ $t('znodes.my-znode.label__last-seen') }}</header>
                     <main>
                         <timeago
                             :datetime="lastSeen"
@@ -20,7 +20,7 @@
                     </main>
                 </section>
                 <section class="active-since">
-                    <header>Active since</header>
+                    <header>{{ $t('znodes.my-znode.label__active-since') }}</header>
                     <main>
                         <timeago
                             :datetime="activeSince"
@@ -29,7 +29,7 @@
                     </main>
                 </section>
                 <section class="next-payout">
-                    <header>Next Payout</header>
+                    <header>{{ $t('znodes.my-znode.label__next-payout') }}</header>
                     <main>
                         <timeago
                             v-if="lastPaidTime"
@@ -39,7 +39,7 @@
                     </main>
                 </section>
                 <section class="last-payout">
-                    <header>Last Payout</header>
+                    <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
                     <main>
                         <timeago
                             v-if="lastPaidTime"
@@ -47,15 +47,18 @@
                             :auto-update="30"
                         />
                         <span v-else>
-                            No Payout yet!
+                            {{ $t('znodes.my-znode.description__last-payout--nothing-received') }}
                         </span>
                     </main>
                 </section>
                 <section class="received">
-                    {{ payoutsReceived }}
+                    <header>{{ $t('znodes.my-znode.label__amount-received') }}</header>
+                    <main>
+                        {{ payoutsReceived }}
+                    </main>
                 </section>
                 <section class="payee">
-                    <header>Payee</header>
+                    <header>{{ $t('znodes.my-znode.label__payee') }}</header>
                     <main>{{ payeeAddress }}</main>
                 </section>
             </div>
@@ -80,6 +83,10 @@ export default {
     name: 'MyZnode',
 
     props: {
+        label: {
+            type: String,
+            required: true
+        },
         payeeAddress: {
             type: String,
             required: true
@@ -121,15 +128,12 @@ export default {
             const znodePaymentCycleInMs = Math.ceil(this.znodePaymentCycleInDays * 24 * 60 * 60 * 1000)
             const now = Date.now()
 
-            // const foo = now - this.lastPaidTime
-
             if (this.lastPaidTime) {
-                const estPayoutInMs = (now - this.lastPaidTime) - znodePaymentCycleInMs
-
-                return now + estPayoutInMs
+                return this.lastPaidTime + znodePaymentCycleInMs
             }
 
-            return 0
+            // todo discuss with @Sebastion
+            return this.activeSince + znodePaymentCycleInMs
         }
     }
 }

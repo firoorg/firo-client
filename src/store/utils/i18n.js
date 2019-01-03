@@ -23,6 +23,7 @@ const isZnodeAddress = function (transactions) {
 
 // if no label provided the client tries to come up with a good default
 export const getLabelForPaymentRequest = function ({ request, transactions, rootState, rootGetters }) {
+    const { address } = request
     const tags = transactions.reduce((accumulator, tx) => {
         const tag = `#${tx.category}`
 
@@ -31,8 +32,12 @@ export const getLabelForPaymentRequest = function ({ request, transactions, root
 
 
     if (isZnodeAddress(transactions)) {
-        return '#znode aliasNameHere #virtual'
+        const myNode = rootGetters['Znode/getMyZnode'](address)
+
+        if (myNode) {
+            return `${myNode.label} #znode #virtual`
+        }
     }
 
-    return '#virtual Payment Request' + (tags.length ? ` ${tags.join(' ')}` : '')
+    return 'Payment Request' + (tags.length ? ` ${tags.join(' ')}` : '') + ' #virtual'
 }
