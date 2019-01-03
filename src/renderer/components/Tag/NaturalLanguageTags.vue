@@ -9,12 +9,12 @@
                 v-if="word.type === 'tag'"
                 @click="() => onClick(word.content)"
             >
-                <BaseTag
+                <base-tag
                     :size="tagSize"
                     class="tag"
                 >
                     {{ word.content }}
-                </BaseTag>
+                </base-tag>
             </a>
             <span v-else>
                 {{ word.content }}
