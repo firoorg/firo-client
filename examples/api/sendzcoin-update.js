@@ -12,6 +12,14 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'get',
-    collection: 'avgblocktime',
+    type: 'update',
+    collection: 'sendZcoin',
+    auth: {
+        passphrase: config.passphrase
+    },
+    data: {
+        txid: "",
+        address: "",
+        label: "new label"
+    }
 }))

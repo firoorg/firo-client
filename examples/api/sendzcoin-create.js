@@ -14,15 +14,19 @@ requester.on('message', (msg) => {
 requester.send(JSON.stringify({
     type: 'create',
     collection: 'sendZcoin',
-	auth: {
-	    passphrase: config.passphrase
-	},
+    auth: {
+        passphrase: config.passphrase
+    },
     data: {
         addresses: {
-            "TBgWnt6ZGqNmkXr1tUsUFNREMQtehLYsVX": {
-                amount: 100000000,
+            "TF1UcaHazfyoPVGDh9da1sSPd4KjJFVyg9": {
+                amount: 300000000,
                 label: "label"
-            } 
+            }, 
+            "TRaTS9Q9QyYScxS6tiRdqNh76bw1FmTNKo": {
+                amount: 200000000,
+                label: "label"
+            }
         },
         feePerKb: 100000
     }

@@ -12,20 +12,14 @@ requester.on('message', (msg) => {
 
 // send stringified json
 requester.send(JSON.stringify({
-    type: 'create',
+    type: 'update',
     collection: 'sendPrivate',
-    data: {
-        address: "TUbC7KzQB1VyFzBv83p37VCEQiq2PUUAFy", // testnet external
-        //address: "TYyAHT6BvRtz72opiZ9QrQRjAozJcX9HDx",   // testnet internal
-        denomination: [
-            {
-                value: 1,
-                amount: 1
-            }
-        ],
-        label: 'label which belongs to the spend tx'
-    },
     auth: {
         passphrase: config.passphrase
     },
+    data: {
+        txid: "",
+        address: "",
+        label: "new label"
+    }
 }))

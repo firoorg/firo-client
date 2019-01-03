@@ -14,6 +14,6 @@ requester.send(JSON.stringify({
     type: 'create',
     collection: 'backup',
     data: {
-        directory: "/absolute/path/without/filename/",
+        directory: "/absolute/path/without/filename/"
     }
 }))
