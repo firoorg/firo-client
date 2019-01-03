@@ -71,7 +71,6 @@ export default {
         const preferences = this.getPreferences({ i18n, store })
 
         const template = [
-            /*
             {
                 label: 'Edit',
                 submenu: [
@@ -86,7 +85,6 @@ export default {
                     {role: 'selectall'}
                 ]
             },
-            */
             paymentsMenu,
             {
                 label: clientMenu.label,
