@@ -11,9 +11,6 @@ const isZnodeAddress = function (transactions) {
         return false
     }
 
-    // and have
-    console.log('received 1000 xzc in the first tx. good chance it is a znode....')
-
     if (potentialMiningTx && potentialMiningTx.length) {
         return potentialMiningTx.some((tx) => tx.category === 'mined')
     }

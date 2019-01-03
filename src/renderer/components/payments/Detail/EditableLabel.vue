@@ -97,6 +97,7 @@ export default {
                 address: this.address
             })
             this.sentLabel = true
+            this.isOpen = false
         }
     }
 }

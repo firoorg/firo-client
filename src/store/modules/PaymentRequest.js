@@ -198,7 +198,7 @@ const getters = {
                         return accumulator + tx.amount
                     }, 0)
 
-                    if (received >= amountRequested) {
+                    if (received && received >= amountRequested) {
                         isIncoming = false
                         isFulfilled = true
                         amountToDisplay = received
