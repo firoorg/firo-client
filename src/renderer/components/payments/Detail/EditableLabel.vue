@@ -63,6 +63,11 @@ export default {
         address: {
             type: String,
             required: true
+        },
+
+        createdAt: {
+            type: Number,
+            required: true
         }
     },
 
@@ -88,6 +93,7 @@ export default {
         onSubmitForm({ label }) {
             this.updateLabel({
                 label,
+                createdAt: this.createdAt,
                 address: this.address
             })
             this.sentLabel = true

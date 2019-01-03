@@ -27,11 +27,12 @@ export default {
             })
         },
 
-        updateLabel ({ label, address }) {
+        updateLabel ({ label, createdAt, address }) {
             this.send({
                 type: 'update',
                 data: {
                     label,
+                    createdAt,
                     id: address
                 }
             }, {

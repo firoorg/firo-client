@@ -143,19 +143,16 @@ const actions = {
         })
     },
 
-    [types.UPDATE_PAYMENT_REQUEST_LABEL] ({ commit, state, getters }, { label, address }) {
+    [types.UPDATE_PAYMENT_REQUEST_LABEL] ({ commit, state, getters }, { label, address, createdAt }) {
         const paymentRequestToUpdate = getters.getPaymentRequestForAddress(address)
 
-        if (!paymentRequestToUpdate) {
-            return
-        }
-
-        if (paymentRequestToUpdate.label === label) {
+        if (paymentRequestToUpdate && paymentRequestToUpdate.label === label) {
             return
         }
 
         commit(types.UPDATE_PAYMENT_REQUEST_LABEL, {
             label,
+            createdAt,
             address
         })
     }

@@ -6,6 +6,7 @@
                 <editable-label
                     :label="label"
                     :address="getAddress"
+                    :created-at="createdAt"
                 >
                     <natural-language-tags
                         :content="label"
