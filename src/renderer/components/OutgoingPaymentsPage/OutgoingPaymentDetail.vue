@@ -126,24 +126,14 @@ export default {
     },
     methods: {
         ...mapActions({
-            updateSendLabel: types.address.UPDATE_SEND_TX_LABEL,
-            updateSpendLabel: types.address.UPDATE_SPEND_TX_LABEL
+            updateLabel: types.address.UPDATE_TX_LABEL,
         }),
 
         onLabelUpdate({ label }) {
-            if (this.isPrivate) {
-                this.updateSpendLabel({
-                    label,
-                    id: this.id
-                })
-            }
-            else {
-                this.updateSendLabel({
-                    label,
-                    address: this.belongsToAddress,
-                    id: this.id
-                })
-            }
+            this.updateLabel({
+                label,
+                id: this.id
+            })
         },
 
         tagClicked (tag) {

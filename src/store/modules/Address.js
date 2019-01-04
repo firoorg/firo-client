@@ -78,8 +78,7 @@ const mutations = {
         ]
     },
 
-    [types.UPDATE_SEND_TX_LABEL] () {},
-    [types.UPDATE_SPEND_TX_LABEL] () {}
+    [types.UPDATE_TX_LABEL] () {}
 }
 
 const actions = {
@@ -291,28 +290,15 @@ const actions = {
         dispatch(types.SET_INITIAL_STATE, payload)
     },
 
-    [types.UPDATE_SEND_TX_LABEL] ({ commit, getters }, { id, label }) {
+    [types.UPDATE_TX_LABEL] ({ commit, getters }, { id, label }) {
         const tx = getters.getOutgoingTransactionById(id)
 
         if (!tx || tx.label === label) {
             return
         }
 
-        commit(types.UPDATE_SEND_TX_LABEL, {
+        commit(types.UPDATE_TX_LABEL, {
             address: tx.belongsToAddress,
-            txid: tx.txid,
-            label
-        })
-    },
-
-    [types.UPDATE_SPEND_TX_LABEL] ({ commit, getters }, { id, label }) {
-        const tx = getters.getOutgoingTransactionById(id)
-
-        if (!tx || tx.label === label) {
-            return
-        }
-
-        commit(types.UPDATE_SPEND_TX_LABEL, {
             txid: tx.txid,
             label
         })
