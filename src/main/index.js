@@ -10,6 +10,8 @@ import menu from './lib/Menu'
 import network from './lib/network'
 
 import store from '../store/main'
+import { setupWindowRouter } from '~/utils/routerHelper'
+
 import windowManager from './lib/windows'
 import deeplink from './lib/deeplink'
 import clipboard from './lib/clipboard'
@@ -54,6 +56,7 @@ if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
 const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
 
 store.replaceState(require('../store/initialState'))
+setupWindowRouter({ store })
 
 const startNetwork = function () {
     debug('STARTING NETWORK')

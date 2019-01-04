@@ -28,7 +28,10 @@ export default {
     getPreferences ({ i18n, store }) {
         return {
             label: i18n.t('application-menu.preferences.title'),
-            accelerator: 'CmdOrCtrl+,'
+            accelerator: 'CmdOrCtrl+,',
+            click () {
+                store.commit(types.router.ROUTE_TO_SETTINGS)
+            }
         }
     },
 
@@ -37,14 +40,23 @@ export default {
             label: i18n.t('application-menu.payments.title'),
             submenu: [
                 {
-                    label: i18n.t('application-menu.payments.label__create-payment-request')
+                    label: i18n.t('application-menu.payments.label__create-payment-request'),
+                    click () {
+                        store.commit(types.router.ROUTE_TO_CREATE_PAYMENT_REQUEST)
+                    }
                 },
                 {type: 'separator'},
                 {
-                    label: i18n.t('application-menu.payments.label__show-private-payments')
+                    label: i18n.t('application-menu.payments.label__show-private-payments'),
+                    click () {
+                        store.commit(types.router.ROUTE_TO_PRIVATE_SPEND)
+                    }
                 },
                 {
-                    label: i18n.t('application-menu.payments.label__show-public-payments')
+                    label: i18n.t('application-menu.payments.label__show-public-payments'),
+                    click () {
+                        store.commit(types.router.ROUTE_TO_PUBLIC_SEND)
+                    }
                 }
             ]
         }

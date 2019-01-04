@@ -14,6 +14,8 @@ import App from './App'
 import router from './router'
 import store from '../store/renderer'
 
+import { setupWindowRouter } from '~/utils/routerHelper'
+
 const app = require('electron').remote.app
 
 const customValidationRules = [
@@ -76,6 +78,8 @@ requireComponent.keys().forEach(fileName => {
 sync(store, router, {
     moduleName: 'AppRouter'
 })
+
+setupWindowRouter({ store, router })
 
 /* eslint-disable no-new */
 new Vue({
