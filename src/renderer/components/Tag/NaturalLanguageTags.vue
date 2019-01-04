@@ -100,10 +100,12 @@ export default {
 
         &.tag-medium {
             border-bottom: emRhythm(0.25, $silent: true) solid $color--polo;
+            margin-bottom: emRhythm(-0.25, $silent: true);
         }
 
         &.tag-large {
             border-bottom: emRhythm(0.5, $silent: true) solid $color--polo;
+            margin-bottom: emRhythm(-0.5, $silent: true)
         }
     }
 </style>

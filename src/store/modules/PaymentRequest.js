@@ -167,7 +167,7 @@ const getters = {
         const walletAddresses = rootGetters['Address/walletAddresses']
 
         for (let key in state.paymentRequests) {
-            const { amount: amountRequested } = state.paymentRequests[key]
+            const { amount: amountRequested = 0, label } = state.paymentRequests[key]
             const address = walletAddresses.find((addr) => addr.address === key)
 
             const { createdAt } = state.paymentRequests[key]
