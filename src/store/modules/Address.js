@@ -76,7 +76,10 @@ const mutations = {
             ...state[stack][address].transactions.filter((tx) => tx.id !== transaction.id),
             transaction
         ]
-    }
+    },
+
+    [types.UPDATE_SEND_TX_LABEL] () {},
+    [types.UPDATE_SPEND_TX_LABEL] () {}
 }
 
 const actions = {
@@ -258,7 +261,6 @@ const actions = {
     },
 
     [types.ADD_MINED_FROM_TX] ({ commit, dispatch, state }, minedTx) {
-        // todo create virtual payment request
         const txBasics = getTxBasics(minedTx)
         const { address, amount } = minedTx
 
@@ -287,6 +289,33 @@ const actions = {
         // todo clarify behaviour with @riordant
         const payload = !data.addresses ? { addresses: data } : data
         dispatch(types.SET_INITIAL_STATE, payload)
+    },
+
+    [types.UPDATE_SEND_TX_LABEL] ({ commit, getters }, { id, label }) {
+        const tx = getters.getOutgoingTransactionById(id)
+
+        if (!tx || tx.label === label) {
+            return
+        }
+
+        commit(types.UPDATE_SEND_TX_LABEL, {
+            address: tx.belongsToAddress,
+            txid: tx.txid,
+            label
+        })
+    },
+
+    [types.UPDATE_SPEND_TX_LABEL] ({ commit, getters }, { id, label }) {
+        const tx = getters.getOutgoingTransactionById(id)
+
+        if (!tx || tx.label === label) {
+            return
+        }
+
+        commit(types.UPDATE_SPEND_TX_LABEL, {
+            txid: tx.txid,
+            label
+        })
     }
 }
 
@@ -373,12 +402,24 @@ const getters = {
                 ...address.transactions.map((transaction) => {
                     const tx = addConfirmationsToTransaction(transaction, currentBlockHeight)
 
-                    return tx
+                    return {
+                        ...tx,
+                        belongsToAddress: key
+
+                    }
                 })
             ]
         }, [])
 
         return txs
+    },
+
+    getOutgoingTransactionById (state, getters) {
+        return (id) => {
+            return getters.getOutgoingTransactions.find((tx) => {
+                return tx.id === id
+            })
+        }
     }
 }
 

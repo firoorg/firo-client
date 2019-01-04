@@ -58,16 +58,6 @@ export default {
         label: {
             type: String,
             default: ''
-        },
-
-        address: {
-            type: String,
-            required: true
-        },
-
-        createdAt: {
-            type: Number,
-            required: true
         }
     },
 
@@ -87,15 +77,11 @@ export default {
 
     methods: {
         ...mapActions({
-            updateLabel: types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL
         }),
 
         onSubmitForm({ label }) {
-            this.updateLabel({
-                label,
-                createdAt: this.createdAt,
-                address: this.address
-            })
+            console.log('submitting label edit form', label)
+            this.$emit('submit', { label })
             this.sentLabel = true
             this.isOpen = false
         }

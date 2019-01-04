@@ -20,6 +20,7 @@
             <base-button
                 v-close-popover
                 size="small"
+                type="button"
                 is-dark
                 is-outline
             >

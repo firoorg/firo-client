@@ -3,13 +3,16 @@
         <header class="outgoing-header">
             <div class="inner">
                 <span>{{ $d(new Date(firstSeenAt), 'long') }}</span>
-                <h2>
+                <editable-label
+                    :label="labelOrPlaceholder"
+                    @submit="onLabelUpdate"
+                >
                     <natural-language-tags
                         :content="labelOrPlaceholder"
                         tag-size="large"
                         :on-tag-click="tagClicked"
                     />
-                </h2>
+                </editable-label>
                 <span v-if="isPrivate">
                     {{ amountInBaseCoin }} XZC {{ $t('send.detail-entry-transaction.label__spend') }}
                 </span>
@@ -27,7 +30,7 @@
                 class="tx-headline"
                 v-html="$t('send.detail-entry-transaction.title__transaction')"
             />
-            <transactions-list :transactions="transaction" />
+            <transactions-list :transactions="[getOutgoingTransactionById(id)]" />
         </div>
 
         <div class="actions">
@@ -40,18 +43,21 @@
 
 <script>
 import { shell } from 'electron'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+
+import types from '~/types'
 
 import { convertToCoin } from '#/lib/convert'
 
 import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 import PaymentStatus from '@/components/Icons/PaymentStatus'
 import TransactionsList from '@/components/payments/TransactionsList'
+import EditableLabel from '@/components/./payments/Detail/EditableLabel'
 
 export default {
     name: 'OutgoingPaymentDetail',
     components: {
-
+        EditableLabel,
         PaymentStatus,
         NaturalLanguageTags,
         TransactionsList
@@ -68,6 +74,10 @@ export default {
         },
         amount: {
             type: Number,
+            required: true
+        },
+        belongsToAddress: {
+            type: String,
             required: true
         },
         firstSeenAt: {
@@ -95,19 +105,11 @@ export default {
     computed: {
         ...mapGetters({
             isTestnet: 'Blockchain/isTestnet',
-            transactions: 'Address/getOutgoingTransactions'
+            getOutgoingTransactionById: 'Address/getOutgoingTransactionById'
         }),
 
         amountInBaseCoin () {
             return convertToCoin(this.amount)
-        },
-
-        transaction () {
-            return this.transactions.filter((tx) => {
-                const { id } = tx
-
-                return id === this.id
-            })
         },
 
         labelOrPlaceholder () {
@@ -123,6 +125,27 @@ export default {
         }
     },
     methods: {
+        ...mapActions({
+            updateSendLabel: types.address.UPDATE_SEND_TX_LABEL,
+            updateSpendLabel: types.address.UPDATE_SPEND_TX_LABEL
+        }),
+
+        onLabelUpdate({ label }) {
+            if (this.isPrivate) {
+                this.updateSpendLabel({
+                    label,
+                    id: this.id
+                })
+            }
+            else {
+                this.updateSendLabel({
+                    label,
+                    address: this.belongsToAddress,
+                    id: this.id
+                })
+            }
+        },
+
         tagClicked (tag) {
             this.$router.push({
                 name: this.$router.currentRoute.name || 'send-zcoin',

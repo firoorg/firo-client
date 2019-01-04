@@ -5,8 +5,7 @@
                 <span>{{ $d(new Date(createdAt), 'long') }}</span>
                 <editable-label
                     :label="label"
-                    :address="getAddress"
-                    :created-at="createdAt"
+                    @submit="onLabelUpdate"
                 >
                     <natural-language-tags
                         :content="label"
@@ -190,12 +189,21 @@ export default {
     },
     methods: {
         ...mapActions({
-            setLastSeen: types.paymentrequest.SET_PAYMENT_REQUEST_LAST_SEEN
+            setLastSeen: types.paymentrequest.SET_PAYMENT_REQUEST_LAST_SEEN,
+            updateLabel: types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL
         }),
 
         toggleQrCode () {
             console.log('toggle qr code')
             this.showQrCode = !this.showQrCode
+        },
+
+        onLabelUpdate({ label }) {
+            this.updateLabel({
+                label,
+                createdAt: this.createdAt,
+                address: this.getAddress
+            })
         },
 
         tagClicked (tag) {
