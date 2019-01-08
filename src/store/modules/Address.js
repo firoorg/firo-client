@@ -78,7 +78,26 @@ const mutations = {
         ]
     },
 
-    [types.UPDATE_TX_LABEL] () {}
+    [types.UPDATE_TX_LABEL] () {},
+
+    [types.MERGE_UPDATED_OUTGOING_TX_LABEL] (state, { txid, address, label }) {
+        if (!state[THIRD_PARTY_ADDRESS_KEY][address]) {
+            return
+        }
+
+        const transactions = state[THIRD_PARTY_ADDRESS_KEY][address].transactions.map((tx) => {
+            if (tx.txid === txid) {
+                return {
+                    ...tx,
+                    label
+                }
+            }
+
+            return tx
+        })
+
+        state[THIRD_PARTY_ADDRESS_KEY][address].transactions = transactions
+    }
 }
 
 const actions = {
@@ -302,6 +321,17 @@ const actions = {
             txid: tx.txid,
             label
         })
+    },
+
+    [types.UPDATED_TX_LABEL] ({ commit, state, getters }, data) {
+        const { txid, address, label } = data
+        const tx = getters.getOutgoingTransactionByTxidAndAddress({ txid, address })
+
+        if (!tx || tx.label === label) {
+            return
+        }
+
+        commit(types.MERGE_UPDATED_OUTGOING_TX_LABEL, { txid, address, label })
     }
 }
 
@@ -404,6 +434,17 @@ const getters = {
         return (id) => {
             return getters.getOutgoingTransactions.find((tx) => {
                 return tx.id === id
+            })
+        }
+    },
+
+    getOutgoingTransactionByTxidAndAddress (state, getters) {
+        return ({ txid, address }) => {
+            return getters.getOutgoingTransactions.find((tx) => {
+                return (
+                    tx.txid === txid &&
+                    tx.belongsToAddress === address
+                )
             })
         }
     }
