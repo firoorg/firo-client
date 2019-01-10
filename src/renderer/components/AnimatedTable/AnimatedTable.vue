@@ -6,7 +6,7 @@
             :fields="getFieldsWithLocalizedTitle"
             :per-page="perPage"
             :track-by="trackBy"
-            :sort-order="sortOrder"
+            :_sort-order="sortOrder"
             :data-manager="dataManager"
             pagination-path="pagination"
             :row-transition-name="rowTransition"
@@ -157,13 +157,17 @@ export default {
 
             let local = this.data
 
-            // sortOrder can be empty, so we have to check for that as well
-            if (sortOrder.length > 0) {
+            // see if we got a sort order passed in into the call if not,
+            // fall back to the optional prop
+            const orderBy = sortOrder.length ? sortOrder : this.sortOrder
+
+            // sortOrder can still be empty, so we have to check for that as well
+            if (orderBy.length > 0) {
                 // console.log('orderBy:', sortOrder[0].sortField, sortOrder[0].direction)
                 local = _.orderBy(
                     local,
-                    sortOrder[0].sortField,
-                    sortOrder[0].direction
+                    orderBy[0].sortField,
+                    orderBy[0].direction
                 )
             }
 

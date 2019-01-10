@@ -191,11 +191,11 @@ export default {
         sortOrder () {
             return [
                 {
-                    field: 'updatedAt',
+                    sortField: 'updatedAt',
                     direction: 'desc'
                 }
             ]
-        },
+        }
     },
 
     methods: {

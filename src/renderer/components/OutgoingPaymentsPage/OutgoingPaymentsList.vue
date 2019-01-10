@@ -16,6 +16,7 @@
             :selected-row="selectedPayment"
             no-data-message="No Payments made yet."
             :on-row-select="onTableRowSelect"
+            :sort-order="sortOrder"
         >
             <template
                 slot="label"
@@ -106,7 +107,15 @@ export default {
 
         filteredTransactions () {
             return this.getFilteredByUrl(this.transactionsWithCategoryTags, ['label', 'category'])
-                .sort((a, b) => a.firstSeenAt < b.firstSeenAt)
+        },
+
+        sortOrder () {
+            return [
+                {
+                    sortField: 'firstSeenAt',
+                    direction: 'desc'
+                }
+            ]
         }
     },
 
@@ -157,14 +166,19 @@ export default {
         addCategoryTagToLabel (rowData) {
             const { label: value, category } = rowData
             const label = value || this.$t('send.table__outgoing-payments.label__tx-nolabel')
+            let catLabel = ''
 
             if (category === 'send') {
-                return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
+                catLabel = `#${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
             } else if (category === 'spendOut') {
-                return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
+                catLabel = `#${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
             }
 
-            return label
+            if (label.includes(catLabel)) {
+                return label
+            }
+
+            return `${label} ${catLabel}`
         }
     }
 }
