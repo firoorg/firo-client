@@ -1,6 +1,6 @@
 <template>
     <section class="outgoing-payments">
-        <div class="scrollable-height">
+        <div v-scrollable>
             <section class="outgoing-requests-list">
                 <component
                     :is="fromClipboardPopoverName"

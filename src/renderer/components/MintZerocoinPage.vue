@@ -1,6 +1,6 @@
 <template>
     <section class="mint-zerocoin">
-        <div class="scrollable-height">
+        <div v-scrollable>
             <section class="mint-selection">
                 <header>
                     <h1 v-html="$t('mint.overview.title')" />
@@ -63,7 +63,10 @@
                 </div>
             </section>
         </div>
-        <section class="current-mint-detail scrollable-height">
+        <section
+            v-scrollable
+            class="current-mint-detail"
+        >
             <template v-if="!hasCurrentMints && hasMintsInProgress">
                 <section class="mints-in-progress">
                     <h2 v-html="$t('mint.detail-process-mint.title')" />

@@ -1,7 +1,8 @@
 <template>
     <section class="spend-zerocoin-queue-form">
         <form
-            class="send scrollable-height"
+            v-scrollable
+            class="send scrollable-dark"
             @submit.prevent="submitForm"
         >
             <div
@@ -155,7 +156,7 @@ export default {
         header {
             // margin-left: emRhythm(3, $ms-up2);
             margin-bottom: emRhythm(7);
-            margin-left: emRhythm(3, $ms-up2);
+            //margin-left: emRhythm(3, $ms-up2);
             margin-bottom: emRhythm(7, $ms-up2);
 
             @include h2-with-description(inherit, $color--polo-dark);
@@ -167,7 +168,7 @@ export default {
     }
 
     .send {
-        padding: emRhythm(5) emRhythm(6);
+        padding: emRhythm(5) emRhythm(6) 0;
         height: 100vh;
         box-sizing: border-box;
     }
@@ -232,7 +233,7 @@ export default {
     .has-divider {
         margin-top: emRhythm(3);
         @include dark-divider-top-with-gradient();
-        padding-bottom: 0;
+        padding-bottom: emRhythm(5);
 
         .fees-and-amount {
             margin-top: 0;

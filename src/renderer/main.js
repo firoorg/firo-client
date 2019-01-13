@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
+import Scrollable from '@/directives/scrollable'
+
 import i18n from '#/lib/i18n'
 
 import upperFirst from 'lodash/upperFirst'
@@ -43,6 +45,7 @@ Vue.use(VeeValidate, {
     fieldsBagName: 'validationFields',
     inject: false
 })
+Vue.directive('scrollable', Scrollable)
 Vue.use(BindScopedSlotsPlugin)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))

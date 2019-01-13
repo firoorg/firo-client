@@ -1,5 +1,8 @@
 <template>
-    <div class="receive scrollable-height_">
+    <div
+        v-scrollable
+        class="receive"
+    >
         <header class="receive-header">
             <div class="inner">
                 <span>{{ $d(new Date(createdAt), 'long') }}</span>
@@ -228,6 +231,7 @@ export default {
 <style lang="scss" scoped>
     .receive {
         @include detail-wrap();
+        height: 100vh;
     }
 
     .receive-header {

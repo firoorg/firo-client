@@ -4,7 +4,8 @@
         leave-active-class="slide-up-leave-active"
     >
         <form
-            class="create scrollable-height"
+            v-scrollable
+            class="create scrollable-medium"
             @submit.prevent="submitForm"
         >
             <div class="form">
@@ -187,7 +188,7 @@ export default {
         display: grid;
         grid-template-rows: auto auto;
 
-        min-height: 100%;
+        height: 100vh;
         padding: emRhythm(5) emRhythm(6);
         box-sizing: border-box;
 

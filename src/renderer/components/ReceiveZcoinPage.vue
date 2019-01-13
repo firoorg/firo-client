@@ -1,6 +1,6 @@
 <template>
     <section class="receive-zcoin">
-        <div class="scrollable-height">
+        <div v-scrollable>
             <section class="paymentrequest-list">
                 <h1 v-html="$t('receive.overview.title')" />
 
@@ -241,7 +241,7 @@ export default {
         display: grid;
         box-sizing: border-box;
         grid-template-columns: 1fr 30rem;
-        grid-column-gap: emRhythm($scrollbar-padding, $silent: true);
+        //grid-column-gap: emRhythm($scrollbar-padding, $silent: true);
     }
 
     .paymentrequest-list,
@@ -250,15 +250,11 @@ export default {
     }
 
     .paymentrequest-list {
-        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(4) emRhythm(5) emRhythm(4);
     }
 
     .payment-requests-table + .onboarding {
         margin-top: emRhythm(8);
-    }
-
-    .receive-zcoin > .scrollable-height {
-        @include scrollbar-on-hover();
     }
 
     .create-payment-request {
@@ -272,7 +268,7 @@ export default {
     }
 
     .paymentrequest-detail-route {
-        max-height: 100vh;
+        //max-height: 100vh;
         box-sizing: border-box;
     }
 

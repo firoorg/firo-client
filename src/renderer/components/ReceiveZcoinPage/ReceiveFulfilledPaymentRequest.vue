@@ -16,6 +16,7 @@
             <div :style="{ height: '100%' }">
                 <unexpected-transaction-popover :is-reused="isReused">
                     <transactions-list
+                        v-scrollable
                         :transactions="transactions"
                         class="scrollable-container"
                     />

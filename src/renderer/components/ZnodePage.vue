@@ -1,6 +1,9 @@
 <template>
     <section class="znode-page">
-        <div class="scrollable-height">
+        <div
+            v-scrollable
+            class="scrollable-dark"
+        >
             <div class="znode-page-inner">
                 <section class="title-bar">
                     <header>
@@ -40,7 +43,10 @@
                             Avgerage Days for Payout
                         </div>
                     </div>
-                    <div class="stat">
+                    <div
+                        v-if="myZnodes.length"
+                        class="stat"
+                    >
                         <div class="value">
                             17.23
                         </div>
@@ -131,17 +137,18 @@ export default {
         box-sizing: border-box;
         //grid-template-columns: 3fr  minmax(30rem, 2fr);
         background: $color--private;
-        padding-right: 6.25rem;
+        //padding-right: 6.25rem;
 
-        & > .scrollable-height {
-            @include scrollbar-on-hover($color--comet-dark-mixed);
+        & > div {
+            height: 100%;
+            //@include scrollbar-on-hover($color--comet-dark-mixed);
         }
     }
 
     .znode-page-inner {
         position: relative;
         background: $color--private;
-        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(4);
     }
 
     .title-bar {
@@ -153,7 +160,7 @@ export default {
 
         display: flex;
         justify-content: space-between;
-        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(4) emRhythm(5) emRhythm(4);
         z-index: 10;
 
         header {

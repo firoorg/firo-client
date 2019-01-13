@@ -20,7 +20,8 @@ body {
     h2 {
         @include font-black();
         @include setType(4, $ms-up2);
-        margin-top: emRhythm(2, $ms-up2);
+        padding-top: emRhythm(2, $ms-up2);
+        margin-top: 0;
         margin-bottom: emRhythm(4, $ms-up2);
     }
 

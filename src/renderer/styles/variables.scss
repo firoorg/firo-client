@@ -49,7 +49,18 @@ $input-bleed: 2;
 $detail-view--min-width: 30rem; // 34rem
 
 // scrollbar
-$scrollbar-padding: 0.5;
+//$scrollbar-padding: 0.5;
+$scroll-color: mix($color--polo, $color--polo-medium);
+$scroll-color-hover: mix($color--polo-dark, $color--polo);
+$scroll-background-hover: $color--polo-light;
+
+$scroll-color-medium: mix($color--comet-dark, $color--comet);
+$scroll-color-hover-medium: mix($color--comet-dark-mixed, $color--comet-dark);
+$scroll-background-hover-medium: $color--comet-light;
+
+$scroll-color-dark: $color--comet;
+$scroll-color-hover-dark: $color--comet-medium;
+$scroll-background-hover-dark: $color--comet-dark-mixed;
 
 // $color--bg-header: #B3C0D1;
 

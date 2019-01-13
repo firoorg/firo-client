@@ -1,39 +1,41 @@
 <template>
     <section class="send-zcoin-queue-form">
-        <form
-            class="send scrollable-height"
-            @submit.prevent="submitForm"
-        >
-            <div
-                ref="grid"
-                class="grid"
+        <div v-scrollable>
+            <form
+                class="send"
+                @submit.prevent="submitForm"
             >
-                <div class="form">
-                    <header>
-                        <div>
-                            <h2 v-html="$t('send.public.detail-public-send.title')" />
-                            <p v-html="$t('send.public.detail-public-send.description')" />
-                        </div>
-                        <pending-payments-queue
-                            :is-disabled="false"
-                            :boundaries-element="$refs.grid"
-                        />
-                    </header>
+                <div
+                    ref="grid"
+                    class="grid"
+                >
+                    <div class="form">
+                        <header>
+                            <div>
+                                <h2 v-html="$t('send.public.detail-public-send.title')" />
+                                <p v-html="$t('send.public.detail-public-send.description')" />
+                            </div>
+                            <pending-payments-queue
+                                :is-disabled="false"
+                                :boundaries-element="$refs.grid"
+                            />
+                        </header>
 
-                    <send-zcoin-form
-                        :is-disabled="false"
-                        @form-validated="setFormValidationStatus"
+                        <send-zcoin-form
+                            :is-disabled="false"
+                            @form-validated="setFormValidationStatus"
+                        />
+                    </div>
+
+                    <send-zcoin-steps
+                        :form-is-valid="formSectionIsValid"
+                        :cleanup-form="cleanupForm"
+                        :update-transaction-fee="updateTransactionFee"
+                        @steps-done="clearPendingPayments"
                     />
                 </div>
-
-                <send-zcoin-steps
-                    :form-is-valid="formSectionIsValid"
-                    :cleanup-form="cleanupForm"
-                    :update-transaction-fee="updateTransactionFee"
-                    @steps-done="clearPendingPayments"
-                />
-            </div>
-        </form>
+            </form>
+        </div>
     </section>
 </template>
 
@@ -181,7 +183,7 @@ export default {
     }
 
     .send {
-        padding: emRhythm(5) emRhythm(6);
+        padding: emRhythm(5) emRhythm(6) 0;
         height: 100vh;
         box-sizing: border-box;
     }
@@ -225,7 +227,7 @@ export default {
     fieldset {
         margin: 0;
         padding: 0;
-        height: 100%;
+        // height: 100%;
         border: none;
 
         &[disabled] {
@@ -235,6 +237,10 @@ export default {
                 pointer-events: none;
             }
         }
+    }
+
+    .button-wrap {
+        padding-bottom: emRhythm(5);
     }
 
     /*.confirmation-popover {

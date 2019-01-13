@@ -1,0 +1,187 @@
+/*
+ * Container style
+ */
+.ps {
+  overflow: hidden !important;
+  overflow-anchor: none;
+  -ms-overflow-style: none;
+  touch-action: auto;
+  -ms-touch-action: auto;
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  display: none;
+  width: 1px;
+}
+
+/*
+ * Scrollbar rail styles
+ */
+.ps__rail-x,
+.ps__rail-y {
+  -webkit-app-region: initial;
+}
+
+.ps__rail-x {
+  display: none;
+  opacity: 0.4;
+  transition: background-color .2s linear, opacity .2s linear;
+  -webkit-transition: background-color .2s linear, opacity .2s linear;
+  height: 15px;
+  /* there must be 'bottom' or 'top' for ps__rail-x */
+  bottom: 0px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__rail-y {
+  display: none;
+  opacity: 0.4;
+  transition: background-color .2s linear, opacity .2s linear;
+  -webkit-transition: background-color .2s linear, opacity .2s linear;
+  width: 15px;
+  /* there must be 'right' or 'left' for ps__rail-y */
+  right: 0;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps--active-x > .ps__rail-x,
+.ps--active-y > .ps__rail-y {
+  display: block;
+  background-color: transparent;
+}
+
+.ps:hover > .ps__rail-x,
+.ps:hover > .ps__rail-y,
+.ps--focus > .ps__rail-x,
+.ps--focus > .ps__rail-y,
+.ps--scrolling-x > .ps__rail-x,
+.ps--scrolling-y > .ps__rail-y {
+  opacity: 0.75;
+}
+
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+  background-color: $scroll-background-hover;
+  opacity: 0.9;
+}
+
+.scrollable-medium .ps__rail-x:hover,
+.scrollable-medium .ps__rail-y:hover,
+.scrollable-medium .ps__rail-x:focus,
+.scrollable-medium .ps__rail-y:focus,
+.scrollable-medium .ps__rail-x.ps--clicking,
+.scrollable-medium .ps__rail-y.ps--clicking {
+  background-color: $scroll-background-hover-medium;
+}
+
+.scrollable-dark .ps__rail-x:hover,
+.scrollable-dark .ps__rail-y:hover,
+.scrollable-dark .ps__rail-x:focus,
+.scrollable-dark .ps__rail-y:focus,
+.scrollable-dark .ps__rail-x.ps--clicking,
+.scrollable-dark .ps__rail-y.ps--clicking {
+  background-color: $scroll-background-hover-dark;
+}
+
+/*
+ * Scrollbar thumb styles
+ */
+.ps__thumb-x {
+  background-color: $scroll-color;
+  border-radius: 6px;
+  transition: background-color .2s linear, height .2s ease-in-out;
+  -webkit-transition: background-color .2s linear, height .2s ease-in-out;
+  height: 6px;
+  /* there must be 'bottom' for ps__thumb-x */
+  bottom: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.scrollable-medium .ps__thumb-x {
+  background-color: $scroll-color-medium;
+}
+
+
+.scrollable-dark .ps__thumb-x {
+  background-color: $scroll-color-dark;
+}
+
+.ps__thumb-y {
+  background-color: $scroll-color;
+  border-radius: 6px;
+  transition: background-color .2s linear, width .2s ease-in-out;
+  -webkit-transition: background-color .2s linear, width .2s ease-in-out;
+  width: 6px;
+  /* there must be 'right' for ps__thumb-y */
+  right: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.scrollable-medium .ps__thumb-y {
+  background-color: $scroll-color-medium;
+}
+
+.scrollable-dark .ps__thumb-y {
+  background-color: $scroll-color-dark;
+}
+
+.ps__rail-x:hover > .ps__thumb-x,
+.ps__rail-x:focus > .ps__thumb-x,
+.ps__rail-x.ps--clicking .ps__thumb-x {
+  background-color: $scroll-color-hover;
+  height: 11px;
+}
+
+.scrollable-medium .ps__rail-x:hover > .ps__thumb-x,
+.scrollable-medium .ps__rail-x:focus > .ps__thumb-x,
+.scrollable-medium .ps__rail-x.ps--clicking .ps__thumb-x {
+  background-color: $scroll-color-hover-medium;
+}
+
+.scrollable-dark .ps__rail-x:hover > .ps__thumb-x,
+.scrollable-dark .ps__rail-x:focus > .ps__thumb-x,
+.scrollable-dark .ps__rail-x.ps--clicking .ps__thumb-x {
+  background-color: $scroll-color-hover-dark;
+}
+
+.ps__rail-y:hover > .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
+.ps__rail-y.ps--clicking .ps__thumb-y {
+  background-color: $scroll-color-hover;
+  width: 11px;
+}
+
+.scrollable-medium .ps__rail-y:hover > .ps__thumb-y,
+.scrollable-medium .ps__rail-y:focus > .ps__thumb-y,
+.scrollable-medium .ps__rail-y.ps--clicking .ps__thumb-y {
+  background-color: $scroll-color-hover-medium;
+}
+
+.scrollable-dark .ps__rail-y:hover > .ps__thumb-y,
+.scrollable-dark .ps__rail-y:focus > .ps__thumb-y,
+.scrollable-dark .ps__rail-y.ps--clicking .ps__thumb-y {
+  background-color: $scroll-color-hover-dark;
+}
+
+/* MS supports */
+@supports (-ms-overflow-style: none) {
+  .ps {
+    overflow: auto !important;
+  }
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .ps {
+    overflow: auto !important;
+  }
+}
+
