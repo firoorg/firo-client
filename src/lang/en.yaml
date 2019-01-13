@@ -263,6 +263,8 @@ znodes:
   overview:
     title: Znodes
     description: Integer posuere erat a ante venenatis dapibus velit aliquet. Etiam porta sem magna mollis euismod.
+    table__znodes:
+      placeholder__filter: Filter Znodes
   my-znode:
     label__status: Status
     label__last-seen: Last Seen
