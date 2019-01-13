@@ -4,6 +4,7 @@
         :fields="tableFields"
         track-by="id"
         :per-page="100"
+        :sort-order="sortOrder"
     />
 </template>
 
@@ -85,6 +86,15 @@ export default {
     computed: {
         remoteZnodesSorted() {
             return [...this.remoteZnodes].sort((a, b) => a.firstSeenAt < b.firstSeenAt)
+        },
+
+        sortOrder () {
+            return [
+                {
+                    sortField: 'rank',
+                    direction: 'asc'
+                }
+            ]
         }
     }
 }
