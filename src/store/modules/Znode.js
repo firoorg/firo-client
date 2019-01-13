@@ -196,10 +196,13 @@ const getters = {
         const lastPayoutTimestamp = 0 // todo get state from address module
 
         const { payeeAddress: id } = znode
+        const authorityIp = znode.authority ? znode.authority.ip : ''
+
         return {
             ...znode,
             lastPayoutTimestamp,
-            id
+            id,
+            authorityIp
         }
     }),
 

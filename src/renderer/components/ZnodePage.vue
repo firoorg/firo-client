@@ -7,16 +7,21 @@
             <div class="znode-page-inner">
                 <section class="title-bar">
                     <header>
-                        <h1>Znodes</h1>
-                        <p>Integer posuere erat a ante venenatis dapibus velit aliquet. Etiam porta sem magna mollis euismod.</p>
+                        <h1>{{ $t('znodes.overview.title') }}</h1>
+                        <p>{{ $t('znodes.overview.description') }}</p>
                     </header>
 
-                    <form>
-                        <!--<input type="text" placeholder="Search for xxx">-->
+                    <div class="search-form">
+                        <base-filter-input
+                            v-model="urlFilter"
+                            type="text"
+                            class="table-filter-input"
+                            :placeholder="$t('znodes.overview.table__znodes.placeholder__filter')"
+                        />
                         <!--<div class="internal-only">
                             For Internal Use Only!!!
                         </div>-->
-                    </form>
+                    </div>
                 </section>
 
                 <znode-map
@@ -65,7 +70,7 @@
                 </section>
 
                 <section class="remote-znodes">
-                    <remote-znodes-list :remote-znodes="remoteZnodes" />
+                    <remote-znodes-list :remote-znodes="filteredRemoteZnodes" />
                 </section>
             </div>
         </div>
@@ -75,6 +80,8 @@
 <script>
 import { mapGetters } from 'vuex'
 // import types from '~/types'
+
+import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
 
 import MyZnode from '@/components/ZnodePage/MyZnode'
 import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
@@ -88,6 +95,10 @@ export default {
         MyZnode,
         ZnodeMap
     },
+
+    mixins: [
+        FilterByUrlParamMixin
+    ],
 
     data () {
         return {
@@ -126,7 +137,11 @@ export default {
             remoteZnodes: 'Znode/remoteZnodes',
             totalZnodes: 'Znode/totalZnodes',
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
-        })
+        }),
+
+        filteredRemoteZnodes () {
+            return this.getFilteredByUrl(this.remoteZnodes, ['status', 'payeeAddress', 'authorityIp'])
+        },
     }
 }
 </script>
@@ -160,7 +175,7 @@ export default {
 
         display: flex;
         justify-content: space-between;
-        padding: emRhythm(5) emRhythm(4) emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(4);
         z-index: 10;
 
         header {
@@ -181,8 +196,14 @@ export default {
             }
         }
 
-        form {
+        .search-form {
+            position: fixed;
+            right: emRhythm(4);
+            width: 20rem;
 
+            .table-filter-input {
+                width: 100%;
+            }
         }
     }
 

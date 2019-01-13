@@ -1,5 +1,6 @@
 <template>
     <animated-table
+        class="remote-znode-list"
         :data="remoteZnodesSorted"
         :fields="tableFields"
         track-by="id"
@@ -31,13 +32,15 @@ const tableFields = [
     {
         name: 'rank',
         title: 'Rank',
-        sortField: 'rank'
+        sortField: 'rank',
+        width: '10%'
     },
     {
         name: RelativeDate,
         title: 'Active Since',
         dateField: 'activeSince',
-        sortField: 'activeSince'
+        sortField: 'activeSince',
+        width: '20%'
     },
     {
         name: RelativeDate,
@@ -45,12 +48,13 @@ const tableFields = [
         // title: 'znodes.table__remote-znodes.label__lastSeen',
         dateField: 'lastSeen',
         sortField: 'lastSeen',
-        width: '30%'
+        width: '20%'
     },
     {
         name: 'status',
         title: 'Status',
-        sortField: 'status'
+        sortField: 'status',
+        width: '25%'
     },
     {
         name: 'authority',
@@ -58,7 +62,8 @@ const tableFields = [
         sortField: 'label',
         formatter ({ ip, port }) {
             return `${ip}<span class="port">:${port}</span>`
-        }
+        },
+        width: '25%'
     }
 ]
 
@@ -100,6 +105,32 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.remote-znode-list /deep/ table.vuetable {
+    border-collapse: separate;
+    border-spacing: 0 1em;
 
+    .vuetable-body {
+        color: $color--comet-dark-mixed;
+
+        tr {
+            background: $color--white-light;
+            //padding-bottom: emRhythm(3);
+            //@include box-shadow-large();
+            @include glow-small-box();
+            cursor: default;
+            //line-height: 40px;
+        }
+
+        td {
+            border-top: 0;
+            padding-top: emRhythm(2);
+            padding-bottom: emRhythm(2);
+
+            &.vuetable-td-rank {
+                @include font-heavy();
+            }
+        }
+    }
+}
 </style>
