@@ -52,6 +52,7 @@ export default {
     .vuetable-th-component-payment-request-status {
         padding-left: 0.85rem;
         padding-right: 0;
+        min-width: 2rem;
     }
 
     .icon {
