@@ -1,7 +1,10 @@
 <template>
     <section class="receive-zcoin">
-        <div v-scrollable>
-            <section class="paymentrequest-list">
+        <div class="window-height">
+            <section
+                v-scrollable
+                class="paymentrequest-list"
+            >
                 <h1 v-html="$t('receive.overview.title')" />
 
                 <div class="table-filter-input-wrap">
@@ -247,6 +250,11 @@ export default {
     .paymentrequest-list,
     .paymentrequest-detail {
         position: relative;
+    }
+
+    .paymentrequest-list {
+        height: 100%;
+        box-sizing: border-box;
     }
 
     .paymentrequest-list {

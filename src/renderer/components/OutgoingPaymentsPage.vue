@@ -1,7 +1,10 @@
 <template>
     <section class="outgoing-payments">
-        <div v-scrollable>
-            <section class="outgoing-requests-list">
+        <div class="window-height">
+            <section
+                v-scrollable
+                class="outgoing-requests-list"
+            >
                 <component
                     :is="fromClipboardPopoverName"
                     @update-form="onFormUpdateFromClipboardPopover"
@@ -115,6 +118,8 @@ export default {
 
     .outgoing-requests-list {
         padding: emRhythm(5) emRhythm(4);
+        box-sizing: border-box;
+        height: 100%;
     }
 
     .paymentrequest-detail {
