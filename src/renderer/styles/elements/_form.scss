@@ -13,6 +13,14 @@
             @include font-heavy();
             padding-bottom: emRhythm(1);
         }
+
+        & > .description {
+            //@include font-medium();
+            display: block;
+            @include description();
+            color: $color--comet;
+            padding-bottom: emRhythm(1);
+        }
     }
 
     .control {
