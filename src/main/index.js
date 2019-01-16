@@ -6,7 +6,7 @@ import { app } from 'electron'
 import { join } from 'path'
 
 import PidManager from './lib/core/PidManager'
-import menu from './lib/Menu'
+import menu from './lib/menu'
 import network from './lib/network'
 
 import store from '../store/main'
