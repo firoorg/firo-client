@@ -22,7 +22,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            isTestnet: 'Blockchain/isTestnet'
+            getExplorerAddressUrl: 'Settings/getExplorerAddressUrl'
         })
     },
 
@@ -30,9 +30,7 @@ export default {
         openBlockExplorer (event) {
             event.preventDefault()
 
-            const explorerUrl = this.isTestnet ? 'https://testexplorer.zcoin.io/address/' : 'https://explorer.zcoin.io/address/'
-
-            shell.openExternal(`${explorerUrl}${this.address}`)
+            shell.openExternal(this.getExplorerAddressUrl(this.address))
         }
     }
 }

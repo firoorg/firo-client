@@ -1,4 +1,6 @@
 import fs from 'fs'
+import { format } from 'util'
+
 import allTypes from '~/types'
 import * as types from '../types/Settings'
 
@@ -10,17 +12,21 @@ const debug = Debug('zcoin:store:settings')
 const state = {
     blockchainLocation: '',
     b58Prefixes: {
-        mainnet: {
+        main: {
             pubkeyAddress: 82, // ['a', 'Z'],
             scriptAddress: 7 // ['3', '4']
         },
-        testnet: {
+        test: {
             pubkeyAddress: 65, // ['T'],
             scriptAddress: 178 // ['2']
         }
     },
     percentageToHoldInZerocoin: 0.5,
-    xzcZerocoinRatioNotified: 0
+    xzcZerocoinRatioNotified: 0,
+    explorer: {
+        test: 'https://testexplorer.zcoin.io/%s/%s',
+        main: 'https://explorer.zcoin.io/%s/%s'
+    }
 }
 
 const mutations = {
@@ -134,11 +140,25 @@ const getters = {
 
         return toMint
     },
-    b58Prefixes: (state, getters, rootState, rootGetters) => {
-        // networkIdentifier
-        const testOrMainNet = rootState.Blockchain.testnet ? 'testnet' : 'mainnet'
+    b58Prefixes (state, getters, rootState, rootGetters) {
+        const network = rootGetters['Blockchain/networkIdentifier']
 
-        return state.b58Prefixes[testOrMainNet]
+        return state.b58Prefixes[network]
+    },
+    getExplorerBaseUrl (state, getters, rootState, rootGetters) {
+        const network = rootGetters['Blockchain/networkIdentifier']
+
+        return state.explorer[network] || ''
+    },
+    getExplorerAddressUrl (state, getters) {
+        return (address) => {
+            return format(getters.getExplorerBaseUrl,'address', address)
+        }
+    },
+    getExplorerTransactionUrl (state, getters) {
+        return (tx) => {
+            return format(getters.getExplorerBaseUrl,'tx', tx)
+        }
     }
 }
 

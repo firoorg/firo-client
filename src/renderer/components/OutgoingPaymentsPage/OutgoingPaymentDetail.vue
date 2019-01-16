@@ -104,8 +104,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            isTestnet: 'Blockchain/isTestnet',
-            getOutgoingTransactionById: 'Address/getOutgoingTransactionById'
+            getOutgoingTransactionById: 'Address/getOutgoingTransactionById',
+            getExplorerTransactionUrl: 'Settings/getExplorerTransactionUrl'
         }),
 
         amountInBaseCoin () {
@@ -148,9 +148,7 @@ export default {
         openBlockExplorer (event) {
             event.preventDefault()
 
-            const explorerUrl = this.isTestnet ? 'https://testexplorer.zcoin.io/tx/' : 'https://explorer.zcoin.io/tx/'
-
-            shell.openExternal(`${explorerUrl}${this.txid}`)
+            shell.openExternal(this.getExplorerTransactionUrl(this.txid))
         }
     }
 }

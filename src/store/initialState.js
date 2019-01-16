@@ -167,14 +167,18 @@ module.exports = {
             }
         },
         b58Prefixes: {
-            mainnet: {
+            main: {
                 pubkeyAddress: 82, // ['a', 'Z'],
                 scriptAddress: 7 // ['3', '4']
             },
-            testnet: {
+            test: {
                 pubkeyAddress: 65, // ['T'],
                 scriptAddress: 178 // ['2']
             }
+        },
+        explorer: {
+            test: 'https://testexplorer.zcoin.io/%s/%s',
+            main: 'https://explorer.zcoin.io/%s/%s'
         }
     },
 
