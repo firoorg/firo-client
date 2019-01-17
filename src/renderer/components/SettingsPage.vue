@@ -20,15 +20,7 @@
                                 </div>
                             </div>
 
-                            <div class="field">
-                                <label>{{ $t('settings.form.interface.label__explorer-pattern') }}</label>
-                                <span class="description">
-                                    {{ $t('settings.form.interface.description__explorer-pattern') }}
-                                </span>
-                                <div class="control">
-                                    <input type="text">
-                                </div>
-                            </div>
+                            <blockchain-explorer-settings />
                         </div>
                     </section>
                 </div>
@@ -38,8 +30,13 @@
 </template>
 
 <script>
+import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
+
 export default {
-    name: 'SettingsPage'
+    name: 'SettingsPage',
+    components: {
+        BlockchainExplorerSettings
+    }
 }
 </script>
 
@@ -56,16 +53,17 @@ export default {
     .interface .form {
         display: flex;
         justify-content: space-between;
+        padding: 0 emRhythm(2);
 
         .field {
             flex-grow: 1;
 
             & + .field {
-                margin-left: emRhythm(5);
+                margin-left: emRhythm(9);
             }
 
-            .control {
-                padding: 0 emRhythm(2);
+            /deep/ .control {
+                //padding: 0 emRhythm(2);
             }
         }
     }

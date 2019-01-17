@@ -40,6 +40,10 @@ const mutations = {
 
     [types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED] (state, ratio) {
         state.xzcZerocoinRatioNotified = ratio
+    },
+
+    [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] (state, { network, url }) {
+        state.explorer[network] = url
     }
 }
 
@@ -100,6 +104,18 @@ const actions = {
                 // this.addDenomination(denom)
             }
         })
+    },
+
+    [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] ({ state, commit, rootGetters }, url) {
+        const network = rootGetters['Blockchain/networkIdentifier']
+
+        if (state.explorer[network] === url) {
+            return
+        }
+
+        // todo add some checks if the given string is an absolute url matches the required format (includes 2x %s)
+
+        commit(types.SET_BLOCKCHAIN_EXPLORER_BASE_URL, { network, url })
     }
 }
 

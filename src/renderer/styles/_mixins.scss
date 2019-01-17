@@ -205,6 +205,39 @@
     }
 }
 
+@mixin white-placeholder () {
+    @include light-placeholder();
+}
+
+@mixin white-placeholder-hover () {
+    @include light-placeholder-hover();
+}
+
+@mixin white-input () {
+    background: $color--white-light;
+    color: $color--dark-light;
+
+    &:hover {
+        background: rgba($color--white, 0.85);
+    }
+
+    &:focus {
+        background: $color--white;
+        color: $color--dark;
+    }
+
+    &::placeholder {
+        @include white-placeholder()
+    }
+
+    &:hover,
+    &:focus {
+        &::placeholder {
+            @include white-placeholder-hover();
+        }
+    }
+}
+
 @mixin light-placeholder () {
     @include placeholder-base();
     color: $color--polo;

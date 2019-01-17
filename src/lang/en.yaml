@@ -275,6 +275,21 @@ znodes:
     label__amount-received: Received
     label__payee: Payee
 
+settings:
+  overview:
+    title: Settings
+  form:
+    interface:
+      title: Interface
+      label__language: Language
+      description__language: Purus Ullamcorper Fermentum.
+      label__explorer-pattern: Blockchain Explorer
+      description__explorer-pattern: Purus Ullamcorper Fermentum.
+      placeholder__explorer-pattern: Enter the url pattern of your favorite explorer
+    privacy:
+      title: Privacy
+
+
 onboarding:
   intro-screen:
     title: Welcome!
