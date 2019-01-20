@@ -2,6 +2,7 @@
     <div
         class="debug-grid"
         :class="{ active: isVisible }"
+        v-if="isDev"
     >
         <form>
             <input
@@ -19,6 +20,12 @@ export default {
     data () {
         return {
             isVisible: false
+        }
+    },
+
+    computed: {
+        isDev () {
+            return process.env.NODE_ENV !== 'production'
         }
     }
 }
