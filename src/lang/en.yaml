@@ -61,6 +61,7 @@ receive:
     table__payment-requests:
       label__amount: Amount
       label__created: Created
+      label__lastUpdate: Last Update
       label__label: Label
       placeholder__filter: Filter by label
   detail-create-request:
