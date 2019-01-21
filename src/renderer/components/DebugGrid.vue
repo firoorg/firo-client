@@ -1,8 +1,8 @@
 <template>
     <div
+        v-if="isDev"
         class="debug-grid"
         :class="{ active: isVisible }"
-        v-if="isDev"
     >
         <form>
             <input

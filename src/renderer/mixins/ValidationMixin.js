@@ -52,7 +52,11 @@ export default {
         }
 
         if (this.autofocusFirstField && this.validationFieldOrder.length) {
-            this.$nextTick(() => this.$refs[this.validationFieldOrder[0]].focus())
+            this.$nextTick(() => {
+                if (this.$refs[this.validationFieldOrder[0]]) {
+                    this.$refs[this.validationFieldOrder[0]].focus()
+                }
+            })
         }
     },
 
