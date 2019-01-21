@@ -86,14 +86,16 @@
                         </div>
                     </template>
                     <template slot="content">
-                        <header class="right">
-                            <h3 v-html="$t('send.private.flyout-amount-selection.title__amount-selection')" />
-                            <p v-html="$t('send.private.flyout-amount-selection.description__amount-selection')" />
-                        </header>
-                        <spend-denomination-selector
-                            class="spend-denomination-selector"
-                            :on-denomination-change="onDenominationChange"
-                        />
+                        <div>
+                            <header class="right">
+                                <h3 v-html="$t('send.private.flyout-amount-selection.title__amount-selection')" />
+                                <p v-html="$t('send.private.flyout-amount-selection.description__amount-selection')" />
+                            </header>
+                            <spend-denomination-selector
+                                class="spend-denomination-selector"
+                                :on-denomination-change="onDenominationChange"
+                            />
+                        </div>
                     </template>
                 </base-popover>
             </div>

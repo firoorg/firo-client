@@ -15,28 +15,30 @@
         </template>
 
         <template slot="content">
-            <header>
-                <h2 v-html="$t('mint.flyout-process-mints.title')" />
-            </header>
+            <div>
+                <header>
+                    <h2 v-html="$t('mint.flyout-process-mints.title')" />
+                </header>
 
-            <p v-html="$t('mint.flyout-process-mints.description')" />
+                <p v-html="$t('mint.flyout-process-mints.description')" />
 
-            <footer>
-                <base-button
-                    :is-outline="true"
-                    :is-dark="true"
-                    @click.prevent="markAsNotified"
-                >
-                    {{ $t('mint.flyout-process-mints.button__cancel--secondary') }}
-                </base-button>
-                <base-button
-                    color="green"
-                    :is-dark="true"
-                    @click.prevent="fillAndRouteToMint"
-                >
-                    {{ $t('mint.flyout-process-mints.button__review-suggestion--primary') }}
-                </base-button>
-            </footer>
+                <footer>
+                    <base-button
+                        :is-outline="true"
+                        :is-dark="true"
+                        @click.prevent="markAsNotified"
+                    >
+                        {{ $t('mint.flyout-process-mints.button__cancel--secondary') }}
+                    </base-button>
+                    <base-button
+                        color="green"
+                        :is-dark="true"
+                        @click.prevent="fillAndRouteToMint"
+                    >
+                        {{ $t('mint.flyout-process-mints.button__review-suggestion--primary') }}
+                    </base-button>
+                </footer>
+            </div>
         </template>
     </base-popover>
 </template>
