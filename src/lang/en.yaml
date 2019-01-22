@@ -403,6 +403,11 @@ onboarding:
     # description: You are now ready to privately send coins! There will be no link between you and the receiver visible anywhere. If you did not get a Payment Request already, please ask the receiver to create one.
 
 overlay:
+  loading:
+    restarting-daemon: Restarting daemon
+    loading-wallet: Loading Wallet
+    initial: Starting up
+
   incoming-payment-request:
     title: Incoming <br>Payment Request
     notice: It seems as if you have <strong>already fulfilled</strong> this <em>Payment Request</em>

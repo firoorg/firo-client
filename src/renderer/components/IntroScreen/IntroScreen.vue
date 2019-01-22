@@ -41,6 +41,8 @@
                             color="dark"
                             class="loading"
                         />
+
+                        {{ loadingMessage }}
                     </div>
                 </div>
 
@@ -105,6 +107,7 @@ export default {
         ...mapGetters({
             isReady: 'App/isReady',
             isRestarting: 'App/isRestarting',
+            isRunning: 'App/isRunning',
             isInitialRun: 'App/isInitialRun',
             showIntroScreen: 'App/showIntroScreen'
         }),
@@ -127,11 +130,24 @@ export default {
         showIntro () {
             return this.isReadyInitialOrRestarting  && this.showIntroScreen
         },
+
         getActions () {
             return {
                 prev: this.prevStep,
                 next: this.nextSettingsStep,
                 goTo: this.goToStep
+            }
+        },
+
+        loadingMessage () {
+            if (this.isRestarting) {
+                return this.$t('overlay.loading.restarting-daemon')
+            }
+            else if (this.isRunning) {
+                return this.$t('overlay.loading.loading-wallet')
+            }
+            else {
+                return this.$t('overlay.loading.initial')
             }
         }
     },
