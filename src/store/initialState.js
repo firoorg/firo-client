@@ -129,7 +129,7 @@ module.exports = {
             isWinnersListSynced: false,
             isZnodeListSynced: false
         },
-        testnet: true,
+        testnet: undefined,
         type: 'full',
         averageBlockTime: 0,
         syncBlocksPerSecond: {

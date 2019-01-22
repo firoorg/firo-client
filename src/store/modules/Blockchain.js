@@ -17,7 +17,7 @@ const state = {
         isWinnersListSynced: false,
         isZnodeListSynced: false
     },
-    testnet: true,
+    testnet: undefined,
     type: 'full',
     averageBlockTime: 0,
     syncBlocksPerSecond: {
@@ -276,8 +276,8 @@ export const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
     currentBlockTimestamp: (state) => state.currentBlock.timestamp,
     // tipHeight: (state) => state.blockchainTip,
-    isTestnet: (state) => state.testnet,
-    isMainnet: (state, getters) => !getters.isTestnet,
+    isTestnet: (state) => state.testnet === true,
+    isMainnet: (state, getters) => getters.isTestnet === false,
     status: (state) => state.status || {},
     isSynced: (state, getters) => getters.status.isSynced,
     isBlockchainSynced: (state, getters) => getters.status.isBlockchainSynced,
