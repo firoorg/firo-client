@@ -44,7 +44,7 @@ const actions = {
         commit(types.SET_NETWORK_CONNECTION_ERROR, errorCode)
     },
 
-    async [types.NETWORK_CONNECTION_LOST] ({ commit }) {
+    async [types.NETWORK_CONNECTION_LOST] ({ commit, state }) {
         commit(types.NETWORK_CONNECTION_SEEMS_LOST, true)
         await sleep(500)
 

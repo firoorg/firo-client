@@ -45,6 +45,7 @@ export default {
     components: {
         Warning
     },
+
     methods: {
         ...mapActions({
             restartDaemon: types.app.DAEMON_RESTART

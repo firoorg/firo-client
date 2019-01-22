@@ -136,6 +136,10 @@ const actions = {
         // set restart flag
         commit(types.DAEMON_RESTART)
 
+        if (!state.isRunning) {
+            return commit(types.DAEMON_START)
+        }
+
         // stop daemon
         commit(types.DAEMON_STOP)
     },

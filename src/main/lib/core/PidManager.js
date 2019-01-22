@@ -237,7 +237,7 @@ export default class PidManager {
         clearTimeout(this.heartbeat)
         this.heartbeat = null
 
-        this.cleanup()
+        await this.cleanup()
         this.doAutoRestart()
     }
 
