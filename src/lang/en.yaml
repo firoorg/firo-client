@@ -135,8 +135,8 @@ mint:
     button__has-error--primary: Try Again
 
   flyout-process-mints:
-    title: onboarding.process-mints.title
-    description: onboarding.process-mints.description
+    title: Review Mint Suggestions
+    description: We suggest you mint some coins to increase your anonymtiy. Would you like to review our suggestion now? 
     button__review-suggestion--primary: Yes, review suggestion
     button__cancel--secondary: No, I will do it later
 
