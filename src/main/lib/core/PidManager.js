@@ -66,7 +66,9 @@ export default class PidManager {
             return this.pid
         }
 
-        this.child = spawn(this.pathToSpawn, {
+        debug('getArguments', this.getArguments())
+
+        this.child = spawn(this.pathToSpawn, this.getArguments(), {
             // detached: true,
             stdio: 'ignore'
         })
@@ -136,6 +138,24 @@ export default class PidManager {
 
     getFileSystemPath () {
         return join(this.filePath, `${this.name}.pid`)
+    }
+
+    getArguments () {
+        return [
+            ...this.getDataDirArgument()
+        ]
+    }
+
+    getDataDirArgument () {
+        const hasLocation = this.store.getters['App/hasBlockchainLocation']
+        const location = this.store.getters['App/blockchainLocation']
+        const exists = hasLocation ? fs.existsSync(location) : false
+
+        if (location && !exists) {
+            debug('blockchain location %s does not exist. falling back to default location', location)
+        }
+
+        return hasLocation && exists ? [`-datadir=${location}`] : []
     }
 
     async cleanup () {
@@ -243,8 +263,6 @@ export default class PidManager {
 
             onStoreMutation: async (mutation) => {
                 const { type } = mutation
-
-                console.log(type)
 
                 if (type === types.app.DAEMON_START) {
                     await this.start()

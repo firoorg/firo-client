@@ -309,7 +309,7 @@ onboarding:
     button__use-default-location--secondary: Use default
     button__select-folder--primary: Select location
     button__select-location--primary: Select location
-    button__confirm-selection--primary: Done
+    button__confirm-selection--primary: Set it up!
     # button__secondary: back / cancel?
 
   create-passphrase:

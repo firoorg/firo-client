@@ -5,7 +5,7 @@
         <p v-html="$t('onboarding.set-blockchain-location.description')" />
 
         <footer>
-            <template v-if="!hasLocation()">
+            <template v-if="!hasLocation">
                 <base-button
                     :is-outline="true"
                     @click="startDaemon"
@@ -49,7 +49,7 @@ export default {
     computed: {
         ...mapGetters({
             hasLocation: 'App/hasBlockchainLocation',
-            location: 'App/getBlockchainLocation'
+            location: 'App/blockchainLocation'
         })
     },
 
@@ -76,17 +76,20 @@ export default {
 
             const [ blockchainPath ] = returned
 
-            this.$store.dispatch(types.app.SET_BLOCKCHAIN_LOCATION, { location: blockchainPath })
+            this.$store.dispatch(types.app.SET_BLOCKCHAIN_LOCATION, blockchainPath)
         },
 
         startDaemon () {
             this.$store.dispatch(types.app.PERSIST_APP_VERSION)
             this.$store.dispatch(types.app.DAEMON_START)
-            this.actions.next()
+
+            this.$nextTick(() => {
+                this.actions.next()
+            })
         },
 
         isEnabled () {
-            return !this.hasLocation() || !fs.existsSync(this.location())
+            return !this.hasLocation || !fs.existsSync(this.location)
         }
     }
 }

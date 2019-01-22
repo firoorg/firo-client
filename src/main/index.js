@@ -9,6 +9,7 @@ import types from '~/types'
 import PidManager from './lib/core/PidManager'
 import menu from './lib/menu'
 import network from './lib/network'
+import { populateStoreWithAppSettings } from './lib/appSettings'
 
 import store from '../store/main'
 import { setupWindowRouter } from '~/utils/routerHelper'
@@ -87,13 +88,13 @@ if (stopOnQuit) {
 // app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
 
 app.on('ready', () => {
+    populateStoreWithAppSettings({ store })
     // start it!
     debug('zcoindPath', zcoindPath)
 
     coreDaemonManager.setPathToSpawn(zcoindPath)
 
-    //if (!store.getters['App/isInitialRun']) {
-    if (store.getters['App/hasBlockchainLocation']()) {
+    if (!store.getters['App/isInitialRun']) {
         coreDaemonManager.start()
     }
 

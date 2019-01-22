@@ -25,7 +25,7 @@ const mutations = {
         state.blockchainLocation = location
     },
 
-    [types.PERSIST_APP_VERSION] (state, version) {
+    [types.SET_APP_VERSION] (state, version) {
         state.appVersion = version
     },
 
@@ -165,7 +165,7 @@ const actions = {
         commit(types.CLEAR_PASSPHRASE)
     },
 
-    [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
+    [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, location) {
         if (!location) {
             return
         }
@@ -179,14 +179,26 @@ const actions = {
         // todo: ...moves the folder while zcoin is running
 
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
-        getAppSettings().set('app.location', location)
+        getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location)
     },
 
-    [types.PERSIST_APP_VERSION] ({ commit, getters }) {
-        const version = getters.getAppVersion()
+    [types.SET_APP_VERSION] ({ commit }, version) {
+        if (state.appVersion === version) {
+            return
+        }
 
-        commit(types.PERSIST_APP_VERSION, version)
-        getAppSettings().set('app.version', version)
+        commit(types.SET_APP_VERSION, version)
+    },
+
+    [types.PERSIST_APP_VERSION] ({ dispatch, getters }) {
+        const version = getApp().getVersion()
+
+        if (getters.appVersion === version) {
+            return
+        }
+
+        dispatch(types.SET_APP_VERSION, version)
+        getAppSettings().set(`app.${types.SET_APP_VERSION}`, version)
     }
 }
 
@@ -195,27 +207,16 @@ const getters = {
     isStopping: (state) => state.isStopping || false,
     isRunning: (state) => state.isRunning || false,
     isRestarting: (state) => state.isRestarting || false,
-    getAppVersion: () => {
-        return () => {
-            return getApp().getVersion()
-        }
-    },
-    isInitialRun: (state, getters) => {
-        const appSettings = getAppSettings()
-
-        if (!appSettings.has('app.version')) {
-            return true
-        }
-
-        return !!appSettings.get('app.version')
-        //return appSettings.get('app.version') === getters.getAppVersion()
+    appVersion: (state) => state.appVersion,
+    isInitialRun: (state) => {
+        return !state.appVersion
     },
 
-    getBlockchainLocation: (state) => () => {
+    blockchainLocation: (state) => {
+
         return state.blockchainLocation
     },
-
-    hasBlockchainLocation: (state, getters) => () => !!getters.getBlockchainLocation(),
+    hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
 
     showIntroScreen: (state, getters) => state.showIntroScreen,
     isLocked: (state) => state.clientIsLocked,
