@@ -1,3 +1,6 @@
+import { app, remote } from 'electron'
+import appSettings from 'electron-settings'
+
 const subscribeToMutation = function ({ store, namespace, onStoreMutation }) {
     store.subscribe((mutation) => {
         const {type, payload} = mutation
@@ -74,5 +77,13 @@ export const ucFirst = function (s) {
 
 export const isRenderer = function () {
     return (process && process.type === 'renderer')
+}
+
+export const getApp = function () {
+    return isRenderer() ? remote.app : app
+}
+
+export const getAppSettings = function () {
+    return appSettings
 }
 

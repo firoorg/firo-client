@@ -107,5 +107,5 @@ export const populateStore = function ({ apiStatus, dispatch }) {
         dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
     }
     // dispatch(types.blockchain.SET_BLOCKCHAIN_TIP, blocks)
-    dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location })
+    dispatch(types.app.SET_BLOCKCHAIN_LOCATION, { location })
 }

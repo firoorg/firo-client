@@ -141,7 +141,6 @@ module.exports = {
 
     Settings: { // daemon: isSubscription
         // blockchainLocation: '~/Library/Application Support/zcoin', // daemon // has, set
-        blockchainLocation: '',
         percentageToHoldInZerocoin: 0.5,
         xzcZerocoinRatioNotified: -1,
 
@@ -206,6 +205,8 @@ module.exports = {
             paymentRequest: 23345932,
             mint: 23489034
         },
-        passphrase: null
+        passphrase: null,
+        appVersion: null,
+        blockchainLocation: ''
     }
 }

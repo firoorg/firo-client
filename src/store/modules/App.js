@@ -1,4 +1,6 @@
 import * as types from '../types/App'
+import { getApp, getAppSettings } from '#/lib/utils'
+import fs from "fs";
 
 const state = {
     isReady: false,
@@ -7,7 +9,9 @@ const state = {
     isRestarting: false,
     clientIsLocked: false,
     showIntroScreen: true,
-    passphrase: null
+    passphrase: null,
+    appVersion: null,
+    blockchainLocation: ''
 }
 
 const mutations = {
@@ -16,6 +20,16 @@ const mutations = {
         state.isRestarting = false
         state.isStopping = false
     },
+
+    [types.SET_BLOCKCHAIN_LOCATION] (state, location) {
+        state.blockchainLocation = location
+    },
+
+    [types.PERSIST_APP_VERSION] (state, version) {
+        state.appVersion = version
+    },
+
+    // daemon
 
     [types.DAEMON_IS_RUNNING] (state) {
         state.isRunning = true
@@ -36,6 +50,11 @@ const mutations = {
         state.isRestarting = true
     },
 
+    [types.DAEMON_START] () {
+    },
+
+    // wallet lock
+
     [types.SET_CLIENT_LOCKED] (state, isLocked) {
         state.clientIsLocked = isLocked
     },
@@ -45,9 +64,13 @@ const mutations = {
         console.log('locking wallet', passphrase)
     },
 
+    // intro
+
     [types.HIDE_INTRO_SCREEN] (state) {
         state.showIntroScreen = false
     },
+
+    // passphrase
 
     [types.SET_CURRENT_PASSPHRASE] (state, passphrase) {
         state.passphrase = passphrase
@@ -117,6 +140,14 @@ const actions = {
         commit(types.DAEMON_STOP)
     },
 
+    [types.DAEMON_START] ({ state, commit }) {
+        if (state.isRunning) {
+            return
+        }
+
+        commit(types.DAEMON_START)
+    },
+
     [types.HIDE_INTRO_SCREEN] ({ commit, state }) {
         console.log('in action')
         commit(types.HIDE_INTRO_SCREEN)
@@ -132,6 +163,30 @@ const actions = {
 
     [types.CLEAR_PASSPHRASE] ({ commit }) {
         commit(types.CLEAR_PASSPHRASE)
+    },
+
+    [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
+        if (!location) {
+            return
+        }
+
+        if (!fs.existsSync(location)) {
+            debug('given location does not exits', location)
+            return
+        }
+
+        // todo: could potentially watch the location to catch cases where the user freakes out and...
+        // todo: ...moves the folder while zcoin is running
+
+        commit(types.SET_BLOCKCHAIN_LOCATION, location)
+        getAppSettings().set('app.location', location)
+    },
+
+    [types.PERSIST_APP_VERSION] ({ commit, getters }) {
+        const version = getters.getAppVersion()
+
+        commit(types.PERSIST_APP_VERSION, version)
+        getAppSettings().set('app.version', version)
     }
 }
 
@@ -140,8 +195,29 @@ const getters = {
     isStopping: (state) => state.isStopping || false,
     isRunning: (state) => state.isRunning || false,
     isRestarting: (state) => state.isRestarting || false,
+    getAppVersion: () => {
+        return () => {
+            return getApp().getVersion()
+        }
+    },
+    isInitialRun: (state, getters) => {
+        const appSettings = getAppSettings()
 
-    showIntroScreen: (state) => state.showIntroScreen,
+        if (!appSettings.has('app.version')) {
+            return true
+        }
+
+        return !!appSettings.get('app.version')
+        //return appSettings.get('app.version') === getters.getAppVersion()
+    },
+
+    getBlockchainLocation: (state) => () => {
+        return state.blockchainLocation
+    },
+
+    hasBlockchainLocation: (state, getters) => () => !!getters.getBlockchainLocation(),
+
+    showIntroScreen: (state, getters) => state.showIntroScreen,
     isLocked: (state) => state.clientIsLocked,
     addressBelongsToWallet: (state, getters, rootState, rootGetters) => {
         return (address) => {

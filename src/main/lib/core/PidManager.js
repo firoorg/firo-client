@@ -38,6 +38,10 @@ export default class PidManager {
         this.connectToStore()
     }
 
+    setPathToSpawn (pathToSpawn) {
+        this.pathToSpawn = pathToSpawn
+    }
+
     async start (pathToSpawn) {
         debug(`starting child process "${this.name}" ...`)
         if (!this.pathToSpawn && !pathToSpawn) {
@@ -239,6 +243,8 @@ export default class PidManager {
 
             onStoreMutation: async (mutation) => {
                 const { type } = mutation
+
+                console.log(type)
 
                 if (type === types.app.DAEMON_START) {
                     await this.start()

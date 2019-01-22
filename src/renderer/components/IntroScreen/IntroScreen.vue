@@ -35,7 +35,7 @@
                     </multi-step-popover>
                 </header>
 
-                <div v-show="!isReadyOrRestarting">
+                <div v-show="!isReadyInitialOrRestarting">
                     <div>
                         <loading-bounce
                             color="dark"
@@ -105,6 +105,7 @@ export default {
         ...mapGetters({
             isReady: 'App/isReady',
             isRestarting: 'App/isRestarting',
+            isInitialRun: 'App/isInitialRun',
             showIntroScreen: 'App/showIntroScreen'
         }),
 
@@ -119,12 +120,12 @@ export default {
 
             return classes.join(' ')
         },
-        isReadyOrRestarting () {
-            return this.isReady || this.isRestarting
+        isReadyInitialOrRestarting () {
+            return this.isReady || this.isInitialRun || this.isRestarting
         },
 
         showIntro () {
-            return this.isReadyOrRestarting && this.showIntroScreen
+            return this.isReadyInitialOrRestarting  && this.showIntroScreen
         },
         getActions () {
             return {

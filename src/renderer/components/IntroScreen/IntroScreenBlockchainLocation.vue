@@ -5,17 +5,24 @@
         <p v-html="$t('onboarding.set-blockchain-location.description')" />
 
         <footer>
-            <BaseButton
-                v-if="!hasLocation"
-                color="green"
-                @click="selectFolder"
-            >
-                {{ $t('onboarding.set-blockchain-location.button__select-folder--primary') }}
-            </BaseButton>
+            <template v-if="!hasLocation()">
+                <base-button
+                    :is-outline="true"
+                    @click="startDaemon"
+                >
+                    {{ $t('onboarding.set-blockchain-location.button__use-default-location--secondary') }}
+                </base-button>
+                <BaseButton
+                    color="green"
+                    @click="selectFolder"
+                >
+                    {{ $t('onboarding.set-blockchain-location.button__select-folder--primary') }}
+                </BaseButton>
+            </template>
             <BaseButton
                 v-else
                 color="green"
-                @click="actions.next"
+                @click="startDaemon"
             >
                 {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
             </BaseButton>
@@ -41,33 +48,45 @@ export default {
 
     computed: {
         ...mapGetters({
-            hasLocation: 'Settings/hasBlockchainLocation',
-            location: 'Settings/blockchainLocation'
+            hasLocation: 'App/hasBlockchainLocation',
+            location: 'App/getBlockchainLocation'
         })
     },
 
     methods: {
         selectFolder () {
-            const [ blockchainPath ] = dialog.showOpenDialog({
+            const returned = dialog.showOpenDialog({
                 title: 'Select Zcoin Blockchain Location',
                 // message: 'just a message',
-                properties: ['openDirectory'],
+                properties: [
+                    'openDirectory',
+                    'createDirectory',
+                    'promptToCreate'
+                ],
                 // todo get default path
-                defaultPath: path.resolve('/Users/joernroeder/Library/Application Support/zcoin'),
-                buttonLabel: 'Select Location'
+                //defaultPath: path.resolve('/Users/joernroeder/Library/Application Support/zcoin'),
+                buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
             })
 
-            if (!blockchainPath) {
+
+            if (!returned || !returned[0]) {
                 console.log('user canceled the selection in the dialog box')
                 return
             }
 
-            this.$store.dispatch(types.settings.SET_BLOCKCHAIN_LOCATION, { location: blockchainPath })
+            const [ blockchainPath ] = returned
+
+            this.$store.dispatch(types.app.SET_BLOCKCHAIN_LOCATION, { location: blockchainPath })
+        },
+
+        startDaemon () {
+            this.$store.dispatch(types.app.PERSIST_APP_VERSION)
+            this.$store.dispatch(types.app.DAEMON_START)
             this.actions.next()
         },
 
         isEnabled () {
-            return !this.hasLocation || !fs.existsSync(this.location)
+            return !this.hasLocation() || !fs.existsSync(this.location())
         }
     }
 }

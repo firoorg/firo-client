@@ -306,7 +306,9 @@ onboarding:
   set-blockchain-location:
     title: Select Blockchain Location
     description: Please pick a location where the blockchain will be stored. As it will be growing over time, please make sure to have plenty of space available. You can also store the blockchain on an external hard drive. Just make sure it is connected before you launch the client!
+    button__use-default-location--secondary: Use default
     button__select-folder--primary: Select location
+    button__select-location--primary: Select location
     button__confirm-selection--primary: Done
     # button__secondary: back / cancel?
 

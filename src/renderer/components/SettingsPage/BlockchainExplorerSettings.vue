@@ -43,10 +43,6 @@ export default {
         }
     },
 
-    mounted() {
-        this.explorerUrl = this.$store.getters['Settings/getExplorerBaseUrl']
-    },
-
     computed: {
         /*
         ...addVuexModel({
@@ -68,6 +64,10 @@ export default {
                 }
             }
         }
+    },
+
+    mounted() {
+        this.explorerUrl = this.$store.getters['Settings/getExplorerBaseUrl']
     }
 }
 </script>

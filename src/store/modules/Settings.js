@@ -10,7 +10,7 @@ import Debug from 'debug'
 const debug = Debug('zcoin:store:settings')
 
 const state = {
-    blockchainLocation: '',
+    //blockchainLocation: '',
     b58Prefixes: {
         main: {
             pubkeyAddress: 82, // ['a', 'Z'],
@@ -30,9 +30,7 @@ const state = {
 }
 
 const mutations = {
-    [types.SET_BLOCKCHAIN_LOCATION] (state, location) {
-        state.blockchainLocation = location
-    },
+    [types.PERSIST_SETTING] () {},
 
     [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] (state, percentage) {
         state.percentageToHoldInZerocoin = percentage
@@ -48,6 +46,11 @@ const mutations = {
 }
 
 const actions = {
+    [types.SET_INITIAL_STATE] ({ commit, state}, initialState) {
+        console.log('SETTINGS GOT INITIAL STATE', initialState)
+    },
+
+    /*
     [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
         if (!location) {
             return
@@ -63,6 +66,7 @@ const actions = {
 
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
     },
+    */
 
     [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ commit, state }, value) {
         const percentage = value / 100
@@ -76,6 +80,11 @@ const actions = {
         }
 
         commit(types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN, percentage)
+        commit(types.PERSIST_SETTING, {
+            key: types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
+            data: percentage,
+            requiresResart: false
+        })
         commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, -1)
     },
 
@@ -120,8 +129,6 @@ const actions = {
 }
 
 const getters = {
-    blockchainLocation: (state) => state.blockchainLocation,
-    hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
     percentageToHoldInZerocoin: (state) => state.percentageToHoldInZerocoin * 100,
     isOutOfPercentageToHoldInZerocoinRange: (state, getters, rootState, rootGetters) => {
         const currentRatio = rootGetters['Balance/confirmedXzcZerocoinRatio']
