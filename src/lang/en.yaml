@@ -263,7 +263,7 @@ send:
 znodes:
   overview:
     title: Znodes
-    description: Integer posuere erat a ante venenatis dapibus velit aliquet. Etiam porta sem magna mollis euismod.
+    description: Znodes are incentivized nodes which help support the network. If you do have a Znode you can manage and monitor it here.
     table__znodes:
       placeholder__filter: Filter Znodes
   my-znode:
