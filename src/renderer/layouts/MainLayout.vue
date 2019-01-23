@@ -74,7 +74,7 @@ export default {
         ...mapGetters({
             isRestarting: 'App/isRestarting',
             hasOpenModal: 'Window/hasOpenModal',
-            networkIsConnected: 'Network/isConnected',
+            networkConnectionLost: 'Network/connectionLost',
             networkConnectionError: 'Network/connectionError',
             showIntroScreen: 'App/showIntroScreen',
             showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
@@ -90,7 +90,7 @@ export default {
         },
 
         showConnectivityOverlay () {
-            return !!((this.connectionLost || this.networkConnectionError) && !this.isRestarting)
+            return !!((this.networkConnectionLost || this.networkConnectionError) && !this.isRestarting)
         },
 
         showIntro () {

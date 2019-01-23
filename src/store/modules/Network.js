@@ -58,7 +58,7 @@ const actions = {
 
 const getters = {
     isConnected: (state) => state.isConnected === true,
-    connectionLost: (state, getters) => state.connectionSeemsLost && !getters.isConnected,
+    connectionLost: (state) => state.connectionSeemsLost && state.isConnected === false,
     connectionError: (state) => state.connectionErrorCode ? state.connectionErrorCode : false
 }
 
