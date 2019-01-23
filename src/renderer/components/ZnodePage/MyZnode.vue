@@ -74,7 +74,7 @@
                         </section>
                     </template>
                     <template v-else>
-                        <div>
+                        <div class="does-not-belong">
                             {{ $t('znodes.my-znode.description__does-not-belong-to-wallet') }}
                         </div>
                     </template>
@@ -83,17 +83,28 @@
         </div>
 
         <footer v-if="!isMissing">
-            <base-button :is-outline="true">
-                Other
-            </base-button>
-            <base-button color="comet">
-                Action Name
-            </base-button>
+            <template v-if="belongsToWallet">
+                <base-button :is-outline="true">
+                    Other
+                </base-button>
+                <base-button color="comet">
+                    Action Name
+                </base-button>
+            </template>
+            <template v-else>
+                <base-button
+                    v-if="payeeAddress"
+                    @click.prevent="openBlockExplorer"
+                >
+                    {{ $t('znodes.my-znode.button__open-explorer') }}
+                </base-button>
+            </template>
         </footer>
     </div>
 </template>
 
 <script>
+import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import { convertToCoin } from '#/lib/convert'
 
@@ -129,6 +140,7 @@ export default {
 
     computed: {
         ...mapGetters({
+            getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
         }),
 
@@ -160,6 +172,18 @@ export default {
 
             // todo discuss with @Sebastion
             return this.activeSince + znodePaymentCycleInMs
+        }
+    },
+
+    methods: {
+        openBlockExplorer (event) {
+            event.preventDefault()
+
+            if (!this.payeeAddress) {
+                return
+            }
+
+            shell.openExternal(this.getExplorerAddressUrl(this.payeeAddress))
         }
     }
 }
@@ -205,7 +229,7 @@ export default {
             .next-payout { grid-area: next-payout; }
             .last-payout { grid-area: last-payout; }
             .received { grid-area: received; }
-            .payee { grid-area: payee; }
+            .payee, .does-not-belong { grid-area: payee; }
         }
 
         footer {

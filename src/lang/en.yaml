@@ -277,6 +277,7 @@ znodes:
     description__last-payout--nothing-received: No Payout yet!
     label__amount-received: Received
     label__payee: Payee
+    button__open-explorer: Show in Block Explorer
 
 settings:
   overview:
