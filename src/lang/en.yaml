@@ -136,7 +136,7 @@ mint:
 
   flyout-process-mints:
     title: Review Mint Suggestions
-    description: We suggest you mint some coins to increase your anonymtiy. Would you like to review our suggestion now? 
+    description: We suggest you mint some coins now. This will increase your anonymity and make sure you have minted coins ready for when you would like to spend them. Would you like to review our suggestion now?  
     button__review-suggestion--primary: Yes, review suggestion
     button__cancel--secondary: No, I will do it later
 
