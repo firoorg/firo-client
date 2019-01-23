@@ -120,19 +120,12 @@ const actions = {
         let onSubscriptionZnodes = {}
 
         // add maximal 10 nodes at a time
-        eachOfLimit(data, 10, async (znode, id) => {
+        eachOfLimit(data, 10, (znode, id, callback) => {
             onSubscriptionZnodes[id] = processZnode(id, znode)
-            /*
-            const bar = dispatch(types.ADD_ZNODE, {
-                id: znodeKey,
-                znode // : data[znodeKey]
-            })
-
-            console.log(bar)
-            */
+            callback()
+        }, () => {
+            addZnodes(commit, onSubscriptionZnodes)
         })
-
-        addZnodes(commit, onSubscriptionZnodes)
     },
 
     /**

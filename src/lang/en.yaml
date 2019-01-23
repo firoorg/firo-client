@@ -267,7 +267,8 @@ znodes:
     table__znodes:
       placeholder__filter: Filter Znodes
   my-znode:
-    description__is-missing: Znode related information did not show up in the blockchain yet. More details about this Znode will show up soon.
+    description__status-missing: Znode information will show up once the blockchain is synced.
+    description__does-not-belong-to-wallet: The payee address is not an address of this wallet. Therefore Payment related information can not be shown.
     label__status: Status
     label__last-seen: Last Seen
     label__active-since: Active Since

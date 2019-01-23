@@ -37,39 +37,47 @@
                             />
                         </main>
                     </section>
-                    <section class="next-payout">
-                        <header>{{ $t('znodes.my-znode.label__next-payout') }}</header>
-                        <main>
-                            <timeago
-                                v-if="lastPaidTime"
-                                :datetime="nextEstPayout"
-                                :auto-update="30"
-                            />
-                        </main>
-                    </section>
-                    <section class="last-payout">
-                        <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
-                        <main>
-                            <timeago
-                                v-if="lastPaidTime"
-                                :datetime="lastPaidTime"
-                                :auto-update="30"
-                            />
-                            <span v-else>
-                                {{ $t('znodes.my-znode.description__last-payout--nothing-received') }}
-                            </span>
-                        </main>
-                    </section>
-                    <section class="received">
-                        <header>{{ $t('znodes.my-znode.label__amount-received') }}</header>
-                        <main>
-                            {{ payoutsReceived }}
-                        </main>
-                    </section>
-                    <section class="payee">
-                        <header>{{ $t('znodes.my-znode.label__payee') }}</header>
-                        <main>{{ payeeAddress }}</main>
-                    </section>
+                    <template v-if="belongsToWallet">
+                        <section class="next-payout">
+                            <header>{{ $t('znodes.my-znode.label__next-payout') }}</header>
+                            <main>
+                                <timeago
+                                    v-if="lastPaidTime"
+                                    :datetime="nextEstPayout"
+                                    :auto-update="30"
+                                />
+                            </main>
+                        </section>
+
+                        <section class="last-payout">
+                            <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
+                            <main>
+                                <timeago
+                                    v-if="lastPaidTime"
+                                    :datetime="lastPaidTime"
+                                    :auto-update="30"
+                                />
+                                <span v-else>
+                                    {{ $t('znodes.my-znode.description__last-payout--nothing-received') }}
+                                </span>
+                            </main>
+                        </section>
+                        <section class="received">
+                            <header>{{ $t('znodes.my-znode.label__amount-received') }}</header>
+                            <main>
+                                {{ payoutsReceived }}
+                            </main>
+                        </section>
+                        <section class="payee">
+                            <header>{{ $t('znodes.my-znode.label__payee') }}</header>
+                            <main>{{ payeeAddress }}</main>
+                        </section>
+                    </template>
+                    <template v-else>
+                        <div>
+                            {{ $t('znodes.my-znode.description__does-not-belong-to-wallet') }}
+                        </div>
+                    </template>
                 </div>
             </template>
         </div>
@@ -128,11 +136,15 @@ export default {
             return (!this.payeeAddress || this.status === 'MISSING')
         },
 
+        belongsToWallet () {
+            return this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress) !== -1
+        },
+
         payoutsReceived () {
             const received = this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress)
 
             if (received === -1) {
-                return `It seems that the masternode collateral is not an address of this wallet.`
+                return
             }
 
             return `${convertToCoin(received)} XZC`
