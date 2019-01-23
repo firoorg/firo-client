@@ -48,7 +48,7 @@
                             Avgerage Days for Payout
                         </div>
                     </div>
-                    <div
+                    <!--<div
                         v-if="myZnodes.length"
                         class="stat"
                     >
@@ -58,7 +58,7 @@
                         <div class="desc">
                             days until your next Payout
                         </div>
-                    </div>
+                    </div>-->
                 </section>
 
                 <section class="my-znodes">
@@ -66,6 +66,7 @@
                         v-for="(znode, index) in filteredMyZnodes"
                         :key="index"
                         v-bind="znode"
+                        :znode-states="znodeStates"
                     />
                 </section>
 

@@ -17,7 +17,14 @@
                 <div class="znode-stats">
                     <section class="status">
                         <header>{{ $t('znodes.my-znode.label__status') }}</header>
-                        <main>{{ status }}</main>
+                        <main>
+                            <span
+                                class="status-badge"
+                                :class="statusColor"
+                            >
+                                {{ status }}
+                            </span>
+                        </main>
                     </section>
                     <section class="last-seen">
                         <header>{{ $t('znodes.my-znode.label__last-seen') }}</header>
@@ -95,6 +102,8 @@
                 <base-button
                     v-if="payeeAddress"
                     @click.prevent="openBlockExplorer"
+                    size="small"
+                    color="comet"
                 >
                     {{ $t('znodes.my-znode.button__open-explorer') }}
                 </base-button>
@@ -135,6 +144,10 @@ export default {
         lastPaidTime: {
             type: Number,
             default: 0
+        },
+        znodeStates: {
+            type: Array,
+            required: true
         }
     },
 
@@ -172,6 +185,12 @@ export default {
 
             // todo discuss with @Sebastion
             return this.activeSince + znodePaymentCycleInMs
+        },
+
+        statusColor () {
+            return this.znodeStates.reduce((accumulator, state) => {
+                return state.states.includes(this.status) ? state.name : accumulator
+            }, '')
         }
     },
 
@@ -223,6 +242,24 @@ export default {
                 color: $color--comet;
             }
 
+            .status-badge {
+                display: inline-block;
+                border-radius: emRhythm(0.5, $silent: true);
+                padding: 0.125rem 0.5rem;
+                margin: -0.125rem 0;
+                background: $color--green;
+                color: $color--polo-light;
+                @include font-medium();
+
+                &.pending {
+                    background: rgba($color--green, 0.5);
+                }
+
+                &.needs-attention {
+                    background: $color--red;
+                }
+            }
+
             .status { grid-area: status; }
             .last-seen { grid-area: last-seen; }
             .active-since { grid-area: active-since; }
@@ -234,6 +271,7 @@ export default {
 
         footer {
             margin-top: emRhythm(5);
+            text-align: right;
         }
     }
 </style>
