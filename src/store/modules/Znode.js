@@ -54,7 +54,9 @@ const processZnode = function (id, znode) {
     const location = geoip.lookup(ip)
 
     return {
+        status: 'MISSING',
         ...znode,
+        id,
         location
     }
 }
@@ -80,7 +82,7 @@ const addZnodesThrottled = throttle(function (commit) {
 const actions = {
     // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response
     [types.SET_INITIAL_STATE] ({ commit, state }, initialState) {
-        // console.log('got initial state from ZNODE', initialState)
+        console.log('got initial state from ZNODE', initialState)
 
         const { status } = initialState._meta
         delete initialState._meta
@@ -101,22 +103,13 @@ const actions = {
 
         commit(types.SET_TOTAL, initialState.total)
 
-        // add maximal 10 nodes at a time
-        eachOfLimit(initialState.nodes, 10, async (znode, id) => {
-            // const { id, znode } = znodeData
-
-            // const ip = authority.split(':')[0]
-
+        // process maximal 10 nodes at a time
+        eachOfLimit(initialState.nodes, 10, (znode, id, callback) => {
             initialZnodes[id] = processZnode(id, znode)
-            /*
-            dispatch(types.ADD_ZNODE, {
-                id: znodeKey,
-                znode // : initialState[znodeKey]
-            })
-            */
+            callback()
+        }, () => {
+            addZnodes(commit, initialZnodes)
         })
-
-        addZnodes(commit, initialZnodes)
     },
 
     [types.ON_ZNODE_SUBSCRIPTION] ({ commit, state }, data) {
@@ -195,13 +188,11 @@ const getters = {
     allZnodes: (state, getters, rootState, rootGetters) => Object.values(state.znodes).map((znode) => {
         const lastPayoutTimestamp = 0 // todo get state from address module
 
-        const { payeeAddress: id } = znode
         const authorityIp = znode.authority ? znode.authority.ip : ''
 
         return {
             ...znode,
             lastPayoutTimestamp,
-            id,
             authorityIp
         }
     }),

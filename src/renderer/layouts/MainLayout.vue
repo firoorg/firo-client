@@ -72,6 +72,7 @@ export default {
 
     computed: {
         ...mapGetters({
+            isRestarting: 'App/isRestarting',
             hasOpenModal: 'Window/hasOpenModal',
             networkIsConnected: 'Network/isConnected',
             networkConnectionError: 'Network/connectionError',
@@ -89,7 +90,7 @@ export default {
         },
 
         showConnectivityOverlay () {
-            return !!(!this.networkIsConnected || this.networkConnectionError)
+            return !!((this.connectionLost || this.networkConnectionError) && !this.isRestarting)
         },
 
         showIntro () {

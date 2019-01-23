@@ -1,70 +1,80 @@
 <template>
-    <div class="znode">
+    <div
+        class="znode"
+        :class="{ 'is-missing': isMissing }"
+    >
         <div>
             <header>
                 <h2>{{ label }}</h2>
             </header>
 
-            <div class="znode-stats">
-                <section class="status">
-                    <header>{{ $t('znodes.my-znode.label__status') }}</header>
-                    <main>{{ status }}</main>
-                </section>
-                <section class="last-seen">
-                    <header>{{ $t('znodes.my-znode.label__last-seen') }}</header>
-                    <main>
-                        <timeago
-                            :datetime="lastSeen"
-                            :auto-update="30"
-                        />
-                    </main>
-                </section>
-                <section class="active-since">
-                    <header>{{ $t('znodes.my-znode.label__active-since') }}</header>
-                    <main>
-                        <timeago
-                            :datetime="activeSince"
-                            :auto-update="30"
-                        />
-                    </main>
-                </section>
-                <section class="next-payout">
-                    <header>{{ $t('znodes.my-znode.label__next-payout') }}</header>
-                    <main>
-                        <timeago
-                            v-if="lastPaidTime"
-                            :datetime="nextEstPayout"
-                            :auto-update="30"
-                        />
-                    </main>
-                </section>
-                <section class="last-payout">
-                    <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
-                    <main>
-                        <timeago
-                            v-if="lastPaidTime"
-                            :datetime="lastPaidTime"
-                            :auto-update="30"
-                        />
-                        <span v-else>
-                            {{ $t('znodes.my-znode.description__last-payout--nothing-received') }}
-                        </span>
-                    </main>
-                </section>
-                <section class="received">
-                    <header>{{ $t('znodes.my-znode.label__amount-received') }}</header>
-                    <main>
-                        {{ payoutsReceived }}
-                    </main>
-                </section>
-                <section class="payee">
-                    <header>{{ $t('znodes.my-znode.label__payee') }}</header>
-                    <main>{{ payeeAddress }}</main>
-                </section>
-            </div>
+            <template v-if="isMissing">
+                <div>
+                    <p v-html="$t('znodes.my-znode.description__is-missing')" />
+                </div>
+            </template>
+            <template v-else>
+                <div class="znode-stats">
+                    <section class="status">
+                        <header>{{ $t('znodes.my-znode.label__status') }}</header>
+                        <main>{{ status }}</main>
+                    </section>
+                    <section class="last-seen">
+                        <header>{{ $t('znodes.my-znode.label__last-seen') }}</header>
+                        <main>
+                            <timeago
+                                :datetime="lastSeen"
+                                :auto-update="30"
+                            />
+                        </main>
+                    </section>
+                    <section class="active-since">
+                        <header>{{ $t('znodes.my-znode.label__active-since') }}</header>
+                        <main>
+                            <timeago
+                                :datetime="activeSince"
+                                :auto-update="30"
+                            />
+                        </main>
+                    </section>
+                    <section class="next-payout">
+                        <header>{{ $t('znodes.my-znode.label__next-payout') }}</header>
+                        <main>
+                            <timeago
+                                v-if="lastPaidTime"
+                                :datetime="nextEstPayout"
+                                :auto-update="30"
+                            />
+                        </main>
+                    </section>
+                    <section class="last-payout">
+                        <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
+                        <main>
+                            <timeago
+                                v-if="lastPaidTime"
+                                :datetime="lastPaidTime"
+                                :auto-update="30"
+                            />
+                            <span v-else>
+                                {{ $t('znodes.my-znode.description__last-payout--nothing-received') }}
+                            </span>
+                        </main>
+                    </section>
+                    <section class="received">
+                        <header>{{ $t('znodes.my-znode.label__amount-received') }}</header>
+                        <main>
+                            {{ payoutsReceived }}
+                        </main>
+                    </section>
+                    <section class="payee">
+                        <header>{{ $t('znodes.my-znode.label__payee') }}</header>
+                        <main>{{ payeeAddress }}</main>
+                    </section>
+                </div>
+            </template>
         </div>
 
-        <footer>
+        <footer v-if="!isMissing">
             <base-button :is-outline="true">
                 Other
             </base-button>
@@ -89,7 +99,7 @@ export default {
         },
         payeeAddress: {
             type: String,
-            required: true
+            default: ''
         },
         lastSeen: {
             type: Number,
@@ -113,6 +123,10 @@ export default {
         ...mapGetters({
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
         }),
+
+        isMissing () {
+            return (!this.payeeAddress || this.status === 'MISSING')
+        },
 
         payoutsReceived () {
             const received = this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress)
@@ -149,6 +163,15 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: background 0.25s ease-in-out;
+
+        &.is-missing {
+            background: rgba($color--polo-light, 0.75);
+        }
+
+        h2 {
+            padding-top: 0;
+        }
 
         .znode-stats {
             display: grid;

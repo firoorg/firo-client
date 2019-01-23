@@ -58,7 +58,7 @@ export const getApiStatus = async function ({ host, port }) {
             }))
 
             apiStatus.once('message', onMessage)
-        }, 200)
+        }, 400)
     })
 }
 

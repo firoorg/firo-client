@@ -36,11 +36,13 @@
                 </header>
 
                 <div v-show="!isReadyInitialOrRestarting">
-                    <div>
-                        <loading-bounce
-                            color="dark"
-                            class="loading"
-                        />
+                    <div class="message-wrap">
+                        <div class="loading-wrap">
+                            <loading-bounce
+                                color="dark"
+                                class="loading"
+                            />
+                        </div>
 
                         {{ loadingMessage }}
                     </div>
@@ -182,8 +184,22 @@ export default {
         z-index: 20000;
     }
 
+    .message-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-style: italic;
+    }
+
+    .loading-wrap {
+        width: 35%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
     .loading {
-        margin: 0 auto;
+        //margin: 0 auto;
+        margin-right: emRhythm(2);
     }
 
     .content {

@@ -2,8 +2,8 @@ import { sleep } from '../../lib/utils'
 import * as types from '../types/Network'
 
 const state = {
-    isConnected: false,
-    connectionSeemsLost: false,
+    isConnected: undefined,
+    connectionSeemsLost: undefined,
     connectionErrorCode: 0
 }
 
@@ -57,7 +57,8 @@ const actions = {
 }
 
 const getters = {
-    isConnected: (state) => state.isConnected,
+    isConnected: (state) => state.isConnected === true,
+    connectionLost: (state, getters) => state.connectionSeemsLost && !getters.isConnected,
     connectionError: (state) => state.connectionErrorCode ? state.connectionErrorCode : false
 }
 

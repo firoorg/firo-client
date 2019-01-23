@@ -37,7 +37,7 @@
                                     v-for="znode of cluster.nodes"
                                     :key="znode.id"
                                 >
-                                    {{ znode.status }} - {{ znode.id }}
+                                    {{ znode.status }} - {{ znode.label }}
                                 </li>
                             </ul>
                         </template>

@@ -63,7 +63,7 @@
 
                 <section class="my-znodes">
                     <my-znode
-                        v-for="(znode, index) in myZnodes"
+                        v-for="(znode, index) in filteredMyZnodes"
                         :key="index"
                         v-bind="znode"
                     />
@@ -139,8 +139,12 @@ export default {
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
         }),
 
+        filteredMyZnodes () {
+            return this.getFilteredByUrl(this.myZnodes, ['status', 'payeeAddress', 'authorityIp', 'id', 'label'])
+        },
+
         filteredRemoteZnodes () {
-            return this.getFilteredByUrl(this.remoteZnodes, ['status', 'payeeAddress', 'authorityIp'])
+            return this.getFilteredByUrl(this.remoteZnodes, ['status', 'payeeAddress', 'authorityIp', 'id'])
         },
     }
 }
