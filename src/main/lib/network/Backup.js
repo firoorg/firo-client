@@ -1,8 +1,8 @@
 import mixin from './mixin'
 import types from '~/types'
 
-import Debug from 'debug'
-const debug = Debug('zcoin:network:backup')
+import { createLogger } from '#/lib/logger'
+const logger = createLogger('zcoin:network:backup')
 
 export default {
 
@@ -16,7 +16,7 @@ export default {
     }),
 
     createBackup({path}) {
-        debug('sending backup directory', path)
+        logger.info('sending backup directory %s', path)
 
         this.send({
             collection: 'backup',

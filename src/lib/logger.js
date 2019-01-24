@@ -18,7 +18,7 @@ const logger = winston.createLogger({
     ]
 })
 
-export const createLogger = function (opts = { label: 'foo' }) {
+export const createLogger = function (label) {
     console.log(logger)
 
     return logger

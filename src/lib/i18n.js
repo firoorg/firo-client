@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
-import Debug from 'debug'
+
+import { createLogger } from '#/lib/logger'
 
 import languages from '#/lang'
 import dateTimeFormats from '#/lang/dateTimeFormats'
 
-const debug = Debug('zcoin:i18n')
+const logger = createLogger('zcoin:i18n')
 
 export function getLocale (app) {
     const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
 
-    console.log('locale --> ', locale)
-    debug('current locale: %s', locale)
+    logger.info('current locale: %s', locale)
 
     return locale
 }
@@ -29,7 +29,7 @@ export function getModule (app) {
     })
 
     if (process.env.SHOW_TRANSLATIONS) {
-        debug('switching to translation mode')
+        logger.info('switching to translation mode')
         const interpolate = i18n._formatter.interpolate
 
         i18n._formatter.interpolate = function (message, values) {

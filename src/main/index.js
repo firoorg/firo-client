@@ -1,10 +1,11 @@
 'use strict'
 
-import Debug from 'debug'
 import os from 'os'
 import { app } from 'electron'
 import { join } from 'path'
 import types from '~/types'
+
+import { createLogger } from '#/lib/logger'
 
 import PidManager from './lib/core/PidManager'
 import menu from './lib/menu'
@@ -19,7 +20,7 @@ import deeplink from './lib/deeplink'
 import clipboard from './lib/clipboard'
 
 import CONFIG from './config'
-const debug = Debug('zcoin:main')
+const logger = createLogger('zcoin:main')
 
 /**
  * Set `__static` path to static files in production
@@ -40,7 +41,7 @@ const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindNa
 const userDataPath = process.env.NODE_ENV === 'development' ? rootFolder + '/assets/core' : app.getPath('userData')
 const pathToStorePid = userDataPath
 
-debug({
+logger.info('zcoin paths: %o', {
     rootFolder,
     unpackedRootFolder,
     zcoindPath,
@@ -50,7 +51,7 @@ debug({
 
 // build settings via electron-settings module
 if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
-    debug('registering protocol handler "%s"', CONFIG.app.protocolIdentifier)
+    logger.info('registering protocol handler "%s"', CONFIG.app.protocolIdentifier)
     app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
 }
 
@@ -61,7 +62,7 @@ store.replaceState(require('../store/initialState'))
 setupWindowRouter({ store })
 
 const startNetwork = function () {
-    debug('STARTING NETWORK')
+    logger.info('starting network')
 
     network.init({ store })
 }
@@ -90,7 +91,7 @@ if (stopOnQuit) {
 app.on('ready', () => {
     populateStoreWithAppSettings({ store })
     // start it!
-    debug('zcoindPath', zcoindPath)
+    logger.info('path to zcoind binary: %s', zcoindPath)
 
     coreDaemonManager.setPathToSpawn(zcoindPath)
 
@@ -111,7 +112,7 @@ app.on('ready', () => {
 })
 
 app.on('before-quit', async (event) => {
-    console.log('app before quit')
+    logger.info('application before quit')
     store.dispatch(types.app.PERSIST_APP_VERSION)
     const isRunning = await coreDaemonManager.isRunning()
 
@@ -121,7 +122,7 @@ app.on('before-quit', async (event) => {
 })
 
 app.on('will-quit', () => {
-    console.log('app will quit')
+    logger.info('application will quit')
     network.close()
     clipboard.unwatch()
 })

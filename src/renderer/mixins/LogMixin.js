@@ -4,6 +4,6 @@ import { createLogger } from '#/lib/logger'
 
 export default {
     beforeCreate () {
-        this.$log = createLogger({ label: `vue:${this.name}` })
+        this.$log = createLogger(`vue:${this.name}`)
     }
 }

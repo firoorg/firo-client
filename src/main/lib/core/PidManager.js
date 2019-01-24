@@ -3,12 +3,12 @@ import { exec, spawn } from 'child_process'
 import { join } from 'path'
 import fs from 'fs'
 
-import Debug from 'debug'
+import { createLogger } from '#/lib/logger'
 import { sleep, connectToStore } from '#/lib/utils'
 
 import types from '~/types'
 
-const debug = Debug('zcoin:core:manager')
+const logger = createLogger('zcoin:core:manager')
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -16,8 +16,8 @@ const unlink = promisify(fs.unlink)
 
 export default class PidManager {
     constructor ({ path: filePath, name, store, onStarted, onStop, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
-        debug('setting up a new PidManager for %s', name)
-        debug('going to write pid file to "%s"', filePath)
+        logger.info('setting up a new PidManager for %s', name)
+        logger.info('going to write pid file to "%s"', filePath)
 
         this.pid = -1
         this.child = null
@@ -43,9 +43,9 @@ export default class PidManager {
     }
 
     async start (pathToSpawn) {
-        debug(`starting child process "${this.name}" ...`)
+        logger.info(`starting child process "${this.name}" ...`)
         if (!this.pathToSpawn && !pathToSpawn) {
-            debug('could not start daemon process. no path to spwan given')
+            logger.warn('could not start daemon process. no path to spwan given')
             return
         }
 
@@ -61,12 +61,12 @@ export default class PidManager {
         }
 
         if (await this.isRunning()) {
-            debug('daemon is still running. no need to start it...')
+            logger.info('daemon is still running. no need to start it...')
             this.onStart()
             return this.pid
         }
 
-        debug('getArguments', this.getArguments())
+        logger.debug('spawning with arguments', this.getArguments())
 
         this.child = spawn(this.pathToSpawn, this.getArguments(), {
             // detached: true,
@@ -81,7 +81,7 @@ export default class PidManager {
         // not using detached at the moment
         this.child.unref()
 
-        debug('started managed process with pid id', this.pid)
+        logger.info('started managed process with pid id', this.pid)
 
         await this.write()
         this.onStart()
@@ -91,7 +91,7 @@ export default class PidManager {
 
     onStart () {
         this.startHeartbeat()
-        console.log('onStarted...')
+
         this.onStarted({
             pid: this.pid
         })
@@ -103,7 +103,7 @@ export default class PidManager {
 
     enableAutoRestart () {
         this.autoRestart = true
-        debug('auto start enabled')
+        logger.debug('auto start enabled')
     }
 
     isAutoRestartEnabled () {
@@ -112,12 +112,12 @@ export default class PidManager {
 
     disableAutoRestart () {
         this.autoRestart = false
-        debug('auto start disabled')
+        logger.debug('auto start disabled')
     }
 
     async isRunning () {
         if (this.pid === -1) {
-            debug('not running pid --> %d', this.pid)
+            logger.debug('daemon with pid %d is not running', this.pid)
             return false
         }
 
@@ -152,7 +152,7 @@ export default class PidManager {
         const exists = hasLocation ? fs.existsSync(location) : false
 
         if (location && !exists) {
-            debug('blockchain location %s does not exist. falling back to default location', location)
+            logger.warn('blockchain location %s does not exist. falling back to default location', location)
         }
 
         return hasLocation && exists ? [`-datadir=${location}`] : []
@@ -163,7 +163,7 @@ export default class PidManager {
             await unlink(this.getFileSystemPath())
         } catch (e) {
             if (e.code !== 'ENOENT') {
-                debug(e)
+                logger.error(e)
             }
         }
         this.pid = -1
@@ -174,25 +174,24 @@ export default class PidManager {
             clearTimeout(this.heartbeat)
             this.heartbeat = null
         }
-        debug('removed .pid file and reset this.pid')
+        logger.debug('removed .pid file and reset this.pid')
     }
 
     async write () {
         const pid = `${this.pid}\n`
         await writeFile(this.getFileSystemPath(), pid)
-        debug('wrote pid %d to path', this.pid)
+        logger.info('wrote pid %d to path', this.pid)
     }
 
     async readPidFromFs () {
         try {
             const content = parseInt(await readFile(this.getFileSystemPath()))
-            debug('content %s', content)
             return content > 0 ? content : -1
         } catch (e) {
             if (e.code !== 'ENOENT') {
-                console.error(e)
+                logger.error(e)
             } else {
-                debug('file does not exist')
+                logger.debug('pid file does not exist')
             }
         }
 
@@ -209,11 +208,11 @@ export default class PidManager {
 
     startHeartbeat () {
         if (this.heartbeat) {
-            debug('heartbeat is already running...')
+            logger.debug('heartbeat is already running...')
             return
         }
 
-        debug('starting heartbeat')
+        logger.info('starting heartbeat')
 
         const beat = () => {
             this.heartbeat = setTimeout(async () => {
@@ -232,7 +231,7 @@ export default class PidManager {
             return beat()
         }
 
-        debug('onHeartbeat: NOT RUNNING ANYMORE')
+        logger.warn('onHeartbeat: NOT RUNNING ANYMORE')
 
         clearTimeout(this.heartbeat)
         this.heartbeat = null
@@ -248,7 +247,7 @@ export default class PidManager {
             return
         }
 
-        debug('restarting daemon...')
+        logger.info('restarting daemon...')
         this.start()
 
         if (this.isAutoRestartEnabled()) {

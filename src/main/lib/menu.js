@@ -2,9 +2,9 @@ import { Menu } from 'electron'
 import { getModule } from '#/lib/i18n'
 import types from '~/types'
 
-import Debug from 'debug'
+import { createLogger } from '#/lib/logger'
 
-const debug = Debug('zcoin:menu')
+const logger = createLogger('zcoin:menu')
 
 export default {
 
@@ -20,7 +20,7 @@ export default {
 
         const menu = Menu.buildFromTemplate(template)
 
-        debug('setting application menu')
+        logger.info('setting application menu')
 
         Menu.setApplicationMenu(menu)
     },

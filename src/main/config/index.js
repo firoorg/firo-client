@@ -11,6 +11,4 @@ files.keys().forEach(key => {
     config[key.replace(/(\.\/|\.js)/g, '')] = files(key).default
 })
 
-console.log(config)
-
 export default config

@@ -1,10 +1,10 @@
-import Debug from 'debug'
 import zmq from 'zeromq'
 import { isString, isFunction } from 'lodash'
+import { createLogger } from '#/lib/logger'
 
-import types from '../../../store/types'
+import types from '~/types'
 
-const debug = Debug('zcoin:network:mixin')
+const logger = createLogger('zcoin:network:mixin')
 
 // @see http://zguide.zeromq.org/php:chapter5#Getting-an-Out-of-Band-Snapshot
 export default {
@@ -28,7 +28,7 @@ export default {
     commitMutation: null,
 
     init ({ host, ports, dispatch, commit, encryption }) {
-        debug(`connecting to requester at ${ports.request}`)
+        logger.info(`connecting to requester at ${ports.request}`)
 
         this.requester = zmq.socket('req')
 
@@ -49,6 +49,7 @@ export default {
         } else if (process.env.NODE_ENV !== 'development') {
             // todo limit error to mainnet?
             dispatch(types.network.SET_NETWORK_CONNECTION_ERROR, 2)
+            logger.error('no encryption provided')
             throw new Error('no encryption provided.')
         }
 
@@ -61,7 +62,7 @@ export default {
         this.types = types[this.namespace.toLowerCase()]
 
         if (this.subscriptions && this.subscriptions.length) {
-            debug(`connecting to publisher at ${ports.publisher}`)
+            logger.info(`connecting to publisher at ${ports.publisher}`)
             this.subscriberUri = `${host}:${ports.publisher}`
             this.subscriber.connect(this.subscriberUri)
 
@@ -84,14 +85,14 @@ export default {
 
                 this.dispatchAction(this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`], data)
             } catch (e) {
-                debug('error in response of', topic, 'request', this.subscriptions)
-                debug(e)
-                debug(message)
+                logger.warn('error in response of', topic, 'request', this.subscriptions)
+                logger.error(e)
+                logger.warn(message)
             }
         })
 
         for (let subscription of this.subscriptions) {
-            debug('subscribing to', subscription)
+            logger.info('subscribing to', subscription)
             this.subscriber.subscribe(subscription)
         }
     },
@@ -102,30 +103,30 @@ export default {
         }
 
         if (!this.types.SET_INITIAL_STATE) {
-            debug('no initial state action set for', this.collection)
+            logger.debug('no initial state action set for', this.collection)
             return
         }
 
         this.requester.once('message', (message) => {
-            debug('received initial state request', this.collection)
+            logger.info('received initial state request', this.collection)
 
             try {
                 const response = JSON.parse(message.toString())
-                console.log('this.types', this.types)
+
                 this.processResponse(response, {
                     onSuccess: this.types.SET_INITIAL_STATE
                 })
                 // todo set intial loading true
                 // this.setLoading(false)
             } catch (e) {
-                debug('error in response of initial request call.', this.namespace)
-                debug(e)
-                debug(message.toString())
+                logger.info('error in response of %s initial request call.', this.namespace)
+                logger.error(e)
+                logger.warn(message.toString())
             }
         })
 
         // todo add timeout to request
-        debug('sending initial state request', this.collection)
+        logger.info('sending initial state request for %s', this.collection)
         this.requester.send(JSON.stringify({
             type: this.initialRequestType,
             collection: this.collection
@@ -144,13 +145,13 @@ export default {
 
         // todo subscriptions are pushed to the client and therefore dont have a meta key set.
         if (!meta || meta.status < 200 || meta.status >= 400) {
-            console.warn(response)
+            logger.warn(response)
             if (onError) {
                 if (isString(onError)) {
-                    debug('dispatching action', onError)
+                    logger.info('dispatching action', onError)
                     this.dispatchAction(onError, { _meta: meta, error })
                 } else if (isFunction(onError)) {
-                    debug('invoking onError callback')
+                    logger.info('invoking onError callback')
                     onError({ _meta: meta, error })
                 }
             }
@@ -158,16 +159,16 @@ export default {
         }
 
         if (!data) {
-            debug('nothing received. returning...')
+            logger.info('nothing received. returning...')
             return
         }
 
         if (onSuccess) {
             if (isString(onSuccess)) {
-                debug('dispatching action', onSuccess)
+                logger.info('dispatching action', onSuccess)
                 this.dispatchAction(onSuccess, { _meta: meta, ...data })
             } else if (isFunction(onSuccess)) {
-                debug('invoking onSuccess callback')
+                logger.info('invoking onSuccess callback')
                 onSuccess({ _meta: meta, ...data })
             }
         }
@@ -175,7 +176,7 @@ export default {
 
     send ({ type, collection, data, auth = null }, actionsToDispatch = {}) {
         if (!collection && !this.collection) {
-            debug('can not send. no collection given!', {
+            logger.warn('can not send. no collection given!', {
                 type,
                 data,
                 actionsToDispatch
@@ -187,14 +188,14 @@ export default {
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
-            console.log('response', response)
+            logger.debug('response', response)
             this.processResponse(response, actionsToDispatch)
             this.setLoading(false)
         }
 
         this.requester.once('message', onMessage)
 
-        console.log('sending data --> ', Date.now(), data)
+        logger.info('sending data --> ', Date.now(), data)
         this.setLoading(true)
 
         this.requester.send(JSON.stringify({
@@ -224,7 +225,7 @@ export default {
         try {
             this.subscriber.close()
         } catch (e) {
-            console.log(e.type)
+            logger.error(e.type)
             // console.log(e)
         }
 

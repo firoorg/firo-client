@@ -1,10 +1,10 @@
-import Debug from 'debug'
 import { app } from 'electron'
 import urlParse from 'url-parse'
 import { isZcoinAddress } from '#/lib/zcoin'
 import types from '~/types'
+import { createLogger } from '#/lib/logger'
 
-const debug = Debug('zcoin:deeplink')
+const logger = createLogger('zcoin:deeplink')
 
 export default {
     windowManager: null,
@@ -45,11 +45,11 @@ export default {
 
         const [ address ] = url.match(RegExp(parsed.hostname, 'i'))
 
-        debug('got deeplink url', url, address, parsed)
+        logger.debug('got deeplink url', url, address, parsed)
 
         // got a payment request url
         if (address && isZcoinAddress(address, prefixes)) {
-            debug('is payment request. filling store...')
+            logger.info('is payment request. filling store...')
             this.store.dispatch(types.clipboard.SET_CLIPBOARD, url)
             this.store.dispatch(types.clipboard.SET_ADDRESS, address)
 
