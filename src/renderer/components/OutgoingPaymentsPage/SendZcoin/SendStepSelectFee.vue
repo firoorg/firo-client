@@ -42,19 +42,18 @@ export default {
 
     methods: {
         updateFee (newVal) {
-            console.log('update fee', this.fee.key, newVal)
+            this.$log.debug('update fee', this.fee.key, newVal)
             const feeChanged = this.fee.key !== newVal.key
 
             this.$store.dispatch(types.zcoinpayment.SET_FEE, newVal)
-            console.log('direct', this.fee.amount)
 
             // we need to defer calculation into the next tick
             // as we have to wait that the `newVal` gets synced down to components
             this.$nextTick(() => {
-                console.log('sending fee + payments to zcoind to get estimated total fee')
+                this.$log.info('sending fee + payments to zcoind to get estimated total fee')
                 this.updateTransactionFee()
 
-                console.log('changed fee', feeChanged)
+                this.$log.info('changed fee', feeChanged)
 
                 this.$parent.$emit('is-confirmed', !feeChanged)
                 this.$parent.$emit('can-submit', !feeChanged)

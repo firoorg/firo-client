@@ -23,7 +23,6 @@ export default {
                 confirm: {
                     component: this.getConfirmStep(),
                     isOpen () {
-                        console.log('is open ->', this, this.currentStepCanSubmit)
                         return true
                     },
                     placement () {
@@ -147,17 +146,14 @@ export default {
 
     methods: {
         onStepCanSubmit (newVal) {
-            console.log('on can submit!', newVal)
             this.currentStepCanSubmit = newVal
         },
 
         onStepCanCancel (newVal) {
-            console.log('on can cancel!', newVal)
             this.currentStepCanCancel = newVal
         },
 
         onConfirm (newVal) {
-            console.log('confirmed!!!', newVal)
             this.isConfirmed = newVal
         },
 
@@ -176,9 +172,8 @@ export default {
         },
 
         clearResponse () {
-            console.log('clearResponse')
             if (this.responseActionName) {
-                console.log('clearResponse dispatch!!')
+                this.$log.debug('clear response dispatched')
                 this.$store.dispatch(this.responseActionName)
             }
         },

@@ -7,7 +7,6 @@ export const addVuexModel = ({ name, getter: getterName, action: actionName, nam
     return {
         [name]: {
             get () {
-                console.log(this.$store.getters)
                 return this.$store.getters[namespaced + getter]
             },
             set (value) {

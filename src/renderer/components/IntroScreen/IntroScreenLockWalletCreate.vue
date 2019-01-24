@@ -187,7 +187,7 @@ export default {
                 this.isValidPassphrase = this.currentScore >= this.scoreToReach
             }
 
-            console.log('this.isValidPassphrase', this.isValidPassphrase)
+            this.$log.debug('this.isValidPassphrase', this.isValidPassphrase)
         }
     }
 

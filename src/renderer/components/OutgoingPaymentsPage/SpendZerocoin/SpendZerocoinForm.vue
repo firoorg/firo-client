@@ -174,13 +174,13 @@ export default {
             this.validate()
         },
         spendFormMintCosts (newVal) {
-            console.log('spendFormMintCosts ->', newVal)
+            this.$log.debug('spendFormMintCosts ->', newVal)
             this.validate()
         },
 
         formValidated: {
             handler (newVal, oldVal) {
-                console.log('form validated', newVal, oldVal)
+                // console.log('form validated', newVal, oldVal)
                 this.$emit('form-validated', newVal)
             },
             immediate: true
@@ -195,7 +195,6 @@ export default {
         onDenominationChange (denomination) {
             this.$refs.amountSelector.focus()
             this.setMint(denomination)
-            console.log('onDenominationChange', denomination)
         },
 
         showAmountSelector () {

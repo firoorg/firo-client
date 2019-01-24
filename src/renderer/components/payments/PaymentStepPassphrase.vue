@@ -64,7 +64,6 @@ export default {
     watch: {
         canSubmit: {
             handler (newVal) {
-                console.log('emitting passphrase state', newVal)
                 this.$parent.$emit('can-submit', newVal)
             },
             immediate: true

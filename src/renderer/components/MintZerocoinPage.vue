@@ -286,7 +286,7 @@ export default {
         },
 
         cleanupForm () {
-            console.log('cleaning up mints...')
+            this.$log.info('cleaning up mints...')
             this.resetDenominations()
         }
     }

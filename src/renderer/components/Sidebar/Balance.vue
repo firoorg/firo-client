@@ -87,7 +87,7 @@ export default {
             if (!isConfirmed) {
                 return
             }
-            console.log('is confirmed')
+
             /*
               this.sendNotification({
                   title: 'Balance Confirmed',
@@ -101,7 +101,7 @@ export default {
                 return
             }
 
-            console.log(`Confirmations update ${this.requiredConfirmations - newPending}/${this.requiredConfirmations}. @todo`)
+            // console.log(`Confirmations update ${this.requiredConfirmations - newPending}/${this.requiredConfirmations}. @todo`)
 
             /*
               this.showMessage({

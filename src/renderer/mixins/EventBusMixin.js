@@ -10,7 +10,7 @@ export default {
     created () {
         if (!this.eventBusName) {
             if (process.env.NODE_ENV !== 'production') {
-                console.warn('event bus mixin added but no `eventBusName` provided')
+                this.$log.warn('event bus mixin added but no `eventBusName` provided')
             }
 
             return

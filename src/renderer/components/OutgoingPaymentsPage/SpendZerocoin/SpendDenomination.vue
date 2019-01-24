@@ -72,7 +72,7 @@ export default {
             // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
             // return all - this.calcHeight(this.minted) + 'px'
             // return this.mapHeight(all) + 'px'
-            console.log(this.available - this.current)
+            //console.log(this.available - this.current)
             return (Math.log(this.calcWidth(this.available + 1 - this.current)) * (8 * 4)) + 'px'
         },
 

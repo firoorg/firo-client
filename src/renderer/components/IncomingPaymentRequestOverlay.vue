@@ -121,7 +121,7 @@ export default {
                 return
             }
 
-            console.log(tx)
+            this.$log.debug(`going to payment detail %o`, tx)
 
             const { id } = tx
 

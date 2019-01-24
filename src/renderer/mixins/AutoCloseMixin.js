@@ -39,7 +39,7 @@ export default {
                     this.close()
                 }
             }, this.closeAfterInSeconds * 1000)
-            console.log('started auto close timeout')
+            //this.$log.debug('started auto close timeout')
         },
 
         cancelAutoClose () {
@@ -53,7 +53,7 @@ export default {
         close () {
             this.$emit('auto-close', true)
             this.onAutoClose()
-            console.log('closing...')
+            this.$log.debug('closing...')
             this.autoCloseTimeout = null
         }
     }

@@ -111,7 +111,6 @@ export default {
 
         // todo integrate GuideMixin
         goToStep (stepKey) {
-            console.log('go to step', stepKey)
             if (!this.steps[stepKey]) {
                 return
             }

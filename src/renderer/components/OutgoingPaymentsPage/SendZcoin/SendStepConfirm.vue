@@ -58,7 +58,7 @@ export default {
 
     methods: {
         goToFeeSelector () {
-            console.log('going to fee selection')
+            this.$log.info('going to fee selection')
             this.actions.goTo('selectFee')
         }
     }

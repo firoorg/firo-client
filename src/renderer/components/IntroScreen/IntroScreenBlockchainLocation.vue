@@ -70,7 +70,7 @@ export default {
 
 
             if (!returned || !returned[0]) {
-                console.log('user canceled the selection in the dialog box')
+                this.$log.debug('user canceled the selection in the dialog box')
                 return
             }
 

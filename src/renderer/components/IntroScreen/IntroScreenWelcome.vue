@@ -7,7 +7,7 @@
         <footer>
             <BaseButton
                 color="green"
-                @click="actions.next"
+                @click="foo"
             >
                 {{ $t('onboarding.intro-screen.button__start--primary') }}
             </BaseButton>
@@ -26,8 +26,12 @@ export default {
 
     methods: {
         isEnabled () {
-            console.log('App/showIntroScreen', this.$store.getters['App/showIntroScreen'])
             return true
+        },
+
+        foo () {
+            this.$log.info('testing the logger')
+            //console.log(this)
         }
     }
 }

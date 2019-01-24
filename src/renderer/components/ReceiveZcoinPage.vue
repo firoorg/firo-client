@@ -158,8 +158,6 @@ export default {
                 return address.address === this.selectedPaymentRequest
             })
 
-            console.log(filteredAddress)
-
             const paymentRequest = this.allPaymentRequests.find((request) => {
                 return request.address === this.selectedPaymentRequest
             })

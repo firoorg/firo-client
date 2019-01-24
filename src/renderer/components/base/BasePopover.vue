@@ -99,7 +99,7 @@ export default {
 
     methods: {
         reflow () {
-            console.log('reflow')
+            //console.log('reflow')
             this.$smoothReflow({
                 el: this.$refs.container,
                 // debug: true,

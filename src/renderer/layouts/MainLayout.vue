@@ -106,7 +106,6 @@ export default {
         await sleep(1000)
         this.overlayDuration = 1000
         // this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
-        console.log(types.app.HIDE_INTRO_SCREEN)
 
         this.$store.commit(types.router.SET_ENABLED_ROUTES, [
             types.router.ROUTE_TO_CREATE_PAYMENT_REQUEST,

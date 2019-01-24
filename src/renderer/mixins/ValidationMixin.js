@@ -65,9 +65,8 @@ export default {
             let tooltipToShow = ''
 
             for (let key of this.validationFieldOrder) {
-                console.log(key, (this.validationFields[key]) ? this.validationFields[key].dirty : null)
+                // console.log(key, (this.validationFields[key]) ? this.validationFields[key].dirty : null)
                 if (this.validationErrors.has(key) && this.validationFields[key].dirty) {
-                    console.log(key)
                     tooltipToShow = key
                     break
                 }

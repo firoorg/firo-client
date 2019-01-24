@@ -221,7 +221,7 @@ export default {
 
             for (let payment of this.pendingPayments) {
                 const { address } = payment
-                console.log('let address in this.pendingPayments', address)
+                //console.log('let address in this.pendingPayments', address)
                 const usedAddress = this.hasAlreadySentToAddress(address)
 
                 if (usedAddress) {

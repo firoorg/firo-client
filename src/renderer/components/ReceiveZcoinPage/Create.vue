@@ -175,7 +175,7 @@ export default {
             }
 
             this.$store.dispatch(types.paymentrequest.CREATE_PAYMENT_REQUEST)
-            console.log('submitting form')
+            this.$log.debug('submitting form')
             this.$refs.submit.$el.blur()
             this.resetValidator()
         }

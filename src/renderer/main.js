@@ -67,8 +67,6 @@ requireComponent.keys().forEach(fileName => {
         )
     )
 
-    console.log('found', fileName, componentName)
-
     // Register component globally
     Vue.component(
         componentName,

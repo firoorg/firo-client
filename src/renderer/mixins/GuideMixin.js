@@ -19,7 +19,7 @@ export default {
         },
 
         currentIndex () {
-            console.log(this.stepKeys, this.currentStep)
+            this.$log.debug(this.stepKeys, this.currentStep)
             return this.stepKeys.indexOf(this.currentStep)
         },
 
@@ -117,7 +117,7 @@ export default {
         },
 
         goToStep (stepKey) {
-            console.log('go to step', stepKey)
+            this.$log.debug('go to step', stepKey)
             if (!this.steps[stepKey]) {
                 return false
             }

@@ -121,7 +121,7 @@ export default {
         },
 
         cleanupForm () {
-            console.log('cleaning up...')
+            this.$log.debug('cleaning up...')
             this.clearForm()
 
             this.resetValidator()
@@ -129,7 +129,7 @@ export default {
 
         submitForm () {
             if (!this.currentPassphrase) {
-                console.log('no passphrase')
+                this.$log.debug('no passphrase. returning')
                 return
             }
 

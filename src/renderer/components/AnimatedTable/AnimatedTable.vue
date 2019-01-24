@@ -125,14 +125,6 @@ export default {
         onRowClick (rowData) {
             const { data, index, event } = rowData
 
-            console.log(data[this.trackBy], data, this.trackBy)
-
-            /*
-                if (data[this.trackBy] === this.selectedRow) {
-                    return
-                }
-                */
-
             if (this.onRowSelect) {
                 this.onRowSelect(data, index, event)
             }
@@ -185,7 +177,7 @@ export default {
             }
         },
         onActionClicked (action, data) {
-            console.log('slot actions: on-click', data.name)
+            this.$log.debug('slot actions: on-click', data.name)
         }
     }
 }

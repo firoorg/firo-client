@@ -8,7 +8,7 @@ export default {
 
                     return filter
                 } catch (e) {
-                    console.error(e)
+                    this.$log.error(e)
                     return ''
                 }
             },

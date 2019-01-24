@@ -202,7 +202,7 @@ export default {
         },
         formValidated: {
             handler (newVal, oldVal) {
-                console.log('form validated', newVal, oldVal)
+                this.$log.debug('form validated', newVal, oldVal)
                 this.$emit('form-validated', newVal)
             },
             immediate: true

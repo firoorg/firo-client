@@ -34,7 +34,6 @@ export default {
 
     watch: {
         received (newVal, oldVal) {
-            console.log('received changed from', oldVal, newVal)
             if (newVal) {
                 this.anim.play()
             }

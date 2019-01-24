@@ -75,7 +75,7 @@ export default {
 
     methods: {
         onRowSelect ({ name, id }) {
-            console.log(name, id)
+            this.$log.debug(name, id)
 
             this.pushRouterWithFilter({
                 name,

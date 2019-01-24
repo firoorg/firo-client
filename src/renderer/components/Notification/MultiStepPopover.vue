@@ -87,7 +87,6 @@ export default {
             for (let key of Object.keys(this.steps)) {
                 const step = this.steps[key]
 
-                console.log(step)
                 if (isObject(step) && step.component) {
                     components[key] = step.component
                 } else {

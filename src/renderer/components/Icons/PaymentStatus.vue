@@ -39,7 +39,6 @@ export default {
     watch: {
         isConfirmed (newVal) {
             if (newVal) {
-                console.log('start to play')
                 this.anim.play()
             } else {
                 this.anim.goToAndPlay(0)
@@ -56,7 +55,6 @@ export default {
         },
 
         onClick () {
-            console.log('clicked')
             this.isConfirmed = !this.isConfirmed
         }
     }

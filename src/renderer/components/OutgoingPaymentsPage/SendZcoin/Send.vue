@@ -121,7 +121,7 @@ export default {
         },
 
         cleanupForm () {
-            console.log('cleaning up...')
+            this.$log.info('cleaning up send form.')
             this.clearForm()
 
             // this.hasSent = false
@@ -138,17 +138,17 @@ export default {
 
         submitForm () {
             if (!this.hasPendingPayments) {
-                console.log('no pending payments')
+                this.$log.info('trying to submit form but no pending payments')
                 return
             }
 
             if (!this.selectedFee) {
-                console.log('no fee selected')
+                this.$log.info('trying to submit form but no fee selected')
                 return
             }
 
             if (!this.currentPassphrase) {
-                console.log('no passphrase')
+                this.$log.info('trying to submit form but no passphrase given')
                 return
             }
 

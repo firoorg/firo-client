@@ -80,7 +80,6 @@ export default {
         }),
 
         onSubmitForm({ label }) {
-            console.log('submitting label edit form', label)
             this.$emit('submit', { label })
             this.sentLabel = true
             this.isOpen = false
