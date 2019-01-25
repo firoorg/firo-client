@@ -11,7 +11,7 @@ import camelCase from 'lodash/camelCase'
 import { sync } from 'vuex-router-sync'
 
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
-import LogMixin from '@/mixins/LogMixin'
+import Logger from '@/plugins/Logger'
 
 import App from './App'
 import router from './router'
@@ -48,7 +48,7 @@ Vue.use(VeeValidate, {
 })
 Vue.directive('scrollable', Scrollable)
 Vue.use(BindScopedSlotsPlugin)
-Vue.mixin(LogMixin)
+Vue.use(Logger)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
