@@ -210,13 +210,14 @@ export default {
         try {
             this.subscriber.disconnect(this.subscriberUri)
         } catch (e) {
-            console.log(e.type)
+            logger.warn(e)
             // console.log(e)
         }
 
         try {
             this.requester.disconnect(this.requesterUri)
         } catch (e) {
+            logger.warn(e)
             // console.log(e)
         }
     },
@@ -225,13 +226,14 @@ export default {
         try {
             this.subscriber.close()
         } catch (e) {
-            logger.error(e.type)
+            logger.warn(e)
             // console.log(e)
         }
 
         try {
             this.requester.close()
         } catch (e) {
+            logger.warn(e)
             // console.log(e)
         }
     }

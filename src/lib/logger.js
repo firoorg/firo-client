@@ -19,7 +19,7 @@ const logger = winston.createLogger({
 })
 
 export const createLogger = function (label) {
-    console.log(logger)
+    // console.log(logger)
 
     return logger
     //return logger.child({ label })
