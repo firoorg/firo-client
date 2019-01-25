@@ -107,7 +107,11 @@ const actions = {
     [types.CREATE_PAYMENT_REQUEST] ({ commit, state }) {
         const { label, amount, message } = state.createPaymentRequestForm
 
-        logger.info('creating payment request: %o', state.createPaymentRequestForm)
+        logger.info('creating payment request: %o', {
+            label,
+            amount,
+            message
+        })
 
         commit(types.CREATE_PAYMENT_REQUEST, {
             label,

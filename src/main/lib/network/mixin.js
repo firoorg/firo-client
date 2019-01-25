@@ -195,7 +195,7 @@ export default {
 
         this.requester.once('message', onMessage)
 
-        logger.info('sending data --> ', Date.now(), data)
+        logger.info('sending data --> %d %o', Date.now(), data)
         this.setLoading(true)
 
         this.requester.send(JSON.stringify({
