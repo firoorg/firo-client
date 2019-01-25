@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import * as types from '~/types/Address'
 import rootTypes from '~/types'
-
 import LastSeen from '~/mixins/LastSeen'
-
 import { addConfirmationsToTransaction } from '~/utils'
+import { createLogger } from '#/lib/logger'
 
+const logger = createLogger('zcoin:store:address')
 const lastSeen = LastSeen.module('transaction')
 
 const WALLET_ADDRESS_KEY = 'walletAddresses'
@@ -53,7 +53,7 @@ const mutations = {
     ...lastSeen.mutations,
 
     [types.ADD_WALLET_ADDRESS] (state, { address, total }) {
-        console.log('adding wallet address', address, total)
+        logger.debug('adding wallet address', address, total)
 
         Vue.set(state[WALLET_ADDRESS_KEY], address, {
             address,
@@ -63,7 +63,7 @@ const mutations = {
     },
 
     [types.ADD_THIRD_PARTY_ADDRESS] (state, { address, total }) {
-        console.log('adding third party address', address, total)
+        logger.debug('adding third party address', address, total)
         Vue.set(state[THIRD_PARTY_ADDRESS_KEY], address, {
             address,
             total,
@@ -104,7 +104,7 @@ const actions = {
     ...lastSeen.actions,
 
     [types.SET_INITIAL_STATE] ({ commit, dispatch, state }, initialState) {
-        console.log(Object.keys(initialState))
+        logger.info('got initial state for ADDRESS %o', Object.keys(initialState))
         const { addresses } = initialState
 
         for (const addressKey of Object.keys(addresses)) {
@@ -117,11 +117,11 @@ const actions = {
             const { txids, total } = address
 
             if (!txids) {
-                console.log('no txids found for address', addressKey)
+                logger.debug('no txids found for address', addressKey)
                 break
             }
 
-            console.log('total:', total)
+            logger.debug('total amount: %d', total)
 
             for (let txIndex of Object.keys(txids)) {
                 for (let txid of Object.keys(txids[txIndex])) {
@@ -129,7 +129,7 @@ const actions = {
                     const { category } = tx
 
                     if (!category) {
-                        console.log(tx, address)
+                        console.warn('transaction without a category given', tx, address)
                         return
                     }
 
@@ -180,7 +180,7 @@ const actions = {
                         break
 
                     default:
-                        console.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
+                        logger.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
                         break
                     }
                 }
@@ -237,7 +237,7 @@ const actions = {
         const txBasics = getTxBasics(spendTx)
         const { address } = spendTx
 
-        console.log(types.ADD_SPEND_IN_FROM_TX, txBasics, Object.keys(spendTx))
+        // console.log(types.ADD_SPEND_IN_FROM_TX, txBasics, Object.keys(spendTx))
 
         commit(types.ADD_TRANSACTION, {
             stack: WALLET_ADDRESS_KEY,
@@ -253,7 +253,7 @@ const actions = {
         const txBasics = getTxBasics(spendTx)
         const { address, label } = spendTx
 
-        console.log(types.ADD_SPEND_OUT_FROM_TX, txBasics, Object.keys(spendTx))
+        // console.log(types.ADD_SPEND_OUT_FROM_TX, txBasics, Object.keys(spendTx))
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,
@@ -298,8 +298,8 @@ const actions = {
             const payload = !data.addresses ? { addresses: data } : data
             dispatch(types.SET_INITIAL_STATE, payload)
         } catch (e) {
-            console.log(e)
-            console.log(data)
+            logger.error(e)
+            logger.warn(data)
         }
     },
 

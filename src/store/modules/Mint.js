@@ -7,9 +7,12 @@ import Response from '~/mixins/Response'
 
 import { formatDenominationPairs } from '~/utils'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+import { createLogger } from '#/lib/logger'
 
 const isLoading = IsLoading.module('')
 const mintResponse = Response.module('mint')
+
+const logger = createLogger('zcoin:store:mint')
 
 const state = {
     ...isLoading.state,
@@ -80,7 +83,7 @@ const actions = {
     },
 
     [types.DO_MINT] ({ commit, dispatch, state }, { denominations, auth }) {
-        console.log(denominations, auth)
+        logger.info('going to mint %o', denominations)
 
         commit(types.DO_MINT, {
             data: {

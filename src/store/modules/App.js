@@ -1,6 +1,9 @@
+import fs from 'fs'
 import * as types from '../types/App'
 import { getApp, getAppSettings } from '#/lib/utils'
-import fs from "fs";
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:store:app')
 
 const state = {
     isReady: false,
@@ -59,9 +62,7 @@ const mutations = {
         state.clientIsLocked = isLocked
     },
 
-    [types.LOCK_WALLET] (state, passphrase) {
-        // picked up by main
-        console.log('locking wallet', passphrase)
+    [types.LOCK_WALLET] () {
     },
 
     // intro
@@ -101,7 +102,7 @@ const actions = {
     [types.LOCK_WALLET] ({ commit, state }, passphrase) {
         // already locked. returning
         if (state.clientIsLocked) {
-            console.log('already locked')
+            logger.info('wallet is already locked')
             return
         }
 
@@ -153,7 +154,6 @@ const actions = {
     },
 
     [types.HIDE_INTRO_SCREEN] ({ commit, state }) {
-        console.log('in action')
         commit(types.HIDE_INTRO_SCREEN)
     },
 
@@ -175,7 +175,7 @@ const actions = {
         }
 
         if (!fs.existsSync(location)) {
-            debug('given location does not exits', location)
+            logger.warn('given location does not exist: %s', location)
             return
         }
 

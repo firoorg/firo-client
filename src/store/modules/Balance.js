@@ -1,7 +1,8 @@
 import * as types from '~/types/Balance'
 
-import Debug from 'debug'
-const debug = Debug('zcoin:store:balance')
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:store:balance')
 
 const state = {
     total: {
@@ -22,7 +23,7 @@ const state = {
 
 const mutations = {
     [types.UPDATE_BALANCE] (state, balance) {
-        debug('going to update balance', balance)
+        logger.debug('going to update balance', balance)
 
         const { total, xzc, zerocoin } = balance
 

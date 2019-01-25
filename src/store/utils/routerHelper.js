@@ -1,7 +1,7 @@
 import * as types from '~/types/Router'
-import Debug from 'debug'
+import { createLogger } from '#/lib/logger'
 
-const debug = Debug('zcoin:store.routeHelper')
+const logger = createLogger('zcoin:store.routeHelper')
 
 const routeMap = {
     [types.ROUTE_TO_CREATE_PAYMENT_REQUEST]: { name: 'receive-zcoin' },
@@ -21,11 +21,10 @@ const buildMutationMap = function (routeMap, router, moduleName) {
 
         mutations[mutation] = function (state) {
             if (!state.enabledRoutes.includes(`${moduleName}/${mutation}`)) {
-                debug('ignoring route action %s %o', mutation, state.enabledRoutes)
+                logger.debug('ignoring route action %s %o', mutation, state.enabledRoutes)
                 return
             }
 
-            debug('routing to %o, via mutation %s, %o', route, mutation, state.enabledRoutes)
             router.push(route)
         }
     })
@@ -34,7 +33,7 @@ const buildMutationMap = function (routeMap, router, moduleName) {
 }
 
 export const setupWindowRouter = function ({ store, router, moduleName = 'Router' }) {
-    debug('adding route mutations on store module %s %o', moduleName, routeMap)
+    logger.debug('adding route mutations on store module %s %o', moduleName, routeMap)
 
     store.registerModule(moduleName, {
         namespaced: true,
@@ -43,7 +42,7 @@ export const setupWindowRouter = function ({ store, router, moduleName = 'Router
         },
         mutations: {
             [types.SET_ENABLED_ROUTES] (state, routes) {
-                debug('setting enabled routes %o', routes)
+                logger.info('setting enabled routes %o', routes)
                 state.enabledRoutes = routes
             },
 

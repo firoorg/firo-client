@@ -1,14 +1,11 @@
 import Vue from 'vue'
 import eachOfLimit from 'async/eachOfLimit'
 import throttle from 'lodash/throttle'
-
 import geoip from 'geoip-lite'
-
 import * as types from '~/types/Znode'
+import { createLogger } from '#/lib/logger'
 
-import Debug from 'debug'
-
-const debug = Debug('zcoin:store:znode')
+const logger = createLogger('zcoin:store:znode')
 
 const state = {
     znodes: {},
@@ -34,7 +31,7 @@ const mutations = {
 
 const processZnode = function (id, znode) {
     if (state.znodes[id]) {
-        debug('TODO: znode already exists -> updating')
+        logger.debug('TODO: znode already exists -> updating')
         // todo add other flexible keys here
         const { status } = znode
 
@@ -47,7 +44,8 @@ const processZnode = function (id, znode) {
     const { authority } = znode
 
     if (!authority) {
-        console.log(znode)
+        logger.warn('znode without authority given %o', znode)
+        return
     }
 
     const { ip } = authority
@@ -82,7 +80,7 @@ const addZnodesThrottled = throttle(function (commit) {
 const actions = {
     // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response
     [types.SET_INITIAL_STATE] ({ commit, state }, initialState) {
-        console.log('got initial state from ZNODE', initialState)
+        logger.info('got initial state from ZNODE', initialState)
 
         const { status } = initialState._meta
         delete initialState._meta
@@ -91,11 +89,11 @@ const actions = {
             const { error } = initialState
 
             if (status === 400 && error.code === -1) {
-                debug(`nothing to process on initial state: "${error.message}"`)
+                logger.debug(`nothing to process on initial state: "${error.message}"`)
                 return
             }
 
-            debug(error)
+            logger.warn(error)
             return
         }
 
@@ -151,7 +149,7 @@ const actions = {
         const { id, znode } = znodeData
 
         if (state.znodes[id]) {
-            debug('TODO: znode already exists -> updating')
+            logger.info('TODO: znode already exists -> updating')
             return
         }
 
@@ -237,10 +235,8 @@ const getters = {
 
     znodePaymentCycleInDays: (state, getters, rootState, rootGetters) => {
         const avgBlockTimeInMs = rootGetters['Blockchain/averageBlockTimeInMilliSeconds']
-        // console.log('rootGetters.blockchain.averageBlockTime', rootGetters.blockchain.averageBlockTime)
         const blocksPerDay = (1000 * 60 * 60 * 24) / avgBlockTimeInMs
 
-        // todo check if only enabled nodes are taken into calculation
         return getters.enabledZnodes / blocksPerDay
     }
 }

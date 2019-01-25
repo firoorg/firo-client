@@ -5,8 +5,12 @@ import { getLabelForPaymentRequest } from '~/utils/i18n'
 import IsLoading from '~/mixins/IsLoading'
 import LastSeen from '~/mixins/LastSeen'
 
+import { createLogger } from '#/lib/logger'
+
 const isLoading = IsLoading.module('')
 const lastSeen = LastSeen.module('payment request')
+
+const logger = createLogger('zcoin:store:paymentRequest')
 
 const state = {
     ...isLoading.state,
@@ -47,7 +51,7 @@ const actions = {
     ...lastSeen.actions,
 
     [types.SET_INITIAL_STATE] ({ dispatch }, initialState) {
-        console.log(initialState)
+        logger.info('got initial payment request state %o', initialState)
 
         for (let address in initialState) {
             if (address.charAt(0) === '_') {
@@ -102,6 +106,8 @@ const actions = {
 
     [types.CREATE_PAYMENT_REQUEST] ({ commit, state }) {
         const { label, amount, message } = state.createPaymentRequestForm
+
+        logger.info('creating payment request: %o', state.createPaymentRequestForm)
 
         commit(types.CREATE_PAYMENT_REQUEST, {
             label,

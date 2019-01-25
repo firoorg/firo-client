@@ -3,8 +3,9 @@ import { dialog } from 'electron'
 import { isRenderer } from '#/lib/utils'
 import * as types from '~/types/Backup'
 
-import Debug from 'debug'
-const debug = Debug('zcoin:store:backup')
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:store:backup')
 
 const state = {
 }
@@ -37,12 +38,11 @@ const actions = {
         const [ path ] = selection
 
         // todo check tadhg if path must exist
-        debug('selected backup destination path: %s', path)
+        logger.info('selected backup destination path: %s', path)
         commit(types.CREATE_BACKUP, { path })
     },
 
     [types.BACKUP_CREATED] () {
-
     }
 }
 

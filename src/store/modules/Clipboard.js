@@ -93,7 +93,7 @@ const getters = {
             return null
         }
 
-        console.log('App/addressBelongsToWallet', rootGetters['App/addressBelongsToWallet'](address))
+        //console.log('App/addressBelongsToWallet', rootGetters['App/addressBelongsToWallet'](address))
 
         if (rootGetters['App/addressBelongsToWallet'](address)) {
             return

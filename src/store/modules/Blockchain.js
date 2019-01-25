@@ -1,7 +1,7 @@
 import * as types from '../types/Blockchain'
+import { createLogger } from '#/lib/logger'
 
-import Debug from 'debug'
-const debug = Debug('zcoin:store:blockchain')
+const logger = createLogger('zcoin:store:blockchain')
 
 const state = {
     connections: 0,
@@ -103,14 +103,14 @@ export const mutations = {
             state.syncBlocksPerSecond.startTimestamp = timestamp
         }
 
-        console.log('UPDATE_SYNC_BLOCKS_PER_SECOND', { height, timestamp })
+        //console.log('UPDATE_SYNC_BLOCKS_PER_SECOND', { height, timestamp })
         state.syncBlocksPerSecond.currentTimestamp = timestamp
     }
 }
 
 export const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
-        console.log(initialState)
+        logger.info('received blockchain initial state %o', initialState)
         const { connections, currentBlock, status, testnet: isTestnet, type: clientType, avgBlockTime } = initialState
         const { height, timestamp } = currentBlock
 
@@ -144,7 +144,7 @@ export const actions = {
 
         for (let [key, value] of Object.entries(status)) {
             if (state.status[key] === undefined) {
-                debug('unknown blockchain status key', key, value)
+                logger.warn('unknown blockchain status key', key, value)
                 continue
             }
 
@@ -157,10 +157,10 @@ export const actions = {
             }).replace(/^_/, '').toUpperCase()
 
             if (!types[mutationName]) {
-                debug('no mutation name found for', mutationName)
+                logger.warn('no mutation name found for', mutationName)
             }
 
-            console.log('committing mutation', mutationName)
+            logger.debug('committing mutation', mutationName)
 
             commit(types[mutationName], value)
         }
@@ -220,7 +220,7 @@ export const actions = {
             break
 
         default:
-            debug('unrecognized network type given')
+            logger.warn('unrecognized network type given')
             break
         }
     },
@@ -256,7 +256,7 @@ export const actions = {
             break
 
         default:
-            debug('unrecognized client type given')
+            logger.warn('unrecognized client type given')
             break
         }
     },

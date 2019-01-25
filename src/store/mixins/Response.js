@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import { getName, getTypeName } from '~/utils'
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:store:mixins:response')
 
 const tn = getTypeName
 
@@ -41,9 +44,8 @@ const module = function (namespace = '') {
             [tn(`SET ${NAME} RESPONSE`)] (state, response) {
                 const responseName = `${name}Response`
                 const { _meta, data, error } = response
-                // todo add generic keys like txids dynamically and be explicit
-                // console.log(_meta, data, error)
-                console.log('updating', tn(`SET ${NAME} RESPONSE`), response)
+
+                logger.debug('updating', tn(`SET ${NAME} RESPONSE`), response)
                 /*
                 Vue.set(state, `${name}Response`, {
                     ...response,
@@ -78,13 +80,13 @@ const module = function (namespace = '') {
             },
 
             [tn(`ON ${NAME} ERROR`)] ({ commit, dispatch, state }, response) {
-                console.log(t[tn(`ON ${NAME} ERROR`)])
-                console.log(response)
+                logger.warn(t[tn(`ON ${NAME} ERROR`)])
+                logger.debug(response)
 
                 try {
                     commit(t[tn(`SET ${NAME} RESPONSE`)], response)
                 } catch (e) {
-                    console.log(e)
+                    logger.error(e)
                 }
             }
         },

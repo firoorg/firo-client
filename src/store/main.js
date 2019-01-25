@@ -5,6 +5,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import modules from './modules'
 
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:store:main')
+
 Vue.use(Vuex)
 
 const clients = []
@@ -22,7 +26,7 @@ store.subscribe((mutation, state) => {
 ipcMain.on('vuex-connect', (event) => {
     const win = event.sender
     let winId = win.id
-    console.log('[background] vuex-connect', winId)
+    logger.info('[background] vuex connected', winId)
 
     win.on('destroyed', () => {
         clients[winId] = null
@@ -39,8 +43,9 @@ ipcMain.on('vuex-mutation', (event, args) => {
         // console.log('vuex-mutation: %s\npayload: %o', type, payload)
         store.commit(type, payload)
     } catch (error) {
-        console.error(error)
-        console.log(args)
+        logger.warn('error during vuex-mutation')
+        logger.error(error)
+        logger.debug(args)
         event.sender.send('vuex-error', error)
     }
 })
@@ -48,11 +53,12 @@ ipcMain.on('vuex-mutation', (event, args) => {
 ipcMain.on('vuex-action', (event, args) => {
     try {
         const {content, payload} = args
-        console.log('vuex-action: %o\npayload: %o', content, payload)
+        logger.debug('vuex-action: %o\npayload: %o', content, payload)
         store.dispatch(...args)
     } catch (error) {
-        console.error(error)
-        console.log(args)
+        logger.warn('error during vuex-action')
+        logger.error(error)
+        logger.debug(args)
         event.sender.send('vuex-error', error)
     }
 })

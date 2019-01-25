@@ -5,9 +5,9 @@ import allTypes from '~/types'
 import * as types from '../types/Settings'
 
 import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
+import { createLogger } from '#/lib/logger'
 
-import Debug from 'debug'
-const debug = Debug('zcoin:store:settings')
+const logger = createLogger('zcoin:store:settings')
 
 const state = {
     //blockchainLocation: '',
@@ -47,7 +47,7 @@ const mutations = {
 
 const actions = {
     [types.SET_INITIAL_STATE] ({ commit, state}, initialState) {
-        console.log('SETTINGS GOT INITIAL STATE', initialState)
+        logger.info('got initial settings state %o', initialState)
     },
 
     /*
@@ -99,7 +99,7 @@ const actions = {
     },
 
     [types.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ dispatch, getters, rootGetters }) {
-        console.log(getters.suggestedMintsToFulfillRatio)
+        logger.debug('suggested mints to fulfill ratio %s', getters.suggestedMintsToFulfillRatio)
         const currentDenomination = rootGetters['Mint/currentDenominations']
 
         Object.entries(getters.suggestedMintsToFulfillRatio).forEach((pairs) => {
