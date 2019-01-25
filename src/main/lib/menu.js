@@ -69,7 +69,6 @@ export default {
                 {
                     label: i18n.t('application-menu.client.label__create-wallet-backup'),
                     click () {
-                        console.log('dispatching wallet create')
                         store.dispatch(types.backup.CREATE_BACKUP)
                     }
                 }

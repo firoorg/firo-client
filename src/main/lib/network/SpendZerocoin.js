@@ -1,6 +1,10 @@
 import mixin from './mixin'
 import types from '~/types'
 
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:network:spendZerocoin')
+
 export default {
     ...mixin,
     ...({
@@ -15,7 +19,7 @@ export default {
             const { auth, data } = payload
             const { passphrase = null } = auth
 
-            console.log('SENDING ZEROCOIN', data, auth)
+            logger.info('SENDING ZEROCOIN: %o', data)
 
             const { address, label, denomination } = data
 

@@ -1,6 +1,10 @@
 import mixin from './mixin'
 import types from '~/types'
 
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:network:address')
+
 export default {
     ...mixin,
     ...({
@@ -19,7 +23,7 @@ export default {
         updateTransactionLabel(payload) {
             const { label, address, txid } = payload
 
-            console.log('UPDATING transaction LABEL', payload)
+            logger.info('UPDATING transaction LABEL', payload)
 
             this.send({
                 type: 'update',

@@ -1,4 +1,3 @@
-// import types from '../../../store/types'
 import mixin from './mixin'
 
 export default {

@@ -1,6 +1,10 @@
 import shajs from 'sha.js'
 import bs58 from 'bs58'
 
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:lib:zcoin')
+
 /*
  * Returns true if the given address is a valid with the given prefixes
  */
@@ -8,7 +12,7 @@ export const isZcoinAddress = function (address, b58Prefixes) {
     let data = null
 
     if (!b58Prefixes || !b58Prefixes['pubkeyAddress'] || !b58Prefixes['pubkeyAddress']) {
-        console.warning('no b58 prefixes given to zcoin address validation')
+        logger.warn('no b58 prefixes given to zcoin address validation')
         return false
     }
 
@@ -59,8 +63,6 @@ export const containsZcoinAddress = function (text, prefixes) {
 
 export const containsZcoinUri = function (text) {
     const zcoinUri = new RegExp('(zcoin://)([a-zA-Z0-9_])(:[0-9]+)?(/.*)?')
-
-    console.log(zcoinUri.test(text))
 
     return zcoinUri.test(text)
 }

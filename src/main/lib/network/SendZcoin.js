@@ -1,5 +1,8 @@
 import mixin from './mixin'
 import types from '~/types'
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:network:sendZcoin')
 
 export default {
     ...mixin,
@@ -46,7 +49,7 @@ export default {
         },
 
         getTransactionFee (data) {
-            console.log('GETTING TX FEE', data)
+            logger.info('GETTING TX FEE', data)
             const { fee, paymentsMap } = data
             const addresses = this.convertToAddressAmountPair(paymentsMap)
 
@@ -66,7 +69,7 @@ export default {
             const { auth, data } = payload
             const { passphrase = null } = auth
 
-            console.log('SENDING ZCOIN', data, auth)
+            logger.info('SENDING ZCOIN', data, auth)
 
             let addresses = this.convertToAmountLabel(data.payments)
 

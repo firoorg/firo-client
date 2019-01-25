@@ -202,7 +202,7 @@ export default {
 
     close () {
         logger.info('closing network')
-        closeApiStatus()
+        //closeApiStatus()
 
         if (!modules || !Object.keys(modules).length) {
             return

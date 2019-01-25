@@ -20,8 +20,6 @@ export default {
         const currentText = clipboard.readText()
 
         if (isDiffText(previousText, currentText)) {
-            console.log('text changed', previousText)
-
             if (containsZcoinUri(previousText)) {
                 deeplink.parseZcoinUrl(previousText)
                 // store.dispatch(types.clipboard.SET_CLIPBOARD, previousText)

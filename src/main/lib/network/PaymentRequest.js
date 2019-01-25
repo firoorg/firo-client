@@ -1,5 +1,8 @@
-import types from '../../../store/types'
+import types from '~/types'
 import mixin from './mixin'
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:network:paymentRequest')
 
 export default {
     ...mixin,
@@ -13,7 +16,7 @@ export default {
         },
 
         createPaymentRequest ({ label, message, amount }) {
-            console.log('CREATING PAYMENT REQUEST')
+            logger.info('CREATING PAYMENT REQUEST: %o', { label, message, amount })
 
             this.send({
                 type: 'create',

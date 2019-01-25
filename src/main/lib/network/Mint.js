@@ -1,6 +1,10 @@
 import types from '~/types'
 import mixin from './mixin'
 
+import { createLogger } from '#/lib/logger'
+
+const logger = createLogger('zcoin:network:mint')
+
 export default {
     ...mixin,
     ...({
@@ -25,12 +29,11 @@ export default {
         mint (payload) {
             const { auth, data } = payload
             const { passphrase = null } = auth
-            console.log('MINTING STARTS')
 
             const { denominations } = data
             const denoms = this.convertToDenominationAmountPair(denominations, 'denomination')
 
-            console.log(denoms)
+            logger.info('MINTING %o', denoms)
 
             this.send({
                 type: 'create',

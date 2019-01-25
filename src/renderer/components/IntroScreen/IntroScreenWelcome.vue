@@ -7,7 +7,7 @@
         <footer>
             <BaseButton
                 color="green"
-                @click="foo"
+                @click="actions.next"
             >
                 {{ $t('onboarding.intro-screen.button__start--primary') }}
             </BaseButton>
@@ -27,11 +27,6 @@ export default {
     methods: {
         isEnabled () {
             return true
-        },
-
-        foo () {
-            this.$log.info('testing the logger')
-            //console.log(this)
         }
     }
 }

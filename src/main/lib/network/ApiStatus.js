@@ -1,9 +1,9 @@
 import zmq from 'zeromq'
 import types from '~/types'
-
+import { createLogger } from '#/lib/logger'
 import { tryUntil } from '#/lib/utils'
 
-// let apiStatus = zmq.socket('req')
+const logger = createLogger('zcoin:network:apiStatus')
 
 export const getApiStatus = async function ({ host, port }) {
     let apiStatus = null
@@ -13,7 +13,6 @@ export const getApiStatus = async function ({ host, port }) {
         let counter = 0
 
         const onMessage = (msg) => {
-            console.log('got message back from api status', counter)
             clearInterval(requestStatusInterval)
 
             try {
@@ -25,10 +24,9 @@ export const getApiStatus = async function ({ host, port }) {
                 }
                 resolve({ data, meta })
             } catch (e) {
-                console.log(e)
+                logger.error(e)
                 reject(new Error('error occured during api status fetching.', e))
             } finally {
-                console.log('closing api status')
                 apiStatus.close()
             }
         }
@@ -49,7 +47,7 @@ export const getApiStatus = async function ({ host, port }) {
             apiStatus.setsockopt(zmq.ZMQ_RCVTIMEO, 100)
             apiStatus.setsockopt(zmq.ZMQ_SNDTIMEO, 100)
 
-            console.log('requesting initial api status', counter, new Date())
+            logger.debug('requesting initial api status %d', counter)
             counter++
 
             apiStatus.send(JSON.stringify({
@@ -62,6 +60,8 @@ export const getApiStatus = async function ({ host, port }) {
     })
 }
 
+/*
+@deprecated
 export const closeApiStatus = function () {
     try {
         console.log('deprecated...')
@@ -70,6 +70,7 @@ export const closeApiStatus = function () {
         console.log('api status close', e)
     }
 }
+*/
 
 export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds }) {
     const validator = ({ status, data }) => {
@@ -80,7 +81,7 @@ export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds 
 
     const { meta, data } = apiStatus
     if (validator({ status: meta.status, data })) {
-        console.log('given status is valid. no need to loose time...')
+        logger.debug('given status is valid. no need to loose time...')
         return apiStatus
     }
 
@@ -101,11 +102,11 @@ export const populateStore = function ({ apiStatus, dispatch }) {
     }
 
     const { walletLock, dataDir: location } = data
-    console.log('populateStore', data)
+    logger.info('populating store with api status %o', data)
 
     if (walletLock !== undefined) {
         dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
     }
-    // dispatch(types.blockchain.SET_BLOCKCHAIN_TIP, blocks)
+
     dispatch(types.app.SET_BLOCKCHAIN_LOCATION, location)
 }
