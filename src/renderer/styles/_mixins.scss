@@ -164,6 +164,18 @@
     padding-right: emRhythm($value);
 }
 
+@mixin bleed-v ($value) {
+    margin-top: emRhythm($value) * -1;
+    margin-bottom: emRhythm($value) * -1;
+    padding-top: emRhythm($value);
+    padding-bottom: emRhythm($value);
+}
+
+@mixin bleed ($value) {
+    @include bleed-h($value);
+    @include bleed-v($value);
+}
+
 @mixin placeholder-base() {
     @include font-medium();
     font-style: italic;

@@ -81,9 +81,9 @@
                         </section>
                     </template>
                     <template v-else>
-                        <div class="does-not-belong">
+                        <notice class="does-not-belong">
                             {{ $t('znodes.my-znode.description__does-not-belong-to-wallet') }}
-                        </div>
+                        </notice>
                     </template>
                 </div>
             </template>
@@ -101,9 +101,9 @@
             <template v-else>
                 <base-button
                     v-if="payeeAddress"
-                    @click.prevent="openBlockExplorer"
                     size="small"
                     color="comet"
+                    @click.prevent="openBlockExplorer"
                 >
                     {{ $t('znodes.my-znode.button__open-explorer') }}
                 </base-button>
@@ -116,10 +116,13 @@
 import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import { convertToCoin } from '#/lib/convert'
+import Notice from '@/components/Notification/Notice'
 
 export default {
     name: 'MyZnode',
-
+    components: {
+        Notice
+    },
     props: {
         label: {
             type: String,
@@ -214,7 +217,7 @@ export default {
         @include box-shadow-large();
         //@include glow-huge-box();
         @include glow-small-box();
-        padding: emRhythm(5) emRhythm(3) emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(4);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -231,8 +234,9 @@ export default {
         .znode-stats {
             display: grid;
             grid-template-areas: "status last-seen active-since"
-            "next-payout last-payout received"
-            "payee payee payee";
+                                 "next-payout last-payout received"
+                                 "payee payee payee";
+            grid-template-columns: 33%;
             grid-column-gap: emRhythm(1);
             grid-row-gap: emRhythm(1);
 
@@ -245,11 +249,12 @@ export default {
             .status-badge {
                 display: inline-block;
                 border-radius: emRhythm(0.5, $silent: true);
-                padding: 0.125rem 0.5rem;
+                padding: 0.125rem 0.25rem;
                 margin: -0.125rem 0;
                 background: $color--green;
                 color: $color--polo-light;
                 @include font-medium();
+                @include setType(2, $ms-down1);
 
                 &.pending {
                     background: rgba($color--green, 0.5);
@@ -267,6 +272,19 @@ export default {
             .last-payout { grid-area: last-payout; }
             .received { grid-area: received; }
             .payee, .does-not-belong { grid-area: payee; }
+
+            /*
+            .does-not-belong {
+                @include bleed(1);
+                //@include font-medium();
+                color: $color--comet-dark;
+                font-style: italic;
+                margin-top: emRhythm(1);
+                background: $color--polo-medium;
+                background: #fff;
+                @include
+            }
+            */
         }
 
         footer {
