@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { sleep } from '../../lib/utils'
 import * as types from '../types/Network'
 
@@ -9,7 +10,8 @@ const state = {
 
 const mutations = {
     [types.NETWORK_IS_CONNECTED] (state) {
-        state.isConnected = true
+        Vue.set(state, 'isConnected', true)
+        //state.isConnected = true
     },
 
     [types.NETWORK_CONNECTION_SEEMS_LOST] (state, value) {
