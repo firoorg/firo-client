@@ -73,8 +73,12 @@ export const closeApiStatus = function () {
 */
 
 export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds }) {
+    logger.debug('waiting for api to warm up...')
+
     const validator = ({ status, data }) => {
         const { modules = {}, walletVersion } = data
+
+        logger.debug('validating api status %d %o', status, data)
 
         return status === 200 && modules.API && walletVersion
     }

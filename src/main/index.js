@@ -89,6 +89,7 @@ if (stopOnQuit) {
 // app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
 
 app.on('ready', () => {
+    logger.info('---- Starting Zcoin client ----')
     populateStoreWithAppSettings({ store })
     // start it!
     logger.info('path to zcoind binary: %s', zcoindPath)

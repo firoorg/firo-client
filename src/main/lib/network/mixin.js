@@ -208,14 +208,18 @@ export default {
 
     disconnect () {
         try {
-            this.subscriber.disconnect(this.subscriberUri)
+            if (this.subscriber) {
+                this.subscriber.disconnect(this.subscriberUri)
+            }
         } catch (e) {
             logger.warn(e)
             // console.log(e)
         }
 
         try {
-            this.requester.disconnect(this.requesterUri)
+            if (this.requester) {
+                this.requester.disconnect(this.requesterUri)
+            }
         } catch (e) {
             logger.warn(e)
             // console.log(e)
@@ -224,14 +228,18 @@ export default {
 
     close () {
         try {
-            this.subscriber.close()
+            if (this.subscriber) {
+                this.subscriber.close()
+            }
         } catch (e) {
             logger.warn(e)
             // console.log(e)
         }
 
         try {
-            this.requester.close()
+            if (this.requester) {
+                this.requester.close()
+            }
         } catch (e) {
             logger.warn(e)
             // console.log(e)
