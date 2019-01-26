@@ -19,10 +19,9 @@ const store = new Vuex.Store({
     strict: process.env.NODE_ENV !== 'production' // this up to you
 })
 
-if (process.env.NODE_ENV !== 'production') {
-    window.vuexStore = store
-    window.vuexTypes = types
-}
+//if (process.env.NODE_ENV !== 'production') {
+window.vuexStore = store
+window.vuexTypes = types
 
 // import master state
 try {
