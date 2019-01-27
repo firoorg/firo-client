@@ -9,7 +9,7 @@ import * as utils from '../../../lib/utils'
 
 // todo load modules dynamically
 // import blockchain from './blockchain'
-import { getApiStatus, closeApiStatus, waitForApi, populateStore } from './ApiStatus'
+import apiStatus from './ApiStatus'
 
 import App from './App'
 import Address from './Address'
@@ -84,38 +84,44 @@ export default {
 
         logger.info('getting api status')
 
-        const { host, port } = CONFIG.network.status
+        const { host, ports } = CONFIG.network.status
 
         let appConfig = null
         let encryption = null
 
         try {
-            const apiStatus = await getApiStatus({
+            apiStatus.init({
                 host,
-                port
+                ports
             })
+            const status = await apiStatus.get()
 
-            const {network: NETWORK} = apiStatus.data
+            const {network: NETWORK} = status.data
             appConfig = CONFIG.network.networks[NETWORK] || {}
 
-            logger.info('got api status %o', apiStatus)
+            logger.info('got api status %o', status)
 
-            populateStore({apiStatus, dispatch})
+            apiStatus.populateStore({
+                status,
+                dispatch
+            })
 
-            encryption = apiStatus.data && apiStatus.data.devAuth ? this.setupEncryption(apiStatus.data.dataDir) : null
+            encryption = status.data && status.data.devAuth ? this.setupEncryption(status.data.dataDir) : null
 
-            const warmedUpApiStatus = await waitForApi({
-                host,
-                port,
-                apiStatus,
+            const warmedUpApiStatus = await apiStatus.wait({
                 ttlInSeconds: CONFIG.network.secondsToWaitForApiToGetReady
             })
 
             // update store with warmed up values
-            populateStore({apiStatus: warmedUpApiStatus, dispatch})
+            apiStatus.populateStore({
+                status: warmedUpApiStatus,
+                dispatch
+            })
+
             store.dispatch(types.network.NETWORK_IS_CONNECTED)
             store.dispatch(types.app.IS_READY)
         } catch (e) {
+            console.log(e)
             logger.error('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...
             dispatch(types.network.SET_NETWORK_CONNECTION_ERROR, 1)
@@ -202,7 +208,7 @@ export default {
 
     close () {
         logger.info('closing network')
-        //closeApiStatus()
+        apiStatus.close()
 
         if (!modules || !Object.keys(modules).length) {
             return

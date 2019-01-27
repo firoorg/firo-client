@@ -1,116 +1,134 @@
 import zmq from 'zeromq'
 import types from '~/types'
+import EventEmitter from 'events'
+import { has } from 'lodash'
 import { createLogger } from '#/lib/logger'
-import { tryUntil } from '#/lib/utils'
 
 const logger = createLogger('zcoin:network:apiStatus')
 
-export const getApiStatus = async function ({ host, port }) {
-    let apiStatus = null
+export default {
+    subscriber: null,
+    currentStatus: null,
+    emitter: null,
 
-    return new Promise((resolve, reject) => {
-        let requestStatusInterval = null
-        let counter = 0
+    init({ host, ports }) {
+        console.log('------>', { host, ports })
+        const subscriberUri = `${host}:${ports.publisher}`
 
-        const onMessage = (msg) => {
-            clearInterval(requestStatusInterval)
+        this.subscriber = zmq.socket('sub')
+        this.emitter = new EventEmitter()
 
+        this.subscriber.connect(subscriberUri)
+
+        this.subscriber.subscribe('apiStatus')
+
+        this.subscriber.on('message', (topic, msg) => {
             try {
                 const { data, meta, error } = JSON.parse(msg.toString())
 
                 if (error || (meta.status < 200 && meta.status >= 400)) {
-                    reject(new Error('error occured during api status fetching.', error))
+                    //reject(new Error('error occured during api status fetching.', error))
                     return
                 }
-                resolve({ data, meta })
+
+                this.currentStatus = { data, meta }
+                this.emitter.emit('update', this.currentStatus)
             } catch (e) {
                 logger.error(e)
-                reject(new Error('error occured during api status fetching.', e))
-            } finally {
-                apiStatus.close()
+                //reject(new Error('error occured during api status fetching.', e))
             }
+        })
+    },
+
+    async get () {
+        if (this.currentStatus) {
+            return this.currentStatus
         }
 
-        requestStatusInterval = setInterval(function () {
+        return new Promise((resolve, reject) => {
+            this.emitter.once('update', (newStatus) => {
+                resolve(newStatus)
+            })
+        })
+    },
 
-            if (apiStatus) {
-                apiStatus.close()
-                apiStatus.removeListener('message', onMessage)
-                apiStatus = null
+    async wait ({ apiStatus, ttlInSeconds }) {
+        if (this.isValidCurrentStatus(this.currentStatus)) {
+            return this.currentStatus
+        }
+
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error(`ApiStatus.wait timed out / TTL: ${ttlInSeconds}`))
+            }, ttlInSeconds * 1000)
+
+            const validateStatus = (newStatus) => {
+                if (!this.isValidCurrentStatus(newStatus)) {
+                    return
+                }
+
+                logger.debug('got valid status. removing listener, clearing timeout.')
+                // remove listener
+                this.emitter.off('update', validateStatus)
+                // clear timeout
+                clearTimeout(timeout)
+
+                // return status
+                resolve(newStatus)
             }
 
-            apiStatus = zmq.socket('req')
+            this.emitter.on('update', validateStatus)
+        })
+    },
 
-            const uri = `${host}:${port}`
-
-            apiStatus.connect(uri)
-            apiStatus.setsockopt(zmq.ZMQ_RCVTIMEO, 100)
-            apiStatus.setsockopt(zmq.ZMQ_SNDTIMEO, 100)
-
-            logger.debug('requesting initial api status %d', counter)
-            counter++
-
-            apiStatus.send(JSON.stringify({
-                type: 'initial',
-                collection: 'apiStatus'
-            }))
-
-            apiStatus.once('message', onMessage)
-        }, 400)
-    })
-}
-
-/*
-@deprecated
-export const closeApiStatus = function () {
-    try {
-        console.log('deprecated...')
-        // apiStatus.close()
-    } catch (e) {
-        console.log('api status close', e)
-    }
-}
-*/
-
-export const waitForApi = async function ({ host, port, apiStatus, ttlInSeconds }) {
-    logger.debug('waiting for api to warm up...')
-
-    const validator = ({ status, data }) => {
+    validator ({ status, data }) {
         const { modules = {}, walletVersion } = data
 
         logger.debug('validating api status %d %o', status, data)
 
         return status === 200 && modules.API && walletVersion
+    },
+
+    isValidCurrentStatus (apiStatus) {
+        if (!apiStatus) {
+            return false
+        }
+
+        if (!has(apiStatus, 'data') || !has(apiStatus, 'meta')) {
+            return false
+        }
+
+        const { data, meta } = apiStatus
+        const { status } = meta
+
+        return this.validator({ status, data })
+    },
+
+    populateStore ({ status, dispatch }) {
+        const { data, meta } = status
+
+        if (!meta || meta.status !== 200) {
+            return
+        }
+
+        const { walletLock, dataDir: location } = data
+        logger.info('populating store with api status %o', data)
+
+        if (walletLock !== undefined) {
+            dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
+        }
+
+        dispatch(types.app.SET_BLOCKCHAIN_LOCATION, location)
+    },
+
+    close () {
+        try {
+            if (this.subscriber) {
+                this.subscriber.close()
+            }
+        }
+        catch (e) {
+            console.log(e)
+        }
     }
-
-    const { meta, data } = apiStatus
-    if (validator({ status: meta.status, data })) {
-        logger.debug('given status is valid. no need to loose time...')
-        return apiStatus
-    }
-
-    return tryUntil({
-        functionToTry: async () => {
-            return getApiStatus({ host, port })
-        },
-        validator,
-        ttlInSeconds
-    })
-}
-
-export const populateStore = function ({ apiStatus, dispatch }) {
-    const { data, meta } = apiStatus
-
-    if (!meta || meta.status !== 200) {
-        return
-    }
-
-    const { walletLock, dataDir: location } = data
-    logger.info('populating store with api status %o', data)
-
-    if (walletLock !== undefined) {
-        dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
-    }
-
-    dispatch(types.app.SET_BLOCKCHAIN_LOCATION, location)
 }

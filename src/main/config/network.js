@@ -5,7 +5,10 @@ export default {
 
     status: {
         host: HOST,
-        port: 25558
+        ports: {
+            request: 25558,
+            publisher: 28333
+        }
     },
 
     networks: {

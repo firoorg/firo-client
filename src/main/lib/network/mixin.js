@@ -1,5 +1,5 @@
 import zmq from 'zeromq'
-import { isString, isFunction } from 'lodash'
+import { isString, isFunction, capitalize } from 'lodash'
 import { createLogger } from '#/lib/logger'
 
 import types from '~/types'
@@ -83,7 +83,15 @@ export default {
                 const json = JSON.parse(message)
                 const { data } = json
 
-                this.dispatchAction(this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`], data)
+                if (this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`]) {
+                    this.dispatchAction(this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`], data)
+                }
+
+                const Topic = capitalize(topic)
+
+                if (this[`on${Topic}Subscription`]) {
+                    this[`on${Topic}Subscription`](data)
+                }
             } catch (e) {
                 logger.warn('error in response of', topic, 'request', this.subscriptions)
                 logger.error(e)
