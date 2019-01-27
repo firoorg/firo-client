@@ -66,7 +66,7 @@ export default class PidManager {
             return this.pid
         }
 
-        logger.debug('spawning with arguments', this.getArguments())
+        logger.debug('spawning with arguments %o', this.getArguments())
 
         this.child = spawn(this.pathToSpawn, this.getArguments(), {
             // detached: true,
@@ -81,7 +81,7 @@ export default class PidManager {
         // not using detached at the moment
         this.child.unref()
 
-        logger.info('started managed process with pid id', this.pid)
+        logger.info('started managed process with pid id %d', this.pid)
 
         await this.write()
         this.onStart()
@@ -117,7 +117,7 @@ export default class PidManager {
 
     async isRunning () {
         if (this.pid === -1) {
-            logger.debug('daemon with pid %d is not running', this.pid)
+            logger.debug('daemon is not running')
             return false
         }
 
@@ -155,7 +155,7 @@ export default class PidManager {
             logger.warn('blockchain location %s does not exist. falling back to default location', location)
         }
 
-        return hasLocation && exists ? [`-datadir=${location}`] : []
+        return hasLocation && exists ? [`-datadir="${location}"`] : []
     }
 
     async cleanup () {
