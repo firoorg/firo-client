@@ -155,7 +155,7 @@ export default class PidManager {
             logger.warn('blockchain location %s does not exist. falling back to default location', location)
         }
 
-        return hasLocation && exists ? [`-datadir="${location}"`] : []
+        return hasLocation && exists ? [`-datadir=${location}`] : []
     }
 
     async cleanup () {
