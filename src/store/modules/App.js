@@ -2,6 +2,7 @@ import fs from 'fs'
 import * as types from '../types/App'
 import { getApp, getAppSettings } from '#/lib/utils'
 import { createLogger } from '#/lib/logger'
+import Vue from 'vue'
 
 const logger = createLogger('zcoin:store:app')
 
@@ -10,7 +11,7 @@ const state = {
     isRunning: false,
     isStopping: false,
     isRestarting: false,
-    clientIsLocked: false,
+    clientIsLocked: undefined,
     showIntroScreen: true,
     passphrase: null,
     appVersion: null,
@@ -59,7 +60,8 @@ const mutations = {
     // wallet lock
 
     [types.SET_CLIENT_LOCKED] (state, isLocked) {
-        state.clientIsLocked = isLocked
+        Vue.set(state, 'clientIsLocked', isLocked)
+        // state.clientIsLocked =
     },
 
     [types.LOCK_WALLET] () {

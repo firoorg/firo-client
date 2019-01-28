@@ -87,6 +87,7 @@ export default {
             this.actions.next()
         },
         isEnabled () {
+            this.$log.debug('is locked', this.isLocked)
             return !this.isLocked
         }
     }

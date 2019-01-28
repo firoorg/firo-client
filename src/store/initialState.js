@@ -201,7 +201,7 @@ module.exports = {
         isRestarting: false,
         isReady: false,
         showIntroScreen: true,
-        clientIsLocked: false,
+        clientIsLocked: undefined,
         lastSeen: {
             paymentRequest: 23345932,
             mint: 23489034

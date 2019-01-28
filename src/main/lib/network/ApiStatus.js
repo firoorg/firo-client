@@ -115,6 +115,7 @@ export default {
         logger.info('populating store with api status %o', data)
 
         if (walletLock !== undefined) {
+            console.log('setting client locked state to', walletLock)
             dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
         }
 
