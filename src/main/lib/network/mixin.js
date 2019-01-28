@@ -236,7 +236,7 @@ export default {
 
     close () {
         try {
-            if (this.subscriber) {
+            if (this.subscriber && !this.subscriber.closed) {
                 this.subscriber.close()
             }
         } catch (e) {
@@ -245,7 +245,7 @@ export default {
         }
 
         try {
-            if (this.requester) {
+            if (this.requester && !this.requester.closed) {
                 this.requester.close()
             }
         } catch (e) {

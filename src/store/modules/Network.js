@@ -47,6 +47,10 @@ const actions = {
     },
 
     async [types.NETWORK_CONNECTION_LOST] ({ commit, state }) {
+        if (!state.isConnected) {
+            return
+        }
+
         commit(types.NETWORK_CONNECTION_SEEMS_LOST, true)
         await sleep(500)
 
@@ -60,7 +64,9 @@ const actions = {
 
 const getters = {
     isConnected: (state) => state.isConnected === true,
-    connectionLost: (state) => (state.connectionSeemsLost && state.isConnected === false),
+    connectionLost: (state) => {
+        return (state.connectionSeemsLost && state.isConnected === false)
+    },
     connectionError: (state) => state.connectionErrorCode ? state.connectionErrorCode : false
 }
 

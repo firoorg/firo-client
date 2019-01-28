@@ -90,7 +90,7 @@ export default {
         },
 
         showConnectivityOverlay () {
-            return !!((this.networkConnectionLost || this.networkConnectionError) && !this.isRestarting)
+            return ((this.networkConnectionLost || this.networkConnectionError) && !this.isRestarting)
         },
 
         showIntro () {
