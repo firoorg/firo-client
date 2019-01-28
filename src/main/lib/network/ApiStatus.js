@@ -111,12 +111,13 @@ export default {
             return
         }
 
-        const { walletLock, dataDir: location } = data
+        const { walletLock, walletVersion, dataDir: location } = data
         logger.info('populating store with api status %o', data)
 
-        if (walletLock !== undefined) {
+        if (walletLock !== undefined && walletVersion !== undefined) {
             console.log('setting client locked state to', walletLock)
-            dispatch(types.app.SET_CLIENT_LOCKED, walletLock)
+            dispatch(types.app.SET_WALLET_LOCKED, walletLock)
+            dispatch(types.app.SET_WALLET_VERSION, walletVersion)
         }
 
         dispatch(types.app.SET_BLOCKCHAIN_LOCATION, location)
@@ -124,7 +125,7 @@ export default {
 
     close () {
         try {
-            if (this.subscriber) {
+            if (this.subscriber && !this.subscriber.closed) {
                 this.subscriber.close()
             }
         }

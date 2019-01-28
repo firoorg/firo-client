@@ -11,7 +11,8 @@ const state = {
     isRunning: false,
     isStopping: false,
     isRestarting: false,
-    clientIsLocked: false,
+    walletIsLocked: false,
+    walletVersion: 0,
     showIntroScreen: true,
     passphrase: null,
     appVersion: null,
@@ -60,9 +61,12 @@ const mutations = {
 
     // wallet lock
 
-    [types.SET_CLIENT_LOCKED] (state, isLocked) {
-        Vue.set(state, 'clientIsLocked', isLocked)
-        // state.clientIsLocked =
+    [types.SET_WALLET_LOCKED] (state, isLocked) {
+        Vue.set(state, 'walletIsLocked', isLocked)
+    },
+
+    [types.SET_WALLET_VERSION] (state, version) {
+        state.walletVersion = version
     },
 
     [types.LOCK_WALLET] () {
@@ -94,17 +98,25 @@ const actions = {
         commit(types.IS_READY)
     },
 
-    [types.SET_CLIENT_LOCKED] ({ commit, state }, isLocked) {
-        if (state.clientIsLocked === isLocked) {
+    [types.SET_WALLET_LOCKED] ({ commit, state }, isLocked) {
+        if (state.walletIsLocked === isLocked) {
             return
         }
 
-        commit(types.SET_CLIENT_LOCKED, isLocked)
+        commit(types.SET_WALLET_LOCKED, isLocked)
+    },
+
+    [types.SET_WALLET_VERSION] ({ commit, state }, version) {
+        if (state.walletVersion === version) {
+            return
+        }
+
+        commit(types.SET_WALLET_VERSION, version)
     },
 
     [types.LOCK_WALLET] ({ commit, state }, passphrase) {
         // already locked. returning
-        if (state.clientIsLocked) {
+        if (state.walletIsLocked) {
             logger.info('wallet is already locked')
             return
         }
@@ -226,7 +238,8 @@ const getters = {
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
 
     showIntroScreen: (state, getters) => state.showIntroScreen,
-    isLocked: (state) => state.clientIsLocked,
+    isLocked: (state) => state.walletIsLocked,
+    walletVersion: (state) => state.walletVersion,
     addressBelongsToWallet: (state, getters, rootState, rootGetters) => {
         return (address) => {
             const isPaymentRequestAddress = !!rootGetters['PaymentRequest/paymentRequests'].find((el) => {

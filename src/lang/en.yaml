@@ -314,6 +314,21 @@ onboarding:
     button__select-location--primary: Select location
     button__confirm-selection--primary: Set it up!
     # button__secondary: back / cancel?
+  location-daemon-restart:
+    title: Setting up Location
+    description: Hang tight, this usually takes less than a minute...
+
+  location-daemon-restart-loading-blockchain:
+    title: Initializing Blockchain
+    description: Adipiscing Tristique Ullamcorper Ornare Consectetur
+
+  location-daemon-restart-loading-wallet:
+    title: Setting up Wallet
+    description: Mollis Lorem Mattis Ullamcorper Ipsum
+
+  location-daemon-restart-success:
+    title: Location is set up!
+    description: The location given is now home of your funds and copy of the blockchain.
 
   create-passphrase:
     title: Secure Your Funds!
@@ -408,6 +423,7 @@ onboarding:
 overlay:
   loading:
     restarting-daemon: Restarting daemon
+    loading-blockchain: Loading Blockchain
     loading-wallet: Loading Wallet
     initial: Starting up
 

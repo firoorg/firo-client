@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="isEnabled()">
         <h1 v-html="$t('onboarding.set-blockchain-location.title')" />
 
         <p v-html="$t('onboarding.set-blockchain-location.description')" />

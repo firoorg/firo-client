@@ -65,6 +65,7 @@ import LoadingBounce from '@/components/Icons/LoadingBounce'
 import MultiStepPopover from '@/components/Notification/MultiStepPopover'
 import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
 import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
+import IntroScreenSettingUpLocation from '@/components/IntroScreen/IntroScreenSettingUpLocation'
 import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
 import IntroScreenRestartingDaemon from '@/components/IntroScreen/IntroScreenRestartingDaemon'
 import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
@@ -79,6 +80,7 @@ export default {
         ZcoinLogoText,
         IntroScreenWelcome,
         IntroScreenBlockchainLocation,
+        IntroScreenSettingUpLocation,
         IntroScreenLockWallet,
         IntroScreenRestartingDaemon,
         IntroScreenAmountToHoldInZerocoin,
@@ -95,6 +97,7 @@ export default {
             steps: {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
+                settingUpLocation: IntroScreenSettingUpLocation,
                 lock: IntroScreenLockWallet,
                 restart: IntroScreenRestartingDaemon
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
@@ -111,6 +114,7 @@ export default {
             isRestarting: 'App/isRestarting',
             isRunning: 'App/isRunning',
             isInitialRun: 'App/isInitialRun',
+            currentBlockHeight: 'Blockchain/currentBlockHeight',
             showIntroScreen: 'App/showIntroScreen'
         }),
 
@@ -144,6 +148,9 @@ export default {
         loadingMessage () {
             if (this.isRestarting) {
                 return this.$t('overlay.loading.restarting-daemon')
+            }
+            else if (!this.currentBlockHeight) {
+                return this.$t('overlay.loading.loading-blockchain')
             }
             else if (this.isRunning) {
                 return this.$t('overlay.loading.loading-wallet')

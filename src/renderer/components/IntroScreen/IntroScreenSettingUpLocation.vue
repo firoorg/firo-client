@@ -1,15 +1,30 @@
 <template>
-    <div
-        v-if="isEnabled()"
-        class="restarting"
-    >
-        <template v-if="!isLocked">
+    <div class="restarting">
+        <template v-if="isEnabled()">
             <div class="icon">
                 <loading-bounce class="bounce" />
             </div>
             <main>
-                <h2>{{ $t('onboarding.passphrase-daemon-restart.title') }}</h2>
-                <p v-html="$t('onboarding.passphrase-daemon-restart.description')" />
+                <h2>{{ $t('onboarding.location-daemon-restart.title') }}</h2>
+                <p v-html="$t('onboarding.location-daemon-restart.description')" />
+            </main>
+        </template>
+        <template v-else-if="!currentBlockHeight">
+            <div class="icon">
+                <loading-bounce class="bounce" />
+            </div>
+            <main>
+                <h2>{{ $t('onboarding.location-daemon-restart-loading-blockchain.title') }}</h2>
+                <p v-html="$t('onboarding.location-daemon-restart-loading-blockchain.description')" />
+            </main>
+        </template>
+        <template v-else-if="!walletVersion">
+            <div class="icon">
+                <loading-bounce class="bounce" />
+            </div>
+            <main>
+                <h2>{{ $t('onboarding.location-daemon-restart-loading-wallet.title') }}</h2>
+                <p v-html="$t('onboarding.location-daemon-restart-loading-wallet.description')" />
             </main>
         </template>
         <template v-else>
@@ -20,8 +35,8 @@
                 />
             </div>
             <main>
-                <h2>{{ $t('onboarding.passphrase-daemon-restart-success.title') }}</h2>
-                <p v-html="$t('onboarding.passphrase-daemon-restart-success.description')" />
+                <h2>{{ $t('onboarding.location-daemon-restart-success.title') }}</h2>
+                <p v-html="$t('onboarding.location-daemon-restart-success.description')" />
 
                 <!--
                 <transition name="fade">
@@ -48,7 +63,7 @@ import LoadingBounce from '@/components/Icons/LoadingBounce'
 import OverlaySuccess from '@/components/Icons/OverlaySuccess'
 
 export default {
-    name: 'IntroScreenRestartingDaemon',
+    name: 'IntroScreenSettingUpDirectory',
     components: {
         OverlaySuccess,
         LoadingBounce
@@ -68,7 +83,9 @@ export default {
 
     computed: {
         ...mapGetters({
-            isLocked: 'App/isLocked',
+            currentBlockHeight: 'Blockchain/currentBlockHeight',
+            walletVersion: 'App/walletVersion',
+            hasLocation: 'App/hasBlockchainLocation',
             isRestarting: 'App/isRestarting'
         })
     },
@@ -86,7 +103,7 @@ export default {
 
     methods: {
         isEnabled () {
-            return this.isLocked === false
+            return !this.hasLocation
         }
     }
 }

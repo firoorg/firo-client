@@ -63,6 +63,15 @@ export default {
             return this.passphrase === this.confirm
         }
     },
+
+    watch: {
+        isLocked (newVal) {
+            if (newVal) {
+                this.actions.next()
+            }
+        }
+    },
+
     methods: {
         ...mapActions({
             lockWallet: types.app.LOCK_WALLET
