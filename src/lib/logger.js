@@ -8,7 +8,10 @@ const logger = winston.createLogger({
         //winston.format.colorize(),
         winston.format.splat(),
         winston.format.timestamp(),
-        winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+        winston.format.printf(info => {
+            const label = info.label ? `[${info.label}] ` : ''
+            return `${info.timestamp} ${label}${info.level}: ${info.message}`
+        })
     ),
     transports: [
         new winston.transports.Console(),
@@ -19,9 +22,6 @@ const logger = winston.createLogger({
     ]
 })
 
-export const createLogger = function (label) {
-    // console.log(logger)
-
-    return logger
-    //return logger.child({ label })
+export const createLogger = function (label = 'zcoin:no-module') {
+    return logger.child({ label })
 }
