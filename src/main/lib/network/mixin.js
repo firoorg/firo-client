@@ -100,7 +100,7 @@ export default {
         })
 
         for (let subscription of this.subscriptions) {
-            logger.info('subscribing to', subscription)
+            logger.info('subscribing to "%s"', subscription)
             this.subscriber.subscribe(subscription)
         }
     },
@@ -111,12 +111,12 @@ export default {
         }
 
         if (!this.types.SET_INITIAL_STATE) {
-            logger.debug('no initial state action set for', this.collection)
+            logger.debug('no initial state action set for "%s"', this.collection)
             return
         }
 
         this.requester.once('message', (message) => {
-            logger.info('received initial state request', this.collection)
+            logger.info('received initial state request for "%s"', this.collection)
 
             try {
                 const response = JSON.parse(message.toString())
@@ -156,7 +156,7 @@ export default {
             logger.warn(response)
             if (onError) {
                 if (isString(onError)) {
-                    logger.info('dispatching action', onError)
+                    logger.info('dispatching action %s', onError)
                     this.dispatchAction(onError, { _meta: meta, error })
                 } else if (isFunction(onError)) {
                     logger.info('invoking onError callback')
@@ -173,7 +173,7 @@ export default {
 
         if (onSuccess) {
             if (isString(onSuccess)) {
-                logger.info('dispatching action', onSuccess)
+                logger.info('dispatching action %s', onSuccess)
                 this.dispatchAction(onSuccess, { _meta: meta, ...data })
             } else if (isFunction(onSuccess)) {
                 logger.info('invoking onSuccess callback')
@@ -184,7 +184,7 @@ export default {
 
     send ({ type, collection, data, auth = null }, actionsToDispatch = {}) {
         if (!collection && !this.collection) {
-            logger.warn('can not send. no collection given!', {
+            logger.warn('can not send. no collection given! %o', {
                 type,
                 data,
                 actionsToDispatch
@@ -196,7 +196,7 @@ export default {
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
-            logger.debug('response', response)
+            console.log('response %o', response)
             this.processResponse(response, actionsToDispatch)
             this.setLoading(false)
         }

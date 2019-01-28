@@ -144,7 +144,7 @@ export const actions = {
 
         for (let [key, value] of Object.entries(status)) {
             if (state.status[key] === undefined) {
-                logger.warn('unknown blockchain status key', key, value)
+                logger.warn('unknown blockchain status key: %s, %o', key, value)
                 continue
             }
 
@@ -157,10 +157,10 @@ export const actions = {
             }).replace(/^_/, '').toUpperCase()
 
             if (!types[mutationName]) {
-                logger.warn('no mutation name found for', mutationName)
+                logger.warn('no mutation name found for: %s', mutationName)
             }
 
-            logger.debug('committing mutation', mutationName)
+            logger.debug('committing mutation %s', mutationName)
 
             commit(types[mutationName], value)
         }
@@ -220,7 +220,7 @@ export const actions = {
             break
 
         default:
-            logger.warn('unrecognized network type given')
+            logger.warn('unrecognized network type given: %s', type)
             break
         }
     },
@@ -256,7 +256,7 @@ export const actions = {
             break
 
         default:
-            logger.warn('unrecognized client type given')
+            logger.warn('unrecognized client type given -> %s', type)
             break
         }
     },
