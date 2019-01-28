@@ -1,5 +1,5 @@
 import { promisify } from 'util'
-import { exec, spawn } from 'child_process'
+import spawn from 'cross-spawn'
 import { join } from 'path'
 import fs from 'fs'
 
