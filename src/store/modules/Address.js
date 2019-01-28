@@ -63,7 +63,7 @@ const mutations = {
     },
 
     [types.ADD_THIRD_PARTY_ADDRESS] (state, { address, total }) {
-        logger.debug('adding third party address', address, total)
+        logger.debug('adding third party address %s %o', address, total)
         Vue.set(state[THIRD_PARTY_ADDRESS_KEY], address, {
             address,
             total,
@@ -121,7 +121,7 @@ const actions = {
                 break
             }
 
-            logger.debug('total amount: %d', total)
+            logger.debug('total amount: %o', total)
 
             for (let txIndex of Object.keys(txids)) {
                 for (let txid of Object.keys(txids[txIndex])) {
