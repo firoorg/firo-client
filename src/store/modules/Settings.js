@@ -22,7 +22,7 @@ const state = {
         }
     },
     percentageToHoldInZerocoin: 0.5,
-    xzcZerocoinRatioNotified: 0,
+    xzcZerocoinRatioNotified: -1,
     explorer: {
         test: 'https://testexplorer.zcoin.io/%s/%s',
         main: 'https://explorer.zcoin.io/%s/%s'

@@ -11,7 +11,7 @@ const state = {
     isRunning: false,
     isStopping: false,
     isRestarting: false,
-    clientIsLocked: undefined,
+    clientIsLocked: false,
     showIntroScreen: true,
     passphrase: null,
     appVersion: null,
@@ -54,7 +54,8 @@ const mutations = {
         state.isRestarting = true
     },
 
-    [types.DAEMON_START] () {
+    [types.DAEMON_START] (state) {
+        state.isRestarting = true
     },
 
     // wallet lock

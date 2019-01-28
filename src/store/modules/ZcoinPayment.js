@@ -16,13 +16,29 @@ const state = {
     ...pendingPayments.state,
     ...sendZcoinResponse.state,
 
-    selectedFee: {},
-    availableFees: [],
+    selectedFee: 'fast',
+    availableFees: {
+        fast: {
+            label: 'Fast',
+            description: 'have a coffee',
+            amount: 100000
+        },
+        medium: {
+            label: 'Medium',
+            description: 'take a long walk',
+            amount: 50000
+        },
+        slow: {
+            label: 'Slow',
+            description: 'sleep over it',
+            amount: 10000
+        }
+    },
     addPaymentForm: {
         amount: null,
         label: '',
         address: '',
-        totalTxFee: 0
+        totalTxFee: 100000
     }
 }
 

@@ -3,8 +3,8 @@ import { sleep } from '../../lib/utils'
 import * as types from '../types/Network'
 
 const state = {
-    isConnected: undefined,
-    connectionSeemsLost: undefined,
+    isConnected: false,
+    connectionSeemsLost: false,
     connectionErrorCode: 0
 }
 

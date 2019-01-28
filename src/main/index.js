@@ -58,7 +58,7 @@ if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
 // get core config
 const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
 
-store.replaceState(require('../store/initialState'))
+//store.replaceState(require('../store/initialState'))
 setupWindowRouter({ store })
 
 const startNetwork = function () {

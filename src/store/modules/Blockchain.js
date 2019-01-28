@@ -17,7 +17,7 @@ const state = {
         isWinnersListSynced: false,
         isZnodeListSynced: false
     },
-    testnet: undefined,
+    testnet: false,
     type: 'full',
     averageBlockTime: 0,
     syncBlocksPerSecond: {
