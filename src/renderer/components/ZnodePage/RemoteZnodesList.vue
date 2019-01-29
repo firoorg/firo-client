@@ -1,7 +1,7 @@
 <template>
     <animated-table
         class="remote-znode-list"
-        :data="remoteZnodesSorted"
+        :data="remoteZnodes"
         :fields="tableFields"
         track-by="id"
         :per-page="100"
@@ -34,7 +34,7 @@ const tableFields = [
     {
         name: Rank,
         title: 'znodes.overview.table__znodes.label__rank',
-        sortField: 'rank',
+        sortField: 'sortRank',
         width: '10%'
     },
     {
@@ -90,14 +90,10 @@ export default {
     },
 
     computed: {
-        remoteZnodesSorted() {
-            return [...this.remoteZnodes].sort((a, b) => a.firstSeenAt < b.firstSeenAt)
-        },
-
         sortOrder () {
             return [
                 {
-                    sortField: 'rank',
+                    sortField: 'sortRank',
                     direction: 'asc'
                 }
             ]

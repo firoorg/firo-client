@@ -59,11 +59,17 @@ const mutations = {
 }
 
 const processZnode = function (id, znode) {
+    const { rank } = znode
+
+    // set sort rank to infinity if no rank defined to move them to the end of the list
+    const sortRank = rank ? rank : Infinity
+
     // already computed additional fields. merging...
     if (state.znodes[id]) {
         return {
             ...state.znodes[id],
-            ...znode
+            ...znode,
+            sortRank
         }
     }
 
@@ -81,7 +87,8 @@ const processZnode = function (id, znode) {
         status: 'MISSING',
         ...znode,
         id,
-        location
+        location,
+        sortRank
     }
 }
 
