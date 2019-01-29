@@ -272,7 +272,7 @@ znodes:
       label__status: Status
       label__authority: Address
   my-znode:
-    description__status-missing: Znode information will show up once the blockchain is synced.
+    description__status-missing: Znode information will show up once the client gathered its data from the network.
     description__does-not-belong-to-wallet: The payee address is not an address of this wallet. Therefore payment related information can not be shown.
     label__status: Status
     label__last-seen: Last Seen

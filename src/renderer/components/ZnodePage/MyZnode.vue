@@ -10,7 +10,7 @@
 
             <template v-if="isMissing">
                 <div>
-                    <p v-html="$t('znodes.my-znode.description__is-missing')" />
+                    <p v-html="$t('znodes.my-znode.description__status-missing')" />
                 </div>
             </template>
             <template v-else>
@@ -185,7 +185,6 @@ export default {
                 return this.lastPaidTime + znodePaymentCycleInMs
             }
 
-            // todo discuss with @Sebastion
             return this.activeSince + znodePaymentCycleInMs
         }
     },
