@@ -12,6 +12,7 @@ const state = {
     total: 0,
 
     // read only settings
+    znodeCollateralInSatoshi: 100000000000,
     znodeStates: [
         {
             name: 'valid',
@@ -268,6 +269,7 @@ const getters = {
         return getters.enabledZnodes / blocksPerDay
     },
 
+    znodeCollateralInSatoshi: (state) => state.znodeCollateralInSatoshi,
     znodeStates: (state) => state.znodeStates
 }
 

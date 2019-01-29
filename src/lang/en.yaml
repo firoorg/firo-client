@@ -280,7 +280,7 @@ znodes:
     label__next-payout: Next Payout
     label__last-payout: Last Payout
     description__last-payout--nothing-received: No Payout yet!
-    label__amount-received: Received
+    label__amount-received: Rewards received
     label__payee: Payee
     button__open-explorer: Show in Block Explorer
 

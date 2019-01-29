@@ -151,6 +151,7 @@ export default {
         ...mapGetters({
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays',
+            znodeCollateralInSatoshi: 'Znode/znodeCollateralInSatoshi',
             znodeStates: 'Znode/znodeStates',
             getAmountReceivedViaAddress: 'Address/getAmountReceivedViaAddress'
         }),
@@ -170,7 +171,10 @@ export default {
                 return
             }
 
-            return `${convertToCoin(received)} XZC`
+            const receivedRewards = Math.max(received - this.znodeCollateralInSatoshi, 0)
+
+            //return receivedRewards
+            return `${convertToCoin(receivedRewards)} XZC`
         },
 
         nextEstPayout () {
