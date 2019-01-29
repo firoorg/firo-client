@@ -59,14 +59,11 @@ const mutations = {
 }
 
 const processZnode = function (id, znode) {
+    // already computed additional fields. merging...
     if (state.znodes[id]) {
-        logger.debug('TODO: znode already exists -> updating')
-        // todo add other flexible keys here
-        const { status } = znode
-
         return {
             ...state.znodes[id],
-            status
+            ...znode
         }
     }
 
@@ -107,9 +104,8 @@ const addZnodesThrottled = throttle(function (commit) {
 }, 2000)
 
 const actions = {
-    // todo ask @tadhg why my znodes (at least without as proper status) are not included in the initial response
     [types.SET_INITIAL_STATE] ({ commit, state }, initialState) {
-        logger.info('got initial state from ZNODE', initialState)
+        logger.info('got initial state from ZNODE %o', initialState)
 
         const { status } = initialState._meta
         delete initialState._meta
