@@ -4,6 +4,7 @@ import throttle from 'lodash/throttle'
 import geoip from 'geoip-lite'
 import * as types from '~/types/Znode'
 import { createLogger } from '#/lib/logger'
+import { convertToCoin } from '#/lib/convert'
 
 const logger = createLogger('zcoin:store:znode')
 
@@ -58,7 +59,7 @@ const mutations = {
     }
 }
 
-const processZnode = function (id, znode) {
+const processZnode = function (id, znode, state) {
     const { rank } = znode
 
     // set sort rank to infinity if no rank defined to move them to the end of the list
@@ -135,7 +136,7 @@ const actions = {
 
         // process maximal 10 nodes at a time
         eachOfLimit(initialState.nodes, 10, (znode, id, callback) => {
-            initialZnodes[id] = processZnode(id, znode)
+            initialZnodes[id] = processZnode(id, znode, state)
             callback()
         }, () => {
             addZnodes(commit, initialZnodes)
@@ -151,7 +152,7 @@ const actions = {
 
         // add maximal 10 nodes at a time
         eachOfLimit(data, 10, (znode, id, callback) => {
-            onSubscriptionZnodes[id] = processZnode(id, znode)
+            onSubscriptionZnodes[id] = processZnode(id, znode, state)
             callback()
         }, () => {
             addZnodes(commit, onSubscriptionZnodes)
@@ -178,6 +179,8 @@ const actions = {
      * @param znodeData
      */
     async [types.ADD_ZNODE] ({ commit, state }, znodeData) {
+        logger.warn('types.ADD_ZNODE is deprecated!!!')
+
         const { id, znode } = znodeData
 
         if (state.znodes[id]) {
@@ -227,6 +230,43 @@ const getters = {
 
                 return isMine
             })
+            .map((znode) => {
+                const { payeeAddress, activeSince, lastPaidTime } = znode
+
+                return {
+                    ...znode,
+                    payoutsReceived: getters.getPayoutsReceived(payeeAddress),
+                    nextEstimatedPayout: getters.getNextEstimatedPayout({ activeSince, lastPaidTime })
+                }
+            })
+    },
+
+    getPayoutsReceived: (state, getters, rootState, rootGetters) => {
+        return (payeeAddress) => {
+            const getAmountReceivedViaAddress = rootGetters['Address/getAmountReceivedViaAddress']
+            const received = getAmountReceivedViaAddress(payeeAddress)
+
+            if (received === -1) {
+                return ''
+            }
+
+            const receivedRewards = Math.max(received - getters.znodeCollateralInSatoshi, 0)
+
+            //return receivedRewards
+            return `${convertToCoin(receivedRewards)} XZC`
+        }
+    },
+
+    getNextEstimatedPayout (state, getters) {
+        return ({ activeSince, lastPaidTime }) => {
+            const znodePaymentCycleInMs = Math.ceil(getters.znodePaymentCycleInDays * 24 * 60 * 60 * 1000)
+
+            if (lastPaidTime) {
+                return lastPaidTime + znodePaymentCycleInMs
+            }
+
+            return activeSince + znodePaymentCycleInMs
+        }
     },
 
     getMyZnode: (state, getters) => {

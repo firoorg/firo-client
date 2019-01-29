@@ -43,11 +43,16 @@
                         <section class="next-payout">
                             <header>{{ $t('znodes.my-znode.label__next-payout') }}</header>
                             <main>
-                                <timeago
-                                    v-if="lastPaidTime"
-                                    :datetime="nextEstPayout"
-                                    :auto-update="30"
-                                />
+                                <template v-if="nextEstimatedPayout < Date.now()">
+                                    {{ $t('znodes.my-znode.description__next-payout--soon') }}
+                                </template>
+                                <template v-else>
+                                    <timeago
+                                        v-if="lastPaidTime"
+                                        :datetime="nextEstimatedPayout"
+                                        :auto-update="30"
+                                    />
+                                </template>
                             </main>
                         </section>
 
@@ -86,8 +91,13 @@
 
         <footer v-if="!isMissing">
             <template v-if="belongsToWallet">
-                <base-button :is-outline="true">
-                    Other
+                <base-button
+                    v-if="payeeAddress"
+                    size="small"
+                    :is-outline="true"
+                    @click.prevent="openBlockExplorer"
+                >
+                    {{ $t('znodes.my-znode.button__open-explorer') }}
                 </base-button>
                 <base-button color="comet">
                     Action Name
@@ -144,15 +154,20 @@ export default {
         lastPaidTime: {
             type: Number,
             default: 0
+        },
+        payoutsReceived: {
+            type: String,
+            default: ''
+        },
+        nextEstimatedPayout: {
+            type: Number,
+            default: -1
         }
     },
 
     computed: {
         ...mapGetters({
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
-            znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays',
-            znodeCollateralInSatoshi: 'Znode/znodeCollateralInSatoshi',
-            znodeStates: 'Znode/znodeStates',
             getAmountReceivedViaAddress: 'Address/getAmountReceivedViaAddress'
         }),
 
@@ -162,30 +177,6 @@ export default {
 
         belongsToWallet () {
             return this.getAmountReceivedViaAddress(this.payeeAddress) !== -1
-        },
-
-        payoutsReceived () {
-            const received = this.getAmountReceivedViaAddress(this.payeeAddress)
-
-            if (received === -1) {
-                return
-            }
-
-            const receivedRewards = Math.max(received - this.znodeCollateralInSatoshi, 0)
-
-            //return receivedRewards
-            return `${convertToCoin(receivedRewards)} XZC`
-        },
-
-        nextEstPayout () {
-            const znodePaymentCycleInMs = Math.ceil(this.znodePaymentCycleInDays * 24 * 60 * 60 * 1000)
-            const now = Date.now()
-
-            if (this.lastPaidTime) {
-                return this.lastPaidTime + znodePaymentCycleInMs
-            }
-
-            return this.activeSince + znodePaymentCycleInMs
         }
     },
 

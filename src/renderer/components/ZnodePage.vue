@@ -36,28 +36,28 @@
                             {{ totalZnodes }}
                         </div>
                         <div class="desc">
-                            Total Nodes
+                            {{ $t('znodes.overview.stats.description__total-nodes') }}
                         </div>
                     </div>
                     <div class="stat">
                         <div class="value">
-                            {{ znodePaymentCycleInDays.toFixed(2) }}
+                            {{ Math.round(znodePaymentCycleInDays) }}
                         </div>
                         <div class="desc">
-                            Avgerage Days for Payout
+                            {{ $t('znodes.overview.stats.description__average-days-for-payout') }}
                         </div>
                     </div>
-                    <!--<div
-                        v-if="myZnodes.length"
+                    <div
+                        v-if="enabledMyZnodes.length"
                         class="stat"
                     >
                         <div class="value">
-                            17.23
+                            {{ Math.round(daysUntilNextPayout) }}
                         </div>
                         <div class="desc">
-                            days until your next Payout
+                            {{ $t('znodes.overview.stats.description__days-until-next-payout') }}
                         </div>
-                    </div>-->
+                    </div>
                 </section>
 
                 <section class="my-znodes">
@@ -107,6 +107,10 @@ export default {
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
         }),
 
+        enabledMyZnodes () {
+            return this.myZnodes.filter((znode) => znode.status === 'ENABLED')
+        },
+
         filteredMyZnodes () {
             return this.getFilteredByUrl(this.myZnodes, ['status', 'payeeAddress', 'authorityIp', 'id', 'label'])
         },
@@ -114,6 +118,21 @@ export default {
         filteredRemoteZnodes () {
             return this.getFilteredByUrl(this.remoteZnodes, ['status', 'payeeAddress', 'authorityIp', 'id'])
         },
+
+        daysUntilNextPayout () {
+            if (!this.myZnodes.length) {
+                return false
+            }
+
+            const now = Date.now()
+            const nextEstimatedPayout = this.myZnodes.reduce((aggregator, znode) => {
+                const { nextEstimatedPayout } = znode
+
+                return aggregator < nextEstimatedPayout ? aggregator : nextEstimatedPayout
+            }, Infinity)
+
+            return (nextEstimatedPayout - now) / 1000 / 60 / 60 / 24
+        }
     }
 }
 </script>

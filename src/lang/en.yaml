@@ -264,6 +264,12 @@ znodes:
   overview:
     title: Znodes
     description: Znodes are incentivized nodes which help support the network. If you do have a Znode you can manage and monitor it here.
+    stats:
+      description__total-nodes: Total Znodes
+      description__average-days-for-payout: Avgerage Days for Payout
+      description__days-until-next-payout: Days until your next Payout
+      label__days-until-next-payout-soon: Soon
+      description__days-until-next-payout-soon: Days until your next Payout
     table__znodes:
       placeholder__filter: Filter Znodes
       label__rank: Rank
@@ -278,6 +284,7 @@ znodes:
     label__last-seen: Last Seen
     label__active-since: Active Since
     label__next-payout: Next Payout
+    description__next-payout--soon: Soon
     label__last-payout: Last Payout
     description__last-payout--nothing-received: No Payout yet!
     label__amount-received: Rewards received
