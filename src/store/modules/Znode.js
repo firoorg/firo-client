@@ -9,7 +9,35 @@ const logger = createLogger('zcoin:store:znode')
 
 const state = {
     znodes: {},
-    total: 0
+    total: 0,
+
+    // read only settings
+    znodeStates: [
+        {
+            name: 'valid',
+            states: [
+                'ENABLED'
+            ]
+        },
+        {
+            name: 'pending',
+            states: [
+                'PRE_ENABLED',
+                'MISSING'
+            ]
+        },
+        {
+            name: 'needs-attention',
+            states: [
+                'EXPIRED',
+                'OUTPOINT_SPENT',
+                'UPDATE_REQUIRED',
+                'WATCHDOG_EXPIRED',
+                'NEW_START_REQUIRED',
+                'POSE_BAN'
+            ]
+        }
+    ]
 }
 
 const mutations = {
@@ -238,7 +266,9 @@ const getters = {
         const blocksPerDay = (1000 * 60 * 60 * 24) / avgBlockTimeInMs
 
         return getters.enabledZnodes / blocksPerDay
-    }
+    },
+
+    znodeStates: (state) => state.znodeStates
 }
 
 export default {

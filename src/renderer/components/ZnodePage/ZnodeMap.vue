@@ -53,6 +53,7 @@
 import h337 from 'heatmap.js'
 import supercluster from 'supercluster'
 import debounce from 'lodash/debounce'
+import { mapGetters } from 'vuex'
 
 import WorldMap from '@/assets/world-low.svg'
 // import WorldMap from '@/assets/Mercator_Projection.svg'
@@ -70,10 +71,6 @@ export default {
             required: true
         },
         myZnodes: {
-            type: Array,
-            required: true
-        },
-        znodeStates: {
             type: Array,
             required: true
         }
@@ -101,6 +98,10 @@ export default {
     },
 
     computed: {
+        ...mapGetters({
+            znodeStates: 'Znode/znodeStates'
+        }),
+
         mapLatBottomRad () {
             return this.bottom * Math.PI / 180
         },

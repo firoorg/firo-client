@@ -28,7 +28,6 @@
                     class="znodes-map"
                     :remote-znodes="remoteZnodes"
                     :my-znodes="myZnodes"
-                    :znode-states="znodeStates"
                 />
 
                 <section class="stats">
@@ -66,7 +65,6 @@
                         v-for="(znode, index) in filteredMyZnodes"
                         :key="index"
                         v-bind="znode"
-                        :znode-states="znodeStates"
                     />
                 </section>
 
@@ -100,37 +98,6 @@ export default {
     mixins: [
         FilterByUrlParamMixin
     ],
-
-    data () {
-        return {
-            znodeStates: [
-                {
-                    name: 'valid',
-                    states: [
-                        'ENABLED'
-                    ]
-                },
-                {
-                    name: 'pending',
-                    states: [
-                        'PRE_ENABLED',
-                        'MISSING'
-                    ]
-                },
-                {
-                    name: 'needs-attention',
-                    states: [
-                        'EXPIRED',
-                        'OUTPOINT_SPENT',
-                        'UPDATE_REQUIRED',
-                        'WATCHDOG_EXPIRED',
-                        'NEW_START_REQUIRED',
-                        'POSE_BAN'
-                    ]
-                }
-            ]
-        }
-    },
 
     computed: {
         ...mapGetters({

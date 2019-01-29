@@ -18,12 +18,7 @@
                     <section class="status">
                         <header>{{ $t('znodes.my-znode.label__status') }}</header>
                         <main>
-                            <span
-                                class="status-badge"
-                                :class="statusColor"
-                            >
-                                {{ status }}
-                            </span>
+                            <znode-status :status="status" />
                         </main>
                     </section>
                     <section class="last-seen">
@@ -117,10 +112,12 @@ import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import { convertToCoin } from '#/lib/convert'
 import Notice from '@/components/Notification/Notice'
+import ZnodeStatus from '@/components/ZnodePage/ZnodeStatus'
 
 export default {
     name: 'MyZnode',
     components: {
+        ZnodeStatus,
         Notice
     },
     props: {
@@ -147,17 +144,15 @@ export default {
         lastPaidTime: {
             type: Number,
             default: 0
-        },
-        znodeStates: {
-            type: Array,
-            required: true
         }
     },
 
     computed: {
         ...mapGetters({
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
-            znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
+            znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays',
+            znodeStates: 'Znode/znodeStates',
+            getAmountReceivedViaAddress: 'Address/getAmountReceivedViaAddress'
         }),
 
         isMissing () {
@@ -165,11 +160,11 @@ export default {
         },
 
         belongsToWallet () {
-            return this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress) !== -1
+            return this.getAmountReceivedViaAddress(this.payeeAddress) !== -1
         },
 
         payoutsReceived () {
-            const received = this.$store.getters['Address/getAmountReceivedViaAddress'](this.payeeAddress)
+            const received = this.getAmountReceivedViaAddress(this.payeeAddress)
 
             if (received === -1) {
                 return
@@ -188,12 +183,6 @@ export default {
 
             // todo discuss with @Sebastion
             return this.activeSince + znodePaymentCycleInMs
-        },
-
-        statusColor () {
-            return this.znodeStates.reduce((accumulator, state) => {
-                return state.states.includes(this.status) ? state.name : accumulator
-            }, '')
         }
     },
 
@@ -244,25 +233,6 @@ export default {
                 @include font-medium();
                 font-style: italic;
                 color: $color--comet;
-            }
-
-            .status-badge {
-                display: inline-block;
-                border-radius: emRhythm(0.5, $silent: true);
-                padding: 0.125rem 0.25rem;
-                margin: -0.125rem 0;
-                background: $color--green;
-                color: $color--polo-light;
-                @include font-medium();
-                @include setType(2, $ms-down1);
-
-                &.pending {
-                    background: rgba($color--green, 0.5);
-                }
-
-                &.needs-attention {
-                    background: $color--red;
-                }
             }
 
             .status { grid-area: status; }
