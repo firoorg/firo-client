@@ -199,7 +199,7 @@ export default class PidManager {
         const location = this.store.getters['App/blockchainLocation']
         const exists = hasLocation ? fs.existsSync(location) : false
 
-        const cleanedLocation = location.replace(/\/(regtest3|testnet3)$/, '')
+        const cleanedLocation = location.replace(/(regtest|testnet3)$/, '')
 
         if (cleanedLocation && !exists) {
             logger.warn('blockchain location %s does not exist. falling back to default location', location)
