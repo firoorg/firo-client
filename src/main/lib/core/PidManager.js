@@ -66,7 +66,7 @@ export default class PidManager {
                     return
                 }
 
-                logger.debug('checking', filePath, 'for pid')
+                logger.debug('checking %s for pid', filePath)
                 const fileExists = fs.existsSync(filePath)
 
                 if (!fileExists) {
@@ -179,6 +179,7 @@ export default class PidManager {
     getFileSystemPath () {
         if (!this.filePath) {
             this.filePath = this.store.getters['App/blockchainLocation']
+            logger.debug('try to get pid path from store: %s', this.filePath)
         }
 
         if (!this.filePath) {
@@ -230,7 +231,7 @@ export default class PidManager {
             clearTimeout(this.heartbeat)
             this.heartbeat = null
         }
-        logger.debug('removed .pid file and reset this.pid')
+        logger.debug('reset this.pid and cleared heartbeat')
     }
 
     /*
@@ -252,6 +253,8 @@ export default class PidManager {
         if (!filePath) {
             return -1
         }
+
+        logger.info('reading pid from %s', filePath)
 
         try {
             const content = parseInt(await readFile(filePath))

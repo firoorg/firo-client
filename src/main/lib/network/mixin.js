@@ -151,6 +151,8 @@ export default {
         // console.log('received message from the network', response)
         const { meta, data, error } = response
 
+        logger.debug('processing response %O', response)
+
         // todo subscriptions are pushed to the client and therefore dont have a meta key set.
         if (!meta || meta.status < 200 || meta.status >= 400) {
             logger.warn(response)
@@ -184,7 +186,7 @@ export default {
 
     send ({ type, collection, data, auth = null }, actionsToDispatch = {}) {
         if (!collection && !this.collection) {
-            logger.warn('can not send. no collection given! %o', {
+            logger.warn('can not send. no collection given! %O', {
                 type,
                 data,
                 actionsToDispatch
@@ -196,7 +198,6 @@ export default {
         const onMessage = (message) => {
             const response = JSON.parse(message.toString())
 
-            console.log('response %o', response)
             this.processResponse(response, actionsToDispatch)
             this.setLoading(false)
         }
