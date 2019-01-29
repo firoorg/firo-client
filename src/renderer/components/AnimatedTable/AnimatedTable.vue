@@ -2,11 +2,11 @@
     <div class="animated-table">
         <vuetable
             ref="vuetable"
+            :class="theme"
             :api-mode="false"
             :fields="getFieldsWithLocalizedTitle"
             :per-page="perPage"
             :track-by="trackBy"
-            :_sort-order="sortOrder"
             :data-manager="dataManager"
             pagination-path="pagination"
             :row-transition-name="rowTransition"
@@ -20,6 +20,7 @@
         <div>
             <animated-table-pagination
                 ref="pagination"
+                :theme="theme"
                 @vuetable-pagination:change-page="onChangePage"
             />
         </div>
@@ -74,6 +75,10 @@ export default {
         onRowSelect: {
             type: Function,
             default: null
+        },
+        theme: {
+            type: String,
+            default: ''
         }
     },
 

@@ -1,8 +1,7 @@
 <template>
     <div
         v-show="tablePagination && tablePagination.last_page > 1"
-        class="pagination"
-        :class="css.wrapperClass"
+        :class="[css.wrapperClass, theme]"
     >
         <a
             :class="[css.linkClass, isOnFirstPage ? css.disabledClass : '']"
@@ -62,17 +61,21 @@ export default {
     mixins: [VuetablePaginationMixin],
 
     props: {
+        theme: {
+            type: String,
+            default: ''
+        },
         css: {
             type: Object,
             default: () => ({
-                wrapperClass: 'ui right floated pagination menu',
+                wrapperClass: 'pagination',
                 activeClass: 'active',
                 disabledClass: 'disabled',
                 pageClass: 'item',
                 linkClass: 'icon',
-                paginationClass: 'ui bottom attached segment grid',
-                paginationInfoClass: 'left floated left aligned six wide column',
-                dropdownClass: 'ui search dropdown'
+                paginationClass: '',
+                paginationInfoClass: '',
+                dropdownClass: ''
             })
         }
     }
@@ -88,6 +91,7 @@ export default {
         text-align: center;
 
     }
+
     a {
         display: inline-block;
         color: $color--comet;
@@ -110,6 +114,7 @@ export default {
 
         &.disabled {
             color: $color--comet-medium;
+            cursor: default;
         }
     }
 
@@ -133,6 +138,49 @@ export default {
             &.active {
                 background: $color--polo;
                 color: $color--white;
+            }
+        }
+    }
+
+    .pagination.dark {
+        a {
+            color: $color--comet-medium;
+            color: blue;
+        }
+
+        .icon {
+            &:not(.disabled) {
+                color: $color--dark;
+                //color: $color--comet;
+
+                &:hover,
+                &:focus {
+                    color: $color--white;
+                    //color: $color--dark;
+                }
+            }
+
+            &.disabled {
+                color: $color--comet-dark-mixed;
+            }
+        }
+
+        .numbers {
+            background: $color--comet-dark-mixed;
+
+            a {
+                color: mix($color--comet-dark, $color--comet);
+
+                &:hover,
+                &:focus {
+                    background: $color--comet-medium;
+                    color: $color--dark;
+                }
+
+                &.active {
+                    background: $color--comet-light;
+                    color: $color--dark;
+                }
             }
         }
     }

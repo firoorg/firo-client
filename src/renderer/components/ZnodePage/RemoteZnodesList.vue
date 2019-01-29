@@ -6,6 +6,7 @@
         track-by="id"
         :per-page="100"
         :sort-order="sortOrder"
+        theme="dark"
     />
 </template>
 
