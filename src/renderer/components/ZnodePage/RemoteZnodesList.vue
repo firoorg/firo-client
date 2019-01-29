@@ -13,6 +13,7 @@
 /* eslint-disable vue/no-unused-components */
 import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
+import Rank from '@/components/AnimatedTable/AnimatedTableZnodeRank'
 
 const tableFields = [
     /*
@@ -30,7 +31,7 @@ const tableFields = [
         },
         */
     {
-        name: 'rank',
+        name: Rank,
         title: 'znodes.overview.table__znodes.label__rank',
         sortField: 'rank',
         width: '10%'
@@ -125,10 +126,6 @@ export default {
             border-top: 0;
             padding-top: emRhythm(2);
             padding-bottom: emRhythm(2);
-
-            &.vuetable-td-rank {
-                @include font-heavy();
-            }
         }
     }
 }
