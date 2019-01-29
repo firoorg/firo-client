@@ -4,8 +4,9 @@
         :class="{ 'is-missing': isMissing }"
     >
         <div>
-            <header>
+            <header class="heading">
                 <h2>{{ label }}</h2>
+                <p v-if="authorityIp">{{ authorityIp }}</p>
             </header>
 
             <template v-if="isMissing">
@@ -167,6 +168,10 @@ export default {
         nextEstimatedPayout: {
             type: Number,
             default: -1
+        },
+        authorityIp: {
+            type: String,
+            default: ''
         }
     },
 
@@ -219,8 +224,20 @@ export default {
             background: rgba($color--polo-light, 0.75);
         }
 
-        h2 {
-            padding-top: 0;
+        .heading {
+            padding-bottom: emRhythm(4);
+
+            h2 {
+                padding-top: 0;
+                margin: 0;
+            }
+
+            p {
+                margin: emRhythm(1) 0 0;
+                @include font-medium();
+                font-style: italic;
+                color: $color--comet;
+            }
         }
 
         .znode-stats {
