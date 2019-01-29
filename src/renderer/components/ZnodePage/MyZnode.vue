@@ -94,12 +94,17 @@
                 <base-button
                     v-if="payeeAddress"
                     size="small"
-                    :is-outline="true"
+                    :is-outline="!isEnabled"
+                    :color="isEnabled ? 'comet' : ''"
                     @click.prevent="openBlockExplorer"
                 >
                     {{ $t('znodes.my-znode.button__open-explorer') }}
                 </base-button>
-                <base-button color="comet">
+                <base-button
+                    v-if="!isEnabled"
+                    size="small"
+                    color="comet"
+                >
                     Action Name
                 </base-button>
             </template>
@@ -173,6 +178,10 @@ export default {
 
         isMissing () {
             return (!this.payeeAddress || this.status === 'MISSING')
+        },
+
+        isEnabled () {
+            return this.status === 'ENABLED'
         },
 
         belongsToWallet () {
