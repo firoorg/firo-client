@@ -85,8 +85,7 @@ export default {
         ...mapGetters({
             currentBlockHeight: 'Blockchain/currentBlockHeight',
             walletVersion: 'App/walletVersion',
-            hasLocation: 'App/hasBlockchainLocation',
-            isRestarting: 'App/isRestarting'
+            hasLocation: 'App/hasBlockchainLocation'
         })
     },
 
@@ -103,7 +102,11 @@ export default {
 
     methods: {
         isEnabled () {
-            return !this.hasLocation
+            console.log('setting up location %O', {
+                hasLocation: this.hasLocation,
+                walletVersion: this.walletVersion,
+            })
+            return !this.hasLocation || !this.walletVersion
         }
     }
 }

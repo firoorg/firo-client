@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isEnabled()">
+    <div>
         <h1 v-html="$t('onboarding.set-blockchain-location.title')" />
 
         <p v-html="$t('onboarding.set-blockchain-location.description')" />
@@ -63,8 +63,6 @@ export default {
                     'createDirectory',
                     'promptToCreate'
                 ],
-                // todo get default path
-                //defaultPath: path.resolve('/Users/joernroeder/Library/Application Support/zcoin'),
                 buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
             })
 
