@@ -1,8 +1,5 @@
 <template>
-    <div
-        v-if="isEnabled()"
-        class="restarting"
-    >
+    <div class="restarting">
         <template v-if="!isLocked">
             <div class="icon">
                 <loading-bounce class="bounce" />
