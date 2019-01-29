@@ -15,14 +15,13 @@ const writeFile = promisify(fs.writeFile)
 const unlink = promisify(fs.unlink)
 
 export default class PidManager {
-    constructor ({ path: filePath, name, store, onStarted, onStop, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
+    constructor ({ name, store, onStarted, onStop, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
         logger.info('setting up a new PidManager for %s', name)
-        logger.info('going to write pid file to "%s"', filePath)
 
         this.pid = -1
+        this.filePath = null
         this.child = null
 
-        this.filePath = filePath
         this.name = name
         this.store = store
 
@@ -38,8 +37,48 @@ export default class PidManager {
         this.connectToStore()
     }
 
+    setFilePath (filePath) {
+        this.filePath = filePath
+        logger.info('going to read pid file from "%s"', this.filePath)
+    }
     setPathToSpawn (pathToSpawn) {
         this.pathToSpawn = pathToSpawn
+    }
+
+    // Wait for file to exist, checks every 500 milliseconds
+    async waitForPid () {
+        return new Promise((resolve, reject) => {
+            let counter = 0
+
+            const timeout = setInterval(async () => {
+                counter++
+
+                if (counter > 100) {
+                    clearInterval(timeout)
+                    logger.warn('pid file not found after 100 attempts')
+                    reject(-1)
+                    return
+                }
+
+                const filePath = this.getFileSystemPath()
+
+                if (!filePath) {
+                    return
+                }
+
+                logger.debug('checking', filePath, 'for pid')
+                const fileExists = fs.existsSync(filePath)
+
+                if (!fileExists) {
+                    return
+                }
+                if (timeout) {
+                    clearInterval(timeout)
+                }
+                resolve(await this.readPidFromFs())
+
+            }, 500)
+        })
     }
 
     async start (pathToSpawn) {
@@ -57,6 +96,7 @@ export default class PidManager {
         try {
             this.pid = await this.readPidFromFs()
         } catch (e) {
+            this.pid = -1
             console.log(e)
         }
 
@@ -72,18 +112,21 @@ export default class PidManager {
             // detached: true,
             stdio: 'ignore'
         })
+        // start network to receive path
+        this.onStarted()
+
+        // wait for api status to provide path
+        this.pid = await this.waitForPid()
+        logger.debug('received pid from fs %d', this.pid)
 
         // @see https://stackoverflow.com/a/18694940/520544
         // this.child.stdin.pause()
-
-        this.pid = this.child.pid
 
         // not using detached at the moment
         this.child.unref()
 
         logger.info('started managed process with pid id %d', this.pid)
 
-        await this.write()
         this.onStart()
 
         return this.pid
@@ -91,10 +134,6 @@ export default class PidManager {
 
     onStart () {
         this.startHeartbeat()
-
-        this.onStarted({
-            pid: this.pid
-        })
     }
 
     stop () {
@@ -137,6 +176,14 @@ export default class PidManager {
     }
 
     getFileSystemPath () {
+        if (!this.filePath) {
+            this.filePath = this.store.getters['App/blockchainLocation']
+        }
+
+        if (!this.filePath) {
+            return
+        }
+
         return join(this.filePath, `${this.name}.pid`)
     }
 
@@ -152,7 +199,6 @@ export default class PidManager {
         const exists = hasLocation ? fs.existsSync(location) : false
 
         const cleanedLocation = location.replace(/\/(regtest3|testnet3)$/, '')
-        console.log('cleanedLocation', cleanedLocation)
 
         if (cleanedLocation && !exists) {
             logger.warn('blockchain location %s does not exist. falling back to default location', location)
@@ -162,13 +208,19 @@ export default class PidManager {
     }
 
     async cleanup () {
+        /*
+        @deprecated -> see write
         try {
-            await unlink(this.getFileSystemPath())
+            const pathToUnlink = this.getFileSystemPath()
+            if (pathToUnlink) {
+                await unlink(pathToUnlink)
+            }
         } catch (e) {
             if (e.code !== 'ENOENT') {
                 logger.error(e)
             }
         }
+        */
         this.pid = -1
         this.child = null
         this.store.dispatch(types.network.NETWORK_CONNECTION_LOST)
@@ -180,15 +232,28 @@ export default class PidManager {
         logger.debug('removed .pid file and reset this.pid')
     }
 
+    /*
+    @deprecated as pid file is owned by zcoind now.
     async write () {
         const pid = `${this.pid}\n`
-        await writeFile(this.getFileSystemPath(), pid)
-        logger.info('wrote pid %d to path', this.pid)
+        const pathToWrite = this.getFileSystemPath()
+
+        if (pathToWrite) {
+            await writeFile(pathToWrite, pid)
+            logger.info('wrote pid %d to path', this.pid)
+        }
     }
+    */
 
     async readPidFromFs () {
+        const filePath = this.getFileSystemPath()
+
+        if (!filePath) {
+            return -1
+        }
+
         try {
-            const content = parseInt(await readFile(this.getFileSystemPath()))
+            const content = parseInt(await readFile(filePath))
             return content > 0 ? content : -1
         } catch (e) {
             if (e.code !== 'ENOENT') {

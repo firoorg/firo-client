@@ -39,14 +39,12 @@ const zcoindName = platform === 'win32' ? 'zcoind.exe' : 'zcoind'
 const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindName}`)
 
 const userDataPath = process.env.NODE_ENV === 'development' ? rootFolder + '/assets/core' : app.getPath('userData')
-const pathToStorePid = userDataPath
 
 logger.info('zcoin paths: %o', {
     rootFolder,
     unpackedRootFolder,
     zcoindPath,
-    userDataPath,
-    pathToStorePid
+    userDataPath
 })
 
 // build settings via electron-settings module
@@ -69,8 +67,7 @@ const startNetwork = function () {
 
 // set up the manager
 const coreDaemonManager = new PidManager({
-    name: 'core',
-    path: pathToStorePid,
+    name: 'zcoind',
     autoRestart,
     heartbeatIntervalInSeconds,
     store,
