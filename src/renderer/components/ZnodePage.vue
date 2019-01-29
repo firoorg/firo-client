@@ -48,11 +48,11 @@
                         </div>
                     </div>
                     <div
-                        v-if="enabledMyZnodes.length"
+                        v-if="enabledMyZnodes.length && roundedDaysUntilNextPayout"
                         class="stat"
                     >
                         <div class="value">
-                            {{ Math.round(daysUntilNextPayout) }}
+                            {{ roundedDaysUntilNextPayout }}
                         </div>
                         <div class="desc">
                             {{ $t('znodes.overview.stats.description__days-until-next-payout') }}
@@ -128,10 +128,14 @@ export default {
             const nextEstimatedPayout = this.myZnodes.reduce((aggregator, znode) => {
                 const { nextEstimatedPayout } = znode
 
-                return aggregator < nextEstimatedPayout ? aggregator : nextEstimatedPayout
+                return !nextEstimatedPayout || aggregator < nextEstimatedPayout ? aggregator : nextEstimatedPayout
             }, Infinity)
 
             return (nextEstimatedPayout - now) / 1000 / 60 / 60 / 24
+        },
+
+        roundedDaysUntilNextPayout () {
+            return Math.round(this.daysUntilNextPayout)
         }
     }
 }
