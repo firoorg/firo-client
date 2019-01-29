@@ -6,7 +6,9 @@
         <div>
             <header class="heading">
                 <h2>{{ label }}</h2>
-                <p v-if="authorityIp">{{ authorityIp }}</p>
+                <p v-if="authorityIp">
+                    {{ authorityIp }}
+                </p>
             </header>
 
             <template v-if="isMissing">

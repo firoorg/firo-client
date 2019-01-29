@@ -41,7 +41,9 @@
                                         :status="znode.status"
                                         :show-text="false"
                                     />
-                                    <div class="label">{{ znode.label }}</div>
+                                    <div class="label">
+                                        {{ znode.label }}
+                                    </div>
                                 </li>
                             </ul>
                         </template>
