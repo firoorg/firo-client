@@ -37,7 +37,11 @@
                                     v-for="znode of cluster.nodes"
                                     :key="znode.id"
                                 >
-                                    {{ znode.status }} - {{ znode.label }}
+                                    <znode-status
+                                        :status="znode.status"
+                                        :show-text="false"
+                                    />
+                                    <div class="label">{{ znode.label }}</div>
                                 </li>
                             </ul>
                         </template>
@@ -56,12 +60,14 @@ import debounce from 'lodash/debounce'
 import { mapGetters } from 'vuex'
 
 import WorldMap from '@/assets/world-low.svg'
+import ZnodeStatus from './ZnodeStatus'
 // import WorldMap from '@/assets/Mercator_Projection.svg'
 
 export default {
     name: 'ZnodeMap',
 
     components: {
+        ZnodeStatus,
         WorldMap
     },
 
@@ -564,5 +570,27 @@ export default {
         list-style: none;
         margin: 0;
         padding: 0;
+
+        li {
+            display: flex;
+            //justify-content: center;
+            //align-items: center;
+            align-items: baseline;
+            padding-bottom: emRhythm(1);
+
+            .label {
+                @include font-medium();
+            }
+        }
+
+        li + li {
+            @include rhythmBorderTop(1px, 1);
+            border-top-color: $color--comet-light;
+            border-top-style: solid;
+        }
+
+        li:last-child {
+            padding-bottom: 0;
+        }
     }
 </style>
