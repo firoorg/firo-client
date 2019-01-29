@@ -31,34 +31,33 @@ const tableFields = [
         */
     {
         name: 'rank',
-        title: 'Rank',
+        title: 'znodes.overview.table__znodes.label__rank',
         sortField: 'rank',
         width: '10%'
     },
     {
         name: RelativeDate,
-        title: 'Active Since',
+        title: 'znodes.overview.table__znodes.label__active-since',
         dateField: 'activeSince',
         sortField: 'activeSince',
         width: '20%'
     },
     {
         name: RelativeDate,
-        title: 'Last Seen',
-        // title: 'znodes.table__remote-znodes.label__lastSeen',
+        title: 'znodes.overview.table__znodes.label__last-seen',
         dateField: 'lastSeen',
         sortField: 'lastSeen',
         width: '20%'
     },
     {
         name: 'status',
-        title: 'Status',
+        title: 'znodes.overview.table__znodes.label__status',
         sortField: 'status',
         width: '25%'
     },
     {
         name: 'authority',
-        title: 'Authority',
+        title: 'znodes.overview.table__znodes.label__authority',
         sortField: 'label',
         formatter ({ ip, port }) {
             return `${ip}<span class="port">:${port}</span>`

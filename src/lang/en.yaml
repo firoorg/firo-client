@@ -266,6 +266,11 @@ znodes:
     description: Znodes are incentivized nodes which help support the network. If you do have a Znode you can manage and monitor it here.
     table__znodes:
       placeholder__filter: Filter Znodes
+      label__rank: Rank
+      label__active-since: Active Since
+      label__last-seen: Last Seen
+      label__status: Status
+      label__authority: Address
   my-znode:
     description__status-missing: Znode information will show up once the blockchain is synced.
     description__does-not-belong-to-wallet: The payee address is not an address of this wallet. Therefore payment related information can not be shown.
