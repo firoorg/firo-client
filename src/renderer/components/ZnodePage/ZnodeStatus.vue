@@ -1,9 +1,9 @@
 <template>
     <span
         class="status-badge"
-        :class="statusColor"
+        :class="[statusColor, { 'no-text': !showText }]"
     >
-        {{ status }}
+        {{ content }}
     </span>
 </template>
 
@@ -17,6 +17,11 @@ export default {
         status: {
             type: String,
             required: true
+        },
+
+        showText: {
+            type: Boolean,
+            default: true
         }
     },
 
@@ -29,6 +34,10 @@ export default {
             return this.znodeStates.reduce((accumulator, state) => {
                 return state.states.includes(this.status) ? state.name : accumulator
             }, '')
+        },
+
+        content () {
+            return this.showText ? this.status: ''
         }
     }
 }
@@ -51,6 +60,16 @@ export default {
 
         &.needs-attention {
             background: $color--red;
+        }
+
+        &.no-text {
+            $width: 0.5;
+            display: inline-block;
+            padding: 0;
+            border-radius: emRhythm(0.25, $silent: true);
+            width: emRhythm($width * 2.5, $silent: true);
+            height: emRhythm($width * 2.5, $silent: true);
+            margin-right: emRhythm($width * 2, $silent: true);
         }
     }
 </style>
