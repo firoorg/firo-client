@@ -171,7 +171,7 @@ export default {
         display: flex;
         justify-content: space-between;
         padding: emRhythm(5) emRhythm(4);
-        z-index: 10;
+        z-index: 20;
 
         header {
             display: flex;
