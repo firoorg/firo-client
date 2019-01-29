@@ -14,6 +14,7 @@
 import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
 import Rank from '@/components/AnimatedTable/AnimatedTableZnodeRank'
+import Status from '@/components/AnimatedTable/AnimatedTableZnodeStatus'
 
 const tableFields = [
     /*
@@ -41,20 +42,20 @@ const tableFields = [
         title: 'znodes.overview.table__znodes.label__active-since',
         dateField: 'activeSince',
         sortField: 'activeSince',
-        width: '20%'
+        width: '22.5%'
     },
     {
         name: RelativeDate,
         title: 'znodes.overview.table__znodes.label__last-seen',
         dateField: 'lastSeen',
         sortField: 'lastSeen',
-        width: '20%'
+        width: '22.5%'
     },
     {
-        name: 'status',
+        name: Status,
         title: 'znodes.overview.table__znodes.label__status',
         sortField: 'status',
-        width: '25%'
+        width: '20%'
     },
     {
         name: 'authority',
