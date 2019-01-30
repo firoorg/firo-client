@@ -115,7 +115,7 @@ const actions = {
 
         commit(types.CREATE_PAYMENT_REQUEST, {
             label,
-            amount,
+            amount: amount || null,
             message
         })
     },
