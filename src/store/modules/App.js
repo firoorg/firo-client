@@ -197,6 +197,8 @@ const actions = {
         // todo: could potentially watch the location to catch cases where the user freakes out and...
         // todo: ...moves the folder while zcoin is running
 
+        logger.info('setting blockchain location to %s', location)
+
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
         getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location)
     },
