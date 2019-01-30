@@ -11,31 +11,33 @@
         </template>
 
         <template slot="content">
-            <header>
-                <h2>Private Spend</h2>
-            </header>
+            <div>
+                <header>
+                    <h2>Private Spend</h2>
+                </header>
 
-            <p>
-                You have enough mints available to make that payment privately.<br>
-                Would you like to do so?
-            </p>
+                <p>
+                    You have enough mints available to make that payment privately.<br>
+                    Would you like to do so?
+                </p>
 
-            <footer>
-                <base-button
-                    :is-outline="true"
-                    :is-dark="true"
-                    @click.prevent="$emit('cancel')"
-                >
-                    No, thanks
-                </base-button>
-                <base-button
-                    color="green"
-                    :is-dark="true"
-                    @click.prevent="$emit('submit')"
-                >
-                    Yes, switch to <em>Private Spend</em>
-                </base-button>
-            </footer>
+                <footer>
+                    <base-button
+                        :is-outline="true"
+                        :is-dark="true"
+                        @click.prevent="$emit('cancel')"
+                    >
+                        No, thanks
+                    </base-button>
+                    <base-button
+                        color="green"
+                        :is-dark="true"
+                        @click.prevent="$emit('submit')"
+                    >
+                        Yes, switch to <em>Private Spend</em>
+                    </base-button>
+                </footer>
+            </div>
         </template>
     </base-popover>
 </template>
