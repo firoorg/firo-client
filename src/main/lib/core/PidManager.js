@@ -19,7 +19,6 @@ export default class PidManager {
         logger.info('setting up a new PidManager for %s', name)
 
         this.pid = -1
-        this.filePath = null
         this.child = null
 
         this.name = name
@@ -37,10 +36,6 @@ export default class PidManager {
         this.connectToStore()
     }
 
-    setFilePath (filePath) {
-        this.filePath = filePath
-        logger.info('going to read pid file from "%s"', this.filePath)
-    }
     setPathToSpawn (pathToSpawn) {
         this.pathToSpawn = pathToSpawn
     }
@@ -177,16 +172,14 @@ export default class PidManager {
     }
 
     getFileSystemPath () {
-        if (!this.filePath) {
-            this.filePath = this.store.getters['App/blockchainLocation']
-            logger.debug('try to get pid path from store: %s', this.filePath)
-        }
+        const filePath = this.store.getters['App/blockchainLocation']
 
-        if (!this.filePath) {
+        if (!filePath) {
+            logger.debug('try to get pid path from store: %s', filePath)
             return
         }
 
-        return join(this.filePath, `${this.name}.pid`)
+        return join(filePath, `${this.name}.pid`)
     }
 
     getArguments () {
