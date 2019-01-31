@@ -78,16 +78,15 @@ export default {
             const message = messageBuffer ? messageBuffer.toString() : null
 
             try {
-                // console.log('processing response -> ', `ON_${topic.toUpperCase()}_SUBSCRIPTION`)
-
                 const json = JSON.parse(message)
                 const { data } = json
+                const Topic = capitalize(topic)
+
+                logger.debug('processing subscription response %s %O %O', `ON_${topic.toUpperCase()}_SUBSCRIPTION`, data, json)
 
                 if (this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`]) {
                     this.dispatchAction(this.types[`ON_${topic.toUpperCase()}_SUBSCRIPTION`], data)
                 }
-
-                const Topic = capitalize(topic)
 
                 if (this[`on${Topic}Subscription`]) {
                     this[`on${Topic}Subscription`](data)

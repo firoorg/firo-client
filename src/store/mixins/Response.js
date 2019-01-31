@@ -45,7 +45,7 @@ const module = function (namespace = '') {
                 const responseName = `${name}Response`
                 const { _meta, data, error } = response
 
-                logger.debug('updating', tn(`SET ${NAME} RESPONSE`), response)
+                logger.debug('updating %s %O', tn(`SET ${NAME} RESPONSE`), response)
                 /*
                 Vue.set(state, `${name}Response`, {
                     ...response,

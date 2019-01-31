@@ -10,6 +10,7 @@ export default {
     ...({
         namespace: 'Mint',
         collection: 'mint',
+        subscriptions: ['mintStatus'],
 
         mutations: {
             [types.mint.DO_MINT]: 'mint'

@@ -95,6 +95,10 @@ const actions = {
         })
 
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
+    },
+
+    [types.ON_MINTSTATUS_SUBSCRIPTION] ({ commit, state }, data) {
+        logger.info('received mint status change %O', data)
     }
 }
 
