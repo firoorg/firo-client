@@ -17,6 +17,16 @@ export const getTypeName = (name) => {
     return snakeCase(name).toUpperCase()
 }
 
+export const getId = (object) => {
+    const { txid, index } = object
+
+    if (!txid || !index) {
+        return false
+    }
+
+    return `${txid}-${index}`
+}
+
 export const formatDenominationPairs = function (denominations) {
     return Object.entries(denominations)
     // transform to [{denomination: '25', amount: 1}]

@@ -4,6 +4,7 @@ import rootTypes from '~/types'
 import LastSeen from '~/mixins/LastSeen'
 import { addConfirmationsToTransaction } from '~/utils'
 import { createLogger } from '#/lib/logger'
+import { getId } from '~/utils/index'
 
 const logger = createLogger('zcoin:store:address')
 const lastSeen = LastSeen.module('transaction')
@@ -31,7 +32,7 @@ const getTxBasics = function (tx) {
     const index = txIndex || 0
 
     return {
-        id: `${txid}-${index}`,
+        id: getId({ txid, index }),
         txid,
         index,
         category,
