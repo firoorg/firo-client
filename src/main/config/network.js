@@ -1,7 +1,7 @@
 const HOST = 'tcp://127.0.0.1'
 
 export default {
-    secondsToWaitForApiToGetReady: 60,
+    secondsToWaitForApiToGetReady: 300,
 
     status: {
         host: HOST,
