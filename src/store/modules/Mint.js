@@ -8,6 +8,7 @@ import Response from '~/mixins/Response'
 import { formatDenominationPairs } from '~/utils'
 import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
+import { getId } from '~/utils/index'
 
 const isLoading = IsLoading.module('')
 const mintResponse = Response.module('mint')
@@ -97,8 +98,32 @@ const actions = {
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
     },
 
-    [types.ON_MINTSTATUS_SUBSCRIPTION] ({ commit, state }, data) {
+    [types.UPDATE_MINT_STATUS] ({ commit, state }, { txid, index, used }) {
+        const id = getId({ txid, index })
+
+        if (!state.mints[id]) {
+            logger.info('can not update mint status. mint doesnt exist %s', id)
+            return
+        }
+
+        commit(types.UPDATE_MINT, {
+            ...state.mints[id],
+            used
+        })
+    },
+
+    [types.ON_MINTSTATUS_SUBSCRIPTION] ({ dispatch, state }, data) {
         logger.info('received mint status change %O', data)
+
+        if (!data) {
+            return
+        }
+
+        Object.values(data).forEach((mint) => {
+            const { txid, index, used } = mint
+
+            dispatch(types.UPDATE_MINT_STATUS, { txid, index, used })
+        })
     }
 }
 
