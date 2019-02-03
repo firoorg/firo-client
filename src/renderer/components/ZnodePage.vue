@@ -27,7 +27,7 @@
                 <znode-map
                     class="znodes-map"
                     :remote-znodes="remoteZnodes"
-                    :my-znodes="myZnodes"
+                    :my-znodes="filteredMyZnodes"
                 />
 
                 <section class="stats">
