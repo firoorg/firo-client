@@ -39,25 +39,42 @@
                             {{ $t('znodes.overview.stats.description__total-nodes') }}
                         </div>
                     </div>
-                    <div class="stat">
-                        <div class="value">
-                            {{ Math.round(znodePaymentCycleInDays) }}
+                    <template v-if="!statsLoaded">
+                        <div class="stat loading">
+                            <div class="loading-wrap">
+                                <loading-bounce color="dark" />
+                            </div>
+                            <div>
+                                <div class="value">
+                                    {{ $t('znodes.overview.stats.label__znodelist-syncing') }}
+                                </div>
+                                <div class="desc">
+                                    {{ $t('znodes.overview.stats.description__znodelist-syncing') }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="desc">
-                            {{ $t('znodes.overview.stats.description__average-days-for-payout') }}
+                    </template>
+                    <template v-else>
+                        <div class="stat">
+                            <div class="value">
+                                {{ Math.round(znodePaymentCycleInDays) }}
+                            </div>
+                            <div class="desc">
+                                {{ $t('znodes.overview.stats.description__average-days-for-payout') }}
+                            </div>
                         </div>
-                    </div>
-                    <div
-                        v-if="enabledMyZnodes.length && roundedDaysUntilNextPayout"
-                        class="stat"
-                    >
-                        <div class="value">
-                            {{ roundedDaysUntilNextPayout }}
+                        <div
+                            v-if="enabledMyZnodes.length && roundedDaysUntilNextPayout"
+                            class="stat"
+                        >
+                            <div class="value">
+                                {{ roundedDaysUntilNextPayout }}
+                            </div>
+                            <div class="desc">
+                                {{ $t('znodes.overview.stats.description__days-until-next-payout') }}
+                            </div>
                         </div>
-                        <div class="desc">
-                            {{ $t('znodes.overview.stats.description__days-until-next-payout') }}
-                        </div>
-                    </div>
+                    </template>
                 </section>
 
                 <section class="my-znodes">
@@ -85,11 +102,13 @@ import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
 import MyZnode from '@/components/ZnodePage/MyZnode'
 import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
 import RemoteZnodesList from '@/components/ZnodePage/RemoteZnodesList'
+import LoadingBounce from "./Icons/LoadingBounce";
 
 export default {
     name: 'ZnodePage',
 
     components: {
+        LoadingBounce,
         RemoteZnodesList,
         MyZnode,
         ZnodeMap
@@ -101,6 +120,7 @@ export default {
 
     computed: {
         ...mapGetters({
+            isZnodeListSynced: 'Blockchain/isZnodeListSynced',
             myZnodes: 'Znode/myZnodes',
             remoteZnodes: 'Znode/remoteZnodes',
             totalZnodes: 'Znode/totalZnodes',
@@ -136,6 +156,10 @@ export default {
 
         roundedDaysUntilNextPayout () {
             return Math.round(this.daysUntilNextPayout)
+        },
+
+        statsLoaded () {
+            return this.isZnodeListSynced && this.roundedDaysUntilNextPayout > 0
         }
     }
 }
@@ -225,6 +249,20 @@ export default {
                 @include font-medium();
                 font-style: italic;
                 color: $color--polo;
+            }
+
+            &.loading {
+                display: flex;
+                align-items: center;
+                max-width: 25rem;
+
+                .loading-wrap {
+                    margin-right: emRhythm(2);
+                }
+
+                .value {
+                    text-align: left;
+                }
             }
         }
     }
