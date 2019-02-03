@@ -54,7 +54,7 @@ const mutations = {
     ...lastSeen.mutations,
 
     [types.ADD_WALLET_ADDRESS] (state, { address, total }) {
-        logger.debug('adding wallet address', address, total)
+        logger.debug('adding wallet address %s %O', address, total)
 
         Vue.set(state[WALLET_ADDRESS_KEY], address, {
             address,
@@ -64,7 +64,7 @@ const mutations = {
     },
 
     [types.ADD_THIRD_PARTY_ADDRESS] (state, { address, total }) {
-        logger.debug('adding third party address %s %o', address, total)
+        logger.debug('adding third party address %s %O', address, total)
         Vue.set(state[THIRD_PARTY_ADDRESS_KEY], address, {
             address,
             total,
@@ -105,7 +105,7 @@ const actions = {
     ...lastSeen.actions,
 
     [types.SET_INITIAL_STATE] ({ commit, dispatch, state }, initialState) {
-        logger.info('got initial state for ADDRESS %o', Object.keys(initialState))
+        logger.info('got initial state for ADDRESS %s', JSON.stringify(initialState, null, 4))
         const { addresses } = initialState
 
         for (const addressKey of Object.keys(addresses)) {
@@ -118,7 +118,7 @@ const actions = {
             const { txids, total } = address
 
             if (!txids) {
-                logger.debug('no txids found for address', addressKey)
+                logger.debug('no txids found for address %s', addressKey)
                 break
             }
 
@@ -130,7 +130,7 @@ const actions = {
                     const { category } = tx
 
                     if (!category) {
-                        console.warn('transaction without a category given', tx, address)
+                        console.warn('transaction without a category given %O %s', tx, address)
                         return
                     }
 
@@ -181,7 +181,7 @@ const actions = {
                         break
 
                     default:
-                        logger.warn('UNHANDLED ADDRESS CATEGORY', category, tx)
+                        logger.warn('UNHANDLED ADDRESS CATEGORY %s %O', category, tx)
                         break
                     }
                 }
