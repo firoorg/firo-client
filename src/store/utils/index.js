@@ -20,7 +20,7 @@ export const getTypeName = (name) => {
 export const getId = (object) => {
     const { txid, index } = object
 
-    if (!txid || !index) {
+    if (!txid || index === undefined) {
         return false
     }
 
