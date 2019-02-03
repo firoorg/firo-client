@@ -137,6 +137,7 @@ const actions = {
         // process maximal 10 nodes at a time
         eachOfLimit(initialState.nodes, 10, (znode, id, callback) => {
             initialZnodes[id] = processZnode(id, znode, state)
+
             callback()
         }, () => {
             addZnodes(commit, initialZnodes)
@@ -224,12 +225,13 @@ const getters = {
     }),
 
     myZnodes: (state, getters) => {
-        return getters.allZnodes
+        return [...getters.allZnodes]
             .filter((znode) => {
                 const { isMine } = znode
 
                 return isMine
             })
+            .sort((a, b) => a.position - b.position)
             .map((znode) => {
                 const { payeeAddress, activeSince, lastPaidTime } = znode
 

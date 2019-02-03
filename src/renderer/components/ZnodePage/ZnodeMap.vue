@@ -190,12 +190,16 @@ export default {
                 let nodes = []
 
                 if (isCluster) {
-                    nodes = index.getLeaves(clusterId).map(({ znodeId }) => znodes[znodeId])
+                    nodes = index
+                        .getLeaves(clusterId)
+                        .map(({ znodeId }) => znodes[znodeId])
                 } else {
                     nodes = [
                         znodes[cluster.znodeId]
                     ]
                 }
+
+                nodes = [...nodes].sort((a, b) => a.position - b.position)
 
                 return {
                     id: isCluster ? clusterId : cluster.znodeId,
