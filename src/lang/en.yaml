@@ -266,10 +266,12 @@ znodes:
     description: Znodes are incentivized nodes which help support the network. If you do have a Znode you can manage and monitor it here.
     stats:
       description__total-nodes: Total Znodes
-      description__average-days-for-payout: Avgerage Days for Payout
+      description__average-days-for-payout: Average Days for Payout
       description__days-until-next-payout: Days until your next Payout
       label__days-until-next-payout-soon: Soon
       description__days-until-next-payout-soon: Days until your next Payout
+      label__znodelist-syncing: Syncing Znodes
+      description__znodelist-syncing: Statistics show up once the Znode list is synced with the network.
     table__znodes:
       placeholder__filter: Filter Znodes
       label__rank: Rank
@@ -279,7 +281,7 @@ znodes:
       label__authority: Address
   my-znode:
     description__status-missing: Znode information will show up once the client gathered its data from the network.
-    description__does-not-belong-to-wallet: The payee address is not an address of this wallet. Therefore payment related information can not be shown.
+    description__does-not-belong-to-wallet: The payee address is not part of this wallet. Therefore payment related information can not be shown.
     label__status: Status
     label__last-seen: Last Seen
     label__active-since: Active Since
