@@ -115,13 +115,15 @@ export default {
         labelOrPlaceholder () {
             const label = this.label || this.$t('send.table__outgoing-payments.label__tx-nolabel')
 
+            let categoryHashtag = ''
+
             if (this.category === 'send') {
-                return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
+                categoryHashtag = `#${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
             } else if (this.category === 'spendOut') {
-                return `${label} #${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
+                categoryHashtag = `#${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
             }
 
-            return label
+            return label.includes(categoryHashtag) ? label : `${label} ${categoryHashtag}`
         }
     },
     methods: {
