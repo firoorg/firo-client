@@ -178,7 +178,7 @@ export default {
             // margin-left: emRhythm(3, $ms-up2);
             margin-bottom: emRhythm(7);
 
-            @include h2-with-description(inherit, $color--polo-dark);
+            @include h2-with-description(inherit, $color--comet);
         }
     }
 

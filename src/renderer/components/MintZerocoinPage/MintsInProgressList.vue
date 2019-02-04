@@ -9,7 +9,7 @@
         >
             <div class="label">
                 <!--<slot v-bind="value" />-->
-                <div>
+                <div class="desc">
                     <span class="name">
                         Mint {{ value.denomination }}
                     </span>
@@ -108,16 +108,22 @@ export default {
             padding-bottom: emRhythm(1);
 
             .label {
+                .desc {
+                    display: flex;
+                    justify-content: space-between;
+                }
+
                 .name {
                     @include font-heavy();
                 }
 
                 .eta {
-                    display: inline-block;
+                    display: block;
                     padding-left: emRhythm(1);
-                    @include font-medium();
+                    @include font-regular();
                     font-style: italic;
                     color: $color--comet;
+                    text-align: right;
                 }
             }
 

@@ -69,7 +69,10 @@
         >
             <template v-if="!hasCurrentMints && hasMintsInProgress">
                 <section class="mints-in-progress">
-                    <h2 v-html="$t('mint.detail-process-mint.title')" />
+                    <header>
+                        <h2 v-html="$t('mint.detail-process-mint.title')" />
+                        <p>{{ $tc('mint.detail-process-mint.description', mintsInProgress.length) }}</p>
+                    </header>
 
                     <mints-in-progress-list :mints="mintsInProgress" />
                 </section>
@@ -82,7 +85,7 @@
                             <base-popover
                                 :disabled="!enableProgressList"
                                 :auto-hide="true"
-                                placement="bottom-end"
+                                placement="top-end"
                                 popover-class="comet"
                                 class="mints-in-process-popover"
                                 trigger="click"
@@ -100,15 +103,17 @@
                                 </template>
 
                                 <template slot="content">
-                                    <header>
-                                        <h3 v-html="$t('mint.detail-process-mint.title')" />
-                                        <p v-html="$t('mint.detail-process-mint.description')" />
-                                    </header>
+                                    <div>
+                                        <header>
+                                            <h3 v-html="$t('mint.detail-process-mint.title')" />
+                                            <p> {{ $tc('mint.detail-process-mint.description', mintsInProgress.length) }} </p>
+                                        </header>
 
-                                    <mints-in-progress-list
-                                        :mints="mintsInProgress"
-                                        :is-monochrome="true"
-                                    />
+                                        <mints-in-progress-list
+                                            :mints="mintsInProgress"
+                                            :is-monochrome="true"
+                                        />
+                                    </div>
                                 </template>
                             </base-popover>
                         </div>
@@ -333,6 +338,13 @@ export default {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+        }
+    }
+
+    .mints-in-progress {
+        header {
+            @include h2-with-description(inherit, $color--comet);
+            margin-bottom: emRhythm(7);
         }
     }
 

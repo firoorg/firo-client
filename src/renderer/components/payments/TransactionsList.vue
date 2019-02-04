@@ -130,7 +130,7 @@ export default {
                 .unit,
                 .timestamp {
                     // @include font-medium();
-                    @include lato-font('regular');
+                    @include font-regular();
                     color: $color--comet;
                 }
 

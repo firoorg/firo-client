@@ -212,7 +212,7 @@ send:
 
     detail-public-send:
       title: Public Send
-      description: You can send one or more payments in one transaction. <p>All transactions send via this screen will be visible on the blockchain.</p>
+      description: You can send one or more payments in one transaction.<br />All transactions send via this screen will be visible on the blockchain.
       label__label: Label
       placeholder__label: "You can use #tags in here"
       label__address: Address
