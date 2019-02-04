@@ -6,11 +6,12 @@
         </span>
         <div class="control">
             <input
-                v-model="explorerUrl"
+                v-model="currentValue"
                 v-validate="'required|url'"
-                v-tooltip="getValidationTooltip('explorerUrl')"
+                v-tooltip="getValidationTooltip('currentValue')"
+                :data-vv-as="$t('settings.form.interface.label__explorer-pattern')"
                 :placeholder="$t('settings.form.interface.placeholder__explorer-pattern')"
-                name="explorerUrl"
+                name="currentValue"
                 type="text"
             >
         </div>
@@ -18,9 +19,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import ValidatedVuexModel from '@/mixins/ValidatedVuexModel'
 
-import ValidationMixin from '@/mixins/ValidationMixin'
 import { addVuexModel } from '@/utils/store'
 import types from '~/types'
 
@@ -28,46 +28,15 @@ export default {
     name: 'BlockchainExplorerSettings',
 
     mixins: [
-        ValidationMixin
+        ValidatedVuexModel
     ],
-    $_veeValidate: {
-        validator: 'new' // give me my own validator instance.
-    },
-
-    data () {
-        return {
-            explorerUrl: '',
-            validationFieldOrder: [
-                'explorerUrl'
-            ]
-        }
-    },
 
     computed: {
-        /*
         ...addVuexModel({
-            name: 'explorerUrl',
+            name: 'storeValue',
             getter: 'Settings/getExplorerBaseUrl',
-            isValidAction: types.settings.SET_BLOCKCHAIN_EXPLORER_BASE_URL,
             action: types.settings.SET_BLOCKCHAIN_EXPLORER_BASE_URL
         })
-        */
-    },
-
-    watch: {
-        validationErrors: {
-            deep: true,
-            handler: function (errorsNew) {
-                console.log('errors watch', errorsNew);
-                if (!errorsNew.items.length) {
-                    console.log('sett')
-                }
-            }
-        }
-    },
-
-    mounted() {
-        this.explorerUrl = this.$store.getters['Settings/getExplorerBaseUrl']
     }
 }
 </script>
