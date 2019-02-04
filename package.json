@@ -121,6 +121,7 @@
     "vue-qrcode-component": "^2.1.1",
     "vue-radial-progress": "^0.2.10",
     "vue-router": "^3.0.2",
+    "vue-select": "^2.5.1",
     "vue-smooth-reflow": "^0.1.12",
     "vue-timeago": "^5.0.0",
     "vuetable-2": "^2.0.0-beta.4",
