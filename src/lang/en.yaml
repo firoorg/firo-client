@@ -244,7 +244,7 @@ send:
 
     flyout-unlock-client:
       title: Unlock Client to send
-      description: Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+      description: Please enter your password to unlock the client and confirm your transaction.
       label__passphrase: Passphrase
       placeholder__passphrase: Enter your passphrase
 
