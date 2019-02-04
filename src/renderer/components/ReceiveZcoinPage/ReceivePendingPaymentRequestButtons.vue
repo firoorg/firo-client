@@ -133,8 +133,15 @@ export default {
             }
 
             const params = []
-            params.push(this.amount ? `amount=${this.amount}` : '')
-            params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
+
+            if (this.amount) {
+                params.push(`amount=${this.amount}`)
+            }
+
+            if (this.message) {
+                params.push(`message=${encodeURIComponent(this.message)}`)
+            }
+
             const paramsString = params.length ? `?${params.join('&')}` : ''
 
             return `zcoin://${address}${paramsString}`

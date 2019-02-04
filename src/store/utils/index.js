@@ -21,7 +21,7 @@ export const getId = (object) => {
     const { txid, index } = object
 
     if (!txid || index === undefined) {
-        return false
+        return null
     }
 
     return `${txid}-${index}`

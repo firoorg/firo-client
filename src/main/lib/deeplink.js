@@ -45,7 +45,7 @@ export default {
 
         const [ address ] = url.match(RegExp(parsed.hostname, 'i'))
 
-        logger.debug('got deeplink url', url, address, parsed)
+        logger.debug('got deeplink url %s, %O', url, { address, parsed })
 
         // got a payment request url
         if (address && isZcoinAddress(address, prefixes)) {
