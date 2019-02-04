@@ -211,6 +211,7 @@ export default {
 
     methods: {
         ...mapActions({
+            clearSendForm: types.zcoinpayment.CLEAR_FORM,
             clearSpendForm: types.zerocoinspend.CLEAR_FORM,
             setSpendFormLabel: types.zerocoinspend.SET_FORM_LABEL,
             setSpendFormAddress: types.zerocoinspend.SET_FORM_ADDRESS,
@@ -234,12 +235,16 @@ export default {
                 return
             }
 
+            // populate spend form
             this.clearSpendForm()
             this.setSpendFormLabel(this.label)
             this.setSpendFormAddress(this.address)
             this.setSpendFormMints(toSpend)
 
             this.$router.push({ name: 'spend-zerocoin' })
+
+            // clear send form
+            this.clearSendForm()
         }
     }
 }
