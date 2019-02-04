@@ -227,6 +227,13 @@ send:
       title: Pending Payments
       description: These payments are currently queued up. Once you have finished adding payments, you can send them via "Send now"
 
+    flyout-suggest-private-spend:
+      title: Private Spend
+      description: You have enough mints available to make that payment privately.<br>Would you like to do so?
+      button__decline: No, thanks
+      button__confirm: Yes, switch to <em>Private Spend</em>
+
+
     flyout-confirm-send:
       title: Confirm Payment
       description: "Here's a breakdown of your payment including the fee. OK? | Here's a breakdown of your payments including the fee. OK?"

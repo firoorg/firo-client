@@ -13,29 +13,24 @@
         <template slot="content">
             <div>
                 <header>
-                    <h2>Private Spend</h2>
+                    <h2>{{ $t('send.public.flyout-suggest-private-spend.title') }}</h2>
                 </header>
 
-                <p>
-                    You have enough mints available to make that payment privately.<br>
-                    Would you like to do so?
-                </p>
+                <p v-html="$t('send.public.flyout-suggest-private-spend.description')" />
 
                 <footer>
                     <base-button
                         :is-outline="true"
                         :is-dark="true"
                         @click.prevent="$emit('cancel')"
-                    >
-                        No, thanks
-                    </base-button>
+                        v-html="$t('send.public.flyout-suggest-private-spend.button__decline')"
+                    />
                     <base-button
                         color="green"
                         :is-dark="true"
                         @click.prevent="$emit('submit')"
-                    >
-                        Yes, switch to <em>Private Spend</em>
-                    </base-button>
+                        v-html="$t('send.public.flyout-suggest-private-spend.button__confirm')"
+                    />
                 </footer>
             </div>
         </template>
