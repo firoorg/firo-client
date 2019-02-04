@@ -164,18 +164,6 @@ export default {
             return this.address.address || this.address
         },
 
-        getZcoinUri () {
-            if (!this.address) {
-                return ''
-            }
-            const params = []
-            params.push(this.amount ? `amount=${this.amount}` : '')
-            params.push(this.message ? `message=${encodeURIComponent(this.message)}` : '')
-            const paramsString = params.length ? `?${params.join('&')}` : ''
-
-            return `zcoin://${this.getAddress}${paramsString}`
-        },
-
         hasAmountReceived () {
             if (typeof this.address === 'string' || !this.address.total) {
                 return false
