@@ -189,7 +189,7 @@ send:
 
     flyout-unlock-client:
       title: Unlock Client to spend
-      description: Etiam porta sem malesuada magna mollis euismod.
+      description: Please enter your password to unlock the client and confirm your private transaction.
       label__passphrase: Passphrase
       placeholder__passphrase: Enter your passphrase
 
