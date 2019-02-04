@@ -114,6 +114,7 @@ export default {
 
     data () {
         return {
+            isUsedAddressCache: undefined,
             responseNamespace: 'ZerocoinSpend/spend zerocoin'
         }
     },
@@ -126,6 +127,10 @@ export default {
         }),
 
         isUsedAddress () {
+            if (this.isUsedAddressCache !== undefined) {
+                return this.isUsedAddressCache
+            }
+
             return this.hasAlreadySentToAddress(this.currentFormAddress)
         },
 
@@ -155,7 +160,23 @@ export default {
         }
     },
 
+    mounted () {
+        this.$on('step-done', () => {
+            this.isUsedAddressCache = undefined
+        })
+    },
+
+    beforeDestroy () {
+        this.$off('step-done')
+    },
+
     methods: {
+        // override mixin
+        onConfirm () {
+            this.isConfirmed = true
+            this.isUsedAddressCache = !!this.containsUsedAddress
+        },
+
         getConfirmStep () {
             return SpendZerocoinStepConfirm
         }
