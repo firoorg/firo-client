@@ -307,10 +307,10 @@ settings:
     interface:
       title: Interface
       label__language: Language
-      description__language: Purus Ullamcorper Fermentum.
+      description__language: Please select your language.
       label__explorer-pattern: Blockchain Explorer
-      description__explorer-pattern: Purus Ullamcorper Fermentum.
-      placeholder__explorer-pattern: Enter the url pattern of your favorite explorer
+      description__explorer-pattern: If you wish to use a non-standard block explorer, you can configure this here.
+      placeholder__explorer-pattern: Enter the URL pattern of your favorite explorer
     privacy:
       title: Privacy
       label__connect-via-tor: Connect via Tor
