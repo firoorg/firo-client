@@ -57,14 +57,14 @@
                     <template v-else>
                         <div class="stat">
                             <div class="value">
-                                {{ Math.round(znodePaymentCycleInDays) }}
+                                {{ Math.ceil(znodePaymentCycleInDays) }}
                             </div>
                             <div class="desc">
                                 {{ $t('znodes.overview.stats.description__average-days-for-payout') }}
                             </div>
                         </div>
                         <div
-                            v-if="enabledMyZnodes.length && roundedDaysUntilNextPayout"
+                            v-if="enabledMyZnodes.length && roundedDaysUntilNextPayout > 0"
                             class="stat"
                         >
                             <div class="value">
@@ -159,7 +159,7 @@ export default {
         },
 
         statsLoaded () {
-            return this.isZnodeListSynced && this.roundedDaysUntilNextPayout > 0
+            return this.isZnodeListSynced
         }
     }
 }
