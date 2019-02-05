@@ -8,19 +8,16 @@
                     <section class="interface">
                         <h2>{{ $t('settings.form.interface.title') }}</h2>
                         <div class="form">
-                            <div class="field">
-                                <label>
-                                    {{ $t('settings.form.interface.label__language') }}
-                                </label>
-                                <span class="description">
-                                    {{ $t('settings.form.interface.description__language') }}
-                                </span>
-                                <div class="control">
-                                    <input type="text">
-                                </div>
-                            </div>
+                            <language-settings />
 
                             <blockchain-explorer-settings />
+                        </div>
+                    </section>
+
+                    <section class="privacy">
+                        <h2>{{ $t('settings.form.privacy.title') }}</h2>
+                        <div class="form">
+                            <connect-via-tor-settings />
                         </div>
                     </section>
                 </div>
@@ -31,10 +28,14 @@
 
 <script>
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
+import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
+import ConnectViaTorSettings from "./SettingsPage/ConnectViaTorSettings";
 
 export default {
     name: 'SettingsPage',
     components: {
+        ConnectViaTorSettings,
+        LanguageSettings,
         BlockchainExplorerSettings
     }
 }

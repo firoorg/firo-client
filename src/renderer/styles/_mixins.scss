@@ -250,6 +250,68 @@
     }
 }
 
+@mixin white-select () {
+    background: $color--white-light;
+    color: $color--dark-light;
+
+    & /deep/ .dropdown-toggle {
+        @include font-regular();
+        position: relative;
+        padding: emRhythm(1) 0 emRhythm(1) emRhythm(1);
+        border: none;
+        border-radius: 0;
+        z-index: 1001;
+
+        .vs__actions {
+            padding: 0 emRhythm(2);
+        }
+
+        .clear {
+            font-weight: normal;
+            margin-right: emRhythm(1);
+        }
+
+        .open-indicator::before {
+            border-width: 2px 2px 0 0;
+            width: emRhythm(1);
+            height: emRhythm(1);
+        }
+    }
+
+    & /deep/ .dropdown-menu {
+        @include glow-small-box();
+        padding: emRhythm(1) 0;
+        border: none;
+        //background: $color--polo-medium;
+        background: $color--comet-dark-mixed;
+        border-radius: 0;
+
+        li {
+            @include setType(3);
+            @include font-regular();
+
+            & > a {
+                padding: emRhythm(1) emRhythm(2);
+                //color: $color--comet-dark;
+                color: $color--comet-medium;
+            }
+        }
+
+        .active > a {
+            //background: mix($color--polo, $color--polo-medium);
+            background: $color--comet-dark;
+            color: $color--white-light;
+        }
+
+        & > .highlight > a {
+            //background: mix($color--polo-dark, $color--dark);
+            //color: $color--polo-light;
+            background: $color--comet-light;
+            color: $color--comet-dark-mixed;
+        }
+    }
+}
+
 @mixin light-placeholder () {
     @include placeholder-base();
     color: $color--polo;

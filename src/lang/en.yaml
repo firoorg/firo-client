@@ -313,6 +313,10 @@ settings:
       placeholder__explorer-pattern: Enter the url pattern of your favorite explorer
     privacy:
       title: Privacy
+      label__connect-via-tor: Connect via Tor
+      description__connect-via-tor: Purus Ullamcorper Fermentum.
+      label__connect-via-tor--checked: Yes, connections to other Nodes in the Zcoin Network are established via Tor
+      label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Zcoin Network
 
 
 onboarding:
