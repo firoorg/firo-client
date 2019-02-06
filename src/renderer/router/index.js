@@ -108,6 +108,10 @@ export default new Router({
                     component: require('@/components/payments/AddressToValidate.vue').default
                 }
             ]
+        },
+        {
+            path: '/wait-for-daemon',
+            component: require('@/layouts/WaitForDaemon').default
         }
     ]
 })

@@ -65,6 +65,37 @@ const startNetwork = function () {
     network.init({ store })
 }
 
+const beforeQuit = async function (event) {
+    store.dispatch(types.app.PERSIST_APP_VERSION)
+    const isRunning = await coreDaemonManager.isRunning()
+
+    network.close()
+    clipboard.unwatch()
+
+    if (!(stopOnQuit && isRunning)) {
+        logger.info('no need to wait for daemon to stop. quitting...')
+        store.dispatch('Window/close', 'waitForDaemonShutdown')
+        return
+    }
+
+    event.preventDefault()
+    logger.info('stopping daemon')
+    coreDaemonManager.stop()
+    logger.info('waiting for daemon shutdown')
+    try {
+        await coreDaemonManager.waitForDaemonShutdown()
+    }
+    catch (e) {
+        logger.warn(e)
+    }
+    finally {
+        logger.debug('finally quitting')
+        store.dispatch('Window/close', 'waitForDaemonShutdown')
+        app.exit(0)
+    }
+
+}
+
 // set up the manager
 const coreDaemonManager = new PidManager({
     name: 'zcoind',
@@ -73,12 +104,6 @@ const coreDaemonManager = new PidManager({
     store,
     onStarted: startNetwork
 })
-
-if (stopOnQuit) {
-    app.on('will-quit', () => {
-        coreDaemonManager.stop()
-    })
-}
 
 // tor proxy
 // https://electronjs.org/docs/api/app#appcommandlineappendswitchswitch-value
@@ -109,20 +134,17 @@ app.on('ready', () => {
     clipboard.watch({ store, deeplink })
 })
 
-app.on('before-quit', async (event) => {
-    logger.info('application before quit')
-    store.dispatch(types.app.PERSIST_APP_VERSION)
-    const isRunning = await coreDaemonManager.isRunning()
-
-    if (stopOnQuit && isRunning) {
-        coreDaemonManager.stop()
-    }
+app.on('window-all-closed', (event) => {
+    logger.info('window-all-closed')
 })
 
-app.on('will-quit', () => {
+app.on('before-quit', async (event) => {
+    logger.info('application before quit')
+    beforeQuit(event)
+})
+
+app.on('will-quit', (event) => {
     logger.info('application will quit')
-    network.close()
-    clipboard.unwatch()
 })
 
 /**

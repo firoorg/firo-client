@@ -128,12 +128,15 @@ const actions = {
         commit(types.DAEMON_IS_RUNNING)
     },
 
-    [types.DAEMON_STOP] ({ commit, state }) {
+    [types.DAEMON_STOP] ({ commit, dispatch, state }) {
         if (state.isStopping || !state.isRunning) {
             return
         }
 
         commit(types.DAEMON_STOP)
+        logger.info('showing waitForDaemonShutdown window')
+        dispatch('Window/show', 'waitForDaemonShutdown', { root: true })
+        dispatch('Window/close', 'main', { root: true })
     },
 
     [types.DAEMON_STOPPED] ({ commit, state }) {

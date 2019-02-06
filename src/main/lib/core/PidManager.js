@@ -76,6 +76,40 @@ export default class PidManager {
         })
     }
 
+    async waitForDaemonShutdown () {
+        return new Promise((resolve, reject) => {
+            let counter = 0
+
+            const timeout = setInterval(async () => {
+                counter++
+
+                if (counter > 100) {
+                    clearInterval(timeout)
+                    // reject(new Error('zcoind did not shutdown after sending the shutdown signal %d seconds ago', 100))
+                    return
+                }
+
+                const filePath = this.getFileSystemPath()
+
+                if (!filePath) {
+                    return resolve()
+                }
+
+                const fileExists = fs.existsSync(filePath)
+
+                if (fileExists) {
+                    return
+                }
+
+                if (timeout) {
+                    clearInterval(timeout)
+                }
+                resolve()
+
+            }, 1000)
+        })
+    }
+
     async start (pathToSpawn) {
         logger.info(`starting child process "${this.name}" ...`)
         if (!this.pathToSpawn && !pathToSpawn) {

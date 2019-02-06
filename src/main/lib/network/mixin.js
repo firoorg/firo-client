@@ -201,13 +201,14 @@ export default {
             this.setLoading(false)
         }
 
+        const coll = collection || this.collection
         this.requester.once('message', onMessage)
 
-        logger.info('sending data --> %d %o', Date.now(), data)
+        logger.info('sending data --> %s %s %o', coll, type, data)
         this.setLoading(true)
 
         this.requester.send(JSON.stringify({
-            collection: collection || this.collection,
+            collection: coll,
             type,
             data,
             auth

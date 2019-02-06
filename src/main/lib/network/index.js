@@ -21,6 +21,7 @@ import SendZcoin from './SendZcoin'
 import SpendZerocoin from './SpendZerocoin'
 import Mint from './Mint'
 import Znode from './Znode'
+import Settings from './Settings'
 
 const logger = createLogger('zcoin:network')
 
@@ -34,7 +35,8 @@ const modules = {
     SendZcoin,
     SpendZerocoin,
     Mint,
-    Znode
+    Znode,
+    Settings
 }
 
 // const networkIdentity = uuid()
