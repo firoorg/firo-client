@@ -144,7 +144,7 @@ export default {
     .inner {
         width: emRhythm(3);
         height: emRhythm(3);
-        margin-right: emRhythm(2);
+        margin-right: emRhythm(1.5, $silent: true);
 
         &:before {
             height: 8px * 1.5;

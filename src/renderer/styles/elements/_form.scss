@@ -17,7 +17,7 @@
         & > .description {
             //@include font-medium();
             display: block;
-            @include description();
+            @include description(100%);
             color: $color--comet;
             padding-bottom: emRhythm(1);
         }
