@@ -14,7 +14,7 @@ export default {
     data () {
         return {
             isValid: false,
-            currentValue: null,
+            currentValue: undefined,
 
             validationFieldOrder: [
                 'currentValue'
@@ -26,17 +26,31 @@ export default {
         validationErrors: {
             deep: true,
             immediate: true,
-            handler: function (errorsNew) {
+            handler (errorsNew) {
                 this.isValid = !errorsNew.items.length
 
-                if (this.isValid) {
-                    this.storeValue = this.currentValue
+                if (this.currentValue === undefined) {
+                    return
                 }
+
+                if (!this.isValid) {
+                    return
+                }
+
+                this.storeValue = this.currentValue
+            }
+        },
+
+        storeValue: {
+            immediate: true,
+            handler (valNew) {
+                this.currentValue = valNew
             }
         }
-    },
+    }
+    /*,
 
     mounted () {
         this.currentValue = this.storeValue
-    }
+    }*/
 }
