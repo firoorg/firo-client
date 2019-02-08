@@ -12,6 +12,10 @@
 # Desv should consider wisely as this can lead to confusion in cases where you have a `label__label`
 # surrounded by e.g. `error__label` and `placeholder__label`.
 #
+meta:
+  name: English
+  flag: 🇬🇧
+
 application-menu:
   preferences:
     title: Preferences
