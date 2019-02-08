@@ -2,7 +2,7 @@ import { format } from 'util'
 
 import allTypes from '~/types'
 import * as types from '../types/Settings'
-import { getAppSettings } from '#/lib/utils'
+import { getApp, getAppSettings } from '#/lib/utils'
 
 import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
@@ -127,21 +127,34 @@ const actions = {
         })
     },
 
-    [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] ({ state, commit, rootGetters }, url) {
-        const network = rootGetters['Blockchain/networkIdentifier']
+    [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] ({ state, commit, rootGetters }, urlOrUrlNetworkPair) {
+        let url = undefined
+        let network = undefined
 
-        if (state.explorer[network] === url) {
+        // change source is settings input
+        if (typeof urlOrUrlNetworkPair === 'string') {
+            network = rootGetters['Blockchain/networkIdentifier']
+            url = urlOrUrlNetworkPair
+        }
+        // change source is persistent settings object
+        else {
+            network = urlOrUrlNetworkPair.network
+            url = urlOrUrlNetworkPair.url
+        }
+
+        if (!state.explorer[network] || state.explorer[network] === url) {
             return
         }
 
         // todo add some checks if the given string is an absolute url matches the required format (includes 2x %s)
 
         commit(types.SET_BLOCKCHAIN_EXPLORER_BASE_URL, { network, url })
-        getAppSettings().set(allTypes.settings.SET_BLOCKCHAIN_EXPLORER_BASE_URL, url)
+        getAppSettings().set(`settings.${types.SET_BLOCKCHAIN_EXPLORER_BASE_URL}`, { network, url })
     },
 
     [types.SET_LOCALE] ({ state, commit, getters }, localeKey) {
         if (getters.currentLocaleKey === localeKey) {
+            logger.debug('given locale "%s" is already set.')
             return
         }
 
@@ -151,7 +164,7 @@ const actions = {
         }
 
         commit(types.SET_LOCALE, localeKey)
-        getAppSettings().set(allTypes.settings.SET_LOCALE, localeKey)
+        getAppSettings().set(`settings.${types.SET_LOCALE}`, localeKey)
     },
 
     [types.SET_AVAILABLE_LOCALES] ({ state, commit }, locales) {
@@ -218,8 +231,12 @@ const getters = {
         }
     },
     availableLocales: (state) => Object.values(state.locales.available),
-    currentLocale: (state) => state.locales.current ? state.locales.available[state.locales.current] : undefined,
-    currentLocaleKey: (state) => state.locales.current
+    currentLocale: (state, getters) => getters.currentLocaleKey ? state.locales.available[getters.currentLocaleKey] : undefined,
+    currentLocaleKey: (state) => {
+        const fallbackLocale = (getApp().getLocale()).substr(0, 2)
+
+        return process.env.LOCALE || state.locales.current || fallbackLocale
+    }
 }
 
 export default {
