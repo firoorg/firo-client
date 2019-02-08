@@ -137,6 +137,7 @@ const actions = {
         // todo add some checks if the given string is an absolute url matches the required format (includes 2x %s)
 
         commit(types.SET_BLOCKCHAIN_EXPLORER_BASE_URL, { network, url })
+        getAppSettings().set(allTypes.settings.SET_BLOCKCHAIN_EXPLORER_BASE_URL, url)
     },
 
     [types.SET_LOCALE] ({ state, commit, getters }, localeKey) {
@@ -150,7 +151,7 @@ const actions = {
         }
 
         commit(types.SET_LOCALE, localeKey)
-        getAppSettings().set(`settings.${types.SET_LOCALE}`, localeKey)
+        getAppSettings().set(allTypes.settings.SET_LOCALE, localeKey)
     },
 
     [types.SET_AVAILABLE_LOCALES] ({ state, commit }, locales) {
