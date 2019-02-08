@@ -28,7 +28,7 @@ const state = {
         main: 'https://explorer.zcoin.io/%s/%s'
     },
     locales: {
-        current: 'en',
+        current: '',
         available: {}
     }
 }

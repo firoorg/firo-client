@@ -37,16 +37,14 @@ export function setupLocales ({ store }) {
 }
 
 export function getLocale ({ app, store }) {
-    const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
+    const fallbackLocale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
     const currentLocale = store.getters['Settings/currentLocaleKey']
 
-    /*
     if (!currentLocale) {
-        store.dispatch()
+        store.dispatch(types.settings.SET_LOCALE, fallbackLocale)
     }
-    */
 
-    logger.info('current locale: %s %s', locale, currentLocale)
+    logger.info('current locale: %s falling back to: %s', currentLocale, fallbackLocale)
 
     return currentLocale
 }

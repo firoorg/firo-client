@@ -8,9 +8,9 @@
                     <section class="interface">
                         <h2>{{ $t('settings.form.interface.title') }}</h2>
                         <div class="form">
-                            <language-settings />
+                            <language-settings class="language-settings" />
 
-                            <blockchain-explorer-settings />
+                            <blockchain-explorer-settings class="blockchain-explorer-settings" />
                         </div>
                     </section>
 
@@ -51,11 +51,7 @@ export default {
         padding: emRhythm(5) emRhythm(4);
     }
 
-    .interface .form {
-        display: flex;
-        justify-content: space-between;
-        padding: 0 emRhythm(2);
-
+    .form {
         .field {
             flex-grow: 1;
 
@@ -65,6 +61,20 @@ export default {
 
             /deep/ .control {
                 //padding: 0 emRhythm(2);
+            }
+        }
+    }
+
+    .interface .form {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 emRhythm(2) 0 0;
+
+        .language-settings {
+            width: 30%;
+
+            /deep/ .control {
+                margin-left: emRhythm(-2);
             }
         }
     }
