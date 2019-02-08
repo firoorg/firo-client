@@ -16,6 +16,10 @@ meta:
   name: Deutsch
   flag: 🇩🇪
 
+application-menu:
+  preferences:
+    title: Einstellungen
+
 navigation:
   balance:
     title: Guthaben

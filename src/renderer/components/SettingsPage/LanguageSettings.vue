@@ -9,13 +9,17 @@
                 class="select test"
                 :options="availableLocales"
                 :value="currentLocale"
+                :placeholder="placeholder"
+                @input="onChange"
             />
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import { VueSelect } from 'vue-select'
+import types from '~/types'
 
 export default {
     name: 'LanguageSettings',
@@ -25,24 +29,28 @@ export default {
     },
 
     computed: {
-        currentLocale () {
-            return {
-                value: 'en',
-                label: '🇬🇧 English'
-            }
-        },
+        ...mapGetters({
+            currentLocale: 'Settings/currentLocale',
+            currentLocaleKey: 'Settings/currentLocaleKey',
+            availableLocales: 'Settings/availableLocales'
+        }),
 
-        availableLocales () {
-            return [
-                {
-                    value: 'en',
-                    label: '🇬🇧 English'
-                },
-                {
-                    value: 'de',
-                    label: '🇩🇪 Deutsch'
-                }
-            ]
+        placeholder () {
+            return this.currentLocale ? this.currentLocale.label : ''
+        }
+    },
+
+    methods: {
+        ...mapActions({
+            setLocale: types.settings.SET_LOCALE
+        }),
+
+        onChange (selected) {
+            if (!selected) {
+                return
+            }
+
+            this.setLocale(selected.key)
         }
     }
 }

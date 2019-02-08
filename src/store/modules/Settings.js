@@ -1,8 +1,8 @@
-import fs from 'fs'
 import { format } from 'util'
 
 import allTypes from '~/types'
 import * as types from '../types/Settings'
+import { getAppSettings } from '#/lib/utils'
 
 import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
@@ -26,6 +26,10 @@ const state = {
     explorer: {
         test: 'https://testexplorer.zcoin.io/%s/%s',
         main: 'https://explorer.zcoin.io/%s/%s'
+    },
+    locales: {
+        current: 'en',
+        available: {}
     }
 }
 
@@ -42,6 +46,14 @@ const mutations = {
 
     [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] (state, { network, url }) {
         state.explorer[network] = url
+    },
+
+    [types.SET_LOCALE] (state, locale) {
+        state.locales.current = locale
+    },
+
+    [types.SET_AVAILABLE_LOCALES] (state, locales) {
+        state.locales.available = locales
     }
 }
 
@@ -125,6 +137,27 @@ const actions = {
         // todo add some checks if the given string is an absolute url matches the required format (includes 2x %s)
 
         commit(types.SET_BLOCKCHAIN_EXPLORER_BASE_URL, { network, url })
+    },
+
+    [types.SET_LOCALE] ({ state, commit, getters }, localeKey) {
+        if (getters.currentLocaleKey === localeKey) {
+            return
+        }
+
+        if (!state.locales.available[localeKey]) {
+            logger.debug('given locale "%s" does not exist in available locales list: ', localeKey)
+            return
+        }
+
+        commit(types.SET_LOCALE, localeKey)
+        getAppSettings().set(`settings.${types.SET_LOCALE}`, localeKey)
+    },
+
+    [types.SET_AVAILABLE_LOCALES] ({ state, commit }, locales) {
+        commit(types.SET_AVAILABLE_LOCALES, {
+            ...state.locales.available,
+            ...locales
+        })
     }
 }
 
@@ -182,7 +215,10 @@ const getters = {
         return (tx) => {
             return format(getters.getExplorerBaseUrl,'tx', tx)
         }
-    }
+    },
+    availableLocales: (state) => Object.values(state.locales.available),
+    currentLocale: (state) => state.locales.current ? state.locales.available[state.locales.current] : undefined,
+    currentLocaleKey: (state) => state.locales.current
 }
 
 export default {

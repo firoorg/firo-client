@@ -10,18 +10,25 @@ export const populateStoreWithAppSettings = function ({ store }) {
 
     logger.info('application settings path %s', settings.file())
 
-    const { app: appSettings } = settings.getAll()
+    console.log(settings.getAll())
 
-    if (!appSettings) {
-        return
-    }
+    Object
+        .entries(settings.getAll())
+        .forEach(([category, pairs]) => {
+            console.log(category, pairs)
 
-    Object.entries(appSettings).forEach(([key, value]) => {
-        if (!types.app[key]) {
-            return
-        }
+            if (!pairs) {
+                return
+            }
 
-        logger.info('populating application settings store: %s : %o', key, value)
-        store.dispatch(types.app[key], value)
-    })
+            Object.entries(pairs).forEach(([key, value]) => {
+                if (!types[category] || !types[category][key]) {
+                    return
+                }
+
+                logger.info('populating application settings store: %s : %o', key, value)
+                store.dispatch(types[category][key], value)
+            })
+        })
+    //const { app: appSettings } = settings.getAll()
 }

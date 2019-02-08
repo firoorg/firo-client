@@ -11,6 +11,7 @@ import PidManager from './lib/core/PidManager'
 import menu from './lib/menu'
 import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
+import { setupLocales } from '#/lib/i18n'
 
 import store from '../store/main'
 import { setupWindowRouter } from '~/utils/routerHelper'
@@ -112,7 +113,9 @@ const coreDaemonManager = new PidManager({
 
 app.on('ready', () => {
     logger.info('---- Starting Zcoin client ----')
+    setupLocales({ store })
     populateStoreWithAppSettings({ store })
+
     // start it!
     logger.info('path to zcoind binary: %s', zcoindPath)
 

@@ -9,19 +9,27 @@ const logger = createLogger('zcoin:menu')
 export default {
 
     init ({ app, router, store }) {
-        const i18n = getModule(app)
+        const buildTemplate = (i18n) => {
+            const template = this.getTemplate({
+                i18n,
+                app,
+                router,
+                store
+            })
 
-        const template = this.getTemplate({
-            i18n,
-            app,
-            router,
-            store
-        })
+            this.build(template)
+        }
 
+        const i18n = getModule({ app, store, onLocaleChange: () => {
+            buildTemplate(i18n)
+        }})
+
+        buildTemplate(i18n)
+    },
+
+    build (template) {
         const menu = Menu.buildFromTemplate(template)
-
         logger.info('setting application menu')
-
         Menu.setApplicationMenu(menu)
     },
 

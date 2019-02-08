@@ -33,9 +33,10 @@ customValidationRules.forEach((rule) => {
 Vue.use(VTooltip, {
     defaultBoundariesElement: 'default-tooltip-boundary'
 })
+
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
-    locale: i18n.getLocale(app), // Default locale
+    locale: i18n.getLocale({ app, store }), // Default locale
     locales: {
         // 'zh-CN': require('date-fns/locale/zh_cn'),
         'en': require('date-fns/locale/en')
@@ -89,6 +90,6 @@ new Vue({
     components: { App },
     router,
     store,
-    i18n: i18n.getModule(app),
+    i18n: i18n.getModule({ app, store }),
     template: '<App/>'
 }).$mount('#app')

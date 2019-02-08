@@ -187,6 +187,7 @@ const actions = {
         commit(types.CLEAR_PASSPHRASE)
     },
 
+    // todo move to settings
     [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, location) {
         if (!location) {
             return

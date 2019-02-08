@@ -1,30 +1,81 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 
-import { createLogger } from '#/lib/logger'
-
+import types from '~/types'
 import languages from '#/lang'
 import dateTimeFormats from '#/lang/dateTimeFormats'
 
+import { createLogger } from '#/lib/logger'
+
 const logger = createLogger('zcoin:i18n')
 
-export function getLocale (app) {
-    const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
+let i18nInstance = null
 
-    logger.info('current locale: %s', locale)
+export function setupLocales ({ store }) {
+    logger.info('setting up languages')
 
-    return locale
+    //const fallback = (process.env.LOCALE || app.getLocale()).substr(0, 2)
+    const locales = Object.keys(languages).reduce((accumulator, key) => {
+        if (!languages[key].meta) {
+            return accumulator
+        }
+
+        const { name, flag } = languages[key].meta
+
+        return {
+            ...accumulator,
+            [key]: {
+                key,
+                flag,
+                name,
+                label: `${flag} ${name}`
+            }
+        }
+    }, {})
+
+    store.dispatch(types.settings.SET_AVAILABLE_LOCALES, locales)
 }
 
-export function getModule (app) {
+export function getLocale ({ app, store }) {
+    const locale = (process.env.LOCALE || app.getLocale()).substr(0, 2)
+    const currentLocale = store.getters['Settings/currentLocaleKey']
+
+    /*
+    if (!currentLocale) {
+        store.dispatch()
+    }
+    */
+
+    logger.info('current locale: %s %s', locale, currentLocale)
+
+    return currentLocale
+}
+
+export function getModule ({ app, store, onLocaleChange }) {
+    if (i18nInstance) {
+        return i18nInstance
+    }
+
     Vue.use(VueI18n)
 
-    const locale = getLocale(app)
+    store.subscribe((mutation, state) => {
+        if (mutation.type !== types.settings.SET_LOCALE) {
+            return
+        }
+
+        i18nInstance.locale = mutation.payload
+
+        if (onLocaleChange) {
+            onLocaleChange()
+        }
+    })
+
+    const locale = getLocale({ app, store })
 
     const i18n = new VueI18n({
         dateTimeFormats,
         locale,
-        fallbackLocale: process.env.NODE_ENV !== 'production' ? 'structure' : 'en',
+        fallbackLocale: 'en',
         messages: languages // set locale messages
     })
 
@@ -38,10 +89,13 @@ export function getModule (app) {
         }
     }
 
-    return i18n
+    i18nInstance = i18n
+
+    return i18nInstance
 }
 
 export default {
+    setupLocales,
     getLocale,
     getModule
 }
