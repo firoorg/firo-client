@@ -14,7 +14,7 @@ export default {
         window: {
             useContentSize: true,
             titleBarStyle: 'hiddenInset',
-            height: 750,
+            height: 780,
             width: 1400,
             minWidth: 1200,
             minHeight: 450
