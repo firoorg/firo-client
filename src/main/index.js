@@ -70,7 +70,6 @@ const beforeQuit = async function (event) {
     store.dispatch(types.app.PERSIST_APP_VERSION)
     const isRunning = await coreDaemonManager.isRunning()
 
-    network.close()
     clipboard.unwatch()
 
     if (!(stopOnQuit && isRunning)) {
@@ -90,6 +89,7 @@ const beforeQuit = async function (event) {
         logger.warn(e)
     }
     finally {
+        network.close()
         logger.debug('finally quitting')
         store.dispatch('Window/close', 'waitForDaemonShutdown')
         app.exit(0)
