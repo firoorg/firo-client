@@ -133,7 +133,7 @@ mint:
 
   flyout-done:
     title: Minting in Progress
-    description: The mint is now being procecessed by the network. | The mints are now being procecessed by the network.
+    description: The mint is now being processed by the network. | The mints are now being processed by the network.
     button__is-loading--primary: Sending…
     button__is-done--primary: Sent!
     button__has-error--primary: Try Again
