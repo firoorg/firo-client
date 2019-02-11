@@ -243,6 +243,8 @@ const getters = {
             })
     },
 
+    hasMyZnodes: (state, getters) => !!getters.myZnodes.length,
+
     getPayoutsReceived: (state, getters, rootState, rootGetters) => {
         return (payeeAddress) => {
             const getAmountReceivedViaAddress = rootGetters['Address/getAmountReceivedViaAddress']
@@ -315,7 +317,12 @@ const getters = {
     },
 
     znodeCollateralInSatoshi: (state) => state.znodeCollateralInSatoshi,
-    znodeStates: (state) => state.znodeStates
+    znodeStates: (state) => state.znodeStates,
+    znodeSyncProgress: (state, getters) => {
+        const progress = getters.allZnodes.length / getters.totalZnodes
+
+        return !isNaN(progress) ? progress : 0
+    }
 }
 
 export default {

@@ -4,23 +4,36 @@
             class="status"
             :class="{ 'is-synced': getIsSynced }"
         >
-            <template v-if="getIsSynced">
-                <tick-icon class="icon" />
-                <span>{{ $t('navigation.network.label__synced') }}</span>
-            </template>
-            <template v-else>
-                <loading-bounce
-                    class="icon"
-                    :color="connections ? 'green' : 'comet'"
-                    size="mini"
-                />
-                <span v-if="connections">
-                    {{ $t('navigation.network.label__syncing') }}
-                </span>
-                <span v-else>
-                    {{ $t('navigation.network.label__peers') }}
-                </span>
-            </template>
+            <base-popover
+                trigger="hover"
+                :disabled="isSynced"
+                boundaries-element="body"
+                :popover-class="['advice', connectionPopoverClass]"
+                placement="bottom-start"
+                :offset="4"
+                :delay="{ show: 200, hide: 100 }"
+            >
+                <blockchain-sync-progress-popover slot="content" />
+                <template slot="target">
+                    <template v-if="getIsSynced">
+                        <tick-icon class="icon" />
+                        <span>{{ $t('navigation.network.label__synced') }}</span>
+                    </template>
+                    <template v-else>
+                        <loading-bounce
+                            class="icon"
+                            :color="connections ? 'green' : 'comet'"
+                            size="mini"
+                        />
+                        <span v-if="connections">
+                            {{ $t('navigation.network.label__syncing') }}
+                        </span>
+                        <span v-else>
+                            {{ $t('navigation.network.label__peers') }}
+                        </span>
+                    </template>
+                </template>
+            </base-popover>
         </div>
         <div
             class="connections"
@@ -65,18 +78,21 @@
                         :class="{ 'is-synced': getIsSynced }"
                     >
                         <div
+                            v-show="!isZnodeListSynced && hasMyZnodes"
+                            class="wrap"
+                        >
+                            <div
+                                class="loaded"
+                                :style="{ width: `${znodeSyncProgress * 100}%`}"
+                            />
+                        </div>
+                        <div
                             v-show="!isBlockchainSynced"
                             class="wrap"
                         >
                             <div
                                 class="loaded"
                                 :style="{ width: `${progress}%`}"
-                            />
-                        </div>
-                        <div class="wrap">
-                            <div
-                                class="loaded"
-                                :style="{ width: `${1.5 * progress}%`}"
                             />
                         </div>
                     </div>
@@ -115,13 +131,14 @@ export default {
             isSynced: 'Blockchain/isSynced',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             isZnodeListSynced: 'Blockchain/isZnodeListSynced',
+            znodeSyncProgress: 'Znode/znodeSyncProgress',
+            hasMyZnodes: 'Znode/hasMyZnodes',
             hasConnections: 'Blockchain/hasConnections',
             connections: 'Blockchain/connections'
         }),
 
         getIsSynced () {
-            // todo check if wallet has znode
-            return this.isBlockchainSynced // ? this.isBlockchainSynced : this.isSynced
+            return this.hasMyZnodes ? this.isSynced : this.isBlockchainSynced
         },
 
         progress () {
@@ -167,15 +184,19 @@ export default {
 
         .status {
             grid-area: status;
-            justify-self: start;
-            align-self: end;
-            margin-left: emRhythm(3);
 
-            color: $color--comet;
-            font-style: italic;
-            // border: 1px solid red;
-            display: flex;
-            align-items: baseline;
+            .trigger {
+                justify-self: start;
+                align-self: end;
+                margin-left: emRhythm(3);
+
+                color: $color--comet;
+                font-style: italic;
+                // border: 1px solid red;
+                display: flex !important;
+                align-items: baseline;
+                width: 100%;
+            }
 
             .icon {
                 transform: translate(0px, 20%);
