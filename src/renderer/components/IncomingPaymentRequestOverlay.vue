@@ -22,9 +22,8 @@
                     <div
                         v-else
                         class="no-message"
-                    >
-                        {{ $t('overlay.incoming-payment-request.placeholder__message') }}
-                    </div>
+                        v-html="$t('overlay.incoming-payment-request.placeholder__message')"
+                    />
 
                     <fees-and-amount
                         :show-fee="false"
