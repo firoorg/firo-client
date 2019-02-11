@@ -139,7 +139,7 @@ export default class PidManager {
         logger.debug('spawning with arguments %o', this.getArguments())
 
         this.child = spawn(this.pathToSpawn, this.getArguments(), {
-            // detached: true,
+            detached: true,
             stdio: 'ignore'
         })
         // start network to receive path
