@@ -270,12 +270,12 @@ const actions = {
     [types.ADD_MINT_FROM_TX] ({ commit, dispatch, state }, mintTx) {
         const txBasics = getTxBasics(mintTx)
 
-        const { fee, used } = mintTx
+        const { fee, available } = mintTx
 
         dispatch(rootTypes.mint.UPDATE_MINT, {
             ...txBasics,
             fee,
-            used
+            available
         }, { root: true })
     },
 

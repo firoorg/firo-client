@@ -98,7 +98,7 @@ const actions = {
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
     },
 
-    [types.UPDATE_MINT_STATUS] ({ commit, state }, { txid, index, used }) {
+    [types.UPDATE_MINT_STATUS] ({ commit, state }, { txid, index, available }) {
         const id = getId({ txid, index })
 
         if (!state.mints[id]) {
@@ -108,7 +108,7 @@ const actions = {
 
         commit(types.UPDATE_MINT, {
             ...state.mints[id],
-            used
+            available
         })
     },
 
@@ -120,9 +120,9 @@ const actions = {
         }
 
         Object.values(data).forEach((mint) => {
-            const { txid, index, used } = mint
+            const { txid, index, available } = mint
 
-            dispatch(types.UPDATE_MINT_STATUS, { txid, index, used })
+            dispatch(types.UPDATE_MINT_STATUS, { txid, index, available })
         })
     }
 }
@@ -166,7 +166,7 @@ const getters = {
 
     mints (state, getters, rootState, rootGetters) {
         return Object.values(state.mints)
-            .filter((mint) => !mint.used)
+            .filter((mint) => mint.available)
             .map((mint) => {
                 const { block } = mint
                 const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
@@ -213,7 +213,7 @@ const getters = {
 
     mintsInProgress (state, getters) {
         return getters.mints
-            .filter((mint) => !mint.used)
+            .filter((mint) => mint.available)
             .filter((mint) => !mint.confirmations || mint.confirmations < 6)
     }
 }
