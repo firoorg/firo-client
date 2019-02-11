@@ -74,6 +74,7 @@ $scroll-background-hover-dark: $color--comet-dark-mixed;
 
 // Gradients
 $gradient--green-bright: linear-gradient(to right, $color--green, $color--green-bright);
+$gradient--green-bright--diagonal: linear-gradient(to top right, $color--green, $color--green-bright);
 $gradient--green-dark: linear-gradient(to right, $color--green-dark, $color--green);
 $gradient--green-dark-bright: linear-gradient(to right, $color--green-dark, $color--green-bright);
 

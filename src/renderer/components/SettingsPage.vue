@@ -17,7 +17,9 @@
                     <section class="privacy">
                         <h2>{{ $t('settings.form.privacy.title') }}</h2>
                         <div class="form">
-                            <connect-via-tor-settings />
+                            <connect-via-tor-settings class="connection-settings" />
+
+                            <amount-to-hold-in-zerocoin-settings />
                         </div>
                     </section>
                 </div>
@@ -29,11 +31,13 @@
 <script>
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
-import ConnectViaTorSettings from "./SettingsPage/ConnectViaTorSettings";
+import ConnectViaTorSettings from '@/components/SettingsPage//ConnectViaTorSettings'
+import AmountToHoldInZerocoinSettings from '@/components/SettingsPage//AmountToHoldInZerocoinSettings'
 
 export default {
     name: 'SettingsPage',
     components: {
+        AmountToHoldInZerocoinSettings,
         ConnectViaTorSettings,
         LanguageSettings,
         BlockchainExplorerSettings
@@ -52,11 +56,13 @@ export default {
     }
 
     .form {
-        .field {
-            flex-grow: 1;
+        display: grid;
+        grid-template-columns: 35% auto;
+        grid-column-gap: emRhythm(9);
 
+        .field {
             & + .field {
-                margin-left: emRhythm(9);
+                //margin-left: emRhythm(9);
             }
 
             /deep/ .control {
@@ -66,16 +72,26 @@ export default {
     }
 
     .interface .form {
-        display: flex;
-        justify-content: space-between;
-        padding: 0 emRhythm(2) 0 0;
+        //display: flex;
+        //justify-content: space-between;
+        //padding: 0 emRhythm(2) 0 0;
 
         .language-settings {
-            width: 30%;
+            //width: 30%;
 
             /deep/ .control {
                 margin-left: emRhythm(-2);
             }
+        }
+    }
+
+    .privacy .form {
+        //display: flex;
+        //justify-content: space-between;
+        //padding: 0 emRhythm(2) 0 0;
+
+        .connection-settings {
+            //width: 30%;
         }
     }
 </style>

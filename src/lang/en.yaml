@@ -321,6 +321,10 @@ settings:
       description__connect-via-tor: Purus Ullamcorper Fermentum.
       label__connect-via-tor--checked: Yes, connections to other Nodes in the Zcoin Network are established via Tor
       label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Zcoin Network
+      label__hold-in-zerocoin: Ratio between private and public funds
+      description__hold-in-zerocoin: Purus Ullamcorper Fermentum.
+      label__hold-in-zerocoin--private: Private
+      label__hold-in-zerocoin--public: Public
 
 
 onboarding:

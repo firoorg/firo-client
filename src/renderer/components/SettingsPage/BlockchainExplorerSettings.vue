@@ -42,6 +42,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .control {
+        margin-right: emRhythm(2);
+    }
     input {
         @include white-input();
     }

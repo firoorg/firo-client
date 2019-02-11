@@ -92,11 +92,7 @@ const actions = {
         }
 
         commit(types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN, percentage)
-        commit(types.PERSIST_SETTING, {
-            key: types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
-            data: percentage,
-            requiresResart: false
-        })
+        getAppSettings().set(`settings.${types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN}`, percentage)
         commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, -1)
     },
 
