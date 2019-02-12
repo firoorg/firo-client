@@ -216,7 +216,7 @@ const actions = {
     },
 
     [types.PERSIST_APP_VERSION] ({ dispatch, getters }) {
-        const version = getApp().getVersion()
+        const version = getters.runningAppVersion
 
         if (getters.appVersion === version) {
             return
@@ -233,6 +233,8 @@ const getters = {
     isRunning: (state) => state.isRunning || false,
     isRestarting: (state) => state.isRestarting || false,
     appVersion: (state) => state.appVersion,
+    runningAppVersion: () => getApp().getVersion(),
+    appVersionChanged: (state, getters) => getters.appVersion !== getters.runningAppVersion,
     isInitialRun: (state) => {
         return !state.appVersion
     },
@@ -243,7 +245,30 @@ const getters = {
     },
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
 
-    showIntroScreen: (state, getters) => state.showIntroScreen,
+    showIntroScreen: (state, getters, rootState, rootGetters) => {
+        // check for all intro screen submodules
+        // 1. is initial run
+        if (getters.isInitialRun) {
+            return 'initial'
+        }
+
+        // 2. version changed
+        if (getters.appVersionChanged) {
+            return 'versionChanged'
+        }
+
+        // 3. has location
+        if (!getters.hasBlockchainLocation) {
+            return 'noLocation'
+        }
+
+        // 4. is locked
+        if (!getters.isLocked) {
+            return 'unlocked'
+        }
+
+        return false //state.showIntroScreen
+    },
     isLocked: (state) => state.walletIsLocked,
     walletVersion: (state) => state.walletVersion,
     addressBelongsToWallet: (state, getters, rootState, rootGetters) => {
