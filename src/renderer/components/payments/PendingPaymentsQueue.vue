@@ -17,12 +17,17 @@
             </template>
 
             <template slot="content">
-                <header>
-                    <h2 v-html="$t('send.public.flyout-pending-payment-queue.title')" />
-                    <p v-html="$t('send.public.flyout-pending-payment-queue.description')" />
-                </header>
+                <div>
+                    <header>
+                        <h2 v-html="$t('send.public.flyout-pending-payment-queue.title')" />
+                        <p v-html="$t('send.public.flyout-pending-payment-queue.description')" />
+                    </header>
 
-                <pending-payments :payments="pendingPayments" />
+                    <pending-payments
+                        :payments="pendingPayments"
+                        class="pending-payments"
+                    />
+                </div>
             </template>
         </base-popover>
     </div>
@@ -58,6 +63,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .pending-payments {
+        border-bottom: none;
+    }
 </style>
