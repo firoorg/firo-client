@@ -13,7 +13,7 @@ const state = {
     isRestarting: false,
     walletIsLocked: false,
     walletVersion: 0,
-    showIntroScreen: true,
+    showIntroScreen: undefined,
     passphrase: null,
     appVersion: null,
     blockchainLocation: ''
@@ -78,6 +78,10 @@ const mutations = {
         state.showIntroScreen = false
     },
 
+    [types.SET_INTRO_SCREEN] (state, value) {
+        Vue.set(state, 'showIntroScreen', value)
+    },
+
     // passphrase
 
     [types.SET_CURRENT_PASSPHRASE] (state, passphrase) {
@@ -90,12 +94,19 @@ const mutations = {
 }
 
 const actions = {
-    [types.IS_READY] ({ commit, state }) {
+    [types.IS_READY] ({ commit, state, getters }) {
         if (state.isReady) {
             return
         }
 
+        console.log('IS_READY: getters.showIntroScreen', getters.showIntroScreen)
+
         commit(types.IS_READY)
+
+        if (state.showIntroScreen === undefined) {
+            console.log('setting types.SET_INTRO_SCREEN', getters.showIntroScreen)
+            commit(types.SET_INTRO_SCREEN, getters.showIntroScreen)
+        }
     },
 
     [types.SET_WALLET_LOCKED] ({ commit, state }, isLocked) {
@@ -246,28 +257,32 @@ const getters = {
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
 
     showIntroScreen: (state, getters, rootState, rootGetters) => {
+        if (state.showIntroScreen !== undefined) {
+            return state.showIntroScreen
+        }
+
         // check for all intro screen submodules
         // 1. is initial run
         if (getters.isInitialRun) {
-            return 'initial'
+            return true
         }
 
         // 2. version changed
         if (getters.appVersionChanged) {
-            return 'versionChanged'
+            return true
         }
 
         // 3. has location
         if (!getters.hasBlockchainLocation) {
-            return 'noLocation'
+            return true
         }
 
         // 4. is locked
         if (!getters.isLocked) {
-            return 'unlocked'
+            return true
         }
 
-        return false //state.showIntroScreen
+        return false
     },
     isLocked: (state) => state.walletIsLocked,
     walletVersion: (state) => state.walletVersion,

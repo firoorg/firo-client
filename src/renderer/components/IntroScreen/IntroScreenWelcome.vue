@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 export default {
@@ -24,9 +25,15 @@ export default {
         GuideStepMixin
     ],
 
+    computed: {
+        ...mapGetters({
+            isInitialRun: 'App/isInitialRun'
+        })
+    },
+
     methods: {
         isEnabled () {
-            return true
+            return this.isInitialRun
         }
     }
 }
