@@ -78,7 +78,7 @@
                         :class="{ 'is-synced': getIsSynced }"
                     >
                         <div
-                            v-show="!isZnodeListSynced && hasMyZnodes"
+                            v-show="!getIsSynced && hasMyZnodes"
                             class="wrap"
                         >
                             <div
@@ -87,7 +87,7 @@
                             />
                         </div>
                         <div
-                            v-show="!isBlockchainSynced"
+                            v-show="!getIsSynced"
                             class="wrap"
                         >
                             <div

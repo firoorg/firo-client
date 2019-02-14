@@ -11,7 +11,6 @@
                         <strong>{{ currentBlockHeight }}</strong>
                     </span>
                 </i18n>
-                <br>
                 <i18n
                     path="navigation.flyout-blockchain-sync-progress.label__blocks-timestamp"
                     tag="span"
@@ -38,8 +37,8 @@
             </p>
         </template>
         <template v-else-if="!isZnodeListSynced">
-            <h3>Syncing Znodes</h3>
-            <p>Curabitur blandit tempus porttitor. Aenean lacinia bibendum nulla sed consectetur.</p>
+            <h3>{{ $t('navigation.flyout-znode-sync-progress.title') }}</h3>
+            <p>{{ $t('navigation.flyout-znode-sync-progress.label') }}</p>
         </template>
     </div>
 </template>

@@ -57,6 +57,9 @@ navigation:
     label__blocks-timestamp: The last block received was generated {blockTimeago}.
     label__estimated-time-until-synced: Blockchain sync will finish in {estimatedTimestamp}
     label__blocks-not-visible: Transactions after this will not yet be visible.
+  flyout-znode-sync-progress:
+    title: Updating Znode Status
+    label: Curabitur blandit tempus porttitor. Aenean lacinia bibendum nulla sed consectetur.
 
 receive:
   overview:
