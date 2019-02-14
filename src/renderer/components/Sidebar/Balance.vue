@@ -120,7 +120,7 @@ export default {
           */
 
         toggleBalance () {
-            this.showBalanceInCurrency = !this.showBalanceInCurrency
+            // this.showBalanceInCurrency = !this.showBalanceInCurrency
         }
     }
 }

@@ -64,7 +64,7 @@
         <div class="sync-progress-wrap">
             <base-popover
                 trigger="hover"
-                :disabled="isSynced"
+                :disabled="getIsSynced"
                 boundaries-element="body"
                 :popover-class="['advice', connectionPopoverClass]"
                 placement="bottom-start"
