@@ -59,6 +59,7 @@
                                 </base-onboarding-button>
                             </template>
                         </onboarding-notice>
+                        <mint-stats v-else />
                     </transition>
                 </div>
             </section>
@@ -168,10 +169,12 @@ import MintSteps from '@/components/MintZerocoinPage/MintSteps'
 import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
 import Stack from '@/components/Icons/Stack'
 import NotificationIndicator from '@/components/Notification/NotificationIndicator'
+import MintStats from '@/components/MintZerocoinPage/MintStats'
 
 export default {
     name: 'MintZerocoinPage',
     components: {
+        MintStats,
         OnboardingNotice,
         NotificationIndicator,
         MintsInProgressList,
