@@ -92,7 +92,7 @@ export default {
                     this[`on${Topic}Subscription`](data)
                 }
             } catch (e) {
-                logger.warn('error in response of', topic, 'request', this.subscriptions)
+                logger.warn('error in response of %s request %O', topic, this.subscriptions)
                 logger.error(e)
                 logger.warn(message)
             }

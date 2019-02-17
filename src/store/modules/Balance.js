@@ -23,7 +23,7 @@ const state = {
 
 const mutations = {
     [types.UPDATE_BALANCE] (state, balance) {
-        logger.debug('going to update balance', balance)
+        logger.debug('going to update balance %O', balance)
 
         const { total, xzc, zerocoin } = balance
 

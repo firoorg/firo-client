@@ -107,7 +107,7 @@ const actions = {
     },
 
     [types.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ dispatch, getters, rootGetters }) {
-        logger.debug('suggested mints to fulfill ratio %s', getters.suggestedMintsToFulfillRatio)
+        logger.debug('suggested mints to fulfill ratio %O', getters.suggestedMintsToFulfillRatio)
         const currentDenomination = rootGetters['Mint/currentDenominations']
 
         Object.entries(getters.suggestedMintsToFulfillRatio).forEach((pairs) => {
