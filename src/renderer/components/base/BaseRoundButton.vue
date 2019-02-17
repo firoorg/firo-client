@@ -59,8 +59,8 @@ export default {
         // sizes
 
         &.large {
-            height: 2.5rem;
-            width: 2.5rem;
+            height: 2rem;
+            width: 2rem;
             //background: $gradient--green-bright;
         }
 
@@ -133,6 +133,10 @@ export default {
                     background-color: rgba($color--comet-light, 1);
                 }
             }
+        }
+
+        span {
+            line-height: 1;
         }
     }
 </style>

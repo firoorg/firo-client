@@ -95,6 +95,7 @@ export default {
 
         h2 {
             max-width: 90%;
+            padding-top: 0;
             // border: 1px solid red;
         }
     }
