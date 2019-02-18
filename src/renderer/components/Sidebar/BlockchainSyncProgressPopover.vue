@@ -36,7 +36,7 @@
                 <strong>{{ $t('navigation.flyout-blockchain-sync-progress.label__blocks-not-visible') }}</strong>
             </p>
         </template>
-        <template v-else-if="!isZnodeListSynced">
+        <template v-else-if="!isWinnersListSynced">
             <h3>{{ $t('navigation.flyout-znode-sync-progress.title') }}</h3>
             <p>{{ $t('navigation.flyout-znode-sync-progress.label') }}</p>
         </template>
@@ -54,7 +54,7 @@ export default {
             currentBlockTimestamp: 'Blockchain/currentBlockTimestamp',
             estimatedTimeUntilSynced: 'Blockchain/estimatedTimeUntilSynced',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            isZnodeListSynced: 'Blockchain/isZnodeListSynced'
+            isWinnersListSynced: 'Blockchain/isWinnersListSynced'
         })
     }
 }

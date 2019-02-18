@@ -130,7 +130,6 @@ export default {
             avgBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds',
             isSynced: 'Blockchain/isSynced',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            isZnodeListSynced: 'Blockchain/isZnodeListSynced',
             znodeSyncProgress: 'Znode/znodeSyncProgress',
             hasMyZnodes: 'Znode/hasMyZnodes',
             hasConnections: 'Blockchain/hasConnections',

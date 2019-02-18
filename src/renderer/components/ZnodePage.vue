@@ -120,7 +120,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            isZnodeListSynced: 'Blockchain/isZnodeListSynced',
+            isWinnersListSynced: 'Blockchain/isWinnersListSynced',
             myZnodes: 'Znode/myZnodes',
             remoteZnodes: 'Znode/remoteZnodes',
             totalZnodes: 'Znode/totalZnodes',
@@ -159,7 +159,7 @@ export default {
         },
 
         statsLoaded () {
-            return this.isZnodeListSynced
+            return this.isWinnersListSynced
         }
     }
 }

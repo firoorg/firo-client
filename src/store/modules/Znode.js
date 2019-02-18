@@ -318,10 +318,25 @@ const getters = {
 
     znodeCollateralInSatoshi: (state) => state.znodeCollateralInSatoshi,
     znodeStates: (state) => state.znodeStates,
-    znodeSyncProgress: (state, getters) => {
+    znodeSyncProgress: (state, getters, rootState, rootGetters) => {
+        const isWinnerListSynced = rootGetters['Blockchain/isWinnersListSynced']
+        const znodeListSyncedMax = 0.9
+
+        if (isWinnerListSynced) {
+            return 1
+        }
+
+        const isZnodeListSynced = rootGetters['Blockchain/isZnodeListSynced']
+
+        if (isZnodeListSynced) {
+            return znodeListSyncedMax
+        }
+
         const progress = getters.allZnodes.length / getters.totalZnodes
 
-        return !isNaN(progress) ? progress : 0
+        console.log(progress)
+        // keep last 10% of sync status for winner list syncing which is something we have no indicator for
+        return !isNaN(progress) ? progress * znodeListSyncedMax : 0
     }
 }
 
