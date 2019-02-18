@@ -38,7 +38,7 @@
     "electron-toolkit": "electron ./node_modules/electron-toolkit"
   },
   "build": {
-    "productName": "Zcoin",
+    "productName": "Zcoin Client",
     "appId": "com.zcoin.client",
     "asar": true,
     "directories": {
