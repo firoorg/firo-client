@@ -55,22 +55,27 @@ export default class PidManager {
                     return
                 }
 
-                const filePath = this.getFileSystemPath()
+                const fsPid = await this.readPidFromFs()
 
-                if (!filePath) {
-                    return
-                }
+                if (fsPid && fsPid > 0) {
+                    if (timeout) {
+                        clearInterval(timeout)
+                    }
 
-                logger.debug('checking %s for pid', filePath)
-                const fileExists = fs.existsSync(filePath)
+                    resolve(fsPid)
+                }
+                /*
+                else if (this.lockFileExists()) {
+                    // fall back to existence of .lock file as zcoind.pid does not exist in some cases in windows systems.
+                    // this is a temporary work around to overcome the windows issue.
 
-                if (!fileExists) {
-                    return
+                    if (timeout) {
+                        clearInterval(timeout)
+                    }
+
+                    resolve(9099111105110)
                 }
-                if (timeout) {
-                    clearInterval(timeout)
-                }
-                resolve(await this.readPidFromFs())
+                */
 
             }, 500)
         })
@@ -89,7 +94,7 @@ export default class PidManager {
                     return
                 }
 
-                const filePath = this.getFileSystemPath()
+                const filePath = this.getPidFileSystemPath()
 
                 if (!filePath) {
                     return resolve()
@@ -139,7 +144,7 @@ export default class PidManager {
         logger.debug('spawning with arguments %o', this.getArguments())
 
         this.child = spawn(this.pathToSpawn, this.getArguments(), {
-            detached: true,
+            detached: process.env.NODE_ENV !== 'production', // run detached in dev to allow hot reloading
             stdio: 'ignore'
         })
         // start network to receive path
@@ -153,7 +158,9 @@ export default class PidManager {
         // this.child.stdin.pause()
 
         // not using detached at the moment
-        this.child.unref()
+        if (process.env.NODE_ENV !== 'production') {
+            this.child.unref()
+        }
 
         logger.info('started managed process with pid id %d', this.pid)
 
@@ -190,6 +197,23 @@ export default class PidManager {
             return false
         }
 
+        /*
+        // .lock file check
+        if (this.pid === 9099111105110) {
+            if (this.lockFileExists()) {
+                this.store.dispatch(types.app.DAEMON_IS_RUNNING)
+                this.store.dispatch(types.network.NETWORK_IS_CONNECTED)
+                return true
+            }
+            else {
+                await this.cleanup()
+
+                this.store.dispatch(types.app.DAEMON_STOPPED)
+                return false
+            }
+        }
+        */
+
         try {
             process.kill(this.pid, 0) // testing existence of pid
 
@@ -205,7 +229,20 @@ export default class PidManager {
         return false
     }
 
-    getFileSystemPath () {
+    /*
+    getLockFileSystemPath () {
+        const filePath = this.store.getters['App/blockchainLocation']
+
+        if (!filePath) {
+            logger.debug('try to get .lock path from store: %s', filePath)
+            return
+        }
+
+        return join(filePath, '.lock')
+    }
+    */
+
+    getPidFileSystemPath () {
         const filePath = this.store.getters['App/blockchainLocation']
 
         if (!filePath) {
@@ -240,7 +277,7 @@ export default class PidManager {
         /*
         @deprecated -> see write
         try {
-            const pathToUnlink = this.getFileSystemPath()
+            const pathToUnlink = this.getPidFileSystemPath()
             if (pathToUnlink) {
                 await unlink(pathToUnlink)
             }
@@ -265,7 +302,7 @@ export default class PidManager {
     @deprecated as pid file is owned by zcoind now.
     async write () {
         const pid = `${this.pid}\n`
-        const pathToWrite = this.getFileSystemPath()
+        const pathToWrite = this.getPidFileSystemPath()
 
         if (pathToWrite) {
             await writeFile(pathToWrite, pid)
@@ -274,10 +311,34 @@ export default class PidManager {
     }
     */
 
-    async readPidFromFs () {
-        const filePath = this.getFileSystemPath()
+    /*
+    lockFileExists () {
+        const filePath = this.getLockFileSystemPath()
 
         if (!filePath) {
+            return false
+        }
+
+        const pidFileExists = fs.existsSync(filePath)
+
+        if (!pidFileExists) {
+            return false
+        }
+
+        return true
+    }
+    */
+
+    async readPidFromFs () {
+        const filePath = this.getPidFileSystemPath()
+
+        if (!filePath) {
+            return -1
+        }
+
+        const pidFileExists = fs.existsSync(filePath)
+
+        if (!pidFileExists) {
             return -1
         }
 
