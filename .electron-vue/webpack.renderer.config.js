@@ -197,7 +197,7 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = ''
 
     rendererConfig.plugins.push(
-        new MinifyWebpackPlugin(),
+        //new MinifyWebpackPlugin(),
         new CopyWebpackPlugin([
             {
                 from: path.join(__dirname, '../static'),
