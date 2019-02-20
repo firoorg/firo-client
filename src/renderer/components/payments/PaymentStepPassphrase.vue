@@ -17,6 +17,7 @@
                     ref="input"
                     v-model="passphrase"
                     v-validate="{ required: true }"
+                    v-focus
                     type="password"
                     :placeholder="$t(`${translationNamespace}.placeholder__passphrase`)"
                     name="passphrase"
@@ -72,10 +73,6 @@ export default {
 
     beforeCreate () {
         this.$parent.$emit('can-submit', false)
-    },
-
-    mounted () {
-        this.$refs.input.focus()
     }
 }
 </script>

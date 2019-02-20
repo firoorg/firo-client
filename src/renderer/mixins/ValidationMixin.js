@@ -1,9 +1,11 @@
 export default {
     props: {
+        /*
         autofocusFirstField: {
             type: Boolean,
             default: true
         }
+        */
     },
     data () {
         const amountRules = {
@@ -51,6 +53,7 @@ export default {
             this.validate()
         }
 
+        /*
         if (this.autofocusFirstField && this.validationFieldOrder.length) {
             this.$nextTick(() => {
                 if (this.$refs[this.validationFieldOrder[0]]) {
@@ -58,6 +61,7 @@ export default {
                 }
             })
         }
+        */
     },
 
     computed: {

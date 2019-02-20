@@ -13,6 +13,7 @@
                     id="label"
                     ref="label"
                     v-model.trim="label"
+                    v-focus
                     v-validate="'required'"
                     v-tooltip="getValidationTooltip('label')"
                     type="text"

@@ -3,6 +3,7 @@ import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
 import Scrollable from '@/directives/scrollable'
+import Focus from '@/directives/focus'
 
 import i18n from '#/lib/i18n'
 
@@ -48,6 +49,7 @@ Vue.use(VeeValidate, {
     inject: false
 })
 Vue.directive('scrollable', Scrollable)
+Vue.directive('focus', Focus)
 Vue.use(BindScopedSlotsPlugin)
 Vue.use(Logger)
 
