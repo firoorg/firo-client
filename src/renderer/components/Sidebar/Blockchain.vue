@@ -84,7 +84,11 @@
                             <div
                                 class="loaded"
                                 :style="{ width: `${znodeSyncProgress * 100}%`}"
-                            />
+                            >
+                                <div class="loading">
+                                    <div class="bg" />
+                                </div>
+                            </div>
                         </div>
                         <div
                             v-show="!getIsSynced"
@@ -93,7 +97,14 @@
                             <div
                                 class="loaded"
                                 :style="{ width: `${progress}%`}"
-                            />
+                            >
+                                <div
+                                    v-if="!isBlockchainSynced"
+                                    class="loading"
+                                >
+                                    <div class="bg" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -284,7 +295,44 @@ export default {
             .loaded {
                 background: $gradient--green-bright;
                 transition: width 1s ease-in-out;
+
+                .loading {
+                    position: relative;
+                    overflow: hidden;
+                    display: block;
+                    height: 100%;
+                    mix-blend-mode: multiply;
+                    opacity: 0.75;
+
+                    .bg {
+                        position: absolute;
+                        left: -2.875rem;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
+                        //z-index: -1;
+                        animation: barberpole 1s linear infinite;
+
+                        background: repeating-linear-gradient(
+                                        -45deg,
+                                        $color--green 0,
+                                        transparent 0.01rem,
+                                        transparent 0.49rem,
+                                        $color--green 0.5rem,
+                                        $color--green 1rem
+                        );
+                    }
+                }
             }
+        }
+    }
+
+    @keyframes barberpole {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(2.875rem);
         }
     }
 </style>
