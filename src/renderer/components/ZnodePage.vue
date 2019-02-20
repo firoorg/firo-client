@@ -16,6 +16,7 @@
                             v-model="urlFilter"
                             type="text"
                             class="table-filter-input"
+                            theme="dark"
                             :placeholder="$t('znodes.overview.table__znodes.placeholder__filter')"
                         />
                         <!--<div class="internal-only">

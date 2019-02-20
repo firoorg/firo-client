@@ -1,5 +1,8 @@
 <template>
-    <div class="filter-input">
+    <div
+        class="filter-input"
+        :class="theme"
+    >
         <input
             type="text"
             v-bind="$attrs"
@@ -27,6 +30,11 @@ export default {
     inheritAttrs: false,
     props: {
         value: {
+            type: String,
+            default: ''
+        },
+
+        theme: {
             type: String,
             default: ''
         }
@@ -107,6 +115,39 @@ export default {
 
             &:hover {
                 background: $color--comet;
+            }
+        }
+    }
+
+    .filter-input.dark {
+        $color: mix($color--dark, $color--comet-dark-mixed);
+        $opacity: 0.85;
+
+        input {
+            background: rgba($color, $opacity);
+            border-bottom-style: solid;
+            border-bottom-color: $color;
+            color: $color--comet-medium;
+
+            &::placeholder {
+                color: $color--comet;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: rgba($color--dark, $opacity + 0.1);
+                border-bottom-color: $color--dark;
+            }
+        }
+
+        .clear-me {
+            span {
+                background: $color--comet;
+                color: $color--dark;
+
+                &:hover {
+                    background: $color--comet-medium;
+                }
             }
         }
     }
