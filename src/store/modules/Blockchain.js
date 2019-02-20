@@ -281,6 +281,7 @@ export const getters = {
     status: (state) => state.status || {},
     isSynced: (state, getters) => getters.status.isSynced,
     isBlockchainSynced: (state, getters) => getters.status.isBlockchainSynced,
+    isWinnersListSynced: (state, getters) => getters.status.isWinnersListSynced,
     isZnodeListSynced: (state, getters) => getters.status.isZnodeListSynced,
     networkIdentifier: (state, getters) => getters.isMainnet ? 'main' : 'test',
     averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime,
