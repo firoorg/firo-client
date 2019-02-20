@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <form @submit.prevent="onSubmitForm">
         <h1>{{ $t('onboarding.confirm-passphrase.title') }}</h1>
         <p v-html="$t('onboarding.confirm-passphrase.description')" />
 
@@ -17,19 +17,20 @@
         <footer>
             <base-button
                 is-outline
+                type="button"
                 @click="onCancel"
             >
                 {{ $t('onboarding.confirm-passphrase.button__create-other-passphrase--secondary') }}
             </base-button>
             <base-button
+                type="submit"
                 :disabled="!isEqual"
                 color="green"
-                @click="onConfirm"
             >
                 {{ $t('onboarding.create-passphrase.button__set-passphrase--primary') }}
             </base-button>
         </footer>
-    </div>
+    </form>
 </template>
 
 <script>
@@ -54,6 +55,14 @@ export default {
         onChange (event) {
             const { value } = event.target
             this.$emit('update:confirm', value)
+        },
+
+        onSubmitForm () {
+            if (!this.isEqual) {
+                return
+            }
+
+            this.onConfirm()
         }
     }
 }

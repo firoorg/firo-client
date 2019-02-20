@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <form @submit.prevent="next">
         <div class="warning">
             <div>
                 <h1>{{ $t('onboarding.final-passphrase-confirmation.title') }}</h1>
@@ -11,21 +11,22 @@
 
             <footer class="footer">
                 <base-button
-                    color=""
                     is-outline
+                    type="button"
                     @click="prev"
                 >
                     {{ $t('onboarding.final-passphrase-confirmation.button__create-other-passphrase--secondary') }}
                 </base-button>
                 <base-button
+                    v-focus
                     color="white"
-                    @click="next"
+                    type="submit"
                 >
                     {{ $t('onboarding.final-passphrase-confirmation.button__confirm-passphrase--primary') }}
                 </base-button>
             </footer>
         </div>
-    </div>
+    </form>
 </template>
 
 <script>

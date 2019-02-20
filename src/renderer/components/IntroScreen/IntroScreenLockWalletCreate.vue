@@ -1,5 +1,8 @@
 <template>
-    <div ref="inner">
+    <form
+        ref="inner"
+        @submit.prevent="onSubmitForm"
+    >
         <h1>{{ $t('onboarding.create-passphrase.title') }}</h1>
         <p v-html="$t('onboarding.create-passphrase.description')" />
 
@@ -32,6 +35,7 @@
                 <template slot="target">
                     <div class="control passphrase">
                         <input
+                            v-focus
                             type="text"
                             :placeholder="$t('onboarding.create-passphrase.placeholder__enter-passphrase')"
                             @input="onInput"
@@ -74,14 +78,14 @@
 
         <footer>
             <base-button
+                type="submit"
                 color="green"
                 :disabled="!isValidPassphrase"
-                @click="goToConfirm"
             >
                 {{ $t('onboarding.confirm-passphrase.button__confirm-passphrase--primary') }}
             </base-button>
         </footer>
-    </div>
+    </form>
 </template>
 
 <script>
@@ -172,6 +176,14 @@ export default {
             this.$emit('update:passphrase', value)
         },
 
+        onSubmitForm() {
+            if (!this.isValidPassphrase) {
+                return
+            }
+
+            this.goToConfirm()
+        },
+
         calculateStrength() {
             this.strength = {}
 
@@ -187,7 +199,7 @@ export default {
                 this.isValidPassphrase = this.currentScore >= this.scoreToReach
             }
 
-            this.$log.debug('this.isValidPassphrase', this.isValidPassphrase)
+            this.$log.debug('this.isValidPassphrase %s', this.isValidPassphrase)
         }
     }
 
