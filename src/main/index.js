@@ -39,7 +39,7 @@ const platform = os.platform()
 const zcoindName = platform === 'win32' ? 'zcoind.exe' : 'zcoind'
 const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindName}`)
 
-const userDataPath = process.env.NODE_ENV === 'development' ? rootFolder + '/assets/core' : app.getPath('userData')
+const userDataPath = app.getPath('userData')
 
 logger.info('zcoin paths: %o', {
     rootFolder,
@@ -63,7 +63,7 @@ setupWindowRouter({ store })
 const startNetwork = function () {
     logger.info('starting network')
 
-    network.init({ store })
+    network.init({ store, coreDaemonManager })
 }
 
 const beforeQuit = async function (event) {
@@ -75,6 +75,7 @@ const beforeQuit = async function (event) {
     if (!(stopOnQuit && isRunning)) {
         logger.info('no need to wait for daemon to stop. quitting...')
         store.dispatch('Window/close', 'waitForDaemonShutdown')
+        //app.exit(0)
         return
     }
 
@@ -100,6 +101,7 @@ const beforeQuit = async function (event) {
 // set up the manager
 const coreDaemonManager = new PidManager({
     name: 'zcoind',
+    pidDirectory: userDataPath,
     autoRestart,
     heartbeatIntervalInSeconds,
     store,

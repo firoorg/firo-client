@@ -15,10 +15,11 @@ const writeFile = promisify(fs.writeFile)
 const unlink = promisify(fs.unlink)
 
 export default class PidManager {
-    constructor ({ name, store, onStarted, onStop, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
+    constructor ({ name, pidDirectory, store, onStarted, onStop, heartbeatIntervalInSeconds = 5, autoRestart = false, maxAutoRestartTries = 5 }) {
         logger.info('setting up a new PidManager for %s', name)
 
         this.pid = -1
+        this.pidDirectory = pidDirectory
         this.child = null
 
         this.name = name
@@ -40,7 +41,10 @@ export default class PidManager {
         this.pathToSpawn = pathToSpawn
     }
 
-    // Wait for file to exist, checks every 500 milliseconds
+    /*
+     * Wait for file to exist, checks every 500 milliseconds
+     *
+     * @see this.setPid for more infos
     async waitForPid () {
         return new Promise((resolve, reject) => {
             let counter = 0
@@ -55,7 +59,7 @@ export default class PidManager {
                     return
                 }
 
-                const fsPid = await this.readPidFromFs()
+                const fsPid = await this.readPidFromFileSystem()
 
                 if (fsPid && fsPid > 0) {
                     if (timeout) {
@@ -64,26 +68,18 @@ export default class PidManager {
 
                     resolve(fsPid)
                 }
-                /*
-                else if (this.lockFileExists()) {
-                    // fall back to existence of .lock file as zcoind.pid does not exist in some cases in windows systems.
-                    // this is a temporary work around to overcome the windows issue.
-
-                    if (timeout) {
-                        clearInterval(timeout)
-                    }
-
-                    resolve(9099111105110)
-                }
-                */
-
             }, 500)
         })
     }
+    */
 
     async waitForDaemonShutdown () {
         return new Promise((resolve, reject) => {
             let counter = 0
+
+            if (this.pid === -1) {
+                return resolve()
+            }
 
             const timeout = setInterval(async () => {
                 counter++
@@ -94,22 +90,18 @@ export default class PidManager {
                     return
                 }
 
-                const filePath = this.getPidFileSystemPath()
+                try {
+                    process.kill(this.pid, 0) // testing existence of pid
+                } catch (e) {
+                    // error occurred as pid was not found
+                    await this.removePidFromFileSystem()
 
-                if (!filePath) {
-                    return resolve()
+                    if (timeout) {
+                        clearInterval(timeout)
+                    }
+
+                    resolve()
                 }
-
-                const fileExists = fs.existsSync(filePath)
-
-                if (fileExists) {
-                    return
-                }
-
-                if (timeout) {
-                    clearInterval(timeout)
-                }
-                resolve()
 
             }, 1000)
         })
@@ -128,7 +120,7 @@ export default class PidManager {
         }
 
         try {
-            this.pid = await this.readPidFromFs()
+            this.pid = await this.readPidFromFileSystem()
         } catch (e) {
             this.pid = -1
             console.log(e)
@@ -138,7 +130,7 @@ export default class PidManager {
             logger.info('daemon is still running. no need to start it...')
             this.onStarted()
             this.onStart()
-            return this.pid
+            return
         }
 
         logger.debug('spawning with arguments %o', this.getArguments())
@@ -150,10 +142,6 @@ export default class PidManager {
         // start network to receive path
         this.onStarted()
 
-        // wait for api status to provide path
-        this.pid = await this.waitForPid()
-        logger.debug('received pid from fs %d', this.pid)
-
         // @see https://stackoverflow.com/a/18694940/520544
         // this.child.stdin.pause()
 
@@ -162,11 +150,11 @@ export default class PidManager {
             this.child.unref()
         }
 
-        logger.info('started managed process with pid id %d', this.pid)
+        logger.info('started daemon process')
 
         this.onStart()
 
-        return this.pid
+        //return this.pid
     }
 
     onStart () {
@@ -175,6 +163,14 @@ export default class PidManager {
 
     stop () {
         this.store.dispatch(types.app.DAEMON_STOP)
+    }
+
+    // daemon pid is provided by the api status until
+    // https://github.com/bitcoin/bitcoin/pull/15456 finds it way back to the zcoin codebase
+    async setPid (pid) {
+        logger.debug('received pid from api status %d', this.pid)
+        this.pid = pid
+        await this.writePidToFileSystem()
     }
 
     enableAutoRestart () {
@@ -197,23 +193,6 @@ export default class PidManager {
             return false
         }
 
-        /*
-        // .lock file check
-        if (this.pid === 9099111105110) {
-            if (this.lockFileExists()) {
-                this.store.dispatch(types.app.DAEMON_IS_RUNNING)
-                this.store.dispatch(types.network.NETWORK_IS_CONNECTED)
-                return true
-            }
-            else {
-                await this.cleanup()
-
-                this.store.dispatch(types.app.DAEMON_STOPPED)
-                return false
-            }
-        }
-        */
-
         try {
             process.kill(this.pid, 0) // testing existence of pid
 
@@ -229,28 +208,8 @@ export default class PidManager {
         return false
     }
 
-    /*
-    getLockFileSystemPath () {
-        const filePath = this.store.getters['App/blockchainLocation']
-
-        if (!filePath) {
-            logger.debug('try to get .lock path from store: %s', filePath)
-            return
-        }
-
-        return join(filePath, '.lock')
-    }
-    */
-
     getPidFileSystemPath () {
-        const filePath = this.store.getters['App/blockchainLocation']
-
-        if (!filePath) {
-            logger.debug('try to get pid path from store: %s', filePath)
-            return
-        }
-
-        return join(filePath, `${this.name}.pid`)
+        return join(this.pidDirectory, `${this.name}.pid`)
     }
 
     getArguments () {
@@ -274,19 +233,8 @@ export default class PidManager {
     }
 
     async cleanup () {
-        /*
-        @deprecated -> see write
-        try {
-            const pathToUnlink = this.getPidFileSystemPath()
-            if (pathToUnlink) {
-                await unlink(pathToUnlink)
-            }
-        } catch (e) {
-            if (e.code !== 'ENOENT') {
-                logger.error(e)
-            }
-        }
-        */
+        await this.removePidFromFileSystem()
+
         this.pid = -1
         this.child = null
         this.store.dispatch(types.network.NETWORK_CONNECTION_LOST)
@@ -298,18 +246,15 @@ export default class PidManager {
         logger.debug('reset this.pid and cleared heartbeat')
     }
 
-    /*
-    @deprecated as pid file is owned by zcoind now.
-    async write () {
+    async writePidToFileSystem () {
         const pid = `${this.pid}\n`
         const pathToWrite = this.getPidFileSystemPath()
 
         if (pathToWrite) {
             await writeFile(pathToWrite, pid)
-            logger.info('wrote pid %d to path', this.pid)
+            logger.info('wrote pid %d to path %s', this.pid, pathToWrite)
         }
     }
-    */
 
     /*
     lockFileExists () {
@@ -329,7 +274,7 @@ export default class PidManager {
     }
     */
 
-    async readPidFromFs () {
+    async readPidFromFileSystem () {
         const filePath = this.getPidFileSystemPath()
 
         if (!filePath) {
@@ -356,6 +301,19 @@ export default class PidManager {
         }
 
         return -1
+    }
+
+    async removePidFromFileSystem () {
+        try {
+            const pathToUnlink = this.getPidFileSystemPath()
+            if (pathToUnlink) {
+                await unlink(pathToUnlink)
+            }
+        } catch (e) {
+            if (e.code !== 'ENOENT') {
+                logger.error(e)
+            }
+        }
     }
 
     setHeartbeatIntervalInSeconds (value) {

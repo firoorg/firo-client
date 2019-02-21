@@ -78,7 +78,7 @@ const callBoundModuleMethod = (list, actionOrMutation, module) => {
 
 export default {
 
-    async init ({ store: vuexStore, /* namespace, */ moduleNames }) {
+    async init ({ store: vuexStore, coreDaemonManager }) {
         store = vuexStore
         this.connectToStore()
         // todo whitelist modules via moduleNames
@@ -98,7 +98,8 @@ export default {
             })
             const status = await apiStatus.get()
 
-            const {network: NETWORK} = status.data
+            const {network: NETWORK, pid } = status.data
+            coreDaemonManager.setPid(pid)
             appConfig = CONFIG.network.networks[NETWORK] || {}
 
             logger.info('got api status %o', status)
