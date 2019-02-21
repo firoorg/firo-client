@@ -124,6 +124,8 @@ export default {
     },
 
     close () {
+        this.currentStatus = null
+
         try {
             if (this.subscriber && !this.subscriber.closed) {
                 this.subscriber.close()

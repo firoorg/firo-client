@@ -151,14 +151,6 @@ export default class PidManager {
         }
 
         logger.info('started daemon process')
-
-        this.onStart()
-
-        //return this.pid
-    }
-
-    onStart () {
-        this.startHeartbeat()
     }
 
     stop () {
@@ -168,9 +160,10 @@ export default class PidManager {
     // daemon pid is provided by the api status until
     // https://github.com/bitcoin/bitcoin/pull/15456 finds it way back to the zcoin codebase
     async setPid (pid) {
-        logger.debug('received pid from api status %d', this.pid)
         this.pid = pid
+        logger.debug('received pid from api status %d', this.pid)
         await this.writePidToFileSystem()
+        this.startHeartbeat()
     }
 
     enableAutoRestart () {
@@ -255,24 +248,6 @@ export default class PidManager {
             logger.info('wrote pid %d to path %s', this.pid, pathToWrite)
         }
     }
-
-    /*
-    lockFileExists () {
-        const filePath = this.getLockFileSystemPath()
-
-        if (!filePath) {
-            return false
-        }
-
-        const pidFileExists = fs.existsSync(filePath)
-
-        if (!pidFileExists) {
-            return false
-        }
-
-        return true
-    }
-    */
 
     async readPidFromFileSystem () {
         const filePath = this.getPidFileSystemPath()
@@ -387,5 +362,4 @@ export default class PidManager {
             }
         })
     }
-
 }
