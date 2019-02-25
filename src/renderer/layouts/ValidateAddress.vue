@@ -1,6 +1,6 @@
 <template>
     <main>
-        <router-view :address="address" />
+        <router-view v-bind="addressToValidate" />
     </main>
 </template>
 
@@ -12,7 +12,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            address: 'AddressValidation/currentAddressToValidate'
+            addressToValidate: 'AddressValidation/currentAddressToValidate'
         })
     }
 }

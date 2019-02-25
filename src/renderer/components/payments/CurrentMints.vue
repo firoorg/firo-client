@@ -32,6 +32,7 @@
                 </div>
             </div>
         </li>
+        <slot />
     </ul>
 </template>
 
@@ -63,10 +64,11 @@ export default {
         border-bottom-style: solid;
         @include rhythmBorderBottom(1px, 1);
         margin: 0;
+        padding-bottom: emRhythm(1);
 
         li {
             padding-top: emRhythm(1);
-            @include rhythmBorderBottom(1px, 1);
+            @include rhythmBorderTop(1px, 1);
             border-color: rgba($color--white, 0.3);
             border-bottom-style: dashed;
             @include font-medium();
@@ -74,9 +76,8 @@ export default {
             display: grid;
             grid-template-columns: $amount-width auto $unit-width;
 
-            &:last-child {
+            &:first-child {
                 border: none;
-                padding-bottom: emRhythm(1);
             };
 
             .amount {

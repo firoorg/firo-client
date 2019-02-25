@@ -43,7 +43,7 @@ $weight--button: 'heavy'; //$weight--label;
     color: $color--white-light;
     font-style: normal;
     text-decoration: none;
-    background: rgba($color--dark, 0.3);
+    background-color: rgba($color--dark, 0.3);
     @include setType(2, $ms-down2);
     text-transform: uppercase;
     letter-spacing: 0.025rem;

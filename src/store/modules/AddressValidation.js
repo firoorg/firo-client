@@ -1,37 +1,45 @@
 import * as types from '~/types/AddressValidation'
 
 const state = {
-    addressToValidate: ''
+    address: '',
+    amount: 0,
+    label: ''
     // isValidated: true
 }
 
 const mutations = {
-    [types.SET_ADDRESS_TO_VALIDATE] (state, address) {
-        state.addressToValidate = address
+    [types.SET_ADDRESS_TO_VALIDATE] (state, { address, amount, label }) {
+        state.address = address
+        state.amount = amount
+        state.label = label
     }
 }
 
 const actions = {
-    [types.SET_ADDRESS_TO_VALIDATE] ({ commit, state }, address) {
-        if (state.addressToValidate === address) {
+    [types.SET_ADDRESS_TO_VALIDATE] ({ commit, state }, { address, amount, label }) {
+        if (state.address === address) {
             return
         }
 
-        commit(types.SET_ADDRESS_TO_VALIDATE, address)
+        commit(types.SET_ADDRESS_TO_VALIDATE, { address, amount, label })
     },
 
-    [types.SHOW_ADDRESS_VALIDATION] ({ dispatch, state }, address) {
+    [types.SHOW_ADDRESS_VALIDATION] ({ dispatch, state }, { address, amount, label }) {
         if (!address) {
             return
         }
 
-        dispatch(types.SET_ADDRESS_TO_VALIDATE, address)
+        dispatch(types.SET_ADDRESS_TO_VALIDATE, { address, amount, label })
         dispatch('Window/show', 'validateAddress', { root: true })
     }
 }
 
 const getters = {
-    currentAddressToValidate: (state) => state.addressToValidate
+    currentAddressToValidate: (state) => ({
+        address: state.address,
+        amount: state.amount,
+        label: state.label
+    })
 }
 
 export default {

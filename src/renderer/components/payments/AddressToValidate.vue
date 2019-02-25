@@ -1,6 +1,22 @@
 <template>
     <section>
-        <div v-html="formattedAddress" />
+        <div class="wrap">
+            <span
+                class="address"
+                v-html="formattedAddress"
+            />
+            <div
+                class="meta"
+                :class="{ 'has-meta': hasMeta }"
+            >
+                <div class="label">
+                    {{ label }}
+                </div>
+                <div class="amount">
+                    {{ amount }} <span class="unit">xzc</span>
+                </div>
+            </div>
+        </div>
     </section>
 </template>
 
@@ -12,12 +28,26 @@ export default {
         address: {
             type: String,
             required: true
+        },
+
+        amount: {
+            type: String,
+            default: ''
+        },
+
+        label: {
+            type: String,
+            default: ''
         }
     },
 
     computed: {
         formattedAddress () {
             return this.address.match(/.{1,5}/g).join('&puncsp;')
+        },
+
+        hasMeta () {
+            return !!this.amount || !!this.label
         }
     }
 }
@@ -25,12 +55,37 @@ export default {
 
 <style lang="scss" scoped>
     section {
-        font-family: 'Overpass Mono';
-        font-weight: bold;
-        font-size: 3.65vw;
+        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%;
+        flex-direction: column;
+    }
+
+    //.wrap
+    .address {
+        font-family: 'Overpass Mono';
+        font-weight: bold;
+        font-size: 3.65vw;
+    }
+
+    .meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: emRhythm(-2);
+        @include font-heavy();
+        color: $color--comet;
+
+        &.has-meta {
+            margin-top: emRhythm(1);
+        }
+    }
+
+    .label {
+        font-style: italic;
+    }
+
+    .amount .unit {
+        color: $color--comet-dark;
     }
 </style>

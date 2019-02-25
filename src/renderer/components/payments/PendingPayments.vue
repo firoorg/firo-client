@@ -11,17 +11,13 @@
                 <!--<slot v-bind="value" />-->
                 {{ value.label }}
             </div>
-            <div
-                v-if="showValidate"
-                class="validate"
-            >
-                <a
-                    href="#"
-                    class="validate-address"
-                    @click.prevent="() => validateAddress(value.address)"
-                >
-                    Show Address
-                </a>
+            <div class="validate">
+                <validate-address-button
+                    v-if="showValidate"
+                    :address="value.address"
+                    :label="value.label"
+                    :amount="value.amountAsBaseCoin"
+                />
             </div>
             <div class="amount">
                 {{ value.amountAsBaseCoin }} <span class="unit">
@@ -33,11 +29,11 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import types from '~/types'
+import ValidateAddressButton from '@/components/payments/ValidateAddressButton'
 
 export default {
     name: 'PendingPayments',
+    components: {ValidateAddressButton},
     props: {
         showValidate: {
             type: Boolean,
@@ -47,16 +43,6 @@ export default {
         payments: {
             type: Array,
             required: true
-        }
-    },
-
-    methods: {
-        ...mapActions({
-            showAddressValidation: types.addressvalidation.SHOW_ADDRESS_VALIDATION
-        }),
-
-        validateAddress (address) {
-            this.showAddressValidation(address)
         }
     }
 }
@@ -83,10 +69,6 @@ export default {
 
             .validate {
                 grid-area: validate;
-
-                a {
-                    @include popover-inline-button();
-                }
             }
 
             .amount {
@@ -108,9 +90,6 @@ export default {
                 border: none;
                 padding-bottom: emRhythm(1);
             };
-
-            .validate-address {
-            }
 
             .amount {
                 align-self: end;

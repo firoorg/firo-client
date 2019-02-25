@@ -10,7 +10,13 @@
             <current-mints
                 :current-mints="denominations"
                 :show-progress="false"
-            />
+            >
+                <validate-address-button
+                    :address="spendFormAddress"
+                    :label="spendFormLabel"
+                    :amount="costs"
+                />
+            </current-mints>
             <fees-and-amount
                 :amount="spendFormMintCostsInSatoshi"
                 :show-fee="false"
@@ -22,14 +28,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { convertToCoin } from '#/lib/convert'
 
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
 import CurrentMints from '@/components/payments/CurrentMints'
+import ValidateAddressButton from '@/components/payments/ValidateAddressButton'
 
 export default {
     name: 'SpendZerocoinStepConfirm',
 
     components: {
+        ValidateAddressButton,
         CurrentMints,
         FeesAndAmount
     },
@@ -47,8 +56,14 @@ export default {
     computed: {
         ...mapGetters({
             denominations: 'ZerocoinSpend/spendFormMintsFormatted',
-            spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
-        })
+            spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi',
+            spendFormAddress: 'ZerocoinSpend/spendFormAddress',
+            spendFormLabel: 'ZerocoinSpend/spendFormLabel'
+        }),
+
+        costs () {
+            return convertToCoin(this.spendFormMintCostsInSatoshi)
+        }
     }
 }
 </script>
