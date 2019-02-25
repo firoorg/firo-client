@@ -11,6 +11,10 @@ export default {
             type: Boolean,
             required: true
         },
+        onFormSubmit: {
+            type: Function,
+            required: true
+        },
         cleanupForm: {
             type: Function,
             required: true

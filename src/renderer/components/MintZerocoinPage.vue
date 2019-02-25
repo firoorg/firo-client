@@ -133,6 +133,7 @@
                         />
                     </div>
                     <mint-steps
+                        :on-form-submit="onSubmit"
                         :form-is-valid="canSubmit"
                         :cleanup-form="cleanupForm"
                         @steps-started="() => enableProgressList = false"
@@ -282,6 +283,11 @@ export default {
         },
 
         onSubmit () {
+            if (!this.canSubmit) {
+                return false
+            }
+
+            this.$log.info('submitting mint form')
             this.doMint({
                 denominations: this.currentMints,
                 auth: {

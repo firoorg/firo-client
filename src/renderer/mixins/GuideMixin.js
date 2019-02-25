@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash'
+
 export default {
     props: {
         boundariesElement: {
@@ -43,7 +45,7 @@ export default {
                 return
             }
 
-            return this.steps[this.currentStep].props.bind(this)()
+            return cloneDeep(this.steps[this.currentStep].props.bind(this)())
         },
 
         currentPopoverClass () {

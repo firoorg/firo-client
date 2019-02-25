@@ -1,8 +1,9 @@
 <template>
     <base-button
+        type="submit"
         :color="color"
         :disabled="!canSubmit"
-        @click="actions.next"
+        @click="onSubmit"
     >
         <slot />
     </base-button>
@@ -21,9 +22,21 @@ export default {
             type: Boolean,
             default: false
         },
+        onFormSubmit: {
+            type: Function,
+            required: true
+        },
         color: {
             type: String,
             default: ''
+        }
+    },
+
+    methods: {
+        onSubmit() {
+            if (this.onFormSubmit() !== false) {
+                this.actions.next()
+            }
         }
     }
 }

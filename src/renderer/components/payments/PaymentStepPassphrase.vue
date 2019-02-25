@@ -46,6 +46,13 @@ export default {
         validator: 'new' // give me my own validator instance.
     },
 
+    props: {
+        onFormSubmit: {
+            type: Function,
+            required: true
+        }
+    },
+
     computed: {
         ...addVuexModel({
             name: 'passphrase',
@@ -74,6 +81,21 @@ export default {
     beforeCreate () {
         this.$parent.$emit('can-submit', false)
     }
+
+    /*
+    todo trigger actions.next
+    methods: {
+        submitIfValid (event) {
+            event.preventDefault()
+
+            if (!this.canSubmit) {
+                return
+            }
+
+            this.onFormSubmit()
+        }
+    }
+    */
 }
 </script>
 

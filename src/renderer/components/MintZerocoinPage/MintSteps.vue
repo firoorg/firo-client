@@ -50,6 +50,7 @@
                     :color="submitButtonColor"
                     :is-dark="true"
                     :can-submit="canSubmit"
+                    :on-form-submit="onFormSubmit"
                 >
                     {{ $t('mint.flyout-unlock-client.button__unlock-mint--primary') }}
                 </payment-step-passphrase-buttons>
@@ -124,7 +125,8 @@ export default {
 
         getPassphraseStepProps() {
             return {
-                translationNamespace: 'mint.flyout-unlock-client'
+                translationNamespace: 'mint.flyout-unlock-client',
+                onFormSubmit: this.onFormSubmit
             }
         },
 

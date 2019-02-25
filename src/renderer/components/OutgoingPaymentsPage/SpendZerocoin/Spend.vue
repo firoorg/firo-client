@@ -32,6 +32,7 @@
                     />
                     <!--</div>-->
                     <spend-zerocoin-steps
+                        :on-form-submit="submitForm"
                         :form-is-valid="formSectionIsValid"
                         :cleanup-form="cleanupForm"
                         @steps-done="cleanupForm"

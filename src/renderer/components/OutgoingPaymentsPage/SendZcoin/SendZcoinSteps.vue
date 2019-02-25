@@ -65,6 +65,7 @@
                     :actions="actions"
                     :color="submitButtonColor"
                     :can-submit="canSubmit"
+                    :on-form-submit="onFormSubmit"
                 >
                     {{ $t('send.public.flyout-confirm-send.button__unlock-and-send--primary') }}
                 </payment-step-passphrase-buttons>
@@ -200,7 +201,8 @@ export default {
 
         getPassphraseStepProps() {
             return {
-                translationNamespace: 'send.public.flyout-unlock-client'
+                translationNamespace: 'send.public.flyout-unlock-client',
+                onFormSubmit: this.onFormSubmit
             }
         },
 
@@ -257,8 +259,8 @@ export default {
 
     methods: {
         // override mixin
-        onConfirm () {
-            this.isConfirmed = true
+        onConfirm (newVal) {
+            this.isConfirmed = newVal
             this.isUsedAddressCache = !!this.containsUsedAddress
         },
 

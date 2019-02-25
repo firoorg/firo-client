@@ -28,6 +28,7 @@
                     </div>
 
                     <send-zcoin-steps
+                        :on-form-submit="submitForm"
                         :form-is-valid="formSectionIsValid"
                         :cleanup-form="cleanupForm"
                         :update-transaction-fee="updateTransactionFee"
