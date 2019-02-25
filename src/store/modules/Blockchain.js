@@ -167,6 +167,10 @@ export const actions = {
     },
 
     [types.ON_BLOCK_SUBSCRIPTION] ({ dispatch }, block) {
+        if (!block) {
+            return
+        }
+
         dispatch(types.SET_INITIAL_STATE, block)
     },
 

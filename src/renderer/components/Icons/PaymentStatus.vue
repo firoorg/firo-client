@@ -64,6 +64,7 @@ export default {
 <style lang="scss" scoped>
     .payment-request-status-animation {
         height: 100%;
+        max-height: 11rem;
         display: inline-block;
         padding-left: emRhythm(1);
     }

@@ -11,9 +11,8 @@
                     <div
                         v-if="alreadyFulfilled"
                         class="already-fulfilled notice"
-                    >
-                        {{ $t('overlay.incoming-payment-request.notice') }}
-                    </div>
+                        v-html="$t('overlay.incoming-payment-request.notice')"
+                    />
 
                     <div v-if="incomingPaymentRequest.message">
                         <h3 v-html="$t('overlay.incoming-payment-request.label__message')" />

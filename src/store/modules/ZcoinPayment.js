@@ -43,7 +43,7 @@ const state = {
 }
 
 const mutations = {
-    ...isLoading.mutation,
+    ...isLoading.mutations,
     ...pendingPayments.mutations,
     ...sendZcoinResponse.mutations,
 

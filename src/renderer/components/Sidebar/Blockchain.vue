@@ -6,7 +6,7 @@
         >
             <base-popover
                 trigger="hover"
-                :disabled="isSynced"
+                :disabled="getIsSynced"
                 boundaries-element="body"
                 :popover-class="['advice', connectionPopoverClass]"
                 placement="bottom-start"
@@ -168,7 +168,7 @@ export default {
                 return 'error'
             }
 
-            // todo implement check if tor and dandelion are activated
+            // todo implement check if tor is activated
             // return 'public'
 
             return 'private'
@@ -302,7 +302,7 @@ export default {
                     display: block;
                     height: 100%;
                     mix-blend-mode: multiply;
-                    opacity: 0.75;
+                    opacity: 0.5;
 
                     .bg {
                         position: absolute;
