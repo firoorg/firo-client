@@ -4,11 +4,12 @@
         class="denomination-selector"
     >
         <spend-denomination
-            v-for="denomination in denominations"
+            v-for="denomination in denominationTypes"
             :key="denomination"
             :denomination="denomination"
             :available="getAvailableAmountFor(denomination)"
             :current="getCurrentAmountFor(denomination)"
+            :increase-disabled="canIncreaseInputs"
             @change="onDenominationChange"
         />
     </section>
@@ -31,17 +32,20 @@ export default {
         }
     },
 
-    data () {
-        return {
-            denominations: [1, 10, 25, 50, 100]
-        }
-    },
-
     computed: {
         ...mapGetters({
             mints: 'Mint/confirmedMintsPerDenomination',
-            currentMints: 'ZerocoinSpend/spendFormMints'
-        })
+            currentMints: 'ZerocoinSpend/spendFormMints',
+            denominationTypes: 'ZerocoinSpend/denominationTypes',
+            maxAmountOfMintInputsPerTx: 'ZerocoinSpend/maxAmountOfMintInputsPerTx'
+        }),
+
+        canIncreaseInputs () {
+            const amount =  Object.values(this.currentMints)
+                .reduce((accumulator, denomAmount) => accumulator + denomAmount, 0)
+
+            return amount > this.maxAmountOfMintInputsPerTx - 1
+        }
     },
 
     methods: {

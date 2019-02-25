@@ -21,7 +21,9 @@ const state = {
         mints: {
         },
         address: null
-    }
+    },
+    denominationTypes: [1, 10, 25, 50, 100],
+    maxAmountOfMintInputsPerTx: 2
 }
 
 const mutations = {
@@ -134,7 +136,9 @@ const getters = {
         !getters.spendFormLabel &&
         !getters.spendFormAmount &&
         !getters.spendFormAddress
-    )
+    ),
+    denominationTypes: (state) => state.denominationTypes,
+    maxAmountOfMintInputsPerTx: (state) => state.maxAmountOfMintInputsPerTx
 }
 
 export default {

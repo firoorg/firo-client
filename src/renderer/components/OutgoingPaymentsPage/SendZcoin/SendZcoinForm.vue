@@ -127,7 +127,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            confirmedMintsPerDenomination: 'Mint/confirmedMintsPerDenomination'
+            confirmedMintsPerDenomination: 'Mint/confirmedMintsPerDenomination',
+            maxAmountOfMintInputsPerTx: 'ZerocoinSpend/maxAmountOfMintInputsPerTx'
         }),
 
         ...addVuexModel({
@@ -164,7 +165,11 @@ export default {
                 return empty
             }
 
-            return getDenominationsToSpend(amount, this.confirmedMintsPerDenomination)
+            return getDenominationsToSpend({
+                amount,
+                denominations: this.confirmedMintsPerDenomination,
+                limit: this.maxAmountOfMintInputsPerTx
+            })
         },
 
         showCanSpendPrivateTooltip () {

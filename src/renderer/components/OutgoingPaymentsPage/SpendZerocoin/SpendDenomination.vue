@@ -57,6 +57,16 @@ export default {
         current: {
             type: Number,
             required: true
+        },
+
+        decreaseDisabled: {
+            type: Boolean,
+            default: false
+        },
+
+        increaseDisabled: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -77,11 +87,19 @@ export default {
         },
 
         canIncrease () {
+            if (this.increaseDisabled) {
+                return false
+            }
+
             // fees for this increase are already subtracted by the parent element
             return (this.current) < this.available
         },
 
         canDecrease () {
+            if (this.decreaseDisabled) {
+                return false
+            }
+
             return this.current > 0
         },
 
