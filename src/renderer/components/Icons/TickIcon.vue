@@ -17,30 +17,10 @@
 </template>
 
 <script>
+import IconColorMixin from '@/mixins/IconColorMixin'
+
 export default {
     name: 'TickIcon',
-
-    props: {
-        color: {
-            type: String,
-            default: 'green'
-        }
-    },
-
-    computed: {
-        strokeColor () {
-            switch (this.color.toLowerCase()) {
-            case 'white':
-                return '#fff'
-            case 'warning':
-            case 'orange':
-                return '#FA8C0F'
-            case 'success':
-            case 'green':
-            default:
-                return '#23b852'
-            }
-        }
-    }
+    mixins: [IconColorMixin]
 }
 </script>

@@ -66,7 +66,7 @@
                 trigger="hover"
                 :disabled="getIsSynced"
                 boundaries-element="body"
-                :popover-class="['advice', connectionPopoverClass]"
+                :popover-class="['advice', blockchainPopoverClass]"
                 placement="bottom-start"
                 :offset="'12,-8'"
                 :delay="{ show: 200, hide: 100 }"
@@ -144,7 +144,8 @@ export default {
             znodeSyncProgress: 'Znode/znodeSyncProgress',
             hasMyZnodes: 'Znode/hasMyZnodes',
             hasConnections: 'Blockchain/hasConnections',
-            connections: 'Blockchain/connections'
+            connections: 'Blockchain/connections',
+            connectedViaTor: 'Settings/isConnectedViaTor'
         }),
 
         getIsSynced () {
@@ -160,6 +161,18 @@ export default {
                 return 'error'
             }
 
+            if (!this.connectedViaTor) {
+                return 'orange'
+            }
+
+            return 'green'
+        },
+
+        blockchainPopoverClass () {
+            if (!this.hasConnections) {
+                return 'error'
+            }
+
             return 'green'
         },
 
@@ -168,8 +181,9 @@ export default {
                 return 'error'
             }
 
-            // todo implement check if tor is activated
-            // return 'public'
+            if (!this.connectedViaTor) {
+                return 'public'
+            }
 
             return 'private'
         }

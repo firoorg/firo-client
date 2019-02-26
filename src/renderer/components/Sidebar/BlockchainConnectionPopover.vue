@@ -16,12 +16,15 @@
             </li>
             <li>
                 <span>
-                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__is-connected-via-tor')" />
+                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__dandelion')" />
                 </span>
             </li>
             <li>
-                <span>
-                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__dandelion')" />
+                <span v-if="connectedViaTor">
+                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__connect-via-tor--enabled')" />
+                </span>
+                <span v-else>
+                    <cross-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__connect-via-tor--disabled')" />
                 </span>
             </li>
         </ul>
@@ -36,12 +39,14 @@ import { mapGetters } from 'vuex'
 
 import CircularBadge from '@/components/Badge/CircularBadge'
 import TickIcon from '@/components/Icons/TickIcon'
+import CrossIcon from '@/components//Icons/CrossIcon'
 
 export default {
     name: 'BlockchainConnectionPopover',
     components: {
         CircularBadge,
-        TickIcon
+        TickIcon,
+        CrossIcon
     },
 
     props: {
@@ -53,7 +58,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            connections: 'Blockchain/connections'
+            connections: 'Blockchain/connections',
+            connectedViaTor: 'Settings/isConnectedViaTor'
         })
     }
 }
