@@ -7,4 +7,9 @@ export const SET_LOCALE = 'SET_LOCALE'
 export const SET_AVAILABLE_LOCALES = 'SET_AVAILABLE_LOCALES'
 
 export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
-export const PERSIST_SETTING = 'PERSIST_SETTING'
+export const UPDATE_SETTING = 'UPDATE_SETTING' // todo check if required
+
+// daemon settings
+export const SET_DAEMON_SETTING = 'SET_DAEMON_SETTING'
+
+export const SET_TORSETUP = 'SET_TORSETUP'

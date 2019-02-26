@@ -1,8 +1,11 @@
+import Vue from 'vue'
+
 import { format } from 'util'
 
 import allTypes from '~/types'
 import * as types from '../types/Settings'
 import { getApp, getAppSettings } from '#/lib/utils'
+import { stringToBool, boolToString } from '~/utils'
 
 import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
@@ -30,11 +33,16 @@ const state = {
     locales: {
         current: '',
         available: {}
+    },
+    daemonSettingNames: [
+        'torsetup'
+    ],
+    daemonSettings: {
     }
 }
 
 const mutations = {
-    [types.PERSIST_SETTING] () {},
+    [types.UPDATE_SETTING] () {},
 
     [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] (state, percentage) {
         state.percentageToHoldInZerocoin = percentage
@@ -54,12 +62,48 @@ const mutations = {
 
     [types.SET_AVAILABLE_LOCALES] (state, locales) {
         state.locales.available = locales
+    },
+
+    [types.SET_DAEMON_SETTING] (state, { key, value }) {
+        Vue.set(state.daemonSettings, key, value)
     }
+
+    /*
+    [types.SET_INITIAL_STATE] (state, initialState) {
+        Vue.set(state, 'daemonSettings', initialState)
+    }
+    */
 }
 
 const actions = {
-    [types.SET_INITIAL_STATE] ({ commit, state}, initialState) {
+    [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
         logger.info('got initial settings state %o', initialState)
+
+        if (!initialState) {
+            return
+        }
+
+        const { daemon } = initialState
+
+        state.daemonSettingNames.forEach((name) => {
+            const daemonSettingName = `-${name}`
+            const actionName = `SET_${name.toUpperCase()}`
+
+            if (!daemon[daemonSettingName]) {
+                return
+            }
+
+            if (!types[actionName]) {
+                return
+            }
+
+            commit(types.SET_DAEMON_SETTING, {
+                key: name,
+                value: daemon[daemonSettingName]
+            })
+            //dispatch(types[actionName], daemon[daemonSettingName])
+        })
+        //commit(types.SET_INITIAL_STATE, initialState)
     },
 
     /*
@@ -168,6 +212,18 @@ const actions = {
             ...state.locales.available,
             ...locales
         })
+    },
+
+    [types.SET_TORSETUP] ({ state, commit, getters }, value) {
+        console.log('setting tor status to:', value)
+        if (getters.isConnectedViaTor === value) {
+            return
+        }
+
+        commit(types.UPDATE_SETTING, {
+            name: '-torsetup',
+            value: boolToString(value)
+        })
     }
 }
 
@@ -232,7 +288,11 @@ const getters = {
         const fallbackLocale = (getApp().getLocale()).substr(0, 2)
 
         return process.env.LOCALE || state.locales.current || fallbackLocale
-    }
+    },
+    getDaemonSetting: (state) => {
+        return (name) => state.daemonSettings[name] ? state.daemonSettings[name].data : null
+    },
+    isConnectedViaTor: (state, getters) =>  stringToBool(getters.getDaemonSetting('torsetup'))
 }
 
 export default {

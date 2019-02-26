@@ -52,3 +52,11 @@ export const addConfirmationsToTransaction = function (tx, currentBlockHeight) {
         isConfirmed: !!txConfirmations
     }
 }
+
+export const stringToBool = function (value) {
+    return value === '1'
+}
+
+export const boolToString = function (value) {
+    return value ? '1' : '0'
+}

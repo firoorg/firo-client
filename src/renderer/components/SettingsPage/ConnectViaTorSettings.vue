@@ -8,12 +8,12 @@
         </span>
         <div class="control">
             <base-checkbox
-                v-model="connectViaTor"
+                v-model="connectedViaTor"
                 size="large"
                 color="green"
             >
                 <template slot-scope="{ isChecked }">
-                    {{ $t(`settings.form.privacy.label__connect-via-tor--${isChecked ? 'checked' : 'unchecked'}`) }}
+                    {{ $t(`settings.form.privacy.label__connect-via-tor--${isChecked ? 'enabled' : 'disabled'}`) }}
                 </template>
             </base-checkbox>
         </div>
@@ -21,13 +21,19 @@
 </template>
 
 <script>
+import types from '~/types'
+
+import { addVuexModel } from '@/utils/store'
+
 export default {
     name: 'ConnectViaTorSettings',
 
-    data () {
-        return {
-            connectViaTor: false
-        }
+    computed: {
+        ...addVuexModel({
+            name: 'connectedViaTor',
+            getter: 'Settings/isConnectedViaTor',
+            action: types.settings.SET_TORSETUP
+        })
     }
 }
 </script>
