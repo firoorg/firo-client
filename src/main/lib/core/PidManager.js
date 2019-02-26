@@ -129,7 +129,6 @@ export default class PidManager {
         if (await this.isRunning()) {
             logger.info('daemon is still running. no need to start it...')
             this.onStarted()
-            this.onStart()
             return
         }
 

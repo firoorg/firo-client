@@ -74,6 +74,7 @@ const beforeQuit = async function (event) {
 
     if (!(stopOnQuit && isRunning)) {
         logger.info('no need to wait for daemon to stop. quitting...')
+        network.close()
         store.dispatch('Window/close', 'waitForDaemonShutdown')
         //app.exit(0)
         return

@@ -346,23 +346,24 @@ const getters = {
             let { transactions: txs } = addr
 
             let confirmations = 0
+            let transactions = []
 
             if (txs.length) {
-                txs = txs
+                transactions = [...txs]
                     .map((tx) => addConfirmationsToTransaction(tx, currentBlockHeight))
-                    .sort((a, b) => a.firstSeenAt > b.firstSeenAt)
+                    .sort((a, b) => a.firstSeenAt - b.firstSeenAt)
 
-                confirmations = txs.reduce((accumulator, tx) => {
+                confirmations = transactions.reduce((accumulator, tx) => {
                     return (tx.confirmations > accumulator) ? tx.confirmations : accumulator
                 }, 0)
             }
 
-            const publicTxs = txs.filter((tx) => !['mined', 'spendIn'].includes(tx.category))
+            const publicTxs = transactions.filter((tx) => !['mined', 'spendIn'].includes(tx.category))
 
             return {
                 ...addr,
-                transactions: txs,
-                hasTransactions: !!txs.length,
+                transactions,
+                hasTransactions: !!transactions.length,
                 isReused: publicTxs.length > 1,
                 isConfirmed: confirmations >= 1,
                 confirmations
