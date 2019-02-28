@@ -7,7 +7,7 @@
 
         <ul>
             <li
-                v-for="(fee, key) in availableFeesWithAmount"
+                v-for="(amountInBaseCoin, key) in availableFeesWithAmount"
                 :key="key"
             >
                 <input
@@ -19,13 +19,13 @@
 
                 <label :for="key">
                     <span class="title">
-                        {{ fee.label }}
+                        {{ $t(`send.public.flyout-fee-selector.fees.${key}.title`) }}
                     </span>
                     <span class="desc">
-                        {{ fee.description }}
+                        {{ $t(`send.public.flyout-fee-selector.fees.${key}.description`) }}
                     </span>
                     <span class="amount">
-                        {{ fee.amountInBaseCoin }} xzc
+                        {{ amountInBaseCoin }} xzc
                     </span>
                 </label>
             </li>
@@ -70,15 +70,9 @@ export default {
             let fees = {}
 
             for (let key of Object.keys(this.availableFees)) {
-                const fee = this.availableFees[key]
-                const { amount } = fee
-
                 fees = {
                     ...fees,
-                    [key]: {
-                        ...fee,
-                        amountInBaseCoin: convertToCoin(amount)
-                    }
+                    [key]: convertToCoin(this.availableFees[key])
                 }
             }
 

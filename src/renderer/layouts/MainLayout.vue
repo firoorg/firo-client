@@ -12,6 +12,7 @@
                 <ConnectivityOverlay v-if="showConnectivityOverlay" />
                 <IntroScreen v-else-if="showIntro" />
                 <incoming-payment-request-overlay v-else-if="showIncomingPaymentRequest" />
+                <restarting-overlay v-else-if="showRestartingOverlay" />
             </transition>
 
             <NotificationCenter />
@@ -49,9 +50,10 @@ import types from '~/types'
 
 import Sidebar from '@/components/Sidebar'
 import NotificationCenter from '@/components/NotificationCenter'
-import ConnectivityOverlay from '@/components/ConnectivityOverlay'
+import ConnectivityOverlay from '@/components/Overlay/ConnectivityOverlay'
 import IntroScreen from '@/components/IntroScreen/IntroScreen'
-import IncomingPaymentRequestOverlay from '@/components/IncomingPaymentRequestOverlay'
+import IncomingPaymentRequestOverlay from '@/components/Overlay/IncomingPaymentRequestOverlay'
+import RestartingOverlay from '@/components/Overlay/RestartingOverlay'
 
 export default {
     name: 'MainLayout',
@@ -60,7 +62,8 @@ export default {
         Sidebar,
         NotificationCenter,
         ConnectivityOverlay,
-        IncomingPaymentRequestOverlay
+        IncomingPaymentRequestOverlay,
+        RestartingOverlay
     },
 
     data () {
@@ -86,11 +89,16 @@ export default {
             return this.hasOpenModal ||
                     this.hasOpenAppOverlay ||
                     this.showConnectivityOverlay ||
-                    this.showIntro
+                    this.showIntro ||
+                    this.showRestartingOverlay
         },
 
         showConnectivityOverlay () {
             return ((this.networkConnectionLost || this.networkConnectionError) && !this.isRestarting)
+        },
+
+        showRestartingOverlay () {
+            return this.isRestarting && !this.showIntro
         },
 
         showIntro () {
@@ -125,7 +133,7 @@ export default {
 
         &.has-overlay {
             .header,
-            .sidebar,
+            .aside,
             .main {
                 filter: blur(1rem);
                 transition: filter 1s linear;
@@ -178,12 +186,15 @@ export default {
 
         margin-bottom: $overlay--blur-offset-neg;
         padding-bottom: $overlay--blur-offset;
+
+        z-index: 1;
     }
 
     .aside {
         background-color: #D3DCE6;
         color: #333;
         text-align: center;
+        z-index: 2;
     }
 
     .main {
