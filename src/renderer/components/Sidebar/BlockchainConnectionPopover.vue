@@ -21,10 +21,10 @@
             </li>
             <li>
                 <span v-if="connectedViaTor">
-                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__connect-via-tor--enabled')" />
+                    <tick-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__is-connected-via-tor')" />
                 </span>
                 <span v-else>
-                    <cross-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__connect-via-tor--disabled')" />
+                    <cross-icon color="white" /> <span v-html="$t('navigation.flyout-connections.label__not-connected-via-tor')" />
                 </span>
             </li>
         </ul>

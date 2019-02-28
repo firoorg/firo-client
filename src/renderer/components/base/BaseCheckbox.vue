@@ -1,7 +1,7 @@
 <template>
     <label
         class="checkbox"
-        :class="[size, color]"
+        :class="[size, color, {'disabled': disabled, 'checked': checkable }]"
     >
         <div>
             <input
@@ -10,17 +10,9 @@
                 type="checkbox"
                 :disabled="disabled"
             >
-            <span
-                class="inner"
-                :disabled="disabled"
-                :checked="checkable"
-            />
+            <span class="inner" />
         </div>
-        <span
-            class="label"
-            :disabled="disabled"
-            :checked="checkable"
-        >
+        <span class="label">
             <slot
                 :is-checked="checkable"
                 :is-disabled="disabled"
@@ -76,6 +68,10 @@ export default {
     display: flex;
     line-height: 1;
     align-items: baseline;
+
+    &.disabled {
+        cursor: default;
+    }
 }
 
 .input {
@@ -115,19 +111,20 @@ export default {
     transform-origin: center;
 }
 
-.inner[checked] {
+.checked .inner {
     background-color: $color--comet-dark;
 }
 
-.inner[checked]:before {
+.checked .inner:before {
     transform: rotate(45deg) scaleY(1);
 }
-.inner[disabled] {
-    background-color: #eff2f7;
-    border-color: #d3dce6;
+.disabled .inner {
+    //background-color: #eff2f7;
+    //border-color: #d3dce6;
     cursor: not-allowed;
 }
-.inner[disabled][checked] {
+
+.disabled.checked .inner {
     background-color: #d3dce6;
     border-color: #d3dce6;
 }
@@ -136,6 +133,14 @@ export default {
     @include setType(3);
     @include font-regular();
     white-space: normal;
+
+    em, code {
+        @include font-heavy();
+    }
+
+    code {
+        @include font-monospace();
+    }
 }
 
 .checkbox.large {
@@ -159,8 +164,20 @@ export default {
 }
 
 .checkbox.green {
-    .inner[checked] {
+    &.checked .inner {
         background: $color--green;
+    }
+
+    &.disabled .label {
+        //opacity: 0.55;
+    }
+
+    &.checked.disabled .inner {
+        background: lighten(desaturate($color--green, 55%), 30%);
+
+        &:before {
+            border-color: rgba($color--white, 0.75);
+        }
     }
 }
 </style>

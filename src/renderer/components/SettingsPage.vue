@@ -3,7 +3,35 @@
         <div class="window-height">
             <div v-scrollable>
                 <div class="settings-page-inner">
-                    <h1>{{ $t('settings.overview.title') }}</h1>
+                    <h1>
+                        <base-popover
+                            trigger="manual"
+                            :open="showRestartDaemon"
+                            placement="right-start"
+                            popover-class="advice"
+                        >
+                            <div slot="content">
+                                <header>
+                                    <h2>{{ $t('settings.flyout-restart-required.title') }}</h2>
+                                </header>
+
+                                <p>{{ $t('settings.flyout-restart-required.description') }}</p>
+
+                                <footer>
+                                    <base-button
+                                        size="small"
+                                        color="green"
+                                        @click="restartDaemon"
+                                    >
+                                        {{ $t('settings.flyout-restart-required.button__restart-now') }}
+                                    </base-button>
+                                </footer>
+                            </div>
+                            <template slot="target">
+                                <span>{{ $t('settings.overview.title') }}</span>
+                            </template>
+                        </base-popover>
+                    </h1>
 
                     <section class="interface">
                         <h2>{{ $t('settings.form.interface.title') }}</h2>
@@ -29,6 +57,9 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+import types from '~/types'
+
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
 import ConnectViaTorSettings from '@/components/SettingsPage//ConnectViaTorSettings'
@@ -41,6 +72,23 @@ export default {
         ConnectViaTorSettings,
         LanguageSettings,
         BlockchainExplorerSettings
+    },
+
+    computed: {
+        ...mapGetters({
+            isDaemonRestartRequired: 'Settings/isDaemonRestartRequired',
+            isRestarting: 'App/isRestarting'
+        }),
+
+        showRestartDaemon () {
+            return this.isDaemonRestartRequired && !this.isRestarting
+        }
+    },
+
+    methods: {
+        ...mapActions({
+            restartDaemon: types.app.DAEMON_RESTART
+        }),
     }
 }
 </script>
@@ -52,7 +100,7 @@ export default {
     }
 
     .settings-page-inner {
-        padding: emRhythm(5) emRhythm(4);
+        padding: emRhythm(5) emRhythm(8) emRhythm(5) emRhythm(4);
     }
 
     .form {

@@ -124,6 +124,11 @@
     letter-spacing: -0.025em;
 }
 
+@mixin font-monospace () {
+    font-family: 'Overpass Mono';
+    font-weight: bold;
+}
+
 @mixin description ($description-width: emRhythm(40), $description-color: inherit) {
     max-width: $description-width;
     @include font-medium();

@@ -7,7 +7,8 @@ export const SET_LOCALE = 'SET_LOCALE'
 export const SET_AVAILABLE_LOCALES = 'SET_AVAILABLE_LOCALES'
 
 export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
-export const UPDATE_SETTING = 'UPDATE_SETTING' // todo check if required
+export const ON_SETTINGS_SUBSCRIPTION = 'ON_SETTINGS_SUBSCRIPTION'
+export const UPDATE_SETTING = 'UPDATE_SETTING'
 
 // daemon settings
 export const SET_DAEMON_SETTING = 'SET_DAEMON_SETTING'

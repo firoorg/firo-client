@@ -10,29 +10,26 @@ export default {
         namespace: 'Settings',
         collection: 'setting',
 
+        subscriptions: [
+            'setting'
+        ],
+
         mutations: {
             [types.settings.UPDATE_SETTING]: 'updateSetting'
         },
 
         updateSetting (data) {
             logger.info('updating setting', data)
-            const { name, value } = data
+
+            const { name, value, create } = data
+            const type = create ? 'create' : 'update'
 
             this.send({
-                type: 'update',
+                type,
                 data: {
-                    [name]: {
+                    [`-${name}`]: {
                         data: value
                     }
-                }
-            }, {
-                onSuccess: () => {
-                    console.log(arguments)
-                    logger.info('on success %o', arguments)
-                },
-                onError: () => {
-                    console.log(arguments)
-                    logger.info('on success %o', arguments)
                 }
             })
         }

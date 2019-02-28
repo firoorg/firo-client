@@ -367,6 +367,16 @@ send:
         Transaktionen mit höheren Gebühren schneller abgewickelt als solche mit
         niedrigeren Gebühren.
       title: Gebühr auswählen
+      fees:
+        fast:
+          title: Schnell
+          description: Trink einen Kaffee
+        medium:
+          title: Durchschnittlich
+          description: Mach einen Spaziergang
+        slow:
+          title: Langsam
+          description: Schlaf eine Nacht
     flyout-pending-payment-queue:
       description: >-
         Diese Zahlungen sind derzeit in der Warteschlange. Wenn du die alle
@@ -417,8 +427,8 @@ settings:
       description__connect-via-tor: ''
       description__hold-in-zerocoin: ''
       label__connect-via-tor: ''
-      label__connect-via-tor--enabled: 'Ja, alle Verbindungen über das Tor-Netzwerk machen'
-      label__connect-via-tor--disabled: 'Nein, regulär mit anderen Nodes verbinden'
+      label__connect-via-tor--checked: 'Ja, alle Verbindungen über das Tor-Netzwerk machen'
+      label__connect-via-tor--unchecked: 'Nein, regulär mit anderen Nodes verbinden'
       label__hold-in-zerocoin: Verhältnis zwischen anonymen und öffentlichen Coins
       label__hold-in-zerocoin--private: Anonym
       label__hold-in-zerocoin--public: Öffentlich

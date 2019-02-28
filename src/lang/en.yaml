@@ -45,8 +45,8 @@ navigation:
   flyout-connections:
     title: Zcoin Network
     label__connections: "{0} Connections established"
-    label__connect-via-tor--enabled: "Connected via <strong>Tor</strong>"
-    label__connect-via-tor--disabled: "Connecting via <strong>Tor</strong> disabled"
+    label__is-connected-via-tor: "Connected via <strong>Tor</strong>"
+    label__not-connected-via-tor: "Connection via <strong>Tor</strong> disabled"
     label__dandelion: "<strong>Dandelion++</strong> activated"
     description__not-connected: Currently not connected to the network
   flyout-blockchain-sync-progress:
@@ -255,6 +255,16 @@ send:
     flyout-fee-selector:
       title: Select Fee
       description: Change transaction fee. When the network is congested, transactions with higher fees will be processed faster than those with lower fees.
+      fees:
+        fast:
+          title: Fast
+          description: have a coffee
+        medium:
+          title: Medium
+          description: take a long walk
+        slow:
+          title: Slow
+          description: sleep over it
       button__select-fee--primary: Select fee
 
     flyout-unlock-client:
@@ -311,6 +321,10 @@ znodes:
 settings:
   overview:
     title: Settings
+  flyout-restart-required:
+    title: Daemon restart required
+    description: Restart of the daemon is required to activate your changes.
+    button__restart-now: Restart now
   form:
     interface:
       title: Interface
@@ -323,8 +337,9 @@ settings:
       title: Privacy
       label__connect-via-tor: Connect via Tor
       description__connect-via-tor: Purus Ullamcorper Fermentum.
-      label__connect-via-tor--enabled: Yes, connections to other Nodes in the Zcoin Network are established via Tor
-      label__connect-via-tor--disabled: No, connecting directly to other nodes in the Zcoin Network
+      label__connect-via-tor--disabled: Tor connection can not be changed here as is defined via {value} in {configFile}
+      label__connect-via-tor--checked: Yes, connections to other Nodes in the Zcoin Network are established via Tor
+      label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Zcoin Network
       label__hold-in-zerocoin: Ratio between private and public funds
       description__hold-in-zerocoin: Purus Ullamcorper Fermentum.
       label__hold-in-zerocoin--private: Private
