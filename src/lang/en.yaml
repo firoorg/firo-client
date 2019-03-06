@@ -107,6 +107,7 @@ mint:
     description: Anonymize coins now to privately send them later
     stats:
       available-zcoin-balance: available to anonymize
+      balance-in-progress: in progress
       zerocoin-balance: already anonymized
 
   detail-process-mint:

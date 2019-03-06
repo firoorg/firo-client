@@ -1,6 +1,9 @@
 <template>
     <div class="mint-stats">
-        <notice class="stats-wrap">
+        <notice
+            class="stats-wrap"
+            :class="{ 'in-progress': isInProgress }"
+        >
             <div class="stats">
                 <div class="stat">
                     <div class="value">
@@ -10,6 +13,19 @@
                         {{ $t('mint.overview.stats.available-zcoin-balance') }}
                     </div>
                 </div>
+
+                <div
+                    v-if="isInProgress"
+                    class="stat"
+                >
+                    <div class="value">
+                        {{ inProgress }} <span>xzc</span>
+                    </div>
+                    <div class="des">
+                        {{ $t('mint.overview.stats.balance-in-progress') }}
+                    </div>
+                </div>
+
                 <div class="stat">
                     <div class="value">
                         {{ alreadyMinted }} <span>xzc</span>
@@ -37,13 +53,26 @@ export default {
     computed: {
         ...mapGetters({
             availableXzc: 'Balance/availableXzc',
-            availableZerocoin: 'Balance/availableZerocoin'
+            availableZerocoin: 'Balance/availableZerocoin',
+            mintsInProgress: 'Mint/mintsInProgress'
         }),
 
-        availableZcoin() {
+        availableZcoin () {
             const available = convertToCoin(this.availableXzc)
 
             return available.replace(/\.\d+/, '')
+        },
+
+        isInProgress () {
+            return !!this.mintsInProgress.length
+        },
+
+        inProgress () {
+            const value = this.mintsInProgress.reduce((accumulator, { amount }) => {
+                return accumulator + amount
+            }, 0)
+
+            return convertToCoin(value).replace(/\.\d+/, '')
         },
 
         alreadyMinted () {
@@ -65,6 +94,10 @@ export default {
 
     .stats-wrap {
         width: 60%;
+
+        &.in-progress {
+            width: 80%;
+        }
     }
 
     .stats {
