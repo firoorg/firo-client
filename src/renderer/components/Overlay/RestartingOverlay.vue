@@ -13,10 +13,10 @@
                         <!--
                         <h1>{{ $t('overlay.error.connection-lost.title') }}</h1>
                         -->
-                        <h2>Restarting Daemon</h2>
+                        <h2>{{ $t('overlay.restarting.title') }}</h2>
                     </header>
 
-                    <p>Restarting daemon to apply your settings</p>
+                    <p>{{ $t('overlay.restarting.description') }}</p>
                 </div>
             </main>
         </div>

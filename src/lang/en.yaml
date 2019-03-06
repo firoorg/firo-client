@@ -490,6 +490,10 @@ overlay:
     button__make-payment--primary: Pay now
     button__cancel--secondary: Cancel
 
+  restarting:
+    title: Restarting Daemon
+    description: Restarting daemon to apply your settings update
+
   error:
     connection-lost:
       title: Connection to the<br>Zcoin Deamon lost
