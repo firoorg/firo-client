@@ -18,27 +18,15 @@ const state = {
 
     selectedFee: 'fast',
     availableFees: {
-        fast: {
-            label: 'Fast',
-            description: 'have a coffee',
-            amount: 100000
-        },
-        medium: {
-            label: 'Medium',
-            description: 'take a long walk',
-            amount: 50000
-        },
-        slow: {
-            label: 'Slow',
-            description: 'sleep over it',
-            amount: 10000
-        }
+        fast: 1000,
+        medium: 500,
+        slow: 100
     },
     addPaymentForm: {
         amount: null,
         label: '',
         address: '',
-        totalTxFee: 100000
+        totalTxFee: 1000
     }
 }
 
