@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { convertToCoin } from '#/lib/convert'
 
 import types from '~/types'
@@ -152,6 +152,10 @@ export default {
     },
 
     computed: {
+        ...mapGetters({
+            getLastSeen: 'PaymentRequest/paymentRequestLastSeen'
+        }),
+
         qrCodeIsVisible () {
             return !this.received && this.showQrCode
         },
@@ -170,14 +174,25 @@ export default {
             }
 
             return this.address.total.balance >= this.amount
+        },
+
+        lastSeen () {
+            if (this.address) {
+                return this.getLastSeen(this.address.address || this.address)
+            }
+
+            return 0
         }
     },
 
     beforeDestroy () {
         if (this.address) {
-            this.setLastSeen(this.address.address || this.address)
+            this.setLastSeen({
+                id: this.address.address || this.address
+            })
         }
     },
+
     methods: {
         ...mapActions({
             setLastSeen: types.paymentrequest.SET_PAYMENT_REQUEST_LAST_SEEN,

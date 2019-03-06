@@ -7,7 +7,7 @@ import { createLogger } from '#/lib/logger'
 import { getId } from '~/utils/index'
 
 const logger = createLogger('zcoin:store:address')
-const lastSeen = LastSeen.module('transaction')
+const lastSeen = LastSeen.module('transaction', 'address')
 
 const WALLET_ADDRESS_KEY = 'walletAddresses'
 const THIRD_PARTY_ADDRESS_KEY = 'thirdPartyAddresses'

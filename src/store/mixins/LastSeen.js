@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { getName, getTypeName } from '~/utils'
+import { getAppSettings } from '#/lib/utils'
 
 const tn = getTypeName
 
@@ -7,36 +8,55 @@ const types = function (namespace) {
     const { NAME } = getName(namespace)
 
     return {
-        [tn(`SET ${NAME} LAST SEEN`)]: tn(`SET ${NAME} LAST SEEN`)
+        [tn(`SET ${NAME} LAST SEEN`)]: tn(`SET ${NAME} LAST SEEN`),
+        [tn(`SET ALL ${NAME} LAST SEEN`)]: tn(`SET ALL ${NAME} LAST SEEN`)
     }
 }
 
-const module = function (namespace = '') {
+const module = function (namespace = '', moduleName = '') {
     const { name, NAME } = getName(namespace)
+    const stateKey = `${name}LastSeen`
+    const actionName = tn(`SET ${NAME} LAST SEEN`)
+    const actionNameAll = tn(`SET_ALL ${NAME} LAST SEEN`)
 
     return {
         state: {
-            [`${name}LastSeen`]: {}
+            [stateKey]: {}
         },
 
         mutations: {
-            [tn(`SET ${NAME} LAST SEEN`)] (state, id) {
-                if (!state[`${name}LastSeen`]) {
-                    Vue.set(state, `${name}LastSeen`, {})
-                }
-
-                Vue.set(state[`${name}LastSeen`], id, Date.now())
+            [actionName] (state, { id, timestamp }) {
+                Vue.set(state, stateKey, {
+                    ...state[stateKey],
+                    [id]: timestamp
+                })
             }
         },
 
         actions: {
-            [tn(`SET ${NAME} LAST SEEN`)] ({ commit }, id) {
-                commit(tn(`SET ${NAME} LAST SEEN`), id)
+            [actionNameAll] ({ commit }, allLastSeen) {
+                console.log('last seen pairs', allLastSeen)
+                const pairs = Object.entries(allLastSeen)
+
+                pairs.forEach(([ id, timestamp ]) => {
+                    console.log('committing', { id, timestamp })
+
+                    commit(actionName, { id, timestamp })
+                })
+            },
+
+            [actionName] ({ commit, state }, { id, timestamp }) {
+                commit(actionName, {
+                    id,
+                    timestamp: timestamp || Date.now()
+                })
+
+                getAppSettings().set(`${(moduleName || name).toLowerCase()}.${actionNameAll}`, state[stateKey])
             }
         },
 
         getters: {
-            [`${name}LastSeen`]: (state) => (id) => state[`${name}LastSeen`][id] || null
+            [stateKey]: (state) => (id) => state[stateKey][id] || null
         }
     }
 }
