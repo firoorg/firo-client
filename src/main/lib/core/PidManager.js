@@ -206,6 +206,7 @@ export default class PidManager {
 
     getArguments () {
         return [
+            '-clientapi=1',
             ...this.getDataDirArgument()
         ]
     }
