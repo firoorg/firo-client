@@ -68,9 +68,10 @@ export default {
 
         li {
             padding-top: emRhythm(1);
+            padding-bottom: emRhythm(1);
             @include rhythmBorderTop(1px, 1);
             border-color: rgba($color--white, 0.3);
-            border-bottom-style: dashed;
+            border-top-style: dashed;
             @include font-medium();
 
             display: grid;

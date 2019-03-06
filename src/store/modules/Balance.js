@@ -89,7 +89,7 @@ const getters = {
             return accumulator + state.zerocoin[key]
         }, 0)
 
-        return zerocoin / state.xzc.confirmed
+        return zerocoin / state.total.available
     }
 }
 

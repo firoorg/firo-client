@@ -64,8 +64,7 @@ export default {
 
     //.wrap
     .address {
-        font-family: 'Overpass Mono';
-        font-weight: bold;
+        @include font-monospace();
         font-size: 3.65vw;
     }
 

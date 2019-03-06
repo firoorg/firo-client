@@ -146,7 +146,7 @@ app.on('window-all-closed', (event) => {
 
 app.on('before-quit', async (event) => {
     logger.info('application before quit')
-    beforeQuit(event)
+    await beforeQuit(event)
 })
 
 app.on('will-quit', (event) => {

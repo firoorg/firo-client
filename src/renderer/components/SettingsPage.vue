@@ -19,7 +19,6 @@
 
                                 <footer>
                                     <base-button
-                                        size="small"
                                         color="green"
                                         @click="restartDaemon"
                                     >
