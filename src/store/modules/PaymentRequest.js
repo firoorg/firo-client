@@ -187,6 +187,7 @@ const getters = {
             let isFulfilled = false
             let isIncoming = false
             let isReused = false
+            let lastSeen = getters.paymentRequestLastSeen(key) || createdAt
 
             let amountToDisplay = amountRequested
 
@@ -227,7 +228,9 @@ const getters = {
                 isIncoming,
                 isReused,
                 transactionsReceived,
-                updatedAt
+                updatedAt,
+                lastSeen,
+                isUnseen: lastSeen < updatedAt
             })
         }
 
@@ -311,6 +314,23 @@ const getters = {
         })
 
         return paymentRequests
+    },
+
+    allPaymentRequests (state, getters) {
+        return [
+            ...getters.paymentRequests,
+            ...getters.virtualPaymentRequests
+        ]
+    },
+
+    hasUnseenPaymentRequests (state, getters) {
+        return !!getters.paymentRequestsWithUnseenChanges.length
+    },
+
+    paymentRequestsWithUnseenChanges (state, getters) {
+        return getters.allPaymentRequests.filter(({ isUnseen }) => {
+            return isUnseen
+        })
     }
 }
 

@@ -61,13 +61,17 @@ export default {
 
     methods: {
         pushRouterWithFilter (data) {
-            this.$router.push({
+            this.$router.push(this.getRouterWithFilter(data))
+        },
+
+        getRouterWithFilter (data) {
+            return {
                 ...data,
                 query: {
                     ...data.query,
                     filter: this.urlFilter
                 }
-            })
+            }
         }
     }
 

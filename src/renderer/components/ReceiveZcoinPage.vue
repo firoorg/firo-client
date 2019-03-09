@@ -5,9 +5,9 @@
                 v-scrollable
                 class="paymentrequest-list"
             >
-                <h1 v-html="$t('receive.overview.title')" />
+                <div class="section-header">
+                    <h1 v-html="$t('receive.overview.title')" />
 
-                <div class="table-filter-input-wrap">
                     <base-filter-input
                         v-model="urlFilter"
                         type="text"
@@ -15,6 +15,32 @@
                         :placeholder="$t('receive.overview.table__payment-requests.placeholder__filter')"
                     />
                 </div>
+
+                <notice
+                    v-if="hasUnseenPaymentRequests"
+                    class="has-unseen-changes"
+                >
+                    <header>
+                        <h3>
+                            {{ $tc('receive.overview.notice__unseen-payments.title', paymentRequestsWithUnseenChanges.length) }}
+                        </h3>
+                    </header>
+
+                    <main>
+                        <p v-html="$tc('receive.overview.notice__unseen-payments.description', paymentRequestsWithUnseenChanges.length, { count: paymentRequestsWithUnseenChanges.length })" />
+
+                        <ul>
+                            <li
+                                v-for="f of paymentRequestsWithUnseenChanges"
+                                :key="f.id"
+                            >
+                                <router-link :to="getDetailRouteForAddress(f.address)">
+                                    {{ f.label }}
+                                </router-link>
+                            </li>
+                        </ul>
+                    </main>
+                </notice>
 
                 <animated-table
                     :data="filteredPaymentRequests"
@@ -87,6 +113,7 @@ import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
 import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
 import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
 import OnboardingNotice from '@/components/Notification/OnboardingNotice'
+import Notice from '@/components/Notification/Notice'
 
 const tableFields = [
     {
@@ -128,6 +155,7 @@ export default {
     name: 'ReceiveZcoinPage',
     components: {
         OnboardingNotice,
+        Notice,
         AnimatedTable
     },
 
@@ -137,8 +165,8 @@ export default {
 
     data () {
         return {
-            tableFields,
-            selectedPaymentRequest: null
+            tableFields
+            //selectedPaymentRequest: null
         }
     },
 
@@ -146,8 +174,15 @@ export default {
         ...mapGetters({
             paymentRequests: 'PaymentRequest/paymentRequests',
             virtualPaymentRequests: 'PaymentRequest/virtualPaymentRequests',
+            allPaymentRequests: 'PaymentRequest/allPaymentRequests',
+            hasUnseenPaymentRequests: 'PaymentRequest/hasUnseenPaymentRequests',
+            paymentRequestsWithUnseenChanges: 'PaymentRequest/paymentRequestsWithUnseenChanges',
             walletAddresses: 'Address/walletAddresses'
         }),
+
+        selectedPaymentRequest () {
+            return this.$route.params.address
+        },
 
         selectedPaymentRequestWithAddress () {
             if (!this.selectedPaymentRequest) {
@@ -168,13 +203,6 @@ export default {
                 ...paymentRequest,
                 address
             }
-        },
-
-        allPaymentRequests () {
-            return [
-                ...this.paymentRequests,
-                ...this.virtualPaymentRequests
-            ]
         },
 
         filteredPaymentRequests () {
@@ -201,22 +229,20 @@ export default {
 
     methods: {
         onRouteToDetail ({ address }) {
-            this.selectedPaymentRequest = address
-
             this.pushRouterWithFilter({
                 name: 'receive-zcoin-paymentrequest',
                 params: {
-                    address: this.selectedPaymentRequest
+                    address
                 }
             })
         },
+
         onTableRowSelect (rowData, index, event) {
             // todo get paymentRequest from store
             const { address } = rowData
 
             // remove selection
             if (this.selectedPaymentRequest === address || this.selectedPaymentRequest === address) {
-                this.selectedPaymentRequest = null
 
                 this.pushRouterWithFilter({
                     name: 'receive-zcoin'
@@ -224,12 +250,19 @@ export default {
                 return
             }
 
-            this.selectedPaymentRequest = address
-
             this.pushRouterWithFilter({
                 name: 'receive-zcoin-paymentrequest',
                 params: {
-                    address: this.selectedPaymentRequest
+                    address
+                }
+            })
+        },
+
+        getDetailRouteForAddress (address) {
+            return this.getRouterWithFilter({
+                name: 'receive-zcoin-paymentrequest',
+                params: {
+                    address
                 }
             })
         }
@@ -243,6 +276,17 @@ export default {
         box-sizing: border-box;
         grid-template-columns: 1fr 30rem;
         //grid-column-gap: emRhythm($scrollbar-padding, $silent: true);
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: emRhythm(7);
+
+            h1 {
+                margin-bottom: 0;
+            }
+        }
     }
 
     .paymentrequest-list,
@@ -282,9 +326,27 @@ export default {
         text-align: right;
         margin-top: emRhythm(3) * -1;
         margin-bottom: emRhythm(5);
+    }
 
-        .table-filter-input {
-            width: 45%;
+    .table-filter-input {
+        width: 45%;
+    }
+
+    .has-unseen-changes {
+        //border: 1px solid $color--green;
+        //@include glow-huge-box($color--green-dark);
+        background: $color--green;
+        color: $color--white;
+        padding: emRhythm(1) emRhythm(4) emRhythm(2);
+        margin: 0 0 emRhythm(4);
+
+        header {
+            font-style: normal;
+        }
+
+        a {
+            color: $color--white;
+            @include font-medium();
         }
     }
 </style>

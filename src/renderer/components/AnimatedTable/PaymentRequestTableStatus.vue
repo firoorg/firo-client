@@ -7,8 +7,13 @@
     />
     <td
         v-else
-        class="vuetable-td-component-relative-date"
+        class="vuetable-td-component-payment-request-status"
     >
+        <div
+            v-show="isUnseen"
+            class="unseen-indicator"
+        />
+
         <payment-request-status
             :key="rowData.id"
             :is-fulfilled="isFulfilled"
@@ -43,6 +48,11 @@ export default {
 
         isReused () {
             return this.rowData[this.rowField.isReusedKey || 'isReused']
+        },
+
+        isUnseen () {
+            console.log(this.rowData['isUnseen'])
+            return !!this.rowData[this.rowField.isUnseenKey || 'isUnseen']
         }
     }
 }
@@ -58,5 +68,18 @@ export default {
     .icon {
         width: emRhythm(2);
         margin-right: emRhythm(1);
+    }
+
+    .unseen-indicator {
+        $rad: 0.125rem;
+        $width: 0.375rem;
+
+        background: $gradient--green-bright--diagonal;
+        height: 100%;
+        width: $width;
+        top: 0;
+        left: $width * -1;
+        position: absolute;
+        border-radius: $rad 0 0 $rad;
     }
 </style>

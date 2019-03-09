@@ -63,6 +63,9 @@ receive:
   overview:
     title: Receive</br>Zcoin
     # description
+    notice__unseen-payments:
+      title: Unseen Payment | Unseen Payments
+      description: The following <em>Payment Request</em> received some coins while you were away. | The following {count} <em>Payment Requests</em> received some coins while you were away.
     table__payment-requests:
       label__amount: Amount
       label__created: Created
