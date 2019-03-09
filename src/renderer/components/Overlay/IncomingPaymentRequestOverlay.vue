@@ -121,10 +121,11 @@ export default {
 
             this.$log.debug(`going to payment detail %o`, tx)
 
-            const { id } = tx
+            const { id, isPrivate } = tx
+            const payment = isPrivate ? 'private' : 'public'
 
             this.$router.push({
-                name: 'outgoing-payment',
+                name: `${payment}-payment`,
                 params: {
                     id
                 }
