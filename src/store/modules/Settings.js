@@ -13,11 +13,13 @@ import { createLogger } from '#/lib/logger'
 const logger = createLogger('zcoin:store:settings')
 
 const setDaemonSettings = function ({ state, commit, getters }, data) {
+    const { settings, isUpdate } = data
+
+
     state.daemonSettingNames.forEach((key) => {
         const daemonSettingName = `-${key}`
         const actionName = `SET_${key.toUpperCase()}`
 
-        const { settings, isUpdate } = data
 
         if (!settings[daemonSettingName]) {
             return
@@ -114,10 +116,8 @@ const actions = {
             return
         }
 
-        const { daemon } = initialState
-
         setDaemonSettings({ state, commit, getters }, {
-            settings: daemon,
+            settings: initialState,
             isUpdate: false
         })
     },
@@ -127,10 +127,9 @@ const actions = {
             return
         }
 
-        const { daemon } = data
 
         setDaemonSettings({ state, commit, getters }, {
-            settings: daemon,
+            settings: data,
             isUpdate: true
         })
     },
@@ -322,7 +321,7 @@ const getters = {
         return process.env.LOCALE || state.locales.current || fallbackLocale
     },
     getDaemonSetting: (state) => {
-        return (name) => state.daemonSettings[name] ? state.daemonSettings[name] : null
+        return (name) => state.daemonSettings[name] ? state.daemonSettings[name] : undefined
     },
     getDaemonSettingValue: (state) => {
         return (name) => state.daemonSettings[name] ? state.daemonSettings[name].data : undefined
