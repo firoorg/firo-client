@@ -23,7 +23,7 @@ const state = {
         address: null
     },
     denominationTypes: [1, 10, 25, 50, 100],
-    maxAmountOfMintInputsPerTx: 2
+    maxAmountOfMintInputsPerTx: 10
 }
 
 const mutations = {
