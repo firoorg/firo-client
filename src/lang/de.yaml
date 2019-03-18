@@ -212,7 +212,7 @@ overlay:
       description: >-
         Der Client hat seine Verbindung zum Zcoin Daemon verloren. Bitte starte
         den Client neu.
-      title: Verbindung zum <br> Zcoin Deamon verloren
+      title: Verbindung zum <br> Zcoin Daemon verloren
   incoming-payment-request:
     button__cancel--secondary: Abbrechen
     button__make-payment--primary: Jetzt senden
