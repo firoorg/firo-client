@@ -16,10 +16,11 @@ export const convertToCoin = function (satoshi) {
     }
 
     try {
+        Big.NE = -9; // Never truncate the satoshis place.
         return new Big(satoshi)
             .times(satoshiBase)
             .div(coinBase)
-            .toFixed(8)
+            .toString()
     } catch (e) {
         return ''
     }
