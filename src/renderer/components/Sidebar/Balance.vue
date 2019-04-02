@@ -9,9 +9,15 @@
             {{ $t('navigation.balance.title') }}
             <span />
         </div>
-        <span class="amount">
-            {{ convertToCoin(availableTotal) }}
-        </span>
+        <div class="amount">
+            <div class="confirmed-total">
+                {{ convertToCoin(availableTotal) }}
+            </div>
+
+            <div v-if="unconfirmedTotal > 0" class="unconfirmed-total" >
+                ({{ convertToCoin(unconfirmedTotal) }} unconfirmed)
+            </div>
+        </div>
     </section>
 </template>
 
@@ -24,7 +30,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            availableTotal: 'Balance/availableTotal'
+            availableTotal: 'Balance/availableTotal',
+            unconfirmedTotal: 'Balance/unconfirmedTotal'
         }),
     },
 
@@ -39,6 +46,11 @@ export default {
     .amount {
         display: block;
         @include setType(3);
+    }
+
+    .unconfirmed-total {
+        font-size-adjust: -80%;
+        color: lightsalmon;
     }
 
     .balance {
