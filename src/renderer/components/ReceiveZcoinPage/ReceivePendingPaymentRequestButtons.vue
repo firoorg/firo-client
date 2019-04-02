@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="receive-pending-payment-request-buttons">
         <timed-tooltip
             :is-open="showCopySuccess"
             popover-class="green"
@@ -20,9 +20,9 @@
                 >
                     <base-button
                         v-bind="button"
-                        @click="copyUri"
+                        @click="copyAddress"
                     >
-                        {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
+                        {{ $t('receive.detail-entry-request.pending.button__copy-address--secondary') }}
                     </base-button>
                 </template>
                 <template slot="flyout">
@@ -32,9 +32,9 @@
                                 <a
                                     v-close-popover
                                     href="#"
-                                    @click.prevent="copyAddress"
+                                    @click.prevent="copyUri"
                                 >
-                                    {{ $t('receive.detail-entry-request.pending.button__copy-address--secondary') }}
+                                    {{ $t('receive.detail-entry-request.pending.button__copy-link--secondary') }}
                                 </a>
                             </li>
                         </ul>
@@ -175,6 +175,9 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+    .receive-pending-payment-request-buttons {
+        // Without this directive, the buttons will be too large and will be displayed on two lines.
+        font-size: 0.9em;
+    }
 </style>
