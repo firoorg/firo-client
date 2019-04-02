@@ -180,6 +180,17 @@ const actions = {
                         dispatch(types.ADD_MINED_FROM_TX, tx)
                         break
 
+                    case 'orphan':
+                        if (!state[WALLET_ADDRESS_KEY][addressKey]) {
+                            dispatch(types.ADD_WALLET_ADDRESS, {
+                                address: addressKey,
+                                total: {balance: 0}
+                            })
+                        }
+
+                        dispatch(types.UPDATE_ORPHAN_TX, tx)
+                        break
+
                     default:
                         logger.warn('UNHANDLED ADDRESS CATEGORY %s %O', category, tx)
                         break
@@ -310,6 +321,17 @@ const actions = {
         dispatch(types.SET_INITIAL_STATE, payload)
     },
 
+    [types.UPDATE_ORPHAN_TX] ({ commit }, orphanTx) {
+        const txBasics = getTxBasics(orphanTx)
+        const { address, amount } = orphanTx
+
+        commit(types.ADD_TRANSACTION, {
+            stack: WALLET_ADDRESS_KEY,
+            address,
+            transaction: txBasics
+        })
+    },
+
     [types.UPDATE_TX_LABEL] ({ commit, getters }, { id, label }) {
         const tx = getters.getOutgoingTransactionById(id)
 
@@ -352,6 +374,7 @@ const getters = {
                 transactions = [...txs]
                     .map((tx) => addConfirmationsToTransaction(tx, currentBlockHeight))
                     .sort((a, b) => a.firstSeenAt - b.firstSeenAt)
+                    .filter( (tx) => tx.category !== 'orphan' )
 
                 confirmations = transactions.reduce((accumulator, tx) => {
                     return (tx.confirmations > accumulator) ? tx.confirmations : accumulator

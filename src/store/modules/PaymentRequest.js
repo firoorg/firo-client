@@ -263,7 +263,7 @@ const getters = {
         let paymentRequests = []
 
         walletAddresses.forEach((walletAddress) => {
-            const { address, transactions, total, isReused } = walletAddress
+            const { address, transactions, isReused } = walletAddress
 
             if (!transactions.length) {
                 return
@@ -287,6 +287,8 @@ const getters = {
                 return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
             }, createdAt)
 
+            const amountReceived = transactions.reduce((a, tx) => a + tx.amount, 0)
+
             const request = {
                 address,
                 isFulfilled,
@@ -294,7 +296,7 @@ const getters = {
                 isIncoming: !isFulfilled,
                 isVirtual: true,
                 transactionsReceived: true,
-                amountReceived: total.balance,
+                amountReceived,
                 amountRequested: null,
                 message: null,
                 createdAt,
