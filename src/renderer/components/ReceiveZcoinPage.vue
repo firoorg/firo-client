@@ -111,7 +111,7 @@ import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import PaymentRequestTableStatus from '@/components/AnimatedTable/PaymentRequestTableStatus'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
 import LabelWithHashTags from '@/components/AnimatedTable/AnimatedTableLabelWithHashTags'
-import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
+import ReceivedAmount from '@/components/AnimatedTable/AnimatedTableReceivedAmount'
 import OnboardingNotice from '@/components/Notification/OnboardingNotice'
 import Notice from '@/components/Notification/Notice'
 
@@ -136,9 +136,9 @@ const tableFields = [
         width: '50%'
     },
     {
-        name: Amount,
+        name: ReceivedAmount,
         title: 'receive.overview.table__payment-requests.label__amount',
-        sortField: 'amount',
+        sortField: 'amountReceived',
         width: '25%'
     }
     /*,

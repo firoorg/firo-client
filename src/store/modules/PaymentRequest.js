@@ -177,7 +177,7 @@ const getters = {
         const walletAddresses = rootGetters['Address/walletAddresses']
 
         for (let key in state.paymentRequests) {
-            const { amount: amountRequested = 0, label } = state.paymentRequests[key]
+            const { amount: amountRequested, label } = state.paymentRequests[key]
             const address = walletAddresses.find((addr) => addr.address === key)
 
             const { createdAt } = state.paymentRequests[key]
@@ -189,7 +189,7 @@ const getters = {
             let isReused = false
             let lastSeen = getters.paymentRequestLastSeen(key) || createdAt
 
-            let amountToDisplay = amountRequested
+            let amountReceived = 0
 
             // address found in wallet addresses. validating status
             if (address) {
@@ -201,7 +201,7 @@ const getters = {
                 if (transactionsReceived) {
                     isIncoming = true
 
-                    const received = transactions.reduce((accumulator, tx) => {
+                    amountReceived = transactions.reduce((accumulator, tx) => {
                         if (!tx.block) {
                             return accumulator
                         }
@@ -209,10 +209,9 @@ const getters = {
                         return accumulator + tx.amount
                     }, 0)
 
-                    if (received && received >= amountRequested) {
+                    if (amountReceived && amountReceived >= amountRequested) {
                         isIncoming = false
                         isFulfilled = true
-                        amountToDisplay = received
                     }
 
                     updatedAt = transactions.reduce((accumulator, tx) => {
@@ -223,7 +222,8 @@ const getters = {
 
             requests.push({
                 ...state.paymentRequests[key],
-                amount: amountToDisplay,
+                amountRequested,
+                amountReceived,
                 isFulfilled,
                 isIncoming,
                 isReused,
@@ -294,7 +294,8 @@ const getters = {
                 isIncoming: !isFulfilled,
                 isVirtual: true,
                 transactionsReceived: true,
-                amount: total.balance,
+                amountReceived: total.balance,
+                amountRequested: null,
                 message: null,
                 createdAt,
                 updatedAt

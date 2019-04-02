@@ -35,7 +35,7 @@ import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
 
 import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
-import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
+import OutgoingAmount from '@/components/AnimatedTable/AnimatedTableOutgoingAmount'
 import OutgoingPaymentTableStatus from '@/components/AnimatedTable/OutgoingPaymentTableStatus'
 import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 
@@ -59,7 +59,7 @@ const tableFields = [
         sortField: 'label'
     },
     {
-        name: Amount,
+        name: OutgoingAmount,
         title: 'send.table__outgoing-payments.label__amount',
         sortField: 'amount',
         width: '20%'
