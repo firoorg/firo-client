@@ -11,11 +11,7 @@
                 :current-mints="denominations"
                 :show-progress="false"
             >
-                <validate-address-button
-                    :address="spendFormAddress"
-                    :label="spendFormLabel"
-                    :amount="costs"
-                />
+                {{ spendFormAddress }}
             </current-mints>
             <fees-and-amount
                 :amount="spendFormMintCostsInSatoshi"
@@ -32,13 +28,11 @@ import { convertToCoin } from '#/lib/convert'
 
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
 import CurrentMints from '@/components/payments/CurrentMints'
-import ValidateAddressButton from '@/components/payments/ValidateAddressButton'
 
 export default {
     name: 'SpendZerocoinStepConfirm',
 
     components: {
-        ValidateAddressButton,
         CurrentMints,
         FeesAndAmount
     },

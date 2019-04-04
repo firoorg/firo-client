@@ -1,39 +1,27 @@
 <template>
-    <ul
+    <div
         class="payments"
         :class="{ 'show-validate': showValidate }"
     >
-        <li
+        <div
             v-for="(value, key) in payments"
             :key="key"
         >
-            <div class="label">
+            <div class="addr-info">
                 <!--<slot v-bind="value" />-->
-                {{ value.label }}
-            </div>
-            <div class="validate">
-                <validate-address-button
-                    v-if="showValidate"
-                    :address="value.address"
-                    :label="value.label"
-                    :amount="value.amountAsBaseCoin"
-                />
+                <div class="label">{{ value.label }}</div>
+                <div class="address">{{ value.address }}</div>
             </div>
             <div class="amount">
-                {{ value.amountAsBaseCoin }} <span class="unit">
-                    xzc
-                </span>
+                {{ value.amountAsBaseCoin }} <span class="unit">XZC</span>
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
 </template>
 
 <script>
-import ValidateAddressButton from '@/components/payments/ValidateAddressButton'
-
 export default {
     name: 'PendingPayments',
-    components: {ValidateAddressButton},
     props: {
         showValidate: {
             type: Boolean,
@@ -57,48 +45,21 @@ export default {
         @include rhythmBorderBottom(1px, 1);
         margin: 0;
 
-        &.show-validate li {
-            grid-template-areas: "label label"
-                                 "validate amount";
-
+        .addr-info {
             .label {
-                grid-area: label;
-                margin-bottom: emRhythm(0.5, $silent: true);
-
+                display: inline-block;
+                margin-right: 1em;
             }
 
-            .validate {
-                grid-area: validate;
-            }
-
-            .amount {
-                grid-area: amount;
+            .address {
+                display: inline-block;
+                float: right;
+                font-style: italic;
             }
         }
 
-        li {
-            padding-top: emRhythm(1);
-            @include rhythmBorderBottom(1px, 1);
-            border-color: rgba($color--white, 0.3);
-            border-bottom-style: dashed;
-            @include font-medium();
-
-            display: grid;
-            grid-template-columns: auto auto;
-
-            &:last-child {
-                border: none;
-                padding-bottom: emRhythm(1);
-            };
-
-            .amount {
-                align-self: end;
-                text-align: right;
-
-                .unit {
-                    opacity: 0.55;
-                }
-            }
+        .amount {
+            font-weight: bold;
         }
     }
 </style>
