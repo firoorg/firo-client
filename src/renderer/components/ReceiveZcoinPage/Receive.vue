@@ -5,7 +5,7 @@
     >
         <header class="receive-header">
             <div class="inner">
-                <span>{{ $d(new Date(createdAt), 'long') }}</span>
+                <div>{{ $d(new Date(createdAt), 'long') }}</div>
                 <editable-label
                     :label="label"
                     @submit="onLabelUpdate"
@@ -16,14 +16,55 @@
                         :on-tag-click="tagClicked"
                     />
                 </editable-label>
+                <div class="amount-delete">
+                    <div v-if="amount" class="amount">
+                        {{ amountInBaseCoin }} XZC {{ $t('receive.detail-entry-request.label__requested') }}
+                    </div>
+                    <div v-else class="amount">
+                        {{ $t('receive.detail-entry-request.label__no-amount') }}
+                    </div>
+
+                    <div v-if="deleteIconIsVisible" class="delete" >
+                        <base-popover
+                            placement="left"
+                            popover-class="popover"
+                            :auto-hide="true"
+                        >
+                            <template slot="content">
+                                <div class="delete-popover">
+                                    <div class="caption">
+                                        Are you sure you want to delete this payment request?
+                                    </div>
+
+                                    <div class="buttons">
+                                        <base-button
+                                            v-close-popover
+                                        >
+                                            No, Cancel
+                                        </base-button>
+                                        <base-button
+                                            class="dark-button"
+                                            @click.prevent="deletePaymentRequest"
+                                        >
+                                            Yes, I'm Sure
+                                        </base-button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template slot="target">
+                                <base-round-button
+                                    color="light"
+                                    size="large"
+                                >
+                                    <delete-icon />
+                                </base-round-button>
+                            </template>
+                        </base-popover>
+                    </div>
+                </div>
                 <span class="address">
                     {{ getAddress }}
-                </span>
-                <span v-if="amount">
-                    {{ amountInBaseCoin }} XZC {{ $t('receive.detail-entry-request.label__requested') }}
-                </span>
-                <span v-else>
-                    {{ $t('receive.detail-entry-request.label__no-amount') }}
                 </span>
                 <!--
                     <i v-if="!isFulfilled"
@@ -92,10 +133,15 @@ import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 import PaymentRequestStatus from '@/components/Icons/PaymentRequestStatus'
 import TimedTooltip from '@/components/Notification/TimedTooltip'
 import UnexpectedTransactionPopover from '@/components/ReceiveZcoinPage/UnexpectedTransactionPopover'
+import DeleteIcon from "@/components/Icons/DeleteIcon";
+import BasePopover from "../base/BasePopover";
+import BaseButton from "../base/BaseButton";
 
 export default {
     name: 'ReceivePaymentRequest',
     components: {
+        BaseButton,
+        BasePopover,
         ReceivePendingPaymentRequest,
         ReceivePendingPaymentRequestButtons,
         ReceiveFulfilledPaymentRequest,
@@ -107,7 +153,8 @@ export default {
         NaturalLanguageTags,
         ReceivePaymentRequestEmailTemplate,
         // 'qr-code': VueQRCodeComponent,
-        TimedTooltip
+        TimedTooltip,
+        DeleteIcon
     },
     props: {
         transactionsReceived: {
@@ -145,6 +192,10 @@ export default {
         address: {
             type: [String, Object],
             required: true
+        },
+        state: {
+            type: String,
+            default: 'active'
         }
     },
     data () {
@@ -158,6 +209,10 @@ export default {
         ...mapGetters({
             getLastSeen: 'PaymentRequest/paymentRequestLastSeen'
         }),
+
+        deleteIconIsVisible () {
+            return !this.address.transactions
+        },
 
         qrCodeIsVisible () {
             return !this.received && this.showQrCode
@@ -199,7 +254,8 @@ export default {
     methods: {
         ...mapActions({
             setLastSeen: types.paymentrequest.SET_PAYMENT_REQUEST_LAST_SEEN,
-            updateLabel: types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL
+            updateLabel: types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL,
+            archivePaymentRequest: types.paymentrequest.ARCHIVE_PAYMENT_REQUEST
         }),
 
         toggleQrCode () {
@@ -228,6 +284,14 @@ export default {
 
             // todo
             alert(`opening ${this.address.address} in block explorer`)
+        },
+
+        // Yes, confusing terminology, but imo it makes sense--front end is deleting the payment request, but it's only
+        // getting archived on the backend.
+        deletePaymentRequest () {
+            this.$router.replace({name: 'receive-zcoin'})
+
+            this.archivePaymentRequest(this.getAddress)
         }
     }
 }
@@ -251,6 +315,37 @@ export default {
 
     .actions {
         @include detail-actions();
+    }
+
+    .amount-delete {
+        .amount {
+            display: inline-block;
+            float: left;
+        }
+
+        .delete {
+            display: inline-block;
+            float: right;
+            cursor: pointer;
+        }
+    }
+
+    .delete-popover {
+        font-size: 0.8em;
+
+        .dark-button {
+            @include dark-input();
+        }
+
+        .caption {
+            font-weight: bold;
+            font-size: 1.2em;
+            padding-bottom: 1.2em;
+        }
+
+        .buttons {
+            text-align: right;
+        }
     }
 
     // - - - - - - -

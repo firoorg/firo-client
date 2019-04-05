@@ -35,6 +35,8 @@ const mutations = {
     // send update label request to the API
     [types.UPDATE_PAYMENT_REQUEST_LABEL] () {},
 
+    [types.ARCHIVE_PAYMENT_REQUEST] () {},
+
     [types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD] (state, { field, value }) {
         state.createPaymentRequestForm[field] = value
     },
@@ -121,14 +123,15 @@ const actions = {
     },
 
     [types.ADD_PAYMENT_REQUEST] ({ commit, dispatch, state }, paymentRequest) {
-        const { address, createdAt, amount, message, label } = paymentRequest
+        const { address, createdAt, amount, message, label, state: prState } = paymentRequest
 
         commit(types.ADD_PAYMENT_REQUEST, {
             address,
             createdAt,
             amount,
             message,
-            label
+            label,
+            state: prState
         })
 
         // clean up form fields
@@ -136,7 +139,7 @@ const actions = {
     },
 
     [types.UPDATED_PAYMENT_REQUEST] ({ commit, dispatch, state }, paymentRequest) {
-        const { address, createdAt, amount, message, label } = paymentRequest
+        const { address, createdAt, amount, message, label, state: prState } = paymentRequest
 
         const paymentRequestToUpdate = getters.getPaymentRequestForAddress(address)
 
@@ -149,7 +152,8 @@ const actions = {
             createdAt,
             amount,
             message,
-            label
+            label,
+            state: prState
         })
     },
 
@@ -165,6 +169,17 @@ const actions = {
             createdAt,
             address
         })
+    },
+
+    [types.ARCHIVE_PAYMENT_REQUEST] ({ commit, state, getters }, address) {
+        const paymentRequestToUpdate = getters.getPaymentRequestForAddress(address)
+
+        if (!paymentRequestToUpdate) {
+            logger.warn("No payment request found for address %s", address)
+            return
+        }
+
+        commit(types.ARCHIVE_PAYMENT_REQUEST, address)
     }
 }
 

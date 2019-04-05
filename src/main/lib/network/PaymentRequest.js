@@ -12,7 +12,8 @@ export default {
 
         mutations: {
             [types.paymentrequest.CREATE_PAYMENT_REQUEST]: 'createPaymentRequest',
-            [types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL]: 'updateLabel'
+            [types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL]: 'updateLabel',
+            [types.paymentrequest.ARCHIVE_PAYMENT_REQUEST]: 'archivePaymentRequest'
         },
 
         createPaymentRequest ({ label, message, amount }) {
@@ -37,6 +38,18 @@ export default {
                     label,
                     createdAt,
                     id: address
+                }
+            }, {
+                onSuccess: types.paymentrequest.ADD_PAYMENT_REQUEST
+            })
+        },
+
+        archivePaymentRequest (address) {
+            this.send({
+                type: 'update',
+                data: {
+                    id: address,
+                    state: 'archived'
                 }
             }, {
                 onSuccess: types.paymentrequest.ADD_PAYMENT_REQUEST

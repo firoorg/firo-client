@@ -59,7 +59,7 @@
 
                 <transition name="fade">
                     <onboarding-notice
-                        v-if="allPaymentRequestsLength < 1"
+                        v-if="unarchivedPaymentRequestsLength < 1"
                         class="onboarding"
                     >
                         <template slot="header">
@@ -193,11 +193,16 @@ export default {
                 return address.address === this.selectedPaymentRequest
             })
 
-            const paymentRequest = this.allPaymentRequests.find((request) => {
+            const paymentRequest = this.unarchivedPaymentRequests.find((request) => {
                 return request.address === this.selectedPaymentRequest
             })
 
-            const address = filteredAddress || paymentRequest.address
+            const address = filteredAddress || (paymentRequest && paymentRequest.address)
+
+            // address will be undefined if this.selectedPaymentRequest was just archived
+            if (!address) {
+                return null
+            }
 
             return {
                 ...paymentRequest,
@@ -205,16 +210,24 @@ export default {
             }
         },
 
-        filteredPaymentRequests () {
-            return this.getFilteredByUrl(this.allPaymentRequests, ['label', 'address'])
+        // This includes all payment requests which have received funds, even if they have been previously marked as
+        // archived.
+        unarchivedPaymentRequests () {
+            return this.allPaymentRequests.filter( (pr) => {
+                return ((pr.state !== 'archived') || pr.transactionsReceived)
+            })
         },
 
-        allPaymentRequestsLength () {
-            return this.allPaymentRequests.length
+        filteredPaymentRequests () {
+            return this.getFilteredByUrl(this.unarchivedPaymentRequests, ['label', 'address'])
+        },
+
+        unarchivedPaymentRequestsLength () {
+            return this.unarchivedPaymentRequests.length
         },
 
         getNoDataMessage () {
-            return this.allPaymentRequestsLength ? 'No Payment Requests found' : 'No Payment Requests created'
+            return this.unarchivedPaymentRequestsLength ? 'No Payment Requests found' : 'No Payment Requests created'
         },
 
         sortOrder () {
@@ -229,6 +242,12 @@ export default {
 
     methods: {
         onRouteToDetail ({ address }) {
+            // Do nothing if we're just coming back from deleting a payment request.
+            const pr = this.allPaymentRequests.find((pr) => {return pr.address === address})
+            if (pr.state === 'archived') {
+                return
+            }
+
             this.pushRouterWithFilter({
                 name: 'receive-zcoin-paymentrequest',
                 params: {
