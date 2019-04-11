@@ -71,7 +71,7 @@ receive:
       label__created: Created
       label__lastUpdate: Last Update
       label__label: Label
-      placeholder__filter: Filter by label
+      placeholder__filter: Filter by label or address
   detail-create-request:
     title__create: Create</br>Payment Request
     label__label: Label
@@ -158,7 +158,7 @@ send:
     label__amount: Amount
     label__sent: Sent
     label__label: Label
-    placeholder__filter: Filter by label
+    placeholder__filter: Filter by label or address
     label__tx-nolabel: No transaction label set
     label__tx-category-send: public
     label__tx-category-spendOut: private

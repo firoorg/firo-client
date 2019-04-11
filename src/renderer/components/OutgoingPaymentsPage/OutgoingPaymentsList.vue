@@ -106,7 +106,7 @@ export default {
         },
 
         filteredTransactions () {
-            return this.getFilteredByUrl(this.transactionsWithCategoryTags, ['label', 'category'])
+            return this.getFilteredByUrl(this.transactionsWithCategoryTags, ['belongsToAddress', 'label', 'category'])
         },
 
         sortOrder () {

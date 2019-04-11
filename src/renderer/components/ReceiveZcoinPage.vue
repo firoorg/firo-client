@@ -206,7 +206,7 @@ export default {
         },
 
         filteredPaymentRequests () {
-            return this.getFilteredByUrl(this.allPaymentRequests, ['label'])
+            return this.getFilteredByUrl(this.allPaymentRequests, ['label', 'address'])
         },
 
         allPaymentRequestsLength () {
