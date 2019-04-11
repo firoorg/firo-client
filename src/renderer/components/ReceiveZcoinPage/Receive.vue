@@ -16,6 +16,9 @@
                         :on-tag-click="tagClicked"
                     />
                 </editable-label>
+                <span class="address">
+                    {{ getAddress }}
+                </span>
                 <span v-if="amount">
                     {{ amountInBaseCoin }} XZC {{ $t('receive.detail-entry-request.label__requested') }}
                 </span>
@@ -239,6 +242,12 @@ export default {
 
     .receive-header {
         @include detail-header();
+
+        .inner {
+            span {
+                display: block;
+            }
+        }
     }
 
     .actions {

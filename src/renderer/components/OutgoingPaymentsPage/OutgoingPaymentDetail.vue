@@ -13,6 +13,9 @@
                         :on-tag-click="tagClicked"
                     />
                 </editable-label>
+                <span class="address">
+                    {{ address }}
+                </span>
                 <span v-if="isPrivate">
                     {{ amountInBaseCoin }} XZC {{ $t('send.detail-entry-transaction.label__spend') }}
                 </span>
@@ -108,6 +111,10 @@ export default {
             getExplorerTransactionUrl: 'Settings/getExplorerTransactionUrl'
         }),
 
+        address () {
+            return this.belongsToAddress
+        },
+
         amountInBaseCoin () {
             return convertToCoin(this.amount)
         },
@@ -164,6 +171,12 @@ export default {
 
     .outgoing-header {
         @include detail-header();
+
+        .inner {
+            span {
+                display: block;
+            }
+        }
     }
 
     .tx-headline {
