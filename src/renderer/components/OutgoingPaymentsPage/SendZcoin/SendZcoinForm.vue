@@ -20,6 +20,7 @@
                     name="label"
                     tabindex="1"
                     :placeholder="$t('send.public.detail-public-send.placeholder__label')"
+                    @keydown.enter.prevent
                 >
             </div>
         </div>
@@ -45,6 +46,7 @@
                     name="address"
                     tabindex="2"
                     :placeholder="$t('send.public.detail-public-send.placeholder__address')"
+                    @keydown.enter.prevent
                 >
             </div>
         </div>
@@ -75,6 +77,7 @@
                         class="amount"
                         tabindex="3"
                         :placeholder="$t('send.public.detail-public-send.placeholder__amount')"
+                        @keydown.enter.prevent
                     >
                     <div class="prefix">
                         XZC
