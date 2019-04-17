@@ -157,7 +157,6 @@ const actions = {
                             total
                         })
                         dispatch(types.ADD_SEND_FROM_TX, tx)
-                        // console.log('got send tx', addressKey, tx)
                         break
 
                     case 'mint':
@@ -249,7 +248,6 @@ const actions = {
         const txBasics = getTxBasics(spendTx)
         const { address } = spendTx
 
-        // console.log(types.ADD_SPEND_IN_FROM_TX, txBasics, Object.keys(spendTx))
 
         commit(types.ADD_TRANSACTION, {
             stack: WALLET_ADDRESS_KEY,
@@ -265,7 +263,6 @@ const actions = {
         const txBasics = getTxBasics(spendTx)
         const { address, label } = spendTx
 
-        // console.log(types.ADD_SPEND_OUT_FROM_TX, txBasics, Object.keys(spendTx))
 
         commit(types.ADD_TRANSACTION, {
             stack: THIRD_PARTY_ADDRESS_KEY,

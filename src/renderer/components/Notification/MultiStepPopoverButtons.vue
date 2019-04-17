@@ -92,7 +92,6 @@ export default {
 
     methods: {
         canSubmit () {
-            console.log('can submit!!')
         },
 
         // todo integrate GuideMixin

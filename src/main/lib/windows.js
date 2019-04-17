@@ -184,14 +184,12 @@ export default {
             return
         }
 
-        console.log('registering module to main store', moduleName)
 
         vuexStore.registerModule(moduleName, {
             namespaced: true,
             state: this.getWindowUrl(url),
             mutations: {
                 'ROUTE_CHANGED': function ROUTE_CHANGED (state, transition) {
-                    console.log('route changed', moduleName, transition)
                     // store.state[moduleName] = cloneRoute(transition.to, transition.from)
                 }
             }
@@ -199,7 +197,6 @@ export default {
     },
 
     connectToStore ({store, namespace}) {
-        console.log('window manager connected to vuex store. listens for mutations at', namespace)
 
         vuexStore = store
         vuexNamespace = namespace

@@ -256,7 +256,6 @@ export default {
 
         /*
             onConfirm (popoverReset) {
-                console.log('on confirm')
                 this.popoverStatus = 'showSuccess'
 
                 this.doMint({

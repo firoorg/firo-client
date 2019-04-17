@@ -103,7 +103,6 @@ export const mutations = {
             state.syncBlocksPerSecond.startTimestamp = timestamp
         }
 
-        //console.log('UPDATE_SYNC_BLOCKS_PER_SECOND', { height, timestamp })
         state.syncBlocksPerSecond.currentTimestamp = timestamp
     }
 }

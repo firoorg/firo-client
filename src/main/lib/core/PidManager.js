@@ -123,7 +123,6 @@ export default class PidManager {
             this.pid = await this.readPidFromFileSystem()
         } catch (e) {
             this.pid = -1
-            console.log(e)
         }
 
         if (await this.isRunning()) {

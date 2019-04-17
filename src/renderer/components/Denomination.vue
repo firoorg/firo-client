@@ -101,7 +101,6 @@ export default {
 
         currentHeight () {
             // const all = this.calcHeight(this.current + this.minted)
-            // console.log(this.current + this.minted, 'all', all, 'max', this.maxValue, 'height', this.mapHeight(all))
             // return all - this.calcHeight(this.minted) + 'px'
             // return this.mapHeight(all) + 'px'
             return this.calcHeight(this.current) * (8 * 3) + 'px'

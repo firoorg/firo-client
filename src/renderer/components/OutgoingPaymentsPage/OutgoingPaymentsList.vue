@@ -121,14 +121,12 @@ export default {
 
     methods: {
         onTableRowSelect (rowData, index, event) {
-            console.log('rowData', rowData)
             const { id, isPrivate } = rowData
 
             const { id: currentRouterId } = this.$route.params
 
             // already selected. removing selection
             if (currentRouterId === id) {
-                console.log('returning to send form')
                 this.$emit('selection-change', {
                     name: 'send-zcoin'
                 })

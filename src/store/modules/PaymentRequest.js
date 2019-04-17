@@ -239,7 +239,6 @@ const getters = {
     getPaymentRequestForAddress (state, getters) {
         return (address) => {
             return getters.paymentRequests.find((paymentRequest) => {
-                console.log('paymentRequest.address', paymentRequest.address, address)
                 return paymentRequest.address === address
             })
         }

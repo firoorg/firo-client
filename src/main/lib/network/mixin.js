@@ -147,7 +147,6 @@ export default {
     },
 
     processResponse (response, { onSuccess, onError }) {
-        // console.log('received message from the network', response)
         const { meta, data, error } = response
 
         logger.debug('processing response %O', response)
@@ -222,7 +221,6 @@ export default {
             }
         } catch (e) {
             logger.warn(e)
-            // console.log(e)
         }
 
         try {
@@ -231,7 +229,6 @@ export default {
             }
         } catch (e) {
             logger.warn(e)
-            // console.log(e)
         }
     },
 
@@ -242,7 +239,6 @@ export default {
             }
         } catch (e) {
             logger.warn(e)
-            // console.log(e)
         }
 
         try {
@@ -251,7 +247,6 @@ export default {
             }
         } catch (e) {
             logger.warn(e)
-            // console.log(e)
         }
     }
 }

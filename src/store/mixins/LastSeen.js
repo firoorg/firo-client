@@ -35,11 +35,9 @@ const module = function (namespace = '', moduleName = '') {
 
         actions: {
             [actionNameAll] ({ commit }, allLastSeen) {
-                console.log('last seen pairs', allLastSeen)
                 const pairs = Object.entries(allLastSeen)
 
                 pairs.forEach(([ id, timestamp ]) => {
-                    console.log('committing', { id, timestamp })
 
                     commit(actionName, { id, timestamp })
                 })

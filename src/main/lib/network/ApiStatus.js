@@ -12,7 +12,6 @@ export default {
     emitter: null,
 
     init({ host, ports }) {
-        console.log('------>', { host, ports })
         const subscriberUri = `${host}:${ports.publisher}`
 
         this.subscriber = zmq.socket('sub')
@@ -115,7 +114,6 @@ export default {
         logger.info('populating store with api status %o', data)
 
         if (walletLock !== undefined && walletVersion !== undefined) {
-            console.log('setting client locked state to', walletLock)
             dispatch(types.app.SET_WALLET_LOCKED, walletLock)
             dispatch(types.app.SET_WALLET_VERSION, walletVersion)
         }
@@ -132,7 +130,6 @@ export default {
             }
         }
         catch (e) {
-            console.log(e)
         }
     }
 }

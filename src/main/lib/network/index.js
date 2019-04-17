@@ -46,7 +46,6 @@ let connectedToStore = false
 
 const dispatch = (key, v) => {
     if (!store) {
-        console.log(key, v)
         return
     }
 
@@ -55,7 +54,6 @@ const dispatch = (key, v) => {
 
 const commit = (key, v) => {
     if (!store) {
-        console.log(key, v)
         return
     }
 
@@ -124,7 +122,6 @@ export default {
             store.dispatch(types.network.NETWORK_IS_CONNECTED)
             store.dispatch(types.app.IS_READY)
         } catch (e) {
-            console.log(e)
             logger.error('Core API module not loaded after XX seconds.', e)
             // todo consider error throw here and shod message to the user. -> should try to restart...
             dispatch(types.network.SET_NETWORK_CONNECTION_ERROR, 1)
@@ -174,7 +171,6 @@ export default {
                 encryption
             })
 
-            // console.log(module)
         })
 
         connectedToStore = true

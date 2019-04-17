@@ -40,7 +40,6 @@ ipcMain.on('vuex-connect', (event) => {
 ipcMain.on('vuex-mutation', (event, args) => {
     try {
         const {type, payload} = args
-        // console.log('vuex-mutation: %s\npayload: %o', type, payload)
         store.commit(type, payload)
     } catch (error) {
         logger.warn('error during vuex-mutation')

@@ -35,7 +35,6 @@ const actions = {
 
 const getters = {
     hasOpenModal: (state) => {
-        console.log('calculating open modals', state)
         return (state.settings)
     }
 }

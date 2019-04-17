@@ -243,7 +243,6 @@ const actions = {
     },
 
     [types.SET_TORSETUP] ({ state, commit, getters }, value) {
-        console.log('setting tor status to:', value)
         if (getters.torsetup === value) {
             return
         }

@@ -51,7 +51,6 @@ export default {
         },
 
         isUnseen () {
-            console.log(this.rowData['isUnseen'])
             return !!this.rowData[this.rowField.isUnseenKey || 'isUnseen']
         }
     }

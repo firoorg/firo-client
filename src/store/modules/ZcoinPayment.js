@@ -53,7 +53,6 @@ const mutations = {
     // --- Fee ---
 
     [types.SET_AVAILABLE_FEES] (state, availableFees) {
-        console.log('setting available fees')
         state.availableFees = availableFees
     },
 
@@ -62,7 +61,6 @@ const mutations = {
     },
 
     [types.SET_TX_FEE] (state, txFee) {
-        console.log('got new tx fee', txFee)
         state.addPaymentForm.totalTxFee = txFee
     }
 }
@@ -100,7 +98,6 @@ const actions = {
     [types.SET_FORM_ADDRESS] ({ commit, state }, value) {
         // todo check via getter
 
-        console.log('address value', value)
 
         commit(types.SET_FORM_ADDRESS, value)
     },
@@ -112,7 +109,6 @@ const actions = {
     },
 
     [types.SET_FEE] ({ commit, state }, fee) {
-        console.log('setting fee', fee)
         const { key } = fee
 
         if (state.selectedFee === key) {
@@ -143,7 +139,6 @@ const actions = {
     },
 
     [types.SEND_ZCOIN] ({ dispatch, commit, state }, { payments, fee, auth }) {
-        console.log('payment in action', payments, fee)
         // const { address, amount } = payment
 
         commit(types.SEND_ZCOIN, {

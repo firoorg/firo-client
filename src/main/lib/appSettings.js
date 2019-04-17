@@ -10,12 +10,10 @@ export const populateStoreWithAppSettings = function ({ store }) {
 
     logger.info('application settings path %s', settings.file())
 
-    console.log(settings.getAll())
 
     Object
         .entries(settings.getAll())
         .forEach(([category, pairs]) => {
-            console.log(category, pairs)
 
             if (!pairs) {
                 return

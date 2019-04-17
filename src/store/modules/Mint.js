@@ -53,7 +53,6 @@ const mutations = {
 
     [types.UPDATE_MINT] (state, mint) {
         const { id } = mint
-        // console.log(id, mint)
         Vue.set(state.mints, id, mint)
     }
 }

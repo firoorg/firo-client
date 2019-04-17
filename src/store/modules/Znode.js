@@ -95,7 +95,6 @@ const processZnode = function (id, znode, state) {
 
 let pendingZnodes = {}
 const addZnodes = function (commit, list) {
-    // console.log('adding znodes to pending list')
     pendingZnodes = {
         ...pendingZnodes,
         ...list
@@ -105,7 +104,6 @@ const addZnodes = function (commit, list) {
 }
 
 const addZnodesThrottled = throttle(function (commit) {
-    // console.log('finally adding znodes')
     commit(types.ADD_ZNODES, pendingZnodes)
 
     pendingZnodes = {}
@@ -334,7 +332,6 @@ const getters = {
 
         const progress = getters.allZnodes.length / getters.totalZnodes
 
-        console.log(progress)
         // keep last 10% of sync status for winner list syncing which is something we have no indicator for
         return !isNaN(progress) ? progress * znodeListSyncedMax : 0
     }

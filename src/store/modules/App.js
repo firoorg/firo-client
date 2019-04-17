@@ -99,12 +99,10 @@ const actions = {
             return
         }
 
-        console.log('IS_READY: getters.showIntroScreen', getters.showIntroScreen)
 
         commit(types.IS_READY)
 
         if (state.showIntroScreen === undefined) {
-            console.log('setting types.SET_INTRO_SCREEN', getters.showIntroScreen)
             commit(types.SET_INTRO_SCREEN, getters.showIntroScreen)
         }
     },

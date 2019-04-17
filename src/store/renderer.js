@@ -26,7 +26,6 @@ window.vuexTypes = types
 // import master state
 try {
     store.replaceState({...store.state, ...ipcRenderer.sendSync('vuex-connect')})
-    console.log('master state imported!')
 } catch (error) {
     console.error('import master state failed: %s', error)
 }

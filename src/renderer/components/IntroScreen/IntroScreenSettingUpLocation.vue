@@ -102,10 +102,6 @@ export default {
 
     methods: {
         isEnabled () {
-            console.log('setting up location %O', {
-                hasLocation: this.hasLocation,
-                walletVersion: this.walletVersion,
-            })
             return !this.hasLocation || !this.walletVersion
         }
     }

@@ -157,7 +157,6 @@ export default {
                 }
             })
 
-            // console.log('myNodes', myNodes)
 
             index.load(myNodes)
 
@@ -176,7 +175,6 @@ export default {
                         return
                     }
 
-                    console.log('cluster children', index.getLeaves(id))
                 })
                 */
 
@@ -217,13 +215,11 @@ export default {
     watch: {
         remoteZnodes: {
             handler (newVal, oldVal) {
-                // console.log('zcoin handler')
                 if (!this.debouncedHeatmapUpdate) {
                     // immediate run
                     if (!oldVal) {
                         this.updateHeatmap()
                     } else {
-                        console.log('could not update heatmap...', oldVal)
                     }
                     return
                 }
@@ -235,7 +231,6 @@ export default {
 
     created () {
         this.debouncedHeatmapUpdate = debounce(() => {
-            // console.log('updating headmap -> debounced')
             this.updateHeatmap()
         }, 5000, {
             maxWait: 30000
@@ -273,7 +268,6 @@ export default {
             data: this.heatmapPoints
         })
 
-        // console.log('this.myZnodeClusters', this.myZnodeClusters)
     },
 
     methods: {
@@ -300,7 +294,6 @@ export default {
             }
 
             // const currentHeatmapData = this.heatmap ? this.heatmap.getData() : []
-            // console.log('currentHeatmapData', currentHeatmapData)
 
             this.remoteZnodes.forEach((znode) => {
                 if (this.heatmapPointsZnodeIds[znode.id]) {
@@ -322,21 +315,17 @@ export default {
                 this.heatmapPointsZnodeIds[znode.id] = 1
             })
 
-            // console.log('points.length', points.length)
 
             /*
                 let gridValues = Object.values(this.heatmapGrid).slice()
                 gridValues.sort((a, b) => parseInt(a) < parseInt(b))
-                console.log(gridValues)
                 const object1 = {
                     a: 'somestring',
                     b: 42,
                     c: false
                 }
 
-                console.log(Object.values(object1).sort())
                 this.heatmapPointsMax = gridValues[0]
-                console.log('this.heatmapPointsMax', this.heatmapPointsMax)
                 */
 
             // todo add radius / 2 padding to the heatmap by mapping over the points here
@@ -420,7 +409,6 @@ export default {
 
             znodes.forEach((znode) => {
                 const { status } = znode
-                // console.log(status)
 
                 for (let i = this.znodeStates.length; i--;) {
                     if (i < state) {
@@ -433,7 +421,6 @@ export default {
                     }
                 }
 
-                // console.log(status, state)
             })
 
             return this.znodeStates[state].name

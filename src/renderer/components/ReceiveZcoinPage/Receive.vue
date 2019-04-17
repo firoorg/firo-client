@@ -203,7 +203,6 @@ export default {
         }),
 
         toggleQrCode () {
-            console.log('toggle qr code')
             this.showQrCode = !this.showQrCode
         },
 

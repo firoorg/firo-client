@@ -61,7 +61,6 @@ const actions = {
     ...spendZerocoinResponse.actions,
 
     [types.SET_FORM_MINTS] ({ commit, state }, mints) {
-        console.log(mints)
 
         // todo validate equality
 
