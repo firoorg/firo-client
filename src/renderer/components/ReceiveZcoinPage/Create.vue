@@ -46,7 +46,7 @@
                         <input
                             id="amount"
                             ref="amount"
-                            v-model.lazy.number="amount"
+                            v-model.number="amount"
                             v-validate="amountValidationRules"
                             v-tooltip="getValidationTooltip('amount')"
                             type="text"
@@ -71,7 +71,7 @@
                         <base-textarea
                             id="message"
                             ref="message"
-                            v-model.lazy="message"
+                            v-model="message"
                             name="message"
                             class="message"
                             :placeholder="$t('receive.detail-create-request.placeholder__message')"
