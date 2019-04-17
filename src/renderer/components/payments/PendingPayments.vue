@@ -9,8 +9,12 @@
         >
             <div class="addr-info">
                 <!--<slot v-bind="value" />-->
-                <div class="label">{{ value.label }}</div>
-                <div class="address">{{ value.address }}</div>
+                <div class="label">
+                    {{ value.label }}
+                </div>
+                <div class="address">
+                    {{ value.address }}
+                </div>
             </div>
             <div class="amount">
                 {{ value.amountAsBaseCoin }} <span class="unit">XZC</span>

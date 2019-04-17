@@ -4,7 +4,7 @@
 </i18n>
 
 <template>
-    <section class="balance" >
+    <section class="balance">
         <div class="label">
             {{ $t('navigation.balance.title') }}
             <span />
@@ -14,7 +14,10 @@
                 {{ convertToCoin(availableTotal) }}
             </div>
 
-            <div v-if="unconfirmedTotal > 0" class="unconfirmed-total" >
+            <div
+                v-if="unconfirmedTotal > 0"
+                class="unconfirmed-total"
+            >
                 ({{ convertToCoin(unconfirmedTotal) }} unconfirmed)
             </div>
         </div>

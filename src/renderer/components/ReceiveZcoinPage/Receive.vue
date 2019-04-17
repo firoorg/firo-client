@@ -17,14 +17,23 @@
                     />
                 </editable-label>
                 <div class="amount-delete">
-                    <div v-if="amount" class="amount">
+                    <div
+                        v-if="amount"
+                        class="amount"
+                    >
                         {{ amountInBaseCoin }} XZC {{ $t('receive.detail-entry-request.label__requested') }}
                     </div>
-                    <div v-else class="amount">
+                    <div
+                        v-else
+                        class="amount"
+                    >
                         {{ $t('receive.detail-entry-request.label__no-amount') }}
                     </div>
 
-                    <div v-if="deleteIconIsVisible" class="delete" >
+                    <div
+                        v-if="deleteIconIsVisible"
+                        class="delete"
+                    >
                         <base-popover
                             placement="left"
                             popover-class="popover"
