@@ -58,7 +58,7 @@
         <div style="position: absolute; top:0;left:0;height:0;width:0;overflow: hidden">
             <receive-payment-request-email-template
                 ref="emailTemplate"
-                :message="message"
+                :message="message || ''"
                 :address="getAddress"
                 :amount="amountInBaseCoin"
                 :uri="getZcoinUri"
