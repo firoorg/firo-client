@@ -79,6 +79,14 @@ export default {
         theme: {
             type: String,
             default: ''
+        },
+        // This is used to check if data has changed and we need to refresh the table. Yes, it's really needed, despite
+        // the reactive nature of Vue, as oftentimes data gets recalculated without actually changing the result, and we
+        // don't want the user to get sent back to page 1 unless the table itself actually changes, even if some of the
+        // things that went into calculating it did.
+        compareElements: {
+            type: Function,
+            default: (a, b) => a === b
         }
     },
 
@@ -102,7 +110,22 @@ export default {
 
     watch: {
         data (newVal, oldVal) {
-            this.$refs.vuetable.refresh()
+            let isEqual = true
+
+            if (newVal.length === oldVal.length) {
+                for (const i in newVal) {
+                    if (!this.compareElements(newVal[i], oldVal[i])) {
+                        isEqual = false
+                        break
+                    }
+                }
+            } else {
+                isEqual = false
+            }
+
+            if (!isEqual) {
+                this.$refs.vuetable.refresh()
+            }
         }
     },
 

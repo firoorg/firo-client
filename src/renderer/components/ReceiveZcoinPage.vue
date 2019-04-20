@@ -51,6 +51,7 @@
                     :on-row-select="onTableRowSelect"
                     class="payment-requests-table"
                     :sort-order="sortOrder"
+                    :compare-elements="comparePaymentRequests"
                 >
                     <!--<template slot="created_at" scope="props">
                         <h1>{{ rowData.name }}</h1>
@@ -241,6 +242,10 @@ export default {
     },
 
     methods: {
+        comparePaymentRequests (paymentRequestA, paymentRequestB) {
+            return paymentRequestA.address === paymentRequestB.address
+        },
+
         onRouteToDetail ({ address }) {
             // Do nothing if we're just coming back from deleting a payment request.
             const pr = this.allPaymentRequests.find((pr) => {return pr.address === address})

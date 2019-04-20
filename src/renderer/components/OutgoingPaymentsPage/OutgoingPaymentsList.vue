@@ -17,6 +17,7 @@
             no-data-message="No Payments made yet."
             :on-row-select="onTableRowSelect"
             :sort-order="sortOrder"
+            :compare-elements="compareTransactions"
         >
             <template
                 slot="label"
@@ -120,6 +121,10 @@ export default {
     },
 
     methods: {
+        compareTransactions (a, b) {
+            return a.id === b.id
+        },
+
         onTableRowSelect (rowData, index, event) {
             const { id, isPrivate } = rowData
 
