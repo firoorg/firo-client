@@ -12,6 +12,12 @@
         <span class="amount">
             {{ amountReceived }}
         </span>
+        <span
+            v-if="amountPending"
+            class="amount-pending"
+        >
+            ({{ amountPending }})
+        </span>
         /
         <span class="amount-requested">
             {{ amountRequested }}
@@ -29,6 +35,15 @@ export default {
         VuetableFieldMixin
     ],
     computed: {
+        amountPending () {
+            if (this.rowData.amountPending > 0) {
+                return convertToCoin(this.rowData.amountPending)
+            }
+
+            // I don't really understand why this is necessary, but it is...
+            return undefined
+        },
+
         amountReceived () {
             return this.rowData.amountReceived > 0 ? convertToCoin(this.rowData.amountReceived) : '~'
         },

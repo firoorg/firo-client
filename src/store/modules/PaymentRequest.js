@@ -205,6 +205,7 @@ const getters = {
             let lastSeen = getters.paymentRequestLastSeen(key) || createdAt
 
             let amountReceived = 0
+            let amountPending = 0
 
             // address found in wallet addresses. validating status
             if (address) {
@@ -216,13 +217,13 @@ const getters = {
                 if (transactionsReceived) {
                     isIncoming = true
 
-                    amountReceived = transactions.reduce((accumulator, tx) => {
-                        if (!tx.block) {
-                            return accumulator
+                    for (const tx of transactions) {
+                        if (tx.block) {
+                            amountReceived += tx.amount
+                        } else {
+                            amountPending += tx.amount
                         }
-
-                        return accumulator + tx.amount
-                    }, 0)
+                    }
 
                     if (amountReceived && amountReceived >= amountRequested) {
                         isIncoming = false
@@ -245,6 +246,7 @@ const getters = {
                 transactionsReceived,
                 updatedAt,
                 lastSeen,
+                amountPending,
                 isUnseen: lastSeen < updatedAt
             })
         }
@@ -301,7 +303,15 @@ const getters = {
                 return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
             }, createdAt)
 
-            const amountReceived = transactions.reduce((a, tx) => a + tx.amount, 0)
+            let amountReceived = 0
+            let amountPending = 0
+            for (const tx of transactions) {
+                if (tx.block) {
+                    amountReceived += tx.amount
+                } else {
+                    amountPending += tx.amount
+                }
+            }
 
             const request = {
                 address,
@@ -311,6 +321,7 @@ const getters = {
                 isVirtual: true,
                 transactionsReceived: true,
                 amountReceived,
+                amountPending,
                 amountRequested: null,
                 message: null,
                 createdAt,
