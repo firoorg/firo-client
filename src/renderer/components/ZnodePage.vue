@@ -26,12 +26,16 @@
                 </section>
 
                 <znode-map
+                    v-if="displayZnodeMap"
                     class="znodes-map"
                     :remote-znodes="remoteZnodes"
                     :my-znodes="filteredMyZnodes"
                 />
 
-                <section class="stats">
+                <section
+                    class="stats"
+                    :class="{'znode-map-displayed': displayZnodeMap}"
+                >
                     <div class="stat">
                         <div class="value">
                             {{ totalZnodes }}
@@ -127,6 +131,10 @@ export default {
             totalZnodes: 'Znode/totalZnodes',
             znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
         }),
+
+        displayZnodeMap () {
+            return false
+        },
 
         enabledMyZnodes () {
             return this.myZnodes.filter((znode) => znode.status === 'ENABLED')
@@ -231,9 +239,15 @@ export default {
         position: relative;
         display: flex;
         justify-content: space-evenly;
-        margin-top: emRhythm(-10);
-        margin-bottom: emRhythm(7);
         z-index: 10;
+
+        &.znode-map-displayed {
+            margin-top: emRhythm(-10);
+            margin-bottom: emRhythm(7);
+        }
+        &:not(.znode-map-displayed) {
+            margin-top: emRhythm(12);
+        }
 
         .stat {
             max-width: 15rem;
