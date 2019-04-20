@@ -242,8 +242,15 @@ export default {
     },
 
     methods: {
-        comparePaymentRequests (paymentRequestA, paymentRequestB) {
-            return paymentRequestA.address === paymentRequestB.address
+        comparePaymentRequests (a, b) {
+            for (const prop of ['address', 'amountReceived', 'amountPending', 'updatedAt']) {
+                this.$log.debug("a[%s] (%O) =? b[%s] (%O)", prop, a[prop], prop, b[prop])
+                if (a[prop] !== b[prop]) {
+                    return false
+                }
+            }
+
+            return true
         },
 
         onRouteToDetail ({ address }) {
