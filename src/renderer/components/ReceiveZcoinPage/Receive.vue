@@ -42,20 +42,20 @@
                             <template slot="content">
                                 <div class="delete-popover">
                                     <div class="caption">
-                                        Are you sure you want to delete this payment request?
+                                        {{ $t('receive.delete-request.are-you-sure') }}
                                     </div>
 
                                     <div class="buttons">
                                         <base-button
                                             v-close-popover
                                         >
-                                            No, Cancel
+                                            {{ $t('receive.delete-request.cancel') }}
                                         </base-button>
                                         <base-button
                                             class="dark-button"
                                             @click.prevent="deletePaymentRequest"
                                         >
-                                            Yes, I'm Sure
+                                            {{ $t('receive.delete-request.confirm') }}
                                         </base-button>
                                     </div>
                                 </div>
