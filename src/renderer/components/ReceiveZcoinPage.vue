@@ -244,7 +244,6 @@ export default {
     methods: {
         comparePaymentRequests (a, b) {
             for (const prop of ['address', 'amountReceived', 'amountPending', 'updatedAt']) {
-                this.$log.debug("a[%s] (%O) =? b[%s] (%O)", prop, a[prop], prop, b[prop])
                 if (a[prop] !== b[prop]) {
                     return false
                 }
