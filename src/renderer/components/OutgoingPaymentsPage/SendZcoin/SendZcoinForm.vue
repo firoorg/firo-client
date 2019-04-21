@@ -68,7 +68,7 @@
                     <input
                         id="amount"
                         ref="amount"
-                        v-model.lazy="amount"
+                        v-model="amount"
                         v-validate="xzcAmountValidationRules"
                         v-tooltip="getValidationTooltip('amount')"
                         data-vv-validate-on="change"
