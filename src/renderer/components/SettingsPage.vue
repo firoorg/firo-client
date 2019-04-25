@@ -4,32 +4,7 @@
             <div v-scrollable>
                 <div class="settings-page-inner">
                     <h1>
-                        <base-popover
-                            trigger="manual"
-                            :open="showRestartDaemon"
-                            placement="right-start"
-                            popover-class="advice"
-                        >
-                            <div slot="content">
-                                <header>
-                                    <h2>{{ $t('settings.flyout-restart-required.title') }}</h2>
-                                </header>
-
-                                <p>{{ $t('settings.flyout-restart-required.description') }}</p>
-
-                                <footer>
-                                    <base-button
-                                        color="green"
-                                        @click="restartDaemon"
-                                    >
-                                        {{ $t('settings.flyout-restart-required.button__restart-now') }}
-                                    </base-button>
-                                </footer>
-                            </div>
-                            <template slot="target">
-                                <span>{{ $t('settings.overview.title') }}</span>
-                            </template>
-                        </base-popover>
+                        <span>{{ $t('settings.overview.title') }}</span>
                     </h1>
 
                     <section class="interface">
@@ -44,7 +19,10 @@
                     <section class="privacy">
                         <h2>{{ $t('settings.form.privacy.title') }}</h2>
                         <div class="form">
-                            <connect-via-tor-settings class="connection-settings" />
+                            <connect-via-tor-settings
+                                class="connection-settings"
+                                @toggle-tor="restartDaemon"
+                            />
 
                             <amount-to-hold-in-zerocoin-settings />
                         </div>
@@ -77,11 +55,7 @@ export default {
         ...mapGetters({
             isDaemonRestartRequired: 'Settings/isDaemonRestartRequired',
             isRestarting: 'App/isRestarting'
-        }),
-
-        showRestartDaemon () {
-            return this.isDaemonRestartRequired && !this.isRestarting
-        }
+        })
     },
 
     methods: {

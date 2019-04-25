@@ -46,7 +46,8 @@ export default {
 
     data () {
         return {
-            name: 'torsetup'
+            name: 'torsetup',
+            torCheckbox: this.connectedViaTor
         }
     },
 
@@ -62,6 +63,16 @@ export default {
             getter: 'Settings/torsetup',
             action: types.settings.SET_TORSETUP
         }),
+
+        connectedViaTor: {
+            get () {
+                return this.$store.getters['Settings/torsetup']
+            },
+            set (val) {
+                this.$store.dispatch(types.settings.SET_TORSETUP, val)
+                this.$emit('toggle-tor')
+            }
+        },
 
         hasChanged () {
             return this.getDaemonSettingHasChanged(this.name)
