@@ -21,6 +21,7 @@
                     type="password"
                     :placeholder="$t(`${translationNamespace}.placeholder__passphrase`)"
                     name="passphrase"
+                    @keyup.enter="onEnter"
                 >
             </div>
         </div>
@@ -80,22 +81,19 @@ export default {
 
     beforeCreate () {
         this.$parent.$emit('can-submit', false)
-    }
+    },
 
-    /*
-    todo trigger actions.next
     methods: {
-        submitIfValid (event) {
-            event.preventDefault()
-
+        onEnter () {
             if (!this.canSubmit) {
                 return
             }
 
-            this.onFormSubmit()
+            // This is picked up in PaymentStepPassphraseButtons. It was the only hack I could think of to cut through
+            // the spaghetti. Please don't shoot me. :x
+            this.$eventHub.$emit('advance-from-passphrase-step')
         }
     }
-    */
 }
 </script>
 

@@ -87,6 +87,11 @@ sync(store, router, {
 
 setupWindowRouter({ store, router })
 
+// This is so we can pass around global events, which we're basically using just to allow enter to work to submit forms
+// that are spread across a large number of files with mixins.
+// TODO: Figure out how to get rid of this.
+Vue.prototype.$eventHub = new Vue()
+
 /* eslint-disable no-new */
 new Vue({
     components: { App },
