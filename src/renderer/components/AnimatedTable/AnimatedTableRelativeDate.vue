@@ -10,10 +10,14 @@
         class="vuetable-td-component-relative-date"
     >
         <timeago
+            v-if="relativeDate"
             :key="rowData.id"
             :datetime="relativeDate"
             :auto-update="30"
         />
+        <span v-else>
+            ~
+        </span>
     </td>
 </template>
 
@@ -21,14 +25,21 @@
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
 
 export default {
-    name: 'AnimatedTableRelativeDate',
+    name: 'RelativeDate',
     mixins: [
         VuetableFieldMixin
     ],
 
     computed: {
         relativeDate () {
-            return this.rowData[this.rowField.dateField]
+            let d = this.rowData[this.rowField.dateField]
+            // If we're set to Infinity, don't render anything. We do this instead of just putting undefined here in
+            // order to get sorted before everything else.
+            if (d === Infinity) {
+                return undefined
+            }
+
+            return d
         }
     }
 }

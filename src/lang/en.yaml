@@ -59,6 +59,14 @@ navigation:
     title: Updating Znodes
     label: Syncing Znode list and payments ({alreadySynced}/{allZnodes} Znodes synced).
 
+transaction-list:
+  label__label: Label
+  label__date: Date
+  label__address: Address
+  placeholder__recv-no-label: Incoming Transaction
+  placeholder__send-no-label: Outgoing Transaction
+  placeholder__filter: Filter by label, address, or txId
+
 receive:
   overview:
     title: Receive</br>Zcoin

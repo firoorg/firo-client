@@ -7,7 +7,8 @@ const routeMap = {
     [types.ROUTE_TO_CREATE_PAYMENT_REQUEST]: { name: 'receive-zcoin' },
     [types.ROUTE_TO_PUBLIC_SEND]: { name: 'send-zcoin' },
     [types.ROUTE_TO_PRIVATE_SPEND]: { name: 'spend-zerocoin' },
-    [types.ROUTE_TO_SETTINGS]: { name: 'settings' }
+    [types.ROUTE_TO_SETTINGS]: { name: 'settings' },
+    [types.ROUTE_TO_TRANSACTION_LIST]: { name: 'transaction-list'}
 }
 
 const buildMutationMap = function (routeMap, router, moduleName) {

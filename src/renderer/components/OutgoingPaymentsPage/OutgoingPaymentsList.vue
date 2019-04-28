@@ -166,6 +166,7 @@ export default {
             },
             */
 
+        // copypasted to TransactionListPage.vue (as addCategoryTagToLabelForOutgoingTransaction)
         addCategoryTagToLabel (rowData) {
             const { label: value, category } = rowData
             const label = value || this.$t('send.table__outgoing-payments.label__tx-nolabel')

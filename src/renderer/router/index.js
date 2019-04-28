@@ -12,8 +12,11 @@ export default new Router({
                 {
                     path: '',
                     redirect: { name: 'receive-zcoin' }
-                    // name: 'home',
-                    // component: require('@/components/TestPage').default
+                },
+                {
+                    path: '/transaction-list',
+                    name: 'transaction-list',
+                    component: require('@/components/TransactionListPage').default
                 },
                 {
                     path: '/receive',
