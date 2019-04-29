@@ -6,6 +6,10 @@ import modules from '~/modules'
 import types from '~/types'
 
 Vue.use(Vuex)
+if (process.env.NODE_ENV !== 'production') {
+    // This must be done before the store is created.
+    Vue.config.devtools = true
+}
 
 const localModules = [
     // todo reduce modules here by looking for local: true in the module definition
