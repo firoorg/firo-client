@@ -1,9 +1,12 @@
 import { clipboard } from 'electron'
 import { containsZcoinUri, containsZcoinAddress } from '#/lib/zcoin'
 import { sleep } from '#/lib/utils'
+import { createLogger } from '#/lib/logger'
 
 // import Vue from 'vue'
 import types from '~/types'
+
+const logger = createLogger('zcoin:clipboard')
 
 let watcherId = null
 let watcherIsRunning = false
@@ -11,21 +14,18 @@ let watcherIsRunning = false
 let previousText = null
 // let previousImage = clipboard.readImage()
 
-const isDiffText = (str1, str2) => str1 && str2 && str1 !== str2
-// const isDiffImage = (img1, img2) => !img2.isEmpty() && img1.toDataURL() !== img2.toDataURL()
-
 export default {
-
     async checkClipboard ({ store, deeplink }) {
         const currentText = clipboard.readText()
 
-        if (isDiffText(previousText, currentText)) {
-            if (containsZcoinUri(previousText)) {
-                deeplink.parseZcoinUrl(previousText)
+        if (currentText && (currentText !== previousText)) {
+            logger.debug("got new clipboard: %O", currentText)
+            if (containsZcoinUri(currentText)) {
+                deeplink.parseZcoinUrl(currentText)
                 // store.dispatch(types.clipboard.SET_CLIPBOARD, previousText)
             } else {
                 const prefixes = store.getters['Settings/b58Prefixes']
-                const addresses = containsZcoinAddress(previousText, prefixes)
+                const addresses = containsZcoinAddress(currentText, prefixes)
 
                 if (addresses && addresses.length === 1) {
                     store.dispatch(types.clipboard.SET_CLIPBOARD, addresses[0])
@@ -49,8 +49,9 @@ export default {
             return
         }
 
-        this.checkClipboard({ store, deeplink })
         watcherIsRunning = true
+        logger.info("beginning to watch clipboard")
+        this.checkClipboard({ store, deeplink })
     },
 
     unwatch () {
