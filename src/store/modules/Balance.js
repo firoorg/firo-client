@@ -77,6 +77,15 @@ const getters = {
     total: (state) => state.total.all,
     availableTotal: (state) => state.total.available,
     unconfirmedTotal: (state) => state.xzc.unconfirmed + state.zerocoin.unconfirmed,
+    immatureTotal: (state, getters, rootState, rootGetters) => {
+        const txs = rootGetters['Address/walletAddresses'].reduce((a, addr) => [...a, ...addr.transactions], [])
+
+        // Mined transactions take 100 blocks to mature.
+        const maxHeight = rootGetters['Blockchain/currentBlockHeight'] - 100
+        const immatureTxs = txs.filter((tx) => tx.category === 'mined' && tx.block.height > maxHeight)
+
+        return immatureTxs.reduce((a, tx) => a + tx.amount, 0)
+    },
     availableXzc: (state) => state.xzc.confirmed - state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed,
     confirmedXzcZerocoinRatio: (state) => {

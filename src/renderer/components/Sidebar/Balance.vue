@@ -15,10 +15,10 @@
             </div>
 
             <div
-                v-if="unconfirmedTotal > 0"
-                class="unconfirmed-total"
+                v-if="pendingTotal > 0"
+                class="pending-total"
             >
-                ({{ convertToCoin(unconfirmedTotal) }} unconfirmed)
+                ({{ convertToCoin(pendingTotal) }} pending)
             </div>
         </div>
     </section>
@@ -34,8 +34,13 @@ export default {
     computed: {
         ...mapGetters({
             availableTotal: 'Balance/availableTotal',
-            unconfirmedTotal: 'Balance/unconfirmedTotal'
+            unconfirmedTotal: 'Balance/unconfirmedTotal',
+            immatureTotal: 'Balance/immatureTotal'
         }),
+
+        pendingTotal () {
+            return this.immatureTotal + this.unconfirmedTotal
+        }
     },
 
     methods: {
@@ -51,7 +56,7 @@ export default {
         @include setType(3);
     }
 
-    .unconfirmed-total {
+    .pending-total {
         font-size-adjust: -80%;
         color: lightsalmon;
     }
