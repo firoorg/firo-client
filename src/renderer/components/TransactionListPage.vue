@@ -115,17 +115,11 @@ export default {
         },
 
         allTableData () {
-            const spendCategories = ['send', 'mint', 'spendOut', 'mined']
-            const receiveCategories = ['receive', 'spendIn']
-            const nullCategories = ['orphan']
+            console.walletAddresses = this.walletAddresses
 
             const data = []
             for (const addr of this.walletAddresses) {
                 for (const tx of addr.transactions) {
-                    if (nullCategories.includes(tx.category)) {
-                        continue
-                    }
-
                     let tableRow = {}
                     tableRow.address = addr.address
                     // Setting a date of Infinity causes AnimatedTableRelativeData to not render anything but still sort
@@ -135,35 +129,36 @@ export default {
                     tableRow.isError = false
                     tableRow.confirmations = tx.confirmations
                     tableRow.isConfirmed = tx.isConfirmed
+                    tableRow.amount = tx.amount
+                    tableRow.label = this.getLabelForPaymentRequestAddress(tableRow.address)
                     // This is different from txId because a single transaction (from the blockchain's perspective) can
                     // be both incoming and outgoing to us, which will require it to be displayed in the table multiple
                     // times.
-                    tableRow.id = tx.id
-
-                    if (spendCategories.includes(tx.category)) {
-                        tableRow.amount = tx.amount
-                    } else if (receiveCategories.includes(tx.category)) {
-                        tableRow.amount = -tx.amount
-                    } else {
-                        this.$log.error("Displaying transaction %s with an unknown category %s", tx.id, tx.category)
-                        // I guess showing the user a zero amount is better than blocking the UI with a warning or
-                        // silently ignoring the transaction ... maybe
-                        tableRow.amount = 0
-                    }
-
-                    if (tableRow.amount > 0) {
-                        tableRow.label = this.getLabelForPaymentRequestAddress(tableRow.address)
-                    } else if (tableRow.amount < 0) {
-                        tableRow.label = this.getLabelForOutgoingTransaction(tableRow.id)
-                    } else {
-                        // As above, I couldn't really think of a better behaviour. At least we're alerting the user to
-                        // the presence of the bug...
-                        tableRow.label = "THIS IS A BUG: tx " + tx.id + " has unknown category " + tx.category
-                        tableRow.isError = true
-                    }
+                    tableRow.id = tx.id + '-incoming'
 
                     data.push(tableRow)
                 }
+            }
+
+            for (const tx of this.outgoingTransactions) {
+                console.log(tx)
+                let tableRow = {}
+                tableRow.address = tx.belongsToAddress
+                // Setting a date of Infinity causes AnimatedTableRelativeData to not render anything but still sort
+                // as if the transaction just happened.
+                tableRow.time = tx.block ? tx.block.time : Infinity
+                tableRow.txId = tx.txid
+                tableRow.isError = false
+                tableRow.confirmations = tx.confirmations
+                tableRow.isConfirmed = tx.isConfirmed
+                tableRow.amount = -tx.amount
+                tableRow.label = tx.label || this.$t('send.table__outgoing-payments.label__tx-nolabel')
+                // This is different from txId because a single transaction (from the blockchain's perspective) can
+                // be both incoming and outgoing to us, which will require it to be displayed in the table multiple
+                // times.
+                tableRow.id = tx.id + '-outgoing'
+
+                data.push(tableRow)
             }
 
             return data
@@ -175,6 +170,7 @@ export default {
             return a.id === b.id
         },
 
+        // address is a String
         getLabelForPaymentRequestAddress (address) {
             for (const pr of this.allPaymentRequests) {
                 if (pr.address === address) {
@@ -182,36 +178,7 @@ export default {
                 }
             }
 
-            return 'Incoming Transaction Not Found'
-        },
-
-        getLabelForOutgoingTransaction (txId) {
-            for (const tx of this.outgoingTransactions) {
-                if (tx.id === txId) {
-                    return this.addCategoryTagToLabelForOutgoingTransaction(tx)
-                }
-            }
-
-            return 'Outgoing Transaction Not Found'
-        },
-
-        // copypasted from OutgoingPaymentsList's addCategoryTagToLabel
-        addCategoryTagToLabelForOutgoingTransaction (tx) {
-            const { label: value, category } = tx
-            const label = value || this.$t('send.table__outgoing-payments.label__tx-nolabel')
-            let catLabel = ''
-
-            if (category === 'send') {
-                catLabel = `#${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
-            } else if (category === 'spendOut') {
-                catLabel = `#${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
-            }
-
-            if (label.includes(catLabel)) {
-                return label
-            }
-
-            return `${label} ${catLabel}`
+            return this.$t('transaction-list.placeholder__recv-no-label')
         }
     }
 }
