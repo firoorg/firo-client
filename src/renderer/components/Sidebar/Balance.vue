@@ -11,7 +11,7 @@
         </div>
         <div class="amount">
             <div class="confirmed-total">
-                {{ convertToCoin(availableTotal) }}
+                {{ convertToCoin(availableXzc) }}
             </div>
 
             <div
@@ -19,6 +19,13 @@
                 class="pending-total"
             >
                 ({{ convertToCoin(pendingTotal) }} pending)
+            </div>
+
+            <div
+                v-if="availableZerocoin > 0"
+                class="zerocoin-total"
+            >
+                {{ convertToCoin(availableZerocoin) }} Zerocoin
             </div>
         </div>
     </section>
@@ -33,7 +40,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            availableTotal: 'Balance/availableTotal',
+            availableXzc: 'Balance/availableXzc',
+            availableZerocoin: 'Balance/availableZerocoin',
             unconfirmedTotal: 'Balance/unconfirmedTotal',
             immatureTotal: 'Balance/immatureTotal'
         }),

@@ -75,7 +75,6 @@ const actions = {
 
 const getters = {
     total: (state) => state.total.all,
-    availableTotal: (state) => state.total.available,
     unconfirmedTotal: (state) => state.xzc.unconfirmed + state.zerocoin.unconfirmed,
     immatureTotal: (state, getters, rootState, rootGetters) => {
         const txs = rootGetters['Address/walletAddresses'].reduce((a, addr) => [...a, ...addr.transactions], [])
