@@ -105,7 +105,6 @@ const actions = {
     ...lastSeen.actions,
 
     [types.SET_INITIAL_STATE] ({ commit, dispatch, state }, initialState) {
-        logger.info('got initial state for ADDRESS %s', JSON.stringify(initialState, null, 4))
         const { addresses } = initialState
 
         for (const addressKey of Object.keys(addresses)) {
@@ -127,6 +126,9 @@ const actions = {
             for (let txIndex of Object.keys(txids)) {
                 for (let txid of Object.keys(txids[txIndex])) {
                     const tx = txids[txIndex][txid]
+
+                    logger.debug("Processing transaction for %s: %O", addressKey, tx)
+
                     const { category } = tx
 
                     if (!category) {
