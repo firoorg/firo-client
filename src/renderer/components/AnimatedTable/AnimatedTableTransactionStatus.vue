@@ -8,26 +8,31 @@
     <td
         v-else
         class="vuetable-td-component-transaction-status"
+        :class="{'is-confirmed': isConfirmed}"
     >
         <span
-            v-if="isError"
-            class="error"
-        >
-            ❗
-        </span>
-        <span
-            v-else-if="isIncoming"
+            v-if="direction === 'incoming'"
             class="ok is-incoming"
-            :class="{'is-confirmed': isConfirmed}"
         >
             ⬇
         </span>
         <span
-            v-else
-            class="is-outgoing"
-            :class="{'is-confirmed': isConfirmed}"
+            v-else-if="direction === 'outgoing'"
+            class="ok is-outgoing"
         >
             ⬆
+        </span>
+        <span
+            v-else-if="direction === 'mint'"
+            class="ok is-mint"
+        >
+            ⓩ
+        </span>
+        <span
+            v-else
+            class="error"
+        >
+            ❗
         </span>
     </td>
 </template>
@@ -48,12 +53,8 @@ export default {
     ],
 
     computed: {
-        isError () {
-            return this.rowData.isError
-        },
-
-        isIncoming () {
-            return this.rowData.amount >= 0
+        direction () {
+            return this.rowData.direction
         },
 
         isConfirmed () {
@@ -65,11 +66,11 @@ export default {
 
 <style lang="scss">
     .vuetable-td-component-transaction-status {
-        .is-confirmed {
+        &.is-confirmed {
             color: green;
         }
 
-        :not(.is-confirmed) {
+        &:not(.is-confirmed) {
             color: orange;
         }
     }

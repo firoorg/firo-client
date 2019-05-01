@@ -90,7 +90,8 @@ export default {
         ...mapGetters({
             walletAddresses: 'Address/walletAddresses',
             allPaymentRequests: 'PaymentRequest/allPaymentRequests',
-            outgoingTransactions: 'Address/getOutgoingTransactions'
+            outgoingTransactions: 'Address/getOutgoingTransactions',
+            allMints: 'Mint/allMints',
         }),
 
         sortOrder () {
@@ -128,6 +129,7 @@ export default {
                     tableRow.confirmations = tx.confirmations
                     tableRow.isConfirmed = tx.isConfirmed
                     tableRow.amount = tx.amount
+                    tableRow.direction = 'incoming'
                     tableRow.label = this.getLabelForPaymentRequestAddress(tableRow.address)
                     // This is different from txId because a single transaction (from the blockchain's perspective) can
                     // be both incoming and outgoing to us, which will require it to be displayed in the table multiple
@@ -149,11 +151,29 @@ export default {
                 tableRow.confirmations = tx.confirmations
                 tableRow.isConfirmed = tx.isConfirmed
                 tableRow.amount = -tx.amount
+                tableRow.direction = 'outgoing'
                 tableRow.label = tx.label || this.$t('send.table__outgoing-payments.label__tx-nolabel')
                 // This is different from txId because a single transaction (from the blockchain's perspective) can
                 // be both incoming and outgoing to us, which will require it to be displayed in the table multiple
                 // times.
                 tableRow.id = tx.id + '-outgoing'
+
+                data.push(tableRow)
+            }
+
+            for (const tx of this.allMints) {
+                let tableRow = {}
+                tableRow.address = 'ZerocoinMint'
+                tableRow.time = tx.block ? tx.block.time : Infinity
+                tableRow.txId = tx.txid
+                tableRow.isError = false
+                tableRow.confirmations = tx.confirmations
+                tableRow.isConfirmed = tx.isConfirmed
+                tableRow.amount = tx.amount
+                // Yes, 'mint' isn't really a direction, but it basically serves that purpose.
+                tableRow.direction = 'mint'
+                tableRow.label = '#Zerocoin Mint'
+                tableRow.id = tx.id + '-mint'
 
                 data.push(tableRow)
             }

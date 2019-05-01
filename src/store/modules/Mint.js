@@ -163,9 +163,9 @@ const getters = {
         }, 0)
     },
 
-    mints (state, getters, rootState, rootGetters) {
+    // All mints we have a record of, including spent ones.
+    allMints (state, getters, rootState, rootGetters) {
         return Object.values(state.mints)
-            .filter((mint) => mint.available)
             .map((mint) => {
                 const { block } = mint
                 const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight']
@@ -176,6 +176,11 @@ const getters = {
                     confirmations
                 }
             })
+    },
+
+    // This returns only unspent mints.
+    mints (state, getters) {
+        return getters.allMints.filter((mint) => mint.available)
     },
 
     confirmedMints (state, getters) {
