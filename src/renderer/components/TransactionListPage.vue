@@ -141,7 +141,6 @@ export default {
             }
 
             for (const tx of this.outgoingTransactions) {
-                console.log(tx)
                 let tableRow = {}
                 tableRow.address = tx.belongsToAddress
                 // Setting a date of Infinity causes AnimatedTableRelativeData to not render anything but still sort
