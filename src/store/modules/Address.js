@@ -136,6 +136,12 @@ const actions = {
                         return
                     }
 
+                    // FIXME: Figure out what these transactions mean. Don't ship with this.
+                    if (addressKey === 'ZEROCOIN_MINT' && category !== 'mint') {
+                        console.error('Ignoring ZEROCOIN_MINT transaction %s with category %s', txid, category)
+                        continue
+                    }
+
                     switch (category.toLowerCase()) {
                     case 'receive':
                         dispatch(types.ADD_WALLET_ADDRESS, {
