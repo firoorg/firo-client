@@ -115,8 +115,6 @@ export default {
         },
 
         allTableData () {
-            console.walletAddresses = this.walletAddresses
-
             const data = []
             for (const addr of this.walletAddresses) {
                 for (const tx of addr.transactions) {
