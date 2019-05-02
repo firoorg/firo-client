@@ -75,8 +75,7 @@ const actions = {
 
 const getters = {
     total: (state) => state.total.all,
-    unconfirmedTotal: (state) => state.xzc.unconfirmed + state.zerocoin.unconfirmed,
-    immatureTotal: (state, getters, rootState, rootGetters) => {
+    immatureXzc: (state, getters, rootState, rootGetters) => {
         const txs = rootGetters['Address/walletAddresses'].reduce((a, addr) => [...a, ...addr.transactions], [])
 
         // Mined transactions take 100 blocks to mature.
@@ -87,19 +86,14 @@ const getters = {
     },
     availableXzc: (state) => state.xzc.confirmed - state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed,
-    confirmedXzcZerocoinRatio: (state) => {
-        /*
-        const xzc = Object.keys(state.xzc).reduce((accumulator, key) => {
-            return accumulator + state.xzc[key]
-        }, 0)
-        */
+    unconfirmedXzc: (state) => state.xzc.unconfirmed,
 
-        const zerocoin = Object.keys(state.zerocoin).reduce((accumulator, key) => {
-            return accumulator + state.zerocoin[key]
-        }, 0)
+    confirmedZerocoin: (state, getters, rootState, rootGetters) =>
+        rootGetters['Mint/confirmedMints'].reduce((a,tx) => a+tx.amount, 0),
+    unconfirmedZerocoin: (state, getters, rootState, rootGetters) =>
+        rootGetters['Mint/unconfirmedMints'].reduce((a,tx) => a+tx.amount, 0),
 
-        return zerocoin / state.total.available
-    }
+    confirmedXzcZerocoinRatio: (state, getters) => getters.confirmedZerocoin / getters.total
 }
 
 export default {

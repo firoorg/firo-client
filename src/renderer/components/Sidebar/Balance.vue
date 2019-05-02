@@ -11,21 +11,31 @@
         </div>
         <div class="amount">
             <div class="confirmed-total">
-                {{ convertToCoin(availableXzc) }}
+                {{ convertToCoin(availableXzc) }} XZC
+                <span
+                    v-if="pendingXzc > 0"
+                >
+                    ({{ convertToCoin(pendingXzc) }} pending)
+                </span>
             </div>
 
             <div
-                v-if="pendingTotal > 0"
-                class="pending-total"
-            >
-                ({{ convertToCoin(pendingTotal) }} pending)
-            </div>
-
-            <div
-                v-if="availableZerocoin > 0"
+                v-if="confirmedZerocoin > 0 && unconfirmedZerocoin > 0"
                 class="zerocoin-total"
             >
-                {{ convertToCoin(availableZerocoin) }} Zerocoin
+                {{ convertToCoin(confirmedZerocoin) }} Zerocoin ({{ convertToCoin(unconfirmedZerocoin) }} pending)
+            </div>
+            <div
+                v-else-if="confirmedZerocoin > 0"
+                class="zerocoin-total"
+            >
+                {{ convertToCoin(confirmedZerocoin) }}
+            </div>
+            <div
+                v-else-if="unconfirmedZerocoin > 0"
+                class="zerocoin-total"
+            >
+                ({{ convertToCoin(unconfirmedZerocoin) }} pending)
             </div>
         </div>
     </section>
@@ -41,13 +51,16 @@ export default {
     computed: {
         ...mapGetters({
             availableXzc: 'Balance/availableXzc',
-            availableZerocoin: 'Balance/availableZerocoin',
-            unconfirmedTotal: 'Balance/unconfirmedTotal',
-            immatureTotal: 'Balance/immatureTotal'
+            unconfirmedXzc: 'Balance/unconfirmedXzc',
+            immatureXzc: 'Balance/immatureXzc',
+
+            confirmedZerocoin: 'Balance/confirmedZerocoin',
+            unconfirmedZerocoin: 'Balance/unconfirmedZerocoin',
+            mints: 'Mint/allMints'
         }),
 
-        pendingTotal () {
-            return this.immatureTotal + this.unconfirmedTotal
+        pendingXzc () {
+            return this.immatureXzc + this.unconfirmedXzc
         }
     },
 

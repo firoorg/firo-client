@@ -184,7 +184,11 @@ const getters = {
     },
 
     confirmedMints (state, getters) {
-        return getters.mints.filter((mint) => mint.confirmations >= 6)
+        return getters.allMints.filter((mint) => mint.confirmations >= 6)
+    },
+
+    unconfirmedMints (state, getters) {
+        return getters.allMints.filter((mint) => mint.confirmations < 6)
     },
 
     confirmedMintPairs (state, getters) {
