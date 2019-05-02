@@ -16,22 +16,26 @@ export default {
         },
 
         spendZerocoin (payload) {
-            const { auth, data } = payload
-            const { passphrase = null } = auth
+            // This weird transformation exists because this function has all the information required to switch to the
+            // new Sigma API and I didn't want to change the code more than necessary. I guess it should probably be
+            // cleaned out and changed on the caller's side if we do a refactor or something.
+            let data = {
+                label: payload.data.label,
+                outputs: [
+                    {
+                        address: payload.data.address,
+                        amount: payload.data.denomination.reduce( (a,denom) => a + denom.amount * denom.value, 0 )
+                    }
+                ]
+            }
 
             logger.info('SENDING ZEROCOIN: %o', data)
 
-            const { address, label, denomination } = data
-
             this.send({
                 type: 'create',
-                data: {
-                    address,
-                    denomination,
-                    label
-                },
+                data: data,
                 auth: {
-                    passphrase
+                    passphrase: payload.auth.passphrase || null
                 }
             }, {
                 onSuccess: types.zerocoinspend.ON_SPEND_ZEROCOIN_SUCCESS,
