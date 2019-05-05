@@ -302,6 +302,9 @@ send:
       description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
       label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
 
+    flyout-used-address:
+      label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
+
 znodes:
   overview:
     title: Znodes
