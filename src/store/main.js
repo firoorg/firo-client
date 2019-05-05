@@ -44,7 +44,7 @@ ipcMain.on('vuex-mutation', (event, args) => {
     } catch (error) {
         logger.warn('error during vuex-mutation')
         logger.error(error)
-        logger.debug(args)
+        logger.debug("%O", args)
         event.sender.send('vuex-error', error)
     }
 })
@@ -57,7 +57,7 @@ ipcMain.on('vuex-action', (event, args) => {
     } catch (error) {
         logger.warn('error during vuex-action')
         logger.error(error)
-        logger.debug(args)
+        logger.debug("%O", args)
         event.sender.send('vuex-error', error)
     }
 })
