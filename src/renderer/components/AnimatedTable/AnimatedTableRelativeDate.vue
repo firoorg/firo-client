@@ -8,6 +8,7 @@
     <td
         v-else
         class="vuetable-td-component-relative-date"
+        :title="absoluteDate || 'Pending'"
     >
         <timeago
             v-if="relativeDate"
@@ -23,6 +24,7 @@
 
 <script>
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import { format } from 'date-fns'
 
 export default {
     name: 'RelativeDate',
@@ -40,6 +42,14 @@ export default {
             }
 
             return d
+        },
+
+        absoluteDate () {
+            const d = this.rowData[this.rowField.dateField]
+            if (d === Infinity) {
+                return undefined
+            }
+            return format(new Date(d), "HH:MM, D MMM YYYY")
         }
     }
 }
