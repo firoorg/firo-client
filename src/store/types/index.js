@@ -6,13 +6,13 @@
 
 import { isObject } from 'lodash'
 
-const files = require.context('.', false, /\.js$/)
+const files = require.context('.', false, /\.[jt]s$/)
 const types = {}
 
 files.keys().forEach(key => {
     if (key === './index.js') return
     const file = files(key)
-    const namespace = key.replace(/(\.\/|\.js)/g, '')
+    const namespace = key.replace(/(\.\/|\.[jt]s)/g, '')
 
     let nsTypes = {}
 

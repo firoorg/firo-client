@@ -56,6 +56,10 @@ let webConfig = {
         exclude: /node_modules/
       },
       {
+        test: /\.ts$/,
+        use: 'ts-loader'
+      },
+      {
         test: /\.vue$/,
         use: {
           loader: 'vue-loader',

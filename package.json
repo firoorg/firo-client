@@ -202,6 +202,8 @@
     "sass-loader": "^7.1.0",
     "spectron": "^5.0.0",
     "style-loader": "^0.23.1",
+    "ts-loader": "^6.0.0",
+    "typescript": "^3.4.5",
     "url-loader": "^1.1.2",
     "vue-devtools": "^5.0.0-beta.1",
     "vue-loader": "^15.7.0",

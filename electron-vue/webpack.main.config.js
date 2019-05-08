@@ -40,6 +40,10 @@ let mainConfig = {
       {
         test: /\.node$/,
         use: 'node-loader'
+      },
+      {
+        test: /\.ts$/,
+        use: 'ts-loader'
       }
     ]
   },
@@ -60,7 +64,7 @@ let mainConfig = {
       '~': path.join(__dirname, '../src/store'),
       '#': path.join(__dirname, '../src')
     },
-    extensions: ['.js', '.json', '.node']
+    extensions: ['.js', '.json', '.node', '.ts']
   },
   target: 'electron-main'
 }
