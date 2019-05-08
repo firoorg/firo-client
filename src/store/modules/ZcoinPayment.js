@@ -168,8 +168,8 @@ const getters = {
 
     availableFees: (state) => state.availableFees,
     selectedFee: (state) => ({
-        ...state.availableFees[state.selectedFee],
-        key: state.selectedFee
+        amount: state.availableFees[state.selectedFee],
+        label: state.selectedFee
     }),
 
     createFormLabel: (state) => state.addPaymentForm.label,
