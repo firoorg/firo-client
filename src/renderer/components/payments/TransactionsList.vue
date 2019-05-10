@@ -33,17 +33,11 @@
                     </span>
                 </div>
 
-                <div class="wrapper">
-                    <!--<span class="progress" :style="{ width: calcProcessInPercent(tx) + '%' }"></span>-->
-                    <div
-                        v-if="tx.isConfirmed"
-                        class="progress"
-                    />
-                    <!--
-                    <div v-for="(confirmations, id) in tx" class="item" :key="id">
-
-                    </div>
-                    -->
+                <div
+                    class="txid"
+                    :class="{confirmed: tx.confirmations}"
+                >
+                    {{ tx.txid }}
                 </div>
             </div>
         </li>
@@ -79,12 +73,12 @@ export default {
             return [...this.transactions]
                 .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
                 .map((tx, index) => {
-                    const { id, amount, firstSeenAt, confirmations, isConfirmed, category } = tx
+                    const { txid, amount, firstSeenAt, confirmations, isConfirmed, category } = tx
                     const order = this.transactions.length - index - 1
                     const isGreen = !order || ['spendIn', 'spendOut', 'mined'].includes(category)
 
                     return {
-                        id,
+                        txid,
                         firstSeenAt,
                         amount: convertToCoin(amount),
                         order,
@@ -148,33 +142,17 @@ export default {
                 }*/
             }
 
-            .wrapper {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                margin-top: emRhythm(1);
-                background: $color--comet-light;
-                height: emRhythm(0.75, $silent: true);
+            .txid {
+                font-size: 0.6em;
+                font-weight: bold;
 
-                .progress {
-                    display: block;
-                    background: $color--green;
-                    transition: width 1s ease-out, background-color 1s ease-out;
-                    min-width: emRhythm(0.5, $silent: true);
-                    height: 100%;
-                    width: 100%;
+
+                &.confirmed {
+                    color: green;
                 }
-            }
 
-            &.green {
-                .progress {
-                    background: $color--green;
-                }
-            }
-
-            &.warning {
-                .progress {
-                    background: $color--orange;
+                &:not(.confirmed) {
+                    color: gray;
                 }
             }
         }
