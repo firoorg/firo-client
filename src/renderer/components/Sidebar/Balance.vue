@@ -5,48 +5,47 @@
 
 <template>
     <section class="balance">
-        <div class="label">
-            {{ $t('navigation.balance.title') }}
-            <span />
+        <div class="confirmed-total">
+            <amount :amount="availableXzc" /> <span class="ticker">XZC</span>
         </div>
-        <div class="amount">
-            <div class="confirmed-total">
-                {{ convertToCoin(availableXzc) }} XZC
-                <span
-                    v-if="pendingXzc > 0"
-                >
-                    ({{ convertToCoin(pendingXzc) }} pending)
-                </span>
-            </div>
+        <div
+            v-if="pendingXzc > 0"
+        >
+            (<amount :amount="pendingXzc" /> pending)
+        </div>
 
-            <div
-                v-if="confirmedZerocoin > 0 && unconfirmedZerocoin > 0"
-                class="zerocoin-total"
-            >
-                {{ convertToCoin(confirmedZerocoin) }} Zerocoin ({{ convertToCoin(unconfirmedZerocoin) }} pending)
-            </div>
-            <div
-                v-else-if="confirmedZerocoin > 0"
-                class="zerocoin-total"
-            >
-                {{ convertToCoin(confirmedZerocoin) }}
-            </div>
-            <div
-                v-else-if="unconfirmedZerocoin > 0"
-                class="zerocoin-total"
-            >
-                ({{ convertToCoin(unconfirmedZerocoin) }} pending)
-            </div>
+        <div
+            v-if="confirmedZerocoin > 0 && unconfirmedZerocoin > 0"
+            class="zerocoin-total"
+        >
+            <amount :amount="confirmedZerocoin" /> <span class="ticker">Zerocoin</span>
+            (<amount :amount="unconfirmedZerocoin" /> pending)
+        </div>
+        <div
+            v-else-if="confirmedZerocoin > 0"
+            class="zerocoin-total"
+        >
+            <amount :amount="confirmedZerocoin" /> <span class="ticker">Zerocoin</span>
+        </div>
+        <div
+            v-else-if="unconfirmedZerocoin > 0"
+            class="zerocoin-total"
+        >
+            (<amount :amount="unconfirmedZerocoin" /> <span class="ticker">Zerocoin</span> pending)
         </div>
     </section>
 </template>
 
 <script>
 import { mapGetters } from 'vuex' /* , mapActions */
-import { convertToCoin } from '#/lib/convert'
+import Amount from './Amount'
 
 export default {
     name: 'Balance',
+
+    components: {
+        Amount
+    },
 
     computed: {
         ...mapGetters({
@@ -62,19 +61,20 @@ export default {
         pendingXzc () {
             return this.immatureXzc + this.unconfirmedXzc
         }
-    },
-
-    methods: {
-        convertToCoin
     }
 }
 </script>
 
 <style lang="scss" scoped>
-    .label,
-    .amount {
+    .balance {
         display: block;
         @include setType(3);
+
+        margin-top: emRhythm(1);
+        opacity: .8;
+        transition: all .15s ease-in-out;
+        //text-shadow: 0 0 10px $color--green-bright;
+        cursor: default;
     }
 
     .pending-total {
@@ -86,12 +86,7 @@ export default {
         margin-top: emRhythm(0.69, $silent: true);
     }
 
-    .amount {
-        margin-top: emRhythm(1);
+    .ticker {
         color: #23B852;
-        opacity: .8;
-        transition: all .15s ease-in-out;
-        //text-shadow: 0 0 10px $color--green-bright;
-        cursor: default;
     }
 </style>
