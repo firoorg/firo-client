@@ -28,7 +28,7 @@
                         <code place="value">{{ name }}={{ getDaemonSettingValue(name) }}</code>
                     </i18n>
                     <span v-else>
-                        {{ $t(`settings.form.privacy.label__connect-via-tor--${isChecked ? 'checked' : 'unchecked'}`) }}
+                        {{ $t('settings.form.privacy.label__connect-via-tor') }}
                     </span>
                 </template>
             </base-checkbox>
