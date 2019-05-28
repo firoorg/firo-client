@@ -39,8 +39,8 @@ import types from '~/types'
 
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
-import ConnectViaTorSettings from '@/components/SettingsPage//ConnectViaTorSettings'
-import AmountToHoldInZerocoinSettings from '@/components/SettingsPage//AmountToHoldInZerocoinSettings'
+import ConnectViaTorSettings from '@/components/SettingsPage/ConnectViaTorSettings'
+import AmountToHoldInZerocoinSettings from '@/components/SettingsPage/AmountToHoldInZerocoinSettings'
 
 export default {
     name: 'SettingsPage',
