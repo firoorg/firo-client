@@ -7,7 +7,7 @@
             <div class="control confirm">
                 <input
                     v-focus
-                    type="text"
+                    type="password"
                     :placeholder="$t('onboarding.confirm-passphrase.placeholder__confirm-passphrase')"
                     @input="onChange"
                 >

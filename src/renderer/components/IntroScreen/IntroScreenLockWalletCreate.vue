@@ -36,7 +36,7 @@
                     <div class="control passphrase">
                         <input
                             v-focus
-                            type="text"
+                            type="password"
                             :placeholder="$t('onboarding.create-passphrase.placeholder__enter-passphrase')"
                             @input="onInput"
                         >
