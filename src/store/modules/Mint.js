@@ -207,7 +207,7 @@ const getters = {
     confirmedMintsPerDenomination (state, getters) {
         return getters.confirmedMints.reduce((accumulator, mint) => {
             const { amount } = mint
-            const label = parseInt(convertToCoin(amount))
+            const label = convertToCoin(amount)
 
             if (!accumulator[`${label}`]) {
                 accumulator[`${label}`] = 0

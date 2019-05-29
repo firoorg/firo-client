@@ -22,7 +22,7 @@ const state = {
         },
         address: null
     },
-    denominationTypes: [1, 10, 25, 50, 100],
+    denominationTypes: [0.1, 0.5, 1, 10, 100],
     maxAmountOfMintInputsPerTx: 10
 }
 

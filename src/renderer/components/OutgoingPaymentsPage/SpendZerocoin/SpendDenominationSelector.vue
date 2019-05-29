@@ -50,7 +50,7 @@ export default {
 
     methods: {
         getAvailableAmountFor (denom) {
-            return this.mints[denom] ? this.mints[denom] : 0
+            return this.mints[String(denom)] ? this.mints[String(denom)] : 0
         },
 
         getCurrentAmountFor (denom) {

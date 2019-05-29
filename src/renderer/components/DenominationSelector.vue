@@ -39,7 +39,7 @@ export default {
 
     data () {
         return {
-            denominations: [1, 10, 25, 50, 100],
+            denominations: [0.1, 0.5, 1, 10, 100],
             maxHeight: 0
         }
     },
