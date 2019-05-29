@@ -167,18 +167,24 @@ module.exports = {
             }
         },
         b58Prefixes: {
-            main: {
+            mainnet: {
                 pubkeyAddress: 82, // ['a', 'Z'],
                 scriptAddress: 7 // ['3', '4']
             },
-            test: {
+            testnet: {
+                pubkeyAddress: 65, // ['T'],
+                scriptAddress: 178 // ['2']
+            },
+            // FIXME: I'm not 100% sure these are the correct values.
+            regtest: {
                 pubkeyAddress: 65, // ['T'],
                 scriptAddress: 178 // ['2']
             }
         },
         explorer: {
-            test: 'https://testexplorer.zcoin.io/%s/%s',
-            main: 'https://explorer.zcoin.io/%s/%s'
+            testnet: 'https://testexplorer.zcoin.io/%s/%s',
+            mainnet: 'https://explorer.zcoin.io/%s/%s',
+            regtest: 'https://regtestexplorer.invalid/%s/%s'
         }
     },
 

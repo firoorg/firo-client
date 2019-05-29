@@ -17,7 +17,7 @@ const state = {
         isWinnersListSynced: false,
         isZnodeListSynced: false
     },
-    testnet: false,
+    network: null, // null is not a valid value here
     type: 'full',
     averageBlockTime: 0,
     syncBlocksPerSecond: {
@@ -81,11 +81,15 @@ export const mutations = {
     },
 
     [types.SET_NETWORK_TO_MAINNET] (state) {
-        state.testnet = false
+        state.network = 'mainnet'
     },
 
     [types.SET_NETWORK_TO_TESTNET] (state) {
-        state.testnet = true
+        state.network = 'testnet'
+    },
+
+    [types.SET_NETWORK_TO_REGTEST] (state) {
+        state.network = 'regtest'
     },
 
     [types.IS_FULL_NODE] (state) {
@@ -125,10 +129,31 @@ export const actions = {
             timestamp: Date.now()
         })
 
+        // FIXME: This is a really dirty hack, and needs to be fixed with info about network state from zcoind.
+        let network = null;
         if (isTestnet) {
-            dispatch(types.SET_NETWORK_TO_TESTNET)
+            network = 'testnet'
+        } else if (connections === 0) {
+            network = 'regtest'
         } else {
+            network = 'mainnet'
+        }
+
+        switch (network) {
+        case 'mainnet':
             dispatch(types.SET_NETWORK_TO_MAINNET)
+            break
+
+        case 'testnet':
+            dispatch(types.SET_NETWORK_TO_TESTNET)
+            break
+
+        case 'regtest':
+            dispatch(types.SET_NETWORK_TO_REGTEST)
+            break
+
+        default:
+            throw "unknown network type: " +  network + "!"
         }
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
@@ -214,12 +239,16 @@ export const actions = {
         }
 
         switch (type.toLowerCase()) {
-        case 'main':
+        case 'mainnet':
             commit(types.SET_NETWORK_TO_MAINNET)
             break
 
-        case 'test':
+        case 'testnet':
             commit(types.SET_NETWORK_TO_TESTNET)
+            break
+
+        case 'regtest':
+            commit(types.SET_NETWORK_TO_REGTEST)
             break
 
         default:
@@ -229,7 +258,7 @@ export const actions = {
     },
 
     [types.SET_NETWORK_TO_TESTNET] ({ commit, getters }) {
-        if (getters.isTestnet) {
+        if (getters.network === 'testnet') {
             return
         }
 
@@ -237,11 +266,19 @@ export const actions = {
     },
 
     [types.SET_NETWORK_TO_MAINNET] ({ commit, getters }) {
-        if (getters.isMainnet) {
+        if (getters.network === 'mainnet') {
             return
         }
 
         commit(types.SET_NETWORK_TO_MAINNET)
+    },
+
+    [types.SET_NETWORK_TO_REGTEST] ({ commit, getters }) {
+        if (getters.network === 'regtest') {
+            return
+        }
+
+        commit(types.SET_NETWORK_TO_REGTEST)
     },
 
     [types.SET_CLIENT_TYPE] ({ commit, state }, type) {
@@ -279,14 +316,12 @@ export const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
     currentBlockTimestamp: (state) => state.currentBlock.timestamp,
     // tipHeight: (state) => state.blockchainTip,
-    isTestnet: (state) => state.testnet === true,
-    isMainnet: (state, getters) => getters.isTestnet === false,
+    network: (state) => state.network, // 'mainnet', 'testnet', or 'regtest'
     status: (state) => state.status || {},
     isSynced: (state, getters) => getters.status.isSynced,
     isBlockchainSynced: (state, getters) => getters.status.isBlockchainSynced,
     isWinnersListSynced: (state, getters) => getters.status.isWinnersListSynced,
     isZnodeListSynced: (state, getters) => getters.status.isZnodeListSynced,
-    networkIdentifier: (state, getters) => getters.isMainnet ? 'main' : 'test',
     averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime,
     connections: (state) => state.connections,
     hasConnections: (state) => !!state.connections,

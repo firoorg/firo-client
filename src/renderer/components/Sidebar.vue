@@ -56,10 +56,16 @@
                         </g>
                     </svg>
                     <div
-                        v-if="isTestnet"
+                        v-if="network === 'testnet'"
                         class="is-testnet-badge"
                     >
                         Testnet
+                    </div>
+                    <div
+                        v-else-if="network === 'regtest'"
+                        class="is-testnet-badge"
+                    >
+                        Regtest
                     </div>
                 </router-link>
             </div>
@@ -92,7 +98,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            isTestnet: 'Blockchain/isTestnet'
+            network: 'Blockchain/network'
         })
     }
 }
