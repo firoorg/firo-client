@@ -94,7 +94,7 @@ const actions = {
                     const { denomination, amount } = denom
 
                     return {
-                        value: parseInt(denomination),
+                        value: Number(denomination),
                         amount
                     }
                 })

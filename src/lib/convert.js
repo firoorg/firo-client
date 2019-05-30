@@ -53,7 +53,7 @@ export const convertToSatoshi = function (base) {
  * getLargestDenomination(42, { '10': 7, '25': 2 }) // { denomination: 25, change: 17 }
  */
 export const getLargestDenomination = function (amount, denominations = {}) {
-    const denominationsPairs = Object.entries(denominations).map(([ key, value ]) => [ parseInt(key), value ])
+    const denominationsPairs = Object.entries(denominations).map(([ key, value ]) => [ Number(key), value ])
     const denoms = denominationsPairs.map(([ key ]) => key).reverse()
     let denomination = null
 

@@ -217,7 +217,7 @@ export default {
                     return {
                         denomination,
                         amount,
-                        cost: parseInt(denomination) * amount
+                        cost: Number(denomination) * amount
                     }
                 })
         },

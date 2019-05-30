@@ -36,7 +36,7 @@ export const formatDenominationPairs = function (denominations) {
             return {
                 denomination,
                 amount,
-                cost: parseInt(denomination) * amount
+                cost: Number(denomination) * amount
             }
         })
         .filter((denom) => denom.amount)

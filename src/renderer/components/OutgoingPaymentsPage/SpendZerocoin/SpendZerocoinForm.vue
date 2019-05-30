@@ -78,7 +78,7 @@
                             />
                             <input
                                 id="mintCosts"
-                                v-validate="{ min_value: 1 }"
+                                v-validate="{ min_value: Number.MIN_VALUE }"
                                 type="hidden"
                                 data-vv-validate-on="change"
                                 :value="spendFormMintCosts"
