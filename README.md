@@ -2,54 +2,73 @@
 
 ![](.github/github-zcoin-client-header.png)
 
-Curabitur blandit tempus porttitor. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui.
+This is an (experimental) client for the [Zcoin](https://zcoin.io/) network. Currently, it requires connection to a
+fully trusted zcoind full node. Windows support is currently slightly broken, but will be fixed shortly.
 
----
+## Installing zcoind
 
-## Development
+For an unbundled install, it's required that you manually link binaries compiled from the `client-api-development`
+branch of the [zcoin repository](https://github.com/zcoinofficial/zcoin) into the appropriate directory for your system.
 
-As the clients architecture is split up into two separate components both of them need to set up first.
-The graphical interface is structurally decoupled from the core and communicates through an ZeroMQ API. This is the Repository of the interface only. Head over to https://github.com/zcoinofficial/zcoin/tree/client-api#dependencies where the daemon code lives and setup of dependencies is described.
+### Pulling and Building zcoind
 
-### Zcoin Daemon
-
-Nevertheless, we provide an easy to us script which pulls the official repo, builds `zcoind` and moves it into the right folders where the gui can pick it up inside this repo. Simply run the following, get a ☕️, and after a couple of minutes you should be good to go.
-
-___NOTE:__ As the development on the Graphical User Interface is mainly done on MacOS the following script will not work on other operating systems – it is at least untested, PRs are welcome ;)._
+Clone the zcoind repository
 
 ```bash
-# fetches core from github and compiles it on all cores
-./fetch-and-build-zcoin-core.sh
-``` 
+git clone --branch client-api-development https://github.com/zcoinofficial/zcoin
+```
 
-### Graphical User Interface
+Now you must build zcoind, instructions for which will be located in `doc/build`, in the `README*.md` and `build*.md`
+files relevant to your platform. Once zcoind is built, the relevant binaries will be located in `./zcoin/src/`.
+
+Now you must make a symbolic link from in your platform-specific directory to the generated binaries.
+
+On OSX, this can be accomplished by running the following command from the `zcoin-client` (assuming you also ran `git`
+from this directory):
 
 ```bash
-# install dependencies
+for x in zcoind zcoin-tx zcoin-cli; do ln -s "$PWD/zcoin/src/$x" "assets/core/darwin/$x"; done
+```
+
+Or on Linux,
+
+```bash
+for x in zcoind zcoin-tx zcoin-cli; do ln -s "$PWD/zcoin/src/$x" "assets/core/linux/$x"; done
+```
+
+#### Updating zcoind
+
+To update `zcoind`, simply run `git pull` in the `zcoind` directory, and run `./autogen.sh`, `./configure`, and `make`
+with the arguments you previously used following your platform-specific build instructions.
+
+## Configuring zcoind
+
+In order for the client to run properly, you must have the line `clientapi=1` in your `zcoin.conf`. The location of this
+file is platform dependant. On OSX it will be at `"~/Library/Application Support/zcoin/zcoin.conf"` (quotes must be used
+when referencing due to the space in the `Application Support` directory), and on Linux it will be at
+`~/.zcoin/zcoin.conf`.
+
+## Installing npm Packages
+
+To install dependencies for the client itself, run
+
+```bash
 npm install
+```
 
-# serve with hot reload at localhost:9080
+## Installing Electron
+
+You must also install [Electron](https://electronjs.org/). We're currently developing on Electron version `3.0.8`.
+
+## Starting zcoin-client
+
+To run the development version of zcoin-client, simply run
+
+```bash
 npm run dev
-
-# serve with hot reload and append a ✅ to localized strings
-npm run translate
-
-# build electron application for production
-npm run build
 ```
 
-We're currently using `Electron ^3.0.0` to run the interface. It is recommended to use the same node version during development on your machine. 
+## Getting Assistance
 
-```
-# Electron   3.0.8
-# Node       10.2.0
-# Chromium   66.0.3359.181
-
-// copied from https://electronjs.org/
-```
----
-
-### Build for Production / Release
-
-Make sure authentication is enabled in `zcoinofficial/zcoin`. The Client __enforces__ encrypted communication between the interface and `zcoind` and will be unable to connect otherwise. 
-
+If you need assistance with this project, you can join the official Zcoin Telegram group
+[@zcoinproject](https://t.me/zcoinproject)
