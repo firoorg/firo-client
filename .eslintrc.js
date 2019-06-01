@@ -31,6 +31,7 @@ module.exports = {
         */
 
         'vue/no-unused-components': 0,
+        'vue/html-self-closing': 0,
 
 // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
