@@ -56,10 +56,6 @@ export default {
             type: Boolean,
             required: true
         },
-        address: {
-            type: Object,
-            required: true
-        },
         message: {
             type: String,
             default: null

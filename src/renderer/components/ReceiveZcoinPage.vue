@@ -34,7 +34,7 @@
                                 v-for="f of paymentRequestsWithUnseenChanges"
                                 :key="f.id"
                             >
-                                <router-link :to="getDetailRouteForAddress(f.address)">
+                                <router-link :to="getDetailRoutForUniqId(f.uniqId)">
                                     {{ f.label }}
                                 </router-link>
                             </li>
@@ -45,9 +45,9 @@
                 <animated-table
                     :data="filteredPaymentRequests"
                     :fields="tableFields"
-                    track-by="address"
+                    track-by="uniqId"
                     :no-data-message="getNoDataMessage"
-                    :selected-row="selectedPaymentRequest"
+                    :selected-row="paymentRequestId"
                     :on-row-select="onTableRowSelect"
                     class="payment-requests-table"
                     :sort-order="sortOrder"
@@ -94,7 +94,7 @@
             >-->
             <router-view
                 :key="$route.path"
-                v-bind="selectedPaymentRequestWithAddress"
+                v-bind="selectedPaymentRequest"
                 class="paymentrequest-detail-route"
                 @route-to-detail="onRouteToDetail"
             />
@@ -181,34 +181,12 @@ export default {
             walletAddresses: 'Address/walletAddresses'
         }),
 
-        selectedPaymentRequest () {
-            return this.$route.params.address
+        paymentRequestId () {
+            return this.$route.params.paymentRequestId
         },
 
-        selectedPaymentRequestWithAddress () {
-            if (!this.selectedPaymentRequest) {
-                return null
-            }
-
-            const filteredAddress = this.walletAddresses.find((address) => {
-                return address.address === this.selectedPaymentRequest
-            })
-
-            const paymentRequest = this.unarchivedPaymentRequests.find((request) => {
-                return request.address === this.selectedPaymentRequest
-            })
-
-            const address = filteredAddress || (paymentRequest && paymentRequest.address)
-
-            // address will be undefined if this.selectedPaymentRequest was just archived
-            if (!address) {
-                return null
-            }
-
-            return {
-                ...paymentRequest,
-                address
-            }
+        selectedPaymentRequest () {
+            return this.allPaymentRequests.find((x) => x.uniqId === this.paymentRequestId)
         },
 
         // This includes all payment requests which have received funds, even if they have been previously marked as
@@ -243,7 +221,7 @@ export default {
 
     methods: {
         comparePaymentRequests (a, b) {
-            for (const prop of ['address', 'amountReceived', 'amountPending', 'updatedAt']) {
+            for (const prop of ['address', 'amountReceived', 'amountPending', 'updatedAt', 'uniqId']) {
                 if (a[prop] !== b[prop]) {
                     return false
                 }
@@ -253,27 +231,20 @@ export default {
         },
 
         onRouteToDetail ({ address }) {
-            // Do nothing if we're just coming back from deleting a payment request.
-            const pr = this.allPaymentRequests.find((pr) => {return pr.address === address})
-            if (pr.state === 'archived') {
+            if (!this.selectedPaymentRequest || this.selectedPaymentRequest.state === 'archived') {
                 return
             }
 
             this.pushRouterWithFilter({
                 name: 'receive-zcoin-paymentrequest',
                 params: {
-                    address
+                    paymentRequestId: this.paymentRequestId
                 }
             })
         },
 
         onTableRowSelect (rowData, index, event) {
-            // todo get paymentRequest from store
-            const { address } = rowData
-
-            // remove selection
-            if (this.selectedPaymentRequest === address || this.selectedPaymentRequest === address) {
-
+            if (this.selectedPaymentRequest && this.selectedPaymentRequest.uniqId === rowData.uniqId) {
                 this.pushRouterWithFilter({
                     name: 'receive-zcoin'
                 })
@@ -283,16 +254,16 @@ export default {
             this.pushRouterWithFilter({
                 name: 'receive-zcoin-paymentrequest',
                 params: {
-                    address
+                    paymentRequestId: rowData.uniqId
                 }
             })
         },
 
-        getDetailRouteForAddress (address) {
+        getDetailRoutForUniqId (uniqId) {
             return this.getRouterWithFilter({
                 name: 'receive-zcoin-paymentrequest',
                 params: {
-                    address
+                    paymentRequestId: uniqId
                 }
             })
         }

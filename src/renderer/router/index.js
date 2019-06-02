@@ -23,7 +23,7 @@ export default new Router({
                     component: require('@/components/ReceiveZcoinPage').default,
                     children: [
                         {
-                            path: ':address',
+                            path: ':paymentRequestId',
                             name: 'receive-zcoin-paymentrequest',
                             component: require('@/components/ReceiveZcoinPage/Receive').default
                         },

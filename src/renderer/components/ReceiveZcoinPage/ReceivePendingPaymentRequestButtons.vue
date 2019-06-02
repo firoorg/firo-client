@@ -59,7 +59,7 @@
             <receive-payment-request-email-template
                 ref="emailTemplate"
                 :message="message || ''"
-                :address="getAddress"
+                :address="address"
                 :amount="amountInBaseCoin"
                 :uri="getZcoinUri"
             >
@@ -93,7 +93,7 @@ export default {
 
     props: {
         address: {
-            type: [Object, String],
+            type: String,
             required: true
         },
         amount: {
@@ -118,20 +118,7 @@ export default {
             return convertToCoin(this.amount)
         },
 
-        getAddress () {
-            if (!this.address) {
-                return ''
-            }
-            return this.address.address || this.address
-        },
-
         getZcoinUri () {
-            const address = this.getAddress
-
-            if (!address) {
-                return ''
-            }
-
             const params = []
 
             if (this.amount) {
@@ -144,7 +131,7 @@ export default {
 
             const paramsString = params.length ? `?${params.join('&')}` : ''
 
-            return `zcoin://${address}${paramsString}`
+            return `zcoin://${this.address}${paramsString}`
         }
     },
 
@@ -161,7 +148,7 @@ export default {
         },
 
         copyAddress () {
-            const address = this.address.address || this.address
+            const address = this.address
             clipboard.writeText(address)
             this.showCopySuccess = true
             this.showCopyType = 'address'

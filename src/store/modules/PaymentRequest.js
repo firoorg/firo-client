@@ -192,6 +192,8 @@ const getters = {
         const walletAddresses = rootGetters['Address/walletAddresses']
 
         for (let key in state.paymentRequests) {
+            // key here is the address, and address is in fact data (such as transactions) *associated* with an address.
+            // This terminology is consistent throughout the client, so I've let it be pending a refactor.
             const { amount: amountRequested, label } = state.paymentRequests[key]
             const address = walletAddresses.find((addr) => addr.address === key)
 
@@ -238,6 +240,8 @@ const getters = {
 
             requests.push({
                 ...state.paymentRequests[key],
+                address: key,
+                transactions: address ? address.transactions || [] : [],
                 amountRequested,
                 amountReceived,
                 isFulfilled,
@@ -247,6 +251,7 @@ const getters = {
                 updatedAt,
                 lastSeen,
                 amountPending,
+                uniqId: `paymentRequest-${key}`,
                 isUnseen: lastSeen < updatedAt
             })
         }
@@ -273,72 +278,46 @@ const getters = {
         return state.createPaymentRequestForm.message
     },
 
+    // One payment request per transaction, not per address.
     virtualPaymentRequests (state, getters, rootState, rootGetters) {
         const paymentRequestsKeys = Object.keys(state.paymentRequests)
         const walletAddresses = rootGetters['Address/walletAddresses']
         let paymentRequests = []
 
         walletAddresses.forEach((walletAddress) => {
-            const { address, transactions, isReused } = walletAddress
-
-            if (!transactions.length) {
-                return
-            }
+            const { address, transactions } = walletAddress
 
             // payment request for this address exists
             if (paymentRequestsKeys.includes(address)) {
                 return
             }
 
-            const isFulfilled = transactions.some((tx) => {
-                // return tx.confirmations && tx.confirmations > 0
-                return tx.isConfirmed
-            })
-
-            const createdAt = transactions.reduce((accumulator, tx) => {
-                return (tx.firstSeenAt < accumulator) ? tx.firstSeenAt : accumulator
-            }, Infinity)
-
-            const updatedAt = transactions.reduce((accumulator, tx) => {
-                return (tx.firstSeenAt > accumulator) ? tx.firstSeenAt : accumulator
-            }, createdAt)
-
-            let amountReceived = 0
-            let amountPending = 0
             for (const tx of transactions) {
-                if (tx.block) {
-                    amountReceived += tx.amount
-                } else {
-                    amountPending += tx.amount
+                if (!tx.id) {
+                    console.log(tx)
                 }
+                const request = {
+                    isVirtual: true,
+                    message: null,
+                    transactions: [tx],
+                    transactionsReceived: true,
+                    address: address,
+                    uniqId: `virtualPaymentRequest-${tx.id}`,
+                    isFulfilled: !!tx.isConfirmed,
+                    isReused: transactions.length > 1,
+                    isIncoming: !tx.isConfirmed,
+                    amountRequested: null,
+                    amountReceived: tx.isConfirmed ? tx.amount : 0,
+                    amountPending: tx.isConfirmed ? 0 : tx.amount,
+                    // Yes, Infinity, not NaN... It makes sorting easier.
+                    createdAt: tx.firstSeenAt || Infinity,
+                    updatedAt: tx.firstSeenAt || Infinity
+                }
+
+                request.label = getLabelForPaymentRequest({request, rootState, rootGetters, transactions: [tx]})
+
+                paymentRequests.push(request)
             }
-
-            const request = {
-                address,
-                isFulfilled,
-                isReused,
-                isIncoming: !isFulfilled,
-                isVirtual: true,
-                transactionsReceived: true,
-                amountReceived,
-                amountPending,
-                amountRequested: null,
-                message: null,
-                createdAt,
-                updatedAt
-            }
-
-            const label = getLabelForPaymentRequest({
-                request,
-                transactions,
-                rootState,
-                rootGetters
-            })
-
-            paymentRequests.push({
-                ...request,
-                label
-            })
         })
 
         return paymentRequests

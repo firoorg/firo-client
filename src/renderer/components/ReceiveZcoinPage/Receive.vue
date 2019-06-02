@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 <span class="address">
-                    {{ getAddress }}
+                    {{ address }}
                 </span>
                 <!--
                     <i v-if="!isFulfilled"
@@ -97,11 +97,9 @@
 
         <receive-fulfilled-payment-request
             v-if="transactionsReceived"
-            :address="address"
             :message="message"
             :is-reused="isReused"
-            :is-fulfilled="isFulfilled"
-            :transactions="address.transactions"
+            :transactions="transactions"
         />
         <receive-pending-payment-request
             v-else
@@ -110,8 +108,8 @@
 
         <div class="actions">
             <receive-fulfilled-payment-request-buttons
-                v-if="hasAmountReceived"
-                :address="address.address"
+                v-if="isFulfilled"
+                :address="address"
             />
             <receive-pending-payment-request-buttons
                 v-else
@@ -166,9 +164,17 @@ export default {
         DeleteIcon
     },
     props: {
+        address: {
+            type: String,
+            required: true
+        },
         transactionsReceived: {
             type: Boolean,
             default: false
+        },
+        transactions: {
+            type: Array,
+            required: true
         },
         isFulfilled: {
             type: Boolean,
@@ -198,10 +204,6 @@ export default {
             type: Number,
             required: true
         },
-        address: {
-            type: [String, Object],
-            required: true
-        },
         state: {
             type: String,
             default: 'active'
@@ -220,7 +222,7 @@ export default {
         }),
 
         deleteIconIsVisible () {
-            return !this.address.transactions
+            return !this.transactions
         },
 
         qrCodeIsVisible () {
@@ -229,26 +231,6 @@ export default {
 
         amountInBaseCoin () {
             return convertToCoin(this.amount)
-        },
-
-        getAddress () {
-            return this.address.address || this.address
-        },
-
-        hasAmountReceived () {
-            if (typeof this.address === 'string' || !this.address.total) {
-                return false
-            }
-
-            return this.address.total.balance >= this.amount
-        },
-
-        lastSeen () {
-            if (this.address) {
-                return this.getLastSeen(this.address.address || this.address)
-            }
-
-            return 0
         }
     },
 
@@ -275,7 +257,7 @@ export default {
             this.updateLabel({
                 label,
                 createdAt: this.createdAt,
-                address: this.getAddress
+                address: this.address
             })
         },
 
@@ -292,7 +274,7 @@ export default {
             event.preventDefault()
 
             // todo
-            alert(`opening ${this.address.address} in block explorer`)
+            alert(`opening ${this.address} in block explorer`)
         },
 
         // Yes, confusing terminology, but imo it makes sense--front end is deleting the payment request, but it's only
@@ -300,7 +282,7 @@ export default {
         deletePaymentRequest () {
             this.$router.replace({name: 'receive-zcoin'})
 
-            this.archivePaymentRequest(this.getAddress)
+            this.archivePaymentRequest(this.address)
         }
     }
 }
