@@ -85,15 +85,10 @@ const getters = {
         return immatureTxs.reduce((a, tx) => a + tx.amount, 0)
     },
     availableXzc: (state) => state.xzc.confirmed - state.xzc.locked,
-    availableZerocoin: (state) => state.zerocoin.confirmed,
     unconfirmedXzc: (state) => state.xzc.unconfirmed,
-
-    confirmedZerocoin: (state, getters, rootState, rootGetters) =>
-        rootGetters['Mint/confirmedMints'].reduce((a,tx) => a+tx.amount, 0),
-    unconfirmedZerocoin: (state, getters, rootState, rootGetters) =>
-        rootGetters['Mint/unconfirmedMints'].reduce((a,tx) => a+tx.amount, 0),
-
-    confirmedXzcZerocoinRatio: (state, getters) => getters.confirmedZerocoin / getters.total
+    availableZerocoin: (state) => state.zerocoin.confirmed,
+    unconfirmedZerocoin: (state) => state.zerocoin.unconfirmed,
+    confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total
 }
 
 export default {

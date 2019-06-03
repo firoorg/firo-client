@@ -15,17 +15,17 @@
         </div>
 
         <div
-            v-if="confirmedZerocoin > 0 && unconfirmedZerocoin > 0"
+            v-if="availableZerocoin > 0 && unconfirmedZerocoin > 0"
             class="zerocoin-total"
         >
-            <amount :amount="confirmedZerocoin" /> <span class="ticker">Zerocoin</span>
+            <amount :amount="availableZerocoin" /> <span class="ticker">Zerocoin</span>
             (<amount :amount="unconfirmedZerocoin" /> pending)
         </div>
         <div
-            v-else-if="confirmedZerocoin > 0"
+            v-else-if="availableZerocoin > 0"
             class="zerocoin-total"
         >
-            <amount :amount="confirmedZerocoin" /> <span class="ticker">Zerocoin</span>
+            <amount :amount="availableZerocoin" /> <span class="ticker">Zerocoin</span>
         </div>
         <div
             v-else-if="unconfirmedZerocoin > 0"
@@ -53,7 +53,7 @@ export default {
             unconfirmedXzc: 'Balance/unconfirmedXzc',
             immatureXzc: 'Balance/immatureXzc',
 
-            confirmedZerocoin: 'Balance/confirmedZerocoin',
+            availableZerocoin: 'Balance/availableZerocoin',
             unconfirmedZerocoin: 'Balance/unconfirmedZerocoin',
             mints: 'Mint/allMints'
         }),
