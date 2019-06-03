@@ -60,7 +60,7 @@
                                         style="padding: 0 80px 40px; text-align: center;"
                                     >
                                         <p style="margin: 0;">
-                                            Maecenas sed ante pellentesque, posuere leo id, eleifend dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra.
+                                            Mint. Spend. Repeat.
                                         </p>
                                     </td>
                                 </tr>

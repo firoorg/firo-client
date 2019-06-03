@@ -356,12 +356,12 @@ settings:
     privacy:
       title: Privacy
       label__connect-via-tor: Connect to other nodes via Tor
-      description__connect-via-tor: Purus Ullamcorper Fermentum.
+      description__connect-via-tor: Connecting via Tor can increase your anonymity.
       label__connect-via-tor--disabled: Tor connection can not be changed here as is defined via {value} in {configFile}
       label__connect-via-tor--checked: Yes, connections to other Nodes in the Zcoin Network are established via Tor
       label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Zcoin Network
       label__hold-in-zerocoin: Ratio between private and public funds
-      description__hold-in-zerocoin: Purus Ullamcorper Fermentum.
+      description__hold-in-zerocoin: You might want to hold more of your funds in Zerocoin to make spending easier.
       label__hold-in-zerocoin--private: Private
       label__hold-in-zerocoin--public: Public
 
