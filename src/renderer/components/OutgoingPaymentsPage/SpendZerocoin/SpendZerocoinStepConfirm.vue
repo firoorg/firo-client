@@ -13,8 +13,10 @@
             >
                 {{ spendFormAddress }}
             </current-mints>
+            <!-- FeesAndAmount takes values in satoshi, so we convert it here, and then it gets converted back again.
+                 This should be made consistent in a refactor. -->
             <fees-and-amount
-                :amount="spendFormMintCostsInSatoshi"
+                :amount="10**8 * spendFormAmount"
                 :show-fee="false"
                 translation-namespace="send.private.flyout-confirm-private-send"
             />
@@ -50,14 +52,10 @@ export default {
     computed: {
         ...mapGetters({
             denominations: 'ZerocoinSpend/spendFormMintsFormatted',
-            spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi',
+            spendFormAmount: 'ZerocoinSpend/spendFormAmount',
             spendFormAddress: 'ZerocoinSpend/spendFormAddress',
             spendFormLabel: 'ZerocoinSpend/spendFormLabel'
-        }),
-
-        costs () {
-            return convertToCoin(this.spendFormMintCostsInSatoshi)
-        }
+        })
     }
 }
 </script>

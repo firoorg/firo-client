@@ -36,6 +36,16 @@ export default {
                 zcoin_address: {
                     b58Prefixes: this.$store.getters['Settings/b58Prefixes']
                 }
+            },
+            zerocoinAmountValidationRules: {
+                required: true,
+                // min_value and decimal validations depends on the smallest Zerocoin denomination being 0.1; this
+                // should be made more modular in a refactor
+                min_value: 0.1,
+                decimal: 1,
+                not_exceeding_balance: {
+                    limit: this.$store.getters['Balance/availableZerocoin']
+                }
             }
         }
     },

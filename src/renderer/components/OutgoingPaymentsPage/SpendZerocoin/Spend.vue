@@ -23,14 +23,6 @@
                     />
                 </div>
                 <section class="checkout has-divider">
-                    <!--<div class="">-->
-                    <fees-and-amount
-                        class="fees-and-amount"
-                        :amount="spendFormMintCostsInSatoshi"
-                        :show-fee="false"
-                        translation-namespace="send.private.detail-private-send"
-                    />
-                    <!--</div>-->
                     <spend-zerocoin-steps
                         :on-form-submit="submitForm"
                         :form-is-valid="formSectionIsValid"
@@ -91,8 +83,7 @@ export default {
             currentPassphrase: 'App/currentPassphrase',
             spendFormLabel: 'ZerocoinSpend/spendFormLabel',
             spendFormAddress: 'ZerocoinSpend/spendFormAddress',
-            spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted',
-            spendFormMintCostsInSatoshi: 'ZerocoinSpend/spendFormMintCostsInSatoshi'
+            spendFormAmount: 'ZerocoinSpend/spendFormAmount'
         }),
         formSectionIsValid () {
             return this.formValidated
@@ -135,12 +126,10 @@ export default {
             }
 
             this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
-                address: this.spendFormAddress,
-                denominations: this.spendFormMintsFormatted,
                 label: this.spendFormLabel,
-                auth: {
-                    passphrase: this.currentPassphrase
-                }
+                address: this.spendFormAddress,
+                amount: this.spendFormAmount,
+                auth: this.currentPassphrase
             })
         }
     }

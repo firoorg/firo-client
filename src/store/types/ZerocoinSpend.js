@@ -5,8 +5,7 @@ const isLoading = IsLoading.types('')
 const spendZerocoinResponse = Response.types('spend zerocoin')
 
 export const SET_FORM_LABEL = 'SET_FORM_LABEL'
-export const SET_FORM_MINTS = 'SET_FORM_MINTS'
-export const CLEAR_FORM_MINTS = 'CLEAR_FORM_MINTS'
+export const SET_FORM_AMOUNT = 'SET_FORM_AMOUNT'
 export const SET_FORM_ADDRESS = 'SET_FORM_ADDRESS'
 export const CLEAR_FORM = 'CLEAR_FORM'
 

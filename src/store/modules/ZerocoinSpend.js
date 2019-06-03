@@ -18,12 +18,10 @@ const state = {
     isLoading: false,
     spendForm: {
         label: '',
-        mints: {
-        },
+        amount: null,
         address: null
     },
     denominationTypes: [0.1, 0.5, 1, 10, 100],
-    maxAmountOfMintInputsPerTx: 10
 }
 
 const mutations = {
@@ -38,15 +36,8 @@ const mutations = {
     },
     */
 
-    [types.SET_FORM_MINTS] (state, mints) {
-        Vue.set(state.spendForm, 'mints', {
-            ...state.spendForm.mints,
-            ...mints
-        })
-    },
-
-    [types.CLEAR_FORM_MINTS] (state) {
-        Vue.set(state.spendForm, 'mints', {})
+    [types.SET_FORM_AMOUNT] (state, amount) {
+        state.spendForm.amount = amount
     },
 
     [types.SET_FORM_LABEL] (state, label) {
@@ -60,11 +51,11 @@ const mutations = {
 const actions = {
     ...spendZerocoinResponse.actions,
 
-    [types.SET_FORM_MINTS] ({ commit, state }, mints) {
+    [types.SET_FORM_AMOUNT] ({ commit }, amount) {
 
         // todo validate equality
 
-        commit(types.SET_FORM_MINTS, mints)
+        commit(types.SET_FORM_AMOUNT, amount)
     },
 
     [types.SET_FORM_LABEL] ({ commit, getters }, value) {
@@ -81,28 +72,12 @@ const actions = {
 
     [types.CLEAR_FORM] ({ dispatch, commit }) {
         dispatch(types.SET_FORM_LABEL, '')
-        commit(types.CLEAR_FORM_MINTS)
+        commit(types.SET_FORM_AMOUNT, null)
         dispatch(types.SET_FORM_ADDRESS, '')
     },
 
-    [types.SPEND_ZEROCOIN] ({ commit, dispatch, state }, { address, denominations, label, auth }) {
-        commit(types.SPEND_ZEROCOIN, {
-            data: {
-                address,
-                label,
-                denomination: denominations.map((denom) => {
-                    const { denomination, amount } = denom
-
-                    return {
-                        value: Number(denomination),
-                        amount
-                    }
-                })
-            },
-            auth: {
-                ...auth
-            }
-        })
+    [types.SPEND_ZEROCOIN] ({ commit, dispatch, state }, {label, address, amount, auth}) {
+        commit(types.SPEND_ZEROCOIN, {label, address, amount, auth})
 
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
     }
@@ -113,23 +88,8 @@ const getters = {
     ...spendZerocoinResponse.getters,
 
     // isLoading: (state) => state.isLoading,
-    spendFormMints: (state) => state.spendForm.mints,
+    spendFormAmount: (state) => state.spendForm.amount,
     spendFormLabel: (state) => state.spendForm.label,
-    spendFormMintsFormatted (state, getters) {
-        if (!getters.spendFormMints) {
-            return []
-        }
-
-        return formatDenominationPairs(getters.spendFormMints)
-    },
-    spendFormMintCosts (state, getters) {
-        return getters.spendFormMintsFormatted
-            .reduce((accumulator, current) => accumulator + current.cost, 0)
-    },
-    spendFormMintCostsInSatoshi (state, getters) {
-        return convertToSatoshi(getters.spendFormMintCosts)
-    },
-    spendFormMintsAsBaseCoin: (state, getters) => convertToCoin(getters.spendFormMintCostsInSatoshi),
     spendFormAddress: (state) => state.spendForm.address,
     spendFormIsEmpty: (state, getters) => (
         !getters.spendFormLabel &&
@@ -137,7 +97,6 @@ const getters = {
         !getters.spendFormAddress
     ),
     denominationTypes: (state) => state.denominationTypes,
-    maxAmountOfMintInputsPerTx: (state) => state.maxAmountOfMintInputsPerTx
 }
 
 export default {

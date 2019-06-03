@@ -57,48 +57,19 @@
             </label>
 
             <div class="control">
-                <base-popover
-                    :open="amountSelectorIsOpen"
-                    trigger="manual"
-                    placement="left-auto"
-                    :offset="8*3"
-                >
-                    <template slot="target">
-                        <!-- todo validate if amount is available in balance to spend -->
-                        <div
-                            ref="amountSelector"
-                            tabindex="3"
-                            :class="{ 'has-focus': amountSelectorIsOpen }"
-                            @focus="showAmountSelector"
-                            @blur="hideAmountSelector"
-                        >
-                            <selected-mints-list
-                                :mints="spendFormMintsFormatted"
-                                :is-open="amountSelectorIsOpen"
-                            />
-                            <input
-                                id="mintCosts"
-                                v-validate="{ min_value: Number.MIN_VALUE }"
-                                type="hidden"
-                                data-vv-validate-on="change"
-                                :value="spendFormMintCosts"
-                                name="mintCosts"
-                            >
-                        </div>
-                    </template>
-                    <template slot="content">
-                        <div>
-                            <header class="right">
-                                <h3 v-html="$t('send.private.flyout-amount-selection.title__amount-selection')" />
-                                <p v-html="$t('send.private.flyout-amount-selection.description__amount-selection')" />
-                            </header>
-                            <spend-denomination-selector
-                                class="spend-denomination-selector"
-                                :on-denomination-change="onDenominationChange"
-                            />
-                        </div>
-                    </template>
-                </base-popover>
+                <!-- The decimal parameter in v-validate depends on not having Zerocoin denominations below 0.1 -->
+                <input
+                    id="amount"
+                    ref="amount"
+                    v-model.trim="amount"
+                    v-validate="zerocoinAmountValidationRules"
+                    v-tooltip="getValidationTooltip('amount')"
+                    data-vv-validate-on="change|blur"
+                    type="text"
+                    name="amount"
+                    tabindex="3"
+                    placeholder="0"
+                />
             </div>
         </div>
     </fieldset>
@@ -110,15 +81,9 @@ import types from '~/types'
 
 import { addVuexModel } from '@/utils/store'
 import ValidationMixin from '@/mixins/ValidationMixin'
-import SpendDenominationSelector from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendDenominationSelector'
-import SelectedMintsList from '@/components/OutgoingPaymentsPage/SpendZerocoin/SelectedMintsList'
 
 export default {
     name: 'SpendZerocoinForm',
-    components: {
-        SelectedMintsList,
-        SpendDenominationSelector
-    },
 
     mixins: [
         ValidationMixin
@@ -140,7 +105,7 @@ export default {
             validationFieldOrder: [
                 'label',
                 'address',
-                'mintCosts'
+                'amount'
             ],
             amountSelectorIsOpen: false,
             amountSelectorTimeout: null
@@ -149,9 +114,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            spendFormMints: 'ZerocoinSpend/spendFormMints',
-            spendFormMintsFormatted: 'ZerocoinSpend/spendFormMintsFormatted',
-            spendFormMintCosts: 'ZerocoinSpend/spendFormMintCosts'
+            availableZerocoin: 'Balance/availableZerocoin'
         }),
 
         ...addVuexModel({
@@ -164,18 +127,25 @@ export default {
             name: 'address',
             getter: 'ZerocoinSpend/spendFormAddress',
             action: types.zerocoinspend.SET_FORM_ADDRESS
+        }),
+
+        ...addVuexModel({
+            name: 'amount',
+            getter: 'ZerocoinSpend/spendFormAmount',
+            action: types.zerocoinspend.SET_FORM_AMOUNT
         })
     },
 
     watch: {
-        amount (newVal) {
+        label () {
             this.validate()
         },
-        address (newVal) {
+
+        address () {
             this.validate()
         },
-        spendFormMintCosts (newVal) {
-            this.$log.debug('spendFormMintCosts ->', newVal)
+
+        amount () {
             this.validate()
         },
 
@@ -184,31 +154,6 @@ export default {
                 this.$emit('form-validated', newVal)
             },
             immediate: true
-        }
-    },
-
-    methods: {
-        ...mapActions({
-            setMint: types.zerocoinspend.SET_FORM_MINTS
-        }),
-
-        onDenominationChange (denomination) {
-            this.$refs.amountSelector.focus()
-            this.setMint(denomination)
-        },
-
-        showAmountSelector () {
-            if (this.amountSelectorTimeout) {
-                clearTimeout(this.amountSelectorTimeout)
-            }
-
-            this.amountSelectorIsOpen = true
-        },
-
-        hideAmountSelector () {
-            this.amountSelectorTimeout = setTimeout(() => {
-                this.amountSelectorIsOpen = false
-            }, 100)
         }
     }
 }
@@ -223,18 +168,6 @@ export default {
 
     .prefix {
         color: $color--comet;
-    }
-
-    .has-focus {
-
-    }
-
-    .spend-denomination-selector {
-        margin-top: emRhythm(3);
-    }
-
-    .fees-and-amount {
-        margin-top: emRhythm(3);
     }
 
     div[tabindex],
