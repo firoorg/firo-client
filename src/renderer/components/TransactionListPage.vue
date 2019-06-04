@@ -168,7 +168,7 @@ export default {
                 tableRow.txId = tx.txid
                 tableRow.isError = false
                 tableRow.confirmations = tx.confirmations
-                tableRow.isConfirmed = tx.confirmations > 0
+                tableRow.isConfirmed = tx.confirmations >= 6
                 tableRow.amount = tx.amount
                 // Yes, 'mint' isn't really a direction, but it basically serves that purpose.
                 tableRow.direction = 'mint'
