@@ -41,13 +41,6 @@ for x in zcoind zcoin-tx zcoin-cli; do ln -s "$PWD/zcoin/src/$x" "assets/core/li
 To update `zcoind`, simply run `git pull` in the `zcoind` directory, and run `./autogen.sh`, `./configure`, and `make`
 with the arguments you previously used following your platform-specific build instructions.
 
-## Configuring zcoind
-
-In order for the client to run properly, you must have the line `clientapi=1` in your `zcoin.conf`. The location of this
-file is platform dependant. On OSX it will be at `"~/Library/Application Support/zcoin/zcoin.conf"` (quotes must be used
-when referencing due to the space in the `Application Support` directory), and on Linux it will be at
-`~/.zcoin/zcoin.conf`.
-
 ## Installing npm Packages
 
 To install dependencies for the client itself, run
