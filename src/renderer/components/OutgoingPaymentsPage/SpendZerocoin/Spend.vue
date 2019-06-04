@@ -50,6 +50,7 @@ import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFe
 // import PendingPayments from '@/components/payments/PendingPayments'
 
 import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
+import {convertToSatoshi} from "#/lib/convert";
 
 export default {
     name: 'SpendZerocoin',
@@ -128,7 +129,7 @@ export default {
             this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
                 label: this.spendFormLabel,
                 address: this.spendFormAddress,
-                amount: this.spendFormAmount,
+                amount: convertToSatoshi(this.spendFormAmount),
                 auth: this.currentPassphrase
             })
         }

@@ -15,9 +15,8 @@ export default {
             [types.zerocoinspend.SPEND_ZEROCOIN]: 'spendZerocoin'
         },
 
+        // amount in satoshis
         spendZerocoin ({label, address, amount, auth}) {
-            logger.info('SENDING ZEROCOIN: %O: %f to %s (auth: %O)', label, amount, address, auth)
-
             this.send({
                 type: 'create',
                 data: {
