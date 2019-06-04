@@ -8,6 +8,7 @@
     <td
         v-else
         class="vuetable-td-component-transaction-status"
+        :title="confirmationsCount + ' confirmations'"
         :class="{'is-confirmed': isConfirmed}"
     >
         <span
@@ -42,7 +43,7 @@ import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue
 import OutgoingPaymentStatus from '@/components/Icons/OutgoingPaymentTableStatus'
 
 export default {
-    name: 'OutgoingPaymentTableStatus',
+    name: 'TransactionStatus',
 
     components: {
         OutgoingPaymentStatus
@@ -53,6 +54,10 @@ export default {
     ],
 
     computed: {
+        confirmationsCount () {
+            return this.rowData.confirmations
+        },
+
         direction () {
             return this.rowData.direction
         },
