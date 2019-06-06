@@ -136,9 +136,15 @@ const actions = {
                         continue
                     }
 
-                    // FIXME: Figure out what these transactions mean. Don't ship with this.
                     if (addressKey === 'ZEROCOIN_MINT' && category !== 'mint') {
-                        console.error('Ignoring ZEROCOIN_MINT transaction %s with category %s', txid, category)
+                        if (category === 'receive') {
+                            // There's one of these transactions associated with every mint transaction. They're
+                            // harmless.
+                            logger.debug("Got ZEROCOIN_MINT transaction %s with category receive", txid)
+                            continue
+                        }
+
+                        logger.error('Ignoring ZEROCOIN_MINT transaction %s with category %s', txid, category)
                         continue
                     }
 
