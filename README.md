@@ -61,6 +61,12 @@ To run the development version of zcoin-client, simply run
 npm run dev
 ```
 
+### Debug Levels
+
+By default, zcoin-client will log to console at level `info`. You can change this with the `ZCOIN_CLIENT_DEBUG_LEVEL`
+environment variable. zcoin-client will additionally log all messages and exceptions to `userData/combined.log` in the
+application data directory.
+
 ## Getting Assistance
 
 If you need assistance with this project, you can join the official Zcoin Telegram group
