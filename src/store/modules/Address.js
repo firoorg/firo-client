@@ -132,8 +132,8 @@ const actions = {
                     const { category } = tx
 
                     if (!category) {
-                        console.warn('transaction without a category given %O %s', tx, address)
-                        return
+                        logger.error('transaction without a category given %O %s', tx, address)
+                        continue
                     }
 
                     // FIXME: Figure out what these transactions mean. Don't ship with this.
