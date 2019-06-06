@@ -56,6 +56,12 @@ export default {
             spendFormAddress: 'ZerocoinSpend/spendFormAddress',
             spendFormLabel: 'ZerocoinSpend/spendFormLabel'
         })
+    },
+
+    mounted () {
+        if (document.activeElement && typeof document.activeElement.blur == 'function') {
+            document.activeElement.blur()
+        }
     }
 }
 </script>
