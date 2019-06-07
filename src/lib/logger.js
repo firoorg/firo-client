@@ -15,7 +15,8 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.Console({
-            level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'info'
+            level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'info',
+            handleExceptions: true
         }),
         new winston.transports.File({
             filename: join(getApp().getPath('userData'), 'combined.log'),
