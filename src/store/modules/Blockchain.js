@@ -133,7 +133,7 @@ export const actions = {
         let network = null;
         if (isTestnet) {
             network = 'testnet'
-        } else if (connections === 0) {
+        } else if (process.env.IS_REGTEST) {
             network = 'regtest'
         } else {
             network = 'mainnet'
