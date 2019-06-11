@@ -2,10 +2,15 @@ import Vue from 'vue'
 import { sleep } from '../../lib/utils'
 import * as types from '../types/Network'
 
+import { createLogger } from '#/lib/logger'
+const logger = createLogger('zcoin:store:network')
+
+
 const state = {
     isConnected: false,
     connectionSeemsLost: false,
-    connectionErrorCode: 0
+    connectionErrorCode: 0,
+    network: null
 }
 
 const mutations = {
@@ -24,6 +29,14 @@ const mutations = {
 
     [types.SET_NETWORK_CONNECTION_ERROR] (state, errorCode) {
         state.connectionErrorCode = errorCode
+    },
+
+    [types.SET_NETWORK_TYPE] (state, networkType) {
+        if (!['test', 'regtest', 'main'].includes(networkType)) {
+            logger.error("Setting unknown network type '%s'", networkType)
+        }
+
+        state.network = networkType
     }
 }
 
@@ -64,6 +77,7 @@ const actions = {
 
 const getters = {
     isConnected: (state) => state.isConnected === true,
+    network: (state) => state.network, // 'mainnet', 'test', or 'regtest'
     connectionLost: (state) => {
         return (state.connectionSeemsLost && state.isConnected === false)
     },

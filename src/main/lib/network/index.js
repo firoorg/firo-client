@@ -102,6 +102,8 @@ export default {
 
             logger.info('got api status %o', status)
 
+            store.commit(types.network.SET_NETWORK_TYPE, NETWORK)
+
             apiStatus.populateStore({
                 status,
                 dispatch

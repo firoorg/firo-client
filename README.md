@@ -67,11 +67,6 @@ By default, zcoin-client will log to console at level `info`. You can change thi
 environment variable. zcoin-client will additionally log all messages and exceptions to `userData/combined.log` in the
 application data directory.
 
-### Regtest Network
-
-If you're using the regtest network, you must set the environment variable `IS_REGTEST` to a non-zero value. Hopefully
-this can be removed at a later point.
-
 ## Getting Assistance
 
 If you need assistance with this project, you can join the official Zcoin Telegram group

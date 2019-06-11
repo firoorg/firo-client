@@ -17,7 +17,6 @@ const state = {
         isWinnersListSynced: false,
         isZnodeListSynced: false
     },
-    network: null, // null is not a valid value here
     type: 'full',
     averageBlockTime: 0,
     syncBlocksPerSecond: {
@@ -80,18 +79,6 @@ export const mutations = {
         }
     },
 
-    [types.SET_NETWORK_TO_MAINNET] (state) {
-        state.network = 'mainnet'
-    },
-
-    [types.SET_NETWORK_TO_TESTNET] (state) {
-        state.network = 'testnet'
-    },
-
-    [types.SET_NETWORK_TO_REGTEST] (state) {
-        state.network = 'regtest'
-    },
-
     [types.IS_FULL_NODE] (state) {
         // todo get string from config
         state.type = 'full'
@@ -114,7 +101,7 @@ export const mutations = {
 export const actions = {
     [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
         logger.info('received blockchain initial state %o', initialState)
-        const { connections, currentBlock, status, testnet: isTestnet, type: clientType, avgBlockTime } = initialState
+        const { connections, currentBlock, status, type: clientType, avgBlockTime } = initialState
         const { height, timestamp } = currentBlock
 
         dispatch(types.SET_CONNECTIONS, connections)
@@ -128,33 +115,6 @@ export const actions = {
             height,
             timestamp: Date.now()
         })
-
-        // FIXME: This is a really dirty hack, and needs to be fixed with info about network state from zcoind.
-        let network = null;
-        if (isTestnet) {
-            network = 'testnet'
-        } else if (process.env.IS_REGTEST) {
-            network = 'regtest'
-        } else {
-            network = 'mainnet'
-        }
-
-        switch (network) {
-        case 'mainnet':
-            dispatch(types.SET_NETWORK_TO_MAINNET)
-            break
-
-        case 'testnet':
-            dispatch(types.SET_NETWORK_TO_TESTNET)
-            break
-
-        case 'regtest':
-            dispatch(types.SET_NETWORK_TO_REGTEST)
-            break
-
-        default:
-            throw "unknown network type: " +  network + "!"
-        }
 
         dispatch(types.SET_CLIENT_TYPE, clientType)
 
@@ -233,54 +193,6 @@ export const actions = {
         commit(types.SET_CURRENT_BLOCK, { height, timestamp })
     },
 
-    [types.SET_NETWORK_TYPE] ({ commit, state }, type) {
-        if (!type) {
-            return
-        }
-
-        switch (type.toLowerCase()) {
-        case 'mainnet':
-            commit(types.SET_NETWORK_TO_MAINNET)
-            break
-
-        case 'testnet':
-            commit(types.SET_NETWORK_TO_TESTNET)
-            break
-
-        case 'regtest':
-            commit(types.SET_NETWORK_TO_REGTEST)
-            break
-
-        default:
-            logger.warn('unrecognized network type given: %s', type)
-            break
-        }
-    },
-
-    [types.SET_NETWORK_TO_TESTNET] ({ commit, getters }) {
-        if (getters.network === 'testnet') {
-            return
-        }
-
-        commit(types.SET_NETWORK_TO_TESTNET)
-    },
-
-    [types.SET_NETWORK_TO_MAINNET] ({ commit, getters }) {
-        if (getters.network === 'mainnet') {
-            return
-        }
-
-        commit(types.SET_NETWORK_TO_MAINNET)
-    },
-
-    [types.SET_NETWORK_TO_REGTEST] ({ commit, getters }) {
-        if (getters.network === 'regtest') {
-            return
-        }
-
-        commit(types.SET_NETWORK_TO_REGTEST)
-    },
-
     [types.SET_CLIENT_TYPE] ({ commit, state }, type) {
         if (!type) {
             return
@@ -316,7 +228,6 @@ export const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
     currentBlockTimestamp: (state) => state.currentBlock.timestamp,
     // tipHeight: (state) => state.blockchainTip,
-    network: (state) => state.network, // 'mainnet', 'testnet', or 'regtest'
     status: (state) => state.status || {},
     isSynced: (state, getters) => getters.status.isSynced,
     isBlockchainSynced: (state, getters) => getters.status.isBlockchainSynced,

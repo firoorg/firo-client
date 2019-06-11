@@ -48,11 +48,11 @@ const setDaemonSettings = function ({ state, commit, getters }, data) {
 const state = {
     //blockchainLocation: '',
     b58Prefixes: {
-        mainnet: {
+        main: {
             pubkeyAddress: 82, // ['a', 'Z'],
             scriptAddress: 7 // ['3', '4']
         },
-        testnet: {
+        test: {
             pubkeyAddress: 65, // ['T'],
             scriptAddress: 178 // ['2']
         },
@@ -64,8 +64,8 @@ const state = {
     percentageToHoldInZerocoin: 0.5,
     xzcZerocoinRatioNotified: -1,
     explorer: {
-        testnet: 'https://testexplorer.zcoin.io/%s/%s',
-        mainnet: 'https://explorer.zcoin.io/%s/%s',
+        test: 'https://testexplorer.zcoin.io/%s/%s',
+        main: 'https://explorer.zcoin.io/%s/%s',
         // This isn't an actual site (obviously), but it'll only show up in testing and it should be fairly obvious
         // what's happening, so meh.
         regtest: 'https://regtestexplorer.invalid/%s/%s'
@@ -208,7 +208,7 @@ const actions = {
 
         // change source is settings input
         if (typeof urlOrUrlNetworkPair === 'string') {
-            network = rootGetters['Blockchain/network']
+            network = rootGetters['Network/network']
             url = urlOrUrlNetworkPair
         }
         // change source is persistent settings object
@@ -300,12 +300,12 @@ const getters = {
         return toMint
     },
     b58Prefixes (state, getters, rootState, rootGetters) {
-        const network = rootGetters['Blockchain/network']
+        const network = rootGetters['Network/network']
 
         return state.b58Prefixes[network]
     },
     getExplorerBaseUrl (state, getters, rootState, rootGetters) {
-        const network = rootGetters['Blockchain/network']
+        const network = rootGetters['Network/network']
 
         return state.explorer[network] || ''
     },

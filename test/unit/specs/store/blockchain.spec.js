@@ -155,28 +155,4 @@ describe('mutations', () => {
             isZnodeListSynced: true
         })
     })
-
-    it('should correctly set the network type to main net', () => {
-        const { SET_NETWORK_TO_MAINNET } = mutations
-
-        // mock state
-        const state = { testnet: true }
-
-        // apply mutation
-        SET_NETWORK_TO_MAINNET(state)
-
-        expect(state.testnet).to.be.false
-    })
-
-    it('should correctly set the network type to testnet', () => {
-        const { SET_NETWORK_TO_TESTNET } = mutations
-
-        // mock state
-        const state = { testnet: false }
-
-        // apply mutation
-        SET_NETWORK_TO_TESTNET(state)
-
-        expect(state.testnet).to.be.true
-    })
 })
