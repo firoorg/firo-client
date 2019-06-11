@@ -2,7 +2,7 @@
     <div class="denomination">
         <div
             class="bar"
-            :class="{ 'is-empty': !minted && !current }"
+            :class="{ 'is-empty': !current }"
         >
             <div
                 class="current"
@@ -15,17 +15,6 @@
                 >
                     <span v-show="current">
                         {{ current ? current : '' }}
-                    </span>
-                </transition>
-            </div>
-            <div
-                class="minted"
-                :class="{ 'has-minted': minted }"
-                :style="{ height: mintHeight }"
-            >
-                <transition name="fade">
-                    <span v-show="minted">
-                        {{ minted }}
                     </span>
                 </transition>
             </div>
@@ -87,7 +76,6 @@ export default {
     computed: {
         ...mapGetters({
             denominations: 'Mint/currentDenominations',
-            mints: 'Mint/confirmedMintsPerDenomination'
         }),
 
         canIncrease () {
@@ -106,18 +94,8 @@ export default {
             return this.calcHeight(this.current) * (8 * 3) + 'px'
         },
 
-        mintHeight () {
-            return (Math.log(this.calcHeight(this.minted + 1)) * (8 * 4)) + 'px'
-            // return this.calcHeight(this.current + this.minted) - this.calcHeight(this.current) + 'px'
-            // return (this.minted ? (Math.log(this.calcHeight(this.minted + 1)) + (8 * 3)) : 0) + 'px'
-        },
-
         current () {
             return this.denominations[`${this.denomination}`] || 0
-        },
-
-        minted () {
-            return this.mints[`${this.denomination}`] || 0 // Math.ceil(Math.random() * 10)
         }
     },
 

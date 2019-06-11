@@ -54,8 +54,7 @@ export default {
             immatureXzc: 'Balance/immatureXzc',
 
             availableZerocoin: 'Balance/availableZerocoin',
-            unconfirmedZerocoin: 'Balance/unconfirmedZerocoin',
-            mints: 'Mint/allMints'
+            unconfirmedZerocoin: 'Balance/unconfirmedZerocoin'
         }),
 
         pendingXzc () {

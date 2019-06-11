@@ -91,7 +91,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { addVuexModel } from '@/utils/store'
-import { getDenominationsToSpend } from '#/lib/convert'
 import ValidationMixin from '@/mixins/ValidationMixin'
 import types from '~/types'
 import SendPrivatePopover from '@/components/OutgoingPaymentsPage/SendZcoin/SendPrivatePopover'
@@ -130,8 +129,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            confirmedMintsPerDenomination: 'Mint/confirmedMintsPerDenomination',
-            maxAmountOfMintInputsPerTx: 'ZerocoinSpend/maxAmountOfMintInputsPerTx'
+            maxAmountOfMintInputsPerTx: 'ZerocoinSpend/maxAmountOfMintInputsPerTx',
+            availableZerocoin: 'Balance/availableZerocoin'
         }),
 
         ...addVuexModel({
@@ -152,52 +151,16 @@ export default {
             action: types.zcoinpayment.SET_FORM_ADDRESS
         }),
 
-        amountConvertedToDenominations () {
-            const amount = Number.parseFloat(this.amount)
-            const empty = {
-                toSpend: 0,
-                change: amount,
-                denominations: this.confirmedMintsPerDenomination
-            }
-
-            if (!amount || Number.isNaN(amount)) {
-                return empty
-            }
-
-            if (!Number.isInteger(amount)) {
-                return empty
-            }
-
-            return getDenominationsToSpend({
-                amount,
-                denominations: this.confirmedMintsPerDenomination,
-                limit: this.maxAmountOfMintInputsPerTx
-            })
-        },
-
         showCanSpendPrivateTooltip () {
             // already seen
             if (this.spendPrivateTooltipAmountSeen === this.amount) {
                 return false
             }
 
-            const amount = Number.parseFloat(this.amount)
+            const amount = Number(this.amount)
 
-            if (!amount || Number.isNaN(amount)) {
-                return false
-            }
-
-            if (!Number.isInteger(amount)) {
-                return false
-            }
-
-            if (!this.amountConvertedToDenominations) {
-                return false
-            }
-
-            const { change: canNotSpendCompletely } = this.amountConvertedToDenominations
-
-            return !canNotSpendCompletely
+            // This requires the lowest denomination of Zerocoin to be 0.1.
+            return amount && amount <= this.availableZerocoin && amount % 0.1 === 0
         }
     },
 
@@ -224,7 +187,7 @@ export default {
             clearSpendForm: types.zerocoinspend.CLEAR_FORM,
             setSpendFormLabel: types.zerocoinspend.SET_FORM_LABEL,
             setSpendFormAddress: types.zerocoinspend.SET_FORM_ADDRESS,
-            setSpendFormMints: types.zerocoinspend.SET_FORM_MINTS
+            setSpendFormAmount: types.zerocoinspend.SET_FORM_AMOUNT
         }),
 
         onCanSpendPrivateTooltipCancel () {
@@ -232,23 +195,13 @@ export default {
         },
 
         onCanSpendPrivateTooltipSubmit () {
-            if (!this.amountConvertedToDenominations) {
-                return
-            }
-
-            const { change: canNotSpendCompletely, toSpend } = this.amountConvertedToDenominations
-
             this.spendPrivateTooltipAmountSeen = this.amount
-
-            if (canNotSpendCompletely) {
-                return
-            }
 
             // populate spend form
             this.clearSpendForm()
             this.setSpendFormLabel(this.label)
             this.setSpendFormAddress(this.address)
-            this.setSpendFormMints(toSpend)
+            this.setSpendFormAmount(this.amount)
 
             this.$router.push({ name: 'spend-zerocoin' })
 

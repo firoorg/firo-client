@@ -47,28 +47,11 @@ export default {
     computed: {
         ...mapGetters({
             currentDenominations: 'Mint/currentDenominations',
-            mints: 'Mint/confirmedMintsPerDenomination',
             availableXzcBalance: 'Balance/availableXzc'
         }),
 
         maxValue () {
-            let max = 0
-
-            for (let denom of this.denominations) {
-                const denoms = this.currentDenominations[`${denom}`] || 0
-                const mints = this.mints[`${denom}`] || 0
-                const total = denoms + mints
-
-                if (!total) {
-                    continue
-                }
-
-                if (max < total) {
-                    max = total
-                }
-            }
-
-            return max
+            return Object.values(this.currentDenominations).reduce((x,y) => x > y ? x : y, 0)
         },
 
         getAvailableBalanceToMint () {

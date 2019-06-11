@@ -178,51 +178,8 @@ const getters = {
             })
     },
 
-    // This returns only unspent mints.
-    mints (state, getters) {
-        return getters.allMints.filter((mint) => mint.available)
-    },
-
-    confirmedMints (state, getters) {
-        return getters.allMints.filter((mint) => mint.confirmations >= 6)
-    },
-
-    unconfirmedMints (state, getters) {
-        return getters.allMints.filter((mint) => mint.confirmations < 6)
-    },
-
-    confirmedMintPairs (state, getters) {
-        let pairs = {}
-
-        getters.mints.forEach((mint) => {
-            const { amount } = mint
-            const denom = `${amount / 100000000}`
-
-            pairs[denom] = !pairs[denom] ? 1 : pairs[denom] + 1
-        })
-
-        return pairs
-    },
-
-    confirmedMintsPerDenomination (state, getters) {
-        return getters.confirmedMints.reduce((accumulator, mint) => {
-            const { amount } = mint
-            const label = convertToCoin(amount)
-
-            if (!accumulator[`${label}`]) {
-                accumulator[`${label}`] = 0
-            }
-
-            accumulator[`${label}`]++
-
-            return accumulator
-        }, {})
-    },
-
     mintsInProgress (state, getters) {
-        return getters.mints
-            .filter((mint) => mint.available)
-            .filter((mint) => !mint.confirmations || mint.confirmations < 6)
+        return getters.allMints.filter((mint) => !mint.confirmations || mint.confirmations < 6)
     }
 }
 
