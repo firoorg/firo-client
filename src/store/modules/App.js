@@ -133,8 +133,10 @@ const actions = {
         commit(types.LOCK_WALLET, { passphrase })
     },
 
-    [types.DAEMON_IS_RUNNING] ({ commit }) {
-        commit(types.DAEMON_IS_RUNNING)
+    [types.DAEMON_IS_RUNNING] ({ commit, getters }) {
+        if (!getters['isRunning']) {
+            commit(types.DAEMON_IS_RUNNING)
+        }
     },
 
     [types.DAEMON_STOP] ({ commit, dispatch, state }) {
