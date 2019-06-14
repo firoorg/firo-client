@@ -129,7 +129,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            maxAmountOfMintInputsPerTx: 'ZerocoinSpend/maxAmountOfMintInputsPerTx',
             availableZerocoin: 'Balance/availableZerocoin'
         }),
 
@@ -152,15 +151,21 @@ export default {
         }),
 
         showCanSpendPrivateTooltip () {
-            // already seen
             if (this.spendPrivateTooltipAmountSeen === this.amount) {
                 return false
             }
 
-            const amount = Number(this.amount)
+            const amount = Number(this.amount) * 10**8
 
-            // This requires the lowest denomination of Zerocoin to be 0.1.
-            return amount && amount <= this.availableZerocoin && amount % 0.1 === 0
+            if (amount &&
+                amount <= this.availableZerocoin &&
+                // This requires the lowest denomination of Zerocoin to be 0.1.
+                amount % 10**7 === 0) {
+
+                return true
+            }
+
+            return false
         }
     },
 
