@@ -89,6 +89,7 @@ export default {
         align-items: center;
         margin-top: emRhythm(5);
         text-align: center;
+        user-select: none;
 
     }
 
