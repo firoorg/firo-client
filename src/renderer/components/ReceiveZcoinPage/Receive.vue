@@ -222,7 +222,7 @@ export default {
         }),
 
         deleteIconIsVisible () {
-            return !this.transactions
+            return !this.transactions.length
         },
 
         qrCodeIsVisible () {
