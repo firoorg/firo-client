@@ -9,7 +9,8 @@ export default {
     },
     data () {
         const amountRules = {
-            decimal: 8
+            decimal: 8,
+            min_value: 1e-8
         }
 
         return {
