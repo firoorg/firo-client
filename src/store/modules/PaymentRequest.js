@@ -1,5 +1,4 @@
 import * as types from '../types/PaymentRequest'
-import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 import { getLabelForPaymentRequest } from '~/utils/i18n'
 
 import IsLoading from '~/mixins/IsLoading'
@@ -16,30 +15,16 @@ const state = {
     ...isLoading.state,
     ...lastSeen.state,
 
-    paymentRequests: {},
-    createPaymentRequestForm: {
-        amount: null,
-        label: '',
-        message: ''
-    },
-    currentPaymentRequest: null
+    paymentRequests: {}
 }
 
 const mutations = {
     ...isLoading.mutations,
     ...lastSeen.mutations,
 
-    // send create request to the api
     [types.CREATE_PAYMENT_REQUEST] () {},
-
-    // send update label request to the API
     [types.UPDATE_PAYMENT_REQUEST_LABEL] () {},
-
     [types.ARCHIVE_PAYMENT_REQUEST] () {},
-
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD] (state, { field, value }) {
-        state.createPaymentRequestForm[field] = value
-    },
 
     [types.ADD_PAYMENT_REQUEST] (state, request) {
         state.paymentRequests = {
@@ -67,61 +52,6 @@ const actions = {
         }
     },
 
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL] ({ commit, state }, value) {
-        const field = 'label'
-
-        if (state.createPaymentRequestForm[field] === value) {
-            return
-        }
-
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field, value })
-    },
-
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT] ({ commit, state }, value) {
-        const field = 'amount'
-
-        if (state.createPaymentRequestForm[field] === value) {
-            return
-        }
-
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, {
-            field,
-            value: convertToSatoshi(value)
-        })
-    },
-
-    [types.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE] ({ commit, state }, value) {
-        const field = 'message'
-
-        if (state.createPaymentRequestForm[field] === value) {
-            return
-        }
-
-        commit(types.SET_PAYMENT_REQUEST_CREATE_FORM_FIELD, { field, value })
-    },
-
-    [types.RESET_PAYMENT_REQUEST_CREATE_FORM] ({ dispatch }) {
-        dispatch(types.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL, '')
-        dispatch(types.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT, null)
-        dispatch(types.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE, '')
-    },
-
-    [types.CREATE_PAYMENT_REQUEST] ({ commit, state }) {
-        const { label, amount, message } = state.createPaymentRequestForm
-
-        logger.info('creating payment request: %o', {
-            label,
-            amount,
-            message
-        })
-
-        commit(types.CREATE_PAYMENT_REQUEST, {
-            label,
-            amount: amount || null,
-            message
-        })
-    },
-
     [types.ADD_PAYMENT_REQUEST] ({ commit, dispatch, state }, paymentRequest) {
         const { address, createdAt, amount, message, label, state: prState } = paymentRequest
 
@@ -133,9 +63,6 @@ const actions = {
             label,
             state: prState
         })
-
-        // clean up form fields
-        dispatch(types.RESET_PAYMENT_REQUEST_CREATE_FORM)
     },
 
     [types.UPDATED_PAYMENT_REQUEST] ({ commit, dispatch, state }, paymentRequest) {
@@ -258,24 +185,13 @@ const getters = {
 
         return requests
     },
+
     getPaymentRequestForAddress (state, getters) {
         return (address) => {
             return getters.paymentRequests.find((paymentRequest) => {
                 return paymentRequest.address === address
             })
         }
-    },
-    createFormLabel (state) {
-        return state.createPaymentRequestForm.label
-    },
-    createFormAmount (state) {
-        return state.createPaymentRequestForm.amount
-    },
-    createFormAmountAsBaseCoin (state) {
-        return convertToCoin(state.createPaymentRequestForm.amount)
-    },
-    createFormMessage (state) {
-        return state.createPaymentRequestForm.message
     },
 
     // One payment request per transaction, not per address.

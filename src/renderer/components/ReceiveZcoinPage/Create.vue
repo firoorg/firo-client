@@ -98,8 +98,6 @@
 
 <script>
 import ValidationMixin from '@/mixins/ValidationMixin'
-import { mapGetters } from 'vuex'
-import { addVuexModel } from '@/utils/store'
 import types from '~/types'
 
 export default {
@@ -113,59 +111,15 @@ export default {
 
     data () {
         return {
-            unsubscribeFromPaymentRequestCreate: null,
-            buttonStep: 0,
+            label: '',
+            amount: '',
+            message: '',
+
             validationFieldOrder: [
                 'label',
                 'amount',
                 'message'
             ]
-        }
-    },
-
-    computed: {
-        ...addVuexModel({
-            name: 'label',
-            getter: 'PaymentRequest/createFormLabel',
-            action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_LABEL
-        }),
-        ...addVuexModel({
-            name: 'amount',
-            getter: 'PaymentRequest/createFormAmountAsBaseCoin',
-            action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_AMOUNT
-        }),
-        ...addVuexModel({
-            name: 'message',
-            getter: 'PaymentRequest/createFormMessage',
-            action: types.paymentrequest.SET_PAYMENT_REQUEST_CREATE_FORM_MESSAGE
-        }),
-
-        ...mapGetters({
-            isLoading: 'PaymentRequest/isLoading'
-        }),
-
-        canSubmit () {
-            return this.formValidated && !this.isLoading
-        }
-    },
-
-    mounted () {
-        this.unsubscribeFromPaymentRequestCreate = this.$store.subscribe((mutation, state) => {
-            const { type, payload } = mutation
-
-            if (type !== types.paymentrequest.ADD_PAYMENT_REQUEST) {
-                return
-            }
-
-            const { address } = payload
-
-            this.$emit('route-to-detail', { address })
-        })
-    },
-
-    beforeDestroy () {
-        if (this.unsubscribeFromPaymentRequestCreate) {
-            this.unsubscribeFromPaymentRequestCreate()
         }
     },
 
@@ -175,9 +129,15 @@ export default {
                 return
             }
 
-            this.$store.dispatch(types.paymentrequest.CREATE_PAYMENT_REQUEST)
-            this.$log.debug('submitting form')
-            this.$refs.submit.$el.blur()
+            this.$store.commit(types.paymentrequest.CREATE_PAYMENT_REQUEST, {
+                label: this.label,
+                amount: this.amount * 1e8,
+                message: this.message
+            })
+
+            this.label = ''
+            this.amount = ''
+            this.message = ''
             this.resetValidator()
         }
     }

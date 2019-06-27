@@ -11,8 +11,8 @@ export default {
         collection: 'paymentRequest',
 
         mutations: {
-            [types.paymentrequest.CREATE_PAYMENT_REQUEST]: 'createPaymentRequest',
             [types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL]: 'updateLabel',
+            [types.paymentrequest.CREATE_PAYMENT_REQUEST]: 'createPaymentRequest',
             [types.paymentrequest.ARCHIVE_PAYMENT_REQUEST]: 'archivePaymentRequest'
         },
 
