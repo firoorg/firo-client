@@ -88,17 +88,15 @@ export default {
 
     computed: {
         ...mapGetters({
-            walletAddresses: 'Address/walletAddresses',
-            allPaymentRequests: 'PaymentRequest/allPaymentRequests',
-            outgoingTransactions: 'Address/getOutgoingTransactions',
-            allMints: 'Mint/allMints',
+            transactions: 'Transactions/transactions',
+            currentBlockHeight: 'Blockchain/currentBlockHeight'
         }),
 
         sortOrder () {
             return [
                 {
-                    sortField: 'time',
-                    direction: 'desc'
+                    sortField: 'confirmations',
+                    direction: 'ascending'
                 }
             ]
         },
@@ -116,86 +114,27 @@ export default {
         },
 
         allTableData () {
-            const data = []
-            for (const addr of this.walletAddresses) {
-                for (const tx of addr.transactions) {
-                    let tableRow = {}
-                    tableRow.address = addr.address
-                    // Setting a date of Infinity causes AnimatedTableRelativeData to not render anything but still sort
-                    // as if the transaction just happened.
-                    tableRow.time = tx.block ? tx.block.time : Infinity
-                    tableRow.txId = tx.txid
-                    tableRow.isError = false
-                    tableRow.confirmations = tx.confirmations
-                    tableRow.isConfirmed = tx.isConfirmed
-                    tableRow.amount = tx.amount
-                    tableRow.direction = 'incoming'
-                    tableRow.label = this.getLabelForPaymentRequestAddress(tableRow.address)
-                    // This is different from txId because a single transaction (from the blockchain's perspective) can
-                    // be both incoming and outgoing to us, which will require it to be displayed in the table multiple
-                    // times.
-                    tableRow.id = tx.id + '-incoming'
+            const currentBlockHeight = this.currentBlockHeight;
 
-                    data.push(tableRow)
-                }
-            }
-
-            for (const tx of this.outgoingTransactions) {
-                let tableRow = {}
-                tableRow.address = tx.belongsToAddress
-                // Setting a date of Infinity causes AnimatedTableRelativeData to not render anything but still sort
-                // as if the transaction just happened.
-                tableRow.time = tx.block ? tx.block.time : Infinity
-                tableRow.txId = tx.txid
-                tableRow.isError = false
-                tableRow.confirmations = tx.confirmations
-                tableRow.isConfirmed = tx.isConfirmed
-                tableRow.amount = -tx.amount
-                tableRow.direction = 'outgoing'
-                tableRow.label = tx.label || this.$t('send.table__outgoing-payments.label__tx-nolabel')
-                // This is different from txId because a single transaction (from the blockchain's perspective) can
-                // be both incoming and outgoing to us, which will require it to be displayed in the table multiple
-                // times.
-                tableRow.id = tx.id + '-outgoing'
-
-                data.push(tableRow)
-            }
-
-            for (const tx of this.allMints) {
-                let tableRow = {}
-                tableRow.address = 'ZerocoinMint'
-                tableRow.time = tx.block ? tx.block.time : Infinity
-                tableRow.txId = tx.txid
-                tableRow.isError = false
-                tableRow.confirmations = tx.confirmations
-                tableRow.isConfirmed = tx.confirmations >= 6
-                tableRow.amount = tx.amount
-                // Yes, 'mint' isn't really a direction, but it basically serves that purpose.
-                tableRow.direction = 'mint'
-                tableRow.label = '#Zerocoin Mint'
-                tableRow.id = tx.id + '-mint'
-
-                data.push(tableRow)
-            }
-
-            return data
+            return this.transactions.map( (tx) => ({
+                address: tx.address || 'Zerocoin_Mint',
+                amount: tx.amount,
+                direction: tx.transactionType,
+                time: tx.block && tx.block.time,
+                txId: tx.txId,
+                id: tx.id,
+                label: tx.label,
+                // mint transactions are considered confirmed after 6 confirmations; other transactions require only 1
+                isConfirmed: tx.block && (!(tx.transactionType === 'mint') || currentBlockHeight > tx.block.height + 5),
+                isError: false,
+                confirmations: tx.block ? currentBlockHeight - tx.block.height + 1 : 0
+            }) );
         }
     },
 
     methods: {
         compareTableRow (a, b) {
-            return a.id === b.id
-        },
-
-        // address is a String
-        getLabelForPaymentRequestAddress (address) {
-            for (const pr of this.allPaymentRequests) {
-                if (pr.address === address) {
-                    return pr.label || this.$t('transaction-list.placeholder__recv-no-label')
-                }
-            }
-
-            return this.$t('transaction-list.placeholder__recv-no-label')
+            return (a.id === b.id) && (a.confirmations === b.confirmations)
         }
     }
 }
