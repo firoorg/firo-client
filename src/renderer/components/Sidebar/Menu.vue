@@ -43,10 +43,6 @@
                     <span class="text">
                         {{ $t('navigation.menu.button__send') }}
                     </span>
-                    <notification-indicator
-                        v-show="hasSendNotification"
-                        :has-shadow="true"
-                    />
                 </router-link>
             </li>
             <li class="has-divider">
@@ -84,14 +80,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            clipboardAddress: 'Clipboard/address',
-            clipboardHasNewAddress: 'Clipboard/hasNewAddress',
-            currentSendFormAddress: 'ZcoinPayment/createFormAddress',
             hasUnseenPaymentRequests: 'PaymentRequest/hasUnseenPaymentRequests'
-        }),
-        hasSendNotification () {
-            return this.clipboardHasNewAddress && this.currentSendFormAddress !== this.clipboardAddress
-        }
+        })
     }
 }
 </script>

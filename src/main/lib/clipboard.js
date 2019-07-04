@@ -1,60 +1,33 @@
 import { clipboard } from 'electron'
-import { containsZcoinUri, containsZcoinAddress } from '#/lib/zcoin'
 import { sleep } from '#/lib/utils'
-import { createLogger } from '#/lib/logger'
 
-// import Vue from 'vue'
-import types from '~/types'
-
-const logger = createLogger('zcoin:clipboard')
-
-let watcherId = null
+// We should only be run once.
 let watcherIsRunning = false
 
-let previousText = null
-// let previousImage = clipboard.readImage()
-
 export default {
-    async checkClipboard ({ store, deeplink }) {
-        const currentText = clipboard.readText()
+    async _watchLoop (store) {
+        let clipboardText = ''
 
-        if (currentText && (currentText !== previousText)) {
-            logger.debug("got new clipboard: %O", currentText)
-            if (containsZcoinUri(currentText)) {
-                deeplink.parseZcoinUrl(currentText)
-                // store.dispatch(types.clipboard.SET_CLIPBOARD, previousText)
-            } else {
-                const prefixes = store.getters['Settings/b58Prefixes']
-                const addresses = containsZcoinAddress(currentText, prefixes)
+        while (true) {
+            const latestText = clipboard.readText()
 
-                if (addresses && addresses.length === 1) {
-                    store.dispatch(types.clipboard.SET_CLIPBOARD, addresses[0])
-                }
+            if (clipboardText !== latestText) {
+                store.commit("Clipboard/setClipboard", latestText)
+                clipboardText = latestText
             }
-        }
 
-        previousText = currentText
-
-        await sleep(500)
-
-        if (watcherIsRunning) {
-            setImmediate(() => {
-                this.checkClipboard({ store, deeplink })
-            })
+            await sleep(500)
         }
     },
 
-    watch ({ store, deeplink }) {
+    // This function will throw an error if it has been called previously.
+    watch (store) {
         if (watcherIsRunning) {
-            return
+            throw "clipboard.watch() should only be called once"
+        } else {
+            watcherIsRunning = true
         }
 
-        watcherIsRunning = true
-        logger.info("beginning to watch clipboard")
-        this.checkClipboard({ store, deeplink })
-    },
-
-    unwatch () {
-        watcherIsRunning = false
+        this._watchLoop(store)
     }
 }

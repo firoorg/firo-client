@@ -5,12 +5,9 @@
                 v-scrollable
                 class="outgoing-requests-list"
             >
-                <component
-                    :is="fromClipboardPopoverName"
-                    @update-form="onFormUpdateFromClipboardPopover"
-                >
-                    <h1 v-html="$t('send.public.overview.title')" />
-                </component>
+                <h1>
+                    {{ $t('send.public.overview.title') }}
+                </h1>
 
                 <outgoing-payments-list
                     :selected-payment="selectedPaymentId"
@@ -35,11 +32,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
 import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
-
-import SendFromClipboardPopover from '@/components/OutgoingPaymentsPage/SendZcoin/SendFromClipboardPopover'
-import SpendZerocoinFromClipboardPopover from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinFromClipboardPopover'
 import OutgoingPaymentsList from '@/components/OutgoingPaymentsPage/OutgoingPaymentsList'
 
 export default {
@@ -47,8 +40,6 @@ export default {
 
     components: {
         OutgoingPaymentsList,
-        SendFromClipboardPopover,
-        SpendZerocoinFromClipboardPopover
     },
 
     mixins: [
@@ -64,12 +55,6 @@ export default {
             const { id } = this.$route.params
 
             return id || null
-        },
-
-        fromClipboardPopoverName () {
-            const prefix = this.$route.meta.isPublic ? 'Send' : 'SpendZerocoin'
-
-            return `${prefix}FromClipboardPopover`
         }
     },
 
@@ -82,13 +67,6 @@ export default {
                 params: {
                     id
                 }
-            })
-        },
-        onFormUpdateFromClipboardPopover (event) {
-            const { name } = event
-
-            this.pushRouterWithFilter({
-                name
             })
         }
     }

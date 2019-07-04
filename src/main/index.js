@@ -70,8 +70,6 @@ const beforeQuit = async function (event) {
     store.dispatch(types.app.PERSIST_APP_VERSION)
     const isRunning = await coreDaemonManager.isRunning()
 
-    clipboard.unwatch()
-
     if (!(stopOnQuit && isRunning)) {
         logger.info('no need to wait for daemon to stop. quitting...')
         network.close()
@@ -137,7 +135,7 @@ app.on('ready', () => {
     menu.init({ app, store })
 
     store.dispatch('Window/show', 'main')
-    clipboard.watch({ store, deeplink })
+    clipboard.watch(store)
 })
 
 app.on('window-all-closed', (event) => {

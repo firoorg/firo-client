@@ -48,6 +48,12 @@
                         >
                             <label for="address">
                                 {{ $t('send.private.detail-private-send.label__address') }}
+                                <a
+                                    v-if="clipboardAddress"
+                                    @click="pasteAddress"
+                                >
+                                    📋
+                                </a>
                             </label>
 
                             <div class="control">
@@ -61,7 +67,6 @@
                                     type="text"
                                     name="address"
                                     tabindex="2"
-                                    class="xyz"
                                     :placeholder="$t('send.private.detail-private-send.placeholder__address')"
                                 >
                             </div>
@@ -152,8 +157,8 @@ export default {
     data () {
         return {
             label: '',
-            address: '',
-            amount: '',
+            address: this.clipboardAddress || '',
+            amount: 0,
 
             validationFieldOrder: [
                 'label',
@@ -166,7 +171,8 @@ export default {
     computed: {
         ...mapGetters({
             availableZerocoin: 'Balance/availableZerocoin',
-            currentPassphrase: 'App/currentPassphrase'
+            currentPassphrase: 'App/currentPassphrase',
+            clipboardAddress: 'Clipboard/address'
         }),
 
         formSectionIsValid () {
@@ -224,6 +230,10 @@ export default {
                 amount: convertToSatoshi(this.amount),
                 auth: this.currentPassphrase
             })
+        },
+
+        pasteAddress () {
+            this.address = this.clipboardAddress
         }
     }
 }
@@ -237,9 +247,6 @@ export default {
         color: $color--white;
 
         header {
-            // margin-left: emRhythm(3, $ms-up2);
-            margin-bottom: emRhythm(7);
-            //margin-left: emRhythm(3, $ms-up2);
             margin-bottom: emRhythm(7, $ms-up2);
 
             @include h2-with-description(inherit, $color--polo-dark);
@@ -314,6 +321,12 @@ export default {
         div.has-focus {
             outline: none;
             cursor: pointer;
+        }
+
+        .address {
+            a {
+                cursor: pointer;
+            }
         }
     }
 
