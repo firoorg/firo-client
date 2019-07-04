@@ -34,6 +34,7 @@ export default {
                     },
                     props () {
                         return {
+                            ...this.getConfirmStepProps(),
                             isTimerDone: this.isConfirmed
                         }
                     }

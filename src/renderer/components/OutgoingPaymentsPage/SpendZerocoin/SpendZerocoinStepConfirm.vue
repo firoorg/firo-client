@@ -7,16 +7,12 @@
 
 
         <div class="payment-fee-list">
-            <current-mints
-                :current-mints="denominations"
-                :show-progress="false"
-            >
-                {{ spendFormAddress }}
-            </current-mints>
+            {{ address }}
+
             <!-- FeesAndAmount takes values in satoshi, so we convert it here, and then it gets converted back again.
                  This should be made consistent in a refactor. -->
             <fees-and-amount
-                :amount="10**8 * spendFormAmount"
+                :amount="10**8 * amount"
                 :show-fee="false"
                 translation-namespace="send.private.flyout-confirm-private-send"
             />
@@ -25,37 +21,25 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { convertToCoin } from '#/lib/convert'
-
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
-import CurrentMints from '@/components/payments/CurrentMints'
 
 export default {
     name: 'SpendZerocoinStepConfirm',
 
     components: {
-        CurrentMints,
         FeesAndAmount
     },
 
-    /*
     props: {
-        actions: {
-            type: Object,
+        address: {
+            type: String,
             required: true
         },
-        isConfirmed
-    },
-    */
 
-    computed: {
-        ...mapGetters({
-            denominations: 'ZerocoinSpend/spendFormMintsFormatted',
-            spendFormAmount: 'ZerocoinSpend/spendFormAmount',
-            spendFormAddress: 'ZerocoinSpend/spendFormAddress',
-            spendFormLabel: 'ZerocoinSpend/spendFormLabel'
-        })
+        amount: {
+            type: String,
+            required: true
+        }
     },
 
     mounted () {

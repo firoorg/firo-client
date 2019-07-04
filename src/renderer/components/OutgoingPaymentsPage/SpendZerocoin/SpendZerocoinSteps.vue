@@ -95,6 +95,7 @@ import SendAddToQueueButton from '@/components/OutgoingPaymentsPage/SendZcoin/Se
 import SpendZerocoinStepStartButton from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinStepStartButton'
 import SpendZerocoinStepConfirmButtons from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinStepConfirmButtons'
 import PaymentStepPassphraseButtons from '@/components/payments/PaymentStepPassphraseButtons'
+import Spend from "@/components/OutgoingPaymentsPage/SpendZerocoin/Spend";
 
 export default {
     name: 'SpendZerocoinSteps',
@@ -113,6 +114,23 @@ export default {
         ConfirmPassphraseStepsMixin
     ],
 
+    props: {
+        label: {
+            type: String,
+            required: true
+        },
+
+        address: {
+            type: String,
+            required: true
+        },
+
+        amount: {
+            type: Number,
+            required: true
+        }
+    },
+
     data () {
         return {
             isUsedAddressCache: undefined,
@@ -123,7 +141,6 @@ export default {
     computed: {
         ...mapGetters({
             isLoading: 'ZerocoinSpend/isLoading',
-            currentFormAddress: 'ZerocoinSpend/spendFormAddress',
             hasAlreadySentToAddress: 'Address/hasAlreadySentToAddress'
         }),
 
@@ -132,7 +149,7 @@ export default {
                 return this.isUsedAddressCache
             }
 
-            return this.hasAlreadySentToAddress(this.currentFormAddress)
+            return this.hasAlreadySentToAddress(this.address)
         },
 
         // mixin override
@@ -181,6 +198,13 @@ export default {
 
         getConfirmStep () {
             return SpendZerocoinStepConfirm
+        },
+
+        getConfirmStepProps () {
+            return {
+                address: this.address,
+                amount: this.amount
+            }
         }
     }
 }

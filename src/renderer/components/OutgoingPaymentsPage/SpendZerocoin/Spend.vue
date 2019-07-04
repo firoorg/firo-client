@@ -17,16 +17,91 @@
                         </div>
                     </header>
 
-                    <spend-zerocoin-form
-                        :is-disabled="false"
-                        @form-validated="setFormValidationStatus"
-                    />
+                    <fieldset>
+                        <div
+                            class="field"
+                            :class="getFieldErrorClass('label')"
+                        >
+                            <label for="label">
+                                {{ $t('send.private.detail-private-send.label__label') }}
+                            </label>
+
+                            <div class="control">
+                                <input
+                                    id="label"
+                                    ref="label"
+                                    v-model.trim="label"
+                                    v-focus
+                                    v-validate="'required'"
+                                    v-tooltip="getValidationTooltip('label')"
+                                    type="text"
+                                    name="label"
+                                    tabindex="1"
+                                    :placeholder="$t('send.private.detail-private-send.placeholder__label')"
+                                >
+                            </div>
+                        </div>
+
+                        <div
+                            class="field"
+                            :class="getFieldErrorClass('address')"
+                        >
+                            <label for="address">
+                                {{ $t('send.private.detail-private-send.label__address') }}
+                            </label>
+
+                            <div class="control">
+                                <input
+                                    id="address"
+                                    ref="address"
+                                    v-model.trim="address"
+                                    v-validate="requiredAddressValidationRules"
+                                    v-tooltip="getValidationTooltip('address')"
+                                    data-vv-validate-on="change|blur"
+                                    type="text"
+                                    name="address"
+                                    tabindex="2"
+                                    class="xyz"
+                                    :placeholder="$t('send.private.detail-private-send.placeholder__address')"
+                                >
+                            </div>
+                        </div>
+
+                        <div
+                            class="field amount-field"
+                            :class="getFieldErrorClass('amount')"
+                        >
+                            <label for="amount">
+                                {{ $t('send.private.detail-private-send.label__amount-selection') }}
+                            </label>
+
+                            <div class="control">
+                                <!-- The decimal parameter in v-validate depends on not having Zerocoin denominations below 0.1 -->
+                                <input
+                                    id="amount"
+                                    ref="amount"
+                                    v-model.trim="amount"
+                                    v-validate="zerocoinAmountValidationRules"
+                                    v-tooltip="getValidationTooltip('amount')"
+                                    data-vv-validate-on="change|blur"
+                                    type="text"
+                                    name="amount"
+                                    tabindex="3"
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
+
                 <section class="checkout has-divider">
                     <spend-zerocoin-steps
                         :on-form-submit="submitForm"
                         :form-is-valid="formSectionIsValid"
                         :cleanup-form="cleanupForm"
+                        :label="label"
+                        :address="address"
+                        :amount="amount"
                         @steps-done="cleanupForm"
                     />
                 </section>
@@ -40,7 +115,6 @@ import { mapGetters, mapActions } from 'vuex'
 // import isEmpty from 'lodash/isEmpty'
 import types from '~/types'
 
-import SpendZerocoinForm from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinForm'
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
 import SpendZerocoinSteps from '@/components/OutgoingPaymentsPage/SpendZerocoin/SpendZerocoinSteps'
 
@@ -48,6 +122,7 @@ import SpendZerocoinSteps from '@/components/OutgoingPaymentsPage/SpendZerocoin/
 import SendConfirmDialog from '@/components/OutgoingPaymentsPage/SendZcoin/SendConfirmDialog'
 import SendFeeSelection from '@/components/OutgoingPaymentsPage/SendZcoin/SendFeeSelection'
 // import PendingPayments from '@/components/payments/PendingPayments'
+import ValidationMixin from '@/mixins/ValidationMixin'
 
 import SendConfirmationCheck from '@/components/Icons/SendConfirmationCheck'
 import {convertToSatoshi} from "#/lib/convert";
@@ -56,12 +131,19 @@ export default {
     name: 'SpendZerocoin',
     components: {
         FeesAndAmount,
-        SpendZerocoinForm,
         SpendZerocoinSteps,
         SendConfirmationCheck,
         SendFeeSelection,
         SendConfirmDialog
     },
+
+    mixins: [
+        ValidationMixin
+    ],
+
+    inject: [
+        '$validator'
+    ],
 
     $_veeValidate: {
         validator: 'new' // give me my own validator instance.
@@ -69,29 +151,42 @@ export default {
 
     data () {
         return {
+            label: '',
+            address: '',
+            amount: '',
+
             validationFieldOrder: [
                 'label',
                 'amount',
                 'address'
             ],
-
-            formValidated: false
         }
     },
 
     computed: {
         ...mapGetters({
-            currentPassphrase: 'App/currentPassphrase',
-            spendFormLabel: 'ZerocoinSpend/spendFormLabel',
-            spendFormAddress: 'ZerocoinSpend/spendFormAddress',
-            spendFormAmount: 'ZerocoinSpend/spendFormAmount'
+            availableZerocoin: 'Balance/availableZerocoin',
+            currentPassphrase: 'App/currentPassphrase'
         }),
+
         formSectionIsValid () {
             return this.formValidated
         }
     },
 
     watch: {
+        label () {
+            this.validate()
+        },
+
+        address () {
+            this.validate()
+        },
+
+        amount () {
+            this.validate()
+        },
+
         currentStep: {
             handler (newVal, oldVal) {
                 window.dispatchEvent(new Event('resize'))
@@ -101,10 +196,6 @@ export default {
     },
 
     methods: {
-        ...mapActions({
-            clearForm: types.zerocoinspend.CLEAR_FORM
-        }),
-
         setFormValidationStatus (isValid) {
             this.formValidated = isValid
         },
@@ -114,8 +205,9 @@ export default {
         },
 
         cleanupForm () {
-            this.$log.debug('cleaning up...')
-            this.clearForm()
+            this.label = ''
+            this.amount = ''
+            this.address = ''
 
             this.resetValidator()
         },
@@ -127,9 +219,9 @@ export default {
             }
 
             this.$store.dispatch(types.zerocoinspend.SPEND_ZEROCOIN, {
-                label: this.spendFormLabel,
-                address: this.spendFormAddress,
-                amount: convertToSatoshi(this.spendFormAmount),
+                label: this.label,
+                address: this.address,
+                amount: convertToSatoshi(this.amount),
                 auth: this.currentPassphrase
             })
         }
@@ -208,12 +300,20 @@ export default {
         padding: 0;
         border: none;
 
-        &[disabled] {
-            input[type="text"],
-            select,
-            .message {
-                pointer-events: none;
-            }
+        input[type="text"],
+        select,
+        .message {
+            @include dark-input();
+        }
+
+        .prefix {
+            color: $color--comet;
+        }
+
+        div[tabindex],
+        div.has-focus {
+            outline: none;
+            cursor: pointer;
         }
     }
 
