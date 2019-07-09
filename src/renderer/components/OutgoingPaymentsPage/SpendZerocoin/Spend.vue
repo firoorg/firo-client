@@ -230,6 +230,8 @@ export default {
                 amount: convertToSatoshi(this.amount),
                 auth: this.currentPassphrase
             })
+
+            this.$store.dispatch(types.app.CLEAR_PASSPHRASE)
         },
 
         pasteAddress () {
