@@ -92,6 +92,7 @@
     }
   },
   "dependencies": {
+    "@types/zeromq": "^4.6.2",
     "ajv": "^6.10.0",
     "async": "^2.6.2",
     "big.js": "^5.2.2",
