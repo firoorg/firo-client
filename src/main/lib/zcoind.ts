@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as zmq from "zeromq";
 import * as path from "path";
+import Mutex from "await-mutex";
 
 import * as constants from '../config/constants';
 import { createLogger } from '../../../src/lib/logger';
@@ -57,11 +58,19 @@ export class Zcoind {
     private requesterSocket: zmq.Socket | undefined;
     private publisherSocket: zmq.Socket | undefined;
     private hasReceivedApiStatus: boolean;
+    private requestMutex: Mutex;
+    // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
+    // that send() will block prior to connecting to the proper socket.
+    private _unlockAfterConnect: Promise<() => void>;
 
     // store is our global Vuex store.
     constructor(store: any) {
         this.store = store;
         this.hasReceivedApiStatus = false;
+        this.requestMutex = new Mutex();
+        // This will resolve instantly, but we don't want to let in a potential race condition by making it assign after
+        // the Promise is resolved.
+        this._unlockAfterConnect = this.requestMutex.lock();
     }
 
     // Connect to the daemon and take action when it serves us appropriate events.
@@ -173,6 +182,9 @@ export class Zcoind {
         this.publisherSocket.on('message', (topicBuffer, messageBuffer) => {
             this.handleSubscriptionEvent(topicBuffer.toString(), messageBuffer.toString());
         });
+
+        // We can send now, so release the initial lock on this.requestMutex().
+        this._unlockAfterConnect.then(f => f());
     }
 
     // We're called when a subscription event from zcoind comes up. In turn, we call the relevant subscription handlers
@@ -195,6 +207,70 @@ export class Zcoind {
             logger.warn("Received subscription event with topic '%s', but no handler exists.", topic);
         }
     }
+
+    // Send a request to zcoind. Basically a given API call is identified by *both* the type and collection parameters.
+    // auth is the wallet password, which is only required for certain calls. data is arbitrary data associated with the
+    // call. We return a Promise containing the data object of the response we got from zcoind.
+    //
+    // The Promise will be reject()ed in the case that zcoind gives invalid JSON data, responds with an error, or
+    // responds with no data object; or if we fail to send to zcoind. If zcoind gives invalid JSON data, or we fail to
+    // send, we reject() with the exception object. If zcoind responds with an error or responds with no data object, we
+    // return the entire response object we received from zcoind.
+    async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
+        logger.debug("Trying to acquire requestMutex for %s/%s call", type, collection);
+        // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
+        // in order, and also no tag information allowing us to associate a given request to a reply.
+        let release = await this.requestMutex.lock();
+        logger.debug("Acquired requestMutex");
+
+        return new Promise((resolve, reject) => {
+            try {
+                logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
+                this.requesterSocket.send(JSON.stringify({
+                    auth,
+                    type,
+                    collection,
+                    data
+                }));
+            } catch (e) {
+                logger.error("Error sending data to zcoind: %O", e);
+                reject(e);
+                release();
+                return;
+            }
+
+            this.requesterSocket.once('message', (messageBuffer) => {
+                const messageString = messageBuffer.toString();
+
+                let message;
+                try {
+                    message = JSON.parse(messageString);
+                } catch (e) {
+                    logger.error("zcoind sent us invalid JSON: %O", messageString);
+                    release();
+                    reject(e);
+                    return;
+                }
+
+                logger.debug("received reply from zcoind: %O", message);
+
+                if (typeof message === 'object' &&
+                    !message.error &&
+                    message.meta &&
+                    message.meta.status === 200 &&
+                    typeof message.data === 'object'
+                ) {
+                    resolve(message.data);
+                } else {
+                    logger.error("zcoind replied with an error: %O", message);
+                    reject(message);
+                }
+
+                release();
+            });
+        });
+    }
+
 
 
     // Subscription Event Handlers

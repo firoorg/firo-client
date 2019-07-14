@@ -138,8 +138,10 @@ app.on('ready', () => {
     menu.init({ app, store })
 
     if (!Vue.prototype.$daemon) {
-        Vue.prototype.$daemon = new Zcoind(store);
-        Vue.prototype.$daemon.connectedAndReact();
+        const daemon = new Zcoind(store);
+        daemon.connectedAndReact();
+
+        Vue.prototype.$daemon = daemon;
     }
 
     store.dispatch('Window/show', 'main')
