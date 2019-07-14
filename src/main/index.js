@@ -13,6 +13,9 @@ import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
 
+import { Zcoind } from './lib/zcoind'
+
+import Vue from 'vue'
 import store from '../store/main'
 import { setupWindowRouter } from '~/utils/routerHelper'
 
@@ -133,6 +136,11 @@ app.on('ready', () => {
     windowManager.setupAppEvents()
 
     menu.init({ app, store })
+
+    if (!Vue.prototype.$daemon) {
+        Vue.prototype.$daemon = new Zcoind(store);
+        Vue.prototype.$daemon.connectedAndReact();
+    }
 
     store.dispatch('Window/show', 'main')
     clipboard.watch(store)
