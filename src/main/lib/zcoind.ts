@@ -285,4 +285,26 @@ export class Zcoind {
     // an apiStatus event is received, not just on initialization.
     async onApiStatus(event: ApiStatus): Promise<void> {
     }
+
+
+
+    // Actions
+
+
+    // Calculate a transaction fee. addresses is a map of {recipient: satoshiAmount} pairs; feePerKb is the satoshi
+    // fee per kilobyte for the generated transaction. We reject() the promise if the zcoind call fails or received data
+    // is invalid.
+    async calcTxFee(feePerKb: number, addresses: Record<string, number>): Promise<number> {
+        let data = await this.send(null, 'get', 'txFee', {
+            addresses,
+            feePerKb
+        });
+
+        if (typeof data.fee === 'number') {
+            return data.fee;
+        } else {
+            logger.error("got invalid calcTxFee response: %O", data);
+            throw "got invalid calcTxFee response";
+        }
+    }
 }
