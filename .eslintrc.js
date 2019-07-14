@@ -13,6 +13,9 @@ module.exports = {
         __static: true
     },
     rules: {
+        'indent': ['warn', 4],
+        'vue/html-indent': ['warn', 4],
+
         // allow paren-less arrow functions
         'arrow-parens': 0,
         // allow async-await
