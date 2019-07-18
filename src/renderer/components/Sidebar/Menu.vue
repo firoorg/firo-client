@@ -31,15 +31,8 @@
                     </percentage-to-hold-in-zerocoin-notification>
                 </router-link>
             </li>
-            <li class="has-divider">
-                <router-link :to="{ name: 'spend-zerocoin' }">
-                    <span class="text">
-                        {{ $t('navigation.menu.button__spend') }}
-                    </span>
-                </router-link>
-            </li>
             <li>
-                <router-link :to="{ name: 'send-zcoin' }">
+                <router-link to="/send">
                     <span class="text">
                         {{ $t('navigation.menu.button__send') }}
                     </span>

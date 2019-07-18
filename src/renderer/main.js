@@ -18,6 +18,8 @@ import App from './App'
 import router from './router'
 import store from '../store/renderer'
 
+import { Zcoind } from '../main/lib/zcoind'
+
 import { setupWindowRouter } from '~/utils/routerHelper'
 
 const app = require('electron').remote.app
@@ -86,6 +88,14 @@ sync(store, router, {
 })
 
 setupWindowRouter({ store, router })
+
+// TODO: Put this in a more appropriate place.
+// Really this isn't a logically appropriate place to put our daemon interaction. It has nothing to do with rendering.
+// But the way initialization is set up, it's hard to set $daemon anywhere else where it will be available to Vue
+// instances, so we'll put it here. Hopefully this can be moved somewhere more sensible in a subsequent stage of
+// refactoring.
+Vue.prototype.$daemon = new Zcoind(store);
+Vue.prototype.$daemon.connectAndReact();
 
 // This is so we can pass around global events, which we're basically using just to allow enter to work to submit forms
 // that are spread across a large number of files with mixins.

@@ -1,5 +1,8 @@
 'use strict'
 
+// Note: Initialization of refactored zcoind interaction is done in src/renderer/main.js so it can be assigned to
+// Vue.prototype.$daemon.
+
 import os from 'os'
 import { app } from 'electron'
 import { join } from 'path'
@@ -13,9 +16,6 @@ import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
 
-import { Zcoind } from './lib/zcoind'
-
-import Vue from 'vue'
 import store from '../store/main'
 import { setupWindowRouter } from '~/utils/routerHelper'
 
@@ -136,13 +136,6 @@ app.on('ready', () => {
     windowManager.setupAppEvents()
 
     menu.init({ app, store })
-
-    if (!Vue.prototype.$daemon) {
-        const daemon = new Zcoind(store);
-        daemon.connectedAndReact();
-
-        Vue.prototype.$daemon = daemon;
-    }
 
     store.dispatch('Window/show', 'main')
     clipboard.watch(store)

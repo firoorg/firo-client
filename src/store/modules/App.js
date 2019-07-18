@@ -90,6 +90,10 @@ const mutations = {
 
     [types.CLEAR_PASSPHRASE] (state) {
         state.passphrase = null
+    },
+
+    setDaemon (state, daemon) {
+        state.daemon = daemon;
     }
 }
 

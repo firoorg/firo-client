@@ -5,70 +5,26 @@
                 v-scrollable
                 class="outgoing-requests-list"
             >
-                <h1>
-                    {{ $t('send.public.overview.title') }}
-                </h1>
-
-                <outgoing-payments-list
-                    :selected-payment="selectedPaymentId"
-                    @selection-change="onRowSelect"
-                />
+                <outgoing-payments-list />
             </section>
         </div>
+
         <section class="paymentrequest-detail">
-            <!--<transition
-                name="fade"
-                mode="out-in"
-            >-->
-            <router-view
-                :key="$route.path"
-                class="paymentrequest-detail-route"
-            />
-            <!--</transition>-->
-            <!--<send-zcoin :boundaries-element="boundariesElement" />-->
+            <send />
         </section>
     </section>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
-import OutgoingPaymentsList from '@/components/OutgoingPaymentsPage/OutgoingPaymentsList'
+import OutgoingPaymentsList from '@/components/SendPage/OutgoingPaymentsList';
+import Send from '@/components/SendPage/Send';
 
 export default {
-    name: 'OutgoingPaymentsPage',
+    name: 'SendPage',
 
     components: {
         OutgoingPaymentsList,
-    },
-
-    mixins: [
-        FilterByUrlParamMixin
-    ],
-
-    computed: {
-        ...mapGetters({
-            transactions: 'Address/getOutgoingTransactions'
-        }),
-
-        selectedPaymentId () {
-            const { id } = this.$route.params
-
-            return id || null
-        }
-    },
-
-    methods: {
-        onRowSelect ({ name, id }) {
-            this.$log.debug(name, id)
-
-            this.pushRouterWithFilter({
-                name,
-                params: {
-                    id
-                }
-            })
-        }
+        Send
     }
 }
 </script>

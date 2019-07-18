@@ -20,18 +20,15 @@
 </template>
 
 <script>
+// We emit @complete when the timer finishes.
+
 import RadialProgressBar from 'vue-radial-progress'
 
 export default {
-
     components: {
         RadialProgressBar
     },
     props: {
-        complete: {
-            type: Function,
-            required: true
-        },
         isDark: {
             type: Boolean,
             default: false
@@ -60,11 +57,11 @@ export default {
 
     mounted () {
         this.interval = setInterval(() => {
-            this.completedSteps++
+            this.completedSteps++;
 
             if (this.completedSteps > this.totalSteps) {
-                this.stop()
-                this.complete()
+                this.stop();
+                this.$emit('complete');
             }
         }, this.duration)
     },

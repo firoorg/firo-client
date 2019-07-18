@@ -18,6 +18,7 @@
             :on-row-select="onTableRowSelect"
             :sort-order="sortOrder"
             :compare-elements="compareTransactions"
+            :per-page="12"
         >
             <template
                 slot="label"
@@ -107,7 +108,8 @@ export default {
         },
 
         filteredTransactions () {
-            return this.getFilteredByUrl(this.transactionsWithCategoryTags, ['belongsToAddress', 'label', 'category'])
+            // FIXME
+            return this.transactionsWithCategoryTags
         },
 
         sortOrder () {

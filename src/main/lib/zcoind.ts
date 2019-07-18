@@ -74,7 +74,7 @@ export class Zcoind {
     }
 
     // Connect to the daemon and take action when it serves us appropriate events.
-    connectedAndReact() {
+    connectAndReact() {
         this.statusPublisherSocket = zmq.socket('sub');
         // Set timeout for requester socket
         this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
@@ -227,7 +227,9 @@ export class Zcoind {
             try {
                 logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
                 this.requesterSocket.send(JSON.stringify({
-                    auth,
+                    auth: {
+                        passphrase: auth
+                    },
                     type,
                     collection,
                     data
@@ -290,6 +292,22 @@ export class Zcoind {
 
     // Actions
 
+
+    // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
+    // or the call fails for some other reason.
+    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number): Promise<string> {
+        const data: {txid: string} = await this.send(auth, 'create', 'sendZcoin', {
+            addresses: {
+                [recipient]: {
+                    label,
+                    amount
+                }
+            },
+            feePerKb
+        });
+
+        return data.txid;
+    }
 
     // Calculate a transaction fee. addresses is a map of {recipient: satoshiAmount} pairs; feePerKb is the satoshi
     // fee per kilobyte for the generated transaction. We reject() the promise if the zcoind call fails or received data
