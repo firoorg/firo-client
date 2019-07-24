@@ -80,7 +80,7 @@
 
                     <div class="buttons">
                         <base-button
-                            v-if="['confirm', 'passphrase'].includes(sendPopoverStep)"
+                            v-if="['confirm', 'passphrase', 'incorrectPassphrase', 'error'].includes(sendPopoverStep)"
                             color="red"
                             :is-dark="true"
                             :is-outline="true"
@@ -128,6 +128,14 @@
                                 Send
                             </base-button>
 
+                            <base-button
+                                v-else-if="sendPopoverStep === 'incorrectPassphrase'"
+                                color="green"
+                                @click.prevent="beginPassphraseStep"
+                            >
+                                Try Again
+                            </base-button>
+
                             <div
                                 v-else-if="sendPopoverStep === 'complete'"
                                 class="ok-icon"
@@ -150,6 +158,15 @@
                                     @onEnter="attemptSend"
                                 />
 
+                                <send-step-error
+                                    v-else-if="sendPopoverStep === 'error'"
+                                    :error-message="errorMessage"
+                                />
+
+                                <send-step-incorrect-passphrase
+                                    v-else-if="sendPopoverStep === 'incorrectPassphrase'"
+                                />
+
                                 <send-step-complete
                                     v-else-if="sendPopoverStep === 'complete'"
                                 />
@@ -165,7 +182,10 @@
 <script>
 import SendStepConfirm from '@/components/SendPage/SendStepConfirm';
 import SendStepPassphrase from "@/components/SendPage/SendStepPassphrase";
+import SendStepIncorrectPassphrase from '@/components/SendPage/SendStepIncorrectPassphrase';
+import SendStepError from '@/components/SendPage/SendStepError';
 import SendStepComplete from '@/components/SendPage/SendStepComplete';
+
 import CircularTimer from "@/components/Icons/CircularTimer";
 
 import {convertToSatoshi} from '#/lib/convert';
@@ -174,9 +194,11 @@ export default {
     name: 'Send',
 
     components: {
-        SendStepPassphrase,
         CircularTimer,
+        SendStepPassphrase,
         SendStepConfirm,
+        SendStepIncorrectPassphrase,
+        SendStepError,
         SendStepComplete
     },
 
@@ -187,13 +209,16 @@ export default {
             address: '',
             passphrase: '',
 
+            errorMessage: '',
+
             // Valid progressions are:
             //
             // initial -> wait
             // wait -> confirm
             // confirm -> initial | passphrase
-            // passphrase -> initial | error | complete
-            // error -> initial | passphrase
+            // passphrase -> initial | incorrectPassphrase | error | complete
+            // error -> initial
+            // incorrectPassphrase -> initial | passphrase
             // complete -> initial
             sendPopoverStep: 'initial',
 
@@ -221,7 +246,6 @@ export default {
             this.amount = '';
             this.address = '';
             this.passphrase = '';
-            this.ignoreSend = false;
             this.closeSendPopover();
         },
 
@@ -242,6 +266,9 @@ export default {
         },
 
         beginPassphraseStep () {
+            // We should never be called before the UI has been reset after a send request is made.
+            this.ignoreSend = false;
+
             this.passphrase = '';
             this.sendPopoverStep = 'passphrase';
             this.recalculatePopoverPosition();
@@ -249,7 +276,7 @@ export default {
 
         async attemptSend () {
             // Ignore the request to send if the user clicked the Send button twice in quick succession. this.ignoreSend
-            // will be reset along with all our other data in cleanupForm().
+            // will be set to false again when a new passphrase request is initiated.
             //
             // JavaScript is single threaded, so there should be no race condition possible with an interruption between
             // the value check and the value assignment.
@@ -259,15 +286,32 @@ export default {
             this.ignoreSend = true;
 
             try {
-                console.log(await this.$daemon.publicSend(this.passphrase, this.label, this.address, this.satoshiAmount, 1));
+                await this.$daemon.publicSend(this.passphrase, this.label, this.address, this.satoshiAmount, 1);
             } catch (e) {
-                console.log("publicSend failed!");
-                console.log(e);
-                this.beginPassphraseStep();
+                // Error code -14 indicates an incorrect passphrase.
+                if (e.error && e.error.code === -14) {
+                    this.beginIncorrectPassphraseStep();
+                } else if (e.error && e.error.message) {
+                    this.beginErrorStep(e.error.message);
+                } else {
+                    this.beginErrorStep(JSON.stringify(e));
+                }
+
                 return;
             }
 
             this.beginCompleteStep();
+        },
+
+        beginIncorrectPassphraseStep () {
+            this.sendPopoverStep = 'incorrectPassphrase';
+            this.recalculatePopoverPosition();
+        },
+
+        beginErrorStep (errorMessage) {
+            this.errorMessage = errorMessage;
+            this.sendPopoverStep = 'error';
+            this.recalculatePopoverPosition();
         },
 
         beginCompleteStep () {
