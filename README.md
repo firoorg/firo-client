@@ -7,15 +7,15 @@ fully trusted zcoind full node. Windows support is currently slightly broken, bu
 
 ## Installing zcoind
 
-For an unbundled install, it's required that you manually link binaries compiled from the `client-api-development`
-branch of the [zcoin repository](https://github.com/zcoinofficial/zcoin) into the appropriate directory for your system.
+For an unbundled install, it's required that you manually link binaries compiled from the `client-api` branch of the
+[zcoin repository](https://github.com/zcoinofficial/zcoin) into the appropriate directory for your system.
 
 ### Pulling and Building zcoind
 
 Clone the zcoind repository
 
 ```bash
-git clone --branch client-api-development https://github.com/zcoinofficial/zcoin
+git clone --branch client-api https://github.com/zcoinofficial/zcoin
 ```
 
 Now you must build zcoind, instructions for which will be located in `doc/build`, in the `README*.md` and `build*.md`

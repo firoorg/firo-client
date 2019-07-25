@@ -78,19 +78,6 @@
                         :class="{ 'is-synced': getIsSynced }"
                     >
                         <div
-                            v-show="!getIsSynced && hasMyZnodes"
-                            class="wrap"
-                        >
-                            <div
-                                class="loaded"
-                                :style="{ width: `${znodeSyncProgress * 100}%`}"
-                            >
-                                <div class="loading">
-                                    <div class="bg" />
-                                </div>
-                            </div>
-                        </div>
-                        <div
                             v-show="!getIsSynced"
                             class="wrap"
                         >
@@ -141,8 +128,6 @@ export default {
             avgBlockTime: 'Blockchain/averageBlockTimeInMilliSeconds',
             isSynced: 'Blockchain/isSynced',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            znodeSyncProgress: 'Znode/znodeSyncProgress',
-            hasMyZnodes: 'Znode/hasMyZnodes',
             hasConnections: 'Blockchain/hasConnections',
             connections: 'Blockchain/connections',
             connectedViaTor: 'Settings/isConnectedViaTor'

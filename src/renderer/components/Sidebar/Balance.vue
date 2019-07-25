@@ -9,7 +9,17 @@
             <amount :amount="availableXzc" /> <span class="ticker">XZC</span>
         </div>
         <div
-            v-if="pendingXzc > 0"
+            v-if="lockedXzc > 0 && pendingXzc > 0"
+        >
+            (<amount :amount="lockedXzc" /> locked, <amount :amount="pendingXzc" /> pending)
+        </div>
+        <div
+            v-else-if="lockedXzc > 0"
+        >
+            (<amount :amount="lockedXzc" /> locked)
+        </div>
+        <div
+            v-else-if="pendingXzc > 0"
         >
             (<amount :amount="pendingXzc" /> pending)
         </div>
@@ -52,7 +62,7 @@ export default {
             availableXzc: 'Balance/availableXzc',
             unconfirmedXzc: 'Balance/unconfirmedXzc',
             immatureXzc: 'Balance/immatureXzc',
-
+            lockedXzc: 'Balance/lockedXzc',
             availableZerocoin: 'Balance/availableZerocoin',
             unconfirmedZerocoin: 'Balance/unconfirmedZerocoin'
         }),
