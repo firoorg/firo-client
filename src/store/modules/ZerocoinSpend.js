@@ -21,7 +21,7 @@ const state = {
         amount: null,
         address: null
     },
-    denominationTypes: [0.1, 0.5, 1, 10, 100],
+    denominationTypes: [0.1, 0.5, 1, 10, 25, 100],
 }
 
 const mutations = {
