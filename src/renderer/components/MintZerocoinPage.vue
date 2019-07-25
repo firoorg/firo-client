@@ -140,15 +140,6 @@
                         @steps-close="() => enableProgressList = true"
                         @steps-done="cleanupForm"
                     />
-                    <!--
-                    <mint-confirm-dialog :can-submit="canSubmit"
-                                         :is-open="showPopover"
-                                         :on-cancel="onCancel"
-                                         :on-confirm="onConfirm"
-                                         popover-class="notice">
-                        <h3>Really?</h3>
-                    </mint-confirm-dialog>
-                    -->
                 </form>
             </template>
         </section>
@@ -165,7 +156,6 @@ import DenominationSelector from '@/components/DenominationSelector'
 import OnboardingNotice from '@/components/Notification/OnboardingNotice'
 import CurrentMints from '@/components/payments/CurrentMints'
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
-// import MintConfirmDialog from '@/components/MintZerocoinPage/MintConfirmDialog'
 import MintSteps from '@/components/MintZerocoinPage/MintSteps'
 import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
 import Stack from '@/components/Icons/Stack'
@@ -180,7 +170,6 @@ export default {
         NotificationIndicator,
         MintsInProgressList,
         MintSteps,
-        // MintConfirmDialog,
         FeesAndAmount,
         CurrentMints,
         DenominationSelector,
@@ -254,29 +243,6 @@ export default {
             doMint: types.mint.DO_MINT
         }),
 
-        /*
-            onConfirm (popoverReset) {
-                this.popoverStatus = 'showSuccess'
-
-                this.doMint({
-                    denominations: this.currentMints
-                })
-
-                this.reset(popoverReset)
-            },
-
-            reset (popoverReset) {
-                this.popoverStatus = ''
-                this.resetDenominations()
-
-                if (popoverReset) {
-                    popoverReset()
-                }
-            },
-            */
-
-        /// -- - - - - - -
-
         onDenominationChange () {
             this.isConfirmed = false
         },
@@ -293,9 +259,6 @@ export default {
                     passphrase: this.currentPassphrase
                 }
             })
-
-            // this.resetDenominations()
-            // this.reset(popoverReset)
         },
 
         cleanupForm () {
