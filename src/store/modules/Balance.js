@@ -86,6 +86,7 @@ const getters = {
     },
     availableXzc: (state) => state.xzc.confirmed - state.xzc.locked,
     unconfirmedXzc: (state) => state.xzc.unconfirmed,
+    lockedXzc: (state) => state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed,
     unconfirmedZerocoin: (state) => state.zerocoin.unconfirmed,
     confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total
