@@ -46,6 +46,8 @@
                                         id="address"
                                         ref="address"
                                         v-model.trim="address"
+                                        v-validate="'zcoinAddress'"
+                                        v-tooltip="getValidationTooltip('address')"
                                         type="text"
                                         name="address"
                                         tabindex="2"
@@ -64,6 +66,8 @@
                                         id="amount"
                                         ref="amount"
                                         v-model="amount"
+                                        v-validate="'amountIsWithinAvailableBalance|amountIsValid'"
+                                        v-tooltip="getValidationTooltip('amount')"
                                         type="text"
                                         name="amount"
                                         class="amount"
@@ -102,6 +106,7 @@
                                 v-if="sendPopoverStep === 'initial'"
                                 color="green"
                                 class="expanded"
+                                :disabled="!canBeginSend"
                                 @click.prevent="beginWaitStep"
                             >
                                 Send
@@ -180,6 +185,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 import SendStepConfirm from '@/components/SendPage/SendStepConfirm';
 import SendStepPassphrase from "@/components/SendPage/SendStepPassphrase";
 import SendStepIncorrectPassphrase from '@/components/SendPage/SendStepIncorrectPassphrase';
@@ -188,7 +195,8 @@ import SendStepComplete from '@/components/SendPage/SendStepComplete';
 
 import CircularTimer from "@/components/Icons/CircularTimer";
 
-import {convertToSatoshi} from '#/lib/convert';
+import {isValidAddress} from '#/lib/isValidAddress';
+import {convertToSatoshi, convertToCoin} from '#/lib/convert';
 
 export default {
     name: 'Send',
@@ -201,6 +209,10 @@ export default {
         SendStepError,
         SendStepComplete
     },
+
+    inject: [
+        '$validator'
+    ],
 
     data () {
         return {
@@ -223,21 +235,58 @@ export default {
             sendPopoverStep: 'initial',
 
             // If we're in the process of sending, we want to ignore any new send requests.
-            ignoreSend: false,
-
-            // ValidationMixin
-            validationFieldOrder: [
-                'label',
-                'amount',
-                'address'
-            ]
+            ignoreSend: false
         }
     },
 
     computed: {
+        ...mapGetters({
+            network: 'Network/network',
+            availableXzc: 'Balance/availableXzc'
+        }),
+
         satoshiAmount () {
             return convertToSatoshi(this.amount);
-        }
+        },
+
+        canBeginSend () {
+            // this.errors was already calculated when amount and address were entered.
+            return !!(this.amount && this.address && !this.validationErrors.items.length);
+        },
+
+
+        getValidationTooltip () {
+            return (fieldName) => ({
+                content: this.validationErrors.first(fieldName),
+                trigger: 'manual',
+                boundariesElement: 'body',
+                offset: 8,
+                placement: 'left',
+                classes: 'error',
+                show: true
+            })
+        },
+    },
+
+    mounted () {
+        // Set up VeeValidator rules.
+
+        this.$validator.extend('zcoinAddress', {
+            getMessage: () => 'Invalid Zcoin Address',
+            validate: (value) => isValidAddress(value, this.network)
+        });
+
+        this.$validator.extend('amountIsWithinAvailableBalance', {
+            // this.availableXzc will still be reactively updated.
+            getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableXzc),
+            validate: (value) => convertToSatoshi(value) <= this.availableXzc
+        });
+
+        this.$validator.extend('amountIsValid', {
+            getMessage: () => 'Amount Must Be A Multiple of 0.00000001',
+            // We use a regex here so as to not to have to deal with floating point issues.
+            validate: (value) => !!value.match(/^\d+(\.\d{1,8})?$/)
+        });
     },
 
     methods: {
