@@ -4,7 +4,7 @@
         class="denomination-selector"
     >
         <denomination
-            v-for="denomination in Object.keys(coinsToMint)"
+            v-for="denomination in Object.keys(coinsToMint).sort((x,y) => Number(x) - Number(y))"
             v-bind:key="denomination"
             :max-value-in-selector="maxValueInSelector"
             :denomination="denomination"
