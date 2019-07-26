@@ -26,13 +26,13 @@
         <div class="buttons">
             <base-round-button
                 :disabled="!canDecrease"
-                @click="decrease"
+                @click="tryDecrease"
             >
                 &minus;
             </base-round-button>
             <base-round-button
                 :disabled="!canIncrease"
-                @click="increase"
+                @click="tryIncrease"
             >
                 &plus;
             </base-round-button>
@@ -96,28 +96,42 @@ export default {
     },
 
     computed: {
-        canIncrease () {
+        canIncrease() {
             // Relevant fees are already calculated by the parent component.
             return convertToSatoshi(this.denomination) <= this.availableBalanceRemaining;
         },
 
-        canDecrease () {
+        canDecrease() {
             return this.value > 0;
         },
 
-        currentHeight () {
+        currentHeight() {
             return this.value * this.notchHeight + 'px';
         },
 
-        notchHeight () {
+        notchHeight() {
             // The height of each notch will adaptively change based on the maximum value in the selector, but will
             // never exceed maxNotchHeight.
             return Math.min(Math.max(this.maxHeight, 0) / this.maxValueInSelector, this.maxMintNotchHeight);
-        }
+        },
     },
 
     mounted () {
         this.maxHeight = this.$refs.el.parentElement.clientHeight;
+    },
+
+    methods: {
+        tryIncrease() {
+            if (this.canIncrease) {
+                this.increase();
+            }
+        },
+
+        tryDecrease() {
+            if (this.canDecrease) {
+                this.decrease();
+            }
+        }
     }
 }
 </script>

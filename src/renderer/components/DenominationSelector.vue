@@ -82,7 +82,7 @@ export default {
 
         currentMintAmount () {
             return Object.entries(this.coinsToMint)
-                .map((denomination, amount) => convertToSatoshi(denomination) * amount)
+                .map(([denomination, amount]) => convertToSatoshi(denomination) * amount)
                 .reduce((x,y)=>x+y);
         },
 
