@@ -9,8 +9,8 @@
 
                 <div class="content-wrapper">
                     <denomination-selector
-                        :on-denomination-change="onDenominationChange"
-                        :current-mint-costs="currentMintCostInSatoshi"
+                        :available-balance="availableXzc"
+                        :coins-to-mint-changed="coinsToMintChanged"
                     />
 
                     <transition name="fade">
@@ -35,6 +35,7 @@
                                 </i18n>
                             </template>
                         </onboarding-notice>
+                        <!--
                         <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
                             <template slot="header">
                                 <h3>{{ $t('onboarding.process-mints.title') }}</h3>
@@ -59,6 +60,7 @@
                                 </base-onboarding-button>
                             </template>
                         </onboarding-notice>
+                        -->
                         <mint-stats v-else />
                     </transition>
                 </div>
@@ -68,7 +70,7 @@
             v-scrollable
             class="current-mint-detail"
         >
-            <template v-if="!hasCurrentMints && hasMintsInProgress">
+            <template v-if="!mintCost && hasMintsInProgress">
                 <section class="mints-in-progress">
                     <header>
                         <h2 v-html="$t('mint.detail-process-mint.title')" />
@@ -119,7 +121,7 @@
                             </base-popover>
                         </div>
                     </header>
-                    <current-mints :current-mints="currentMints" />
+                    <current-mints :current-mints="Object.entries(coinsToMint)" />
                 </section>
                 <form
                     class="checkout"
@@ -127,14 +129,14 @@
                 >
                     <div class="has-divider">
                         <fees-and-amount
-                            :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: currentDenominationFees }"
-                            :amount="currentMintCostInSatoshi"
+                            :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: mintFees }"
+                            :amount="mintAmount"
                             translation-namespace="mint.detail-create-mint"
                         />
                     </div>
                     <mint-steps
                         :on-form-submit="onSubmit"
-                        :form-is-valid="canSubmit"
+                        :form-is-valid="hasMints"
                         :cleanup-form="cleanupForm"
                         @steps-started="() => enableProgressList = false"
                         @steps-close="() => enableProgressList = true"
@@ -149,8 +151,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import types from '~/types'
-
-import { convertToSatoshi } from '#/lib/convert'
 
 import DenominationSelector from '@/components/DenominationSelector'
 import OnboardingNotice from '@/components/Notification/OnboardingNotice'
@@ -179,60 +179,25 @@ export default {
     data () {
         return {
             popoverStatus: '',
-            enableProgressList: true
+            enableProgressList: true,
+
+            mintCost: 0,
+            coinsToMint: {}
         }
     },
 
     computed: {
         ...mapGetters({
             availableXzc: 'Balance/availableXzc',
-            currentPassphrase: 'App/currentPassphrase',
-            denominations: 'Mint/currentDenominations',
-            currentDenominationFees: 'Mint/currentDenominationFees',
             mintsInProgress: 'Mint/mintsInProgress',
-            isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
-            percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
-            remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
         }),
 
-        currentMints () {
-            return Object.entries(this.denominations)
-            // filter out unused
-                .filter((pair) => pair[1])
-            // transform to [{denomination: '25', amount: 1}]
-                .map((pair) => {
-                    const [ denomination, amount ] = pair
-
-                    return {
-                        denomination,
-                        amount,
-                        cost: Number(denomination) * amount
-                    }
-                })
-        },
-
-        hasCurrentMints () {
-            return !!this.currentMints.length
-        },
-
-        currentMintCost () {
-            return this.currentMints.reduce((accumulator, current) => accumulator + current.cost, 0)
-        },
-
-        currentMintCostInSatoshi () {
-            return convertToSatoshi(this.currentMintCost)
-        },
-
-        canSubmit () {
-            return !!Object.keys(this.currentMints).length
+        hasMints () {
+            return !!Object.values(this.coinsToMint).find(x=>x);
         },
 
         hasMintsInProgress () {
             return !!this.mintsInProgress.length
-        },
-
-        mintsInProgressLength () {
-            return this.mintsInProgress.length
         }
     },
 
@@ -243,8 +208,10 @@ export default {
             doMint: types.mint.DO_MINT
         }),
 
-        onDenominationChange () {
-            this.isConfirmed = false
+        coinsToMintChanged(mintAmount, mintFees, coinsToMint) {
+            this.mintAmount = mintAmount;
+            this.mintFees = mintFees;
+            this.coinsToMint = coinsToMint;
         },
 
         onSubmit () {

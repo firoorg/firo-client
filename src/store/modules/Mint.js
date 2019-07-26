@@ -5,8 +5,6 @@ import allTypes from '~/types'
 import IsLoading from '~/mixins/IsLoading'
 import Response from '~/mixins/Response'
 
-import { formatDenominationPairs } from '~/utils'
-import { convertToCoin, convertToSatoshi } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
 import { getId } from '~/utils/index'
 
@@ -19,7 +17,6 @@ const state = {
     ...isLoading.state,
     ...mintResponse.state,
 
-    currentDenominations: {},
     mints: {}
 }
 
@@ -29,28 +26,6 @@ const mutations = {
 
     [types.DO_MINT] () {},
 
-    [types.ADD_DENOMINATION] (state, denomination) {
-        const name = `${denomination}`
-        if (state.currentDenominations[name] === undefined) {
-            Vue.set(state.currentDenominations, name, 0)
-        }
-
-        state.currentDenominations[name] = state.currentDenominations[name] + 1
-    },
-
-    [types.REMOVE_DENOMINATION] (state, denomination) {
-        const name = `${denomination}`
-        if (!state.currentDenominations[name]) {
-            return
-        }
-
-        state.currentDenominations[name] = state.currentDenominations[name] - 1
-    },
-
-    [types.RESET_DENOMINATIONS] (state) {
-        state.currentDenominations = {}
-    },
-
     [types.UPDATE_MINT] (state, mint) {
         const { id } = mint
         Vue.set(state.mints, id, mint)
@@ -59,22 +34,6 @@ const mutations = {
 
 const actions = {
     ...mintResponse.actions,
-
-    [types.ADD_DENOMINATION] ({ commit, state }, denomination) {
-        commit(types.ADD_DENOMINATION, denomination)
-    },
-
-    [types.REMOVE_DENOMINATION] ({ commit, state }, denomination) {
-        commit(types.REMOVE_DENOMINATION, denomination)
-    },
-
-    [types.RESET_DENOMINATIONS] ({ commit, state }) {
-        if (!Object.keys(state.currentDenominations).length) {
-            return
-        }
-
-        commit(types.RESET_DENOMINATIONS)
-    },
 
     [types.UPDATE_MINT] ({ commit, state }, mint) {
         commit(types.UPDATE_MINT, {
@@ -129,39 +88,6 @@ const actions = {
 const getters = {
     ...isLoading.getters,
     ...mintResponse.getters,
-
-    currentDenominations (state) {
-        return state.currentDenominations
-    },
-
-    currentDenominationsFormatted (state, getters) {
-        if (!getters.currentDenominations) {
-            return []
-        }
-
-        return formatDenominationPairs(getters.currentDenominations)
-    },
-
-    currentDenominationCosts (state, getters) {
-        return getters.currentDenominationsFormatted
-            .reduce((accumulator, current) => accumulator + current.cost, 0)
-    },
-
-    currentDenominationCostsInSatoshi (state, getters) {
-        return convertToSatoshi(getters.currentDenominationCosts)
-    },
-
-    currentDenominationFees (state, getters) {
-        return getters.currentDenominationsFormatted.reduce((accumulator, denom) => {
-            return accumulator + (denom.amount * 100000)
-        }, 0)
-    },
-
-    currentDenominationAmount (state, getters) {
-        return getters.currentDenominationsFormatted.reduce((accumulator, denom) => {
-            return accumulator + denom.amount
-        }, 0)
-    },
 
     // All mints we have a record of, including spent ones.
     allMints (state, getters, rootState, rootGetters) {

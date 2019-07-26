@@ -4,67 +4,111 @@
         class="denomination-selector"
     >
         <denomination
-            v-for="denomination in denominations"
-            :key="denomination"
-            :max-value="maxValue"
-            :max-height="maxHeight"
+            v-for="denomination in Object.keys(coinsToMint)"
+            v-bind:key="denomination"
+            :max-value-in-selector="maxValueInSelector"
             :denomination="denomination"
-            :on-change="onDenominationChange"
-            :available-balance="getAvailableBalanceToMint"
+            :available-balance-remaining="getAvailableBalanceToMint"
+            :increase="() => increaseCoinsToMint(denomination)"
+            :decrease="() => decreaseCoinsToMint(denomination)"
+            :value="coinsToMint[denomination]"
         />
     </section>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import Denomination from '@/components/Denomination'
+import {convertToSatoshi} from "#/lib/convert";
 
 export default {
     name: 'DenominationSelector',
+
     components: {
         Denomination
     },
 
     props: {
-        onDenominationChange: {
-            type: Function,
+        // Total available balance for minting.
+        availableBalance: {
+            type: Number,
+            required: true
+        },
+
+        mintFee: {
+            type: Number,
+            default: 1e5
+        },
+
+        mintSuggestions: {
+            type: Object,
             default: () => {}
         },
 
-        currentMintCosts: {
-            type: Number,
+        // When the user changes the amount of coins they want to mint, we'll be called with currentMintCost as the
+        // first argument and coinsToMint as the second. We'll also be called when the component is mounted, where we'll
+        // return what we're passed in in mintSuggestions.
+        coinsToMintChanged: {
+            type: Function,
             required: true
         }
     },
 
     data () {
         return {
-            denominations: [0.1, 0.5, 1, 10, 25, 100],
-            maxHeight: 0
+            coinsToMint: Object.assign({
+                '0.1': 0,
+                '0.5': 0,
+                '1': 0,
+                '10': 0,
+                '25': 0,
+                '100': 0
+            }, this.mintSuggestions)
         }
     },
 
     computed: {
-        ...mapGetters({
-            currentDenominations: 'Mint/currentDenominations',
-            availableXzcBalance: 'Balance/availableXzc'
-        }),
-
-        maxValue () {
-            return Object.values(this.currentDenominations).reduce((x,y) => x > y ? x : y, 0)
+        maxValueInSelector () {
+            return Object.values(this.coinsToMint).reduce((x,y) => Math.max(x,y));
         },
 
         getAvailableBalanceToMint () {
-            // substract current costs + one additional fee for (potential) upcoming mint
-            // todo get mint fee from config
-            const available = this.availableXzcBalance - this.currentMintCosts - 100000
+            // Everything we're currently paying plus the fee for an additional mint.
+            return Math.max(this.availableBalance - this.currentMintCost - this.mintFee, 0);
+        },
 
-            return available > 0 ? available : 0
+        currentMintFees () {
+            return Object.values(this.coinsToMint).reduce((x,y)=>x+y) * this.mintFee;
+        },
+
+        currentMintAmount () {
+            return Object.entries(this.coinsToMint)
+                .map((denomination, amount) => convertToSatoshi(denomination) * amount)
+                .reduce((x,y)=>x+y);
+        },
+
+        currentMintCost () {
+            return this.currentMintFees + this.currentMintAmount;
         }
     },
 
     mounted () {
-        this.maxHeight = this.$el.clientHeight
+        this.changed();
+    },
+
+    methods: {
+        increaseCoinsToMint(denomination) {
+            this.coinsToMint[denomination] += 1;
+            this.changed();
+        },
+
+        decreaseCoinsToMint(denomination) {
+            this.coinsToMint[denomination] -= 1;
+            this.changed();
+        },
+
+        changed() {
+            this.coinsToMintChanged(this.currentMintAmount, this.currentMintFees, this.coinsToMint);
+        }
     }
 }
 </script>

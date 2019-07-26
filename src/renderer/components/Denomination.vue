@@ -1,20 +1,23 @@
 <template>
-    <div class="denomination">
+    <div
+        ref="el"
+        class="denomination"
+    >
         <div
             class="bar"
-            :class="{ 'is-empty': !current }"
+            :class="{ 'is-empty': !value }"
         >
             <div
-                class="current"
-                :class="{ 'has-current': current }"
+                class="value"
+                :class="{ 'has-value': !!value }"
                 :style="{ height: currentHeight }"
             >
                 <transition
                     name="fade"
                     duration="250ms"
                 >
-                    <span v-show="current">
-                        {{ current ? current : '' }}
+                    <span v-if="value">
+                        {{ value }}
                     </span>
                 </transition>
             </div>
@@ -38,104 +41,83 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { convertToSatoshi } from '#/lib/convert'
-// import { addVuexModel } from '@/utils/store'
-import types from '~/types'
+import { convertToSatoshi } from "#/lib/convert";
 
 export default {
     name: 'Denomination',
+
     props: {
         denomination: {
+            type: String,
+            required: true
+        },
+
+        // This is the largest number of coins showing in any mint bar.
+        maxValueInSelector: {
             type: Number,
             required: true
         },
-        availableBalance: {
+
+        // The maximum height of a notch of the mint bar, in pixels.
+        maxMintNotchHeight: {
+            type: Number,
+            default: 24
+        },
+
+        // Remaining balance available for minting (with fee for the next mint already subtracted) in satoshi.
+        availableBalanceRemaining: {
             type: Number,
             required: true
         },
-        maxValue: {
+
+        // The parent component is responsible for updating this appropriately when we call increase() and decrease().
+        value: {
             type: Number,
             required: true
         },
-        maxHeight: {
-            type: Number,
-            required: true
-        },
-        onChange: {
+
+        // Called with no arguments when the user requests an increase in the amount of coins of this denomination to mint.
+        increase: {
             type: Function,
-            default: () => {}
+            required: true
+        },
+
+        // Inverse of increase().
+        decrease: {
+            type: Function,
+            required: true
         }
     },
 
     data () {
         return {
-        }
+            maxHeight: 0
+        };
     },
 
     computed: {
-        ...mapGetters({
-            denominations: 'Mint/currentDenominations',
-        }),
-
         canIncrease () {
-            // fees for this increase are already subtracted by the parent element
-            return convertToSatoshi(this.denomination) < this.availableBalance
+            // Relevant fees are already calculated by the parent component.
+            return convertToSatoshi(this.denomination) <= this.availableBalanceRemaining;
         },
 
         canDecrease () {
-            return this.current > 0
+            return this.value > 0;
         },
 
         currentHeight () {
-            // const all = this.calcHeight(this.current + this.minted)
-            // return all - this.calcHeight(this.minted) + 'px'
-            // return this.mapHeight(all) + 'px'
-            return this.calcHeight(this.current) * (8 * 3) + 'px'
+            return this.value * this.notchHeight + 'px';
         },
 
-        current () {
-            return this.denominations[`${this.denomination}`] || 0
+        notchHeight () {
+            // The height of each notch will adaptively change based on the maximum value in the selector, but will
+            // never exceed maxNotchHeight.
+            return Math.min(Math.max(this.maxHeight, 0) / this.maxValueInSelector, this.maxMintNotchHeight);
         }
     },
 
-    methods: {
-        mapHeight (amount) {
-            const map = (value, low1, high1, low2, high2) => {
-                return low2 + (high2 - low2) * (value - low1) / (high1 - low1)
-            }
-
-            return map(amount, 0, Math.log(this.maxValue + 1), 30, this.maxHeight)
-        },
-
-        calcHeight (amount) {
-            /*
-
-                */
-
-            return !amount ? 0 : Math.ceil((amount)/* *  this.denomination */) // * (8 * 3)
-
-            // return !amount ? 0 : Math.ceil(map(Math.log(amount + 1), 0, Math.log(this.maxValue + 1) || 1, 30, this.maxHeight))
-            // return !amount ? 0 : Math.log(amount + 1)
-        },
-
-        increase () {
-            if (!this.canIncrease) {
-                return
-            }
-
-            this.$store.dispatch(types.mint.ADD_DENOMINATION, this.denomination)
-            this.onChange()
-        },
-
-        decrease () {
-            if (!this.canDecrease) {
-                return
-            }
-
-            this.$store.dispatch(types.mint.REMOVE_DENOMINATION, this.denomination)
-            this.onChange()
-        }
+    mounted () {
+        this.maxHeight = this.$refs.el.parentElement.clientHeight;
     }
 }
 </script>
@@ -159,7 +141,7 @@ export default {
         }
 
         .minted,
-        .current {
+        .value {
             opacity: 0;
             height: 0;
             overflow: hidden;
@@ -173,13 +155,13 @@ export default {
             }
         }
 
-        .current {
+        .value {
             background: rgba($color--polo-medium, 0.5);
             border: 1px dashed $color--comet;
             border-bottom: none;
             transition: height 0.25s ease-out, opacity 0.25s ease-out;
 
-            &.has-current {
+            &.has-value {
                 opacity: 1;
             }
 
@@ -223,42 +205,7 @@ export default {
         display: flex;
         justify-content: center;
         margin-top: emRhythm(1);
-
-        /*
-        button {
-            border: none;
-            @include font-heavy();
-            cursor: pointer;
-            color: $color--comet-dark;
-            outline: none;
-            border-radius: 50%;
-            background-color: rgba($color--polo-medium, 0);
-            position: relative;
-            height: 1.5rem;
-            width: 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            transition: color 0.15s ease-out, background-color 0.15s ease-out;
-
-            &[disabled] {
-                color: $color--comet;
-                cursor: default;
-            }
-
-            &:not([disabled]) {
-                &:hover {
-                    color: $color--dark;
-                    background-color: rgba($color--polo-medium, 0.7);
-                }
-
-                &:active {
-                    background-color: rgba($color--polo-medium, 1);
-                }
-            }
-        }
-        */
+        user-select: none;
 
         button + button {
             margin-left: 0.25rem;
