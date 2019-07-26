@@ -1,38 +1,25 @@
 <template>
     <ul class="mints">
         <li
-            v-for="(value, key) in currentMints"
-            :key="key"
+            v-for="[denomination, amount] in denominations"
+            :key="denomination"
         >
             <div class="amount">
-                {{ value.amount }}&MediumSpace;x
+                {{ amount }}&MediumSpace;x
             </div>
             <div class="label">
-                <!--<slot v-bind="value" />-->
                 <div>
                     <span class="name">
-                        Mint {{ value.denomination }}
+                        Mint {{ denomination }}
                     </span>
                     <span class="cost">
-                        {{ value.cost }} <span class="unit">
+                        {{ Number(denomination) * amount }} <span class="unit">
                             xzc
                         </span>
                     </span>
                 </div>
-
-                <div
-                    v-if="showProgress"
-                    class="wrapper"
-                >
-                    <div
-                        v-for="(item, index) in value.amount"
-                        :key="index"
-                        class="item"
-                    />
-                </div>
             </div>
         </li>
-        <slot />
     </ul>
 </template>
 
@@ -42,12 +29,20 @@ export default {
 
     props: {
         currentMints: {
-            type: Array,
+            type: Object,
             required: true
         },
         showProgress: {
             type: Boolean,
             default: true
+        }
+    },
+
+    computed: {
+        denominations () {
+            return Object.entries(this.currentMints)
+                .filter(([denomination, amount]) => amount > 0)
+                .sort(([d1, a1], [d2, a2]) => Number(d1) - Number(d2));
         }
     }
 }

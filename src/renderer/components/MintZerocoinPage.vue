@@ -70,7 +70,7 @@
             v-scrollable
             class="current-mint-detail"
         >
-            <template v-if="!mintCost && hasMintsInProgress">
+            <template v-if="!mintAmount && hasMintsInProgress">
                 <section class="mints-in-progress">
                     <header>
                         <h2 v-html="$t('mint.detail-process-mint.title')" />
@@ -121,7 +121,7 @@
                             </base-popover>
                         </div>
                     </header>
-                    <current-mints :current-mints="Object.entries(coinsToMint)" />
+                    <current-mints :current-mints="coinsToMint" />
                 </section>
                 <form
                     class="checkout"
@@ -181,7 +181,8 @@ export default {
             popoverStatus: '',
             enableProgressList: true,
 
-            mintCost: 0,
+            mintAmount: 0,
+            mintFees: 0,
             coinsToMint: {}
         }
     },
