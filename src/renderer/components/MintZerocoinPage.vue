@@ -123,10 +123,8 @@
                     </header>
                     <current-mints :current-mints="coinsToMint" />
                 </section>
-                <form
-                    class="checkout"
-                    @submit.prevent="onSubmit"
-                >
+
+                <div class="checkout">
                     <div class="has-divider">
                         <fees-and-amount
                             :fee="{ label: $t('mint.detail-create-mint.label__fees'), amount: mintFees }"
@@ -134,15 +132,18 @@
                             translation-namespace="mint.detail-create-mint"
                         />
                     </div>
-                    <mint-steps
-                        :on-form-submit="onSubmit"
-                        :form-is-valid="hasMints"
-                        :cleanup-form="cleanupForm"
-                        @steps-started="() => enableProgressList = false"
-                        @steps-close="() => enableProgressList = true"
-                        @steps-done="cleanupForm"
-                    />
-                </form>
+                    <div
+                        v-if="mintStep === 'initial'"
+                    >
+                        <base-button
+                                color="green"
+                                :disabled="!canSubmit"
+                                @click.prevent="beginAnonymiz"
+                        >
+                            Anonymize Now
+                        </base-button>
+                    </div>
+                </div>
             </template>
         </section>
     </section>
@@ -180,6 +181,8 @@ export default {
         return {
             popoverStatus: '',
             enableProgressList: true,
+
+            mintStep: 'initial',
 
             mintAmount: 0,
             mintFees: 0,
