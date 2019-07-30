@@ -134,7 +134,7 @@ export default {
         }),
 
         getIsSynced () {
-            return this.hasMyZnodes ? this.isSynced : this.isBlockchainSynced
+            return this.isBlockchainSynced
         },
 
         progress () {
