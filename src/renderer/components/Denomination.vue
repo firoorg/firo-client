@@ -86,6 +86,12 @@ export default {
         decrease: {
             type: Function,
             required: true
+        },
+
+        // increase and decrease buttons will be disabled if this is set.
+        disabled: {
+            type: Boolean,
+            required: true
         }
     },
 
@@ -98,11 +104,11 @@ export default {
     computed: {
         canIncrease() {
             // Relevant fees are already calculated by the parent component.
-            return convertToSatoshi(this.denomination) <= this.availableBalanceRemaining;
+            return !this.disabled && convertToSatoshi(this.denomination) <= this.availableBalanceRemaining;
         },
 
         canDecrease() {
-            return this.value > 0;
+            return !this.disabled && this.value > 0;
         },
 
         currentHeight() {

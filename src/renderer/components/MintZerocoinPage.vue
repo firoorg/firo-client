@@ -11,6 +11,7 @@
                     <denomination-selector
                         :available-balance="availableXzc"
                         :coins-to-mint-changed="coinsToMintChanged"
+                        :disabled="false"
                     />
 
                     <transition name="fade">

@@ -12,6 +12,7 @@
             :increase="() => increaseCoinsToMint(denomination)"
             :decrease="() => decreaseCoinsToMint(denomination)"
             :value="coinsToMint[denomination]"
+            :disabled="disabled"
         />
     </section>
 </template>
@@ -42,6 +43,12 @@ export default {
         mintSuggestions: {
             type: Object,
             default: () => {}
+        },
+
+        // This will be set after denominations have been selected and the confirmation dialog is initiated.
+        disabled: {
+            type: Boolean,
+            required: true
         },
 
         // When the user changes the amount of coins they want to mint, we'll be called with currentMintCost as the
