@@ -8,10 +8,12 @@
                 </header>
 
                 <div class="content-wrapper">
+                    <!-- It's critical that DenominationSelector is disabled properly. Otherwise, the user might end up
+                         sending a value they didn't confirm. -->
                     <denomination-selector
                         :available-balance="availableXzc"
                         :coins-to-mint-changed="coinsToMintChanged"
-                        :disabled="false"
+                        :disabled="popoverStep !== 'initial'"
                     />
 
                     <transition name="fade">
@@ -81,6 +83,7 @@
                     <mints-in-progress-list :mints="mintsInProgress" />
                 </section>
             </template>
+
             <template v-else>
                 <section class="current-mint">
                     <header>
@@ -133,17 +136,72 @@
                             translation-namespace="mint.detail-create-mint"
                         />
                     </div>
-                    <div
-                        v-if="mintStep === 'initial'"
+
+                    <v-popover
+                        :open="popoverStep !== 'initial'"
+                        placement="top-end"
+                        popover-class="tooltip popover multi-step-popover"
+                        class="send-button-popover-container"
+                        trigger="manually"
+                        :auto-hide="false"
+                        :handle-resize="true"
                     >
-                        <base-button
+                        <div class="buttons">
+                            <base-button
+                                v-if="!['initial', 'wait'].includes(popoverStep)"
+                                color="red"
+                                @click.prevent="closePopover"
+                            >
+                                Cancel
+                            </base-button>
+
+                            <base-button
+                                v-if="popoverStep === 'initial'"
                                 color="green"
-                                :disabled="!canSubmit"
-                                @click.prevent="beginAnonymiz"
-                        >
-                            Anonymize Now
-                        </base-button>
-                    </div>
+                                :disabled="!mintAmount"
+                                @click.prevent="beginWaitStep"
+                            >
+                                Anonymize Now
+                            </base-button>
+
+                            <circular-timer
+                                v-else-if="popoverStep === 'wait'"
+                                @complete="beginConfirmStep"
+                            />
+
+
+                            <base-button
+                                v-else-if="popoverStep === 'confirm'"
+                                color="green"
+                                @click.prevent="beginPassphraseStep"
+                            >
+                                Confirm
+                            </base-button>
+
+                            <base-button
+                                v-else-if="popoverStep === 'passphrase'"
+                                color="green"
+                                @click.prevent="attemptMint"
+                            >
+                                Mint
+                            </base-button>
+                        </div>
+
+                        <template slot="popover">
+                            <mint-step-confirm
+                                v-if="popoverStep === 'wait' || popoverStep === 'confirm'"
+                                :mint-amount="mintAmount"
+                                :mint-fees="mintFees"
+                                :mints="coinsToMint"
+                            />
+
+                            <send-step-passphrase
+                                v-else-if="popoverStep === 'passphrase'"
+                                v-model="passphrase"
+                                @onEnter="attemptMint"
+                            />
+                        </template>
+                    </v-popover>
                 </div>
             </template>
         </section>
@@ -154,6 +212,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import types from '~/types'
 
+import CircularTimer from '@/components/Icons/CircularTimer';
 import DenominationSelector from '@/components/DenominationSelector'
 import OnboardingNotice from '@/components/Notification/OnboardingNotice'
 import CurrentMints from '@/components/payments/CurrentMints'
@@ -164,9 +223,16 @@ import Stack from '@/components/Icons/Stack'
 import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 import MintStats from '@/components/MintZerocoinPage/MintStats'
 
+import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
+import SendStepPassphrase from '@/components/SendPage/SendStepPassphrase';
+
 export default {
     name: 'MintZerocoinPage',
     components: {
+        CircularTimer,
+        MintStepConfirm,
+        SendStepPassphrase,
+
         MintStats,
         OnboardingNotice,
         NotificationIndicator,
@@ -183,11 +249,22 @@ export default {
             popoverStatus: '',
             enableProgressList: true,
 
-            mintStep: 'initial',
+            // Valid progressions are:
+            //
+            // initial -> wait
+            // wait -> confirm
+            // confirm -> initial | passphrase
+            // passphrase -> initial | incorrectPassphrase | error | complete
+            // error -> initial
+            // incorrectPassphrase -> initial | passphrase
+            // complete -> initial
+            popoverStep: 'initial',
 
+            passphrase: '',
             mintAmount: 0,
             mintFees: 0,
-            coinsToMint: {}
+            // {[denomination: string]: number}
+            coinsToMint: {},
         }
     },
 
@@ -207,6 +284,71 @@ export default {
     },
 
     methods: {
+        beginWaitStep() {
+            this.popoverStep = 'wait';
+        },
+
+        beginConfirmStep() {
+            this.popoverStep = 'confirm';
+        },
+
+        beginPassphraseStep() {
+            this.popoverStep = 'passphrase';
+        },
+
+        closePopover() {
+            this.popoverStep = 'initial';
+        },
+
+        beginIncorrectPassphraseStep() {
+            this.popoverStep = 'passphrase';
+        },
+
+        beginErrorStep() {
+            alert('error');
+            this.popoverStep = 'initial';
+        },
+
+        beginCompleteStep() {
+            this.cleanupForm();
+        },
+
+        cleanupForm() {
+            this.mintAmount = 0;
+            this.mintFees = 0;
+            this.coinsToMint = {};
+        },
+
+        async attemptMint() {
+            // This will have the effect of preventing the user from sending again without re-entering their passphrase.
+            // JavaScript is single threaded, so there should be no race condition possible with an interruption between
+            // the value check and the value assignment.
+            let passphrase = this.passphrase;
+            this.passphrase = '';
+            if (!passphrase) {
+                return;
+            }
+
+            try {
+                await this.$daemon.mintZerocoin(passphrase, this.coinsToMint);
+            } catch (e) {
+                // Error code -14 indicates an incorrect passphrase.
+                if (e.error && e.error.code === -14) {
+                    this.beginIncorrectPassphraseStep();
+                } else if (e.error && e.error.message) {
+                    this.beginErrorStep(e.error.message);
+                } else {
+                    this.beginErrorStep(JSON.stringify(e));
+                }
+
+                return;
+            }
+
+            this.beginCompleteStep();
+        },
+
+        // old methods
+
         ...mapActions({
             resetDenominations: types.mint.RESET_DENOMINATIONS,
             fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
@@ -231,11 +373,6 @@ export default {
                     passphrase: this.currentPassphrase
                 }
             })
-        },
-
-        cleanupForm () {
-            this.$log.info('cleaning up mints...')
-            this.resetDenominations()
         }
     }
 }
@@ -352,5 +489,9 @@ export default {
 
     .onboarding {
         margin-top: emRhythm(7);
+    }
+
+    .buttons {
+        text-align: center;
     }
 </style>

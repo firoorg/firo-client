@@ -1,29 +1,26 @@
 <template>
-    <section>
+    <div class="content-wrapper">
         <header>
             <h2 v-html="$t('mint.flyout-confirm-mint.title')" />
-            <p>{{ $tc('mint.flyout-confirm-mint.description', currentDenominationAmount) }}</p>
+            <p>{{ $tc('mint.flyout-confirm-mint.description', mintAmount) }}</p>
         </header>
-
 
         <div class="payment-fee-list">
             <current-mints
-                :current-mints="denominations"
+                :current-mints="mints"
                 :show-progress="false"
             />
             <fees-and-amount
-                :amount="currentDenominationCostsInSatoshi"
-                :fee="{ label: $t('mint.flyout-confirm-mint.label__fees'), amount: currentDenominationFees }"
+                :amount="mintAmount"
+                :fee="{ label: $t('mint.flyout-confirm-mint.label__fees'), amount: mintFees }"
                 :show-fee="true"
                 translation-namespace="mint.flyout-confirm-mint"
             />
         </div>
-    </section>
+    </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
 import CurrentMints from '@/components/payments/CurrentMints'
 
@@ -35,21 +32,23 @@ export default {
         FeesAndAmount
     },
 
-    /*
-    props: [
-        'actions',
-        'isConfirmed'
-    ],
-    */
+    props: {
+        mintAmount: {
+            type: Number,
+            required: true
+        },
 
-    computed: {
-        ...mapGetters({
-            denominations: 'Mint/currentDenominationsFormatted',
-            currentDenominationCostsInSatoshi: 'Mint/currentDenominationCostsInSatoshi',
-            currentDenominationFees: 'Mint/currentDenominationFees',
-            currentDenominationAmount: 'Mint/currentDenominationAmount'
-        })
-    }
+        mintFees: {
+            type: Number,
+            required: true
+        },
+
+        mints: {
+            // {[denomination: string]: number}
+            type: Object,
+            required: true
+        }
+    },
 }
 </script>
 
