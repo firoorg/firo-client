@@ -5,7 +5,7 @@
     >
         <denomination
             v-for="denomination in Object.keys(coinsToMint).sort((x,y) => Number(x) - Number(y))"
-            v-bind:key="denomination"
+            :key="denomination"
             :max-value-in-selector="maxValueInSelector"
             :denomination="denomination"
             :available-balance-remaining="getAvailableBalanceToMint"
