@@ -311,13 +311,11 @@ export class Zcoind {
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.1', '0.5', '1', '10', '25', or
     // '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200 Zerocoin). We
-    // resolve() with the list of generated txids, or reject() with an error if something went wrong.
-    async mintZerocoin(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string[]> {
-        const data: {txids: string[]} = await this.send(auth, 'create', 'mint', {
+    // resolve() with the generated txid, or reject() with an error if something went wrong.
+    async mintZerocoin(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string> {
+        return await this.send(auth, 'create', 'mint', {
             denominations: mints
         });
-
-        return data.txids;
     }
 
     // Calculate a transaction fee. addresses is a map of {recipient: satoshiAmount} pairs; feePerKb is the satoshi
