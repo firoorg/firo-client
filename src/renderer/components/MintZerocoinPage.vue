@@ -285,16 +285,25 @@ export default {
     },
 
     methods: {
+        recalculatePopoverPosition () {
+            // v-popover only knows to recalculate position on resize events, so fake that one happened in order to
+            // trigger the update.
+            window.dispatchEvent(new Event('resize'));
+        },
+
         beginWaitStep() {
             this.popoverStep = 'wait';
+            this.recalculatePopoverPosition();
         },
 
         beginConfirmStep() {
             this.popoverStep = 'confirm';
+            this.recalculatePopoverPosition();
         },
 
         beginPassphraseStep() {
             this.popoverStep = 'passphrase';
+            this.recalculatePopoverPosition();
         },
 
         closePopover() {
@@ -303,6 +312,7 @@ export default {
 
         beginIncorrectPassphraseStep() {
             this.popoverStep = 'passphrase';
+            this.recalculatePopoverPosition();
         },
 
         beginErrorStep() {
