@@ -138,27 +138,28 @@
                         />
                     </div>
 
-                    <v-popover
-                        :open="popoverStep !== 'initial'"
-                        placement="top-end"
-                        popover-class="tooltip popover multi-step-popover"
-                        class="send-button-popover-container"
-                        trigger="manually"
-                        :auto-hide="false"
-                        :handle-resize="true"
-                    >
-                        <div class="buttons">
-                            <base-button
+                    <div class="buttons">
+                        <base-button
                                 v-if="!['initial', 'wait'].includes(popoverStep)"
                                 color="red"
                                 @click.prevent="closePopover"
-                            >
-                                Cancel
-                            </base-button>
+                        >
+                            Cancel
+                        </base-button>
 
+                        <v-popover
+                            :open="popoverStep !== 'initial'"
+                            placement="top-end"
+                            popover-class="tooltip popover multi-step-popover"
+                            class="send-button-popover-container"
+                            trigger="manually"
+                            :auto-hide="false"
+                            :handle-resize="true"
+                        >
                             <base-button
                                 v-if="popoverStep === 'initial'"
                                 color="green"
+                                class="expanded"
                                 :disabled="!mintAmount"
                                 @click.prevent="beginWaitStep"
                             >
@@ -186,23 +187,23 @@
                             >
                                 Mint
                             </base-button>
-                        </div>
 
-                        <template slot="popover">
-                            <mint-step-confirm
-                                v-if="popoverStep === 'wait' || popoverStep === 'confirm'"
-                                :mint-amount="mintAmount"
-                                :mint-fees="mintFees"
-                                :mints="coinsToMint"
-                            />
+                            <template slot="popover">
+                                <mint-step-confirm
+                                    v-if="popoverStep === 'wait' || popoverStep === 'confirm'"
+                                    :mint-amount="mintAmount"
+                                    :mint-fees="mintFees"
+                                    :mints="coinsToMint"
+                                />
 
-                            <send-step-passphrase
-                                v-else-if="popoverStep === 'passphrase'"
-                                v-model="passphrase"
-                                @onEnter="attemptMint"
-                            />
-                        </template>
-                    </v-popover>
+                                <send-step-passphrase
+                                    v-else-if="popoverStep === 'passphrase'"
+                                    v-model="passphrase"
+                                    @onEnter="attemptMint"
+                                />
+                            </template>
+                        </v-popover>
+                    </div>
                 </div>
             </template>
         </section>
@@ -501,7 +502,20 @@ export default {
         margin-top: emRhythm(7);
     }
 
+    .send-button-popover-container {
+        display: inline-block;
+    }
+
     .buttons {
         text-align: center;
+
+        button {
+            display: inline-block;
+            width: 10em;
+
+            &.expanded {
+                width: 20em;
+            }
+        }
     }
 </style>
