@@ -260,7 +260,7 @@ export class Zcoind {
                     !message.error &&
                     message.meta &&
                     message.meta.status === 200 &&
-                    typeof message.data === 'object'
+                    message.data
                 ) {
                     resolve(message.data);
                 } else {
