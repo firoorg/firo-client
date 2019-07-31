@@ -232,10 +232,7 @@ export default {
             // error -> initial
             // incorrectPassphrase -> initial | passphrase
             // complete -> initial
-            sendPopoverStep: 'initial',
-
-            // If we're in the process of sending, we want to ignore any new send requests.
-            ignoreSend: false
+            sendPopoverStep: 'initial'
         }
     },
 
@@ -315,27 +312,22 @@ export default {
         },
 
         beginPassphraseStep () {
-            // We should never be called before the UI has been reset after a send request is made.
-            this.ignoreSend = false;
-
-            this.passphrase = '';
             this.sendPopoverStep = 'passphrase';
             this.recalculatePopoverPosition();
         },
 
         async attemptSend () {
-            // Ignore the request to send if the user clicked the Send button twice in quick succession. this.ignoreSend
-            // will be set to false again when a new passphrase request is initiated.
-            //
+            // This will have the effect of preventing the user from sending again without re-entering their passphrase.
             // JavaScript is single threaded, so there should be no race condition possible with an interruption between
             // the value check and the value assignment.
-            if (this.ignoreSend) {
+            let passphrase = this.passphrase;
+            this.passphrase = '';
+            if (!passphrase) {
                 return;
             }
-            this.ignoreSend = true;
 
             try {
-                await this.$daemon.publicSend(this.passphrase, this.label, this.address, this.satoshiAmount, 1);
+                await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount, 1);
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.
                 if (e.error && e.error.code === -14) {
