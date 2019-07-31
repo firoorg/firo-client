@@ -11,6 +11,7 @@
                     <!-- It's critical that DenominationSelector is disabled properly. Otherwise, the user might end up
                          sending a value they didn't confirm. -->
                     <denomination-selector
+                        ref="denominationSelector"
                         :available-balance="availableXzc"
                         :coins-to-mint-changed="coinsToMintChanged"
                         :disabled="popoverStep !== 'initial'"
@@ -314,9 +315,8 @@ export default {
         },
 
         cleanupForm() {
-            this.mintAmount = 0;
-            this.mintFees = 0;
-            this.coinsToMint = {};
+            this.popoverStep = 'initial';
+            this.$refs.denominationSelector.reset();
         },
 
         async attemptMint() {

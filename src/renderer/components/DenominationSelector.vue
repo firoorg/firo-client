@@ -115,6 +115,19 @@ export default {
 
         changed() {
             this.coinsToMintChanged(this.currentMintAmount, this.currentMintFees, this.coinsToMint);
+        },
+
+        // This method will be called by our parent after a spend is made to reset our UI.
+        reset() {
+            this.coinsToMint = {
+                '0.1': 0,
+                '0.5': 0,
+                '1': 0,
+                '10': 0,
+                '25': 0,
+                '100': 0
+            };
+            this.changed();
         }
     }
 }
