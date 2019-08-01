@@ -32,9 +32,16 @@
                 </router-link>
             </li>
             <li>
-                <router-link to="/send">
+                <router-link to="/send/public">
                     <span class="text">
-                        {{ $t('navigation.menu.button__send') }}
+                        Public Send
+                    </span>
+                </router-link>
+            </li>
+            <li>
+                <router-link to="/send/private">
+                    <span class="text">
+                        Private Send
                     </span>
                 </router-link>
             </li>

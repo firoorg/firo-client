@@ -36,7 +36,16 @@ export default new Router({
                 },
                 {
                     path: '/send',
-                    component: require('@/components/SendPage').default
+                    component: require('@/components/SendPage').default,
+                    children: [
+                        {
+                            path: 'private'
+                        },
+
+                        {
+                            path: 'public'
+                        }
+                    ]
                 },
                 {
                     path: '/mint',

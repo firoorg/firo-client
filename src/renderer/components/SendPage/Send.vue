@@ -1,18 +1,32 @@
 <template>
-    <section class="send-zcoin-form">
+    <section
+        class="send-zcoin-form"
+        :class="privateOrPublic + '-send'"
+    >
         <div v-scrollable>
             <form class="send">
                 <div class="grid">
                     <div class="form">
                         <header>
                             <h2>
-                                Send Zcoin
+                                Send Zcoin {{ privateOrPublic[0].toUpperCase() + privateOrPublic.substr(1) }}ly
                             </h2>
                         </header>
 
-                        <p class="public-send-warning">
+                        <p
+                            v-if="privateOrPublic === 'public'"
+                            class="description"
+                        >
                             Zcoin you send with Public Send will be visible by everyone. Maybe you want to use
                             Private Send instead?
+                        </p>
+
+                        <p
+                            v-else
+                            class="description"
+                        >
+                            No one will know the origin of Zcoin you send privately. Note that you may only send
+                            multiples of 0.1 XZC.
                         </p>
 
 
@@ -66,13 +80,13 @@
                                         id="amount"
                                         ref="amount"
                                         v-model="amount"
-                                        v-validate="'amountIsWithinAvailableBalance|amountIsValid'"
+                                        v-validate="'amountIsWithinAvailableBalance|' + (privateOrPublic==='private'?'private':'public') + 'AmountIsValid'"
                                         v-tooltip="getValidationTooltip('amount')"
                                         type="text"
                                         name="amount"
                                         class="amount"
                                         tabindex="3"
-                                        :placeholder="$t('send.public.detail-public-send.placeholder__amount')"
+                                        :placeholder="`Enter amount to send ${privateOrPublic}ly`"
                                     />
                                     <div class="prefix">
                                         XZC
@@ -239,8 +253,29 @@ export default {
     computed: {
         ...mapGetters({
             network: 'Network/network',
-            availableXzc: 'Balance/availableXzc'
+            availableXzc: 'Balance/availableXzc',
+            availableZerocoin: 'Balance/availableZerocoin'
         }),
+
+        // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
+        // send.
+        privateOrPublic () {
+            switch (this.$route.path) {
+                case '/send/private':
+                    return 'private';
+
+                case '/send/public':
+                    return 'public';
+
+                default:
+                    this.$log.error("Route neither public nor private");
+                    throw 'Route neither public nor private';
+            }
+        },
+
+        availableBalance () {
+            return this.privateOrPublic === 'private' ? this.availableZerocoin : this.availableXzc;
+        },
 
         satoshiAmount () {
             return convertToSatoshi(this.amount);
@@ -275,15 +310,20 @@ export default {
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availableXzc will still be reactively updated.
-            getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableXzc),
-            validate: (value) => convertToSatoshi(value) <= this.availableXzc
+            getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableBalance),
+            validate: (value) => convertToSatoshi(value) <= this.availableBalance
         });
 
-        this.$validator.extend('amountIsValid', {
+        this.$validator.extend('publicAmountIsValid', {
             getMessage: () => 'Amount Must Be A Multiple of 0.00000001',
             // We use a regex here so as to not to have to deal with floating point issues.
             validate: (value) => !!value.match(/^\d+(\.\d{1,8})?$/)
         });
+
+        this.$validator.extend('privateAmountIsValid', {
+            getMessage: () => 'Amount For Private Spend Must Be A Multiple of 0.1',
+            validate: (value) => !!value.match(/^\d+(\.\d)?$/)
+        })
     },
 
     methods: {
@@ -327,7 +367,11 @@ export default {
             }
 
             try {
-                await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount, 1);
+                if (this.privateOrPublic === 'private') {
+                    await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount);
+                } else {
+                    await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount, 1);
+                }
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.
                 if (e.error && e.error.code === -14) {
@@ -374,7 +418,7 @@ export default {
 .send-zcoin-form {
     height: 100vh;
 
-    .public-send-warning {
+    .description {
         @include description();
         margin-bottom: emRhythm(7);
     }
