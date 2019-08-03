@@ -37,7 +37,11 @@ export default {
 </script>
 
 <style scoped>
-.payment-request-label, .mint-label {
+.payment-request-label {
     color: gray;
+}
+
+.mint-label {
+    font-style: italic;
 }
 </style>
