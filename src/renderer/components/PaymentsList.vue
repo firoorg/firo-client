@@ -87,15 +87,15 @@ export default {
 
     computed: {
         ...mapGetters({
-            outgoingTransactions: 'Address/getOutgoingTransactions'
+            transactions: 'Transactions/transactions'
         }),
 
         tableData () {
             const tableData = [];
 
-            for (const tx of this.outgoingTransactions) {
+            for (const tx of this.transactions) {
                 tableData.push({
-                    paymentType: 'outgoing',
+                    paymentType: tx.paymentType,
                     blockHeight: tx.block && tx.block.height,
                     date: tx.block ? tx.block.time : Infinity,
                     amount: tx.amount,
