@@ -25,11 +25,9 @@ const mutations = {
     [types.UPDATE_BALANCE] (state, balance) {
         logger.debug('going to update balance %O', balance)
 
-        const { total, xzc, zerocoin } = balance
-
-        const { all, pending, available } = total
-        const { confirmed: confirmedXzc, unconfirmed: unconfirmedXzc, locked } = xzc
-        const { confirmed: confirmedZerocoin, unconfirmed: unconfirmedZerocoin } = zerocoin
+        const { all, pending, available } = balance.total
+        const { confirmed: confirmedXzc, unconfirmed: unconfirmedXzc, locked } = balance.public
+        const { confirmed: confirmedZerocoin, unconfirmed: unconfirmedZerocoin } = balance.private
 
         state.total = {
             ...state.total,
@@ -63,13 +61,7 @@ const actions = {
     },
 
     [types.UPDATE_BALANCE] ({ commit }, balance) {
-        const { total, xzc, zerocoin } = balance
-
-        commit(types.UPDATE_BALANCE, {
-            total,
-            xzc,
-            zerocoin
-        })
+        commit(types.UPDATE_BALANCE, balance)
     }
 }
 
