@@ -10,6 +10,13 @@
         v-else
         :class="`${paymentType}-label`"
     >
+        <span
+            v-if="paymentType === 'payment-request'"
+            class="payment-request-warning"
+        >
+            Payment Request:
+        </span>
+
         {{ label }}
     </td>
 </template>
@@ -36,9 +43,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .payment-request-label {
     color: gray;
+
+    .payment-request-warning {
+        font-style: italic;
+    }
 }
 
 .mint-label {
