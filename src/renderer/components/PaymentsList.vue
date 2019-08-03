@@ -18,26 +18,19 @@
             :on-row-select="onTableRowSelect"
             :sort-order="sortOrder"
             :compare-elements="compareTransactions"
-            :per-page="12"
-        >
-            <template
-                slot="label"
-                slot-scope="props"
-            >
-                <natural-language-tags :content="props.rowData.label" />
-            </template>
-        </animated-table>
+            :per-page="13"
+        />
     </section>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
-import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
-import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
-import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
-import PaymentStatus from '@/components/AnimatedTable/AnimatedTablePaymentStatus'
-import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
+import AnimatedTable from '@/components/AnimatedTable/AnimatedTable';
+import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate';
+import Amount from '@/components/AnimatedTable/AnimatedTableAmount';
+import PaymentStatus from '@/components/AnimatedTable/AnimatedTablePaymentStatus';
+import Label from '@/components/AnimatedTable/AnimatedTableLabel';
 
 const tableFields = [
     {
@@ -52,7 +45,7 @@ const tableFields = [
         width: '25%'
     },
     {
-        name: 'label',
+        name: Label,
         title: 'send.table__outgoing-payments.label__label',
         sortField: 'label'
     },
@@ -62,14 +55,13 @@ const tableFields = [
         sortField: 'amount',
         width: '20%'
     }
-]
+];
 
 export default {
     name: 'PaymentsList',
 
     components: {
         AnimatedTable,
-        NaturalLanguageTags
     },
 
     props: {
@@ -153,64 +145,7 @@ export default {
             return a.id === b.id
         },
 
-        onTableRowSelect (rowData, index, event) {
-            const { id, isPrivate } = rowData
-
-            const { id: currentRouterId } = this.$route.params
-
-            // already selected. removing selection
-            if (currentRouterId === id) {
-                this.$emit('selection-change', {
-                    name: 'send-zcoin'
-                })
-            } else {
-                this.$emit('selection-change', {
-                    name: `${isPrivate ? 'private' : 'public'}-payment`,
-                    id
-                })
-            }
-            /*
-                this.$router.push({
-                    name: 'outgoing-payment',
-                    params: {
-                        id
-                    }
-                })
-                */
-        },
-        /*
-            onTableRowSelect (rowData, index, event) {
-                // todo get paymentRequest from store
-                this.selectedPaymentRequest = rowData.address
-
-                /*
-                this.$router.push({
-                    name: 'send-zcoin-paymentrequest',
-                    params: {
-                        address: this.selectedPaymentRequest
-                    }
-                })
-                * /
-            },
-            */
-
-        // copypasted to TransactionListPage.vue (as addCategoryTagToLabelForOutgoingTransaction)
-        addCategoryTagToLabel (rowData) {
-            const { label: value, category } = rowData
-            const label = value || this.$t('send.table__outgoing-payments.label__tx-nolabel')
-            let catLabel = ''
-
-            if (category === 'send') {
-                catLabel = `#${this.$t('send.table__outgoing-payments.label__tx-category-send')}`
-            } else if (category === 'spendOut') {
-                catLabel = `#${this.$t('send.table__outgoing-payments.label__tx-category-spendOut')}`
-            }
-
-            if (label.includes(catLabel)) {
-                return label
-            }
-
-            return `${label} ${catLabel}`
+        onTableRowSelect (rowData) {
         }
     }
 }
