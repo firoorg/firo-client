@@ -1,8 +1,8 @@
 <template>
-    <section class="outgoing-payments-list">
+    <section class="payments-list">
         <div class="table-filter-input-wrap">
-            <base-filter-input
-                v-model="urlFilter"
+            <input
+                v-model="filter"
                 type="text"
                 class="table-filter-input"
                 :placeholder="$t('send.table__outgoing-payments.placeholder__filter')"
@@ -10,7 +10,7 @@
         </div>
 
         <animated-table
-            :data="filteredTransactions"
+            :data="tableData"
             :fields="tableFields"
             track-by="id"
             :selected-row="selectedPayment"
@@ -33,26 +33,22 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
-
 import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
-import OutgoingAmount from '@/components/AnimatedTable/AnimatedTableOutgoingAmount'
-import OutgoingPaymentTableStatus from '@/components/AnimatedTable/OutgoingPaymentTableStatus'
+import Amount from '@/components/AnimatedTable/AnimatedTableAmount'
+import PaymentStatus from '@/components/AnimatedTable/AnimatedTablePaymentStatus'
 import NaturalLanguageTags from '@/components/Tag/NaturalLanguageTags'
 
 const tableFields = [
     {
-        name: OutgoingPaymentTableStatus,
-        isFulfilledKey: 'isConfirmed',
-        sortField: 'isConfirmed',
-        width: '2rem'
+        name: PaymentStatus,
+        width: '2em'
     },
     {
         name: RelativeDate,
         title: 'send.table__outgoing-payments.label__sent',
-        dateField: 'firstSeenAt',
-        sortField: 'firstSeenAt',
+        dateField: 'data',
+        sortField: 'date',
         width: '25%'
     },
     {
@@ -61,7 +57,7 @@ const tableFields = [
         sortField: 'label'
     },
     {
-        name: OutgoingAmount,
+        name: Amount,
         title: 'send.table__outgoing-payments.label__amount',
         sortField: 'amount',
         width: '20%'
@@ -69,16 +65,12 @@ const tableFields = [
 ]
 
 export default {
-    name: 'OutgointPaymentsList',
+    name: 'PaymentsList',
 
     components: {
         AnimatedTable,
         NaturalLanguageTags
     },
-
-    mixins: [
-        FilterByUrlParamMixin
-    ],
 
     props: {
         selectedPayment: {
@@ -95,21 +87,24 @@ export default {
 
     computed: {
         ...mapGetters({
-            transactions: 'Address/getOutgoingTransactions'
+            outgoingTransactions: 'Address/getOutgoingTransactions'
         }),
 
-        transactionsWithCategoryTags () {
-            return this.transactions.map((tx) => {
-                return {
-                    ...tx,
-                    label: this.addCategoryTagToLabel(tx)
-                }
-            })
-        },
+        tableData () {
+            const tableData = [];
 
-        filteredTransactions () {
-            // FIXME
-            return this.transactionsWithCategoryTags
+            for (const tx of this.outgoingTransactions) {
+                tableData.push({
+                    paymentType: 'outgoing',
+                    blockHeight: tx.block && tx.block.height,
+                    date: tx.block ? tx.block.time : Infinity,
+                    amount: tx.amount,
+                    address: tx.address,
+                    label: tx.label
+                });
+            }
+
+            return tableData;
         },
 
         sortOrder () {

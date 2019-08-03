@@ -5,7 +5,7 @@
                 v-scrollable
                 class="outgoing-requests-list"
             >
-                <outgoing-payments-list />
+                <payments-list />
             </section>
         </div>
 
@@ -16,14 +16,14 @@
 </template>
 
 <script>
-import OutgoingPaymentsList from '@/components/SendPage/OutgoingPaymentsList';
+import PaymentsList from '@/components/PaymentsList';
 import Send from '@/components/SendPage/Send';
 
 export default {
     name: 'SendPage',
 
     components: {
-        OutgoingPaymentsList,
+        PaymentsList,
         Send
     }
 }

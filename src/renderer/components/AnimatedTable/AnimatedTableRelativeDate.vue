@@ -28,13 +28,14 @@ import { format } from 'date-fns'
 
 export default {
     name: 'RelativeDate',
+
     mixins: [
         VuetableFieldMixin
     ],
 
     computed: {
         relativeDate () {
-            let d = this.rowData[this.rowField.dateField]
+            let d = this.rowData.date;
             // If we're set to Infinity, don't render anything. We do this instead of just putting undefined here in
             // order to get sorted before everything else.
             if (d === Infinity) {
@@ -45,10 +46,13 @@ export default {
         },
 
         absoluteDate () {
-            const d = this.rowData[this.rowField.dateField]
+            const d = this.rowData.date;
+            // If we're set to Infinity, don't render anything. We do this instead of just putting undefined here in
+            // order to get sorted before everything else.
             if (d === Infinity) {
                 return undefined
             }
+
             return format(new Date(d), "HH:MM, D MMM YYYY")
         }
     }

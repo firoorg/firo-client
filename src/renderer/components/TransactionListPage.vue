@@ -119,13 +119,13 @@ export default {
             return this.transactions.map( (tx) => ({
                 address: tx.address || 'Zerocoin_Mint',
                 amount: tx.amount,
-                direction: tx.transactionType,
+                direction: tx.paymentType,
                 time: tx.block && tx.block.time,
                 txId: tx.txId,
                 id: tx.id,
                 label: tx.label,
                 // mint transactions are considered confirmed after 6 confirmations; other transactions require only 1
-                isConfirmed: tx.block && (!(tx.transactionType === 'mint') || currentBlockHeight > tx.block.height + 5),
+                isConfirmed: tx.block && (!(tx.paymentType === 'mint') || currentBlockHeight > tx.block.height + 5),
                 isError: false,
                 confirmations: tx.block ? currentBlockHeight - tx.block.height + 1 : 0
             }) );

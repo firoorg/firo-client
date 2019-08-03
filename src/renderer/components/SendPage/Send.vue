@@ -261,19 +261,24 @@ export default {
         // send.
         privateOrPublic () {
             switch (this.$route.path) {
-                case '/send/private':
-                    return 'private';
+            case '/send/private':
+                return 'private';
 
-                case '/send/public':
-                    return 'public';
+            case '/send/public':
+                return 'public';
 
-                default:
-                    this.$log.error("Route neither public nor private");
-                    throw 'Route neither public nor private';
+            default:
+                this.$log.error("Route neither public nor private");
+                throw 'Route neither public nor private';
             }
         },
 
         availableBalance () {
+            // fixme: This is a hack because private balance checks are currently non-functional.
+            if (this.privateOrPublic === 'private') {
+                return Infinity;
+            }
+
             return this.privateOrPublic === 'private' ? this.availableZerocoin : this.availableXzc;
         },
 

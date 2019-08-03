@@ -23,9 +23,11 @@ import OutgoingPaymentStatus from '@/components/Icons/OutgoingPaymentTableStatus
 
 export default {
     name: 'OutgoingPaymentTableStatus',
+
     components: {
         OutgoingPaymentStatus
     },
+
     mixins: [
         VuetableFieldMixin
     ],

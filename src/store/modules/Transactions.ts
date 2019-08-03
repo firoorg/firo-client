@@ -30,7 +30,7 @@ enum TransactionOutputType {
 // one transaction output, of which a transaction may have many.
 class TransactionOutput {
     // is this an outgoing, incoming, or mint transaction?
-    readonly transactionType: TransactionOutputType;
+    readonly paymentType: TransactionOutputType;
     // the destination address of the transaction output. This will be null if this is a mint transaction
     readonly address: string | null;
     // the value of the transaction, in satoshi.
@@ -50,7 +50,7 @@ class TransactionOutput {
     // The caller is responsible that id is entirely unique. This is not checked anywhere else.
     constructor(transactionType: TransactionOutputType, address: string | null, amount: number, txId: string,
                 id: string, block: Block | null, label: String | null) {
-        this.transactionType = transactionType;
+        this.paymentType = transactionType;
         this.address = address;
         this.amount = amount;
         this.txId = txId;
