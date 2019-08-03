@@ -87,7 +87,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            transactions: 'Transactions/transactions'
+            transactions: 'Transactions/transactions',
+            paymentRequests: 'PaymentRequest/paymentRequests'
         }),
 
         tableData () {
@@ -101,6 +102,21 @@ export default {
                     amount: tx.amount,
                     address: tx.address,
                     label: tx.label
+                });
+            }
+
+            for (const pr of this.paymentRequests) {
+                // There are actual transactions associated with the request now, so we don't need to show it.
+                if (pr.amountReceived) {
+                    continue;
+                }
+
+                tableData.push({
+                    paymentType: 'payment-request',
+                    blockHeight: null,
+                    date: Infinity,
+                    amount: pr.amountRequested,
+                    label: pr.label
                 });
             }
 
