@@ -114,6 +114,7 @@ export default {
                 tableData.push({
                     paymentType: 'payment-request',
                     blockHeight: null,
+                    // Outstanding payment requests will always be sorted first.
                     date: Infinity,
                     amount: pr.amountRequested,
                     label: pr.label
@@ -126,7 +127,7 @@ export default {
         sortOrder () {
             return [
                 {
-                    sortField: 'firstSeenAt',
+                    sortField: 'date',
                     direction: 'desc'
                 }
             ]
