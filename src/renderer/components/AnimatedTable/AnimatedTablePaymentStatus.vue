@@ -85,5 +85,9 @@ export default {
         &:not(.is-confirmed) {
             color: orange;
         }
+
+        .is-outgoing {
+            color: red;
+        }
     }
 </style>
