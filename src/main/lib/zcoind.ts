@@ -32,6 +32,15 @@ interface ApiStatus {
     error: string | null;
 }
 
+interface PaymentRequestData {
+    address: string;
+    createdAt: number;
+    amount: number;
+    label: string;
+    message: string;
+    state: 'active' | 'hidden' | 'deleted' | 'archived';
+}
+
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
 // file.
 function readCert(path: string): [string, string] {
@@ -292,6 +301,15 @@ export class Zcoind {
 
     // Actions
 
+
+    // Create a new payment request (to be stored on the daemon-side).
+    async createPaymentRequest(amount: number | undefined, label: string, message: string): Promise<PaymentRequestData> {
+        return await this.send(null, 'create', 'paymentRequest', {
+            amount,
+            label,
+            message
+        });
+    }
 
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.

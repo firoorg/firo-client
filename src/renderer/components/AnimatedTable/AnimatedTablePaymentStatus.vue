@@ -8,8 +8,8 @@
     <td
         v-else
         class="vuetable-td-component-transaction-status"
-        :title="confirmationsCount + ' confirmations'"
-        :class="{'is-confirmed': !!confirmationsCount}"
+        :title="`${confirmations} confirmations`"
+        :class="{'is-confirmed': confirmations > 1}"
     >
         <span
             v-if="paymentType === 'incoming'"
@@ -69,8 +69,8 @@ export default {
             return this.rowData.paymentType;
         },
 
-        confirmationsCount () {
-            return this.rowData.blockHeight && this.rowData.blockHeight - this.currentBlockHeight;
+        confirmations () {
+            return (this.rowData.blockHeight || 0) && (1 + this.currentBlockHeight - this.rowData.blockHeight);
         }
     }
 }

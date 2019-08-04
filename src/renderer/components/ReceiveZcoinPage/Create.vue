@@ -6,15 +6,11 @@
         <form
             v-scrollable
             class="create scrollable-medium"
-            @submit.prevent="submitForm"
         >
             <div class="form">
                 <h2 v-html="$t('receive.detail-create-request.title__create')" />
 
-                <div
-                    class="field"
-                    :class="getFieldErrorClass('label')"
-                >
+                <div class="field">
                     <label for="label">
                         {{ $t('receive.detail-create-request.label__label') }}
                     </label>
@@ -22,22 +18,15 @@
                     <div class="control">
                         <input
                             id="label"
-                            ref="label"
                             v-model.trim="label"
-                            v-focus
-                            v-validate="'required'"
-                            v-tooltip="getValidationTooltip('label')"
                             type="text"
                             name="label"
                             :placeholder="$t('receive.detail-create-request.placeholder__label')"
-                        >
+                        />
                     </div>
                 </div>
 
-                <div
-                    class="field amount-field"
-                    :class="getFieldErrorClass('amount')"
-                >
+                <div class="field amount-field">
                     <label for="amount">
                         {{ $t('receive.detail-create-request.label__amount') }}
                     </label>
@@ -45,32 +34,27 @@
                     <div class="control">
                         <input
                             id="amount"
-                            ref="amount"
-                            v-model.number="amount"
-                            v-validate="amountValidationRules"
+                            v-model="amount"
+                            v-validate="'paymentRequestAmountIsValid'"
                             v-tooltip="getValidationTooltip('amount')"
                             type="text"
                             name="amount"
                             class="amount"
                             :placeholder="$t('receive.detail-create-request.placeholder__amount')"
-                        >
+                        />
                         <div class="prefix">
                             XZC
                         </div>
                     </div>
                 </div>
 
-                <div
-                    class="field message-field"
-                    :class="getFieldErrorClass('message')"
-                >
+                <div class="field message-field">
                     <label for="message">
                         {{ $t('receive.detail-create-request.label__message') }}
                     </label>
                     <div class="control">
                         <base-textarea
                             id="message"
-                            ref="message"
                             v-model="message"
                             name="message"
                             class="message"
@@ -82,12 +66,11 @@
 
             <div class="create-wrap">
                 <base-button
-                    ref="submit"
                     color="green"
-                    :is-dark="false"
                     type="submit"
                     class="submit"
-                    :disabled="!canSubmit"
+                    :disabled="!canCreateRequest"
+                    @click.prevent="createRequest"
                 >
                     {{ $t('receive.detail-create-request.button__create-payment-request') }}
                 </base-button>
@@ -97,48 +80,61 @@
 </template>
 
 <script>
-import ValidationMixin from '@/mixins/ValidationMixin'
-import types from '~/types'
+import {convertToSatoshi} from "#/lib/convert";
 
 export default {
     name: 'CreatePaymentRequest',
-    mixins: [
-        ValidationMixin
+
+    inject: [
+        '$validator'
     ],
-    $_veeValidate: {
-        validator: 'new' // give me my own validator instance.
-    },
 
     data () {
         return {
             label: '',
             amount: '',
-            message: '',
-
-            validationFieldOrder: [
-                'label',
-                'amount',
-                'message'
-            ]
+            message: ''
         }
     },
 
+    computed: {
+        canCreateRequest () {
+            return !this.validationErrors.items.length
+        },
+
+        getValidationTooltip () {
+            return (fieldName) => ({
+                content: this.validationErrors.first(fieldName),
+                trigger: 'manual',
+                boundariesElement: 'body',
+                offset: 8,
+                placement: 'left',
+                classes: 'error',
+                show: true
+            })
+        }
+    },
+
+    mounted () {
+        this.$validator.extend('paymentRequestAmountIsValid', {
+            getMessage: () => 'Amount Must Be A Multiple of 0.00000001',
+            // We use a regex here so as to not to have to deal with floating point issues.
+            validate: (value) => !!value.match(/^\d+(\.\d{1,8})?$/)
+        });
+    },
+
     methods: {
-        submitForm () {
-            if (!this.canSubmit) {
+        async createRequest () {
+            if (!this.canCreateRequest) {
                 return
             }
 
-            this.$store.commit(types.paymentrequest.CREATE_PAYMENT_REQUEST, {
-                label: this.label,
-                amount: this.amount * 1e8,
-                message: this.message
-            })
+            const label = this.label || (this.amount ? `Request for ${this.amount} XZC` : 'Payment Request');
+            await this.$daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message);
 
-            this.label = ''
-            this.amount = ''
-            this.message = ''
-            this.resetValidator()
+            this.label = '';
+            this.amount = '';
+            this.message = '';
         }
     }
 }
