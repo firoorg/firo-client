@@ -48,9 +48,9 @@ class TransactionOutput {
     readonly label: String | null;
 
     // The caller is responsible that id is entirely unique. This is not checked anywhere else.
-    constructor(transactionType: TransactionOutputType, address: string | null, amount: number, txId: string,
+    constructor(paymentType: TransactionOutputType, address: string | null, amount: number, txId: string,
                 id: string, block: Block | null, label: String | null) {
-        this.paymentType = transactionType;
+        this.paymentType = paymentType;
         this.address = address;
         this.amount = amount;
         this.txId = txId;
