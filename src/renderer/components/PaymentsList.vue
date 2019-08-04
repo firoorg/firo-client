@@ -150,6 +150,8 @@ export default {
         },
 
         onTableRowSelect (rowData) {
+            return;
+
             // id is always set to the path of the detail route of the payment.
             if (this.$route.path !== rowData.id) {
                 this.$router.push(rowData.id);
