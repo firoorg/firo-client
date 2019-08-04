@@ -12,13 +12,6 @@
                     />
                 </router-link>
             </li>
-            <li>
-                <router-link :to="{ name: 'transaction-list' }">
-                    <span class="text">
-                        Transactions
-                    </span>
-                </router-link>
-            </li>
             <li class="has-divider">
                 <router-link
                     :to="{ name: 'mint-zerocoin' }"
