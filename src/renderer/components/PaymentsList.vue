@@ -87,16 +87,43 @@ export default {
         tableData () {
             const tableData = [];
 
-            for (const tx of this.transactions) {
+            for (const [id, tx] of Object.entries(this.transactions)) {
+                let paymentType;
+                let defaultLabel;
+                switch (tx.category) {
+                case 'mined':
+                    defaultLabel = '#Mining Reward';
+                    paymentType = 'incoming';
+                    break;
+
+                case 'receive':
+                    paymentType = 'incoming';
+                    defaultLabel = 'Incoming Transaction';
+                    break;
+
+                case 'send':
+                    paymentType = 'outgoing';
+                    defaultLabel = 'Outgoing Transaction';
+                    break;
+
+                default:
+                    this.$log.error(`unknown payment type on tx ${id}`);
+                    continue;
+                }
+
+                if (!tx.address) {
+                    console.log(tx);
+                }
+
                 tableData.push({
                     // id is the path of the detail route for the transaction.
-                    id: `/transaction/${tx.id}`,
-                    paymentType: tx.paymentType,
-                    blockHeight: tx.block && tx.block.height,
-                    date: tx.block ? tx.block.time : Infinity,
+                    id: `/transaction/${id}`,
+                    paymentType: paymentType,
+                    blockHeight: tx.blockHeight,
+                    date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
-                    label: tx.label
+                    label: tx.label || defaultLabel
                 });
             }
 
