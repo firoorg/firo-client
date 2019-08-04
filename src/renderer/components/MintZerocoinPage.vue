@@ -140,9 +140,9 @@
 
                     <div class="buttons">
                         <base-button
-                                v-if="!['initial', 'wait'].includes(popoverStep)"
-                                color="red"
-                                @click.prevent="closePopover"
+                            v-if="!['initial', 'wait'].includes(popoverStep)"
+                            color="red"
+                            @click.prevent="closePopover"
                         >
                             Cancel
                         </base-button>
