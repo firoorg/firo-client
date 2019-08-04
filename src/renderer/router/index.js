@@ -6,55 +6,53 @@ Vue.use(Router)
 export default new Router({
     routes: [
         {
+            path: '',
+            redirect: '/receive'
+        },
+
+        {
             path: '/main',
             component: require('@/layouts/MainLayout').default,
+            // fixme: It would be cleaner if we started pointing to / instead of /main.
+            redirect: '/receive',
             children: [
                 {
-                    path: '',
-                    redirect: { name: 'receive-zcoin' }
-                },
-                {
-                    path: '/receive',
-                    component: require('@/components/ReceiveZcoinPage').default,
+                    path: 'transaction',
+                    component: require('@/components/TransactionsPage').default,
                     children: [
                         {
-                            path: ':paymentRequestId',
-                            name: 'receive-zcoin-paymentrequest',
-                            component: require('@/components/ReceiveZcoinPage/Receive').default
-                        },
-                        {
-                            path: '',
-                            name: 'receive-zcoin',
-                            component: require('@/components/ReceiveZcoinPage/Create.vue').default
-                        }
-                    ]
-                },
-                {
-                    path: '/send',
-                    component: require('@/components/SendPage').default,
-                    children: [
-                        {
-                            path: 'private'
+                            path: '/send',
+                            component: require('@/components/SendPage/Send').default,
+                            children: [
+                                {
+                                    path: 'private'
+                                },
+
+                                {
+                                    path: 'public'
+                                }
+                            ]
                         },
 
                         {
-                            path: 'public'
+                            path: '/receive',
+                            component: require('@/components/ReceiveZcoinPage/Create').default
                         }
                     ]
                 },
+
                 {
                     path: '/mint',
-                    name: 'mint-zerocoin',
                     component: require('@/components/MintZerocoinPage').default
                 },
+
                 {
-                    path: '/znode',
-                    name: 'znode',
+                    path: '/znodelist',
                     component: require('@/components/ZnodePage').default
                 },
+
                 {
                     path: '/settings',
-                    name: 'settings',
                     component: require('@/components/SettingsPage').default
                 }
             ]

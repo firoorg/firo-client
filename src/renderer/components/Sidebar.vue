@@ -5,7 +5,7 @@
     >
         <div class="sidebar">
             <div class="logo">
-                <router-link :to="{ name: 'receive-zcoin' }">
+                <router-link to="/">
                     <svg viewBox="0 0 633 200">
                         <linearGradient
                             id="green-gradient"

@@ -1,16 +1,16 @@
 <template>
-    <section class="outgoing-payments">
+    <section class="tx-page">
         <div class="window-height">
             <section
                 v-scrollable
-                class="outgoing-requests-list"
+                class="payment-list-container"
             >
                 <payments-list />
             </section>
         </div>
 
-        <section class="paymentrequest-detail">
-            <send />
+        <section class="tx-page-sidebar">
+            <router-view />
         </section>
     </section>
 </template>
@@ -20,7 +20,7 @@ import PaymentsList from '@/components/PaymentsList';
 import Send from '@/components/SendPage/Send';
 
 export default {
-    name: 'SendPage',
+    name: 'TransactionsPage',
 
     components: {
         PaymentsList,
@@ -30,11 +30,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .outgoing-payments {
+    .tx-page {
         display: grid;
         box-sizing: border-box;
         grid-template-columns: 1fr $detail-view--min-width;
-        //grid-column-gap: emRhythm(5);
 
         .scrollable {
             position: relative;
@@ -45,32 +44,18 @@ export default {
         }
     }
 
-    .outgoing-requests-list,
-    .paymentrequest-detail {
+    .payment-list-container,
+    .tx-page-sidebar {
         position: relative;
     }
 
-    .outgoing-requests-list {
+    .payment-list-container {
         padding: emRhythm(5) emRhythm(4);
         box-sizing: border-box;
         height: 100%;
     }
 
-    .paymentrequest-detail {
-        //background: $gradient--comet-dark-horizontal;
-        //background: $gradient--polo-horizontal;
+    .tx-page-sidebar {
         background: $color--white;
-    }
-
-    .create-wrap {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 2;
-        width: 100%;
-
-        .create-payment-request {
-            width: 100%;
-        }
     }
 </style>

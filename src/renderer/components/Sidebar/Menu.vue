@@ -2,7 +2,7 @@
     <nav class="menu">
         <ul>
             <li>
-                <router-link :to="{ name: 'receive-zcoin' }">
+                <router-link to="/receive">
                     <span class="text">
                         {{ $t('navigation.menu.button__receive') }}
                     </span>
@@ -13,10 +13,7 @@
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link
-                    :to="{ name: 'mint-zerocoin' }"
-                    exact
-                >
+                <router-link to="/mint">
                     <percentage-to-hold-in-zerocoin-notification>
                         <span class="text">
                             {{ $t('navigation.menu.button__mint') }}
@@ -39,17 +36,14 @@
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link :to="{ name: 'znode' }">
+                <router-link to="/znodelist">
                     <span class="text">
                         {{ $t('navigation.menu.button__znode') }}
                     </span>
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link
-                    :to="{ name: 'settings' }"
-                    exact
-                >
+                <router-link to="/settings">
                     <span class="text">
                         {{ $t('navigation.menu.button__settings') }}
                     </span>
