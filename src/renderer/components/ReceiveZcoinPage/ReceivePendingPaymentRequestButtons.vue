@@ -39,11 +39,6 @@
                             </li>
                         </ul>
                     </nav>
-                    <!--<base-button :is-dark="true" :is-outline="true">Copy Address</base-button>-->
-                    <!--
-                    <h3>Copy Address</h3>
-                    <p>Copies the address to send Zcoin to only. Try to use is as rarely as possible, almost only when receiving from legacy wallets or external services like exchanges.</p>
-                    -->
                 </template>
             </base-split-button>
         </timed-tooltip>
@@ -65,11 +60,6 @@
             >
                 <template slot="qrcode">
                     <h1>qr code</h1>
-                    <!--<qr-code :text="getZcoinUri"
-                             :size="128"
-                             color="#1F1F2E"
-                             bg-color="#ffffff">
-                    </qr-code>-->
                 </template>
             </receive-payment-request-email-template>
         </div>

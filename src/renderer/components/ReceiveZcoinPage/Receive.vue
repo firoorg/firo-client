@@ -163,52 +163,7 @@ export default {
         TimedTooltip,
         DeleteIcon
     },
-    props: {
-        address: {
-            type: String,
-            required: true
-        },
-        transactionsReceived: {
-            type: Boolean,
-            default: false
-        },
-        transactions: {
-            type: Array,
-            required: true
-        },
-        isFulfilled: {
-            type: Boolean,
-            required: true
-        },
-        isIncoming: {
-            type: Boolean,
-            required: true
-        },
-        isReused: {
-            type: Boolean,
-            required: true
-        },
-        label: {
-            type: String,
-            required: true
-        },
-        amount: {
-            type: Number,
-            default: null
-        },
-        message: {
-            type: String,
-            default: ''
-        },
-        createdAt: {
-            type: Number,
-            required: true
-        },
-        state: {
-            type: String,
-            default: 'active'
-        }
-    },
+
     data () {
         return {
             showQrCode: false,
@@ -218,8 +173,55 @@ export default {
 
     computed: {
         ...mapGetters({
-            getLastSeen: 'PaymentRequest/paymentRequestLastSeen'
+            getLastSeen: 'PaymentRequest/paymentRequestLastSeen',
+            paymentRequests: 'PaymentRequest/paymentRequests'
         }),
+
+        // The address of the payment request we're trying to view information about is given as a parameter when our
+        // page is requested.
+        address () {
+            return this.$route.params.address;
+        },
+
+        paymentRequest () {
+            return this.paymentRequests.find(pr => pr.address === this.address);
+        },
+
+        transactions () {
+            return this.paymentRequest.transactions;
+        },
+
+        transactionsReceived () {
+            return !!this.transactions.length;
+        },
+
+        isFulfilled () {
+            return this.paymentRequest.isFulfilled;
+        },
+
+        isIncoming () {
+            return this.paymentRequest.isIncoming;
+        },
+
+        label () {
+            return this.paymentRequest.label;
+        },
+
+        amount () {
+            return this.paymentRequest.amount;
+        },
+
+        message () {
+            return this.paymentRequest.message;
+        },
+
+        createdAt () {
+            return this.paymentRequest.createdAt;
+        },
+
+        state () {
+            return this.paymentRequest.state || 'active';
+        },
 
         deleteIconIsVisible () {
             return !this.transactions.length

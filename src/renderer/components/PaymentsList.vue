@@ -89,7 +89,8 @@ export default {
 
             for (const tx of this.transactions) {
                 tableData.push({
-                    id: `tx-${tx.id}`,
+                    // id is the path of the detail route for the transaction.
+                    id: `/transaction/${tx.id}`,
                     paymentType: tx.paymentType,
                     blockHeight: tx.block && tx.block.height,
                     date: tx.block ? tx.block.time : Infinity,
@@ -106,7 +107,8 @@ export default {
                 }
 
                 tableData.push({
-                    id: `pr-${pr.address}`,
+                    // id is the path of the detail route for the payment request.
+                    id: `/payment-request/${pr.address}`,
                     paymentType: 'payment-request',
                     blockHeight: null,
                     // Outstanding payment requests will always be sorted first.
@@ -148,6 +150,10 @@ export default {
         },
 
         onTableRowSelect (rowData) {
+            // id is always set to the path of the detail route of the payment.
+            if (this.$route.path !== rowData.id) {
+                this.$router.push(rowData.id);
+            }
         }
     }
 }

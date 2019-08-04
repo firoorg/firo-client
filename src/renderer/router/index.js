@@ -17,7 +17,7 @@ export default new Router({
             redirect: '/receive',
             children: [
                 {
-                    path: 'transaction',
+                    path: 'transaction-page',
                     component: require('@/components/TransactionsPage').default,
                     children: [
                         {
@@ -37,6 +37,11 @@ export default new Router({
                         {
                             path: '/receive',
                             component: require('@/components/ReceiveZcoinPage/Create').default
+                        },
+
+                        {
+                            path: '/payment-request/:address',
+                            component: require('@/components/ReceiveZcoinPage/Receive').default
                         }
                     ]
                 },
