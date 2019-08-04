@@ -92,6 +92,7 @@
     }
   },
   "dependencies": {
+    "@types/webpack-env": "^1.14.0",
     "@types/zeromq": "^4.6.2",
     "ajv": "^6.10.0",
     "async": "^2.6.2",

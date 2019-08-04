@@ -3,8 +3,8 @@ import * as zmq from "zeromq";
 import * as path from "path";
 import Mutex from "await-mutex";
 
-import * as constants from '../config/constants';
-import { createLogger } from '../../../src/lib/logger';
+import * as constants from './constants';
+import { createLogger } from '../lib/logger';
 
 const logger = createLogger('zcoin:daemon');
 
@@ -60,8 +60,6 @@ function readCert(path: string): [string, string] {
 
 // Daemon takes care of sending messages to the daemon and receiving subscription events.
 export class Zcoind {
-    // Vuex global store
-    private store: any;
     private statusPublisherSocket: zmq.Socket;
     // (requester|publisher)Socket will be undefined prior to the invocation of gotStatus
     private requesterSocket: zmq.Socket | undefined;
@@ -71,15 +69,17 @@ export class Zcoind {
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
     private _unlockAfterConnect: Promise<() => void>;
+    private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
 
-    // store is our global Vuex store.
-    constructor(store: any) {
-        this.store = store;
+    // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
+    // key that will be called when an apiStatus event is receives.
+    constructor(eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
         this.hasReceivedApiStatus = false;
         this.requestMutex = new Mutex();
         // This will resolve instantly, but we don't want to let in a potential race condition by making it assign after
         // the Promise is resolved.
         this._unlockAfterConnect = this.requestMutex.lock();
+        this.eventHandlers = eventHandlers;
     }
 
     // Connect to the daemon and take action when it serves us appropriate events.
@@ -123,7 +123,9 @@ export class Zcoind {
             this.initializeWithApiStatus(apiStatus);
         }
 
-        this.onApiStatus(apiStatus);
+        if (this.eventHandlers['apiStatus']) {
+            this.eventHandlers['apiStatus'](this, apiStatus);
+        }
     }
 
     // This function contains the logic for connecting to proper sockets, registering for events, etc. that are required
@@ -175,14 +177,12 @@ export class Zcoind {
 
         logger.info("Connected to zcoind");
 
-        // Subscribe to all events for which we've implemented a handler.
-        for (const methodName of Object.getOwnPropertyNames(Object.getPrototypeOf(this))) {
-            let topic = (methodName.match(/^on(.+)SubscriptionEvent$/) || [])[1];
-            if (!topic) {
+        // Subscribe to all events for which we've been given a handler.
+        for (const topic of Object.keys(this.eventHandlers)) {
+            // apiStatus is a special key that's not actually associated with an event of that name.
+            if (topic === 'apiStatus') {
                 continue;
             }
-            // Method names are of the form "onFooSubscriptionEvent", but event names are lowercase.
-            topic = topic[0].toLowerCase() + topic.slice(1);
 
             logger.debug("Subscribing to %O events", topic);
             this.publisherSocket.subscribe(topic);
@@ -209,9 +209,8 @@ export class Zcoind {
 
         logger.debug("zcoind sent us a subscription event for topic %s: %O", topic, parsedMessage);
 
-        let handler = `on${topic[0].toUpperCase()}${topic.slice(1)}SubscriptionEvent`;
-        if (this[handler]) {
-            this[handler](parsedMessage);
+        if (this.eventHandlers[topic]) {
+            this.eventHandlers[topic](this, parsedMessage);
         } else {
             logger.warn("Received subscription event with topic '%s', but no handler exists.", topic);
         }
@@ -280,21 +279,6 @@ export class Zcoind {
                 release();
             });
         });
-    }
-
-
-
-    // Subscription Event Handlers
-    //
-    // Every handler defined here with the correct name format (/^on(.+)SubscriptionEvent$/) will automatically be
-    // subscribed to on startup (in gotApiStatus()) and called when the corresponding event is generated (from
-    // handleSubscriptionEvent()). (The event name used is the uncapitalized version of the capturing group in the
-    // preceding regexp).
-
-
-    // This function contains apiStatus-handling logic not related to initialization, which will be called every time
-    // an apiStatus event is received, not just on initialization.
-    async onApiStatus(event: ApiStatus): Promise<void> {
     }
 
 
