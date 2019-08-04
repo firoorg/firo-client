@@ -89,6 +89,7 @@ export default {
 
             for (const tx of this.transactions) {
                 tableData.push({
+                    id: `tx-${tx.id}`,
                     paymentType: tx.paymentType,
                     blockHeight: tx.block && tx.block.height,
                     date: tx.block ? tx.block.time : Infinity,
@@ -105,6 +106,7 @@ export default {
                 }
 
                 tableData.push({
+                    id: `pr-${pr.address}`,
                     paymentType: 'payment-request',
                     blockHeight: null,
                     // Outstanding payment requests will always be sorted first.
