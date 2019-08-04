@@ -86,8 +86,26 @@ export default {
 
         tableData () {
             const tableData = [];
+            // {[blockNumber: number]: {totalMintAmount: number, blockTime: number}}
+            const consolidatedMints = {};
 
             for (const [id, tx] of Object.entries(this.transactions)) {
+                // Consolidate all mints at a specific block height into one larger mint.
+                if (tx.category === 'mint') {
+                    const block = tx.blockHeight || 0;
+
+                    if (!consolidatedMints[block]) {
+                        consolidatedMints[block] = {
+                            totalMintAmount: 0,
+                            blockTime: tx.blockTime
+                        };
+                    }
+
+                    consolidatedMints[block].totalMintAmount += tx.amount;
+                    continue;
+                }
+
+
                 let paymentType;
                 let defaultLabel;
                 switch (tx.category) {
@@ -107,7 +125,7 @@ export default {
                     break;
 
                 default:
-                    this.$log.error(`unknown payment type on tx ${id}`);
+                    this.$log.error(`unknown payment type ${tx.category} on tx ${id}`);
                     continue;
                 }
 
@@ -124,6 +142,17 @@ export default {
                     amount: tx.amount,
                     address: tx.address,
                     label: tx.label || defaultLabel
+                });
+            }
+
+            for (const [blockHeight, mintInfo] of Object.entries(consolidatedMints)) {
+                tableData.push({
+                    id: `/consolidated-mint/${blockHeight}`,
+                    paymentType: 'mint',
+                    blockHeight: blockHeight,
+                    date: mintInfo.blockTime * 1000 || Infinity,
+                    amount: mintInfo.totalMintAmount,
+                    label: 'Private #Mint'
                 });
             }
 
