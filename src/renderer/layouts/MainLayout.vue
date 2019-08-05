@@ -11,7 +11,6 @@
             >
                 <ConnectivityOverlay v-if="showConnectivityOverlay" />
                 <IntroScreen v-else-if="showIntro" />
-                <incoming-payment-request-overlay v-else-if="showIncomingPaymentRequest" />
                 <restarting-overlay v-else-if="showRestartingOverlay" />
             </transition>
 
@@ -52,7 +51,6 @@ import Sidebar from '@/components/Sidebar'
 import NotificationCenter from '@/components/NotificationCenter'
 import ConnectivityOverlay from '@/components/Overlay/ConnectivityOverlay'
 import IntroScreen from '@/components/IntroScreen/IntroScreen'
-import IncomingPaymentRequestOverlay from '@/components/Overlay/IncomingPaymentRequestOverlay'
 import RestartingOverlay from '@/components/Overlay/RestartingOverlay'
 
 export default {
@@ -62,7 +60,6 @@ export default {
         Sidebar,
         NotificationCenter,
         ConnectivityOverlay,
-        IncomingPaymentRequestOverlay,
         RestartingOverlay
     },
 
