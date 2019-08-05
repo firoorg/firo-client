@@ -290,27 +290,6 @@ const getters = {
     },
     isLocked: (state) => state.walletIsLocked,
     walletVersion: (state) => state.walletVersion,
-    addressBelongsToWallet: (state, getters, rootState, rootGetters) => {
-        return (address) => {
-            const isPaymentRequestAddress = !!rootGetters['PaymentRequest/paymentRequests'].find((el) => {
-                if (typeof el.address === 'string') {
-                    return el.address === address
-                }
-
-                return el.address && el.address.address === address
-            })
-
-            if (isPaymentRequestAddress) {
-                return true
-            }
-
-            const isWalledAddress = rootGetters['Address/walletAddresses'].find((addr) => {
-                return addr.address === address
-            })
-
-            return !!isWalledAddress
-        }
-    },
     showIncomingPaymentRequest (state, getters, rootState, rootGetters) {
         return rootGetters['Clipboard/hasIncomingPaymentRequest'] &&
             !rootGetters['Clipboard/isNotified']
