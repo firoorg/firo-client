@@ -116,11 +116,13 @@ export default {
                     break;
 
                 case 'receive':
+                case 'spendIn':
                     paymentType = 'incoming';
                     defaultLabel = 'Incoming Transaction';
                     break;
 
                 case 'send':
+                case 'spendOut':
                     paymentType = 'outgoing';
                     defaultLabel = 'Outgoing Transaction';
                     break;
