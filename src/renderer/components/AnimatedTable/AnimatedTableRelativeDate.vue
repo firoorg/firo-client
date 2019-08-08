@@ -9,6 +9,7 @@
         v-else
         class="vuetable-td-component-relative-date"
         :title="absoluteDate || 'Pending'"
+        :class="`${paymentType}-date`"
     >
         <timeago
             v-if="relativeDate"
@@ -34,6 +35,10 @@ export default {
     ],
 
     computed: {
+        paymentType () {
+            return this.rowData.paymentType;
+        },
+
         relativeDate () {
             let d = this.rowData.date;
             // If we're set to Infinity, don't render anything. We do this instead of just putting undefined here in
@@ -60,5 +65,7 @@ export default {
 </script>
 
 <style scoped>
-
+.payment-request-date {
+    color: gray;
+}
 </style>
