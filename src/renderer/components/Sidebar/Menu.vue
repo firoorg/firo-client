@@ -6,10 +6,6 @@
                     <span class="text">
                         {{ $t('navigation.menu.button__receive') }}
                     </span>
-                    <notification-indicator
-                        v-show="hasUnseenPaymentRequests"
-                        :has-shadow="true"
-                    />
                 </router-link>
             </li>
             <li class="has-divider">
@@ -54,21 +50,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
 
 export default {
     name: 'Menu',
-    components: {
-        PercentageToHoldInZerocoinNotification,
-        NotificationIndicator
-    },
 
-    computed: {
-        ...mapGetters({
-            hasUnseenPaymentRequests: 'PaymentRequest/hasUnseenPaymentRequests'
-        })
+    components: {
+        PercentageToHoldInZerocoinNotification
     }
 }
 </script>
