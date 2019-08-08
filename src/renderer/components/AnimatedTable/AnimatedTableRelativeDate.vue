@@ -9,7 +9,7 @@
         v-else
         class="vuetable-td-component-relative-date"
         :title="absoluteDate || 'Pending'"
-        :class="`${paymentType}-date`"
+        :class="`${category}-date`"
     >
         <timeago
             v-if="relativeDate"
@@ -35,8 +35,8 @@ export default {
     ],
 
     computed: {
-        paymentType () {
-            return this.rowData.paymentType;
+        category () {
+            return this.rowData.category;
         },
 
         relativeDate () {

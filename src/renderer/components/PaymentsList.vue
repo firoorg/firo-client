@@ -107,55 +107,36 @@ export default {
                 }
 
 
-                let paymentType;
-                let defaultLabel;
-                switch (tx.category) {
-                case 'mined':
-                    defaultLabel = '#Mining Reward';
-                    paymentType = 'incoming';
-                    break;
-
-                case 'receive':
-                case 'spendIn':
-                    paymentType = 'incoming';
-                    defaultLabel = 'Incoming Transaction';
-                    break;
-
-                case 'send':
-                case 'spendOut':
-                    paymentType = 'outgoing';
-                    defaultLabel = 'Outgoing Transaction';
-                    break;
-
-                default:
-                    this.$log.error(`unknown payment type ${tx.category} on tx ${id}`);
+                if (!['mined', 'receive', 'spendIn', 'send', 'spendOut'].includes(tx.category)) {
+                    this.$log.error(`unknown category '${tx.category}' on tx ${id}`);
                     continue;
                 }
 
                 if (!tx.address) {
-                    console.log(tx);
+                    this.$log.error(`transaction ${id} with no associated address`);
+                    continue;
                 }
 
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction/${id}`,
-                    paymentType: paymentType,
+                    category: tx.category,
                     blockHeight: tx.blockHeight,
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
-                    label: tx.label || defaultLabel
+                    label: tx.label
                 });
             }
 
             for (const [blockHeight, mintInfo] of Object.entries(consolidatedMints)) {
                 tableData.push({
                     id: `/consolidated-mint/${blockHeight}`,
-                    paymentType: 'mint',
+                    category: 'mint',
                     blockHeight: blockHeight,
                     date: mintInfo.blockTime * 1000 || Infinity,
                     amount: mintInfo.totalMintAmount,
-                    label: 'Private #Mint'
+                    label: null
                 });
             }
 
@@ -168,7 +149,7 @@ export default {
                 tableData.push({
                     // id is the path of the detail route for the payment request.
                     id: `/payment-request/${pr.address}`,
-                    paymentType: 'payment-request',
+                    category: 'payment-request',
                     blockHeight: null,
                     date: pr.createdAt,
                     amount: pr.amount,
@@ -186,7 +167,7 @@ export default {
 
             let filter = this.filter.toLowerCase();
             return this.tableData.filter(tableRow =>
-                ['label', 'address'].find(key =>
+                ['label', 'address', 'category'].find(key =>
                     tableRow[key] && tableRow[key].toLowerCase().indexOf(filter) !== -1
                 )
             )

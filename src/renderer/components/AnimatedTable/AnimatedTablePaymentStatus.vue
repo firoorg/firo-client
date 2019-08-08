@@ -12,25 +12,25 @@
         :class="{'is-confirmed': confirmations > 1}"
     >
         <span
-            v-if="paymentType === 'incoming'"
+            v-if="['spendIn', 'receive', 'mined'].includes(category)"
             class="ok is-incoming"
         >
             ⬇
         </span>
         <span
-            v-else-if="paymentType === 'outgoing'"
+            v-else-if="['spendOut', 'send'].includes(category)"
             class="ok is-outgoing"
         >
             ⬆
         </span>
         <span
-            v-else-if="paymentType === 'mint'"
+            v-else-if="category === 'mint'"
             class="ok is-mint"
         >
             ⓩ
         </span>
         <span
-            v-else-if="paymentType === 'payment-request'"
+            v-else-if="category === 'payment-request'"
             class="is-payment-request"
         >
             …
@@ -65,8 +65,8 @@ export default {
             currentBlockHeight: 'Blockchain/currentBlockHeight'
         }),
 
-        paymentType () {
-            return this.rowData.paymentType;
+        category () {
+            return this.rowData.category;
         },
 
         confirmations () {

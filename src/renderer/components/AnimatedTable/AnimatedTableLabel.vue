@@ -8,16 +8,42 @@
 
     <td
         v-else
-        :class="`${paymentType}-label`"
+        :class="`${category}-label`"
     >
         <span
-            v-if="paymentType === 'payment-request'"
+            v-if="category === 'payment-request'"
             class="payment-request-warning"
         >
             Payment Request:
         </span>
 
-        {{ label }}
+        <span v-if="label">
+            {{ label }}
+        </span>
+
+        <span v-else-if="category === 'mint'">
+            Private Mint
+        </span>
+
+        <span v-else-if="category === 'mined'">
+            Mined Transaction
+        </span>
+
+        <span v-else-if="['send', 'spendOut'].includes(category)">
+            Outgoing Transaction
+        </span>
+
+        <span v-else-if="['receive', 'spendIn'].includes(category)">
+            Incoming Transaction
+        </span>
+
+        <span v-else-if="category === 'payment-request'">
+            {{ paymentRequestAddress }}
+        </span>
+
+        <span v-else>
+            Unknown Transaction: This is a bug
+        </span>
     </td>
 </template>
 
@@ -32,12 +58,16 @@ export default {
     ],
 
     computed: {
-        paymentType () {
-            return this.rowData.paymentType;
+        category () {
+            return this.rowData.category;
         },
 
         label () {
             return this.rowData.label;
+        },
+
+        paymentRequestAddress () {
+            return this.category === 'payment-request' ? this.rowData.address : null;
         }
     }
 }
@@ -52,7 +82,15 @@ export default {
     }
 }
 
+.private-icon {
+    color: green;
+}
+
 .mint-label {
+    font-style: italic;
+}
+
+.mined-label {
     font-style: italic;
 }
 </style>

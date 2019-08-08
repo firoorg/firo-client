@@ -10,28 +10,31 @@
         class="vuetable-td-component-amount"
     >
         <span
-            v-if="paymentType === 'outgoing'"
+            v-if="['spendOut', 'send'].includes(category)"
             class="outgoing"
         >
             -{{ amount }}
         </span>
         <span
-            v-else-if="paymentType === 'incoming'"
+            v-else-if="['spendIn', 'receive', 'mined'].includes(category)"
             class="incoming"
         >
             +{{ amount }}
         </span>
         <span
-            v-else-if="paymentType === 'mint'"
+            v-else-if="category === 'mint'"
             class="mint"
         >
             ({{ amount }})
         </span>
         <span
-            v-else-if="paymentType === 'payment-request'"
+            v-else-if="category === 'payment-request'"
             class="payment-request"
         >
             ({{ amount }})
+        </span>
+        <span v-else>
+            This is a bug.
         </span>
     </td>
 </template>
@@ -48,8 +51,8 @@ export default {
     ],
 
     computed: {
-        paymentType () {
-            return this.rowData.paymentType;
+        category () {
+            return this.rowData.category;
         },
 
         amount () {
