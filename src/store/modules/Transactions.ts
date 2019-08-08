@@ -38,6 +38,8 @@ interface StateWallet {
 
 const state = {
     transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
+    // values are keys of transactions in state.transactions associated with the address
+    addresses: <{[address: string]: string[]}>{}
 };
 
 const mutations = {
@@ -45,6 +47,7 @@ const mutations = {
         logger.info("Populating initial wallet state...");
 
         const newStateTransactions = {};
+        const newStateAddresses = {};
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
 
@@ -58,9 +61,20 @@ const mutations = {
                     }
 
                     newStateTransactions[`${tx.txid}-${tx.txIndex}`] = tx;
+
+                    // Mint transactions will have no associated address.
+                    if (!tx.address) {
+                        continue;
+                    }
+
+                    if (!newStateAddresses[tx.address]) {
+                        newStateAddresses[tx.address] = [];
+                    }
+                    newStateAddresses[tx.address].push(`${tx.txid}-${tx.txIndex}`);
                 }
             }
         }
+        state.addresses = newStateAddresses;
         state.transactions = newStateTransactions;
     }
 };
@@ -72,8 +86,11 @@ const actions = {
 };
 
 const getters = {
-    // a list of all the transactions we've made, include incoming, outgoing, and mints.
-    transactions: (state) => state.transactions
+    // a map of `${txid}-${txIndex}` to the full transaction object returned from zcoind
+    transactions: (state) => state.transactions,
+
+    // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
+    addresses: (state) => state.addresses
 };
 
 export default {
