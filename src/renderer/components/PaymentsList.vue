@@ -168,8 +168,7 @@ export default {
                     id: `/payment-request/${pr.address}`,
                     paymentType: 'payment-request',
                     blockHeight: null,
-                    // Outstanding payment requests will always be sorted first.
-                    date: Infinity,
+                    date: pr.createdAt,
                     amount: pr.amount,
                     label: pr.label
                 });
