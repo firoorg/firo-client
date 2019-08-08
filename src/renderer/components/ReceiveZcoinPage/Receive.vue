@@ -13,7 +13,6 @@
                     <natural-language-tags
                         :content="label"
                         tag-size="large"
-                        :on-tag-click="tagClicked"
                     />
                 </editable-label>
                 <div class="amount-delete">
@@ -75,23 +74,6 @@
                 <span class="address">
                     {{ address }}
                 </span>
-                <!--
-                    <i v-if="!isFulfilled"
-                       class="qr-toggle el-icon-menu"
-                       @click="toggleQrCode">
-                    </i>
-                    -->
-            </div>
-            <div
-                v-show="!qrCodeIsVisible"
-                class="status"
-                :class="{ 'is-fulfilled': isFulfilled }"
-            >
-                <payment-request-status
-                    :is-fulfilled="isFulfilled"
-                    :is-incoming="isIncoming"
-                    :is-reused="isReused"
-                />
             </div>
         </header>
 
@@ -122,12 +104,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import { convertToCoin } from '#/lib/convert'
-
-import types from '~/types'
-
-// import VueQRCodeComponent from 'vue-qrcode-component'
 
 import ReceivePendingPaymentRequest from '@/components/ReceiveZcoinPage/ReceivePendingPaymentRequest'
 import ReceivePendingPaymentRequestButtons from '@/components/ReceiveZcoinPage/ReceivePendingPaymentRequestButtons'
@@ -159,22 +137,15 @@ export default {
         EditableLabel,
         NaturalLanguageTags,
         ReceivePaymentRequestEmailTemplate,
-        // 'qr-code': VueQRCodeComponent,
         TimedTooltip,
         DeleteIcon
-    },
-
-    data () {
-        return {
-            showQrCode: false,
-            recurring: false
-        }
     },
 
     computed: {
         ...mapGetters({
             getLastSeen: 'PaymentRequest/paymentRequestLastSeen',
-            paymentRequests: 'PaymentRequest/paymentRequests'
+            paymentRequests: 'PaymentRequest/paymentRequests',
+            transactionsByAddress: 'Transactions/addresses'
         }),
 
         // The address of the payment request we're trying to view information about is given as a parameter when our
@@ -184,11 +155,11 @@ export default {
         },
 
         paymentRequest () {
-            return this.paymentRequests.find(pr => pr.address === this.address);
+            return this.paymentRequests[this.address];
         },
 
         transactions () {
-            return this.paymentRequest.transactions;
+            return this.transactionsByAddress[this.address] || [];
         },
 
         transactionsReceived () {
@@ -196,11 +167,11 @@ export default {
         },
 
         isFulfilled () {
-            return this.paymentRequest.isFulfilled;
+            return this.transactionsReceived;
         },
 
         isIncoming () {
-            return this.paymentRequest.isIncoming;
+            return !this.transactionsReceived;
         },
 
         label () {
@@ -227,64 +198,24 @@ export default {
             return !this.transactions.length
         },
 
-        qrCodeIsVisible () {
-            return !this.received && this.showQrCode
-        },
-
         amountInBaseCoin () {
             return convertToCoin(this.amount)
         }
     },
 
-    beforeDestroy () {
-        if (this.address) {
-            this.setLastSeen({
-                id: this.address.address || this.address
-            })
-        }
-    },
-
     methods: {
-        ...mapActions({
-            setLastSeen: types.paymentrequest.SET_PAYMENT_REQUEST_LAST_SEEN,
-            updateLabel: types.paymentrequest.UPDATE_PAYMENT_REQUEST_LABEL,
-            archivePaymentRequest: types.paymentrequest.ARCHIVE_PAYMENT_REQUEST
-        }),
-
-        toggleQrCode () {
-            this.showQrCode = !this.showQrCode
-        },
-
-        onLabelUpdate({ label }) {
-            this.updateLabel({
-                label,
-                createdAt: this.createdAt,
-                address: this.address
-            })
-        },
-
-        tagClicked (tag) {
-            this.$router.push({
-                name: this.$router.currentRoute.name || 'receive-zcoin-paymentrequest',
-                query: {
-                    filter: `#${tag}`
-                }
-            })
-        },
-
-        openBlockExplorer (event) {
-            event.preventDefault()
-
-            // todo
-            alert(`opening ${this.address} in block explorer`)
+        async onLabelUpdate({ label }) {
+            let pr = await this.$daemon.updatePaymentRequest(this.address, this.amount, label, this.message, 'active');
+            this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', pr);
         },
 
         // Yes, confusing terminology, but imo it makes sense--front end is deleting the payment request, but it's only
         // getting archived on the backend.
-        deletePaymentRequest () {
-            this.$router.replace({name: 'receive-zcoin'})
+        async deletePaymentRequest () {
+            let pr = await this.$daemon.updatePaymentRequest(this.address, this.amount, this.label, this.message, 'archived');
+            this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', pr);
 
-            this.archivePaymentRequest(this.address)
+            this.$router.replace('/');
         }
     }
 }
@@ -340,99 +271,4 @@ export default {
             text-align: right;
         }
     }
-
-    // - - - - - - -
-
-    /*
-    .create-payment {
-        display: block;
-        width: 100%;
-    }
-
-    .qr-code {
-        display: inline-block;
-        margin: emRhythm(3) 0 emRhythm(5)
-    }
-
-    .qr-toggle {
-        display: inline-block;
-        cursor: pointer;
-        color: $color--polo-medium;
-        cursor: pointer;
-    }
-
-    .status {
-        max-width: emRhythm(25);
-        margin: 0 auto;
-        opacity: 1;
-    }
-
-    header {
-        // margin-bottom: emRhythm(4);
-        position: relative;
-
-        h1, h2 {
-            position: absolute;
-            display: grid;
-            width: 100%;
-            height: 100%;
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr;
-            align-items: center;
-            top: 0;
-            margin: 0;
-
-            @include typo-headline();
-            mix-blend-mode: multiply;
-
-
-            i {
-                color: $color--comet;
-            }
-        }
-
-        p {
-            @include lato-font('regular', italic);
-        }
-    }
-
-    $title-width: 25%;
-
-    dl {
-        margin: 0 auto emRhythm(5);
-        max-width: emRhythm(35);
-        text-align: left;
-        overflow: hidden;
-    }
-
-    dt, dd {
-        float: left;
-        box-sizing: border-box;
-        margin: 0;
-    }
-
-    dt {
-        @include typo-label();
-
-        clear: both;
-        width: $title-width;
-        text-align: right;
-    }
-
-    dd {
-        width: 100% - $title-width;
-        padding-left: emRhythm(1);
-        padding-bottom: emRhythm(2);
-    }
-
-    .message-wrap {
-        @include divider-top-with-gradient();
-        margin: 0 emRhythm(3);
-
-        p {
-            margin: 0 auto;
-            max-width: emRhythm(37);
-        }
-    }
-    */
 </style>

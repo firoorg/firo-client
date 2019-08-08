@@ -32,13 +32,15 @@ interface ApiStatus {
     error: string | null;
 }
 
+type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
+
 interface PaymentRequestData {
     address: string;
     createdAt: number;
     amount: number;
     label: string;
     message: string;
-    state: 'active' | 'hidden' | 'deleted' | 'archived';
+    state: PaymentRequestState;
 }
 
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
@@ -294,6 +296,19 @@ export class Zcoind {
             amount,
             label,
             message
+        });
+    }
+
+    // Update an existing payment request.
+    // Note: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
+    // responsible for any updating of state that might be required.
+    async updatePaymentRequest(address: string, amount: number | undefined, label: string, message: string, state: PaymentRequestState): Promise<PaymentRequestData> {
+        return await this.send(null, 'update', 'paymentRequest', {
+            id: address,
+            amount,
+            label,
+            message,
+            state
         });
     }
 

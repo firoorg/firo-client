@@ -17,7 +17,7 @@
             no-data-message="No Payments made yet."
             :on-row-select="onTableRowSelect"
             :sort-order="sortOrder"
-            :compare-elements="compareTransactions"
+            :compare-elements="comparePayments"
             :per-page="13"
         />
     </section>
@@ -146,6 +146,11 @@ export default {
                     continue;
                 }
 
+                if (pr.state !== 'active') {
+                    // Don't show deleted or archived payment requests.
+                    continue;
+                }
+
                 tableData.push({
                     // id is the path of the detail route for the payment request.
                     id: `/payment-request/${pr.address}`,
@@ -184,8 +189,10 @@ export default {
     },
 
     methods: {
-        compareTransactions (a, b) {
-            return a.id === b.id
+        comparePayments(a, b) {
+            return !!['id', 'category', 'blockHeight', 'date', 'amount', 'address', 'label'].find(field =>
+                a[field] !== b[field]
+            );
         },
 
         async onTableRowSelect (rowData) {
