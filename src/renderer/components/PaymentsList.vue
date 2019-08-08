@@ -81,6 +81,7 @@ export default {
     computed: {
         ...mapGetters({
             transactions: 'Transactions/transactions',
+            addresses: 'Transactions/addresses',
             paymentRequests: 'PaymentRequest/paymentRequests'
         }),
 
@@ -156,9 +157,9 @@ export default {
                 });
             }
 
-            for (const pr of this.paymentRequests) {
-                // There are actual transactions associated with the request now, so we don't need to show it.
-                if (pr.amountReceived) {
+            for (const pr of Object.values(this.paymentRequests)) {
+                if (this.addresses[pr.address] && this.addresses[pr.address].length) {
+                    // There are actual transactions associated with the request now, so we don't need to show it.
                     continue;
                 }
 
@@ -169,7 +170,7 @@ export default {
                     blockHeight: null,
                     // Outstanding payment requests will always be sorted first.
                     date: Infinity,
-                    amount: pr.amountRequested,
+                    amount: pr.amount,
                     label: pr.label
                 });
             }
@@ -205,8 +206,10 @@ export default {
             return a.id === b.id
         },
 
-        onTableRowSelect (rowData) {
-            return;
+        async onTableRowSelect (rowData) {
+            if (!rowData.id.match("payment-request")) {
+                return;
+            }
 
             // id is always set to the path of the detail route of the payment.
             if (this.$route.path !== rowData.id) {
