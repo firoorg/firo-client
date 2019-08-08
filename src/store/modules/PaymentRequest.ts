@@ -18,12 +18,26 @@ const mutations = {
     setStateWithInitialPaymentRequest(state, initialPaymentRequestState: {[address: string]: PaymentRequest}) {
         logger.info("Populating initial paymentRequest state...");
         state.paymentRequests = initialPaymentRequestState;
+    },
+
+    addOrUpdatePaymentRequestFromResponse(state, paymentRequest: PaymentRequest) {
+        logger.info("Updating payment request %s", paymentRequest.address);
+
+        // FIXME: Change to use Vue.set once issues with WebPack require aliases are resolved.
+        state.paymentRequests = {
+            ...state.paymentRequests,
+            [paymentRequest.address]: paymentRequest
+        };
     }
 };
 
 const actions = {
     setStateWithInitialPaymentRequest({commit}, initialPaymentRequestState: {[address: string]: PaymentRequest}) {
         commit('setStateWithInitialPaymentRequest', initialPaymentRequestState);
+    },
+
+    addOrUpdatePaymentRequestFromResponse({commit}, paymentRequest: PaymentRequest) {
+        commit('addOrUpdatePaymentRequestFromResponse', paymentRequest);
     }
 };
 

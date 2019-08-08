@@ -130,7 +130,8 @@ export default {
             }
 
             const label = this.label || (this.amount ? `Request for ${this.amount} XZC` : 'Payment Request');
-            await this.$daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message);
+            const pr = await this.$daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message);
+            this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', pr);
 
             this.label = '';
             this.amount = '';
