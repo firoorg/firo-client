@@ -17,6 +17,13 @@
             Payment Request:
         </span>
 
+        <span
+            v-if="['spendIn', 'spendOut'].includes(category)"
+            class="private-icon"
+        >
+            ⓩ
+        </span>
+
         <span v-if="label">
             {{ label }}
         </span>
