@@ -36,7 +36,7 @@ export default new Router({
 
                         {
                             path: '/receive',
-                            component: require('@/components/ReceiveZcoinPage/Create').default
+                            component: require('@/components/PaymentSidebars/CreatePaymentRequest').default
                         },
 
                         {
