@@ -119,7 +119,7 @@ export default {
 
                 tableData.push({
                     // id is the path of the detail route for the transaction.
-                    id: `/transaction/${id}`,
+                    id: `/transaction-info/${id}`,
                     category: tx.category,
                     blockHeight: tx.blockHeight,
                     date: tx.blockTime * 1000 || Infinity,
@@ -196,7 +196,7 @@ export default {
         },
 
         async onTableRowSelect (rowData) {
-            if (!rowData.id.match("payment-request")) {
+            if (rowData.id.match("consolidated-mint")) {
                 return;
             }
 

@@ -42,6 +42,11 @@ export default new Router({
                         {
                             path: '/payment-request/:address',
                             component: require('@/components/ReceiveZcoinPage/Receive').default
+                        },
+
+                        {
+                            path: '/transaction-info/:uniqId',
+                            component: require('@/components/PaymentSidebars/TransactionInfo').default
                         }
                     ]
                 },
