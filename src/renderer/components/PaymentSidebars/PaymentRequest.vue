@@ -58,7 +58,8 @@ export default {
     computed: {
         ...mapGetters({
             paymentRequests: 'PaymentRequest/paymentRequests',
-            getExplorerAddressUrl: 'Settings/getExplorerAddressUrl'
+            getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
+            transactionsByAddress: 'Transactions/addresses'
         }),
 
         uniqId () {
@@ -71,6 +72,19 @@ export default {
 
         title () {
             return this.pr.label || 'Payment Request';
+        },
+
+        associatedTransactions () {
+            return this.transactionsByAddress[this.pr.address] || [];
+        }
+    },
+
+    watch: {
+        // If this payment request receives a transaction, redirect the user there.
+        associatedTransactions (newVal) {
+            if (newVal.length) {
+                this.$router.push(`/transaction-info/${newVal[0]}`);
+            }
         }
     },
 
