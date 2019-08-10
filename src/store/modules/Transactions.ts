@@ -10,6 +10,11 @@ enum TransactionOutputType {
 
 // one transaction output, of which a transaction may have many.
 interface TransactionOutput {
+    // A unique ID generated on our side (not present in the API) which identifies the transaction. It will be different
+    // for outgoing and incoming versions of the same
+    // transactions.
+    uniqId: string;
+
     category: string;
     txid: string;
     txIndex: number;
@@ -43,11 +48,7 @@ const state = {
 };
 
 const mutations = {
-    setStateWithInitialStateWallet(state, initialStateWallet: StateWallet) {
-        logger.info("Populating initial wallet state...");
-
-        const newStateTransactions = {};
-        const newStateAddresses = {};
+    setWalletState(state, initialStateWallet: StateWallet) {
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
 
@@ -60,22 +61,27 @@ const mutations = {
                         continue;
                     }
 
-                    newStateTransactions[`${tx.txid}-${tx.txIndex}`] = tx;
+                    tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
+
+                    state.transactions[tx.uniqId] = tx;
 
                     // Mint transactions will have no associated address.
                     if (!tx.address) {
                         continue;
                     }
 
-                    if (!newStateAddresses[tx.address]) {
-                        newStateAddresses[tx.address] = [];
+                    if (!state.addresses[tx.address]) {
+                        state.addresses[tx.address] = [];
                     }
-                    newStateAddresses[tx.address].push(`${tx.txid}-${tx.txIndex}`);
+                    state.addresses[tx.address].push(tx.uniqId);
                 }
             }
         }
-        state.addresses = newStateAddresses;
-        state.transactions = newStateTransactions;
+
+        // Tell Vue we've updated our variables.
+        // FIXME: Use Vue.set.
+        state.addresses = {...state.addresses};
+        state.transactions = {...state.transactions};
     }
 };
 
