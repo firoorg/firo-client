@@ -28,6 +28,7 @@ interface TransactionOutput {
     blockTime?: number;
 }
 
+// This is the data format for initial/stateWallet.
 interface StateWallet {
     addresses: {
         // maybeAddress could also be the string "MINT"
@@ -36,6 +37,29 @@ interface StateWallet {
                 [grouping: string]: {
                     [maybeTxid: string]: TransactionOutput
                 }
+            }
+        }
+    }
+}
+
+// This is the data format we're given in 'transaction' events.
+interface TransactionEvent {
+    // maybeAddress could also be the string "MINT"
+    [maybeAddress: string]: {
+        txids: {
+            [grouping: string]: {
+                [txid: string]: TransactionOutput
+            }
+        },
+
+        total: {
+            [txCategory: string]: {
+                send?: number;
+                mint?: number;
+                spend?: number;
+                mined?: number;
+                znode?: number;
+                receive?: number;
             }
         }
     }
@@ -86,8 +110,14 @@ const mutations = {
 };
 
 const actions = {
-    setStateWithInitialStateWallet({commit}, initialStateWallet: StateWallet) {
-        commit('setStateWithInitialStateWallet', initialStateWallet);
+    // We're called by stateWallet (in initialize).
+    setWalletState({commit}, initialStateWallet: StateWallet) {
+        commit('setWalletState', initialStateWallet);
+    },
+
+    handleTransactionEvent({commit}, transactionEvent: TransactionEvent) {
+        logger.info('handleTransactionEvent');
+        commit('setWalletState', {addresses: transactionEvent});
     }
 };
 
