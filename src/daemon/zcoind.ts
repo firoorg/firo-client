@@ -211,8 +211,12 @@ export class Zcoind {
 
         logger.debug("zcoind sent us a subscription event for topic %s: %O", topic, parsedMessage);
 
+        if (parsedMessage.meta.status !== 200) {
+            logger.error("zcoind sent us an event for topic %s with a non-200 status: %O", topic, parsedMessage);
+        }
+
         if (this.eventHandlers[topic]) {
-            this.eventHandlers[topic](this, parsedMessage);
+            this.eventHandlers[topic](this, parsedMessage.data);
         } else {
             logger.warn("Received subscription event with topic '%s', but no handler exists.", topic);
         }
