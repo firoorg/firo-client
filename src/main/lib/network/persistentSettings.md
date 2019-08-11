@@ -1,10 +1,5 @@
 # Persistent Settings
 
-### PaymentRequest
-
-```
-SET_PAYMENT_REQUEST_LAST_SEEN (id)
-```
 ### Settings
 
 ```
