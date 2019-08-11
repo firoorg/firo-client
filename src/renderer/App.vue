@@ -1,18 +1,12 @@
 <template>
     <div id="app">
-        <DebugGrid />
         <router-view />
     </div>
 </template>
 
 <script>
-import DebugGrid from '@/components/DebugGrid'
-
 export default {
-    name: 'ZcoinClient',
-    components: {
-        DebugGrid
-    }
+    name: 'ZcoinClient'
 }
 </script>
 
