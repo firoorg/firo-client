@@ -119,7 +119,14 @@ const getters = {
     transactions: (state) => state.transactions,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
-    addresses: (state) => state.addresses
+    addresses: (state) => state.addresses,
+
+    getAmountReceivedViaAddress: (state) => {
+        return (address) => (state.addresses[address] || [])
+            .map(uniqId => state.transactions[uniqId])
+            .filter(tx => ['spendIn', 'receive', 'mined'].includes(tx.category))
+            .reduce((a,tx) => a + tx.amount, 0);
+    }
 };
 
 export default {

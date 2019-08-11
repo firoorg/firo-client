@@ -180,7 +180,7 @@ export default {
     computed: {
         ...mapGetters({
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
-            getAmountReceivedViaAddress: 'Address/getAmountReceivedViaAddress'
+            getAmountReceivedViaAddress: 'Transactions/getAmountReceivedViaAddress'
         }),
 
         isMissing () {

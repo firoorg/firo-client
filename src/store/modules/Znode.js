@@ -245,7 +245,7 @@ const getters = {
 
     getPayoutsReceived: (state, getters, rootState, rootGetters) => {
         return (payeeAddress) => {
-            const getAmountReceivedViaAddress = rootGetters['Address/getAmountReceivedViaAddress']
+            const getAmountReceivedViaAddress = rootGetters['Transactions/getAmountReceivedViaAddress']
             const received = getAmountReceivedViaAddress(payeeAddress)
 
             if (received === -1) {
