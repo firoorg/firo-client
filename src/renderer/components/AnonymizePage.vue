@@ -140,7 +140,7 @@
 
                     <div class="buttons">
                         <base-button
-                            v-if="!['initial', 'wait'].includes(popoverStep)"
+                            v-if="!['initial', 'waitToConfirm', 'waitForReply'].includes(popoverStep)"
                             color="red"
                             @click.prevent="closePopover"
                         >
@@ -161,16 +161,15 @@
                                 color="green"
                                 class="expanded"
                                 :disabled="!mintAmount"
-                                @click.prevent="beginWaitStep"
+                                @click.prevent="beginWaitToConfirmStep"
                             >
                                 Anonymize Now
                             </base-button>
 
                             <circular-timer
-                                v-else-if="popoverStep === 'wait'"
+                                v-else-if="popoverStep === 'waitToConfirm'"
                                 @complete="beginConfirmStep"
                             />
-
 
                             <base-button
                                 v-else-if="popoverStep === 'confirm'"
@@ -188,9 +187,17 @@
                                 Mint
                             </base-button>
 
+
+                            <div
+                                v-else-if="popoverStep === 'waitForReply'"
+                                class="wait-for-reply-icon"
+                            >
+                                ⧗
+                            </div>
+
                             <template slot="popover">
                                 <mint-step-confirm
-                                    v-if="popoverStep === 'wait' || popoverStep === 'confirm'"
+                                    v-if="popoverStep === 'waitToConfirm' || popoverStep === 'confirm'"
                                     :mint-amount="mintAmount"
                                     :mint-fees="mintFees"
                                     :mints="coinsToMint"
@@ -200,6 +207,10 @@
                                     v-else-if="popoverStep === 'passphrase'"
                                     v-model="passphrase"
                                     @onEnter="attemptMint"
+                                />
+
+                                <send-step-wait-for-reply
+                                    v-else-if="popoverStep === 'waitForReply'"
                                 />
                             </template>
                         </v-popover>
@@ -226,6 +237,7 @@ import MintStats from '@/components/MintZerocoinPage/MintStats'
 
 import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
 import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
+import SendStepWaitForReply from '@/components/PaymentSidebars/SendSteps/WaitForReply';
 
 export default {
     name: 'AnonymizePage',
@@ -233,6 +245,7 @@ export default {
         CircularTimer,
         MintStepConfirm,
         SendStepPassphrase,
+        SendStepWaitForReply,
 
         MintStats,
         OnboardingNotice,
@@ -252,10 +265,11 @@ export default {
 
             // Valid progressions are:
             //
-            // initial -> wait
-            // wait -> confirm
+            // initial -> waitToConfirm
+            // waitToConfirm -> confirm
             // confirm -> initial | passphrase
-            // passphrase -> initial | incorrectPassphrase | error | complete
+            // passphrase -> initial | waitForReply
+            // waitForReply -> incorrectPassphrase | error | complete
             // error -> initial
             // incorrectPassphrase -> initial | passphrase
             // complete -> initial
@@ -291,8 +305,8 @@ export default {
             window.dispatchEvent(new Event('resize'));
         },
 
-        beginWaitStep() {
-            this.popoverStep = 'wait';
+        beginWaitToConfirmStep() {
+            this.popoverStep = 'waitToConfirm';
             this.recalculatePopoverPosition();
         },
 
@@ -338,6 +352,9 @@ export default {
             if (!passphrase) {
                 return;
             }
+
+            this.popoverStep = 'waitForReply';
+            this.recalculatePopoverPosition();
 
             try {
                 await this.$daemon.mintZerocoin(passphrase, this.coinsToMint);
