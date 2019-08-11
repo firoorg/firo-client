@@ -47,14 +47,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
-import OutgoingPaymentStatus from '@/components/Icons/OutgoingPaymentTableStatus'
 
 export default {
     name: 'TransactionStatus',
-
-    components: {
-        OutgoingPaymentStatus
-    },
 
     mixins: [
         VuetableFieldMixin
