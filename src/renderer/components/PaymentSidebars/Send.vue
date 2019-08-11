@@ -121,13 +121,13 @@
                                 color="green"
                                 class="expanded"
                                 :disabled="!canBeginSend"
-                                @click.prevent="beginWaitStep"
+                                @click.prevent="beginWaitToConfirmStep"
                             >
                                 Send
                             </base-button>
 
                             <circular-timer
-                                v-else-if="sendPopoverStep === 'wait'"
+                                v-else-if="sendPopoverStep === 'waitToConfirm'"
                                 @complete="beginConfirmStep"
                             />
 
@@ -147,6 +147,13 @@
                                 Send
                             </base-button>
 
+                            <div
+                                v-else-if="sendPopoverStep === 'waitForReply'"
+                                class="wait-for-reply-icon"
+                            >
+                                ⧗
+                            </div>
+
                             <base-button
                                 v-else-if="sendPopoverStep === 'incorrectPassphrase'"
                                 color="green"
@@ -164,7 +171,7 @@
 
                             <template slot="popover">
                                 <send-step-confirm
-                                    v-if="['wait', 'confirm'].includes(sendPopoverStep)"
+                                    v-if="['waitToConfirm', 'confirm'].includes(sendPopoverStep)"
                                     :label="label"
                                     :address="address"
                                     :amount="satoshiAmount"
@@ -175,6 +182,10 @@
                                     v-else-if="sendPopoverStep === 'passphrase'"
                                     v-model="passphrase"
                                     @onEnter="attemptSend"
+                                />
+
+                                <send-step-wait-for-reply
+                                    v-else-if="sendPopoverStep === 'waitForReply'"
                                 />
 
                                 <send-step-error
@@ -203,6 +214,7 @@ import { mapGetters } from 'vuex';
 
 import SendStepConfirm from './SendSteps/Confirm';
 import SendStepPassphrase from "./SendSteps/Passphrase";
+import SendStepWaitForReply from './SendSteps/WaitForReply';
 import SendStepIncorrectPassphrase from './SendSteps/IncorrectPassphrase';
 import SendStepError from './SendSteps/Error';
 import SendStepComplete from './SendSteps/Complete';
@@ -217,8 +229,9 @@ export default {
 
     components: {
         CircularTimer,
-        SendStepPassphrase,
         SendStepConfirm,
+        SendStepPassphrase,
+        SendStepWaitForReply,
         SendStepIncorrectPassphrase,
         SendStepError,
         SendStepComplete
@@ -239,8 +252,8 @@ export default {
 
             // Valid progressions are:
             //
-            // initial -> wait
-            // wait -> confirm
+            // initial -> waitToConfirm
+            // waitToConfirm -> confirm
             // confirm -> initial | passphrase
             // passphrase -> initial | incorrectPassphrase | error | complete
             // error -> initial
@@ -346,8 +359,8 @@ export default {
             window.dispatchEvent(new Event('resize'));
         },
 
-        beginWaitStep () {
-            this.sendPopoverStep = 'wait';
+        beginWaitToConfirmStep () {
+            this.sendPopoverStep = 'waitToConfirm';
             this.recalculatePopoverPosition();
         },
 
@@ -370,6 +383,9 @@ export default {
             if (!passphrase) {
                 return;
             }
+
+            this.sendPopoverStep = 'waitForReply';
+            this.recalculatePopoverPosition();
 
             try {
                 if (this.privateOrPublic === 'private') {
