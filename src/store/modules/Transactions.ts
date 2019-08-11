@@ -1,13 +1,6 @@
 import { createLogger } from '../../lib/logger';
 const logger = createLogger('zcoin:store:Transactions');
 
-enum TransactionOutputType {
-    Mined = 'mined',
-    Mint = 'mint',
-    Receive = 'receive',
-    Send = 'send'
-}
-
 // one transaction output, of which a transaction may have many.
 interface TransactionOutput {
     // A unique ID generated on our side (not present in the API) which identifies the transaction. It will be different
