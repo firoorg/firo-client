@@ -9,7 +9,7 @@
                 </router-link>
             </li>
             <li class="has-divider">
-                <router-link to="/mint">
+                <router-link to="/anonymize">
                     <percentage-to-hold-in-zerocoin-notification>
                         <span class="text">
                             {{ $t('navigation.menu.button__mint') }}

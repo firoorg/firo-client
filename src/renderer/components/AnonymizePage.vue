@@ -229,7 +229,7 @@ import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
 import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
 
 export default {
-    name: 'MintZerocoinPage',
+    name: 'AnonymizePage',
     components: {
         CircularTimer,
         MintStepConfirm,
@@ -497,3 +497,4 @@ export default {
         }
     }
 </style>
+

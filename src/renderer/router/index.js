@@ -52,8 +52,8 @@ export default new Router({
                 },
 
                 {
-                    path: '/mint',
-                    component: require('@/components/MintZerocoinPage').default
+                    path: '/anonymize',
+                    component: require('@/components/AnonymizePage').default
                 },
 
                 {
