@@ -17,14 +17,12 @@
 
 <script>
 import PaymentsList from '@/components/PaymentsList';
-import Send from '@/components/SendPage/Send';
 
 export default {
     name: 'TransactionsPage',
 
     components: {
-        PaymentsList,
-        Send
+        PaymentsList
     }
 }
 </script>
