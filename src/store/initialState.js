@@ -65,11 +65,6 @@ module.exports = {
         currentPaymentRequest: '' // gui // payment request showed in detail
     },
 
-    Address: { // daemon: isSubscription
-        walletAddresses: {},
-        thirdPartyAddresses: {}
-    },
-
     AddressValidation: {
         addressToValidate: ''
     },

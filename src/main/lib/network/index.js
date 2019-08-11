@@ -12,7 +12,6 @@ import * as utils from '../../../lib/utils'
 import apiStatus from './ApiStatus'
 
 import App from './App'
-import Address from './Address'
 import Backup from './Backup'
 import Balance from './Balance'
 import Blockchain from './Blockchain'
@@ -27,7 +26,6 @@ const logger = createLogger('zcoin:network')
 
 const modules = {
     App,
-    Address,
     Backup,
     Balance,
     Blockchain,
