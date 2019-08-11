@@ -211,8 +211,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import types from '~/types'
+import { mapGetters } from 'vuex'
 
 import CircularTimer from '@/components/Icons/CircularTimer';
 import DenominationSelector from '@/components/DenominationSelector'
