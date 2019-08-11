@@ -358,32 +358,10 @@ export default {
             this.beginCompleteStep();
         },
 
-        // old methods
-
-        ...mapActions({
-            resetDenominations: types.mint.RESET_DENOMINATIONS,
-            fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN,
-            doMint: types.mint.DO_MINT
-        }),
-
         coinsToMintChanged(mintAmount, mintFees, coinsToMint) {
             this.mintAmount = mintAmount;
             this.mintFees = mintFees;
             this.coinsToMint = coinsToMint;
-        },
-
-        onSubmit () {
-            if (!this.canSubmit) {
-                return false
-            }
-
-            this.$log.info('submitting mint form')
-            this.doMint({
-                denominations: this.currentMints,
-                auth: {
-                    passphrase: this.currentPassphrase
-                }
-            })
         }
     }
 }
