@@ -226,7 +226,7 @@ import NotificationIndicator from '@/components/Notification/NotificationIndicat
 import MintStats from '@/components/MintZerocoinPage/MintStats'
 
 import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
-import SendStepPassphrase from '@/components/SendPage/SendStepPassphrase';
+import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
 
 export default {
     name: 'MintZerocoinPage',

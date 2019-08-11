@@ -22,7 +22,7 @@ export default new Router({
                     children: [
                         {
                             path: '/send',
-                            component: require('@/components/SendPage/Send').default,
+                            component: require('@/components/PaymentSidebars/Send').default,
                             children: [
                                 {
                                     path: 'private'

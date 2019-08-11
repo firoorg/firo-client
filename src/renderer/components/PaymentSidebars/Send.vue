@@ -201,11 +201,11 @@
 <script>
 import { mapGetters } from 'vuex';
 
-import SendStepConfirm from '@/components/SendPage/SendStepConfirm';
-import SendStepPassphrase from "@/components/SendPage/SendStepPassphrase";
-import SendStepIncorrectPassphrase from '@/components/SendPage/SendStepIncorrectPassphrase';
-import SendStepError from '@/components/SendPage/SendStepError';
-import SendStepComplete from '@/components/SendPage/SendStepComplete';
+import SendStepConfirm from './SendSteps/Confirm';
+import SendStepPassphrase from "./SendSteps/Passphrase";
+import SendStepIncorrectPassphrase from './SendSteps/IncorrectPassphrase';
+import SendStepError from './SendSteps/Error';
+import SendStepComplete from './SendSteps/Complete';
 
 import CircularTimer from "@/components/Icons/CircularTimer";
 
