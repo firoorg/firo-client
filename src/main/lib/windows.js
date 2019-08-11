@@ -141,7 +141,6 @@ export default {
 
     registerWindow (name, window) {
         availableWindows.set(name, window)
-        // this.addRouterStoreForWindow(name)
 
         if (window.show) {
             app.once('ready', () => {
@@ -171,29 +170,6 @@ export default {
         } else if (action === 'CLOSE_WINDOW') {
             this.close(name)
         }
-    },
-
-    addRouterStoreForWindow (name) {
-        const moduleName = `${name}Router`
-
-        const opts = availableWindows.get(name)
-        const {url} = opts
-
-        // set up vuex router module for given window
-        if (vuexStore[moduleName]) {
-            return
-        }
-
-
-        vuexStore.registerModule(moduleName, {
-            namespaced: true,
-            state: this.getWindowUrl(url),
-            mutations: {
-                'ROUTE_CHANGED': function ROUTE_CHANGED (state, transition) {
-                    // store.state[moduleName] = cloneRoute(transition.to, transition.from)
-                }
-            }
-        })
     },
 
     connectToStore ({store, namespace}) {

@@ -20,8 +20,6 @@ import store from '../store/renderer'
 
 import zcoind from '../daemon/init'
 
-import { setupWindowRouter } from '~/utils/routerHelper'
-
 const app = require('electron').remote.app
 
 const customValidationRules = [
@@ -86,8 +84,6 @@ requireComponent.keys().forEach(fileName => {
 sync(store, router, {
     moduleName: 'AppRouter'
 })
-
-setupWindowRouter({ store, router })
 
 
 // TODO: Put this in a more appropriate place.

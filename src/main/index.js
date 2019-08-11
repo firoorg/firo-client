@@ -11,13 +11,11 @@ import types from '~/types'
 import { createLogger } from '#/lib/logger'
 
 import PidManager from './lib/core/PidManager'
-import menu from './lib/menu'
 import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
 
 import store from '../store/main'
-import { setupWindowRouter } from '~/utils/routerHelper'
 
 import windowManager from './lib/windows'
 import deeplink from './lib/deeplink'
@@ -59,9 +57,6 @@ if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
 
 // get core config
 const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
-
-//store.replaceState(require('../store/initialState'))
-setupWindowRouter({ store })
 
 const startNetwork = function () {
     logger.info('starting network')
@@ -134,8 +129,6 @@ app.on('ready', () => {
     windowManager.connectToStore({ store, namespace: 'Window' })
     windowManager.registerWindows(CONFIG.windows)
     windowManager.setupAppEvents()
-
-    menu.init({ app, store })
 
     store.dispatch('Window/show', 'main')
     clipboard.watch(store)
