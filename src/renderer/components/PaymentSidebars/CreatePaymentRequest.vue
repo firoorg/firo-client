@@ -80,6 +80,7 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex";
 import {convertToSatoshi} from "#/lib/convert";
 
 export default {
@@ -98,6 +99,10 @@ export default {
     },
 
     computed: {
+        ...mapGetters({
+            paymentRequests: 'PaymentRequest/paymentRequests'
+        }),
+
         canCreateRequest () {
             return !this.validationErrors.items.length
         },
@@ -136,6 +141,23 @@ export default {
             this.label = '';
             this.amount = '';
             this.message = '';
+
+            // Because the legacy codebase has had the *brilliant* idea of separating the client into two processes,
+            // and then using events to communicate mutations between them (the logic of which is implemented in
+            // src/store/renderer.js), it's not actually possible to await the result of a mutation. Because of that,
+            // basically all we can do is loop until we find that the mutation has been applied and then redirect the
+            // user.
+            //
+            // FIXME: Just use an await above, as soon as refactor of the process model permits.
+
+            while (true) {
+                await new Promise(resolve => setTimeout(resolve, 100)); // sleep 100ms
+
+                if (this.paymentRequests[pr.address]) {
+                    this.$router.push('/payment-request/' + pr.address);
+                    break;
+                }
+            }
         }
     }
 }
