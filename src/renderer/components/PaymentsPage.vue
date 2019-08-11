@@ -19,7 +19,7 @@
 import PaymentsList from '@/components/PaymentsList';
 
 export default {
-    name: 'TransactionsPage',
+    name: 'PaymentsPage',
 
     components: {
         PaymentsList

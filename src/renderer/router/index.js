@@ -18,7 +18,7 @@ export default new Router({
             children: [
                 {
                     path: 'transaction-page',
-                    component: require('@/components/TransactionsPage').default,
+                    component: require('@/components/PaymentsPage').default,
                     children: [
                         {
                             path: '/send',
