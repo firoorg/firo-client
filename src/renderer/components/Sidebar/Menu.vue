@@ -10,6 +10,10 @@
             </li>
             <li class="has-divider">
                 <router-link to="/anonymize">
+                    <span class="text">
+                        Anonymize
+                    </span>
+
                     <!-- FIXME: Update this to work after refactor.
 
                     <percentage-to-hold-in-zerocoin-notification>
