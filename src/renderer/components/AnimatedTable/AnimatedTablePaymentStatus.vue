@@ -9,7 +9,7 @@
         v-else
         class="vuetable-td-component-transaction-status"
         :title="`${confirmations} confirmations`"
-        :class="{'is-confirmed': confirmations > 1}"
+        :class="{'is-confirmed': confirmations >= 1}"
     >
         <span
             v-if="['spendIn', 'receive', 'mined'].includes(category)"
