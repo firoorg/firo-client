@@ -58,6 +58,9 @@ interface TransactionEvent {
     }
 }
 
+// This is the data format we're given in 'address' events.
+type AddressEvent = StateWallet;
+
 const state = {
     transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
     // values are keys of transactions in state.transactions associated with the address
@@ -111,6 +114,11 @@ const actions = {
     handleTransactionEvent({commit}, transactionEvent: TransactionEvent) {
         logger.info('handleTransactionEvent');
         commit('setWalletState', {addresses: transactionEvent});
+    },
+
+    handleAddressEvent({commit}, addressEvent: AddressEvent) {
+        logger.info('handleAddressEvent');
+        commit('setWalletState', addressEvent)
     }
 };
 
