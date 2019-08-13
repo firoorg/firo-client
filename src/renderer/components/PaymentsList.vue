@@ -117,6 +117,24 @@ export default {
                     continue;
                 }
 
+                // Coordinate this with the default values in AnimatedTableLabel.
+                let extraSearchText;
+                switch (tx.category) {
+                case 'mined':
+                    extraSearchText = 'Mined Transaction';
+                    break;
+
+                case 'receive':
+                case 'spendIn':
+                    extraSearchText = 'Incoming Transaction';
+                    break;
+
+                case 'send':
+                case 'spendOut':
+                    extraSearchText = 'Outgoing Transaction';
+                    break;
+                }
+
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction-info/${id}`,
@@ -125,7 +143,8 @@ export default {
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
-                    label: tx.label
+                    label: tx.label,
+                    extraSearchText
                 });
             }
 
@@ -136,7 +155,9 @@ export default {
                     blockHeight: blockHeight,
                     date: mintInfo.blockTime * 1000 || Infinity,
                     amount: mintInfo.totalMintAmount,
-                    label: null
+                    label: null,
+                    // Coordinate this with the default values in AnimatedTableLabel.
+                    extraSearchText: 'Private Mint'
                 });
             }
 
@@ -158,7 +179,9 @@ export default {
                     blockHeight: null,
                     date: pr.createdAt,
                     amount: pr.amount,
-                    label: pr.label
+                    label: pr.label,
+                    // Coordinate this with the default values in AnimatedTableLabel.
+                    extraSearchText: 'Payment Request'
                 });
             }
 
@@ -172,7 +195,7 @@ export default {
 
             let filter = this.filter.toLowerCase();
             return this.tableData.filter(tableRow =>
-                ['label', 'address', 'category'].find(key =>
+                ['label', 'address', 'category', 'extraSearchText'].find(key =>
                     tableRow[key] && tableRow[key].toLowerCase().indexOf(filter) !== -1
                 )
             )

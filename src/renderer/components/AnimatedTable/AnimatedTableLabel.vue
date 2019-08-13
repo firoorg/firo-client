@@ -55,6 +55,8 @@
 </template>
 
 <script>
+// The default values here should be coordinated with the assignment of extraSearchText in PaymentsList.
+
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue';
 
 export default {
