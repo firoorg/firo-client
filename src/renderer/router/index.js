@@ -47,6 +47,11 @@ export default new Router({
                         {
                             path: '/transaction-info/:uniqId',
                             component: require('@/components/PaymentSidebars/TransactionInfo').default
+                        },
+
+                        {
+                            path: '/mint-info/:blockHeight',
+                            component: require('@/components/PaymentSidebars/MintInfo').default
                         }
                     ]
                 },

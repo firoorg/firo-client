@@ -84,6 +84,7 @@ export default {
         ...mapGetters({
             transactions: 'Transactions/transactions',
             addresses: 'Transactions/addresses',
+            consolidatedMints: 'Transactions/consolidatedMints',
             paymentRequests: 'PaymentRequest/paymentRequests'
         }),
 
@@ -93,21 +94,10 @@ export default {
             const consolidatedMints = {};
 
             for (const [id, tx] of Object.entries(this.transactions)) {
-                // Consolidate all mints at a specific block height into one larger mint.
+                // Mints are handled separately.
                 if (tx.category === 'mint') {
-                    const block = tx.blockHeight || 0;
-
-                    if (!consolidatedMints[block]) {
-                        consolidatedMints[block] = {
-                            totalMintAmount: 0,
-                            blockTime: tx.blockTime
-                        };
-                    }
-
-                    consolidatedMints[block].totalMintAmount += tx.amount;
                     continue;
                 }
-
 
                 if (!['mined', 'receive', 'spendIn', 'send', 'spendOut'].includes(tx.category)) {
                     this.$log.error(`unknown category '${tx.category}' on tx ${id}`);
@@ -150,9 +140,9 @@ export default {
                 });
             }
 
-            for (const [blockHeight, mintInfo] of Object.entries(consolidatedMints)) {
+            for (const [blockHeight, mintInfo] of Object.entries(this.consolidatedMints)) {
                 tableData.push({
-                    id: `/consolidated-mint/${blockHeight}`,
+                    id: `/mint-info/${blockHeight}`,
                     category: 'mint',
                     blockHeight: blockHeight,
                     date: mintInfo.blockTime * 1000 || Infinity,
@@ -221,10 +211,6 @@ export default {
         },
 
         async onTableRowSelect (rowData) {
-            if (rowData.id.match("consolidated-mint")) {
-                return;
-            }
-
             // id is always set to the path of the detail route of the payment.
             if (this.$route.path !== rowData.id) {
                 this.$router.push(rowData.id);
