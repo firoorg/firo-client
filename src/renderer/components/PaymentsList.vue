@@ -32,6 +32,8 @@ import Amount from '@/components/AnimatedTable/AnimatedTableAmount';
 import PaymentStatus from '@/components/AnimatedTable/AnimatedTablePaymentStatus';
 import Label from '@/components/AnimatedTable/AnimatedTableLabel';
 
+import { convertToCoin } from "#/lib/convert";
+
 const tableFields = [
     {
         name: PaymentStatus,
@@ -144,7 +146,7 @@ export default {
                     amount: tx.amount,
                     address: tx.address,
                     label: tx.label,
-                    extraSearchText
+                    extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
                 });
             }
 
@@ -157,7 +159,7 @@ export default {
                     amount: mintInfo.totalMintAmount,
                     label: null,
                     // Coordinate this with the default values in AnimatedTableLabel.
-                    extraSearchText: 'Private Mint'
+                    extraSearchText: 'Private Mint (' + convertToCoin(mintInfo.totalMintAmount) + ')'
                 });
             }
 
@@ -181,7 +183,7 @@ export default {
                     amount: pr.amount,
                     label: pr.label,
                     // Coordinate this with the default values in AnimatedTableLabel.
-                    extraSearchText: 'Payment Request'
+                    extraSearchText: 'Payment Request (' + convertToCoin(pr.amount) + ')'
                 });
             }
 
