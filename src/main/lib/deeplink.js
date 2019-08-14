@@ -40,6 +40,9 @@ export default {
     },
 
     parseZcoinUrl (url) {
+        // FIXME: Make this actually work again.
+        return;
+
         const parsed = urlParse(url, true)
         const prefixes = this.store.getters['Settings/b58Prefixes']
 
