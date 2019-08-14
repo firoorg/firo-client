@@ -105,13 +105,16 @@ export default {
             case 'mined':
                 return 'Mining Transaction';
 
+            case 'znode':
+                return 'Znode Payment';
+
             default:
                 return `${this.tx.category} Transaction`;
             }
         },
 
         isIncoming () {
-            return ['spendIn', 'receive', 'mined'].includes(this.tx.category);
+            return ['spendIn', 'receive', 'mined', 'znode'].includes(this.tx.category);
         },
 
         isPrivate () {

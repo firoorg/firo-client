@@ -97,7 +97,7 @@ export default {
                     continue;
                 }
 
-                if (!['mined', 'receive', 'spendIn', 'send', 'spendOut'].includes(tx.category)) {
+                if (!['mined', 'receive', 'spendIn', 'send', 'spendOut', 'znode'].includes(tx.category)) {
                     this.$log.error(`unknown category '${tx.category}' on tx ${id}`);
                     continue;
                 }
@@ -123,6 +123,10 @@ export default {
                 case 'spendOut':
                     extraSearchText = 'Outgoing Transaction';
                     break;
+
+                case 'znode':
+                    extraSearchText = 'Znode Payment';
+                    break
                 }
 
                 tableData.push({

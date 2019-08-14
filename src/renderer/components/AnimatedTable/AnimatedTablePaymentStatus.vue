@@ -12,7 +12,7 @@
         :class="{'is-confirmed': confirmations >= 1}"
     >
         <span
-            v-if="['spendIn', 'receive', 'mined'].includes(category)"
+            v-if="['spendIn', 'receive', 'mined', 'znode'].includes(category)"
             class="ok is-incoming"
         >
             ⬇

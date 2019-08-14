@@ -36,6 +36,10 @@
             Mined Transaction
         </span>
 
+        <span v-else-if="category === 'znode'">
+            Znode Payment
+        </span>
+
         <span v-else-if="['send', 'spendOut'].includes(category)">
             Outgoing Transaction
         </span>
