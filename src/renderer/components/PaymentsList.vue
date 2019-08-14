@@ -90,8 +90,6 @@ export default {
 
         tableData () {
             const tableData = [];
-            // {[blockNumber: number]: {totalMintAmount: number, blockTime: number}}
-            const consolidatedMints = {};
 
             for (const [id, tx] of Object.entries(this.transactions)) {
                 // Mints are handled separately.
