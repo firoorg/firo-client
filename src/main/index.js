@@ -19,7 +19,6 @@ import store from '../store/main'
 
 import windowManager from './lib/windows'
 import deeplink from './lib/deeplink'
-import clipboard from './lib/clipboard'
 
 import CONFIG from './config'
 const logger = createLogger('zcoin:main')
@@ -131,7 +130,6 @@ app.on('ready', () => {
     windowManager.setupAppEvents()
 
     store.dispatch('Window/show', 'main')
-    clipboard.watch(store)
 })
 
 app.on('window-all-closed', (event) => {
