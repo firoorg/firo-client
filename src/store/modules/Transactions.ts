@@ -64,7 +64,9 @@ type AddressEvent = StateWallet;
 const state = {
     transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
     // values are keys of transactions in state.transactions associated with the address
-    addresses: <{[address: string]: string[]}>{}
+    addresses: <{[address: string]: string[]}>{},
+    // this is a map of txids (NOT uniqIds) to labels associated with them.
+    spendLabelBugWorkaroundCache: <{[txid: string]: string}>{}
 };
 
 const mutations = {
@@ -102,6 +104,13 @@ const mutations = {
         // FIXME: Use Vue.set.
         state.addresses = {...state.addresses};
         state.transactions = {...state.transactions};
+    },
+
+    addSpendLabelToWorkaroundCache(state, {txid, label}) {
+        state.spendLabelBugWorkaroundCache = {
+            ...state.spendLabelBugWorkaroundCache,
+            [txid]: label
+        };
     }
 };
 
@@ -165,7 +174,9 @@ const getters = {
         }
 
         return consolidatedMints;
-    }
+    },
+
+    spendLabelBugWorkaroundCache: (state) => state.spendLabelBugWorkaroundCache
 };
 
 export default {

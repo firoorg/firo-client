@@ -210,7 +210,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 import SendStepConfirm from './SendSteps/Confirm';
 import SendStepPassphrase from "./SendSteps/Passphrase";
@@ -345,6 +345,10 @@ export default {
     },
 
     methods: {
+        ...mapMutations({
+            addSpendLabelToWorkaroundCache: 'Transactions/addSpendLabelToWorkaroundCache'
+        }),
+
         cleanupForm () {
             this.label = '';
             this.amount = '';
@@ -387,9 +391,11 @@ export default {
             this.sendPopoverStep = 'waitForReply';
             this.recalculatePopoverPosition();
 
+            let privateTxid;
+
             try {
                 if (this.privateOrPublic === 'private') {
-                    await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount);
+                    privateTxid = await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount);
                 } else {
                     await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount, 1);
                 }
@@ -404,6 +410,15 @@ export default {
                 }
 
                 return;
+            }
+
+            // This is to paper over a bug in zcoind where private spend labels are not shown until the first
+            // confirmation is received.
+            if (privateTxid) {
+                console.log(`${privateTxid} = ${this.label}`);
+                this.addSpendLabelToWorkaroundCache({txid: privateTxid, label: this.label});
+            } else {
+                console.log('no response');
             }
 
             this.beginCompleteStep();
