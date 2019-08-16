@@ -335,7 +335,7 @@ export class Zcoind {
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
     async privateSend(auth: string, label: string, recipient: string, amount: number): Promise<string> {
-        const data: {txid: string} = await this.send(auth, 'create', 'sendPrivate', {
+        const data = await this.send(auth, 'create', 'sendPrivate', {
             outputs: [
                 {
                     address: recipient,
@@ -345,7 +345,7 @@ export class Zcoind {
             label
         });
 
-        return data.txid;
+        return data;
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.1', '0.5', '1', '10', '25', or
