@@ -329,7 +329,6 @@ export default {
 
     watch: {
         $route(to) {
-            console.log(to);
             this.address = to.query.address || '';
             this.label = to.query.label || '';
             this.amount = to.query.amount || '';
@@ -435,10 +434,7 @@ export default {
             // This is to paper over a bug in zcoind where private spend labels are not shown until the first
             // confirmation is received.
             if (privateTxid) {
-                console.log(`${privateTxid} = ${this.label}`);
                 this.addSpendLabelToWorkaroundCache({txid: privateTxid, label: this.label});
-            } else {
-                console.log('no response');
             }
 
             this.beginCompleteStep();
