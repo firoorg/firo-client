@@ -287,11 +287,6 @@ export default {
         },
 
         availableBalance () {
-            // fixme: This is a hack because private balance checks are currently non-functional.
-            if (this.privateOrPublic === 'private') {
-                return Infinity;
-            }
-
             return this.privateOrPublic === 'private' ? this.availableZerocoin : this.availableXzc;
         },
 
