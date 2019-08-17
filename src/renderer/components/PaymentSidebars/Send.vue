@@ -60,7 +60,7 @@
                                         id="address"
                                         ref="address"
                                         v-model.trim="address"
-                                        v-validate="'zcoinAddress'"
+                                        v-validate.initial="'zcoinAddress'"
                                         v-tooltip="getValidationTooltip('address')"
                                         type="text"
                                         name="address"
@@ -80,7 +80,7 @@
                                         id="amount"
                                         ref="amount"
                                         v-model="amount"
-                                        v-validate="'amountIsWithinAvailableBalance|' + privateOrPublic + 'AmountIsValid'"
+                                        v-validate.initial="'amountIsWithinAvailableBalance|' + privateOrPublic + 'AmountIsValid'"
                                         v-tooltip="getValidationTooltip('amount')"
                                         type="text"
                                         name="amount"
@@ -252,9 +252,9 @@ export default {
 
     data () {
         return {
-            label: '',
-            amount: '',
-            address: '',
+            label: this.$route.query.label || '',
+            amount: this.$route.query.amount || '',
+            address: this.$route.query.address || '',
             passphrase: '',
 
             errorMessage: '',
@@ -327,7 +327,16 @@ export default {
         },
     },
 
-    mounted () {
+    watch: {
+        $route(to) {
+            console.log(to);
+            this.address = to.query.address || '';
+            this.label = to.query.label || '';
+            this.amount = to.query.amount || '';
+        }
+    },
+
+    beforeMount () {
         // Set up VeeValidator rules.
 
         this.$validator.extend('zcoinAddress', {

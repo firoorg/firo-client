@@ -16,7 +16,8 @@ const state = {
     showIntroScreen: undefined,
     passphrase: null,
     appVersion: null,
-    blockchainLocation: ''
+    blockchainLocation: '',
+    zcoinLink: ''
 }
 
 const mutations = {
@@ -94,6 +95,11 @@ const mutations = {
 
     setDaemon (state, daemon) {
         state.daemon = daemon;
+    },
+
+    // This triggers a watcher in App.vue.
+    gotLink (state, url) {
+        state.zcoinLink = url;
     }
 }
 
@@ -239,6 +245,10 @@ const actions = {
 
         dispatch(types.SET_APP_VERSION, version)
         getAppSettings().set(`app.${types.SET_APP_VERSION}`, version)
+    },
+
+    gotLink ({commit}, url) {
+        commit('gotLink', url);
     }
 }
 
@@ -305,7 +315,9 @@ const getters = {
             networkConnectionError ||
             getters.showIncomingPaymentRequest
     },
-    currentPassphrase: (state) => state.passphrase
+    currentPassphrase: (state) => state.passphrase,
+
+    zcoinLink: (state) => state.zcoinLink
 }
 
 export default {
