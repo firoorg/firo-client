@@ -80,7 +80,7 @@
                                         id="amount"
                                         ref="amount"
                                         v-model="amount"
-                                        v-validate="'amountIsWithinAvailableBalance|' + (privateOrPublic==='private'?'private':'public') + 'AmountIsValid'"
+                                        v-validate="'amountIsWithinAvailableBalance|' + privateOrPublic + 'AmountIsValid'"
                                         v-tooltip="getValidationTooltip('amount')"
                                         type="text"
                                         name="amount"
@@ -90,6 +90,15 @@
                                     />
                                     <div class="prefix">
                                         XZC
+                                    </div>
+                                </div>
+
+                                <div class="amount-available">
+                                    {{ convertToCoin(availableBalance) }} XZC available for {{ privateOrPublic }} send.
+                                    <div v-if="unavailableBalance > 0">
+                                        ({{ convertToCoin(unavailableBalance )}} XZC in pending,
+                                        {{ privateOrPublic === 'private' ? 'public' : 'private' }}, and locked balances
+                                        unavailable.)
                                     </div>
                                 </div>
                             </div>
@@ -267,7 +276,8 @@ export default {
         ...mapGetters({
             network: 'Network/network',
             availableXzc: 'Balance/availableXzc',
-            availableZerocoin: 'Balance/availableZerocoin'
+            availableZerocoin: 'Balance/availableZerocoin',
+            totalBalance: 'Balance/total'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -284,6 +294,10 @@ export default {
                 this.$log.error("Route neither public nor private");
                 throw 'Route neither public nor private';
             }
+        },
+
+        unavailableBalance () {
+            return this.totalBalance - this.availableBalance;
         },
 
         availableBalance () {
@@ -340,6 +354,8 @@ export default {
     },
 
     methods: {
+        convertToCoin,
+
         ...mapMutations({
             addSpendLabelToWorkaroundCache: 'Transactions/addSpendLabelToWorkaroundCache'
         }),
@@ -494,6 +510,12 @@ fieldset {
 
     .prefix {
         color: $color--polo-dark;
+    }
+
+    .amount-available {
+        text-align: right;
+        color: $color--polo-dark;
+        font-style: italic;
     }
 }
 
