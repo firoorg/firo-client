@@ -373,4 +373,10 @@ export class Zcoind {
             throw "got invalid calcTxFee response";
         }
     }
+
+    // Backup wallet.dat into backupDirectory. We will reject() the problem if the backup fails for some reason;
+    // otherwise we return void.
+    async backup(backupDirectory: string): Promise<void> {
+        await this.send(null, 'create', 'backup', {directory: backupDirectory});
+    }
 }
