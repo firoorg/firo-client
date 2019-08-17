@@ -187,6 +187,11 @@
                                 <send-step-wait-for-reply
                                     v-else-if="popoverStep === 'waitForReply'"
                                 />
+
+                                <send-step-error
+                                    v-else-if="popoverStep === 'error'"
+                                    :error-message="errorMessage"
+                                />
                             </template>
                         </v-popover>
                     </div>
@@ -213,6 +218,7 @@ import MintStats from '@/components/MintZerocoinPage/MintStats'
 import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
 import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
 import SendStepWaitForReply from '@/components/PaymentSidebars/SendSteps/WaitForReply';
+import SendStepError from '@/components/PaymentSidebars/SendSteps/Error';
 
 export default {
     name: 'AnonymizePage',
@@ -221,6 +227,7 @@ export default {
         MintStepConfirm,
         SendStepPassphrase,
         SendStepWaitForReply,
+        SendStepError,
 
         MintStats,
         OnboardingNotice,
@@ -237,6 +244,8 @@ export default {
         return {
             popoverStatus: '',
             enableProgressList: true,
+
+            errorMessage: '',
 
             // Valid progressions are:
             //
@@ -304,9 +313,9 @@ export default {
             this.recalculatePopoverPosition();
         },
 
-        beginErrorStep() {
-            alert('error');
-            this.popoverStep = 'initial';
+        beginErrorStep(errorMessage) {
+            this.errorMessage = errorMessage;
+            this.popoverStep = 'error';
         },
 
         beginCompleteStep() {
