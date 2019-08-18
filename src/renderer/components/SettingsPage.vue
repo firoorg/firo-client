@@ -27,6 +27,55 @@
                             <amount-to-hold-in-zerocoin-settings />
                         </div>
                     </section>
+
+                    <section class="backup">
+                        <input
+                            ref="backupDirectory"
+                            type="file"
+                            hidden
+                            webkitdirectory
+                            @change="doBackup"
+                        />
+
+                        <v-popover
+                            :open="popoverStep !== 'initial'"
+                            placement="top-end"
+                            popover-class="tooltip popover multi-step-popover"
+                            class="send-button-popover-container"
+                            trigger="manually"
+                            :auto-hide="false"
+                            :handle-resize="true"
+                        >
+                            <base-button @click="openBackupDialog">
+                                Backup Zcoin Data
+                            </base-button>
+
+                            <template slot="popover">
+                                <div class="close-dialog-button">
+                                    <a
+                                        @click.prevent="closePopover"
+                                        href="#"
+                                    >
+                                        X
+                                    </a>
+                                </div>
+
+                                <div class="content-wrapper">
+                                    <div v-if="popoverStep === 'wait'">
+                                        Please wait...
+                                    </div>
+
+                                    <div v-if="popoverStep === 'success'">
+                                        Backup succeeded!
+                                    </div>
+
+                                    <div v-if="popoverStep === 'error'">
+                                        {{ errorMessage }}
+                                    </div>
+                                </div>
+                            </template>
+                        </v-popover>
+                    </section>
                 </div>
             </div>
         </div>
@@ -58,11 +107,39 @@ export default {
         })
     },
 
+    data () {
+        return {
+            popoverStep: 'initial',
+            errorMessage: ''
+        }
+    },
+
     methods: {
         ...mapActions({
             restartDaemon: types.app.DAEMON_RESTART
         }),
-    }
+
+        openBackupDialog() {
+            this.$refs.backupDirectory.click();
+        },
+
+        async doBackup() {
+            let backupDirectory = this.$refs.backupDirectory.files[0].path;
+            this.popoverStep = 'wait';
+
+            try {
+                await this.$daemon.backup(backupDirectory);
+                this.popoverStep = 'success';
+            } catch (e) {
+                this.errorMessage = (e.error && e.error.message) ? e.error.message : String(e);
+                this.popoverStep = 'error';
+            }
+        },
+
+        closePopover() {
+            this.popoverStep = 'initial';
+        }
+    },
 }
 </script>
 
@@ -113,6 +190,16 @@ export default {
 
         .connection-settings {
             //width: 30%;
+        }
+    }
+
+    .close-dialog-button {
+        margin-top: 0.5em;
+        margin-right: 1em;
+        margin-bottom: -2em;
+        text-align: right;
+        a {
+            color: white;
         }
     }
 </style>

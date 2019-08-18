@@ -10,18 +10,11 @@
             </li>
             <li class="has-divider">
                 <router-link to="/anonymize">
-                    <span class="text">
-                        Anonymize
-                    </span>
-
-                    <!-- FIXME: Update this to work after refactor.
-
                     <percentage-to-hold-in-zerocoin-notification>
                         <span class="text">
                             {{ $t('navigation.menu.button__mint') }}
                         </span>
                     </percentage-to-hold-in-zerocoin-notification>
-                    -->
                 </router-link>
             </li>
             <li>

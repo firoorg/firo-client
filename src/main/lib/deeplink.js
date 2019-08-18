@@ -1,7 +1,4 @@
 import { app } from 'electron'
-import urlParse from 'url-parse'
-import { isZcoinAddress } from '#/lib/zcoin'
-import types from '~/types'
 import { createLogger } from '#/lib/logger'
 
 const logger = createLogger('zcoin:deeplink')
@@ -39,33 +36,11 @@ export default {
         })
     },
 
+    // This is called when the user opens a zcoin:// URL.
     parseZcoinUrl (url) {
-        // FIXME: Make this actually work again.
-        return;
+        logger.info('deeplink: %O', url);
 
-        const parsed = urlParse(url, true)
-        const prefixes = this.store.getters['Settings/b58Prefixes']
-
-        const [ address ] = url.match(RegExp(parsed.hostname, 'i'))
-
-        logger.debug('got deeplink url %s, %O', url, { address, parsed })
-
-        // got a payment request url
-        if (address && isZcoinAddress(address, prefixes)) {
-            logger.info('is payment request. filling store...')
-            this.store.dispatch(types.clipboard.SET_CLIPBOARD, url)
-            this.store.dispatch(types.clipboard.SET_ADDRESS, address)
-
-            const { amount, message } = parsed.query
-
-            if (amount) {
-                this.store.dispatch(types.clipboard.SET_AMOUNT, amount)
-            }
-
-            if (message) {
-                this.store.dispatch(types.clipboard.SET_MESSAGE, message)
-            }
-        }
+        this.store.dispatch('App/gotLink', url);
 
         this.windowManager.focus('main')
     }

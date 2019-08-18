@@ -63,20 +63,25 @@ export default {
             percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
             isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
             showIsOutOfPercentageToHoldInZerocoinNotification: 'Settings/showIsOutOfPercentageToHoldInZerocoinNotification',
-            remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin'
+            remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin',
+            suggestedMintsToFulfillRatio: 'Settings/suggestedMintsToFulfillRatio'
         })
     },
 
     methods: {
         ...mapActions({
             markAsNotified: types.settings.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED,
-            fillUpPercentateToHoldInZerocoin: types.settings.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN
         }),
 
         fillAndRouteToMint () {
-            this.fillUpPercentateToHoldInZerocoin()
-            this.markAsNotified()
-            this.$router.push({ name: 'mint-zerocoin' })
+            this.markAsNotified();
+
+            this.$router.push({
+                path: '/anonymize',
+                query: {
+                    coinsToMint: this.suggestedMintsToFulfillRatio
+                }
+            });
         }
     }
 }

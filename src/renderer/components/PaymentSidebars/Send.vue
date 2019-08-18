@@ -60,7 +60,7 @@
                                         id="address"
                                         ref="address"
                                         v-model.trim="address"
-                                        v-validate="'zcoinAddress'"
+                                        v-validate.initial="'zcoinAddress'"
                                         v-tooltip="getValidationTooltip('address')"
                                         type="text"
                                         name="address"
@@ -80,7 +80,7 @@
                                         id="amount"
                                         ref="amount"
                                         v-model="amount"
-                                        v-validate="'amountIsWithinAvailableBalance|' + (privateOrPublic==='private'?'private':'public') + 'AmountIsValid'"
+                                        v-validate.initial="'amountIsWithinAvailableBalance|' + privateOrPublic + 'AmountIsValid'"
                                         v-tooltip="getValidationTooltip('amount')"
                                         type="text"
                                         name="amount"
@@ -90,6 +90,15 @@
                                     />
                                     <div class="prefix">
                                         XZC
+                                    </div>
+                                </div>
+
+                                <div class="amount-available">
+                                    {{ convertToCoin(availableBalance) }} XZC available for {{ privateOrPublic }} send.
+                                    <div v-if="unavailableBalance > 0">
+                                        ({{ convertToCoin(unavailableBalance )}} XZC in pending,
+                                        {{ privateOrPublic === 'private' ? 'public' : 'private' }}, and locked balances
+                                        unavailable.)
                                     </div>
                                 </div>
                             </div>
@@ -243,9 +252,9 @@ export default {
 
     data () {
         return {
-            label: '',
-            amount: '',
-            address: '',
+            label: this.$route.query.label || '',
+            amount: this.$route.query.amount || '',
+            address: this.$route.query.address || '',
             passphrase: '',
 
             errorMessage: '',
@@ -267,7 +276,8 @@ export default {
         ...mapGetters({
             network: 'Network/network',
             availableXzc: 'Balance/availableXzc',
-            availableZerocoin: 'Balance/availableZerocoin'
+            availableZerocoin: 'Balance/availableZerocoin',
+            totalBalance: 'Balance/total'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -286,12 +296,11 @@ export default {
             }
         },
 
-        availableBalance () {
-            // fixme: This is a hack because private balance checks are currently non-functional.
-            if (this.privateOrPublic === 'private') {
-                return Infinity;
-            }
+        unavailableBalance () {
+            return this.totalBalance - this.availableBalance;
+        },
 
+        availableBalance () {
             return this.privateOrPublic === 'private' ? this.availableZerocoin : this.availableXzc;
         },
 
@@ -318,7 +327,15 @@ export default {
         },
     },
 
-    mounted () {
+    watch: {
+        $route(to) {
+            this.address = to.query.address || '';
+            this.label = to.query.label || '';
+            this.amount = to.query.amount || '';
+        }
+    },
+
+    beforeMount () {
         // Set up VeeValidator rules.
 
         this.$validator.extend('zcoinAddress', {
@@ -345,6 +362,8 @@ export default {
     },
 
     methods: {
+        convertToCoin,
+
         ...mapMutations({
             addSpendLabelToWorkaroundCache: 'Transactions/addSpendLabelToWorkaroundCache'
         }),
@@ -415,10 +434,7 @@ export default {
             // This is to paper over a bug in zcoind where private spend labels are not shown until the first
             // confirmation is received.
             if (privateTxid) {
-                console.log(`${privateTxid} = ${this.label}`);
                 this.addSpendLabelToWorkaroundCache({txid: privateTxid, label: this.label});
-            } else {
-                console.log('no response');
             }
 
             this.beginCompleteStep();
@@ -499,6 +515,12 @@ fieldset {
 
     .prefix {
         color: $color--polo-dark;
+    }
+
+    .amount-available {
+        text-align: right;
+        color: $color--polo-dark;
+        font-style: italic;
     }
 }
 

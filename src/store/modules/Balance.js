@@ -80,7 +80,15 @@ const getters = {
     unconfirmedXzc: (state) => state.xzc.unconfirmed,
     lockedXzc: (state) => state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed,
-    unconfirmedZerocoin: (state) => state.zerocoin.unconfirmed,
+    unconfirmedZerocoin: (state, getters, rootState, rootGetters) => {
+        // FIXME: This is a workaround because zcoind does not update unconfirmed private balance until one block is
+        //        mined.
+        const txs = Object.values(rootGetters['Transactions/transactions']);
+
+        return txs
+            .filter(tx => tx.category === 'mint' && !tx.blockHeight)
+            .reduce((a,x) => a + x.amount, 0) + state.zerocoin.unconfirmed;
+    },
     confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total
 }
 

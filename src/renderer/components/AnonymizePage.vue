@@ -13,6 +13,7 @@
                     <denomination-selector
                         ref="denominationSelector"
                         :available-balance="availableXzc"
+                        :mint-suggestions="coinsToMint"
                         :coins-to-mint-changed="coinsToMintChanged"
                         :disabled="popoverStep !== 'initial'"
                     />
@@ -39,32 +40,6 @@
                                 </i18n>
                             </template>
                         </onboarding-notice>
-                        <!--
-                        <onboarding-notice v-else-if="isOutOfPercentageToHoldInZerocoin">
-                            <template slot="header">
-                                <h3>{{ $t('onboarding.process-mints.title') }}</h3>
-                            </template>
-                            <template slot="content">
-                                <i18n
-                                    path="onboarding.process-mints.description"
-                                    tag="p"
-                                    :places="{ percentageToHoldInZerocoin, remainingXzcToFulFillPercentageToHoldInZerocoin }"
-                                >
-                                    <nobr place="percentageToHoldInZerocoin">
-                                        <strong>{{ percentageToHoldInZerocoin }}&#8201;%</strong>
-                                    </nobr>
-                                    <nobr place="remainingXzcToFulFillPercentageToHoldInZerocoin">
-                                        <strong>{{ remainingXzcToFulFillPercentageToHoldInZerocoin }}&#8201;XZC</strong>
-                                    </nobr>
-                                </i18n>
-                            </template>
-                            <template slot="actions">
-                                <base-onboarding-button @click.prevent="fillUpPercentateToHoldInZerocoin">
-                                    {{ $t('onboarding.process-mints.button__add-selection--primary') }}
-                                </base-onboarding-button>
-                            </template>
-                        </onboarding-notice>
-                        -->
                         <mint-stats v-else />
                     </transition>
                 </div>
@@ -212,6 +187,11 @@
                                 <send-step-wait-for-reply
                                     v-else-if="popoverStep === 'waitForReply'"
                                 />
+
+                                <send-step-error
+                                    v-else-if="popoverStep === 'error'"
+                                    :error-message="errorMessage"
+                                />
                             </template>
                         </v-popover>
                     </div>
@@ -238,6 +218,7 @@ import MintStats from '@/components/MintZerocoinPage/MintStats'
 import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
 import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
 import SendStepWaitForReply from '@/components/PaymentSidebars/SendSteps/WaitForReply';
+import SendStepError from '@/components/PaymentSidebars/SendSteps/Error';
 
 export default {
     name: 'AnonymizePage',
@@ -246,6 +227,7 @@ export default {
         MintStepConfirm,
         SendStepPassphrase,
         SendStepWaitForReply,
+        SendStepError,
 
         MintStats,
         OnboardingNotice,
@@ -263,6 +245,8 @@ export default {
             popoverStatus: '',
             enableProgressList: true,
 
+            errorMessage: '',
+
             // Valid progressions are:
             //
             // initial -> waitToConfirm
@@ -279,14 +263,14 @@ export default {
             mintAmount: 0,
             mintFees: 0,
             // {[denomination: string]: number}
-            coinsToMint: {},
+            coinsToMint: this.$route.query.coinsToMint || {},
         }
     },
 
     computed: {
         ...mapGetters({
             availableXzc: 'Balance/availableXzc',
-            mintsInProgress: 'Mint/mintsInProgress',
+            mintsInProgress: 'Transactions/mintsInProgress',
         }),
 
         hasMints () {
@@ -294,7 +278,7 @@ export default {
         },
 
         hasMintsInProgress () {
-            return !!this.mintsInProgress.length
+            return !!Object.keys(this.mintsInProgress).length
         }
     },
 
@@ -329,9 +313,9 @@ export default {
             this.recalculatePopoverPosition();
         },
 
-        beginErrorStep() {
-            alert('error');
-            this.popoverStep = 'initial';
+        beginErrorStep(errorMessage) {
+            this.errorMessage = errorMessage;
+            this.popoverStep = 'error';
         },
 
         beginCompleteStep() {
