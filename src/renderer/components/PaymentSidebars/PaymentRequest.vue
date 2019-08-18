@@ -38,6 +38,17 @@
                 </div>
             </div>
 
+            <div
+                v-if="pr.message"
+                class="message"
+            >
+                <label>Message:</label>
+
+                <div class="value">
+                    {{ pr.message }}
+                </div>
+            </div>
+
             <div class="block-explorer">
                 <a href="#" @click.prevent="openExplorer">
                     View Transaction in Block Explorer
@@ -165,6 +176,12 @@ export default {
                 font-family: monospace;
                 font-style: italic;
                 font-size: 0.9em;
+            }
+        }
+
+        .message {
+            .value {
+                font-style: italic;
             }
         }
 
