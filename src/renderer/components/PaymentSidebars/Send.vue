@@ -356,8 +356,8 @@ export default {
         });
 
         this.$validator.extend('privateAmountIsValid', {
-            getMessage: () => 'Amount For Private Spend Must Be A Multiple of 0.1',
-            validate: (value) => !!value.match(/^\d+(\.\d)?$/)
+            getMessage: () => 'Amount For Private Spend Must Be A Multiple of 0.05',
+            validate: (value) => convertToSatoshi(value) % 5e6 === 0
         })
     },
 
