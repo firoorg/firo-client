@@ -113,8 +113,8 @@ export default {
                 params.push(`amount=${this.pr.amount}`);
             }
 
-            if (this.pr.message) {
-                params.push(`message=${encodeURIComponent(this.pr.message)}`);
+            if (this.pr.message || this.pr.label) {
+                params.push(`message=${encodeURIComponent(this.pr.message || this.pr.label)}`);
             }
 
             const paramsString = params.length ? `?${params.join('&')}` : '';
