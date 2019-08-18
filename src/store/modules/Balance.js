@@ -25,6 +25,9 @@ const mutations = {
     [types.UPDATE_BALANCE] (state, balance) {
         logger.debug('going to update balance %O', balance)
 
+        // FIXME: This just aliases different names used in zcoind (where zcoind's public becomes our xzc, and its
+        //        private becomes our zerocoin), which is very confusing. We should change names for us to be consistent
+        //        with that throughout the program.
         const { all, pending, available } = balance.total
         const { confirmed: confirmedXzc, unconfirmed: unconfirmedXzc, locked } = balance.public
         const { confirmed: confirmedZerocoin, unconfirmed: unconfirmedZerocoin } = balance.private
