@@ -278,7 +278,6 @@ export default {
         },
 
         hasMintsInProgress () {
-            console.log(this.mintsInProgress);
             return !!Object.keys(this.mintsInProgress).length
         }
     },
