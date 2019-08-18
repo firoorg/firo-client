@@ -26,7 +26,7 @@
                             class="description"
                         >
                             No one will know the origin of Zcoin you send privately. Note that you may only send
-                            multiples of 0.1 XZC.
+                            multiples of 0.05 XZC.
                         </p>
 
 
