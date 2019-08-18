@@ -361,7 +361,7 @@ settings:
       label__connect-via-tor--checked: Yes, connections to other Nodes in the Zcoin Network are established via Tor
       label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Zcoin Network
       label__hold-in-zerocoin: Ratio between private and public funds
-      description__hold-in-zerocoin: You might want to hold more of your funds in Zerocoin to make spending easier.
+      description__hold-in-zerocoin: You might want to hold more of your funds as private coins to make spending easier.
       label__hold-in-zerocoin--private: Private
       label__hold-in-zerocoin--public: Public
 
