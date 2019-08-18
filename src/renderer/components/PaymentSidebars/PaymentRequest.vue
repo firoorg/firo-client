@@ -4,6 +4,44 @@
             {{ title }}
         </div>
 
+        <div class="delete">
+            <v-popover
+                :open="deletePopoverIsOpen"
+                placement="bottom-end"
+                popover-class="tooltip popover multi-step-popover"
+                trigger="manually"
+                :auto-hide="false"
+                :handle-resize="true"
+            >
+                <a
+                    href="#"
+                    @click.prevent="openDeletePopover"
+                >
+                    Delete Payment Request
+                </a>
+
+                <template slot="popover">
+                    <div>
+                        <div class="popover-content">
+                            <base-button
+                                @click.prevent="cancelDelete"
+                                color="red"
+                            >
+                                Cancel
+                            </base-button>
+
+                            <base-button
+                                @click.prevent="deletePaymentRequest"
+                                color="green"
+                            >
+                                Confirm
+                            </base-button>
+                        </div>
+                    </div>
+                </template>
+            </v-popover>
+        </div>
+
         <div class="details">
             <div
                 v-if="pr.amount"
@@ -90,6 +128,12 @@ export default {
         }
     },
 
+    data () {
+        return {
+            deletePopoverIsOpen: false
+        }
+    },
+
     watch: {
         // If this payment request receives a transaction, redirect the user there.
         associatedTransactions (newVal) {
@@ -120,6 +164,30 @@ export default {
             const paramsString = params.length ? `?${params.join('&')}` : '';
 
             clipboard.writeText(`zcoin://${this.pr.address}${paramsString}`);
+        },
+
+        openDeletePopover() {
+            this.deletePopoverIsOpen = true;
+        },
+
+        cancelDelete() {
+            this.deletePopoverIsOpen = false;
+        },
+
+        async deletePaymentRequest() {
+            const pr = this.pr;
+
+            this.$router.push("/");
+
+            try {
+                await this.$daemon.updatePaymentRequest(pr.address, pr.amount, pr.label, pr.message, 'archived');
+            } catch (e) {
+                // Errors deleting a payment request should never occur during normal operation, so fancy error handling
+                // isn't required.
+                alert(String(e));
+            }
+
+            this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', {...pr, state: 'archived'});
         }
     }
 }
@@ -141,6 +209,16 @@ export default {
 
     .title {
         font-size: 2em;
+    }
+
+    .delete {
+        margin-top: -1em;
+        text-align: right;
+
+        a {
+            font-style: italic;
+            font-size: 0.6em;
+        }
     }
 
     .description {
@@ -194,6 +272,14 @@ export default {
             font-style: italic;
             text-underline: none;
         }
+    }
+}
+
+.popover-content {
+    padding: 1em;
+
+    button {
+        margin: 0.5em;
     }
 }
 </style>
