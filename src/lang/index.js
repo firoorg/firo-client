@@ -3,7 +3,10 @@
  * in a one-shot manner. There should not be any reason to edit this file.
  */
 
-const files = require.context('.', false, /\.ya?ml/)
+// FIXME: Undo this when translations are updated.
+// const files = require.context('.', false, /\.ya?ml/)
+const files = require.context('.', false, /en.yaml$/)
+
 const modules = {}
 
 files.keys().forEach(key => {
