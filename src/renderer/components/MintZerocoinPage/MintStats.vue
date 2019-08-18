@@ -54,7 +54,7 @@ export default {
         ...mapGetters({
             availableXzc: 'Balance/availableXzc',
             availableZerocoin: 'Balance/availableZerocoin',
-            mintsInProgress: 'Mint/mintsInProgress'
+            mintsInProgress: 'Transactions/mintsInProgress'
         }),
 
         availableZcoin () {

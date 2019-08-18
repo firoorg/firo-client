@@ -270,7 +270,7 @@ export default {
     computed: {
         ...mapGetters({
             availableXzc: 'Balance/availableXzc',
-            mintsInProgress: 'Mint/mintsInProgress',
+            mintsInProgress: 'Transactions/mintsInProgress',
         }),
 
         hasMints () {
@@ -278,7 +278,8 @@ export default {
         },
 
         hasMintsInProgress () {
-            return !!this.mintsInProgress.length
+            console.log(this.mintsInProgress);
+            return !!Object.keys(this.mintsInProgress).length
         }
     },
 

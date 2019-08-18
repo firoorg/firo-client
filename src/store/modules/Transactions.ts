@@ -176,6 +176,20 @@ const getters = {
         return consolidatedMints;
     },
 
+
+    mintsInProgress (state, getters, rootState, rootGetters) {
+        const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight'];
+        return Object.values(<{[id: string]: TransactionOutput}>getters['transactions'])
+            .filter(tx => tx.category === 'mint' && (!tx.blockHeight || currentBlockHeight - tx.blockHeight < 5))
+            .map((tx) => {
+                return {
+                    confirmations: tx.blockHeight ? currentBlockHeight - tx.blockHeight + 1 : 0,
+                    amount: tx.amount,
+                    id: tx.uniqId,
+                }
+            })
+    },
+
     spendLabelBugWorkaroundCache: (state) => state.spendLabelBugWorkaroundCache
 };
 
