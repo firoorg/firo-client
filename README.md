@@ -3,7 +3,7 @@
 ![](.github/github-zcoin-client-header.png)
 
 This is an (experimental) client for the [Zcoin](https://zcoin.io/) network. Currently, it requires connection to a
-fully trusted zcoind full node. Windows support is currently slightly broken, but will be fixed shortly.
+fully trusted zcoind full node.
 
 ## Installing zcoind
 
