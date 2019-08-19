@@ -2,17 +2,10 @@
   "name": "zcoin-client",
   "version": "0.0.1",
   "author": {
-    "name": "Jörn Röder",
-    "email": "kontakt@joernroeder.de",
-    "url": "http://joernroeder.de"
+    "name": "Zcoin Foundation",
+    "email": "team@zcoin.io",
+    "url": "https://zcoin.io/"
   },
-  "contributors": [
-    {
-      "name": "Mike Huntemann",
-      "email": "mail@mikehuntemann.com",
-      "url": "http://mikehuntemann.de"
-    }
-  ],
   "description": "Official Zcoin Client",
   "license": null,
   "main": "./dist/electron/main.js",
