@@ -11,6 +11,7 @@ import types from '~/types'
 import { createLogger } from '#/lib/logger'
 
 import PidManager from './lib/core/PidManager'
+import menu from './lib/menu'
 import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
@@ -128,6 +129,8 @@ app.on('ready', () => {
     windowManager.connectToStore({ store, namespace: 'Window' })
     windowManager.registerWindows(CONFIG.windows)
     windowManager.setupAppEvents()
+
+    menu.init({ app, store })
 
     store.dispatch('Window/show', 'main')
 })
