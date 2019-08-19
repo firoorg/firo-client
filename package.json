@@ -7,7 +7,7 @@
     "url": "https://zcoin.io/"
   },
   "description": "Official Zcoin Client",
-  "license": null,
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "docs:dev": "vuepress dev docs",
