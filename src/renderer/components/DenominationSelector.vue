@@ -63,6 +63,7 @@ export default {
     data () {
         return {
             coinsToMint: Object.assign({
+                '0.05': 0,
                 '0.1': 0,
                 '0.5': 0,
                 '1': 0,
@@ -120,6 +121,7 @@ export default {
         // This method will be called by our parent after a spend is made to reset our UI.
         reset() {
             this.coinsToMint = {
+                '0.05': 0,
                 '0.1': 0,
                 '0.5': 0,
                 '1': 0,
