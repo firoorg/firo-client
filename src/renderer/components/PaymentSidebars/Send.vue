@@ -357,7 +357,10 @@ export default {
 
         this.$validator.extend('privateAmountIsValid', {
             getMessage: () => 'Amount For Private Spend Must Be A Multiple of 0.05',
-            validate: (value) => convertToSatoshi(value) % 5e6 === 0
+            validate: (value) => {
+                const v = convertToSatoshi(value);
+                return (v % 5e6 === 0) && (v > 0);
+            }
         })
     },
 

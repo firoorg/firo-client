@@ -108,7 +108,7 @@ export const getDenominationsToSpend = function ({ amount, denominations = {}, l
     }
 }
 
-export const getDenominationsToMint = function (amount, denoms = [0.5, 0.1, 0.5, 1, 10, 25, 100]) {
+export const getDenominationsToMint = function (amount, denoms = [0.05, 0.1, 0.5, 1, 10, 25, 100]) {
     const denomsToMint = {}
     const reversed = denoms.reverse()
 
