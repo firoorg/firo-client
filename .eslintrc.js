@@ -15,24 +15,14 @@ module.exports = {
     rules: {
         'indent': ['warn', 4],
         'vue/html-indent': ['warn', 4],
-
         // allow paren-less arrow functions
         'arrow-parens': 0,
         // allow async-await
         'generator-star-spacing': 0,
-
         'vue/no-v-html': 0,
         'vue/component-name-in-template-casing': 'kebab-case',
-
-/*
-        'vue/no-unused-components': ['error', {
-            'ignoreWhenBindingPresent': false
-        }],
-        */
-
-        'vue/no-unused-components': 0,
+        'vue/no-unused-components': 1,
         'vue/html-self-closing': 0,
-
 // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
     }
