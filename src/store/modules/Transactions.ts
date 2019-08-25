@@ -71,6 +71,8 @@ const state = {
 
 const mutations = {
     setWalletState(state, initialStateWallet: StateWallet) {
+        logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
+
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
 
