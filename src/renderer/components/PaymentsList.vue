@@ -212,7 +212,7 @@ export default {
 
     methods: {
         comparePayments(a, b) {
-            return !!['id', 'category', 'blockHeight', 'date', 'amount', 'address', 'label'].find(field =>
+            return !['id', 'category', 'blockHeight', 'date', 'amount', 'address', 'label'].find(field =>
                 a[field] !== b[field]
             );
         },
