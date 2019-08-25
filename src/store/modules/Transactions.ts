@@ -172,6 +172,7 @@ const getters = {
                 };
             }
 
+            consolidatedMints[block].mints.push(tx);
             consolidatedMints[block].totalMintAmount += tx.amount;
         }
 
