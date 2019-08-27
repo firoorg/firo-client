@@ -11,12 +11,12 @@
         <div
             v-if="lockedXzc > 0 && pendingXzc > 0"
         >
-            (<amount :amount="lockedXzc" /> locked, <amount :amount="pendingXzc" /> pending)
+            (+ <amount :amount="lockedXzc" /> locked, <amount :amount="pendingXzc" /> pending)
         </div>
         <div
             v-else-if="lockedXzc > 0"
         >
-            (<amount :amount="lockedXzc" /> locked)
+            (+ <amount :amount="lockedXzc" /> locked)
         </div>
         <div
             v-else-if="pendingXzc > 0"
