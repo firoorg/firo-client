@@ -185,23 +185,6 @@ const actions = {
         commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, ratio)
     },
 
-    [types.FILL_UP_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ dispatch, getters, rootGetters }) {
-        logger.debug('suggested mints to fulfill ratio %O', getters.suggestedMintsToFulfillRatio)
-        const currentDenomination = rootGetters['Mint/currentDenominations']
-
-        Object.entries(getters.suggestedMintsToFulfillRatio).forEach((pairs) => {
-            const [ denom, amount ] = pairs
-            const current = currentDenomination[denom] ? currentDenomination[denom] : 0
-
-            for (let i = 0; i < amount - current; i++) {
-                dispatch(allTypes.mint.ADD_DENOMINATION, denom, {
-                    root: true
-                })
-                // this.addDenomination(denom)
-            }
-        })
-    },
-
     [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] ({ state, commit, rootGetters }, urlOrUrlNetworkPair) {
         let url = undefined
         let network = undefined

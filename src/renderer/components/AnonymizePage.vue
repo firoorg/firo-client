@@ -209,7 +209,6 @@ import DenominationSelector from '@/components/DenominationSelector'
 import OnboardingNotice from '@/components/Notification/OnboardingNotice'
 import CurrentMints from '@/components/payments/CurrentMints'
 import FeesAndAmount from '@/components/payments/FeesAndAmount'
-import MintSteps from '@/components/MintZerocoinPage/MintSteps'
 import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
 import Stack from '@/components/Icons/Stack'
 import NotificationIndicator from '@/components/Notification/NotificationIndicator'
@@ -233,7 +232,6 @@ export default {
         OnboardingNotice,
         NotificationIndicator,
         MintsInProgressList,
-        MintSteps,
         FeesAndAmount,
         CurrentMints,
         DenominationSelector,
