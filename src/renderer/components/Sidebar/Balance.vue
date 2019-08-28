@@ -29,7 +29,7 @@
             class="zerocoin-total"
         >
             <amount :amount="availableZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span>
-            (<amount :amount="unconfirmedZerocoin" /> pending)
+            (+ <amount :amount="unconfirmedZerocoin" /> pending)
         </div>
         <div
             v-else-if="availableZerocoin > 0"
@@ -41,7 +41,7 @@
             v-else-if="unconfirmedZerocoin > 0"
             class="zerocoin-total"
         >
-            (<amount :amount="unconfirmedZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span> pending)
+            (+ <amount :amount="unconfirmedZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span> pending)
         </div>
     </section>
 </template>
