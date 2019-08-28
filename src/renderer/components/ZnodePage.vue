@@ -13,32 +13,19 @@
 
                     <div class="search-form">
                         <base-filter-input
-                            v-model="urlFilter"
+                            v-model="searchQuery"
                             type="text"
                             class="table-filter-input"
                             theme="dark"
                             :placeholder="$t('znodes.overview.table__znodes.placeholder__filter')"
                         />
-                        <!--<div class="internal-only">
-                            For Internal Use Only!!!
-                        </div>-->
                     </div>
                 </section>
 
-                <znode-map
-                    v-if="displayZnodeMap"
-                    class="znodes-map"
-                    :remote-znodes="remoteZnodes"
-                    :my-znodes="filteredMyZnodes"
-                />
-
-                <section
-                    class="stats"
-                    :class="{'znode-map-displayed': displayZnodeMap}"
-                >
+                <section class="stats">
                     <div class="stat">
                         <div class="value">
-                            {{ totalZnodes }}
+                            {{ znodeCount }}
                         </div>
                         <div class="desc">
                             {{ $t('znodes.overview.stats.description__total-nodes') }}
@@ -62,18 +49,18 @@
                     <template v-else>
                         <div class="stat">
                             <div class="value">
-                                {{ Math.ceil(znodePaymentCycleInDays) }}
+                                {{ paymentPeriodInDays }}
                             </div>
                             <div class="desc">
                                 {{ $t('znodes.overview.stats.description__average-days-for-payout') }}
                             </div>
                         </div>
                         <div
-                            v-if="enabledMyZnodes.length && roundedDaysUntilNextPayout > 0"
+                            v-if="enabledMyZnodes.length && daysUntilNextPayout > 0"
                             class="stat"
                         >
                             <div class="value">
-                                {{ roundedDaysUntilNextPayout }}
+                                {{ daysUntilNextPayout }}
                             </div>
                             <div class="desc">
                                 {{ $t('znodes.overview.stats.description__days-until-next-payout') }}
@@ -86,7 +73,7 @@
                     <my-znode
                         v-for="(znode, index) in filteredMyZnodes"
                         :key="index"
-                        v-bind="znode"
+                        :znode="znode"
                     />
                 </section>
 
@@ -100,12 +87,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-// import types from '~/types'
-
-import FilterByUrlParamMixin from '@/mixins/FilterByUrlParamMixin'
 
 import MyZnode from '@/components/ZnodePage/MyZnode'
-import ZnodeMap from '@/components/ZnodePage/ZnodeMap'
 import RemoteZnodesList from '@/components/ZnodePage/RemoteZnodesList'
 import LoadingBounce from "./Icons/LoadingBounce";
 
@@ -115,56 +98,65 @@ export default {
     components: {
         LoadingBounce,
         RemoteZnodesList,
-        MyZnode,
-        ZnodeMap
+        MyZnode
     },
 
-    mixins: [
-        FilterByUrlParamMixin
-    ],
+    data () {
+        return {
+            searchQuery: ''
+        }
+    },
 
     computed: {
         ...mapGetters({
             isWinnersListSynced: 'Blockchain/isWinnersListSynced',
             myZnodes: 'Znode/myZnodes',
             remoteZnodes: 'Znode/remoteZnodes',
-            totalZnodes: 'Znode/totalZnodes',
-            znodePaymentCycleInDays: 'Znode/znodePaymentCycleInDays'
+            znodeCount: 'Znode/znodeCount',
+            paymentPeriod: 'Znode/paymentPeriod'
         }),
 
-        displayZnodeMap () {
-            return false
-        },
-
         enabledMyZnodes () {
-            return this.myZnodes.filter((znode) => znode.status === 'ENABLED')
+            return this.myZnodes.filter(znode => znode.status === 'ENABLED')
         },
 
         filteredMyZnodes () {
-            return this.getFilteredByUrl(this.myZnodes, ['status', 'payeeAddress', 'authorityIp', 'id', 'label'])
+            return this.myZnodes.filter(znode => {
+                for (const data of [znode.status, znode.payeeAddress, znode.authority.ip, znode.outpoint.txid, znode.label]) {
+                    if (data && data.indexOf(this.searchQuery) !== -1) {
+                        return true;
+                    }
+                }
+            });
         },
 
         filteredRemoteZnodes () {
-            return this.getFilteredByUrl(this.remoteZnodes, ['status', 'payeeAddress', 'authorityIp', 'id'])
+            return this.remoteZnodes.filter(znode => {
+                for (const data of [znode.status, znode.payeeAddress, znode.authority.ip, znode.outpoint.txid]) {
+                    if (data && data.indexOf(this.searchQuery) !== -1) {
+                        return true;
+                    }
+                }
+            });
+        },
+
+        paymentPeriodInDays () {
+            return Math.ceil(this.paymentPeriod / 1000 / 24 / 60 / 60)
         },
 
         daysUntilNextPayout () {
-            if (!this.myZnodes.length) {
+            const oldestUnpaidTime = this.myZnodes
+                .map(znode => znode.lastPaidTime || znode.activeSince )
+                .sort() // false is sorted last
+                [0];
+
+            if (!oldestUnpaidTime) {
                 return false
             }
 
-            const now = Date.now()
-            const nextEstimatedPayout = this.myZnodes.reduce((aggregator, znode) => {
-                const { nextEstimatedPayout } = znode
+            const estimatedNextPayout = oldestUnpaidTime + this.paymentPeriod;
 
-                return !nextEstimatedPayout || aggregator < nextEstimatedPayout ? aggregator : nextEstimatedPayout
-            }, Infinity)
-
-            return (nextEstimatedPayout - now) / 1000 / 60 / 60 / 24
-        },
-
-        roundedDaysUntilNextPayout () {
-            return Math.round(this.daysUntilNextPayout)
+            return (estimatedNextPayout - Date.now()) / 1000 / 24 / 60 / 60;
         },
 
         statsLoaded () {
@@ -241,13 +233,7 @@ export default {
         justify-content: space-evenly;
         z-index: 10;
 
-        &.znode-map-displayed {
-            margin-top: emRhythm(-10);
-            margin-bottom: emRhythm(7);
-        }
-        &:not(.znode-map-displayed) {
-            margin-top: emRhythm(12);
-        }
+        margin-top: emRhythm(12);
 
         .stat {
             max-width: 15rem;
@@ -287,6 +273,7 @@ export default {
         grid-template-columns: repeat(2, 1fr);
         grid-column-gap: emRhythm(4);
         grid-row-gap: emRhythm(6);
+        padding-top: 2em;
     }
 
     .remote-znodes {

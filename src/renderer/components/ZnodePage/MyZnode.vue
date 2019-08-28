@@ -5,9 +5,9 @@
     >
         <div>
             <header class="heading">
-                <h2>{{ label }}</h2>
-                <p v-if="authorityIp">
-                    {{ authorityIp }}
+                <h2>{{ znode.label }}</h2>
+                <p v-if="znode.authority.ip">
+                    {{ znode.authority.ip }}
                 </p>
             </header>
 
@@ -21,14 +21,14 @@
                     <section class="status">
                         <header>{{ $t('znodes.my-znode.label__status') }}</header>
                         <main>
-                            <znode-status :status="status" />
+                            <znode-status :status="znode.status" />
                         </main>
                     </section>
                     <section class="last-seen">
                         <header>{{ $t('znodes.my-znode.label__last-seen') }}</header>
                         <main>
                             <timeago
-                                :datetime="lastSeen"
+                                :datetime="znode.lastSeen"
                                 :auto-update="30"
                             />
                         </main>
@@ -37,7 +37,7 @@
                         <header>{{ $t('znodes.my-znode.label__active-since') }}</header>
                         <main>
                             <timeago
-                                :datetime="activeSince"
+                                :datetime="znode.activeSince"
                                 :auto-update="30"
                             />
                         </main>
@@ -51,7 +51,7 @@
                                 </template>
                                 <template v-else>
                                     <timeago
-                                        v-if="lastPaidTime"
+                                        v-if="znode.lastPaidTime"
                                         :datetime="nextEstimatedPayout"
                                         :auto-update="30"
                                     />
@@ -63,8 +63,8 @@
                             <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
                             <main>
                                 <timeago
-                                    v-if="lastPaidTime"
-                                    :datetime="lastPaidTime"
+                                    v-if="znode.lastPaidTime"
+                                    :datetime="znode.lastPaidTime"
                                     :auto-update="30"
                                 />
                                 <span v-else>
@@ -75,12 +75,12 @@
                         <section class="received">
                             <header>{{ $t('znodes.my-znode.label__amount-received') }}</header>
                             <main>
-                                {{ payoutsReceived }}
+                                {{ convertToCoin(payoutsReceived) }} XZC
                             </main>
                         </section>
                         <section class="payee">
                             <header>{{ $t('znodes.my-znode.label__payee') }}</header>
-                            <main>{{ payeeAddress }}</main>
+                            <main>{{ znode.payeeAddress }}</main>
                         </section>
                     </template>
                     <template v-else>
@@ -95,7 +95,6 @@
         <footer v-if="!isMissing">
             <template v-if="belongsToWallet">
                 <base-button
-                    v-if="payeeAddress"
                     size="small"
                     :is-outline="!isEnabled"
                     :color="isEnabled ? 'comet' : ''"
@@ -103,17 +102,9 @@
                 >
                     {{ $t('znodes.my-znode.button__open-explorer') }}
                 </base-button>
-                <base-button
-                    v-if="!isEnabled"
-                    size="small"
-                    color="comet"
-                >
-                    Action Name
-                </base-button>
             </template>
             <template v-else>
                 <base-button
-                    v-if="payeeAddress"
                     size="small"
                     color="comet"
                     @click.prevent="openBlockExplorer"
@@ -134,77 +125,54 @@ import ZnodeStatus from '@/components/ZnodePage/ZnodeStatus'
 
 export default {
     name: 'MyZnode',
+
     components: {
         ZnodeStatus,
         Notice
     },
+
     props: {
-        label: {
-            type: String,
+        znode: {
+            type: Object,
             required: true
-        },
-        payeeAddress: {
-            type: String,
-            default: ''
-        },
-        lastSeen: {
-            type: Number,
-            default: -1
-        },
-        activeSince: {
-            type: Number,
-            default: -1
-        },
-        status: {
-            type: String,
-            default: 'MISSING'
-        },
-        lastPaidTime: {
-            type: Number,
-            default: 0
-        },
-        payoutsReceived: {
-            type: String,
-            default: ''
-        },
-        nextEstimatedPayout: {
-            type: Number,
-            default: -1
-        },
-        authorityIp: {
-            type: String,
-            default: ''
         }
     },
 
     computed: {
         ...mapGetters({
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
-            getAmountReceivedViaAddress: 'Transactions/getAmountReceivedViaAddress'
+            getAmountReceivedViaAddress: 'Transactions/getAmountReceivedViaAddress',
+            addresses: 'Transactions/addresses',
+            paymentPeriod: 'Znode/paymentPeriod'
         }),
 
         isMissing () {
-            return (!this.payeeAddress || this.status === 'MISSING')
+            return this.status === 'MISSING'
         },
 
         isEnabled () {
             return this.status === 'ENABLED'
         },
 
+        payoutsReceived () {
+            return this.getAmountReceivedViaAddress(this.znode.payeeAddress) - 1e11;
+        },
+
         belongsToWallet () {
-            return this.getAmountReceivedViaAddress(this.payeeAddress) !== -1
+            return !!this.addresses[this.znode.payeeAddress];
+        },
+
+        nextEstimatedPayout () {
+            const t = this.znode.lastPaidTime || this.znode.activeSince || Date.now();
+            return (t + this.paymentPeriod - Date.now()) / 1000 / 24 / 60 / 60;
         }
     },
 
     methods: {
-        openBlockExplorer (event) {
-            event.preventDefault()
+        convertToCoin,
 
-            if (!this.payeeAddress) {
-                return
-            }
-
-            shell.openExternal(this.getExplorerAddressUrl(this.payeeAddress))
+        openBlockExplorer () {
+            shell.openExternal(this.getExplorerAddressUrl(this.znode.payeeAddress))
         }
     }
 }
@@ -214,7 +182,6 @@ export default {
     .znode {
         background: $color--polo-light;
         @include box-shadow-large();
-        //@include glow-huge-box();
         @include glow-small-box();
         padding: emRhythm(5) emRhythm(4);
         display: flex;
@@ -264,19 +231,6 @@ export default {
             .last-payout { grid-area: last-payout; }
             .received { grid-area: received; }
             .payee, .does-not-belong { grid-area: payee; }
-
-            /*
-            .does-not-belong {
-                @include bleed(1);
-                //@include font-medium();
-                color: $color--comet-dark;
-                font-style: italic;
-                margin-top: emRhythm(1);
-                background: $color--polo-medium;
-                background: #fff;
-                @include
-            }
-            */
         }
 
         footer {

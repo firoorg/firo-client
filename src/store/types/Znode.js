@@ -1,7 +1,0 @@
-export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
-export const ON_ZNODE_SUBSCRIPTION = 'ON_ZNODE_SUBSCRIPTION'
-
-export const ADD_ZNODES = 'ADD_ZNODES'
-
-export const ADD_ZNODE = 'ADD_ZNODE'
-export const SET_TOTAL = 'SET_TOTAL'

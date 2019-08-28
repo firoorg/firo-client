@@ -11,44 +11,29 @@
 </template>
 
 <script>
-/* eslint-disable vue/no-unused-components */
 import AnimatedTable from '@/components/AnimatedTable/AnimatedTable'
 import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate'
+import ZnodeActiveSince from '@/components/AnimatedTable/AnimatedTableZnodeActiveSince'
+import ZnodeLastSeen from '@/components/AnimatedTable/AnimatedTableZnodeLastSeen'
 import Rank from '@/components/AnimatedTable/AnimatedTableZnodeRank'
 import Status from '@/components/AnimatedTable/AnimatedTableZnodeStatus'
 
 const tableFields = [
-    /*
-        {
-            name: PaymentRequestTableStatus,
-            isFulfilledKey: 'isConfirmed',
-            sortField: 'isConfirmed',
-            width: '2rem'
-        },
-        {
-            name: Amount,
-            title: 'send.table__outgoing-payments.label__amount',
-            sortField: 'amount',
-            width: '25%'
-        },
-        */
     {
         name: Rank,
         title: 'znodes.overview.table__znodes.label__rank',
-        sortField: 'sortRank',
+        sortField: 'rank',
         width: '10%'
     },
     {
-        name: RelativeDate,
+        name: ZnodeActiveSince,
         title: 'znodes.overview.table__znodes.label__active-since',
-        dateField: 'activeSince',
         sortField: 'activeSince',
         width: '22.5%'
     },
     {
-        name: RelativeDate,
+        name: ZnodeLastSeen,
         title: 'znodes.overview.table__znodes.label__last-seen',
-        dateField: 'lastSeen',
         sortField: 'lastSeen',
         width: '22.5%'
     },
@@ -61,7 +46,7 @@ const tableFields = [
     {
         name: 'authority',
         title: 'znodes.overview.table__znodes.label__authority',
-        sortField: 'label',
+        sortField: 'authority.ip',
         formatter ({ ip, port }) {
             return `${ip}<span class="port">:${port}</span>`
         },
@@ -79,8 +64,7 @@ export default {
 
     props: {
         remoteZnodes: {
-            type: Array,
-            default: () => []
+            type: Array
         }
     },
 
@@ -94,7 +78,7 @@ export default {
         sortOrder () {
             return [
                 {
-                    sortField: 'sortRank',
+                    sortField: 'rank',
                     direction: 'asc'
                 }
             ]
