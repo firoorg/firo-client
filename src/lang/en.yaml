@@ -392,11 +392,11 @@ onboarding:
 
   location-daemon-restart-loading-blockchain:
     title: Initializing Blockchain
-    description: Adipiscing Tristique Ullamcorper Ornare Consectetur
+    description: Please wait a moment...
 
   location-daemon-restart-loading-wallet:
     title: Setting up Wallet
-    description: Mollis Lorem Mattis Ullamcorper Ipsum
+    description: Please wait a moment...
 
   location-daemon-restart-success:
     title: Location is set up!
