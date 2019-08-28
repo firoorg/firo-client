@@ -142,7 +142,10 @@ export default {
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
-                    label: tx.label || (tx.category === 'spendOut' ? this.spendLabelBugWorkaroundCache[tx.txid] : undefined),
+                    label:
+                        tx.label ||
+                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined) ||
+                        (tx.category === 'spendOut' ? this.spendLabelBugWorkaroundCache[tx.txid] : undefined),
                     extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
                 });
             }
