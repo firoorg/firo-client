@@ -143,7 +143,7 @@ const getters = {
     getAmountReceivedViaAddress: (state) => {
         return (address) => (state.addresses[address] || [])
             .map(uniqId => state.transactions[uniqId])
-            .filter(tx => ['spendIn', 'receive', 'mined'].includes(tx.category))
+            .filter(tx => ['spendIn', 'receive', 'mined', 'znode'].includes(tx.category))
             .reduce((a,tx) => a + tx.amount, 0);
     },
 
