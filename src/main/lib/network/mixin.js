@@ -230,23 +230,5 @@ export default {
         } catch (e) {
             logger.warn(e)
         }
-    },
-
-    close () {
-        try {
-            if (this.subscriber && !this.subscriber.closed) {
-                this.subscriber.close()
-            }
-        } catch (e) {
-            logger.warn(e)
-        }
-
-        try {
-            if (this.requester && !this.requester.closed) {
-                this.requester.close()
-            }
-        } catch (e) {
-            logger.warn(e)
-        }
     }
 }
