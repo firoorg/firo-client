@@ -162,13 +162,20 @@
                                 Mint
                             </base-button>
 
-
                             <div
                                 v-else-if="popoverStep === 'waitForReply'"
                                 class="wait-for-reply-icon"
                             >
                                 ⧗
                             </div>
+
+                            <base-button
+                                v-else-if="popoverStep === 'incorrectPassphrase'"
+                                color="green"
+                                @click.prevent="beginPassphraseStep"
+                            >
+                                Try Again
+                            </base-button>
 
                             <template slot="popover">
                                 <mint-step-confirm
@@ -186,6 +193,10 @@
 
                                 <send-step-wait-for-reply
                                     v-else-if="popoverStep === 'waitForReply'"
+                                />
+
+                                <send-step-incorrect-passphrase
+                                    v-else-if="popoverStep === 'incorrectPassphrase'"
                                 />
 
                                 <send-step-error
@@ -218,6 +229,8 @@ import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
 import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
 import SendStepWaitForReply from '@/components/PaymentSidebars/SendSteps/WaitForReply';
 import SendStepError from '@/components/PaymentSidebars/SendSteps/Error';
+import SendStepIncorrectPassphrase from '@/components/PaymentSidebars/SendSteps/IncorrectPassphrase';
+
 
 export default {
     name: 'AnonymizePage',
@@ -227,6 +240,7 @@ export default {
         SendStepPassphrase,
         SendStepWaitForReply,
         SendStepError,
+        SendStepIncorrectPassphrase,
 
         MintStats,
         OnboardingNotice,
@@ -307,7 +321,7 @@ export default {
         },
 
         beginIncorrectPassphraseStep() {
-            this.popoverStep = 'passphrase';
+            this.popoverStep = 'incorrectPassphrase';
             this.recalculatePopoverPosition();
         },
 
