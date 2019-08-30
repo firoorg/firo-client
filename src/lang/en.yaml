@@ -342,8 +342,8 @@ settings:
   overview:
     title: Settings
   flyout-restart-required:
-    title: Daemon restart required
-    description: Restart of the daemon is required to activate your changes.
+    title: Restart required
+    description: Restart of the client is required to activate your changes.
     button__restart-now: Restart now
   form:
     interface:
@@ -494,7 +494,7 @@ onboarding:
 
 overlay:
   loading:
-    restarting-daemon: Restarting daemon
+    restarting-daemon: Restarting
     loading-blockchain: Loading Blockchain
     loading-wallet: Loading Wallet
     initial: Starting up
@@ -510,12 +510,12 @@ overlay:
     button__cancel--secondary: Cancel
 
   restarting:
-    title: Restarting Daemon
-    description: Restarting daemon to apply your settings update
+    title: Restarting
+    description: Restarting to apply your settings update
 
   error:
     connection-lost:
       title: Connection to the<br>Zcoin Deamon lost
       description: The client has lost its connection to the Zcoin Daemon. Please restart the client.
       button__quit--secondary: Quit Zcoin
-      button__restart-daemon--primary: Restart Daemon
+      button__restart-daemon--primary: Restart
