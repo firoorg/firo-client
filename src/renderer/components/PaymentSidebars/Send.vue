@@ -80,7 +80,7 @@
                                         id="amount"
                                         ref="amount"
                                         v-model="amount"
-                                        v-validate.initial="'amountIsWithinAvailableBalance|' + privateOrPublic + 'AmountIsValid'"
+                                        v-validate.initial="amountValidations"
                                         v-tooltip="getValidationTooltip('amount')"
                                         type="text"
                                         name="amount"
@@ -313,6 +313,12 @@ export default {
             return !!(this.amount && this.address && !this.validationErrors.items.length);
         },
 
+        amountValidations () {
+            return this.privateOrPublic === 'private' ?
+                'amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds'
+                :
+                'amountIsWithinAvailableBalance|publicAmountIsValid'
+        },
 
         getValidationTooltip () {
             return (fieldName) => ({
@@ -362,6 +368,11 @@ export default {
                 return (v % 5e6 === 0) && (v > 0);
             }
         })
+
+        this.$validator.extend('privateAmountIsWithinBounds', {
+            getMessage: () => 'Amount For Private Send May Not Exceed 500 XZC',
+            validate: (value) => Number(value) <= 500
+        });
     },
 
     methods: {
