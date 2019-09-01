@@ -362,12 +362,12 @@ export default {
         });
 
         this.$validator.extend('privateAmountIsValid', {
-            getMessage: () => 'Amount For Private Spend Must Be A Multiple of 0.05',
+            getMessage: () => 'Amount For Private Send Must Be A Multiple of 0.05',
             validate: (value) => {
                 const v = convertToSatoshi(value);
                 return (v % 5e6 === 0) && (v > 0);
             }
-        })
+        });
 
         this.$validator.extend('privateAmountIsWithinBounds', {
             getMessage: () => 'Amount For Private Send May Not Exceed 500 XZC',
