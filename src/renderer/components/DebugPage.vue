@@ -68,7 +68,7 @@ export default {
 
     methods: {
         focusInputUnlessTextIsSelected() {
-            // FIXME: We will fail to fire if the current click undoes the selection.
+            // FIXME: We will fail to fire if the current click is one that removes a selection.
             if (!document.getSelection().toString()) {
                 this.focusInput();
             }
@@ -97,7 +97,7 @@ export default {
             this.$refs.currentInput.contentEditable = true;
             this.$refs.currentInput.innerText = '';
 
-            // Scroll to top. It has to be on $nextTick because we need to wait for sessionLog to update.
+            // Scroll to bottom. It has to be on $nextTick because we need to wait for sessionLog to update.
             this.$nextTick(() => {
                 this.focusInput();
                 this.$refs.debugPage.scrollTop = this.$refs.debugPage.scrollHeight;
