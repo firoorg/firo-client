@@ -227,6 +227,7 @@ export default {
             justify-self: end;
             align-self: end;
             margin-right: emRhythm(3);
+            margin-left: emRhythm(2);
 
             /*
             &.error .connections-badge {

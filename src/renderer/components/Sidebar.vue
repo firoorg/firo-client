@@ -108,7 +108,11 @@ export default {
     aside {
         height: 100vh;
         overflow: hidden;
+
+        // This is required to have the sidebar not compress when long strings are entered into the debug console.
+        min-width: max-content;
     }
+
     .sidebar {
         //background-image: $gradient--comet-dark-horizontal;
         background-image: linear-gradient(to top right, $color--dark, $color--comet-dark-mixed);

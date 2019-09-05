@@ -69,6 +69,11 @@ export default new Router({
                 {
                     path: '/settings',
                     component: require('@/components/SettingsPage').default
+                },
+
+                {
+                    path: '/debugconsole',
+                    component: require('@/components/DebugPage').default
                 }
             ]
         },

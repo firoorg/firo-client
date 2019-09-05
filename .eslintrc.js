@@ -23,7 +23,9 @@ module.exports = {
         'vue/component-name-in-template-casing': 'kebab-case',
         'vue/no-unused-components': 1,
         'vue/html-self-closing': 0,
-// allow debugger during development
+        // The default behaviour is fine in some cases (like an append-only array).
+        'vue/require-v-for-key': 0,
+        // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
     }
 }

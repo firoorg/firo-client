@@ -45,6 +45,13 @@
                     </span>
                 </router-link>
             </li>
+            <li>
+                <router-link to="/debugconsole">
+                    <span class="text">
+                        Debug Console
+                    </span>
+                </router-link>
+            </li>
         </ul>
     </nav>
 </template>

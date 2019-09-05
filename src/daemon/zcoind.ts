@@ -291,6 +291,22 @@ export class Zcoind {
 
     // Actions
 
+    // Invoke a legacy RPC command. result is whatever the JSON result of the command is, and errored is a boolean that
+    // indicates whether or not an error has occurred.
+    //
+    // Note: legacyRpc commands sometimes require auth, but they take it as a special legacyRpc command
+    //       (walletpassphrase) which is called prior to invoking the protected command.
+    async legacyRpc(commandline: string): Promise<{result: object, errored: boolean}> {
+        // Yes, it is correct to infer that zcoind can parse the argument list but cannot parse the command name.
+        const i = commandline.indexOf(' ');
+        const method = (i !== -1) ? commandline.slice(0, i) : commandline;
+        const args = (i !== -1) ? commandline.slice(i+1) : '';
+
+        return await this.send(null, 'create', 'rpc', {
+            method,
+            args
+        });
+    }
 
     // Create a new payment request (to be stored on the daemon-side).
     // Note: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
