@@ -131,7 +131,7 @@ export default {
         convertToCoin,
 
         openExplorer () {
-            shell.openExternal(this.getExplorerTransactionUrl(this.tx.id));
+            shell.openExternal(this.getExplorerTransactionUrl(this.tx.txid));
         }
     }
 }
