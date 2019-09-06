@@ -58,9 +58,8 @@ export default {
         }),
 
         availableZcoin () {
-            const available = convertToCoin(this.availableXzc)
-
-            return available.replace(/\.\d+/, '')
+            // truncate to two decimal places
+            return convertToCoin(this.availableXzc - this.availableXzc % 1e6);
         },
 
         isInProgress () {
@@ -72,13 +71,13 @@ export default {
                 return accumulator + amount
             }, 0)
 
-            return convertToCoin(value).replace(/\.\d+/, '')
+            // truncate to two decimal places
+            return convertToCoin(value - value % 1e6);
         },
 
         alreadyMinted () {
-            const mints = convertToCoin(this.availableZerocoin)
-
-            return mints.replace(/\.\d+/, '')
+            // truncate to two decimal places
+            return convertToCoin(this.availableZerocoin - this.availableZerocoin % 1e6);
         }
     }
 }
