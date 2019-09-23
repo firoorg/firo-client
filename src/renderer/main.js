@@ -92,7 +92,8 @@ sync(store, router, {
 // instances, so we'll put it here. Hopefully this can be moved somewhere more sensible in a subsequent stage of
 // refactoring.
 Vue.prototype.$daemon = zcoind(store);
-
+// Allow users to access this from Chrome Dev Tools.
+window.$daemon = Vue.prototype.$daemon;
 
 // This is so we can pass around global events, which we're basically using just to allow enter to work to submit forms
 // that are spread across a large number of files with mixins.
