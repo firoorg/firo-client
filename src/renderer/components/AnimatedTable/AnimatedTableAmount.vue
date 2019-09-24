@@ -16,7 +16,7 @@
             -{{ amount }}
         </span>
         <span
-            v-else-if="['spendIn', 'receive', 'mined'].includes(category)"
+            v-else-if="['spendIn', 'receive', 'mined', 'znode'].includes(category)"
             class="incoming"
         >
             +{{ amount }}
