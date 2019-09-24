@@ -42,8 +42,20 @@
                     class="input"
                     contenteditable="true"
                     @keydown="onInput"
+                    @keyup="updateSuggestions"
                 >
                 </div>
+            </div>
+
+            <div class="suggestions">
+                <span
+                    v-for="suggestion of suggestions"
+                    :key="suggestion"
+                    class="suggestion"
+                    :class="{selected: suggestions[suggestionTabIndex] === suggestion}"
+                >
+                    {{ suggestion }}
+                </span>
             </div>
         </div>
     </section>
@@ -74,15 +86,69 @@ export default {
             // temporaryBuffer is a temporary input buffer referenced by historyIndex 0. Unlike other items in history,
             // edits made to it will be persistent when navigating away from and back to it, however it will be cleared
             // when a command is sent (even if it is not sent while historyIndex 0 is active.
-            temporaryBuffer: ''
+            temporaryBuffer: '',
+
+            // A list of all available commands. Will be filled in when mounted.
+            availableCommands: [],
+
+            // The list of suggestions relevant to the current input.
+            suggestions: [],
+
+            // Which suggestion is currently active. This is -1 before the user tabs to the next suggestion.
+            suggestionTabIndex: -1
         }
     },
 
     mounted () {
         this.focusInput();
+
+        // Get the list of available commands.
+        this.$daemon.legacyRpcCommands().then(commands => {
+            this.availableCommands = commands;
+            this.availableCommands.push('clear');
+        })
     },
 
     methods: {
+        // Update the suggestions to show the user. This can't be made as a computed property because this.$refs is not
+        // reactive.
+        updateSuggestions (event=null) {
+            console.log('updating suggestions');
+
+            if (event && event.keyCode === 9) {
+                return;
+            }
+
+            this.suggestionTabIndex = -1;
+
+            const input = this.$refs.currentInput && this.$refs.currentInput.innerText;
+            if (input) {
+                this.suggestions = this.availableCommands.filter(cmd => cmd.indexOf(input) === 0);
+            } else {
+                // Don't show completions if the user hasn't typed anything yet.
+                this.suggestions = [];
+            }
+
+            // Make sure suggestions are visible.
+            this.$nextTick(() =>
+                this.scrollToBottom()
+            );
+        },
+
+        // Move the user to the next suggestion.
+        onTab () {
+            if (!this.suggestions) {
+                return;
+            }
+
+            this.suggestionTabIndex = (this.suggestionTabIndex + 1) % this.suggestions.length;
+            this.$refs.currentInput.innerText = this.suggestions[this.suggestionTabIndex];
+
+            this.$nextTick(() =>
+                this.moveCursorToEndOfInput()
+            );
+        },
+
         focusInputUnlessTextIsSelected() {
             // FIXME: We will fail to fire if the current click is one that removes a selection.
             if (!document.getSelection().toString()) {
@@ -92,6 +158,11 @@ export default {
 
         focusInput() {
             this.$refs.currentInput.focus();
+        },
+
+        scrollToBottom() {
+            this.$refs.debugPage.scrollTop = this.$refs.debugPage.scrollHeight;
+            this.$refs.debugPage.scrollLeft = 0;
         },
 
         moveCursorToEndOfInput() {
@@ -104,6 +175,11 @@ export default {
 
         onInput(event) {
             switch (event.keyCode) {
+            case 9:
+                event.preventDefault();
+                this.onTab();
+                break;
+
             case 38:
                 event.preventDefault();
                 this.onUpArrow();
@@ -176,11 +252,9 @@ export default {
             this.$refs.currentInput.innerText = '';
             this.temporaryBuffer = '';
 
-            // Scroll to bottom. It has to be on $nextTick because we need to wait for sessionLog to update.
             this.$nextTick(() => {
                 this.focusInput();
-                this.$refs.debugPage.scrollTop = this.$refs.debugPage.scrollHeight;
-                this.$refs.debugPage.scrollLeft = 0;
+                this.updateSuggestions();
             });
         },
 
@@ -265,6 +339,16 @@ export default {
 
             .input {
                 outline: none;
+            }
+        }
+
+        .suggestions {
+            margin-top: 0.5em;
+
+            .suggestion {
+                &.selected {
+                    font-weight: bold;
+                }
             }
         }
     }

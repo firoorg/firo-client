@@ -308,6 +308,18 @@ export class Zcoind {
         });
     }
 
+    // Returns a list of all available legacy RPC commands.
+    async legacyRpcCommands(): Promise<string[]> {
+        // I don't exactly understand why TypeScript infers the incorrect types for stuff here, given that this.send()
+        // returns a Promise of any, but ...
+        const r = await this.send(null, 'initial', 'rpc', {});
+        const categories = Object.values(r.categories);
+        const helpEntries = <string[]>categories.reduce((a: string[], x: string[]) => a.concat(x), []);
+        const commands = helpEntries.map(x => x.split(' ')[0]);
+
+        return commands;
+    }
+
     // Create a new payment request (to be stored on the daemon-side).
     // Note: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
     // responsible for any updating of state that might be required.
