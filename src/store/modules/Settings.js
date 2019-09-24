@@ -271,7 +271,8 @@ const getters = {
     },
     showIsOutOfPercentageToHoldInZerocoinNotification (state, getters, rootState, rootGetters) {
         return getters.isOutOfPercentageToHoldInZerocoin &&
-            rootGetters['Balance/xzcZerocoinRatio'] !== state.xzcZerocoinRatioNotified
+            rootGetters['Balance/xzcZerocoinRatio'] !== state.xzcZerocoinRatioNotified &&
+            rootGetters['Blockchain/isBlockchainSynced']
     },
     remainingXzcToFulFillPercentageToHoldInZerocoin (state, getters, rootState, rootGetters) {
         return Math.floor((rootGetters['Balance/availableXzc'] * (state.percentageToHoldInZerocoin - rootGetters['Balance/confirmedXzcZerocoinRatio'])) / 100000000)
