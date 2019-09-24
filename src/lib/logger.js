@@ -20,7 +20,9 @@ const logger = winston.createLogger({
         }),
         new winston.transports.File({
             filename: join(getApp().getPath('userData'), 'combined.log'),
-            handleExceptions: true
+            handleExceptions: true,
+            // Only keep logs of the latest session.
+            options: {flags: 'w'}
         })
     ]
 })
