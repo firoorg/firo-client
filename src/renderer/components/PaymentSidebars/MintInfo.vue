@@ -8,15 +8,31 @@
             <div class="amount">
                 {{ convertToCoin(amount) }} XZC
             </div>
-        </div>
 
-        <div class="privacy-message">
-            Minting allows you to privately spend your funds at a later date.
+            <div class="transactions">
+                <label>Transaction IDs:</label>
+
+                <div
+                    v-for="txid of txids"
+                    class="transaction"
+                >
+                    <div class="txid">
+                        {{ txid }}
+                    </div>
+
+                    <div class="block-explorer">
+                        <a @click.prevent="() => openExplorer(txid)" href="#">
+                            View Transaction in Block Explorer
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </template>
 
 <script>
+import { shell } from 'electron';
 import { mapGetters } from 'vuex';
 import { convertToCoin } from "#/lib/convert";
 
@@ -25,11 +41,16 @@ export default {
 
     computed: {
         ...mapGetters({
-            consolidatedMints: 'Transactions/consolidatedMints'
+            consolidatedMints: 'Transactions/consolidatedMints',
+            getExplorerTransactionUrl: 'Settings/getExplorerTransactionUrl',
         }),
 
         blockHeight () {
             return this.$route.params.blockHeight || throw 'unspecified blockHeight';
+        },
+
+        txids () {
+            return this.consolidatedMints[this.blockHeight].mints.map(x => x.txid);
         },
 
         amount () {
@@ -38,7 +59,11 @@ export default {
     },
 
     methods: {
-        convertToCoin
+        convertToCoin,
+
+        openExplorer (txid) {
+            shell.openExternal(this.getExplorerTransactionUrl(txid));
+        }
     }
 }
 </script>
@@ -68,11 +93,20 @@ export default {
             font-size: 1.5em;
             text-align: right;
         }
-    }
 
-    .privacy-message {
-        text-align: center;
-        font-style: italic;
+        .txid {
+            padding-top: 0.5em;
+
+            font-size: 0.5em;
+            font-family: monospace;
+            font-style: italic;
+        }
+
+        .block-explorer {
+            font-size: 0.5em;
+            font-style: italic;
+            text-underline: none;
+        }
     }
 }
 </style>
