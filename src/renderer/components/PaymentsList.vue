@@ -85,16 +85,11 @@ export default {
             transactions: 'Transactions/transactions',
             addresses: 'Transactions/addresses',
             consolidatedMints: 'Transactions/consolidatedMints',
-            paymentRequests: 'PaymentRequest/paymentRequests',
-            spendLabelBugWorkaroundCache: 'Transactions/spendLabelBugWorkaroundCache'
+            paymentRequests: 'PaymentRequest/paymentRequests'
         }),
 
         tableData () {
             const tableData = [];
-
-            if (this.spendLabelBugWorkaroundCache[1] === 'unreachable') {
-                throw 'unreachable';
-            }
 
             for (const [id, tx] of Object.entries(this.transactions)) {
                 // Mints are handled separately.
@@ -144,8 +139,7 @@ export default {
                     address: tx.address,
                     label:
                         tx.label ||
-                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined) ||
-                        (tx.category === 'spendOut' ? this.spendLabelBugWorkaroundCache[tx.txid] : undefined),
+                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
                     extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
                 });
             }

@@ -73,8 +73,7 @@ export default {
         ...mapGetters({
             transactions: 'Transactions/transactions',
             currentBlockHeight: 'Blockchain/currentBlockHeight',
-            getExplorerTransactionUrl: 'Settings/getExplorerTransactionUrl',
-            spendLabelBugWorkaroundCache: 'Transactions/spendLabelBugWorkaroundCache'
+            getExplorerTransactionUrl: 'Settings/getExplorerTransactionUrl'
         }),
 
         uniqId () {
@@ -92,10 +91,6 @@ export default {
         title () {
             if (this.tx.label) {
                 return this.tx.label;
-            }
-
-            if (this.tx.category === 'spendOut' && this.spendLabelBugWorkaroundCache[this.tx.txid]) {
-                return this.spendLabelBugWorkaroundCache[this.tx.txid];
             }
 
             switch (this.tx.category) {
