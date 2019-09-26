@@ -407,4 +407,16 @@ export class Zcoind {
     async backup(backupDirectory: string): Promise<void> {
         await this.send(null, 'create', 'backup', {directory: backupDirectory});
     }
+
+    // Rebroadcast a transaction. If the rebroadcast fails, we reject() the promise with the cause.
+    async rebroadcast(txid: string): Promise<void> {
+        const r = await this.send(null, 'create', 'rebroadcast', {
+            txHash: txid
+        });
+
+        // The call failed.
+        if (!r.result) {
+            throw r.error;
+        }
+    }
 }

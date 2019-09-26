@@ -10,6 +10,7 @@
         class="vuetable-td-component-transaction-status"
         :title="`${confirmations} confirmations`"
         :class="{'is-confirmed': confirmations >= 1}"
+        @contextmenu="contextMenu"
     >
         <span
             v-if="['spendIn', 'receive', 'mined', 'znode'].includes(category)"
@@ -48,6 +49,17 @@
 import { mapGetters } from 'vuex';
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
 
+const remote = require('electron').remote;
+const {Menu, MenuItem} = remote;
+
+const menu = new Menu();
+const menuItem = new MenuItem({
+    label: 'Inspect Element',
+    click: () => {
+        remote.getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y)
+    }
+});
+
 export default {
     name: 'TransactionStatus',
 
@@ -67,12 +79,38 @@ export default {
         confirmations () {
             return (this.rowData.blockHeight || 0) && (1 + this.currentBlockHeight - this.rowData.blockHeight);
         }
+    },
+
+    methods: {
+        contextMenu () {
+            // Only show the menu for outgoing transactions not yet included in a block;
+            if (this.rowData.blockHeight || !['send', 'spendOut'].includes(this.rowData.category)) {
+                return;
+            }
+
+            const menu = new Menu();
+            menu.append(new MenuItem({
+                label: 'Rebroadcast Transaction',
+                click: async () => {
+                    try {
+                        await this.$daemon.rebroadcast(this.rowData.txid);
+                        alert('Rebroadcast tx ' + this.rowData.txid);
+                    } catch (e) {
+                        alert('Error rebroadcasting tx ' + this.rowData.txid + ': ' + e);
+                    }
+                }
+            }));
+
+            menu.popup({ window: remote.getCurrentWindow() });
+        }
     }
 }
 </script>
 
 <style lang="scss">
     .vuetable-td-component-transaction-status {
+        user-select: none;
+
         &.is-confirmed {
             color: green;
         }

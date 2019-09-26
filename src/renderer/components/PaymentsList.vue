@@ -132,6 +132,7 @@ export default {
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction-info/${id}`,
+                    txid: tx.txid,
                     category: tx.category,
                     blockHeight: tx.blockHeight,
                     date: tx.blockTime * 1000 || Infinity,
