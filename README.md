@@ -63,9 +63,9 @@ npm run dev
 
 ### Debug Levels
 
-By default, zcoin-client will log to console at level `info`. You can change this with the `ZCOIN_CLIENT_DEBUG_LEVEL`
-environment variable. zcoin-client will additionally log all messages and exceptions to `userData/combined.log` in the
-application data directory.
+By default, zcoin-client will log to `userData/combined.log` in the application data directory at level info. This may
+be changed with the environment variable `ZCOIN_CLIENT_DEBUG_LEVEL`. Logs from old runs will be cleared every time the
+client is started anew.
 
 ## Getting Assistance
 

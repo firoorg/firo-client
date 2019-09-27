@@ -15,12 +15,13 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.Console({
-            level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'info',
+            level: 'debug',
             handleExceptions: true
         }),
         new winston.transports.File({
             filename: join(getApp().getPath('userData'), 'combined.log'),
             handleExceptions: true,
+	    level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'info',
             // Only keep logs of the latest session.
             options: {flags: 'w'}
         })
