@@ -9,7 +9,6 @@ export async function initialize(store: any, zcoind: Zcoind) {
     while (true) {
         try {
             const data = await zcoind.send(null, 'initial', 'znodeList', null);
-            logger.info("Got initial znodeList data");
 
             if (Object.keys(data.nodes).length) {
                 store.dispatch('Znode/setStateWithZnodeList', data.nodes);

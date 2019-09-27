@@ -42,6 +42,7 @@ const state = {
 
 const mutations = {
     setStateWithZnodeList(state, znodeList: ZnodeList) {
+        logger.debug(`Setting state with znodeList: ${Object.keys(znodeList).length} nodes`);
         state.znodes = znodeList;
     },
 
