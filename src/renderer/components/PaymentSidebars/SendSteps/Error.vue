@@ -24,4 +24,9 @@ export default {
 </script>
 
 <style scoped>
+.content-wrapper {
+    word-break: break-word;
+    /* This could possibly overflow, but other elements have greater fixed-length anyway. */
+    max-width: 40em;
+}
 </style>

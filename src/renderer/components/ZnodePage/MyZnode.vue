@@ -92,27 +92,97 @@
             </template>
         </div>
 
-        <footer v-if="!isMissing">
-            <template v-if="belongsToWallet">
+        <div
+            v-if="!isMissing"
+            ref="znodeActions"
+            class="znode-actions"
+        >
+            <v-popover
+                v-if="znode.status !== 'ENABLED'"
+                :open="startZnodeStep !== 'initial'"
+                placement="top-start"
+                class="popover-and-button"
+                popover-class="tooltip popover multi-step-popover"
+                trigger="manually"
+                :auto-hide="false"
+                :handle-resize="true"
+            >
                 <base-button
-                    size="small"
-                    :is-outline="!isEnabled"
-                    :color="isEnabled ? 'comet' : ''"
-                    @click.prevent="openBlockExplorer"
-                >
-                    {{ $t('znodes.my-znode.button__open-explorer') }}
-                </base-button>
-            </template>
-            <template v-else>
-                <base-button
+                    v-if="startZnodeStep === 'initial'"
                     size="small"
                     color="comet"
-                    @click.prevent="openBlockExplorer"
+                    @click.prevent="beginPassphraseStep"
                 >
-                    {{ $t('znodes.my-znode.button__open-explorer') }}
+                    Start Znode
                 </base-button>
-            </template>
-        </footer>
+
+                <base-button
+                    v-if="startZnodeStep === 'passphrase'"
+                    size="small"
+                    color="green"
+                    @click.prevent="tryStartZnode"
+                >
+                    Start Znode
+                </base-button>
+
+                <base-button
+                    v-if="startZnodeStep === 'incorrectPassphrase'"
+                    size="small"
+                    color="green"
+                    @click.prevent="beginPassphraseStep"
+                >
+                    Try Again
+                </base-button>
+
+                <base-button
+                    v-if="startZnodeStep === 'error'"
+                    size="small"
+                    color="comet"
+                    @click.prevent="closeStartZnodePopover"
+                >
+                    Ok
+                </base-button>
+
+                <base-button
+                    v-if="startZnodeStep === 'success'"
+                    size="small"
+                    color="green"
+                    @click.prevent="closeStartZnodePopover"
+                >
+                    Ok
+                </base-button>
+
+                <template slot="popover">
+                    <div ref="popoverInterior">
+                        <passphrase
+                            v-if="['passphrase', 'incorrectPassphrase'].includes(startZnodeStep)"
+                            v-model="passphrase"
+                            :from-incorrect="startZnodeStep === 'incorrectPassphrase'"
+                            @onEnter="tryStartZnode"
+                        />
+
+                        <error
+                            v-if="startZnodeStep === 'error'"
+                            :error-message="errorMessage"
+                        />
+
+                        <complete
+                            v-if="startZnodeStep === 'success'"
+                            message="Znode start message sent successfully!"
+                        />
+                    </div>
+                </template>
+            </v-popover>
+
+            <base-button
+                size="small"
+                :is-outline="!isEnabled"
+                :color="isEnabled ? 'comet' : ''"
+                @click.prevent="openBlockExplorer"
+            >
+                {{ $t('znodes.my-znode.button__open-explorer') }}
+            </base-button>
+        </div>
     </div>
 </template>
 
@@ -123,12 +193,21 @@ import { convertToCoin } from '#/lib/convert'
 import Notice from '@/components/Notification/Notice'
 import ZnodeStatus from '@/components/ZnodePage/ZnodeStatus'
 
+import Passphrase from "@/components/PaymentSidebars/SendSteps/Passphrase";
+import Error from "@/components/PaymentSidebars/SendSteps/Error";
+import Complete from "@/components/PaymentSidebars/SendSteps/Complete";
+
+
+
 export default {
     name: 'MyZnode',
 
     components: {
         ZnodeStatus,
-        Notice
+        Notice,
+        Passphrase,
+        Error,
+        Complete
     },
 
     props: {
@@ -168,8 +247,93 @@ export default {
         }
     },
 
+    data () {
+        return {
+            startZnodeStep: 'initial',
+            passphrase: '',
+            errorMessage: '',
+            outsideClickListener: null
+        }
+    },
+
     methods: {
         convertToCoin,
+
+        // We should be called when the passphrase step begins, to allow the user to close the dialog.
+        // removeOutsideClickListener() MUST be called when the passphrase step is over.
+        addOutsideClickListener() {
+            this.outsideClickListener = (event) => {
+                let isContainedWithin = false;
+                for (const ref of ['znodeActions', 'popoverInterior']) {
+                    if (this.$refs[ref] && this.$refs[ref].contains(event.target)) {
+                        isContainedWithin = true;
+                        break;
+                    }
+                }
+
+                if (!isContainedWithin) {
+                    this.onOutsideClick();
+                }
+            };
+
+            document.addEventListener('click', this.outsideClickListener);
+        },
+
+        removeOutsideClickListener() {
+            document.removeEventListener('click', this.outsideClickListener);
+            this.outsideClickListener = null;
+        },
+
+        // Click outside the passphrase dialog to close it.
+        onOutsideClick() {
+            if (['passphrase', 'incorrectPassphrase'].includes(this.startZnodeStep)) {
+                this.startZnodeStep = 'initial';
+                this.removeOutsideClickListener();
+            }
+        },
+
+        beginPassphraseStep() {
+            this.passphrase = '';
+            this.startZnodeStep = 'passphrase';
+            this.addOutsideClickListener();
+        },
+
+        beginIncorrectPassphraseStep() {
+            this.passphrase = '';
+            this.startZnodeStep = 'incorrectPassphrase';
+        },
+
+        // Attempt to start the Znode.
+        async tryStartZnode() {
+            try {
+                await this.$daemon.startZnode(this.passphrase, this.znode.label);
+            } catch (e) {
+                if (e.name === 'ZcoindErrorResponse') {
+                    this.removeOutsideClickListener();
+                    this.beginErrorStep(e.message);
+                    return;
+                } else if ((e.error && e.error.code === -14)) {
+                    // Going to the incorrect passphrase step, we do NOT want to removeOutsideClickListener().
+                    this.beginIncorrectPassphraseStep();
+                    return;
+                } else {
+                    this.removeOutsideClickListener();
+                    throw e;
+                }
+            }
+
+            this.removeOutsideClickListener();
+            this.startZnodeStep = 'success';
+        },
+
+        beginErrorStep(message) {
+            this.errorMessage = message;
+            this.startZnodeStep = 'error';
+        },
+
+        closeStartZnodePopover() {
+            this.startZnodeStep = 'initial';
+        },
 
         openBlockExplorer () {
             shell.openExternal(this.getExplorerAddressUrl(this.znode.payeeAddress))
@@ -233,9 +397,18 @@ export default {
             .payee, .does-not-belong { grid-area: payee; }
         }
 
-        footer {
+        .znode-actions {
             margin-top: emRhythm(5);
             text-align: right;
+        }
+
+        .popover-and-button {
+            display: inline-block;
+
+            .popover {
+                max-width: 30%;
+                overflow-wrap: break-word;
+            }
         }
     }
 </style>

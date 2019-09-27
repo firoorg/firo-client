@@ -434,4 +434,22 @@ export class Zcoind {
             throw r.error;
         }
     }
+
+    // Start a Znode by alias. If the call fails, we reject() with the cause.
+    async startZnode(auth: string, znodeAlias: string): Promise<void> {
+        const r = await this.send(auth, 'update', 'znodeControl', {
+            method: 'start-alias',
+            alias: znodeAlias
+        });
+
+        if (!r.overall || r.overall.total !== 1 || !r.detail || !r.detail.status
+            || (!r.detail.status.success && !r.detail.status.info)) {
+            throw new UnexpectedZcoindResponse('update/znodeControl', r);
+        }
+
+        // If the call failed, r.detail[0].info will be the error message; otherwise, it will be blank.
+        if (!r.detail.status.success) {
+            throw new ZcoindErrorResponse('update/znodeControl', r.detail.status.info);
+        }
+    }
 }
