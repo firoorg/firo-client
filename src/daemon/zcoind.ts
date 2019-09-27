@@ -8,6 +8,21 @@ import { createLogger } from '../lib/logger';
 
 const logger = createLogger('zcoin:daemon');
 
+class ZcoindErrorResponse extends Error {
+    constructor(call, error) {
+        super(`${call} call failed due to ${JSON.stringify(error)}`);
+        this.name = 'ZcoindErrorResponse';
+        this.message = error;
+    }
+}
+
+class UnexpectedZcoindResponse extends Error {
+    constructor(call: string, response: any) {
+        super(`unexpected response to ${call} ${JSON.stringify(response)}`);
+        this.name = 'UnexpectedZcoindResponse';
+    }
+}
+
 interface ApiStatus {
     data: {
         myZnode: any, // TODO: What are allowed values here?
