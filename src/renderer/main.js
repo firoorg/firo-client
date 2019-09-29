@@ -95,6 +95,9 @@ Vue.prototype.$daemon = zcoind(store);
 // Allow users to access this from Chrome Dev Tools.
 window.$daemon = Vue.prototype.$daemon;
 
+// Allow users to access the store from Chrome Dev Tools.
+window.$store = store;
+
 // This is so we can pass around global events, which we're basically using just to allow enter to work to submit forms
 // that are spread across a large number of files with mixins.
 // TODO: Figure out how to get rid of this.
