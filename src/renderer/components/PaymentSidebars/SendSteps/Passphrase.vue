@@ -6,6 +6,13 @@
                     Enter Your Passphrase
                 </label>
             </h2>
+
+            <div
+                v-if="fromIncorrect"
+                class="from-incorrect"
+            >
+                Please try again.
+            </div>
         </header>
 
         <div class="control">
@@ -30,6 +37,11 @@ export default {
         value: {
             type: String,
             required: true
+        },
+
+        fromIncorrect: {
+            type: Boolean,
+            default: false
         }
     }
 }
@@ -44,6 +56,11 @@ export default {
         bottom: 2em;
         left: 3em;
         right: 3em;
+    }
+
+    .from-incorrect {
+        font-size: 0.9em;
+        font-style: italic;
     }
 
     input {
