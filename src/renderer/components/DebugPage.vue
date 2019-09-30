@@ -231,7 +231,11 @@ export default {
         },
 
         async onEnter() {
-            const input = this.$refs.currentInput.innerText;
+            let input = this.$refs.currentInput.innerText;
+
+            // For some reason I'm not exactly sure of, spaces in the input are sometimes non-breaking (\xa0) instead of
+            // breaking (\x20).
+            input = input.replace(/\x160/g, ' ');
 
             // Prevent the user from making changes to the command or hitting enter again while we're loading the result
             // of a command.
