@@ -68,7 +68,9 @@ const state = {
 };
 
 const mutations = {
-    setWalletState(state, initialStateWallet: StateWallet) {
+    // isReindexing is state.getters['ApiStatus/isReindexing']. The caller must be responsible for it due to inherent
+    // limitations in VueX.
+    setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
 
         for (const address of Object.keys(initialStateWallet.addresses)) {
@@ -76,6 +78,14 @@ const mutations = {
 
             for (const transactions of Object.values(addressData.txids)) {
                 for (const tx of Object.values(transactions)) {
+                    // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
+                    // transactions should occur only during reindex, and they'll later be sent out with Transaction
+                    // events when block data is associated with them again.
+                    if (isReindexing && !tx.blockHeight) {
+                        logger.warn(`Ignoring transaction ${tx} with no block data received during sync.`);
+                        continue;
+                    }
+
                     if (address === 'MINT' && tx.category === 'receive') {
                         // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
                         // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
@@ -122,18 +132,22 @@ const mutations = {
 
 const actions = {
     // We're called by stateWallet (in initialize).
-    setWalletState({commit}, initialStateWallet: StateWallet) {
-        commit('setWalletState', initialStateWallet);
+    setWalletState({commit, rootGetters}, initialStateWallet: StateWallet) {
+        logger.info('setWalletState');
+        const isReindexing = rootGetters['ApiStatus/isReindexing'];
+        commit('setWalletState', {isReindexing, initialStateWallet});
     },
 
-    handleTransactionEvent({commit}, transactionEvent: TransactionEvent) {
+    handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
         logger.info('handleTransactionEvent');
-        commit('setWalletState', {addresses: transactionEvent});
+        const isReindexing = rootGetters['ApiStatus/isReindexing'];
+        commit('setWalletState', {isReindexing, initialStateWallet: {addresses: transactionEvent}});
     },
 
-    handleAddressEvent({commit}, addressEvent: AddressEvent) {
+    handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
         logger.info('handleAddressEvent');
-        commit('setWalletState', addressEvent)
+        const isReindexing = rootGetters['ApiStatus/isReindexing'];
+        commit('setWalletState', {isReindexing, initialStateWallet: addressEvent})
     }
 };
 

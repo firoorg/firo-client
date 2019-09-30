@@ -11,7 +11,7 @@ const mutations = {
 
 const getters = {
     apiStatus: (state) => state.apiStatus,
-    isSynced: (state): boolean => !!(state.apiStatus && state.apiStatus.data && state.apiStatus.data.synced)
+    isReindexing: (state): boolean => state.apiStatus.data.reindexing
 };
 
 export default {

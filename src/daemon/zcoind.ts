@@ -37,6 +37,7 @@ interface ApiStatus {
         devAuth: boolean;
         synced: boolean;
         pid: number;
+        reindexing: boolean;
         modules: {
             [moduleName: string]: boolean;
         }
