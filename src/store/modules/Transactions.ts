@@ -76,23 +76,6 @@ const mutations = {
 
             for (const transactions of Object.values(addressData.txids)) {
                 for (const tx of Object.values(transactions)) {
-                    if (tx.category === 'orphan') {
-                        // Orphan category transactions are only sent for mined transactions, when they leave the main
-                        // chain.
-                        let uniqId = `${tx.txid}-${tx.txIndex}-mined`;
-
-                        // Delete previous records associated with the transaction.
-                        if (state.transactions[uniqId]) {
-                            logger.info(`Got orphan ${tx.txid}-${tx.txIndex}, deleting associated records.`);
-                            delete state.transactions[uniqId];
-                            state.addresses[tx.address] = state.addresses[tx.address].filter(id => id !== uniqId);
-                        } else {
-                            logger.warn(`Got orphan ${tx.txid}-${tx.txIndex}, but no previous records were associated with it.`)
-                        }
-
-                        continue;
-                    }
-
                     if (address === 'MINT' && tx.category === 'receive') {
                         // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
                         // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
@@ -101,6 +84,19 @@ const mutations = {
                     }
 
                     tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
+
+                    // mined and znode transactions without a blockHeight are orphans.
+                    if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
+                        // Delete previous records associated with the transaction.
+                        if (state.transactions[tx.uniqId]) {
+                            logger.info(`Got orphan ${tx.uniqId}, deleting associated records.`);
+                            delete state.transactions[tx.uniqId];
+                            state.addresses[tx.address] = state.addresses[tx.address].filter(id => id !== tx.uniqId);
+                        }
+
+                        // We don't want to display orphan transactions in the UI.
+                        continue;
+                    }
 
                     state.transactions[tx.uniqId] = tx;
 
