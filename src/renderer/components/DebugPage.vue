@@ -137,7 +137,7 @@ export default {
 
         // Move the user to the next suggestion.
         onTab () {
-            if (!this.suggestions) {
+            if (!this.suggestions.length) {
                 return;
             }
 
