@@ -1,14 +1,21 @@
 <template>
     <div class="content-wrapper">
         <div>
-            Your transaction was successful!
+            {{ message }}
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "SendStepComplete"
+    name: "SendStepComplete",
+
+    props: {
+        message: {
+            type: String,
+            default: "Your transaction was successful!"
+        }
+    }
 }
 </script>
 
