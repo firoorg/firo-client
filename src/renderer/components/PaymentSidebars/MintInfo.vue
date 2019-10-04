@@ -5,6 +5,10 @@
         </div>
 
         <div class="details">
+            <div class="confirmations">
+                {{ confirmations }} confirmation{{ confirmations === 1 ? '' : 's' }}
+            </div>
+
             <div class="amount">
                 {{ convertToCoin(amount) }} XZC
             </div>
@@ -43,7 +47,12 @@ export default {
         ...mapGetters({
             consolidatedMints: 'Transactions/consolidatedMints',
             getExplorerTransactionUrl: 'Settings/getExplorerTransactionUrl',
+            currentBlockHeight: 'Blockchain/currentBlockHeight'
         }),
+
+        confirmations () {
+            return this.blockHeight ? this.currentBlockHeight - this.blockHeight + 1 : 0;
+        },
 
         blockHeight () {
             return this.$route.params.blockHeight || throw 'unspecified blockHeight';
@@ -88,6 +97,11 @@ export default {
 
     .details {
         @include detail-header();
+
+        .confirmations {
+            font-size: 0.7em;
+            font-style: italic;
+        }
 
         .amount {
             font-size: 1.5em;
