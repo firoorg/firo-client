@@ -61,7 +61,7 @@
 
                 <section class="my-znodes">
                     <my-znode
-                        v-for="(znode, index) in myZnodes"
+                        v-for="(znode, index) in sortedMyZnodes"
                         :key="index"
                         :znode="znode"
                     />
@@ -92,6 +92,10 @@ export default {
             znodeCount: 'Znode/znodeCount',
             paymentPeriod: 'Znode/paymentPeriod'
         }),
+
+        sortedMyZnodes () {
+            return [...this.myZnodes].sort((x, y) => x.position - y.position);
+        },
 
         enabledMyZnodes () {
             return this.myZnodes.filter(znode => znode.status === 'ENABLED')
