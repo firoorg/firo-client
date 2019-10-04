@@ -10,16 +10,6 @@
                         <h1>{{ $t('znodes.overview.title') }}</h1>
                         <p>{{ $t('znodes.overview.description') }}</p>
                     </header>
-
-                    <div class="search-form">
-                        <base-filter-input
-                            v-model="searchQuery"
-                            type="text"
-                            class="table-filter-input"
-                            theme="dark"
-                            :placeholder="$t('znodes.overview.table__znodes.placeholder__filter')"
-                        />
-                    </div>
                 </section>
 
                 <section class="stats">
@@ -71,14 +61,10 @@
 
                 <section class="my-znodes">
                     <my-znode
-                        v-for="(znode, index) in filteredMyZnodes"
+                        v-for="(znode, index) in myZnodes"
                         :key="index"
                         :znode="znode"
                     />
-                </section>
-
-                <section class="remote-znodes">
-                    <remote-znodes-list :remote-znodes="filteredRemoteZnodes" />
                 </section>
             </div>
         </div>
@@ -89,7 +75,6 @@
 import { mapGetters } from 'vuex'
 
 import MyZnode from '@/components/ZnodePage/MyZnode'
-import RemoteZnodesList from '@/components/ZnodePage/RemoteZnodesList'
 import LoadingBounce from "./Icons/LoadingBounce";
 
 export default {
@@ -97,47 +82,19 @@ export default {
 
     components: {
         LoadingBounce,
-        RemoteZnodesList,
         MyZnode
-    },
-
-    data () {
-        return {
-            searchQuery: ''
-        }
     },
 
     computed: {
         ...mapGetters({
             isWinnersListSynced: 'Blockchain/isWinnersListSynced',
             myZnodes: 'Znode/myZnodes',
-            remoteZnodes: 'Znode/remoteZnodes',
             znodeCount: 'Znode/znodeCount',
             paymentPeriod: 'Znode/paymentPeriod'
         }),
 
         enabledMyZnodes () {
             return this.myZnodes.filter(znode => znode.status === 'ENABLED')
-        },
-
-        filteredMyZnodes () {
-            return this.myZnodes.filter(znode => {
-                for (const data of [znode.status, znode.payeeAddress, znode.authority.ip, znode.outpoint.txid, znode.label]) {
-                    if (data && data.indexOf(this.searchQuery) !== -1) {
-                        return true;
-                    }
-                }
-            });
-        },
-
-        filteredRemoteZnodes () {
-            return this.remoteZnodes.filter(znode => {
-                for (const data of [znode.status, znode.payeeAddress, znode.authority.ip, znode.outpoint.txid]) {
-                    if (data && data.indexOf(this.searchQuery) !== -1) {
-                        return true;
-                    }
-                }
-            });
         },
 
         paymentPeriodInDays () {
