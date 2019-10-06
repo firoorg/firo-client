@@ -119,5 +119,17 @@ export default {
         }
 
         dispatch(types.app.SET_BLOCKCHAIN_LOCATION, location)
+    },
+
+    close () {
+        this.currentStatus = null
+
+        try {
+            if (this.subscriber && !this.subscriber.closed) {
+                this.subscriber.close()
+            }
+        }
+        catch (e) {
+        }
     }
 }

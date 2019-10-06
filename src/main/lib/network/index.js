@@ -203,6 +203,19 @@ export default {
         })
     },
 
+    close () {
+        logger.info('closing network')
+        apiStatus.close()
+
+        if (!modules || !Object.keys(modules).length) {
+            return
+        }
+
+        Object.keys(modules).forEach((module) => {
+            modules[module].close()
+        })
+    },
+
     connectToStore () {
         if (connectedToStore) {
             return
