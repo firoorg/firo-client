@@ -89,7 +89,7 @@ export default {
         ...mapGetters({
             isWinnersListSynced: 'Blockchain/isWinnersListSynced',
             myZnodes: 'Znode/myZnodes',
-            znodeCount: 'Znode/znodeCount',
+            znodeCount: 'ApiStatus/totalZnodeCount',
             paymentPeriod: 'Znode/paymentPeriod'
         }),
 
