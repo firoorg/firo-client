@@ -31,7 +31,10 @@
                     </span>
                 </router-link>
             </li>
-            <li class="has-divider">
+            <li
+                v-if="localZnodeCount > 0"
+                class="has-divider"
+            >
                 <router-link to="/znodelist">
                     <span class="text">
                         {{ $t('navigation.menu.button__znode') }}
@@ -57,6 +60,7 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex";
 import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
 
 export default {
@@ -64,6 +68,12 @@ export default {
 
     components: {
         PercentageToHoldInZerocoinNotification
+    },
+
+    computed: {
+        ...mapGetters({
+            localZnodeCount: 'ApiStatus/localZnodeCount'
+        })
     }
 }
 </script>

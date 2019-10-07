@@ -25,7 +25,6 @@ class UnexpectedZcoindResponse extends Error {
 
 interface ApiStatus {
     data: {
-        myZnode: any, // TODO: What are allowed values here?
         version: number;
         protocolVersion: number;
         walletVersion: number;
@@ -40,7 +39,11 @@ interface ApiStatus {
         reindexing: boolean;
         modules: {
             [moduleName: string]: boolean;
-        }
+        };
+        Znode: {
+            localCount: number;
+            totalCount: number;
+        };
     };
     meta: {
         status: number;
