@@ -11,6 +11,7 @@
             :available-balance-remaining="getAvailableBalanceToMint"
             :increase="() => increaseCoinsToMint(denomination)"
             :decrease="() => decreaseCoinsToMint(denomination)"
+            :existing-value="(existingMints[denomination] || {confirmed: 0}).confirmed"
             :value="coinsToMint[denomination]"
             :disabled="disabled"
         />
@@ -57,6 +58,12 @@ export default {
         coinsToMintChanged: {
             type: Function,
             required: true
+        },
+
+        // {[denomination: string]: {confirmed: number, unconfirmed: number}
+        existingMints: {
+            type: Object,
+            required: true
         }
     },
 
@@ -76,7 +83,9 @@ export default {
 
     computed: {
         maxValueInSelector () {
-            return Object.values(this.coinsToMint).reduce((x,y) => Math.max(x,y));
+            return Object.keys(this.coinsToMint)
+                .map(k => this.coinsToMint[k] + (this.existingMints[k] || {confirmed: 0}).confirmed)
+                .reduce((x,y) => Math.max(x,y));
         },
 
         getAvailableBalanceToMint () {

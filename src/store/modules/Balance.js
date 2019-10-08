@@ -18,7 +18,8 @@ const state = {
     zerocoin: {
         confirmed: 0,
         unconfirmed: 0
-    }
+    },
+    unspentMints: {}
 }
 
 const mutations = {
@@ -51,6 +52,8 @@ const mutations = {
             confirmed: confirmedZerocoin,
             unconfirmed: unconfirmedZerocoin
         }
+
+        state.unspentMints = balance.unspentMints || {};
     }
 }
 
@@ -84,7 +87,8 @@ const getters = {
     lockedXzc: (state) => state.xzc.locked,
     availableZerocoin: (state) => state.zerocoin.confirmed,
     unconfirmedZerocoin: (state) => state.zerocoin.unconfirmed,
-    confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total
+    confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total,
+    unspentMints: (state) => state.unspentMints
 }
 
 export default {

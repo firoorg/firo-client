@@ -5,21 +5,25 @@
     >
         <div
             class="bar"
-            :class="{ 'is-empty': !value }"
+            :class="{ 'is-empty': !existingValue && !value }"
         >
             <div
                 class="value"
                 :class="{ 'has-value': !!value }"
                 :style="{ height: currentHeight }"
             >
-                <transition
-                    name="fade"
-                    duration="250ms"
-                >
-                    <span v-if="value">
-                        {{ value }}
-                    </span>
-                </transition>
+                <span v-if="value">
+                    {{ value }}
+                </span>
+            </div>
+            <div
+                class="existing-value"
+                :class="{'has-existing-value': !!existingValue}"
+                :style="{height: existingHeight}"
+            >
+                <span v-if="existingValue">
+                    {{ existingValue }}
+                </span>
             </div>
             <label>{{ denomination }}</label>
         </div>
@@ -76,6 +80,12 @@ export default {
             required: true
         },
 
+        // The number of mints we have of this denomination currently.
+        existingValue: {
+            type: Number,
+            required: true
+        },
+
         // Called with no arguments when the user requests an increase in the amount of coins of this denomination to mint.
         increase: {
             type: Function,
@@ -113,6 +123,10 @@ export default {
 
         currentHeight() {
             return this.value * this.notchHeight + 'px';
+        },
+
+        existingHeight() {
+            return this.existingValue * this.notchHeight + 'px';
         },
 
         notchHeight() {
@@ -160,8 +174,7 @@ export default {
             border-bottom-color: $color--polo-medium;
         }
 
-        .minted,
-        .value {
+        .minted, .value {
             opacity: 0;
             height: 0;
             overflow: hidden;
@@ -175,8 +188,7 @@ export default {
             }
         }
 
-        .value {
-            background: rgba($color--polo-medium, 0.5);
+        .value, .existing-value {
             border: 1px dashed $color--comet;
             border-bottom: none;
             transition: height 0.25s ease-out, opacity 0.25s ease-out;
@@ -186,10 +198,20 @@ export default {
             }
 
             span {
+                position: absolute;
+                right: emRhythm(1);
                 @include font-regular();
                 font-style: italic;
                 color: $color--polo-dark;
             }
+        }
+
+        .value {
+            background: rgba($color--polo-medium, 0.5);
+        }
+
+        .existing-value {
+            background: $color--polo-medium;
         }
 
         .minted {
