@@ -99,6 +99,20 @@
                                 >
                                     Very slightly less will be sent because of fees.
                                 </div>
+                                <div
+                                    v-else
+                                    class="subtract-fee-from-amount-checkbox"
+                                >
+                                    <input
+                                        v-model="subtractFeeFromAmount"
+                                        type="checkbox"
+                                        name="subtractFeeFromAmount"
+                                    />
+
+                                    <label for="subtractFeeFromAmount">
+                                        Take Transaction Fee From Amount
+                                    </label>
+                                </div>
 
                                 <div class="amount-available">
                                     {{ convertToCoin(availableBalance) }} XZC available for {{ privateOrPublic }} send.
@@ -110,6 +124,41 @@
                                 </div>
                             </div>
                         </fieldset>
+                    </div>
+
+                    <div
+                        v-if="!!transactionFee"
+                        class="totals"
+                    >
+                        <div class="field amount">
+                            <label>
+                                Recipient will receive:
+                            </label>
+
+                            <div class="value">
+                                {{ convertToCoin(amountToReceive) }} XZC
+                            </div>
+                        </div>
+
+                        <div class="field fee">
+                            <label>
+                                Transaction fee:
+                            </label>
+
+                            <div class="value">
+                                {{ convertToCoin(transactionFee) }} XZC
+                            </div>
+                        </div>
+
+                        <div class="field total">
+                            <label>
+                                Total:
+                            </label>
+
+                            <div class="value">
+                                {{ convertToCoin(totalAmount) }} XZC
+                            </div>
+                        </div>
                     </div>
 
                     <div class="buttons">
@@ -136,7 +185,7 @@
                                 v-if="sendPopoverStep === 'initial'"
                                 color="green"
                                 class="expanded"
-                                :disabled="!canBeginSend"
+                                :disabled="!(canBeginSend && transactionFee)"
                                 @click.prevent="beginWaitToConfirmStep"
                             >
                                 Send
@@ -190,8 +239,8 @@
                                     v-if="['waitToConfirm', 'confirm'].includes(sendPopoverStep)"
                                     :label="label"
                                     :address="address"
-                                    :amount="satoshiAmount"
-                                    :fee="0"
+                                    :amount="amountToReceive"
+                                    :fee="transactionFee"
                                 />
 
                                 <send-step-passphrase
@@ -262,6 +311,7 @@ export default {
             label: this.$route.query.label || '',
             amount: this.$route.query.amount || '',
             address: this.$route.query.address || '',
+            subtractFeeFromAmount: true,
             passphrase: '',
 
             errorMessage: '',
@@ -275,7 +325,13 @@ export default {
             // error -> initial
             // incorrectPassphrase -> initial | passphrase
             // complete -> initial
-            sendPopoverStep: 'initial'
+            sendPopoverStep: 'initial',
+
+            // This will be updated in watch() as computed properties can't use async.
+            transactionFee: 0,
+
+            // TODO: Right now we're just hardcoding this. It should be made user configurable.
+            txFeePerKb: 1
         }
     },
 
@@ -312,11 +368,27 @@ export default {
             return this.privateOrPublic === 'private' ? this.availableZerocoin : this.availableXzc;
         },
 
+        // This is the amount the user entered in satoshis.
         satoshiAmount () {
             return convertToSatoshi(this.amount);
         },
 
+        // This is the amount the user will receive. It may be less than satoshiAmount.
+        amountToReceive () {
+            return this.subtractFeeFromAmount ? this.satoshiAmount - this.transactionFee : this.satoshiAmount;
+        },
+
+        // This is the total amount that will be sent, including transaction fee.
+        totalAmount () {
+            return this.subtractFeeFromAmount ? this.satoshiAmount : this.satoshiAmount + this.transactionFee;
+        },
+
+        // We can begin the send if the fee has been shown (if required) and the form is valid.
         canBeginSend () {
+            return this.isValidated && (!this.privateOrPublic === 'private' || this.transactionFee > 0);
+        },
+
+        isValidated () {
             // this.errors was already calculated when amount and address were entered.
             return !!(this.amount && this.address && !this.validationErrors.items.length);
         },
@@ -338,7 +410,7 @@ export default {
                 classes: 'error',
                 show: true
             })
-        },
+        }
     },
 
     watch: {
@@ -346,6 +418,20 @@ export default {
             this.address = to.query.address || '';
             this.label = to.query.label || '';
             this.amount = to.query.amount || '';
+        },
+
+        address: {
+            handler: 'maybeShowFee',
+            immediate: true
+        },
+
+        amount: {
+            handler: 'maybeShowFee',
+            immediate: true
+        },
+
+        isValidated: {
+            handler: 'maybeShowFee'
         }
     },
 
@@ -394,6 +480,24 @@ export default {
     methods: {
         convertToCoin,
 
+        maybeShowFee () {
+            if (this.privateOrPublic === 'private' || !this.isValidated) {
+                this.transactionFee = 0;
+                return;
+            }
+
+            // First set transactionFee to 0. This is so the user can't hit Send before we've shown the fee.
+            this.transactionFee = 0;
+
+            this.$daemon.calcTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
+                .then(r => {
+                    this.transactionFee = r;
+                })
+                .catch(e => {
+                    this.transactionFee = 0;
+                })
+        },
+
         cleanupForm () {
             this.label = '';
             this.amount = '';
@@ -440,7 +544,8 @@ export default {
                 if (this.privateOrPublic === 'private') {
                     await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount);
                 } else {
-                    await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount, 1);
+                    await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
+                        this.txFeePerKb, this.subtractFeeFromAmount);
                 }
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.
@@ -490,7 +595,7 @@ export default {
 
     .description {
         @include description();
-        margin-bottom: emRhythm(7);
+        margin-bottom: 1em;
     }
 }
 
@@ -540,10 +645,37 @@ fieldset {
         font-size: 0.85em;
     }
 
+    .subtract-fee-from-amount-checkbox {
+        font-weight: bold;
+    }
+
     .amount-available {
         text-align: right;
         color: $color--polo-dark;
         font-style: italic;
+    }
+}
+
+.totals {
+    margin-top: -3em;
+
+    .field {
+        font-weight: bold;
+
+        label, .value {
+            display: inline;
+        }
+
+        .value {
+            color: $color--green-dark;
+        }
+    }
+
+    .total {
+        border-top: {
+            color: black;
+            width: 5px;
+        }
     }
 }
 

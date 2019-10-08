@@ -365,7 +365,7 @@ export class Zcoind {
 
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
-    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number): Promise<string> {
+    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number, subtractFeeFromAmount: boolean): Promise<string> {
         const data: {txid: string} = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
@@ -373,7 +373,8 @@ export class Zcoind {
                     amount
                 }
             },
-            feePerKb
+            feePerKb,
+            subtractFeeFromAmount
         });
 
         return data.txid;
@@ -406,13 +407,17 @@ export class Zcoind {
         });
     }
 
-    // Calculate a transaction fee. addresses is a map of {recipient: satoshiAmount} pairs; feePerKb is the satoshi
-    // fee per kilobyte for the generated transaction. We reject() the promise if the zcoind call fails or received data
-    // is invalid.
-    async calcTxFee(feePerKb: number, addresses: Record<string, number>): Promise<number> {
+    // Calculate a transaction fee. feePerKb is the satoshi fee per kilobyte for the generated transaction.
+    //
+    // We resolve() with the calculated fee in satoshi.
+    // We reject() the promise if the zcoind call fails or received data is invalid.
+    async calcTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
         let data = await this.send(null, 'get', 'txFee', {
-            addresses,
-            feePerKb
+            addresses: {
+                [address]: amount
+            },
+            feePerKb,
+            subtractFeeFromAmount
         });
 
         if (typeof data.fee === 'number') {

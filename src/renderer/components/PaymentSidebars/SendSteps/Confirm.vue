@@ -119,7 +119,7 @@ export default {
     font-weight: bold;
 }
 
-.fee, .total {
+.amount, .fee, .total {
     text-align: right;
 }
 
