@@ -379,8 +379,9 @@ export class Zcoind {
         return data.txid;
     }
 
-    // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
-    // or the call fails for some other reason.
+    // Publicly send amount satoshi XZC to recipient, subtracting the fee from the amount.
+    //
+    // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
     async privateSend(auth: string, label: string, recipient: string, amount: number): Promise<string> {
         const data = await this.send(auth, 'create', 'sendPrivate', {
             outputs: [
@@ -389,7 +390,8 @@ export class Zcoind {
                     amount
                 }
             ],
-            label
+            label,
+            subtractFeeFromAmount: true
         });
 
         return data;

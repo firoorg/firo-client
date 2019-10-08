@@ -93,6 +93,13 @@
                                     </div>
                                 </div>
 
+                                <div
+                                    v-if="privateOrPublic === 'private'"
+                                    class="fee-warning"
+                                >
+                                    Very slightly less will be sent because of fees.
+                                </div>
+
                                 <div class="amount-available">
                                     {{ convertToCoin(availableBalance) }} XZC available for {{ privateOrPublic }} send.
                                     <div v-if="unavailableBalance > 0">
@@ -526,6 +533,11 @@ fieldset {
 
     .prefix {
         color: $color--polo-dark;
+    }
+
+    .fee-warning {
+        font-style: italic;
+        font-size: 0.85em;
     }
 
     .amount-available {
