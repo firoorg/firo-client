@@ -140,14 +140,12 @@ const actions = {
 
     handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
         logger.info('handleTransactionEvent');
-        const isReindexing = rootGetters['ApiStatus/isReindexing'];
-        commit('setWalletState', {isReindexing, initialStateWallet: {addresses: transactionEvent}});
+        commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
     },
 
     handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
         logger.info('handleAddressEvent');
-        const isReindexing = rootGetters['ApiStatus/isReindexing'];
-        commit('setWalletState', {isReindexing, initialStateWallet: addressEvent})
+        commit('setWalletState', {isReindexing: false, initialStateWallet: addressEvent})
     }
 };
 
