@@ -12,7 +12,7 @@
                          sending a value they didn't confirm. -->
                     <denomination-selector
                         ref="denominationSelector"
-                        :existing-mints="unspentMints"
+                        :existing-mints="unspentMintsx"
                         :available-balance="availableXzc"
                         :mint-suggestions="coinsToMint"
                         :coins-to-mint-changed="coinsToMintChanged"

@@ -1,6 +1,8 @@
 import * as types from '~/types/Balance'
 
 import { createLogger } from '#/lib/logger'
+import { convertToSatoshi } from "#/lib/convert";
+import {max} from "vee-validate/dist/rules.esm";
 
 const logger = createLogger('zcoin:store:balance')
 
@@ -88,7 +90,36 @@ const getters = {
     availableZerocoin: (state) => state.zerocoin.confirmed,
     unconfirmedZerocoin: (state) => state.zerocoin.unconfirmed,
     confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total,
-    unspentMints: (state) => state.unspentMints
+    unspentMints: (state) => state.unspentMints,
+
+    // This is the maximum amount (in satoshi) that we can send privately. Consensus limits prohibit private
+    // transactions spending over 500 XZC, and transactions with over 35 private inputs.
+    maxPrivateSend: (state) => {
+        // Sort denominations from highest to lowest.
+        const denominations = Object.keys(state.unspentMints).sort((a, b) => Number(b) - Number(a));
+
+        let maxPrivateSend = 0;
+        let inputsRemaining = 35;
+
+        for (const denomination of denominations) {
+            const value = convertToSatoshi(denomination);
+            const amount = state.unspentMints[denomination].confirmed || 0;
+
+            if (inputsRemaining <= amount) {
+                maxPrivateSend += value * inputsRemaining;
+                break
+            }
+
+            maxPrivateSend += value * amount;
+            inputsRemaining -= amount;
+
+            if (inputsRemaining <= 0) {
+                break;
+            }
+        }
+
+        return Math.min(5e10, maxPrivateSend);
+    }
 }
 
 export default {

@@ -277,7 +277,8 @@ export default {
             network: 'Network/network',
             availableXzc: 'Balance/availableXzc',
             availableZerocoin: 'Balance/availableZerocoin',
-            totalBalance: 'Balance/total'
+            totalBalance: 'Balance/total',
+            maxPrivateSend: 'Balance/maxPrivateSend'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -315,7 +316,7 @@ export default {
 
         amountValidations () {
             return this.privateOrPublic === 'private' ?
-                'amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds'
+                'amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits'
                 :
                 'amountIsWithinAvailableBalance|publicAmountIsValid'
         },
@@ -372,6 +373,14 @@ export default {
         this.$validator.extend('privateAmountIsWithinBounds', {
             getMessage: () => 'Amount For Private Send May Not Exceed 500 XZC',
             validate: (value) => Number(value) <= 500
+        });
+
+        this.$validator.extend('privateAmountDoesntViolateInputLimits', {
+            getMessage: () =>
+                `Due to private transaction input limits, you can currently spend no more than ` +
+                `${convertToCoin(this.maxPrivateSend)} XZC in one transaction. Try minting a larger denomination.`,
+
+            validate: (value) => convertToSatoshi(value) <= this.maxPrivateSend
         });
     },
 
