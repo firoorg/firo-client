@@ -5,6 +5,10 @@
                 <div class="settings-page-inner">
                     <h1>
                         <span>{{ $t('settings.overview.title') }}</span>
+
+                        <div class="version">
+                            Zcoin Client v{{ zcoinClientVersion }}
+                        </div>
                     </h1>
 
                     <section class="interface">
@@ -91,6 +95,8 @@ import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
 import ConnectViaTorSettings from '@/components/SettingsPage/ConnectViaTorSettings'
 import AmountToHoldInZerocoinSettings from '@/components/SettingsPage/AmountToHoldInZerocoinSettings'
 
+const zcoinClientVersion = require('../../../package.json').version;
+
 export default {
     name: 'SettingsPage',
     components: {
@@ -110,7 +116,8 @@ export default {
     data () {
         return {
             popoverStep: 'initial',
-            errorMessage: ''
+            errorMessage: '',
+            zcoinClientVersion
         }
     },
 
@@ -144,6 +151,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .version {
+        font: {
+            style: italic;
+            weight: normal;
+            size: 0.5em;
+        }
+    }
+
     .settings-page {
         //padding: emRhythm(5);
         box-sizing: border-box;
