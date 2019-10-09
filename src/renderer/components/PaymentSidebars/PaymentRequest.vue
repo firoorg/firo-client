@@ -72,7 +72,7 @@
                 <label>Address:</label>
 
                 <div class="value">
-                    {{ pr.address }}
+                    {{ pr.address }}&nbsp;<a @click.prevent="copyAddress" href="#">📋</a>
                 </div>
             </div>
 
@@ -166,6 +166,10 @@ export default {
             clipboard.writeText(`zcoin://${this.pr.address}${paramsString}`);
         },
 
+        copyAddress () {
+            clipboard.writeText(this.pr.address);
+        },
+
         openDeletePopover() {
             this.deletePopoverIsOpen = true;
         },
@@ -254,6 +258,10 @@ export default {
                 font-family: monospace;
                 font-style: italic;
                 font-size: 0.9em;
+
+                a {
+                    text-decoration: none;
+                }
             }
         }
 
