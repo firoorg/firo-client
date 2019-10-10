@@ -185,7 +185,7 @@
                                 v-if="sendPopoverStep === 'initial'"
                                 color="green"
                                 class="expanded"
-                                :disabled="!(canBeginSend && transactionFee)"
+                                :disabled="!canBeginSend"
                                 @click.prevent="beginWaitToConfirmStep"
                             >
                                 Send
@@ -385,7 +385,7 @@ export default {
 
         // We can begin the send if the fee has been shown (if required) and the form is valid.
         canBeginSend () {
-            return this.isValidated && (!this.privateOrPublic === 'private' || this.transactionFee > 0);
+            return this.isValidated && (this.privateOrPublic === 'private' || this.transactionFee > 0);
         },
 
         isValidated () {
