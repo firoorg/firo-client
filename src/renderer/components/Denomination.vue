@@ -202,16 +202,23 @@ export default {
                 right: emRhythm(1);
                 @include font-regular();
                 font-style: italic;
-                color: $color--polo-dark;
             }
         }
 
         .value {
             background: rgba($color--polo-medium, 0.5);
+
+            span {
+                color: $color--polo-dark;
+            }
         }
 
         .existing-value {
-            background: $color--polo-medium;
+            background: $color--green;
+
+            span {
+                color: $color--white-light;
+            }
         }
 
         .minted {
