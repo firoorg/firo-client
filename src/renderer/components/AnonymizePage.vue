@@ -43,6 +43,28 @@
                         </onboarding-notice>
                         <mint-stats v-else />
                     </transition>
+
+                    <div class="automint-form">
+                        <label for="autoMintAmount">
+                            Choose Mints Automatically:
+                        </label>
+
+                        <input
+                            id="autoMintAmount"
+                            v-model="autoMintAmount"
+                            v-validate.initial="'amountIsWithinAvailableBalance|amountIsValid'"
+                            v-tooltip="getValidationTooltip('autoMintAmount')"
+                            name="autoMintAmount"
+                            class="automint-input"
+                            type="text"
+                            placeholder="Enter amount to fill mint bars"
+                            @keyup.enter="autoMint"
+                        />
+
+                        <span class="xzc">
+                            XZC
+                        </span>
+                    </div>
                 </div>
             </section>
         </div>
@@ -215,6 +237,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { getDenominationsToMint, convertToSatoshi, convertToCoin } from "#/lib/convert";
 
 import CircularTimer from '@/components/Icons/CircularTimer';
 import DenominationSelector from '@/components/DenominationSelector'
@@ -235,6 +258,7 @@ import SendStepIncorrectPassphrase from '@/components/PaymentSidebars/SendSteps/
 
 export default {
     name: 'AnonymizePage',
+
     components: {
         CircularTimer,
         MintStepConfirm,
@@ -252,6 +276,10 @@ export default {
         DenominationSelector,
         Stack
     },
+
+    inject: [
+        '$validator'
+    ],
 
     data () {
         return {
@@ -277,6 +305,8 @@ export default {
             mintFees: 0,
             // {[denomination: string]: number}
             coinsToMint: this.$route.query.coinsToMint || {},
+
+            autoMintAmount: 0
         }
     },
 
@@ -293,7 +323,38 @@ export default {
 
         hasMintsInProgress () {
             return !!Object.keys(this.mintsInProgress).length
+        },
+
+        getValidationTooltip () {
+            return (fieldName) => ({
+                content: this.validationErrors.first(fieldName),
+                trigger: 'manual',
+                boundariesElement: 'body',
+                offset: 8,
+                placement: 'top',
+                classes: 'error',
+                show: true
+            })
         }
+    },
+
+    beforeMount() {
+        this.$validator.extend('amountIsWithinAvailableBalance', {
+            // this.availableXzc will still be reactively updated.
+            getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableXzc),
+            validate: (value) => convertToSatoshi(value) <= this.availableXzc
+        });
+
+        this.$validator.extend('amountIsValid', {
+            // this.availableXzc will still be reactively updated.
+            getMessage: () => 'Amount Must Be a Positive Multiple of 0.05',
+            validate: (value) => 1 / (convertToSatoshi(value) % 5e6) === Infinity
+        });
+    },
+
+    mounted() {
+        console.log('joy');
+        console.log(this.coinsToMint);
     },
 
     methods: {
@@ -376,12 +437,61 @@ export default {
             this.mintAmount = mintAmount;
             this.mintFees = mintFees;
             this.coinsToMint = coinsToMint;
+        },
+
+        autoMint() {
+            if (this.autoMintAmount && !this.validationErrors.items.length) {
+                // This is a horrible, evil hack because Vue Router doesn't allow links to the current page, and
+                // changing our whole architecture is too much trouble. I guess this should be FIXME,
+                //  but I don't really see a great solution, so meh.
+                setTimeout(() => {
+                    this.$router.push({
+                        path: '/anonymize',
+                        query: {
+                            coinsToMint: getDenominationsToMint(this.autoMintAmount).toMint
+                        }
+                    });
+                }, 50);
+                this.$router.push('/');
+            }
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
+    .automint-form {
+        float: right;
+        right: 20px;
+
+        margin-top: 2em;
+        text-align: right;
+
+        label {
+            margin-right: 1em;
+            font: {
+                weight: bold;
+            }
+        }
+
+        .automint-input {
+            border: none;
+            width: 8em;
+            padding: 0.5em;
+
+            text-align: right;
+
+            background: $color--comet-light;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .xzc {
+            margin-left: 0.5em;
+            font-weight: bold;
+        }
+    }
+
     .mint-zerocoin {
         display: grid;
         box-sizing: border-box;

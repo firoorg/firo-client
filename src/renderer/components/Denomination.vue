@@ -46,6 +46,7 @@
 
 <script>
 import { convertToSatoshi } from "#/lib/convert";
+import { mapGetters } from "vuex";
 
 export default {
     name: 'Denomination',
@@ -112,6 +113,10 @@ export default {
     },
 
     computed: {
+        ...mapGetters({
+            availableXzc: 'Balance/availableXzc'
+        }),
+
         canIncrease() {
             // Relevant fees are already calculated by the parent component.
             return !this.disabled && convertToSatoshi(this.denomination) <= this.availableBalanceRemaining;
