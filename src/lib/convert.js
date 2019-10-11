@@ -126,10 +126,6 @@ export const getDenominationsToMint = function (amount, denoms = [0.05, 0.1, 0.5
                 continue
             }
 
-            if (denomsToMint[`${denom}`] >= 10) {
-                continue
-            }
-
             if (denomsToMint[`${denom}`] === undefined) {
                 denomsToMint[`${denom}`] = 0
             }
