@@ -5,43 +5,21 @@
 
 <template>
     <section class="balance">
-        <div class="confirmed-total">
+        <div>
             <amount :amount="availableXzc" /> <span class="ticker">XZC</span>
         </div>
-        <div
-            v-if="lockedXzc > 0 && pendingXzc > 0"
-        >
-            (+ <amount :amount="lockedXzc" /> locked, <amount :amount="pendingXzc" /> pending)
+        <div v-if="lockedXzc > 0">
+            + <amount :amount="lockedXzc" /> <span class="ticker">XZC</span> locked
         </div>
-        <div
-            v-else-if="lockedXzc > 0"
-        >
-            (+ <amount :amount="lockedXzc" /> locked)
-        </div>
-        <div
-            v-else-if="pendingXzc > 0"
-        >
-            (<amount :amount="pendingXzc" /> pending)
+        <div v-if="pendingXzc > 0">
+            + <amount :amount="pendingXzc" /> <span class="ticker">XZC</span> pending
         </div>
 
-        <div
-            v-if="availableZerocoin > 0 && unconfirmedZerocoin > 0"
-            class="zerocoin-total"
-        >
-            <amount :amount="availableZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span>
-            (+ <amount :amount="unconfirmedZerocoin" /> pending)
-        </div>
-        <div
-            v-else-if="availableZerocoin > 0"
-            class="zerocoin-total"
-        >
+        <div>
             <amount :amount="availableZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span>
         </div>
-        <div
-            v-else-if="unconfirmedZerocoin > 0"
-            class="zerocoin-total"
-        >
-            (+ <amount :amount="unconfirmedZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span> pending)
+        <div v-if="unconfirmedZerocoin > 0">
+            + <amount :amount="unconfirmedZerocoin" /> <span class="ticker" title="Private XZC">ⓩ</span> pending
         </div>
     </section>
 </template>
@@ -75,27 +53,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .balance {
-        display: block;
-        @include setType(3);
+.balance {
+    display: block;
+    @include setType(3);
 
-        margin-top: emRhythm(1);
-        opacity: .8;
-        transition: all .15s ease-in-out;
-        //text-shadow: 0 0 10px $color--green-bright;
-        cursor: default;
-    }
+    margin-top: emRhythm(1);
+    opacity: .8;
+    transition: all .15s ease-in-out;
+    //text-shadow: 0 0 10px $color--green-bright;
+    cursor: default;
 
-    .pending-total {
-        font-size-adjust: -80%;
-        color: lightsalmon;
+    margin: {
+        right: 1em;
+        left: 1em;
     }
-
-    .balance {
-        margin-top: emRhythm(0.69, $silent: true);
-    }
+    text-align: right;
 
     .ticker {
         color: #23B852;
     }
+}
 </style>

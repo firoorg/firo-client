@@ -110,7 +110,7 @@ export default {
         overflow: hidden;
 
         // This is required to have the sidebar not compress when long strings are entered into the debug console.
-        min-width: max-content;
+        width: max-content;
     }
 
     .sidebar {
@@ -121,7 +121,7 @@ export default {
         grid-row-gap: emRhythm(2);
         grid-template-areas: "logo" "balance" "menu" "blockchain";
         $logo-height: $sidebar--logo-margin-top + $sidebar--logo-height + $sidebar--logo-margin-bottom;
-        grid-template-rows: emRhythm($logo-height) 5rem auto 3rem;
+        grid-template-rows: emRhythm($logo-height) min-content auto 3rem;
         color: #fff;
 
         -webkit-user-select: none;
