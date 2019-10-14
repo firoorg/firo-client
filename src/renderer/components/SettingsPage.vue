@@ -160,7 +160,6 @@ export default {
     }
 
     .settings-page {
-        //padding: emRhythm(5);
         box-sizing: border-box;
     }
 
@@ -172,39 +171,13 @@ export default {
         display: grid;
         grid-template-columns: 35% auto;
         grid-column-gap: emRhythm(9);
-
-        .field {
-            & + .field {
-                //margin-left: emRhythm(9);
-            }
-
-            /deep/ .control {
-                //padding: 0 emRhythm(2);
-            }
-        }
     }
 
     .interface .form {
-        //display: flex;
-        //justify-content: space-between;
-        //padding: 0 emRhythm(2) 0 0;
-
         .language-settings {
-            //width: 30%;
-
-            /deep/ .control {
+            .control {
                 margin-left: emRhythm(-2);
             }
-        }
-    }
-
-    .privacy .form {
-        //display: flex;
-        //justify-content: space-between;
-        //padding: 0 emRhythm(2) 0 0;
-
-        .connection-settings {
-            //width: 30%;
         }
     }
 
