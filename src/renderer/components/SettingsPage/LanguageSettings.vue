@@ -1,5 +1,8 @@
 <template>
-    <div class="field">
+    <div
+        v-if="availableLocales.length > 1"
+        class="field"
+    >
         <label>{{ $t('settings.form.interface.label__language') }}</label>
         <span class="description">
             {{ $t('settings.form.interface.description__language') }}
