@@ -115,10 +115,7 @@ export const getDenominationsToMint = function (amount, denoms = [0.05, 0.1, 0.5
     let amountToMint = amount
     let found = false
 
-    let counter = 0
-
     do {
-        counter++
         found = false
 
         for (let denom of reversed) {
@@ -134,7 +131,7 @@ export const getDenominationsToMint = function (amount, denoms = [0.05, 0.1, 0.5
             found = true
             break
         }
-    } while (found && counter < 100)
+    } while (found)
     return {
         toMint: denomsToMint,
         change: amountToMint
