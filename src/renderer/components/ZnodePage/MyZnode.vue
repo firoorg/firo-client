@@ -51,7 +51,7 @@
                                 </template>
                                 <template v-else>
                                     <timeago
-                                        v-if="znode.lastPaidTime"
+                                        v-if="lastPaidTime"
                                         :datetime="nextEstimatedPayout"
                                         :auto-update="30"
                                     />
@@ -63,8 +63,8 @@
                             <header>{{ $t('znodes.my-znode.label__last-payout') }}</header>
                             <main>
                                 <timeago
-                                    v-if="znode.lastPaidTime"
-                                    :datetime="znode.lastPaidTime"
+                                    v-if="lastPaidTime"
+                                    :datetime="lastPaidTime"
                                     :auto-update="30"
                                 />
                                 <span v-else>
@@ -222,8 +222,13 @@ export default {
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
             getZnodeRewardsReceivedAtAddress: 'Transactions/getZnodeRewardsReceivedAtAddress',
             addresses: 'Transactions/addresses',
-            paymentPeriod: 'Znode/paymentPeriod'
+            paymentPeriod: 'Znode/paymentPeriod',
+            getLastPaidTime: 'Znode/getLastPaidTime'
         }),
+
+        lastPaidTime () {
+            return this.getLastPaidTime(this.znode.payeeAddress) * 1000;
+        },
 
         isMissing () {
             return this.status === 'MISSING'
@@ -242,7 +247,7 @@ export default {
         },
 
         nextEstimatedPayout () {
-            const t = this.znode.lastPaidTime || this.znode.activeSince || Date.now();
+            const t = this.lastPaidTime || this.znode.activeSince || Date.now();
             return (t + this.paymentPeriod - Date.now()) / 1000 / 24 / 60 / 60;
         }
     },
