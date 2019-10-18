@@ -6,80 +6,38 @@
         <span class="description">
             {{ $t('settings.form.privacy.description__connect-via-tor') }}
         </span>
-        <div
-            class="control"
-            :class="{ 'is-disabled': disabled }"
-        >
+        <div class="control">
             <base-checkbox
-                v-model="connectedViaTor"
-                :disabled="disabled"
+                v-model="torCheckbox"
                 size="large"
                 color="green"
             >
-                <template slot-scope="{ isChecked, isDisabled }">
-                    <i18n
-                        v-if="isDisabled"
-                        path="settings.form.privacy.label__connect-via-tor--disabled"
-                        tag="span"
-                    >
-                        <em place="configFile">
-                            zcoin.conf
-                        </em>
-                        <code place="value">{{ name }}={{ getDaemonSettingValue(name) }}</code>
-                    </i18n>
-                    <span v-else>
-                        {{ $t('settings.form.privacy.label__connect-via-tor') }}
-                    </span>
-                </template>
+                {{ $t('settings.form.privacy.label__connect-via-tor') }}
             </base-checkbox>
         </div>
     </div>
 </template>
 
 <script>
-import types from '~/types'
 import { mapGetters } from 'vuex'
-import { addVuexModel } from '@/utils/store'
 
 export default {
     name: 'ConnectViaTorSettings',
 
-    data () {
-        return {
-            name: 'torsetup',
-            torCheckbox: this.connectedViaTor
-        }
-    },
-
     computed: {
         ...mapGetters({
-            getDaemonSettingValue: 'Settings/getDaemonSettingValue',
-            getDaemonSettingHasChanged: 'Settings/getDaemonSettingHasChanged',
-            getDaemonSettingIsDisabled: 'Settings/getDaemonSettingIsDisabled'
+            isConnectedViaTor: 'Settings/isConnectedViaTor'
         }),
 
-        ...addVuexModel({
-            name: 'connectedViaTor',
-            getter: 'Settings/torsetup',
-            action: types.settings.SET_TORSETUP
-        }),
-
-        connectedViaTor: {
+        torCheckbox: {
             get () {
-                return this.$store.getters['Settings/torsetup']
+                return this.isConnectedViaTor
             },
-            set (val) {
-                this.$store.dispatch(types.settings.SET_TORSETUP, val)
+            async set (val) {
+                await this.$daemon.updateSettings({torsetup: val ? '1' : '0'});
+                this.$store.commit('Settings/setDaemonSettings', await this.$daemon.getSettings());
                 this.$emit('toggle-tor')
             }
-        },
-
-        hasChanged () {
-            return this.getDaemonSettingHasChanged(this.name)
-        },
-
-        disabled () {
-            return this.getDaemonSettingIsDisabled(this.name)
         }
     }
 }

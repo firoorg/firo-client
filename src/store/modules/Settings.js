@@ -1,49 +1,12 @@
-import Vue from 'vue'
-
 import { format } from 'util'
 
-import allTypes from '~/types'
 import * as types from '../types/Settings'
 import { getApp, getAppSettings } from '#/lib/utils'
-import { stringToBool, boolToString } from '~/utils'
 
 import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
 
 const logger = createLogger('zcoin:store:settings')
-
-const setDaemonSettings = function ({ state, commit, getters }, data) {
-    const { settings, isUpdate } = data
-
-
-    state.daemonSettingNames.forEach((key) => {
-        const daemonSettingName = `-${key}`
-        const actionName = `SET_${key.toUpperCase()}`
-
-
-        if (!settings[daemonSettingName]) {
-            return
-        }
-
-        if (!types[actionName]) {
-            return
-        }
-
-        let value = settings[daemonSettingName]
-        const oldValue = getters.getDaemonSetting(key)
-
-        // todo check if it makes sense to rely on .changed instead of isUpdate
-        if (isUpdate && oldValue !== undefined) {
-            value = {
-                ...value,
-                changedData: value.data,
-                data: oldValue.data
-            }
-        }
-
-        commit(types.SET_DAEMON_SETTING, { key, value })
-    })
-}
 
 const state = {
     //blockchainLocation: '',
@@ -104,15 +67,9 @@ const mutations = {
         state.locales.available = locales
     },
 
-    [types.SET_DAEMON_SETTING] (state, { key, value }) {
-        Vue.set(state.daemonSettings, key, value)
+    setDaemonSettings (state, settings) {
+        state.daemonSettings = settings;
     }
-
-    /*
-    [types.SET_INITIAL_STATE] (state, initialState) {
-        Vue.set(state, 'daemonSettings', initialState)
-    }
-    */
 }
 
 const actions = {
@@ -140,24 +97,6 @@ const actions = {
             isUpdate: true
         })
     },
-
-    /*
-    [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, { location }) {
-        if (!location) {
-            return
-        }
-
-        if (!fs.existsSync(location)) {
-            debug('given location does not exits', location)
-            return
-        }
-
-        // todo: could potentially watch the location to catch cases where the user freakes out and...
-        // todo: ...moves the folder while zcoin is running
-
-        commit(types.SET_BLOCKCHAIN_LOCATION, location)
-    },
-    */
 
     [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ commit, state }, value) {
         const percentage = value / 100
@@ -230,20 +169,6 @@ const actions = {
             ...state.locales.available,
             ...locales
         })
-    },
-
-    [types.SET_TORSETUP] ({ state, commit, getters }, value) {
-        if (getters.torsetup === value) {
-            return
-        }
-
-        const name = 'torsetup'
-
-        commit(types.UPDATE_SETTING, {
-            name,
-            value: boolToString(value),
-            create: state.daemonSettings[name] === undefined
-        })
     }
 }
 
@@ -310,50 +235,9 @@ const getters = {
 
         return process.env.LOCALE || state.locales.current || fallbackLocale
     },
-    getDaemonSetting: (state) => {
-        return (name) => state.daemonSettings[name] ? state.daemonSettings[name] : undefined
-    },
-    getDaemonSettingValue: (state) => {
-        return (name) => state.daemonSettings[name] ? state.daemonSettings[name].data : undefined
-    },
-    getChangedDaemonSettingValue: (state, getters) => {
-        return (name) => {
-            if (!state.daemonSettings[name]) {
-                return undefined
-            }
 
-            if (!state.daemonSettings[name].changedData) {
-                return getters.getDaemonSettingValue(name)
-            }
-
-            return state.daemonSettings[name].changedData
-        }
-    },
-    getDaemonSettingHasChanged: (state) => {
-        return (name) => state.daemonSettings[name] ? state.daemonSettings[name].changed : false
-    },
-    getDaemonSettingIsDisabled: (state) => {
-        return (name) => state.daemonSettings[name] ? state.daemonSettings[name].disabled : false
-    },
-    getDaemonSettingsRequireRestart: (state) => {
-        return Object.entries(state.daemonSettings).reduce((accumulator, [key, data]) => {
-            const { changed } = data
-
-            if (!changed) {
-                return accumulator
-            }
-
-            return [
-                ...accumulator,
-                key
-            ]
-        }, [])
-    },
-    isDaemonRestartRequired: (state, getters) => {
-        return !!getters.getDaemonSettingsRequireRestart.length
-    },
-    torsetup: (state, getters) =>  stringToBool(getters.getChangedDaemonSettingValue('torsetup')),
-    isConnectedViaTor: (state, getters) =>  stringToBool(getters.getDaemonSettingValue('torsetup'))
+    daemonSettings: (state) => state.daemonSettings,
+    isConnectedViaTor: (state, getters) =>  (getters.daemonSettings['-torsetup'] || {}).data === '1'
 }
 
 export default {

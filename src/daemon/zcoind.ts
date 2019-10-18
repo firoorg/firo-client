@@ -463,4 +463,16 @@ export class Zcoind {
             throw new ZcoindErrorResponse('update/znodeControl', r.detail.status.info);
         }
     }
+
+    // Change zcoind settings. If the call fails (e.g. invalid setting names), it will be reject()ed. Note that zcoind
+    // emits no event when settings are changed; the caller of this function should update any required state
+    // accordingly.
+    async updateSettings(settings: {[key: string]: string}) {
+        await this.send(null, 'update', 'setting', settings);
+    }
+
+    // Retrieve the value of all settings.
+    async getSettings(): Promise<{[key: string]: {data: string, changed: boolean, restartRequired: boolean}}> {
+        return await this.send(null, 'initial', 'setting', null);
+    }
 }
