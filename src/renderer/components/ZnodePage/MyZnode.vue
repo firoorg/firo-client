@@ -220,7 +220,7 @@ export default {
     computed: {
         ...mapGetters({
             getExplorerAddressUrl: 'Settings/getExplorerAddressUrl',
-            getAmountReceivedViaAddress: 'Transactions/getAmountReceivedViaAddress',
+            getZnodeRewardsReceivedAtAddress: 'Transactions/getZnodeRewardsReceivedAtAddress',
             addresses: 'Transactions/addresses',
             paymentPeriod: 'Znode/paymentPeriod'
         }),
@@ -234,7 +234,7 @@ export default {
         },
 
         payoutsReceived () {
-            return this.getAmountReceivedViaAddress(this.znode.payeeAddress) - 1e11;
+            return this.getZnodeRewardsReceivedAtAddress(this.znode.payeeAddress);
         },
 
         belongsToWallet () {

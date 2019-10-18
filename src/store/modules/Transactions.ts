@@ -156,10 +156,10 @@ const getters = {
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,
 
-    getAmountReceivedViaAddress: (state) => {
+    getZnodeRewardsReceivedAtAddress: (state) => {
         return (address) => (state.addresses[address] || [])
             .map(uniqId => state.transactions[uniqId])
-            .filter(tx => ['spendIn', 'receive', 'mined', 'znode'].includes(tx.category))
+            .filter(tx => tx.category === 'znode')
             .reduce((a,tx) => a + tx.amount, 0);
     },
 
