@@ -108,9 +108,6 @@ export default {
     aside {
         height: 100vh;
         overflow: hidden;
-
-        // This is required to have the sidebar not compress when long strings are entered into the debug console.
-        width: max-content;
     }
 
     .sidebar {
