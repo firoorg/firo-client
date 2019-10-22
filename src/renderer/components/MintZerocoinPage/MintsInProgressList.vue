@@ -17,7 +17,7 @@
                         <timeago
                             :datetime="value.eta"
                             :auto-update="30"
-                        />
+                        />&nbsp;(approximately)
                     </span>
                 </div>
 
