@@ -27,19 +27,31 @@
                     <section class="last-seen">
                         <header>{{ $t('znodes.my-znode.label__last-seen') }}</header>
                         <main>
-                            <timeago
-                                :datetime="znode.lastSeen"
-                                :auto-update="30"
-                            />
+                            <div v-if="znode.lastSeen">
+                                <timeago
+                                    :datetime="znode.lastSeen"
+                                    :auto-update="30"
+                                />
+                            </div>
+
+                            <div v-else>
+                                N/A
+                            </div>
                         </main>
                     </section>
                     <section class="active-since">
                         <header>{{ $t('znodes.my-znode.label__active-since') }}</header>
                         <main>
-                            <timeago
-                                :datetime="znode.activeSince"
-                                :auto-update="30"
-                            />
+                            <div v-if="znode.activeSince">
+                                <timeago
+                                    :datetime="znode.activeSince"
+                                    :auto-update="30"
+                                />
+                            </div>
+
+                            <div v-else>
+                                N/A
+                            </div>
                         </main>
                     </section>
                     <template v-if="belongsToWallet">
