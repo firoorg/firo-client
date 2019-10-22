@@ -83,7 +83,7 @@ receive:
   detail-create-request:
     title__create: Create</br>Payment Request
     label__label: Label
-    placeholder__label: "You can use #tags in here"
+    placeholder__label: Enter a label for the payment
     label__amount: Amount
     placeholder__amount: Amount to receive
     label__message: Message
@@ -190,7 +190,7 @@ send:
       title__private-send: Private Spend
       description: Here you can privately send coins with no transaction history on the blockchain. You can combine anonymized coins to spend any amount in multiples of 1 XZC.
       label__label: Label
-      placeholder__label: "You can use #tags in here"
+      placeholder__label: Enter a label for your transaction
       label__address: Address
       placeholder__address: Add a valid Zcoin address
       label__amount-selection: Amount
@@ -239,7 +239,7 @@ send:
       title: Public Send
       description: You can send one or more payments in one transaction.<br />All transactions send via this screen will be visible on the blockchain.
       label__label: Label
-      placeholder__label: "You can use #tags in here"
+      placeholder__label: Enter a label for your transaction
       label__address: Address
       placeholder__address: Add a valid Zcoin address
       label__amount: Amount
