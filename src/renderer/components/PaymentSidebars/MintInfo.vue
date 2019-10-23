@@ -59,7 +59,10 @@ export default {
         },
 
         txids () {
-            return this.consolidatedMints[this.blockHeight].mints.map(x => x.txid);
+            return this.consolidatedMints[this.blockHeight].mints
+                .map(x => x.txid)
+                .sort()
+                .reduce((a, x) => x === a[a.length-1] ? a : [...a, x], []);
         },
 
         amount () {
