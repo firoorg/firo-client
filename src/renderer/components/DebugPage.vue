@@ -147,6 +147,18 @@ export default {
             );
         },
 
+        // Clear the input.
+        onCtrlC () {
+            this.historyIndex = 0;
+            this.temporaryBuffer = '';
+            this.$refs.currentInput.innerText = '';
+            this.updateSuggestions();
+
+            this.$nextTick(() =>
+                this.scrollToBottom()
+            );
+        },
+
         focusInputUnlessTextIsSelected() {
             // FIXME: We will fail to fire if the current click is one that removes a selection.
             if (!document.getSelection().toString()) {
@@ -192,6 +204,14 @@ export default {
                 event.preventDefault();
                 this.onEnter();
                 break;
+
+            case 67:
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                    this.onCtrlC();
+                }
+
+                break
             }
         },
 
