@@ -55,7 +55,7 @@ export default {
         },
 
         blockHeight () {
-            return this.$route.params.blockHeight || throw 'unspecified blockHeight';
+            return Number(this.$route.params.blockHeight);
         },
 
         txids () {
