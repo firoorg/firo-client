@@ -113,8 +113,6 @@ export default {
         // Update the suggestions to show the user. This can't be made as a computed property because this.$refs is not
         // reactive.
         updateSuggestions (event=null) {
-            console.log('updating suggestions');
-
             if (event && event.keyCode === 9) {
                 return;
             }
