@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import { promisify } from 'util'
 import spawn from 'cross-spawn'
 import { join } from 'path'
@@ -137,6 +138,18 @@ export default class PidManager {
             detached: process.env.NODE_ENV !== 'production', // run detached in dev to allow hot reloading
             stdio: 'ignore'
         })
+
+        this.child.on('exit', (code, signal) => {
+            if (this.lastHeartbeat) {
+                // Failure is not on startup, so other restart functionality should be available.
+                logger.error(`zcoind exited on startup with ${code !== null ? 'code' : 'signal'} ${ code !== null ? code : signal}`);
+            } else if (code !== 0) {
+                // If zcoind fails on startup, give up and kill ourselves hard.
+                logger.error(`zcoind exited on startup with ${code !== null ? 'code' : 'signal'} ${ code !== null ? code : signal}; killing ourselves`);
+                app.exit(-1);
+            }
+        });
+
         // start network to receive path
         this.onStarted()
 
