@@ -108,7 +108,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            isDaemonRestartRequired: 'Settings/isDaemonRestartRequired',
             isRestarting: 'App/isRestarting'
         })
     },
