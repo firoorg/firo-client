@@ -95,7 +95,15 @@ export default {
             suggestions: [],
 
             // Which suggestion is currently active. This is -1 before the user tabs to the next suggestion.
-            suggestionTabIndex: -1
+            suggestionTabIndex: -1,
+
+            // Extra help to display to the user in addition to RPC help.
+            clientHelp: {
+                clear: {
+                    shortHelp: 'clear',
+                    longHelp: 'clear the console'
+                }
+            }
         }
     },
 
@@ -104,8 +112,7 @@ export default {
 
         // Get the list of available commands.
         this.$daemon.legacyRpcCommands().then(commands => {
-            this.availableCommands = commands;
-            this.availableCommands.push('clear');
+            this.availableCommands = commands.concat(Object.keys(this.clientHelp));
         })
     },
 
@@ -261,8 +268,27 @@ export default {
 
             this.history.push(input);
 
+            let m;
+
             if (input === 'clear') {
                 this.sessionLog = [];
+            } else if (input.match(/^\s*help\s*$/)) { // Add our own commands to help.
+                let output = await this.legacyRpc("help");
+                output += "\n\n== GUI ==\n";
+                output += Object.values(this.clientHelp)
+                    .map(c => c.shortHelp)
+                    .sort()
+                    .join("\n");
+
+                this.sessionLog.push({
+                    input,
+                    output
+                });
+            } else if ((m = input.match(/^\s*help\s*(\w+)\s*$/)) && this.clientHelp[m[1]]) { // Give help about our own commands.
+                this.sessionLog.push({
+                    input,
+                    output: this.clientHelp[m[1]].longHelp,
+                })
             } else {
                 this.sessionLog.push({
                     input,
