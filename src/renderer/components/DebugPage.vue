@@ -102,6 +102,11 @@ export default {
                 clear: {
                     shortHelp: 'clear',
                     longHelp: 'clear the console'
+                },
+
+                chdatadir: {
+                    shortHelp: 'chdatadir /path/to/datadir',
+                    longHelp: 'Change the datadir to be passed to zcoind on next startup WITHOUT moving any data, creating the directory if it does not exist.'
                 }
             }
         }
@@ -272,6 +277,19 @@ export default {
 
             if (input === 'clear') {
                 this.sessionLog = [];
+            } else if (input.match(/^\s*chdatadir/)) {
+                if ((m = input.match(/^\s*chdatadir (.+)$/))) {
+                    this.sessionLog.push({
+                        input,
+                        output: await this.chdatadir(m[1])
+                    });
+                } else {
+                    const c = this.clientHelp['chdatadir'];
+                    this.sessionLog.push({
+                        input,
+                        output: `${c.shortHelp}\n${c.longHelp}`
+                    });
+                }
             } else if (input.match(/^\s*help\s*$/)) { // Add our own commands to help.
                 let output = await this.legacyRpc("help");
                 output += "\n\n== GUI ==\n";
@@ -304,6 +322,16 @@ export default {
                 this.focusInput();
                 this.updateSuggestions();
             });
+        },
+
+        async chdatadir(newDataDirectory) {
+            try {
+                await this.$store.dispatch('App/changeBlockchainLocation', newDataDirectory);
+            } catch(e) {
+                return `Error: ${e}`;
+            }
+
+            return "Success! Changes will take effect on restart. Please note that if you wish to keep your existing data, you must migrate it yourself.";
         },
 
         async legacyRpc(commandline) {

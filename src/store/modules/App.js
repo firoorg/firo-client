@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import * as types from '../types/App'
 import { getApp, getAppSettings } from '#/lib/utils'
 import { createLogger } from '#/lib/logger'
@@ -225,7 +226,33 @@ const actions = {
         logger.info('setting blockchain location to %s', location)
 
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
-        getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location)
+
+        // This has been modified from an unconditional set, because we don't want it to override what we did in
+        // changeBlockchainLocation.
+        if (!getAppSettings().get(`app.${types.SET_BLOCKCHAIN_LOCATION}`)) {
+            getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location)
+        }
+    },
+
+    // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
+    // the reason.
+    async changeBlockchainLocation ({}, newLocation) {
+        if (!path.isAbsolute(newLocation)) {
+            throw "Location for the new blockchain must be an absolute path.";
+        }
+
+        if (!fs.existsSync(newLocation)) {
+            // Throws on failure.
+            fs.mkdirSync(newLocation);
+        }
+
+        try {
+            fs.accessSync(newLocation, fs.constants.W_OK | fs.constants.R_OK);
+        } catch {
+            throw `${newLocation} is not writable by the current user.`
+        }
+
+        getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, newLocation);
     },
 
     [types.SET_APP_VERSION] ({ commit }, version) {
