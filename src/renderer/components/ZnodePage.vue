@@ -15,10 +15,10 @@
                 <section class="stats">
                     <div class="stat">
                         <div class="value">
-                            {{ znodeCount }}
+                            {{ enabledZnodeCount }}/{{ totalZnodeCount }}
                         </div>
                         <div class="desc">
-                            {{ $t('znodes.overview.stats.description__total-nodes') }}
+                            Enabled/Total Znodes
                         </div>
                     </div>
                     <template v-if="!statsLoaded">
@@ -89,7 +89,8 @@ export default {
         ...mapGetters({
             isWinnersListSynced: 'Blockchain/isWinnersListSynced',
             myZnodes: 'Znode/myZnodes',
-            znodeCount: 'ApiStatus/totalZnodeCount',
+            totalZnodeCount: 'ApiStatus/totalZnodeCount',
+            enabledZnodeCount: 'ApiStatus/enabledZnodeCount',
             paymentPeriod: 'Znode/paymentPeriod'
         }),
 

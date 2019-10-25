@@ -43,6 +43,7 @@ interface ApiStatus {
         Znode: {
             localCount: number;
             totalCount: number;
+            enabledCount: number;
         };
     };
     meta: {

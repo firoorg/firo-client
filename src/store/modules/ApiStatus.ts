@@ -26,7 +26,9 @@ const getters = {
     // We will return 0 if apiStatus hasn't yet loaded.
     localZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.localCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
-    totalZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.totalCount : 0
+    totalZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.totalCount : 0,
+    // We will return 0 if apiStatus hasn't yet loaded.
+    enabledZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.enabledCount : 0
 };
 
 export default {
