@@ -69,9 +69,9 @@ const getters = {
 
     // in milliseconds
     paymentPeriod: (state, getters, rootState, rootGetters): number => {
-        const enabledZnodeCount = Object.values(<ZnodeList>state.znodes).filter(znode => znode.status === 'ENABLED').length;
+        const enabledZnodeCount = rootGetters['ApiStatus/enabledZnodeCount'];
         const blockTime = rootGetters['Blockchain/averageBlockTimeInMilliSeconds'];
-        return enabledZnodeCount / blockTime;
+        return  blockTime * enabledZnodeCount;
     },
 
     // Returns the last time the Znode was paid (in seconds after the Epoch), or null if the Znode has never been paid.

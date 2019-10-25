@@ -103,7 +103,7 @@ export default {
         },
 
         paymentPeriodInDays () {
-            return Math.ceil(this.paymentPeriod / 1000 / 24 / 60 / 60)
+            return (this.paymentPeriod / 1000 / 24 / 60 / 60).toFixed(1);
         },
 
         daysUntilNextPayout () {
