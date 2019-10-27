@@ -1,7 +1,7 @@
 <template>
     <section class="settings-page">
         <div class="window-height">
-            <div v-scrollable>
+            <div>
                 <div class="settings-page-inner">
                     <h1>
                         <span>{{ $t('settings.overview.title') }}</span>
@@ -32,7 +32,81 @@
                         </div>
                     </section>
 
+                    <section class="passphrase">
+                        <h2>Passphrase</h2>
+
+                        <form class="form">
+                            <div class="field">
+                                <label>Current Passphrase:</label>
+                                <input
+                                    v-model="currentPassphrase"
+                                    type="password"
+                                />
+                            </div>
+
+                            <div class="field">
+                                <label>New Passphrase:</label>
+                                <input
+                                    v-model="newPassphrase"
+                                    name="newPassphrase"
+                                    type="password"
+                                    :class="passphraseBoxClass"
+                                />
+                            </div>
+
+                            <div class="field">
+                                <label>Confirm New Passphrase:</label>
+                                <input
+                                    v-model="confirmNewPassphrase"
+                                    name="confirmNewPassphrase"
+                                    type="password"
+                                    :class="passphraseBoxClass"
+                                />
+                            </div>
+                        </form>
+
+                        <v-popover
+                            placement="top-end"
+                            popover-class="tooltip popover multi-step-popover"
+                            class="change-passphrase-button-popover-container"
+                            trigger="manually"
+                            :open="openPassphrasePopover"
+                            :auto-hide="true"
+                            :handle-resize="true"
+                        >
+                            <base-button
+                                :disabled="!canChangePassphrase"
+                                color="green"
+                                @click="changePassphrase"
+                            >
+                                Change Passphrase
+                            </base-button>
+
+                            <template slot="popover">
+                                <div class="close-dialog-button">
+                                    <a
+                                        href="#"
+                                        @click.prevent="closePassphrasePopover"
+                                    >
+                                        X
+                                    </a>
+                                </div>
+
+                                <div class="content-wrapper">
+                                    <div v-if="!changePassphraseError">
+                                        Passphrase changed successfully.
+                                    </div>
+
+                                    <div v-else>
+                                        {{ changePassphraseError }}
+                                    </div>
+                                </div>
+                            </template>
+                        </v-popover>
+                    </section>
+
                     <section class="backup">
+                        <h2>Backup</h2>
                         <input
                             ref="backupDirectory"
                             type="file"
@@ -50,7 +124,10 @@
                             :auto-hide="false"
                             :handle-resize="true"
                         >
-                            <base-button @click="openBackupDialog">
+                            <base-button
+                                color="green"
+                                @click="openBackupDialog"
+                            >
                                 Backup Zcoin Data
                             </base-button>
 
@@ -99,6 +176,7 @@ const zcoinClientVersion = require('../../../package.json').version;
 
 export default {
     name: 'SettingsPage',
+
     components: {
         AmountToHoldInZerocoinSettings,
         ConnectViaTorSettings,
@@ -109,13 +187,29 @@ export default {
     computed: {
         ...mapGetters({
             isRestarting: 'App/isRestarting'
-        })
+        }),
+
+        passphraseBoxClass () {
+            return this.confirmNewPassphrase && (this.newPassphrase !== this.confirmNewPassphrase) ?
+                'non-matching'
+                :
+                'matching';
+        },
+
+        canChangePassphrase () {
+            return this.currentPassphrase && this.newPassphrase && (this.newPassphrase === this.confirmNewPassphrase) && !this.openPassphrasePopover;
+        }
     },
 
     data () {
         return {
             popoverStep: 'initial',
             errorMessage: '',
+            changePassphraseError: '',
+            currentPassphrase: '',
+            newPassphrase: '',
+            confirmNewPassphrase: '',
+            openPassphrasePopover: false,
             zcoinClientVersion
         }
     },
@@ -124,6 +218,31 @@ export default {
         ...mapActions({
             restartDaemon: types.app.DAEMON_RESTART
         }),
+
+        async changePassphrase() {
+            if (!this.canChangePassphrase) {
+                return;
+            }
+
+            try {
+                await this.$daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
+            } catch (e) {
+                if (e.name === 'IncorrectPassphrase') {
+                    this.changePassphraseError = 'Incorrect Passphrase';
+                } else if (e.error && e.error.message) {
+                    this.changePassphraseError = e.error.message;
+                } else {
+                    this.changePassphraseError = JSON.stringify(e);
+                }
+            }
+
+            this.openPassphrasePopover = true;
+        },
+
+        closePassphrasePopover() {
+            this.changePassphraseError = '';
+            this.openPassphrasePopover = false;
+        },
 
         openBackupDialog() {
             this.$refs.backupDirectory.click();
@@ -160,22 +279,58 @@ export default {
 
     .settings-page {
         box-sizing: border-box;
+        overflow-y: auto;
     }
 
     .settings-page-inner {
         padding: emRhythm(5) emRhythm(8) emRhythm(5) emRhythm(4);
     }
 
-    .form {
-        display: grid;
-        grid-template-columns: 35% auto;
-        grid-column-gap: emRhythm(9);
-    }
-
     .interface .form {
         .language-settings {
             .control {
                 margin-left: emRhythm(-2);
+            }
+        }
+    }
+
+    .passphrase {
+        display: table;
+
+        .line {
+            display: table-row;
+
+            .left, .right {
+                display: table-cell;
+                width: max-content;
+            }
+        }
+
+        .form {
+            width: max-content;
+
+            .field {
+                display: table-row;
+
+                label, input {
+                    display: table-cell;
+                }
+
+                label {
+                    padding-right: 2em;
+                }
+
+                input {
+                    background-color: $color--comet-medium;
+                    border: none;
+                    height: 1.5em;
+                    width: 30em;
+
+                    &.non-matching {
+                        outline-style: auto;
+                        outline-color: red;
+                    }
+                }
             }
         }
     }

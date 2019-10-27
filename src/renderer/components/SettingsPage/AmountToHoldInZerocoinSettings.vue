@@ -132,7 +132,6 @@ export default {
 
     .control {
         margin-top: emRhythm(2);
-        padding-bottom: emRhythm(8);
     }
 
     .slider {

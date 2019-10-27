@@ -2,6 +2,7 @@
     <button
         v-bind="$attrs"
         :class="[color, size, { 'is-dark' : isDark, 'is-outline': isOutline, 'is-popover': isPopover }]"
+        :disabled="disabled"
         @click="$emit('click', $event)"
     >
         <span>
@@ -42,6 +43,11 @@ export default {
         size: {
             type: String,
             default: ''
+        },
+
+        disabled: {
+            type: Boolean,
+            default: false
         }
     }
 }
@@ -190,124 +196,127 @@ export default {
             }
         }
 
-        &.green,
-        &.orange,
-        &.red,
-        &.comet {
-            &:not(.is-outline) {
-                //padding-top: emRhythm($padding-v);
-                //padding-bottom: emRhythm($padding-v);
-                //border: none;
-                outline: none;
-                color: $color--white-light;
+        &:not([disabled]) {
+            &.green,
+            &.orange,
+            &.red,
+            &.comet {
+                &:not(.is-outline) {
+                    //padding-top: emRhythm($padding-v);
+                    //padding-bottom: emRhythm($padding-v);
+                    //border: none;
+                    outline: none;
+                    color: $color--white-light;
 
-                &:not([disabled]) {
-                    &:hover,
-                    &:focus {
+                    &:not([disabled]) {
+                        &:hover,
+                        &:focus {
+                            &:before {
+                                opacity: 0.5;
+                            }
+
+                            &:after {
+                                opacity: 1;
+                            }
+
+                            span {
+                                color: $color--white;
+                                opacity: 1;
+                            }
+
+                            &.is-popover {
+                                box-shadow: 0 1px 2px rgba($color--dark, 0.5);
+                            }
+                        }
+                    }
+
+                    &.is-popover {
+                        box-shadow: inset 0 1px 2px rgba($color--dark, 0.5);
+                    }
+
+                    span {
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    &.green {
+                        background: $color--green;
+                        border-color: transparent;
+
                         &:before {
-                            opacity: 0.5;
+                            background: $gradient--green-bright;
                         }
+
                         &:after {
-                            opacity: 1;
+                            @include glow-small-box($color--green, 0);
                         }
 
-                        span {
+                        &[disabled] {
+                            background: rgba(mix($color--green, $color--dark, 40%), 0.25);
+                            border-color: $color--green;
                             color: $color--white;
-                            opacity: 1;
-                        }
 
-                        &.is-popover {
-                            box-shadow: 0 1px 2px rgba($color--dark, 0.5);
-                        }
-                    }
-                }
+                            span {
+                                opacity: 1;
+                            }
 
-                &.is-popover {
-                    box-shadow: inset 0 1px 2px rgba($color--dark, 0.5);
-                }
-
-                span {
-                    position: relative;
-                    z-index: 2;
-                }
-
-                &.green {
-                    background: $color--green;
-                    border-color: transparent;
-
-                    &:before {
-                        background: $gradient--green-bright;
-                    }
-
-                    &:after {
-                        @include glow-small-box($color--green, 0);
-                    }
-
-                    &[disabled] {
-                        background: rgba(mix($color--green, $color--dark, 40%), 0.25);
-                        border-color: $color--green;
-                        color: $color--white;
-
-                        span {
-                            opacity: 1;
-                        }
-
-                        &.is-dark {
-                            color: mix($color--green-dark, $color--dark, 15%);
-                            background: rgba(mix($color--green, $color--dark), 0.2);
-                            border-color: mix($color--green-dark, $color--dark);
+                            &.is-dark {
+                                color: mix($color--green-dark, $color--dark, 15%);
+                                background: rgba(mix($color--green, $color--dark), 0.2);
+                                border-color: mix($color--green-dark, $color--dark);
+                            }
                         }
                     }
-                }
 
-                &.comet {
-                    background: $color--comet-dark;
-                    border-color: transparent;
+                    &.comet {
+                        background: $color--comet-dark;
+                        border-color: transparent;
 
-                    &:before {
-                        background: $gradient--comet-dark-vertical;
+                        &:before {
+                            background: $gradient--comet-dark-vertical;
+                        }
+
+                        &:after {
+                            @include glow-small-box($color--comet-dark, 0);
+                        }
+
+                        &[disabled] {
+                            background: mix($color--green, grayscale($color--green));
+                        }
                     }
 
-                    &:after {
-                        @include glow-small-box($color--comet-dark, 0);
+                    &.orange {
+                        background: $color--orange;
+                        border-color: transparent;
+
+                        &:before {
+                            background: $gradient--orange-vertical;
+                        }
+
+                        &:after {
+                            @include glow-small-box($color--orange, 0);
+                        }
+
+                        &[disabled] {
+                            background: mix($color--orange, grayscale($color--orange));
+                        }
                     }
 
-                    &[disabled] {
-                        background: mix($color--green, grayscale($color--green));
-                    }
-                }
+                    &.red {
+                        background: $color--red;
+                        border-color: transparent;
 
-                &.orange {
-                    background: $color--orange;
-                    border-color: transparent;
+                        &:before {
+                            background: $gradient--red-vertical;
+                        }
 
-                    &:before {
-                        background: $gradient--orange-vertical;
-                    }
+                        &:after {
+                            @include glow-small-box($color--red, 0);
+                        }
 
-                    &:after {
-                        @include glow-small-box($color--orange, 0);
-                    }
-
-                    &[disabled] {
-                        background: mix($color--orange, grayscale($color--orange));
-                    }
-                }
-
-                &.red {
-                    background: $color--red;
-                    border-color: transparent;
-
-                    &:before {
-                        background: $gradient--red-vertical;
-                    }
-
-                    &:after {
-                        @include glow-small-box($color--red, 0);
-                    }
-
-                    &[disabled] {
-                        background: mix($color--red, grayscale($color--red));
+                        &[disabled] {
+                            background: mix($color--red, grayscale($color--red));
+                        }
                     }
                 }
             }

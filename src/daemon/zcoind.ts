@@ -8,6 +8,7 @@ import { createLogger } from '../lib/logger';
 
 const logger = createLogger('zcoin:daemon');
 
+// FIXME: This is not thrown consistently. See documention of individual calls for details.
 class ZcoindErrorResponse extends Error {
     constructor(call, error) {
         super(`${call} call failed due to ${JSON.stringify(error)}`);
@@ -16,10 +17,19 @@ class ZcoindErrorResponse extends Error {
     }
 }
 
+// FIXME: This is not thrown consistently. See documention of individual calls for details.
 class UnexpectedZcoindResponse extends Error {
     constructor(call: string, response: any) {
         super(`unexpected response to ${call} ${JSON.stringify(response)}`);
         this.name = 'UnexpectedZcoindResponse';
+    }
+}
+
+// FIXME: This is not thrown consistently. See documention of individual calls for details.
+class IncorrectPassphrase extends Error {
+    constructor() {
+        super('incorrect passphrase');
+        this.name = 'IncorrectPassphrase';
     }
 }
 
@@ -251,7 +261,23 @@ export class Zcoind {
     // send, we reject() with the exception object. If zcoind responds with an error or responds with no data object, we
     // return the entire response object we received from zcoind.
     async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
-        logger.debug("Trying to acquire requestMutex for %s/%s call", type, collection);
+        logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
+
+        return await this.requesterSocketSend({
+            auth: {
+                passphrase: auth
+            },
+            type,
+            collection,
+            data
+        });
+    }
+
+    // Send an object through the requester socket and process the response. Refer to the documentation of send() for
+    // what we're actually doing. The reason this method is split off is that setPassphrase() is weird and requires a
+    // special case to work.
+    private async requesterSocketSend(message: any): Promise<any> {
+        logger.debug("Trying to acquire requestMutex");
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
         let release = await this.requestMutex.lock();
@@ -259,15 +285,7 @@ export class Zcoind {
 
         return new Promise((resolve, reject) => {
             try {
-                logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-                this.requesterSocket.send(JSON.stringify({
-                    auth: {
-                        passphrase: auth
-                    },
-                    type,
-                    collection,
-                    data
-                }));
+                this.requesterSocket.send(JSON.stringify(message));
             } catch (e) {
                 logger.error("Error sending data to zcoind: %O", e);
                 reject(e);
@@ -475,5 +493,32 @@ export class Zcoind {
     // Retrieve the value of all settings.
     async getSettings(): Promise<{[key: string]: {data: string, changed: boolean, restartRequired: boolean}}> {
         return await this.send(null, 'initial', 'setting', null);
+    }
+
+    // Set a new passphrase. We throw IncorrectPassphrase if the passphrase is incorrect, and do not return on success.
+    async setPassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
+        let r;
+
+        try {
+            r = await this.requesterSocketSend({
+                auth: {
+                    passphrase: oldPassphrase,
+                    newPassphrase
+                },
+                type: 'update',
+                collection: 'setPassphrase',
+                data: {}
+            });
+        } catch (e) {
+            if (e.error && e.error.code === -14) {
+                throw new IncorrectPassphrase();
+            }
+
+            throw e;
+        }
+
+        if (!r) {
+            throw 'setPassphrase call failed';
+        }
     }
 }

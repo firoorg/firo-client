@@ -1,4 +1,5 @@
 import { createLogger } from '../../lib/logger';
+
 const logger = createLogger('zcoin:store:Transactions');
 
 // one transaction output, of which a transaction may have many.
