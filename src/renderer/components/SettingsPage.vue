@@ -73,6 +73,7 @@
                             :open="openPassphrasePopover"
                             :auto-hide="true"
                             :handle-resize="true"
+                            @hide="closePassphrasePopover"
                         >
                             <base-button
                                 :disabled="!canChangePassphrase"
@@ -239,6 +240,7 @@ export default {
             this.openPassphrasePopover = true;
         },
 
+        // This also needs to be called on popover auto-close to cleanup data.
         closePassphrasePopover() {
             this.changePassphraseError = '';
             this.openPassphrasePopover = false;
