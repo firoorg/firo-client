@@ -65,7 +65,6 @@ const startNetwork = function () {
 }
 
 const beforeQuit = async function (event) {
-    store.dispatch(types.app.PERSIST_APP_VERSION)
     const isRunning = await coreDaemonManager.isRunning()
 
     if (!(stopOnQuit && isRunning)) {

@@ -78,7 +78,6 @@ export default {
         },
 
         startDaemon () {
-            this.$store.dispatch(types.app.PERSIST_APP_VERSION)
             this.$store.dispatch(types.app.DAEMON_START)
 
             this.$nextTick(() => {

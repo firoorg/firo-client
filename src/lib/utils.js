@@ -1,5 +1,72 @@
 import { app, remote } from 'electron'
-import appSettings from 'electron-settings'
+import fs from 'fs';
+import path from 'path';
+import {homedir} from 'os';
+
+
+class AppSettings {
+    /**
+     * Get application settings in an OS-native way (registry, .config, plist file), returning {} if the file does not
+     * yet exist.
+     *
+     * @returns {Object<string, Object>} key/value pairs
+     */
+    getAll() {
+        switch (process.platform) {
+        case "darwin":
+            const plist = require('simple-plist');
+
+            const plistLocation = path.join(homedir(), 'Library', 'Preferences', 'io.Zcoin-Client.plist');
+            if (fs.existsSync(plistLocation)) {
+                return plist.readFileSync(plistLocation);
+            } else {
+                return {};
+            }
+
+        default:
+            throw 'unsupported platform';
+        }
+    }
+
+    /**
+     * Get a single key.
+     *
+     * @param {string} key
+     * @returns {Object}
+     */
+    get(key) {
+        return this.getAll()[key];
+    }
+
+    /**
+     * Set application settings in an OS-native way (registry, .config, plist file).
+     *
+     * @param {string} key
+     * @param {Object} value
+     */
+    set(key, value) {
+        switch (process.platform) {
+        case "darwin":
+            const plist = require('simple-plist');
+
+            const plistLocation = path.join(homedir(), 'Library', 'Preferences', 'io.Zcoin-Client.plist');
+            let parsed;
+            if (fs.existsSync(plistLocation)) {
+                parsed = plist.readFileSync(plistLocation);
+            } else {
+                parsed = {};
+            }
+
+            parsed[key] = value;
+            plist.writeBinaryFileSync(plistLocation, parsed);
+
+            break;
+
+        default:
+            throw 'unsupported platform';
+        }
+    }
+}
 
 const subscribeToMutation = function ({ store, namespace, onStoreMutation }) {
     store.subscribe((mutation) => {
@@ -83,6 +150,7 @@ export const getApp = function () {
     return isRenderer() ? remote.app : app
 }
 
+const appSettings = new AppSettings();
 export const getAppSettings = function () {
     return appSettings
 }

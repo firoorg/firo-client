@@ -1,32 +1,24 @@
 import { getAppSettings } from '#/lib/utils'
-import { createLogger } from '#/lib/logger'
-
 import types from '~/types'
 
+import { createLogger } from '#/lib/logger'
 const logger = createLogger('zcoin:appSettings')
 
 export const populateStoreWithAppSettings = function ({ store }) {
-    const settings = getAppSettings()
+    for (const [categoryKey, value] of Object.entries(getAppSettings().getAll())) {
+        logger.info(`key ${categoryKey} with value ${value}`);
 
-    logger.info('application settings path %s', settings.file())
+        const [category, ...key_] = categoryKey.split('.');
+        const key = key_.join('.');
 
-
-    Object
-        .entries(settings.getAll())
-        .forEach(([category, pairs]) => {
-
-            if (!pairs) {
-                return
+        try {
+            if (!(types[category] && types[category][key])) {
+                logger.warn(`Unknown key ${categoryKey} with value ${value}`);
             }
+        } catch(e) {
+            logger.error(e);
+        }
 
-            Object.entries(pairs).forEach(([key, value]) => {
-                if (!types[category] || !types[category][key]) {
-                    return
-                }
-
-                logger.info('populating application settings store: %s : %o', key, value)
-                store.dispatch(types[category][key], value)
-            })
-        })
-    //const { app: appSettings } = settings.getAll()
-}
+        store.dispatch(types[category][key], value);
+    }
+};

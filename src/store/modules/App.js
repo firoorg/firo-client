@@ -32,10 +32,6 @@ const mutations = {
         state.blockchainLocation = location
     },
 
-    [types.SET_APP_VERSION] (state, version) {
-        state.appVersion = version
-    },
-
     // daemon
 
     [types.DAEMON_IS_RUNNING] (state) {
@@ -227,11 +223,7 @@ const actions = {
 
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
 
-        // This has been modified from an unconditional set, because we don't want it to override what we did in
-        // changeBlockchainLocation.
-        if (!getAppSettings().get(`app.${types.SET_BLOCKCHAIN_LOCATION}`)) {
-            getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location)
-        }
+        getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location);
     },
 
     // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
@@ -255,25 +247,6 @@ const actions = {
         getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, newLocation);
     },
 
-    [types.SET_APP_VERSION] ({ commit }, version) {
-        if (state.appVersion === version) {
-            return
-        }
-
-        commit(types.SET_APP_VERSION, version)
-    },
-
-    [types.PERSIST_APP_VERSION] ({ dispatch, getters }) {
-        const version = getters.runningAppVersion
-
-        if (getters.appVersion === version) {
-            return
-        }
-
-        dispatch(types.SET_APP_VERSION, version)
-        getAppSettings().set(`app.${types.SET_APP_VERSION}`, version)
-    },
-
     gotLink ({commit}, url) {
         commit('gotLink', url);
     }
@@ -284,11 +257,8 @@ const getters = {
     isStopping: (state) => state.isStopping || false,
     isRunning: (state) => state.isRunning || false,
     isRestarting: (state) => state.isRestarting || false,
-    appVersion: (state) => state.appVersion,
-    runningAppVersion: () => getApp().getVersion(),
-    appVersionChanged: (state, getters) => getters.appVersion !== getters.runningAppVersion,
     isInitialRun: (state) => {
-        return !state.appVersion
+        return !state.blockchainLocation
     },
 
     blockchainLocation: (state) => {
@@ -308,17 +278,12 @@ const getters = {
             return true
         }
 
-        // 2. version changed
-        if (getters.appVersionChanged) {
-            return true
-        }
-
-        // 3. has location
+        // 2. has location
         if (!getters.hasBlockchainLocation) {
             return true
         }
 
-        // 4. is locked
+        // 3. is locked
         if (!getters.isLocked) {
             return true
         }
