@@ -4,8 +4,8 @@ import types from '~/types'
 import { createLogger } from '#/lib/logger'
 const logger = createLogger('zcoin:appSettings')
 
-export const populateStoreWithAppSettings = function ({ store }) {
-    for (const [categoryKey, value] of Object.entries(getAppSettings().getAll())) {
+export const populateStoreWithAppSettings = async function ({ store }) {
+    for (const [categoryKey, value] of Object.entries(await getAppSettings().getAll())) {
         logger.info(`key ${categoryKey} with value ${value}`);
 
         const [category, ...key_] = categoryKey.split('.');

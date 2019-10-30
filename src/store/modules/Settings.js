@@ -98,7 +98,7 @@ const actions = {
         })
     },
 
-    [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ commit, state }, value) {
+    async [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] ({ commit, state }, value) {
         const percentage = value / 100
 
         if (state.percentageToHoldInZerocoin === percentage) {
@@ -110,7 +110,7 @@ const actions = {
         }
 
         commit(types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN, percentage)
-        getAppSettings().set(`settings.${types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN}`, percentage * 100)
+        await getAppSettings().set(`settings.${types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN}`, percentage * 100)
         commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, -1)
     },
 
@@ -124,7 +124,7 @@ const actions = {
         commit(types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED, ratio)
     },
 
-    [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] ({ state, commit, rootGetters }, urlOrUrlNetworkPair) {
+    async [types.SET_BLOCKCHAIN_EXPLORER_BASE_URL] ({ state, commit, rootGetters }, urlOrUrlNetworkPair) {
         let url = undefined
         let network = undefined
 
@@ -146,10 +146,10 @@ const actions = {
         // todo add some checks if the given string is an absolute url matches the required format (includes 2x %s)
 
         commit(types.SET_BLOCKCHAIN_EXPLORER_BASE_URL, { network, url })
-        getAppSettings().set(`settings.${types.SET_BLOCKCHAIN_EXPLORER_BASE_URL}`, { network, url })
+        await getAppSettings().set(`settings.${types.SET_BLOCKCHAIN_EXPLORER_BASE_URL}`, { network, url })
     },
 
-    [types.SET_LOCALE] ({ state, commit, getters }, localeKey) {
+    async [types.SET_LOCALE] ({ state, commit, getters }, localeKey) {
         if (getters.currentLocaleKey === localeKey) {
             logger.debug('given locale "%s" is already set.')
             return
@@ -161,7 +161,7 @@ const actions = {
         }
 
         commit(types.SET_LOCALE, localeKey)
-        getAppSettings().set(`settings.${types.SET_LOCALE}`, localeKey)
+        await getAppSettings().set(`settings.${types.SET_LOCALE}`, localeKey)
     },
 
     [types.SET_AVAILABLE_LOCALES] ({ state, commit }, locales) {

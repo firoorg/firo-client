@@ -9,9 +9,9 @@ class AppSettings {
      * Get application settings in an OS-native way (registry, .config, plist file), returning {} if the file does not
      * yet exist.
      *
-     * @returns {Object<string, Object>} key/value pairs
+     * @returns {Promise<Object<string, Object>>} key/value pairs
      */
-    getAll() {
+    async getAll() {
         switch (process.platform) {
         case "darwin":
             const plist = require('simple-plist');
@@ -44,10 +44,10 @@ class AppSettings {
      * Get a single key.
      *
      * @param {string} key
-     * @returns {Object}
+     * @returns {Promise<Object>}
      */
-    get(key) {
-        return this.getAll()[key];
+    async get(key) {
+        return (await this.getAll())[key];
     }
 
     /**
@@ -56,7 +56,7 @@ class AppSettings {
      * @param {string} key
      * @param {Object} value
      */
-    set(key, value) {
+    async set(key, value) {
         switch (process.platform) {
         case "darwin":
             const plist = require('simple-plist');
@@ -88,7 +88,7 @@ class AppSettings {
                 }
             }
 
-            const config = this.getAll();
+            const config = await this.getAll();
             config[key] = value;
 
             fs.writeFileSync(configLocation, JSON.stringify(config));

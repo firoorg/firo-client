@@ -206,7 +206,7 @@ const actions = {
     },
 
     // todo move to settings
-    [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, location) {
+    async [types.SET_BLOCKCHAIN_LOCATION] ({ commit, state }, location) {
         if (!location) {
             return
         }
@@ -223,7 +223,7 @@ const actions = {
 
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
 
-        getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location);
+        await getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location);
     },
 
     // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
@@ -244,7 +244,7 @@ const actions = {
             throw `${newLocation} is not writable by the current user.`
         }
 
-        getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, newLocation);
+        await getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, newLocation);
     },
 
     gotLink ({commit}, url) {

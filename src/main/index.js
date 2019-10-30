@@ -109,10 +109,10 @@ const coreDaemonManager = new PidManager({
 // https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 // app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
 
-app.on('ready', () => {
+app.on('ready', async () => {
     logger.info('---- Starting Zcoin client ----')
     setupLocales({ store })
-    populateStoreWithAppSettings({ store })
+    await populateStoreWithAppSettings({ store })
 
     // start it!
     logger.info('path to zcoind binary: %s', zcoindPath)
