@@ -93,20 +93,12 @@
                                     </div>
                                 </div>
 
-                                <div
-                                    v-if="privateOrPublic === 'private'"
-                                    class="fee-warning"
-                                >
-                                    Very slightly less will be sent because of fees.
-                                </div>
-                                <div
-                                    v-else
-                                    class="subtract-fee-from-amount-checkbox"
-                                >
+                                <div class="subtract-fee-from-amount-checkbox">
                                     <input
                                         v-model="subtractFeeFromAmount"
                                         type="checkbox"
                                         name="subtractFeeFromAmount"
+                                        :checked="privateOrPublic === 'private'"
                                     />
 
                                     <label for="subtractFeeFromAmount">
@@ -126,10 +118,7 @@
                         </fieldset>
                     </div>
 
-                    <div
-                        v-if="!!transactionFee"
-                        class="totals"
-                    >
+                    <div class="totals">
                         <div class="field amount">
                             <label>
                                 Recipient will receive:
@@ -383,9 +372,9 @@ export default {
             return this.subtractFeeFromAmount ? this.satoshiAmount : this.satoshiAmount + this.transactionFee;
         },
 
-        // We can begin the send if the fee has been shown (if required) and the form is valid.
+        // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && (this.privateOrPublic === 'private' || this.transactionFee > 0);
+            return this.isValidated && this.transactionFee > 0;
         },
 
         isValidated () {
@@ -481,7 +470,7 @@ export default {
         convertToCoin,
 
         maybeShowFee () {
-            if (this.privateOrPublic === 'private' || !this.isValidated) {
+            if (!this.isValidated) {
                 this.transactionFee = 0;
                 return;
             }
@@ -489,13 +478,23 @@ export default {
             // First set transactionFee to 0. This is so the user can't hit Send before we've shown the fee.
             this.transactionFee = 0;
 
-            this.$daemon.calcTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
-                .then(r => {
-                    this.transactionFee = r;
-                })
-                .catch(e => {
-                    this.transactionFee = 0;
-                })
+            if (this.privateOrPublic === 'private') {
+                this.$daemon.calcPrivateTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
+                    .then(r => {
+                        this.transactionFee = r;
+                    })
+                    .catch(e => {
+                        this.transactionFee = 0;
+                    });
+            } else {
+                this.$daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
+                    .then(r => {
+                        this.transactionFee = r;
+                    })
+                    .catch(e => {
+                        this.transactionFee = 0;
+                    });
+            }
         },
 
         cleanupForm () {
@@ -542,7 +541,8 @@ export default {
 
             try {
                 if (this.privateOrPublic === 'private') {
-                    await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount);
+                    await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
+                        this.subtractFeeFromAmount);
                 } else {
                     await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
                         this.txFeePerKb, this.subtractFeeFromAmount);

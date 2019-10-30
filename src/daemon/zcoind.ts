@@ -402,7 +402,7 @@ export class Zcoind {
     // Publicly send amount satoshi XZC to recipient, subtracting the fee from the amount.
     //
     // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async privateSend(auth: string, label: string, recipient: string, amount: number): Promise<string> {
+    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean): Promise<string> {
         const data = await this.send(auth, 'create', 'sendPrivate', {
             outputs: [
                 {
@@ -411,7 +411,7 @@ export class Zcoind {
                 }
             ],
             label,
-            subtractFeeFromAmount: true
+            subtractFeeFromAmount
         });
 
         return data;
@@ -426,11 +426,34 @@ export class Zcoind {
         });
     }
 
-    // Calculate a transaction fee. feePerKb is the satoshi fee per kilobyte for the generated transaction.
+    // Calculate a transaction fee for a public transaction.
+    // feePerKb is the satoshi fee per kilobyte for the generated transaction.
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the zcoind call fails or received data is invalid.
-    async calcTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+    async calcPublicTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+        let data = await this.send(null, 'get', 'txFee', {
+            addresses: {
+                [address]: amount
+            },
+            feePerKb,
+            subtractFeeFromAmount
+        });
+
+        if (typeof data.fee === 'number') {
+            return data.fee;
+        } else {
+            logger.error("got invalid calcTxFee response: %O", data);
+            throw "got invalid calcTxFee response";
+        }
+    }
+
+    // Calculate a transaction fee for a private transaction.
+    // feePerKb is the satoshi fee per kilobyte for the generated transaction.
+    //
+    // We resolve() with the calculated fee in satoshi.
+    // We reject() the promise if the zcoind call fails or received data is invalid.
+    async calcPrivateTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
         let data = await this.send(null, 'get', 'txFee', {
             addresses: {
                 [address]: amount
