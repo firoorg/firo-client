@@ -23,6 +23,18 @@ class AppSettings {
                 return {};
             }
 
+        case "linux":
+        case "openbsd":
+        case "freebsd":
+            const xdgConfigHome = process.env.XDG_CONFIG_HOME || path.join(homedir(), '.config');
+            const configLocation = path.join(xdgConfigHome, 'zcoin-client', 'zcoin-client.conf');
+            if (fs.existsSync(configLocation)) {
+                const raw = fs.readFileSync(configLocation);
+                return JSON.parse(raw);
+            } else {
+                return {};
+            }
+
         default:
             throw 'unsupported platform';
         }
@@ -61,6 +73,28 @@ class AppSettings {
             plist.writeBinaryFileSync(plistLocation, parsed);
 
             break;
+
+
+        case "linux":
+        case "openbsd":
+        case "freebsd":
+            const xdgConfigHome = process.env.XDG_CONFIG_HOME || path.join(homedir(), '.config');
+            const zcoinConfigDir = path.join(xdgConfigHome, 'zcoin-client');
+            const configLocation = path.join(zcoinConfigDir, 'zcoin-client.conf');
+
+            for (const dir of [xdgConfigHome, zcoinConfigDir]) {
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir);
+                }
+            }
+
+            const config = this.getAll();
+            config[key] = value;
+
+            fs.writeFileSync(configLocation, JSON.stringify(config));
+
+            break;
+
 
         default:
             throw 'unsupported platform';
