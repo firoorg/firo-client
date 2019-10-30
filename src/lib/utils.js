@@ -35,6 +35,39 @@ class AppSettings {
                 return {};
             }
 
+        // Our settings are saved as a JSON-encoded object as the default value of \Software\Zcoin\Zcoin_Client\Settings.
+        case "win32":
+            const Registry = require('winreg');
+            const regKey = new Registry({
+                hive: Registry.HKCU,
+                key:  '\\Software\\Zcoin\\Zcoin_Client\\Settings'
+            });
+
+            return new Promise(resolve => {
+                regKey.keyExists((err, exists) => {
+                    if (!exists) {
+                        resolve({});
+                        return;
+                    }
+
+                    // The empty string is the default value.
+                    regKey.get('', (err, item) => {
+                        if (err) {
+                            throw err;
+                        }
+
+                        // item will be null when we're calling this from this.set() during initialization.
+                        if (!item) {
+                            resolve({});
+                            return;
+                        }
+
+                        const settings = JSON.parse(item.value);
+                        resolve(settings);
+                    });
+                });
+            });
+
         default:
             throw 'unsupported platform';
         }
@@ -94,6 +127,36 @@ class AppSettings {
             fs.writeFileSync(configLocation, JSON.stringify(config));
 
             break;
+
+        // Our settings are saved as a JSON-encoded object as the default value of \Software\Zcoin\Zcoin_Client\Settings.
+        case "win32":
+            const Registry = require('winreg');
+            const regKey = new Registry({
+                hive: Registry.HKCU,
+                key:  '\\Software\\Zcoin\\Zcoin_Client\\Settings'
+            });
+
+            return new Promise((resolve, reject) => {
+                // Creating the key even if it exists is fine.
+                regKey.create(async (err) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    const settings = await this.getAll();
+                    settings[key] = value;
+                    const encodedSettings = JSON.stringify(settings);
+
+                    // Empty string represents the default value.
+                    regKey.set('', 'REG_SZ', encodedSettings, (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(undefined);
+                        }
+                    })
+                });
+            });
 
 
         default:
