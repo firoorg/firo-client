@@ -105,15 +105,10 @@ export default {
             type: Function,
             required: true
         },
-        scoreToReach: {
-            type: Number,
-            default: 3
-        }
     },
 
     data () {
         return {
-            isValidPassphrase: false,
             maxScore: 5,
             strength: {}
         }
@@ -158,6 +153,10 @@ export default {
 
         hasFeedback () {
             return this.hasWarning || this.hasSuggestions
+        },
+
+        isValidPassphrase () {
+            return !!this.passphrase.length;
         }
     },
 
@@ -190,16 +189,6 @@ export default {
             if (this.passphraseLength) {
                 this.strength = zxcvbn(this.passphrase, [])
             }
-
-            // dont check for password strength in development
-            if (process.env.NODE_ENV !== 'production') {
-                this.isValidPassphrase = this.currentScore > 0
-            }
-            else {
-                this.isValidPassphrase = this.currentScore >= this.scoreToReach
-            }
-
-            this.$log.debug('this.isValidPassphrase %s', this.isValidPassphrase)
         }
     }
 
