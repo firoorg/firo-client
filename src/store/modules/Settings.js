@@ -24,7 +24,7 @@ const state = {
             scriptAddress: 178 // ['2']
         }
     },
-    percentageToHoldInZerocoin: 0.5,
+    percentageToHoldInZerocoin: 1.0,
     xzcZerocoinRatioNotified: -1,
     explorer: {
         test: 'https://testexplorer.zcoin.io/%s/%s',
