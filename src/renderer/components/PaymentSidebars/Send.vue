@@ -124,8 +124,18 @@
                                 Recipient will receive:
                             </label>
 
-                            <div class="value">
+                            <div
+                                v-if="transactionFee"
+                                class="value"
+                            >
                                 {{ convertToCoin(amountToReceive) }} XZC
+                            </div>
+
+                            <div
+                                v-else
+                                class="value"
+                            >
+                                ??? XZC
                             </div>
                         </div>
 
@@ -134,8 +144,17 @@
                                 Transaction fee:
                             </label>
 
-                            <div class="value">
+                            <div
+                                v-if="transactionFee"
+                                class="value"
+                            >
                                 {{ convertToCoin(transactionFee) }} XZC
+                            </div>
+                            <div
+                                v-else
+                                class="value"
+                            >
+                                ??? XZC
                             </div>
                         </div>
 
@@ -144,10 +163,27 @@
                                 Total:
                             </label>
 
-                            <div class="value">
+                            <div
+                                v-if="transactionFee"
+                                class="value"
+                            >
                                 {{ convertToCoin(totalAmount) }} XZC
                             </div>
+
+                            <div
+                                v-else
+                                class="value"
+                            >
+                                ??? XZC
+                            </div>
                         </div>
+                    </div>
+
+                    <div
+                        v-if="totalAmountExceedsBalance"
+                        class="total-amount-exceeds-balance"
+                    >
+                        Amount (including fees) exceeds available balance.
                     </div>
 
                     <div class="buttons">
@@ -319,6 +355,9 @@ export default {
             // This will be updated in watch() as computed properties can't use async.
             transactionFee: 0,
 
+            // This is set if error -6 occurs during fee calculation.
+            totalAmountExceedsBalance: false,
+
             // TODO: Right now we're just hardcoding this. It should be made user configurable.
             txFeePerKb: 1
         }
@@ -374,7 +413,7 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && this.transactionFee > 0;
+            return this.isValidated && this.transactionFee > 0 && !this.totalAmountExceedsBalance;
         },
 
         isValidated () {
@@ -415,6 +454,11 @@ export default {
         },
 
         amount: {
+            handler: 'maybeShowFee',
+            immediate: true
+        },
+
+        subtractFeeFromAmount: {
             handler: 'maybeShowFee',
             immediate: true
         },
@@ -469,31 +513,29 @@ export default {
     methods: {
         convertToCoin,
 
-        maybeShowFee () {
+        async maybeShowFee () {
+            this.transactionFee = 0;
+            this.totalAmountExceedsBalance = false;
+
             if (!this.isValidated) {
-                this.transactionFee = 0;
                 return;
             }
 
-            // First set transactionFee to 0. This is so the user can't hit Send before we've shown the fee.
-            this.transactionFee = 0;
-
+            let p;
             if (this.privateOrPublic === 'private') {
-                this.$daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
-                    .then(r => {
-                        this.transactionFee = r;
-                    })
-                    .catch(e => {
-                        this.transactionFee = 0;
-                    });
+                p = this.$daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
             } else {
-                this.$daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
-                    .then(r => {
-                        this.transactionFee = r;
-                    })
-                    .catch(e => {
-                        this.transactionFee = 0;
-                    });
+                p = this.$daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+            }
+
+            try {
+                this.transactionFee = await p;
+            } catch (e) {
+                console.log('q');
+                if (e.error && e.error.code === -6) {
+                    console.log('z');
+                    this.totalAmountExceedsBalance = true;
+                }
             }
         },
 
@@ -676,6 +718,15 @@ fieldset {
             color: black;
             width: 5px;
         }
+    }
+}
+
+.total-amount-exceeds-balance {
+    text-align: center;
+    color: red;
+    font: {
+        style: italic;
+        weight: bold;
     }
 }
 
