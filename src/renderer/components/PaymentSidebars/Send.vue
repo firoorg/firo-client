@@ -479,7 +479,7 @@ export default {
             this.transactionFee = 0;
 
             if (this.privateOrPublic === 'private') {
-                this.$daemon.calcPrivateTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
+                this.$daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount)
                     .then(r => {
                         this.transactionFee = r;
                     })

@@ -453,12 +453,15 @@ export class Zcoind {
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the zcoind call fails or received data is invalid.
-    async calcPrivateTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
-        let data = await this.send(null, 'get', 'txFee', {
-            addresses: {
-                [address]: amount
-            },
-            feePerKb,
+    async calcPrivateTxFee(label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+        let data = await this.send(null, 'none', 'privateTxFee', {
+            outputs: [
+                {
+                    address: recipient,
+                    amount
+                }
+            ],
+            label,
             subtractFeeFromAmount
         });
 
