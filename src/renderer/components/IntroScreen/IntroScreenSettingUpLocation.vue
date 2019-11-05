@@ -85,24 +85,33 @@ export default {
         ...mapGetters({
             currentBlockHeight: 'Blockchain/currentBlockHeight',
             walletVersion: 'App/walletVersion',
-            hasLocation: 'App/hasBlockchainLocation'
+            hasLocation: 'App/hasBlockchainLocation',
+            hasApiStatus: 'ApiStatus/hasApiStatus'
         })
     },
 
     watch: {
-        showNextButton () {
-            setTimeout(() => {
+        // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
+        // actions (like setting the passphrase) until zcoind is ready.
+        hasApiStatus (val) {
+            if (val) {
                 this.actions.next()
-            }, 5000)
+            }
         }
-        /*showNextButton() {
-            this.eventBus.$emit('reflow')
-        }*/
+    },
+
+    mounted() {
+        // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
+        // loaded and the watch() is set.
+        if (this.hasApiStatus) {
+            this.actions.next();
+        }
     },
 
     methods: {
+        // part of GuideStepMixin
         isEnabled () {
-            return !this.hasLocation || !this.walletVersion
+            return !this.hasApiStatus;
         }
     }
 }

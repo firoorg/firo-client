@@ -22,6 +22,8 @@ const actions = {
 
 const getters = {
     apiStatus: (state) => state.apiStatus,
+    // Do we have an apiStatus?
+    hasApiStatus: (state): boolean => !!state.apiStatus.data,
     isReindexing: (state): boolean => state.apiStatus.data.reindexing,
     // We will return 0 if apiStatus hasn't yet loaded.
     localZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.localCount : 0,
