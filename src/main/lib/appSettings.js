@@ -19,6 +19,6 @@ export const populateStoreWithAppSettings = async function ({ store }) {
             logger.error(e);
         }
 
-        store.dispatch(types[category][key], value);
+        await store.dispatch(types[category][key], value);
     }
 };

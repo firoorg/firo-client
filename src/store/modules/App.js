@@ -8,6 +8,7 @@ import Vue from 'vue'
 const logger = createLogger('zcoin:store:app')
 
 const state = {
+    isInitialRun: true,
     isReady: false,
     isRunning: false,
     isStopping: false,
@@ -30,6 +31,10 @@ const mutations = {
 
     [types.SET_BLOCKCHAIN_LOCATION] (state, location) {
         state.blockchainLocation = location
+    },
+
+    setInitialRun (state, value) {
+        state.isInitialRun = value;
     },
 
     // daemon
@@ -224,6 +229,13 @@ const actions = {
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
 
         await getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location);
+
+        if (fs.existsSync(path.join(location, 'wallet.dat'))) {
+            logger.info("app.setInitialRun = false");
+            commit('setInitialRun', false);
+        } else {
+            logger.info("app.setInitialRun = true");
+        }
     },
 
     // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
@@ -258,7 +270,7 @@ const getters = {
     isRunning: (state) => state.isRunning || false,
     isRestarting: (state) => state.isRestarting || false,
     isInitialRun: (state) => {
-        return !state.blockchainLocation
+        return state.isInitialRun
     },
 
     blockchainLocation: (state) => {
