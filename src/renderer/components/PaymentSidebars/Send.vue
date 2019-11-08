@@ -632,6 +632,25 @@ export default {
 .send-zcoin-form {
     height: 100vh;
 
+    &.private-send {
+        background-color: $color--comet-dark;
+        color: darken($color--white-light, 10%);
+
+        input {
+            color: $color--dark-light;
+            background-color: $color--comet-light;
+
+            &::placeholder {
+                color: darken($color--dark-light, 10%);
+            }
+        }
+    }
+
+    &.public-send {
+        .form {
+        }
+    }
+
     .description {
         @include description();
         margin-bottom: 1em;
@@ -656,11 +675,6 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }
-
-    ::selection {
-        color: $color--white-light;
-        background: $color--dark;
     }
 }
 
