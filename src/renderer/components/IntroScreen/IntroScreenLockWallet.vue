@@ -1,7 +1,10 @@
 <template>
+    <intro-screen-lock-wallet-waiting
+        v-if="!hasApiStatus"
+    />
     <component
         :is="'IntroScreenLockWalletCreate'"
-        v-if="!showConfirm"
+        v-else-if="!showConfirm"
         :passphrase.sync="passphrase"
         :go-to-confirm="goToConfirm"
     />
@@ -29,6 +32,7 @@ import types from '~/types'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 import EventBusMixin from '@/mixins/EventBusMixin'
 
+import IntroScreenLockWalletWaiting from './IntroScreenLockWalletWaiting'
 import IntroScreenLockWalletCreate from './IntroScreenLockWalletCreate'
 import IntroScreenLockWalletConfirm from './IntroScreenLockWalletConfirm'
 import IntroScreenLockWalletWarning from './IntroScreenLockWalletWarning'
@@ -36,6 +40,7 @@ import IntroScreenLockWalletWarning from './IntroScreenLockWalletWarning'
 export default {
     name: 'IntroScreenLockWallet',
     components: {
+        IntroScreenLockWalletWaiting,
         IntroScreenLockWalletCreate,
         IntroScreenLockWalletConfirm,
         IntroScreenLockWalletWarning
@@ -57,7 +62,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            isLocked: 'App/isLocked'
+            isLocked: 'ApiStatus/isLocked',
+            hasApiStatus: 'ApiStatus/hasApiStatus'
         }),
         isEqual () {
             return this.passphrase === this.confirm
@@ -96,8 +102,8 @@ export default {
             this.actions.next()
         },
         isEnabled () {
-            this.$log.debug('is locked', this.isLocked)
-            return !this.isLocked
+            this.$log.debug('is locked: %O', this.isLocked)
+            return this.isLocked !== true
         }
     }
 }
