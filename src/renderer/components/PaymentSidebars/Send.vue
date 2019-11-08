@@ -135,7 +135,6 @@
                                 v-else
                                 class="value"
                             >
-                                ??? XZC
                             </div>
                         </div>
 
@@ -154,7 +153,6 @@
                                 v-else
                                 class="value"
                             >
-                                ??? XZC
                             </div>
                         </div>
 
@@ -174,7 +172,6 @@
                                 v-else
                                 class="value"
                             >
-                                ??? XZC
                             </div>
                         </div>
                     </div>
