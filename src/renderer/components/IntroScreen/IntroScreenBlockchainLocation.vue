@@ -75,6 +75,7 @@ export default {
             const [ blockchainPath ] = returned
 
             this.$store.dispatch(types.app.SET_BLOCKCHAIN_LOCATION, blockchainPath)
+            this.$store.dispatch(types.app.DAEMON_START)
         },
 
         startDaemon () {
