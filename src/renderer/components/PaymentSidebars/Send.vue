@@ -636,6 +636,12 @@ export default {
         background-color: $color--comet-dark;
         color: darken($color--white-light, 10%);
 
+        .totals {
+            .value {
+                color: white;
+            }
+        }
+
         input {
             color: $color--dark-light;
             background-color: $color--comet-light;
@@ -644,10 +650,21 @@ export default {
                 color: darken($color--dark-light, 10%);
             }
         }
+
+        .amount-available {
+            color: $color--comet-light;
+        }
     }
 
     &.public-send {
-        .form {
+        .totals {
+            .value {
+                color: $color--green-dark;
+            }
+        }
+
+        .amount-available {
+            color: $color--polo-dark;
         }
     }
 
@@ -704,7 +721,6 @@ fieldset {
 
     .amount-available {
         text-align: right;
-        color: $color--polo-dark;
         font-style: italic;
     }
 }
@@ -717,10 +733,6 @@ fieldset {
 
         label, .value {
             display: inline;
-        }
-
-        .value {
-            color: $color--green-dark;
         }
     }
 
