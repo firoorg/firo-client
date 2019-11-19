@@ -19,7 +19,7 @@ const logger = winston.createLogger({
             handleExceptions: true
         }),
         new winston.transports.File({
-            filename: join(getApp().getPath('userData'), 'combined.log'),
+            filename: join(getApp().getPath('userData'), 'zcoin-client.log'),
             handleExceptions: true,
 	    level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'info',
             // Only keep logs of the latest session.
