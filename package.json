@@ -166,7 +166,7 @@
     "del": "^4.0.0",
     "devtron": "^1.4.0",
     "electron": "^3.1.5",
-    "electron-builder": "^20.40.2",
+    "electron-builder": "21.2.0",
     "electron-debug": "^2.1.0",
     "electron-toolkit": "^1.0.24",
     "eslint": "^5.15.1",
