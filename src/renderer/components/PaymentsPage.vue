@@ -1,11 +1,17 @@
 <template>
     <section class="tx-page">
-        <div class="window-height">
+        <div class="window-height payment-page-window">
             <section
                 v-scrollable
                 class="payment-list-container"
             >
                 <payments-list />
+            </section>
+            <section
+                v-scrollable
+                class="overlay centered"
+            >
+                <custom-input-popup />
             </section>
         </div>
 
@@ -17,12 +23,14 @@
 
 <script>
 import PaymentsList from '@/components/PaymentsList';
+import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
 
 export default {
     name: 'PaymentsPage',
 
     components: {
-        PaymentsList
+        PaymentsList,
+        CustomInputPopup
     }
 }
 </script>
@@ -55,5 +63,8 @@ export default {
 
     .tx-page-sidebar {
         background: $color--white;
+    }
+    .payment-page-window{
+        position: relative
     }
 </style>

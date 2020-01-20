@@ -92,7 +92,9 @@
                                         XZC
                                     </div>
                                 </div>
-
+                                <div class="control">
+                                    <u><a @click="selectCustomInputs()"> Select Custom Inputs</a></u>
+                                </div>
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
                                         v-model="subtractFeeFromAmount"
@@ -100,7 +102,7 @@
                                         name="subtractFeeFromAmount"
                                         :checked="privateOrPublic === 'private'"
                                     />
-
+                                    
                                     <label for="subtractFeeFromAmount">
                                         Take Transaction Fee From Amount
                                     </label>
@@ -109,7 +111,7 @@
                                 <div class="amount-available">
                                     {{ convertToCoin(availableBalance) }} XZC available for {{ privateOrPublic }} send.
                                     <div v-if="unavailableBalance > 0">
-                                        ({{ convertToCoin(unavailableBalance )}} XZC in pending,
+                                        ({{ convertToCoin(unavailableBalance ) }} XZC in pending,
                                         {{ privateOrPublic === 'private' ? 'public' : 'private' }}, and locked balances
                                         unavailable.)
                                     </div>
@@ -623,6 +625,11 @@ export default {
         closeSendPopover () {
             this.passphrase = '';
             this.sendPopoverStep = 'initial';
+        },
+
+        selectCustomInputs() {
+            console.log("Start custom inputs popup")
+            // show popup here
         }
     }
 }
