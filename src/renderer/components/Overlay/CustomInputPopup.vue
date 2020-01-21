@@ -13,6 +13,7 @@
             :fields="tableFields"
             :data-manager="dataManager"
             :track-by="trackBy"
+            :per-page="100"
             @vuetable:checkbox-toggled-custom="toggleCheckbox"
         >
             <div
@@ -156,11 +157,20 @@ export default {
 
         tableData () {
             const tableData = [];
-            console.log('transaction:', this.transactions);
             for (const [id, tx] of Object.entries(this.transactions)) {
-                if (!['mined', 'receive', 'znode'].includes(tx.category)) {
-                    continue;
+                console.log('path:', this.$route.path);
+                console.log('Selected:', this.selectedTx[tx.uniqId]);
+                if (this.$route.path == '/send/private') {
+                    if (!['spendIn'].includes(tx.category)) {
+                        continue;
+                    }
+                } else {
+                    if (!['coinbase', 'znode', 'mined', 'receive'].includes(tx.category)) {
+                        continue;
+                    }
                 }
+                if (!tx.spendable) continue;
+                console.log('amount:', tx.amount);
                 let timestamp = new Date(tx.blockTime * 1000) || Infinity;
                 tableData.push({
                     id: `/transaction-info/${id}`,
@@ -211,7 +221,7 @@ export default {
                 }
             });
 
-            this.$store.dispatch('ZcoinPayment/UPDATE_CUSTOM_INPUTS', utxos);
+            this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', utxos);
         },
         getRowClass (item, index) {
             const classes = []
@@ -272,6 +282,8 @@ export default {
                 this.selectedTx[dataItem.uniqId] = true;
                 this.totalSelected += dataItem.amount
             }
+            console.log('Element id:', dataItem.uniqId);
+            console.log('state data:', this.$store.state.selectedTx);
         },
         closePopup() {
             this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');

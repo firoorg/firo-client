@@ -372,7 +372,8 @@ export default {
             availableXzc: 'Balance/availableXzc',
             availableZerocoin: 'Balance/availableZerocoin',
             totalBalance: 'Balance/total',
-            maxPrivateSend: 'Balance/maxPrivateSend'
+            maxPrivateSend: 'Balance/maxPrivateSend',
+            selectedUtxos: 'ZcoinPayment/selectedInputs'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -572,6 +573,15 @@ export default {
         },
 
         async attemptSend () {
+            var coinControl = '';
+            if (this.selectedUtxos && this.selectedUtxos.length > 0) {
+                this.selectedUtxos.forEach(element => {
+                    coinControl = `${coinControl}:${element.txid}-${element.txIndex}`;
+                });
+                this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
+                coinControl = coinControl.substring(1);
+            }
+            console.log('coin control:', coinControl);
             // This will have the effect of preventing the user from sending again without re-entering their passphrase.
             // JavaScript is single threaded, so there should be no race condition possible with an interruption between
             // the value check and the value assignment.
@@ -587,11 +597,10 @@ export default {
             try {
                 if (this.privateOrPublic === 'private') {
                     await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
-                        this.subtractFeeFromAmount, "64c406dba7eec404845b2d52931ee974758a78d639a0a7f57c0916e21edd2ffd-4:64c406dba7eec404845b2d52931ee974758a78d639a0a7f57c0916e21edd2ffd-5");
+                        this.subtractFeeFromAmount, coinControl);
                 } else {
                     let d = await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
-                        this.txFeePerKb, this.subtractFeeFromAmount, "");
-                    console.log("transaction data:", d);
+                        this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
                 }
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.

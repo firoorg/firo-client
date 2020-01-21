@@ -49,7 +49,8 @@ module.exports = {
             data: null,
             error: null
         },
-        lastSeen: 'blockHeightAsInteger'
+        lastSeen: 'blockHeightAsInteger',
+        selectedUtxos: []
     },
 
     PaymentRequest: {

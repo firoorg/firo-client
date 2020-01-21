@@ -147,6 +147,10 @@ const actions = {
         commit(types.SET_TX_FEE, fee)
     },
 
+    [types.UPDATE_CUSTOM_INPUTS] ({ commit }, { inputs }) {
+        commit(types.UPDATE_CUSTOM_INPUTS, inputs)
+    },
+
     [types.SEND_ZCOIN] ({ dispatch, commit, state }, { payments, fee, auth }) {
         // const { address, amount } = payment
 
