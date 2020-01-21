@@ -93,7 +93,11 @@
                                     </div>
                                 </div>
                                 <div class="control">
-                                    <u><a @click="selectCustomInputs()"> Select Custom Inputs</a></u>
+                                    <u><a
+                                        :style="{ cursor: 'default'}"
+                                        @click="selectCustomInputs()"
+                                    >
+                                        Select Custom Inputs</a></u>
                                 </div>
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
@@ -583,10 +587,11 @@ export default {
             try {
                 if (this.privateOrPublic === 'private') {
                     await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
-                        this.subtractFeeFromAmount);
+                        this.subtractFeeFromAmount, "64c406dba7eec404845b2d52931ee974758a78d639a0a7f57c0916e21edd2ffd-4:64c406dba7eec404845b2d52931ee974758a78d639a0a7f57c0916e21edd2ffd-5");
                 } else {
-                    await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
-                        this.txFeePerKb, this.subtractFeeFromAmount);
+                    let d = await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
+                        this.txFeePerKb, this.subtractFeeFromAmount, "");
+                    console.log("transaction data:", d);
                 }
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.
@@ -628,8 +633,8 @@ export default {
         },
 
         selectCustomInputs() {
-            console.log("Start custom inputs popup")
-            // show popup here
+            // show popup
+            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         }
     }
 }

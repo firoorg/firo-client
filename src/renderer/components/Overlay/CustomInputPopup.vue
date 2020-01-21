@@ -1,5 +1,9 @@
 <template>
     <section class="custom-input-popup animated-table">
+        <a
+            class="close"
+            @click="closePopup"
+        >&times;</a>
         <h4>
             Available UTXOs
         </h4>
@@ -8,13 +12,50 @@
             :api-mode="false"
             :fields="tableFields"
             :data-manager="dataManager"
-            :row-class="getRowClass"
-            v-bind="{ scopedSlots: $scopedSlots }"
-            @vuetable:row-clicked="onRowClick"
+            :track-by="trackBy"
+            @vuetable:checkbox-toggled-custom="toggleCheckbox"
         >
+            <div
+                slot="status"
+                slot-scope="props"
+            >
+                <span
+                    v-if="props.rowData.status === true"
+                    class="tx-enable"
+                >
+                    <unlock-icon />
+                </span>
+                <span
+                    v-else
+                    class="tx-disable"
+                >
+                    <lock-icon />
+                </span>
+            </div>
+
+            <div
+                slot="amount"
+                slot-scope="props"
+                class="vuetable-amount"
+            >
+                {{ convertToCoin(props.rowData.amount) + " XZC" }}
+                <u
+                    v-if="props.rowData.category === 'znode'"
+                >
+                    MASTERNODE COLLATERAL
+                </u>
+            </div>
+            
+            <div
+                slot="timestamp"
+                slot-scope="props"
+                class="vuetable-timestamp"
+            >
+                {{ props.rowData.timestamp.toLocaleDateString() + " " + props.rowData.timestamp.toLocaleTimeString() }}
+            </div>
         </vuetable>
         <div class="popup-footer">
-            <h4> Total Currenly Selected: </h4>
+            <h4> Total Currenly Selected: {{ convertToCoin(totalSelected) }} XZC</h4>
             <base-button
                 color="white"
                 @click="confirmSelect()"
@@ -27,45 +68,44 @@
 
 <script>
 import { mapGetters } from 'vuex';
-
-// import AnimatedTable from '@/components/AnimatedTable/AnimatedTable';
+import Vue from 'vue'
 import { Vuetable } from 'vuetable-2'
-import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate';
-import Amount from '@/components/AnimatedTable/AnimatedTableAmount';
-import PaymentStatus from '@/components/AnimatedTable/AnimatedTablePaymentStatus';
-import Label from '@/components/AnimatedTable/AnimatedTableLabel';
 import _ from 'lodash'
+import VueTableCheckbox from '@/components/Overlay/VueTableCheckbox'
+import LockIcon from '@/components//Icons/LockIcon'
+import UnlockIcon from '@/components//Icons/UnlockIcon'
 import { convertToCoin } from "#/lib/convert";
-import VuetableFieldCheckbox from 'vuetable-2/src/components/VuetableFieldCheckbox.vue'
+Vue.component('vuetable-field-checkbox', VueTableCheckbox)
 
 const tableFields = [
     {
         name: 'vuetable-field-checkbox',
         title: "checkbox",
-        width: "5%"
-    },
-    {
-        name: 'index',
-        title: ''
+        width: "10%",
+        titleClass: "vuetable-checkbox-header",
     },
     {
         name: 'amount',
-        title: 'Amount'
+        title: 'Amount',
+        sortField: 'amount',
+        width: "15%",
+        formatter: value => convertToCoin(value) + " XZC",
     },
     {
         name: 'status',
         sortField: 'status',
-        dataClass: 'center aligned',
+        width: '25%'
     },
     {
         name: 'timestamp',
-        sortField: 'timestamp'
+        sortField: 'timestamp',
+        width: "20%"
     },
     {
         name: "txIndex",
         title: 'Index',
         sortField: 'txIndex',
-        width: '25%'
+        width: '15%'
     }
    
 ];
@@ -74,19 +114,21 @@ export default {
     name: 'CustomInputPopup',
     components: {
         Vuetable,
-        VuetableFieldCheckbox
+        LockIcon,
+        UnlockIcon
     },
     props: {
         trackBy: {
             type: String,
-            default: 'id'
+            default: 'uniqId'
         },
         sortOrder: {
             type: Array,
             default: () => [
                 {
-                    field: 'createdAt',
-                    direction: 'desc'
+                    field: 'txIndex',
+                    direction: 'desc',
+                    sortField: 'txIndex'
                 }
             ]
         },
@@ -102,27 +144,34 @@ export default {
     data () {
         return {
             tableFields,
-            filter: ''
+            filter: '',
+            totalSelected: 0,
+            selectedTx: {}
         }
     },
     computed: {
         ...mapGetters({
-            transactions: 'Transactions/transactions',
-            addresses: 'Transactions/addresses',
-            consolidatedMints: 'Transactions/consolidatedMints',
-            paymentRequests: 'PaymentRequest/paymentRequests'
+            transactions: 'Transactions/transactions'
         }),
 
         tableData () {
             const tableData = [];
-
+            console.log('transaction:', this.transactions);
             for (const [id, tx] of Object.entries(this.transactions)) {
+                if (!['mined', 'receive', 'znode'].includes(tx.category)) {
+                    continue;
+                }
+                let timestamp = new Date(tx.blockTime * 1000) || Infinity;
                 tableData.push({
                     id: `/transaction-info/${id}`,
                     txIndex: tx.txIndex + "",
-                    timestamp: new Date(tx.blockTime * 1000).toLocaleDateString("en-US") || Infinity,
-                    amount: tx.amount + " XZC",
-                    status: true
+                    timestamp: timestamp,
+                    amount: tx.amount,
+                    status: tx.category !== 'znode',
+                    txid: tx.txid,
+                    uniqId: tx.uniqId,
+                    category: tx.category,
+                    address: tx.address
                 });
             }
             return tableData;
@@ -130,8 +179,12 @@ export default {
 
         filteredTableData () {
             return this.tableData;
-        },
-
+        }
+    },
+    watch:{
+        $route (to, from){
+            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+        }
     },
     methods: {
         comparePayments(a, b) {
@@ -140,14 +193,28 @@ export default {
             );
         },
         confirmSelect() {
-            console.log("confirm select")
+            if (this.totalSelected === 0 ) {
+                return alert("Please select at least one !")
+            }
+            let agree = confirm("Are you sure?");
+
+            if (!agree) return
+
+            // close dialog and trigger payment event
+            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+
+            // get selected utxos
+            const utxos = [];
+            this.tableData.forEach(element => {
+                if (this.selectedTx[element.uniqId]) {
+                    utxos.push(element)
+                }
+            });
+
+            this.$store.dispatch('ZcoinPayment/UPDATE_CUSTOM_INPUTS', utxos);
         },
         getRowClass (item, index) {
             const classes = []
-
-            if (item[this.trackBy] === this.selectedRow) {
-                classes.push('selected')
-            }
 
             if (item.isFulfilled) {
                 classes.push('is-fulfilled')
@@ -162,24 +229,6 @@ export default {
             return classes.join(' ')
         },
 
-        onRowClick (rowData) {
-            const { data, index, event } = rowData
-
-            if (this.onRowSelect) {
-                this.onRowSelect(data, index, event)
-            }
-        },
-
-        onPaginationData (paginationData) {
-            this.$refs.pagination.setPaginationData(paginationData)
-        },
-
-        onChangePage (page) {
-            this.rowTransition = ''
-            this.$refs.vuetable.changePage(page)
-            this.rowTransition = 'fade'
-        },
-
         dataManager (sortOrder, pagination) {
             if (this.tableData.length < 1) {
                 return {
@@ -188,12 +237,7 @@ export default {
             }
 
             let local = this.tableData
-
-            // see if we got a sort order passed in into the call if not,
-            // fall back to the optional prop
             const orderBy = sortOrder.length ? sortOrder : this.sortOrder
-
-            // sortOrder can still be empty, so we have to check for that as well
             if (orderBy.length > 0) {
                 local = _.orderBy(
                     local,
@@ -202,24 +246,40 @@ export default {
                 )
             }
 
-            pagination = this.$refs.vuetable.makePagination(
-                local.length,
-                this.perPage
-            )
-            let from = pagination.from - 1
-            let to = from + this.perPage
-
             return {
-                pagination: pagination,
-                data: _.slice(local, from, to)
+                data: local
             }
         },
-        onActionClicked (action, data) {
-            this.$log.debug('slot actions: on-click', data.name)
+        toggleAllCheckbox(isChecked) {
+            if (!isChecked) {
+                this.totalSelected = 0;
+                this.selectedTx = {};
+            } else {
+                let sum = 0;
+                this.tableData.forEach(element => {
+                    sum += element.amount;
+                    this.selectedTx[element.uniqId] = true;
+                });
+                this.totalSelected = sum;
+            }
+        },
+        convertToCoin: convertToCoin,
+        toggleCheckbox(isCheck, dataItem) {
+            if (!isCheck) {
+                this.selectedTx[dataItem.uniqId] = false;
+                this.totalSelected -= dataItem.amount
+            } else {
+                this.selectedTx[dataItem.uniqId] = true;
+                this.totalSelected += dataItem.amount
+            }
+        },
+        closePopup() {
+            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         }
     }
 }
 </script>
+
 
 <style lang="scss" scoped>
     .custom-input-popup {
@@ -230,6 +290,18 @@ export default {
         right: 20px;
         padding: 20px;
         background: #fff;
+        overflow: auto;
+        .close{
+            position: absolute;
+            top: 15px;
+            right: 30px;
+            transition: all 200ms;
+            font-size: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #333;
+            cursor: pointer;
+        }
         .popup-footer {
             margin-top: 10px;
             h4 {
@@ -239,6 +311,40 @@ export default {
                 float: right;
                 width: 40%;
                 margin-top:10px
+            }
+        }
+        .vuetable-timestamp{
+            font-size: 11px;
+        }
+        .vuetable-amount > u{
+            display: block;
+            font-size: 8px;
+            font-style: italic;
+        }
+        .tx-enable{
+            // background: green;
+            width: 78%;
+            height: 5px;
+            background: #58ca58;
+            display: inline-block;
+            >img {
+                float: right;
+                margin-top: -8px;
+                margin-right: -13px;
+                width: 15px;
+                filter: invert(74%) sepia(13%) saturate(1998%) hue-rotate(85deg) brightness(93%) contrast(85%);
+            }
+        }
+        .tx-disable{
+            width: 78%;
+            height: 5px;
+            background: #ef3650;
+            display: inline-block;
+            margin-left: 12px;
+            >svg {
+                float: left;
+                margin-top: -8px;
+                margin-left: -13px;
             }
         }
     }

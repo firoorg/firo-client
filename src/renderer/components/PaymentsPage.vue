@@ -8,7 +8,7 @@
                 <payments-list />
             </section>
             <section
-                v-scrollable
+                v-if="isShowingCustomInputs"
                 class="overlay centered"
             >
                 <custom-input-popup />
@@ -21,7 +21,9 @@
     </section>
 </template>
 
+
 <script>
+import { mapGetters } from 'vuex';
 import PaymentsList from '@/components/PaymentsList';
 import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
 
@@ -31,6 +33,11 @@ export default {
     components: {
         PaymentsList,
         CustomInputPopup
+    },
+    computed: {
+        ...mapGetters({
+            isShowingCustomInputs: 'ZcoinPayment/customInputs'
+        }),
     }
 }
 </script>

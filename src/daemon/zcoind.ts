@@ -285,6 +285,8 @@ export class Zcoind {
 
         return new Promise((resolve, reject) => {
             try {
+                logger.debug("message raw:%O", message);
+                logger.debug("message:%O", JSON.stringify(message));
                 this.requesterSocket.send(JSON.stringify(message));
             } catch (e) {
                 logger.error("Error sending data to zcoind: %O", e);
@@ -384,7 +386,7 @@ export class Zcoind {
 
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
-    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number, subtractFeeFromAmount: boolean): Promise<string> {
+    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, selecteds: string): Promise<string> {
         const data: {txid: string} = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
@@ -393,7 +395,10 @@ export class Zcoind {
                 }
             },
             feePerKb,
-            subtractFeeFromAmount
+            subtractFeeFromAmount,
+            coincontrol: {
+                selecteds
+            }
         });
 
         return data.txid;
@@ -402,7 +407,7 @@ export class Zcoind {
     // Publicly send amount satoshi XZC to recipient, subtracting the fee from the amount.
     //
     // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean): Promise<string> {
+    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean, selecteds: string): Promise<string> {
         const data = await this.send(auth, 'create', 'sendPrivate', {
             outputs: [
                 {
@@ -411,9 +416,12 @@ export class Zcoind {
                 }
             ],
             label,
-            subtractFeeFromAmount
+            subtractFeeFromAmount,
+            coincontrol: {
+                selecteds
+            }
         });
-
+        console.log('privateSend data:', data);
         return data;
     }
 
