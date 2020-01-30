@@ -159,9 +159,9 @@ export default {
             const tableData = [];
             for (const [id, tx] of Object.entries(this.transactions)) {
                 console.log('path:', this.$route.path);
-                console.log('Selected:', this.selectedTx[tx.uniqId]);
+                console.log('category:', tx.category);
                 if (this.$route.path == '/send/private') {
-                    if (!['spendIn'].includes(tx.category)) {
+                    if (!['sigmaMint', 'mint'].includes(tx.category)) {
                         continue;
                     }
                 } else {

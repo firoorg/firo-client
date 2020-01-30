@@ -425,6 +425,12 @@ export class Zcoind {
         return data;
     }
 
+    async unlockWallet(auth: string): Promise<string> {
+        const data = await this.send(auth, 'create', 'unlockWallet', {});
+        console.log('unlocking wallet');
+        return data;
+    }
+
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
     // '25', or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200
     // Zerocoin). We resolve() with the generated txid, or reject() with an error if something went wrong.

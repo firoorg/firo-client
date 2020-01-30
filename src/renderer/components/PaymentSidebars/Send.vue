@@ -233,11 +233,19 @@
                             </base-button>
 
                             <base-button
-                                v-else-if="sendPopoverStep === 'passphrase'"
+                                v-else-if="sendPopoverStep === 'passphrase' && !isCCSigmaSelected"
                                 color="green"
                                 @click.prevent="attemptSend"
                             >
                                 Send
+                            </base-button>
+
+                            <base-button
+                                v-else-if="sendPopoverStep === 'passphrase' && isCCSigmaSelected"
+                                color="green"
+                                @click.prevent="attemptUnlock"
+                            >
+                                Unlock
                             </base-button>
 
                             <div
@@ -272,9 +280,15 @@
                                 />
 
                                 <send-step-passphrase
-                                    v-else-if="sendPopoverStep === 'passphrase'"
+                                    v-else-if="sendPopoverStep === 'passphrase' && !isCCSigmaSelected"
                                     v-model="passphrase"
                                     @onEnter="attemptSend"
+                                />
+
+                                <send-step-passphrase
+                                    v-else-if="sendPopoverStep === 'passphrase' && isCCSigmaSelected"
+                                    v-model="passphrase"
+                                    @onEnter="attemptUnlock"
                                 />
 
                                 <send-step-wait-for-reply
@@ -362,7 +376,9 @@ export default {
             totalAmountExceedsBalance: false,
 
             // TODO: Right now we're just hardcoding this. It should be made user configurable.
-            txFeePerKb: 1
+            txFeePerKb: 1,
+
+            isCCSigmaSelected: false
         }
     },
 
@@ -614,8 +630,49 @@ export default {
 
                 return;
             }
-
+            
             this.beginCompleteStep();
+        },
+
+        async attemptUnlock () {
+            // This will have the effect of preventing the user from sending again without re-entering their passphrase.
+            // JavaScript is single threaded, so there should be no race condition possible with an interruption between
+            // the value check and the value assignment.
+            let passphrase = this.passphrase;
+            this.passphrase = '';
+            if (!passphrase) {
+                return;
+            }
+            this.sendPopoverStep = 'waitForReply';
+            this.recalculatePopoverPosition();
+
+            try {
+                if (this.privateOrPublic === 'private') {
+                    await this.$daemon.unlockWallet(passphrase);
+                    //resync data
+                    const data = await this.$daemon.send(passphrase, 'initial', 'stateWallet', {});
+                    console.log('attemptUnlock');
+                    this.$store.dispatch('Transactions/setWalletState', data);
+                }
+            } catch (e) {
+                // Error code -14 indicates an incorrect passphrase.
+                if (e.error && e.error.code === -14) {
+                    this.beginIncorrectPassphraseStep();
+                } else if (e.error && e.error.message) {
+                    this.beginErrorStep(e.error.message);
+                } else {
+                    this.beginErrorStep(JSON.stringify(e));
+                }
+
+                return;
+            }
+            if (this.privateOrPublic === 'private') {
+                this.sendPopoverStep = 'initial';
+                this.isCCSigmaSelected = false;
+                this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+            } else {
+                this.beginCompleteStep();
+            }
         },
 
         beginIncorrectPassphraseStep () {
@@ -642,8 +699,13 @@ export default {
         },
 
         selectCustomInputs() {
-            // show popup
-            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+            if (this.privateOrPublic === 'public') {
+                // show popup
+                this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+            } else {
+                this.isCCSigmaSelected = true;
+                this.beginPassphraseStep();
+            }
         }
     }
 }
