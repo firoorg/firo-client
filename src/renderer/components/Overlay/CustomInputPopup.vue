@@ -158,19 +158,21 @@ export default {
         tableData () {
             const tableData = [];
             for (const [id, tx] of Object.entries(this.transactions)) {
-                console.log('path:', this.$route.path);
-                console.log('category:', tx.category);
+                var amount = tx.amount;
                 if (this.$route.path == '/send/private') {
-                    if (!['sigmaMint', 'mint'].includes(tx.category)) {
+                    if (!['mint'].includes(tx.category)) {
                         continue;
                     }
+                    amount = tx.sigmaAmount;
                 } else {
                     if (!['coinbase', 'znode', 'mined', 'receive'].includes(tx.category)) {
                         continue;
                     }
                 }
-                if (!tx.spendable) continue;
+                if (!tx.spendable) continue; 
                 console.log('amount:', tx.amount);
+                console.log('id:', id);
+                console.log('index:', tx.txIndex);
                 let timestamp = new Date(tx.blockTime * 1000) || Infinity;
                 tableData.push({
                     id: `/transaction-info/${id}`,
