@@ -698,9 +698,11 @@ export default {
             this.sendPopoverStep = 'initial';
         },
 
-        selectCustomInputs() {
+        async selectCustomInputs() {
             if (this.privateOrPublic === 'public') {
                 // show popup
+                const data = await this.$daemon.send('', 'initial', 'stateWallet', {});
+                this.$store.dispatch('Transactions/setWalletState', data);
                 this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
             } else {
                 this.isCCSigmaSelected = true;
