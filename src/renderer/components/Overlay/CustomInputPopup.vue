@@ -12,8 +12,11 @@
             :api-mode="false"
             :fields="tableFields"
             :data-manager="dataManager"
+            pagination-path="pagination"
+            @vuetable:loaded="onLoadingCompleted"
             :track-by="trackBy"
-            :per-page="100"
+            :per-page="perPage"
+            @vuetable:pagination-data="onPaginationData"
             @vuetable:checkbox-toggled-custom="toggleCheckbox"
         >
             <div
@@ -55,6 +58,15 @@
                 {{ props.rowData.timestamp.toLocaleDateString() + " " + props.rowData.timestamp.toLocaleTimeString() }}
             </div>
         </vuetable>
+
+        <div>
+            <animated-table-pagination
+                ref="pagination"
+                :theme="theme"
+                @vuetable-pagination:change-page="onChangePage"
+            />
+        </div>
+
         <div class="popup-footer">
             <h4> Total Currenly Selected: {{ convertToCoin(totalSelected) }} XZC</h4>
             <base-button
@@ -75,6 +87,7 @@ import _ from 'lodash'
 import VueTableCheckbox from '@/components/Overlay/VueTableCheckbox'
 import LockIcon from '@/components//Icons/LockIcon'
 import UnlockIcon from '@/components//Icons/UnlockIcon'
+import AnimatedTablePagination from '@/components/AnimatedTable/AnimatedTablePagination'
 import { convertToCoin } from "#/lib/convert";
 Vue.component('vuetable-field-checkbox', VueTableCheckbox)
 
@@ -116,7 +129,8 @@ export default {
     components: {
         Vuetable,
         LockIcon,
-        UnlockIcon
+        UnlockIcon,
+        AnimatedTablePagination
     },
     props: {
         trackBy: {
@@ -158,12 +172,10 @@ export default {
         tableData () {
             const tableData = [];
             for (const [id, tx] of Object.entries(this.transactions)) {
-                var amount = tx.amount;
                 if (this.$route.path == '/send/private') {
                     if (!['mint'].includes(tx.category)) {
                         continue;
                     }
-                    amount = tx.sigmaAmount;
                 } else {
                     if (!['coinbase', 'znode', 'mined', 'receive'].includes(tx.category)) {
                         continue;
@@ -241,6 +253,16 @@ export default {
             return classes.join(' ')
         },
 
+        onPaginationData (paginationData) {
+            this.$refs.pagination.setPaginationData(paginationData)
+        },
+
+        onChangePage (page) {
+            this.rowTransition = ''
+            this.$refs.vuetable.changePage(page)
+            this.rowTransition = 'fade'
+        },
+
         dataManager (sortOrder, pagination) {
             if (this.tableData.length < 1) {
                 return {
@@ -258,8 +280,16 @@ export default {
                 )
             }
 
+            pagination = this.$refs.vuetable.makePagination(
+                local.length,
+                this.perPage
+            )
+            let from = pagination.from - 1
+            let to = from + this.perPage
+
             return {
-                data: local
+                pagination: pagination,
+                data: _.slice(local, from, to)
             }
         },
         toggleAllCheckbox(isChecked) {
@@ -287,7 +317,15 @@ export default {
             console.log('Element id:', dataItem.uniqId);
             console.log('state data:', this.$store.state.selectedTx);
         },
+        onLoadingCompleted() {
+            this.selectedTx.forEach((id, e) => {
+                this.$refs.vuetable.selectedId(id);
+            })
+        },
         closePopup() {
+            if (this.totalSelected === 0 ) {
+                this.$store.dispatch('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
+            } 
             this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         }
     }

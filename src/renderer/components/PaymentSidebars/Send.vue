@@ -441,6 +441,14 @@ export default {
             return !!(this.amount && this.address && !this.validationErrors.items.length);
         },
 
+        coinControlSelectedAmount() {
+            var selectedAmount = 0;
+            this.selectedUtxos.forEach(element => {
+                    selectedAmount += element.amount;
+            });
+            return selectedAmount;
+        },
+
         amountValidations () {
             return this.privateOrPublic === 'private' ?
                 'amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits'
@@ -498,8 +506,9 @@ export default {
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availableXzc will still be reactively updated.
-            getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableBalance),
-            validate: (value) => convertToSatoshi(value) <= this.availableBalance
+            getMessage: () => this.coinControlSelectedAmount == 0? ('Amount Is Over Your Available Balance of ' + convertToCoin(this.availableBalance)):'Amount Is Over Your Selected Amount of ' + convertToCoin(this.coinControlSelectedAmount),
+            validate: (value) => (this.coinControlSelectedAmount == 0 && convertToSatoshi(value) <= this.availableBalance) 
+                                || (this.coinControlSelectedAmount > 0 && convertToSatoshi(value) <= this.coinControlSelectedAmount) 
         });
 
         this.$validator.extend('publicAmountIsValid', {
@@ -596,6 +605,7 @@ export default {
                 });
                 this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
                 coinControl = coinControl.substring(1);
+                
             }
             console.log('coin control:', coinControl);
             // This will have the effect of preventing the user from sending again without re-entering their passphrase.
