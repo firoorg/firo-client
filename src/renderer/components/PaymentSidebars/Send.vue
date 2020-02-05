@@ -113,6 +113,10 @@
                                 </div>
 
                                 <div class="amount-available">
+                                    <div v-if="coinControlSelectedAmount > 0">
+                                        {{ convertToCoin(coinControlSelectedAmount ) }} XZC selected in coin control for
+                                        {{ privateOrPublic === 'private' ? 'private' : 'public' }} send.
+                                    </div>
                                     {{ convertToCoin(availableBalance) }} XZC available for {{ privateOrPublic }} send.
                                     <div v-if="unavailableBalance > 0">
                                         ({{ convertToCoin(unavailableBalance ) }} XZC in pending,
@@ -443,9 +447,11 @@ export default {
 
         coinControlSelectedAmount() {
             var selectedAmount = 0;
-            this.selectedUtxos.forEach(element => {
-                    selectedAmount += element.amount;
-            });
+            if (this.selectedUtxos) {
+                this.selectedUtxos.forEach(element => {
+                        selectedAmount += element.amount;
+                });
+            }
             return selectedAmount;
         },
 

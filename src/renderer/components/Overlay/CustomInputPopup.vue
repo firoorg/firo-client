@@ -62,7 +62,6 @@
         <div>
             <animated-table-pagination
                 ref="pagination"
-                :theme="theme"
                 @vuetable-pagination:change-page="onChangePage"
             />
         </div>
@@ -166,7 +165,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            transactions: 'Transactions/transactions'
+            transactions: 'Transactions/transactions',
+            selectedUtxos: 'ZcoinPayment/selectedInputs'
         }),
 
         tableData () {
@@ -182,9 +182,6 @@ export default {
                     }
                 }
                 if (!tx.spendable) continue; 
-                console.log('amount:', tx.amount);
-                console.log('id:', id);
-                console.log('index:', tx.txIndex);
                 let timestamp = new Date(tx.blockTime * 1000) || Infinity;
                 tableData.push({
                     id: `/transaction-info/${id}`,
@@ -307,6 +304,7 @@ export default {
         },
         convertToCoin: convertToCoin,
         toggleCheckbox(isCheck, dataItem) {
+            console.log('Data item:', dataItem);
             if (!isCheck) {
                 this.selectedTx[dataItem.uniqId] = false;
                 this.totalSelected -= dataItem.amount
@@ -315,12 +313,25 @@ export default {
                 this.totalSelected += dataItem.amount
             }
             console.log('Element id:', dataItem.uniqId);
-            console.log('state data:', this.$store.state.selectedTx);
         },
         onLoadingCompleted() {
-            this.selectedTx.forEach((id, e) => {
-                this.$refs.vuetable.selectedId(id);
-            })
+            if (this.selectedUtxos) {
+                this.selectedUtxos.forEach(element1 => {
+                    let found = false;
+                    this.tableData.forEach(element2 => {
+                        if (element1.uniqId == element2.uniqId) {
+                            found = true;
+                        }
+                    });
+
+                    if (found) {
+                        this.$refs.vuetable.selectId(element1.uniqId);
+                        this.totalSelected += element1.amount;
+                        this.selectedTx[element1.uniqId] = true;
+                    }
+                });
+            }
+            console.log('loading completed');
         },
         closePopup() {
             if (this.totalSelected === 0 ) {
