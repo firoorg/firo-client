@@ -252,6 +252,7 @@ export default {
 
         onPaginationData (paginationData) {
             this.$refs.pagination.setPaginationData(paginationData)
+            console.log('switching page');
         },
 
         onChangePage (page) {
@@ -326,12 +327,13 @@ export default {
 
                     if (found) {
                         this.$refs.vuetable.selectId(element1.uniqId);
-                        this.totalSelected += element1.amount;
+                        if (!this.selectedTx[element1.uniqId]) {
+                            this.totalSelected += element1.amount;
+                        }
                         this.selectedTx[element1.uniqId] = true;
                     }
                 });
             }
-            console.log('loading completed');
         },
         closePopup() {
             if (this.totalSelected === 0 ) {
