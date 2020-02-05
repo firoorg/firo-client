@@ -632,6 +632,8 @@ export default {
             }
             
             this.beginCompleteStep();
+            const data = await this.$daemon.send('', 'initial', 'stateWallet', {});
+            this.$store.dispatch('Transactions/setWalletState', data);
         },
 
         beginIncorrectPassphraseStep () {
@@ -658,10 +660,7 @@ export default {
         },
 
         async selectCustomInputs() {
-            console.log('dispatching:', this.amount? this.amount : 0);
             this.$store.commit('ZcoinPayment/ENTERED_SEND_AMOUNT', this.amount? this.amount : 0);
-            const data = await this.$daemon.send('', 'initial', 'stateWallet', {});
-            this.$store.dispatch('Transactions/setWalletState', data);
             this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         }
     }
