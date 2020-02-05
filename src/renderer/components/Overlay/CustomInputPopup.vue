@@ -87,7 +87,7 @@ import VueTableCheckbox from '@/components/Overlay/VueTableCheckbox'
 import LockIcon from '@/components//Icons/LockIcon'
 import UnlockIcon from '@/components//Icons/UnlockIcon'
 import AnimatedTablePagination from '@/components/AnimatedTable/AnimatedTablePagination'
-import { convertToCoin } from "#/lib/convert";
+import { convertToSatoshi, convertToCoin } from "#/lib/convert";
 Vue.component('vuetable-field-checkbox', VueTableCheckbox)
 
 const tableFields = [
@@ -166,7 +166,8 @@ export default {
     computed: {
         ...mapGetters({
             transactions: 'Transactions/transactions',
-            selectedUtxos: 'ZcoinPayment/selectedInputs'
+            selectedUtxos: 'ZcoinPayment/selectedInputs',
+            enteredAmount: 'ZcoinPayment/enteredAmount'
         }),
 
         tableData () {
@@ -214,8 +215,13 @@ export default {
             );
         },
         confirmSelect() {
+            console.log('entered amount:', this.enteredAmount);
             if (this.totalSelected === 0 ) {
-                return alert("Please select at least one !")
+                return alert("Please select at least one !");
+            }
+
+            if (this.totalSelected < convertToSatoshi(this.enteredAmount)) {
+                return alert("Selected amount of " + convertToCoin(this.totalSelected) + " is less than required sending amount of " + this.enteredAmount);
             }
             let agree = confirm("Are you sure?");
 
@@ -304,8 +310,8 @@ export default {
             }
         },
         convertToCoin: convertToCoin,
+        convertToSatoshi: convertToSatoshi,
         toggleCheckbox(isCheck, dataItem) {
-            console.log('Data item:', dataItem);
             if (!isCheck) {
                 this.selectedTx[dataItem.uniqId] = false;
                 this.totalSelected -= dataItem.amount
@@ -313,7 +319,6 @@ export default {
                 this.selectedTx[dataItem.uniqId] = true;
                 this.totalSelected += dataItem.amount
             }
-            console.log('Element id:', dataItem.uniqId);
         },
         onLoadingCompleted() {
             if (this.selectedUtxos) {

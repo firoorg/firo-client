@@ -29,7 +29,8 @@ const state = {
         totalTxFee: 1000
     },
     isSelectingCustomInputs: false,
-    selectedUtxos: []
+    selectedUtxos: [],
+    enteredAmount: 0
 }
 
 const mutations = {
@@ -71,6 +72,9 @@ const mutations = {
     },
     [types.UPDATE_CUSTOM_INPUTS](state, inputs) {
         state.selectedUtxos = inputs
+    },
+    [types.ENTERED_SEND_AMOUNT](state, amount) {
+        state.enteredAmount = amount
     }
 }
 
@@ -151,6 +155,10 @@ const actions = {
         commit(types.UPDATE_CUSTOM_INPUTS, inputs)
     },
 
+    [types.ENTERED_SEND_AMOUNT] ({ commit }, { amount }) {
+        commit(types.ENTERED_SEND_AMOUNT, amount)
+    },
+
     [types.SEND_ZCOIN] ({ dispatch, commit, state }, { payments, fee, auth }) {
         // const { address, amount } = payment
 
@@ -201,7 +209,8 @@ const getters = {
         !getters.createFormAddress
     ),
     customInputs: (state) => state.isSelectingCustomInputs,
-    selectedInputs: (state) => state.selectedUtxos
+    selectedInputs: (state) => state.selectedUtxos,
+    enteredAmount: (state) => state.enteredAmount
 }
 
 export default {
