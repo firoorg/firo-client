@@ -20,6 +20,12 @@ interface TransactionOutput {
     blockHeight?: number;
     blockHash?: number;
     blockTime?: number;
+    spendable: boolean;
+}
+
+interface TransactionInput {
+    txid: string;
+    index: number;
 }
 
 // This is the data format for initial/stateWallet.
@@ -32,7 +38,10 @@ interface StateWallet {
                     [maybeTxid: string]: TransactionOutput
                 }
             }
-        }
+        }    
+    },
+    listspents?: {
+        [outpoint: string]: TransactionInput
     }
 }
 
@@ -56,6 +65,9 @@ interface TransactionEvent {
                 receive?: number;
             }
         }
+    },
+    listspents?: {
+        [outpoint: string]: TransactionInput
     }
 }
 
@@ -74,52 +86,64 @@ const mutations = {
     setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
 
+        //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
-
-            for (const transactions of Object.values(addressData.txids)) {
-                for (const tx of Object.values(transactions)) {
-                    // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
-                    // transactions should occur only during reindex, and they'll later be sent out with Transaction
-                    // events when block data is associated with them again.
-                    if (isReindexing && !tx.blockHeight) {
-                        logger.warn(`Ignoring transaction ${tx} with no block data received during sync.`);
-                        continue;
-                    }
-
-                    if (address === 'MINT' && tx.category === 'receive') {
-                        // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
-                        // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
-                        // category one.
-                        continue;
-                    }
-
-                    tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
-
-                    // mined and znode transactions without a blockHeight are orphans.
-                    if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
-                        // Delete previous records associated with the transaction.
-                        if (state.transactions[tx.uniqId]) {
-                            logger.info(`Got orphan ${tx.uniqId}, deleting associated records.`);
-                            delete state.transactions[tx.uniqId];
-                            state.addresses[tx.address] = state.addresses[tx.address].filter(id => id !== tx.uniqId);
+            if (address != 'listspents') {
+                for (const transactions of Object.values(addressData.txids)) {
+                    for (const tx of Object.values(transactions)) {
+                        // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
+                        // transactions should occur only during reindex, and they'll later be sent out with Transaction
+                        // events when block data is associated with them again.
+                        if (isReindexing && !tx.blockHeight) {
+                            logger.warn(`Ignoring transaction ${tx} with no block data received during sync.`);
+                            continue;
                         }
 
-                        // We don't want to display orphan transactions in the UI.
-                        continue;
-                    }
+                        if (address === 'MINT' && tx.category === 'receive') {
+                            // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
+                            // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
+                            // category one.
+                            continue;
+                        }
 
-                    state.transactions[tx.uniqId] = tx;
+                        tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
 
-                    // Mint transactions will have no associated address.
-                    if (!tx.address) {
-                        continue;
-                    }
+                        // mined and znode transactions without a blockHeight are orphans.
+                        if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
+                            // Delete previous records associated with the transaction.
+                            if (state.transactions[tx.uniqId]) {
+                                logger.info(`Got orphan ${tx.uniqId}, deleting associated records.`);
+                                delete state.transactions[tx.uniqId];
+                                state.addresses[tx.address] = state.addresses[tx.address].filter(id => id !== tx.uniqId);
+                            }
 
-                    if (!state.addresses[tx.address]) {
-                        state.addresses[tx.address] = [];
+                            // We don't want to display orphan transactions in the UI.
+                            continue;
+                        }
+
+                        state.transactions[tx.uniqId] = tx;
+
+                        // Mint transactions will have no associated address.
+                        if (!tx.address) {
+                            continue;
+                        }
+
+                        if (!state.addresses[tx.address]) {
+                            state.addresses[tx.address] = [];
+                        }
+                        state.addresses[tx.address].push(tx.uniqId);
                     }
-                    state.addresses[tx.address].push(tx.uniqId);
+                }
+            } else {
+                logger.info("Setting wallet state: spents %s", addressData.toString());
+                logger.info("Setting wallet state: spents %s", Object.values(addressData).length);
+                for (const outpoint of Object.values(addressData)) {
+                    for (const [id, tx] of Object.entries(state.transactions)) {
+                        if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
+                            state.transactions[id].spendable = false;
+                        }
+                    }
                 }
             }
         }
@@ -140,8 +164,9 @@ const actions = {
     },
 
     handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
+        console.log('handleTransactionEvent:', transactionEvent);
         logger.info('handleTransactionEvent');
-        commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
+        commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent, listspents: transactionEvent.total.litspents}});
     },
 
     handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
