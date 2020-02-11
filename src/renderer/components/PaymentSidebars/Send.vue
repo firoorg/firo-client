@@ -632,8 +632,6 @@ export default {
             }
             
             this.beginCompleteStep();
-            const data = await this.$daemon.send('', 'initial', 'stateWallet', {});
-            this.$store.dispatch('Transactions/setWalletState', data);
         },
 
         beginIncorrectPassphraseStep () {

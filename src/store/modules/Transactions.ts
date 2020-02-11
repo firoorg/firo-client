@@ -37,11 +37,11 @@ interface StateWallet {
                 [grouping: string]: {
                     [maybeTxid: string]: TransactionOutput
                 }
+            },
+            inputs?: {
+                [outpoint: string]: TransactionInput
             }
         }    
-    },
-    listspents?: {
-        [outpoint: string]: TransactionInput
     }
 }
 
@@ -55,6 +55,10 @@ interface TransactionEvent {
             }
         },
 
+        inputs?: {
+            [outpoint: string]: TransactionInput
+        }
+
         total: {
             [txCategory: string]: {
                 send?: number;
@@ -65,9 +69,6 @@ interface TransactionEvent {
                 receive?: number;
             }
         }
-    },
-    listspents?: {
-        [outpoint: string]: TransactionInput
     }
 }
 
@@ -89,7 +90,7 @@ const mutations = {
         //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
-            if (address != 'listspents') {
+            if (address != 'inputs') {
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
                         // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
@@ -166,7 +167,7 @@ const actions = {
     handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
         console.log('handleTransactionEvent:', transactionEvent);
         logger.info('handleTransactionEvent');
-        commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent, listspents: transactionEvent.total.litspents}});
+        commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
     },
 
     handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
