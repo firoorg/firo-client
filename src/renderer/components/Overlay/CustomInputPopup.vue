@@ -160,7 +160,8 @@ export default {
             tableFields,
             filter: '',
             totalSelected: 0,
-            selectedTx: {}
+            selectedTx: {},
+            unselected: {}
         }
     },
     computed: {
@@ -300,11 +301,15 @@ export default {
             if (!isChecked) {
                 this.totalSelected = 0;
                 this.selectedTx = {};
+                this.tableData.forEach(element => {
+                    this.unselected[element.uniqId] = true;
+                });
             } else {
                 let sum = 0;
                 this.tableData.forEach(element => {
                     sum += element.amount;
                     this.selectedTx[element.uniqId] = true;
+                    this.unselected[element.uniqId] = false;
                 });
                 this.totalSelected = sum;
             }
@@ -315,9 +320,11 @@ export default {
             if (!isCheck) {
                 this.selectedTx[dataItem.uniqId] = false;
                 this.totalSelected -= dataItem.amount
+                this.unselected[dataItem.uniqId] = true;
             } else {
                 this.selectedTx[dataItem.uniqId] = true;
                 this.totalSelected += dataItem.amount
+                this.unselected[dataItem.uniqId] = false;
             }
         },
         onLoadingCompleted() {
@@ -331,11 +338,13 @@ export default {
                     });
 
                     if (found) {
-                        this.$refs.vuetable.selectId(element1.uniqId);
-                        if (!this.selectedTx[element1.uniqId]) {
-                            this.totalSelected += element1.amount;
+                        if (!this.unselected[element1.uniqId]) {
+                            this.$refs.vuetable.selectId(element1.uniqId);
+                            if (!this.selectedTx[element1.uniqId]) {
+                                this.totalSelected += element1.amount;
+                            }
+                            this.selectedTx[element1.uniqId] = true;
                         }
-                        this.selectedTx[element1.uniqId] = true;
                     }
                 });
             }
