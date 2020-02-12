@@ -386,7 +386,7 @@ export class Zcoind {
 
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
-    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, selecteds: string): Promise<string> {
+    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, selected: string): Promise<string> {
         const data: {txid: string} = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
@@ -396,8 +396,8 @@ export class Zcoind {
             },
             feePerKb,
             subtractFeeFromAmount,
-            coincontrol: {
-                selecteds
+            coinControl: {
+                selected
             }
         });
 
@@ -407,7 +407,7 @@ export class Zcoind {
     // Publicly send amount satoshi XZC to recipient, subtracting the fee from the amount.
     //
     // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean, selecteds: string): Promise<string> {
+    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean, selected: string): Promise<string> {
         const data = await this.send(auth, 'create', 'sendPrivate', {
             outputs: [
                 {
@@ -417,8 +417,8 @@ export class Zcoind {
             ],
             label,
             subtractFeeFromAmount,
-            coincontrol: {
-                selecteds
+            coinControl: {
+                selected
             }
         });
         console.log('privateSend data:', data);
