@@ -92,6 +92,7 @@ export default {
             const tableData = [];
 
             for (const [id, tx] of Object.entries(this.transactions)) {
+                this.$log.error(`transaction ${id}`);
                 // Mints are handled separately.
                 if (tx.category === 'mint') {
                     continue;

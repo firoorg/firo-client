@@ -27,7 +27,10 @@ const state = {
         label: '',
         address: '',
         totalTxFee: 1000
-    }
+    },
+    isSelectingCustomInputs: false,
+    selectedUtxos: [],
+    enteredAmount: 0
 }
 
 const mutations = {
@@ -62,6 +65,16 @@ const mutations = {
 
     [types.SET_TX_FEE] (state, txFee) {
         state.addPaymentForm.totalTxFee = txFee
+    },
+
+    [types.TOGGLE_CUSTOM_INPUTS_POPUP](state) {
+        state.isSelectingCustomInputs = !state.isSelectingCustomInputs
+    },
+    [types.UPDATE_CUSTOM_INPUTS](state, inputs) {
+        state.selectedUtxos = inputs
+    },
+    [types.ENTERED_SEND_AMOUNT](state, amount) {
+        state.enteredAmount = amount
     }
 }
 
@@ -138,6 +151,14 @@ const actions = {
         commit(types.SET_TX_FEE, fee)
     },
 
+    [types.UPDATE_CUSTOM_INPUTS] ({ commit }, { inputs }) {
+        commit(types.UPDATE_CUSTOM_INPUTS, inputs)
+    },
+
+    [types.ENTERED_SEND_AMOUNT] ({ commit }, { amount }) {
+        commit(types.ENTERED_SEND_AMOUNT, amount)
+    },
+
     [types.SEND_ZCOIN] ({ dispatch, commit, state }, { payments, fee, auth }) {
         // const { address, amount } = payment
 
@@ -158,7 +179,13 @@ const actions = {
         dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
         // todo think about when to clear pending payments and if we're waiting for a
         // confirmation per payment/denomination we need some identifier which doesn't exist right now
-    }
+    },
+    [types.TOGGLE_CUSTOM_INPUTS_POPUP]({ commit }) {
+        commit(types.TOGGLE_CUSTOM_INPUTS_POPUP)
+    },
+    [types.UPDATE_CUSTOM_INPUTS]({ commit }, { inputs }) {
+        commit(types.UPDATE_CUSTOM_INPUTS, inputs)
+    },
 }
 
 const getters = {
@@ -180,7 +207,10 @@ const getters = {
         !getters.createFormLabel &&
         !getters.createFormAmount &&
         !getters.createFormAddress
-    )
+    ),
+    customInputs: (state) => state.isSelectingCustomInputs,
+    selectedInputs: (state) => state.selectedUtxos,
+    enteredAmount: (state) => state.enteredAmount
 }
 
 export default {

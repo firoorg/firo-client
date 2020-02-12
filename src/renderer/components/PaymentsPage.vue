@@ -1,11 +1,17 @@
 <template>
     <section class="tx-page">
-        <div class="window-height">
+        <div class="window-height payment-page-window">
             <section
                 v-scrollable
                 class="payment-list-container"
             >
                 <payments-list />
+            </section>
+            <section
+                v-if="isShowingCustomInputs"
+                class="overlay centered"
+            >
+                <custom-input-popup />
             </section>
         </div>
 
@@ -15,14 +21,23 @@
     </section>
 </template>
 
+
 <script>
+import { mapGetters } from 'vuex';
 import PaymentsList from '@/components/PaymentsList';
+import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
 
 export default {
     name: 'PaymentsPage',
 
     components: {
-        PaymentsList
+        PaymentsList,
+        CustomInputPopup
+    },
+    computed: {
+        ...mapGetters({
+            isShowingCustomInputs: 'ZcoinPayment/customInputs'
+        }),
     }
 }
 </script>
@@ -55,5 +70,8 @@ export default {
 
     .tx-page-sidebar {
         background: $color--white;
+    }
+    .payment-page-window{
+        position: relative
     }
 </style>
