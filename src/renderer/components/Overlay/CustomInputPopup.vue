@@ -168,22 +168,33 @@ export default {
         ...mapGetters({
             transactions: 'Transactions/transactions',
             selectedUtxos: 'ZcoinPayment/selectedInputs',
-            enteredAmount: 'ZcoinPayment/enteredAmount'
+            enteredAmount: 'ZcoinPayment/enteredAmount',
+            currentHeight: 'Blockchain/currentBlockHeight',
+            unspentUTXOs: 'Transactions/unspentUTXOs'
         }),
 
         tableData () {
             const tableData = [];
-            for (const [id, tx] of Object.entries(this.transactions)) {
+            for (const [id, isIn] of Object.entries(this.unspentUTXOs)) {
+                let tx = this.transactions[id];
+                if (!tx || !tx.blockHeight) continue;
                 if (this.$route.path == '/send/private') {
                     if (!['mint'].includes(tx.category)) {
+                        continue;
+                    }
+                    if (tx.blockHeight + 6.0 > this.currentHeight) {
                         continue;
                     }
                 } else {
                     if (!['coinbase', 'znode', 'mined', 'receive'].includes(tx.category)) {
                         continue;
                     }
+
+                    if (['coinbase', 'mined'].includes(tx.category) &&
+                        (tx.blockHeight + 100.0 > this.currentHeight)) {
+                        continue;
+                    }
                 }
-                if (!tx.spendable) continue; 
                 let timestamp = new Date(tx.blockTime * 1000) || Infinity;
                 tableData.push({
                     id: `/transaction-info/${id}`,
@@ -259,7 +270,6 @@ export default {
 
         onPaginationData (paginationData) {
             this.$refs.pagination.setPaginationData(paginationData)
-            console.log('switching page');
         },
 
         onChangePage (page) {

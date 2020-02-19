@@ -78,7 +78,8 @@ type AddressEvent = StateWallet;
 const state = {
     transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
     // values are keys of transactions in state.transactions associated with the address
-    addresses: <{[address: string]: string[]}>{}
+    addresses: <{[address: string]: string[]}>{},
+    unspentUTXOs: <{[txidAndIndex:string]:boolean}>{}
 };
 
 const mutations = {
@@ -116,12 +117,15 @@ const mutations = {
                             if (state.transactions[tx.uniqId]) {
                                 logger.info(`Got orphan ${tx.uniqId}, deleting associated records.`);
                                 delete state.transactions[tx.uniqId];
+                                delete state.unspentUTXOs[tx.uniqId];
                                 state.addresses[tx.address] = state.addresses[tx.address].filter(id => id !== tx.uniqId);
                             }
 
                             // We don't want to display orphan transactions in the UI.
                             continue;
                         }
+
+                        state.unspentUTXOs[tx.uniqId] = true;
 
                         state.transactions[tx.uniqId] = tx;
 
@@ -137,12 +141,11 @@ const mutations = {
                     }
                 }
             } else {
-                logger.info("Setting wallet state: spents %s", addressData.toString());
-                logger.info("Setting wallet state: spents %s", Object.values(addressData).length);
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
                             state.transactions[id].spendable = false;
+                            delete state.unspentUTXOs[id];
                         }
                     }
                 }
@@ -169,7 +172,7 @@ const actions = {
         logger.info('handleTransactionEvent');
         commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
     },
-
+    
     handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
         logger.info('handleAddressEvent');
         commit('setWalletState', {isReindexing: false, initialStateWallet: addressEvent})
@@ -179,6 +182,7 @@ const actions = {
 const getters = {
     // a map of `${txid}-${txIndex}` to the full transaction object returned from zcoind
     transactions: (state) => state.transactions,
+    unspentUTXOs: (state) => state.unspentUTXOs,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,

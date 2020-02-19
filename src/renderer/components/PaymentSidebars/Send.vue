@@ -94,7 +94,7 @@
                                 </div>
                                 <div class="control">
                                     <u><a
-                                        :style="{ cursor: 'default'}"
+                                        :style="{ cursor: 'pointer'}"
                                         @click="selectCustomInputs()"
                                     >
                                         Select Custom Inputs</a></u>
