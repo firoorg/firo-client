@@ -184,7 +184,7 @@ export default {
                     if (!['mint'].includes(tx.category)) {
                         continue;
                     }
-                    if (tx.blockHeight + 6.0 > this.currentHeight) {
+                    if (this.currentHeight < (tx.blockHeight + 6.0) - 1.0) {
                         continue;
                     }
                 } else {
@@ -193,7 +193,7 @@ export default {
                     }
 
                     if (['coinbase', 'mined'].includes(tx.category) &&
-                        (tx.blockHeight + 100.0 > this.currentHeight)) {
+                        (this.currentHeight < (tx.blockHeight + 100.0) - 1.0)) {
                         continue;
                     }
                 }
