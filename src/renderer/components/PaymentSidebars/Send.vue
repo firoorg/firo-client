@@ -377,7 +377,8 @@ export default {
             availableZerocoin: 'Balance/availableZerocoin',
             totalBalance: 'Balance/total',
             maxPrivateSend: 'Balance/maxPrivateSend',
-            selectedUtxos: 'ZcoinPayment/selectedInputs'
+            selectedUtxos: 'ZcoinPayment/selectedInputs',
+            coinChanges: 'ZcoinPayment/coinChanges'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -595,8 +596,25 @@ export default {
                 });
                 this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
                 coinControl = coinControl.substring(1);
-                
             }
+
+            var coinLocks = '';
+            var coinUnlocks = '';
+            if (this.coinChanges && this.coinChanges.length > 0) {
+                console.log('coin changes:', this.coinChanges);
+                this.coinChanges.forEach(element => {
+                    console.log('string:', element);
+                    var str = `${element.txid}-${element.txIndex}`;
+                    if (element.status) {
+                        coinUnlocks = `${coinUnlocks}:${str}`;
+                    } else {
+                        coinLocks = `${coinLocks}:${str}`;
+                        console.log('locking ', element.txid);
+                    }
+                });
+                this.$store.commit('ZcoinPayment/UPDATE_COIN_LOCK', []);
+            }
+
             console.log('coin control:', coinControl);
             // This will have the effect of preventing the user from sending again without re-entering their passphrase.
             // JavaScript is single threaded, so there should be no race condition possible with an interruption between
@@ -611,6 +629,10 @@ export default {
             this.recalculatePopoverPosition();
 
             try {
+                //attempting to lock/unlock coins first
+                if (coinLocks !== '' || coinUnlocks !== '') {
+                    await this.$daemon.lockCoins(passphrase, coinLocks, coinUnlocks);
+                }
                 if (this.privateOrPublic === 'private') {
                     await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
                         this.subtractFeeFromAmount, coinControl);

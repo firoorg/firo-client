@@ -21,6 +21,7 @@ interface TransactionOutput {
     blockHash?: number;
     blockTime?: number;
     spendable: boolean;
+    locked: boolean;
 }
 
 interface TransactionInput {
@@ -40,7 +41,14 @@ interface StateWallet {
             },
             inputs?: {
                 [outpoint: string]: TransactionInput
-            }
+            },
+            lockedcoins?: {
+                [outpoint: string]: TransactionInput
+            },
+    
+            unlockedcoins?: {
+                [outpoint: string]: TransactionInput
+            },
         }    
     }
 }
@@ -57,7 +65,15 @@ interface TransactionEvent {
 
         inputs?: {
             [outpoint: string]: TransactionInput
-        }
+        },
+
+        lockedcoins?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        unlockedcoins?: {
+            [outpoint: string]: TransactionInput
+        },
 
         total: {
             [txCategory: string]: {
@@ -91,7 +107,7 @@ const mutations = {
         //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
-            if (address != 'inputs') {
+            if (!['inputs', 'lockedcoins', 'unlockedcoins'].includes(address)) {
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
                         // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
@@ -140,12 +156,29 @@ const mutations = {
                         state.addresses[tx.address].push(tx.uniqId);
                     }
                 }
-            } else {
+            } else if (['inputs'.includes(address)]) {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
+                            logger.info("spent: %s", id);
                             state.transactions[id].spendable = false;
                             delete state.unspentUTXOs[id];
+                        }
+                    }
+                }
+            } else if (['lockedcoins'.includes(address)]) {
+                for (const outpoint of Object.values(addressData)) {
+                    for (const [id, tx] of Object.entries(state.transactions)) {
+                        if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
+                            state.transactions[id].locked = true;
+                        }
+                    }
+                }
+            } else if (['unlockedcoins'.includes(address)]) {
+                for (const outpoint of Object.values(addressData)) {
+                    for (const [id, tx] of Object.entries(state.transactions)) {
+                        if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
+                            state.transactions[id].locked = false;
                         }
                     }
                 }

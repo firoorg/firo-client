@@ -22,6 +22,8 @@
             <div
                 slot="status"
                 slot-scope="props"
+                @click="toggleSlider(props.rowData)"
+                :style="{ cursor: 'pointer'}"
             >
                 <span
                     v-if="props.rowData.status === true"
@@ -201,7 +203,7 @@ export default {
                     txIndex: tx.txIndex + "",
                     timestamp: timestamp,
                     amount: tx.amount,
-                    status: tx.category !== 'znode',
+                    status: !tx.locked,
                     txid: tx.txid,
                     uniqId: tx.uniqId,
                     category: tx.category,
@@ -244,13 +246,18 @@ export default {
 
             // get selected utxos
             const utxos = [];
+            const statusChanges = [];
             this.tableData.forEach(element => {
                 if (this.selectedTx[element.uniqId]) {
                     utxos.push(element)
                 }
+                if (element.status === this.transactions[element.uniqId].locked) {
+                    statusChanges.push(element);
+                }
             });
 
             this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', utxos);
+            this.$store.commit('ZcoinPayment/UPDATE_COIN_LOCK', statusChanges);
         },
         getRowClass (item, index) {
             const classes = []
@@ -329,12 +336,15 @@ export default {
         toggleCheckbox(isCheck, dataItem) {
             if (!isCheck) {
                 this.selectedTx[dataItem.uniqId] = false;
-                this.totalSelected -= dataItem.amount
+                if (dataItem.status) {
+                    this.totalSelected -= dataItem.amount
+                }
                 this.unselected[dataItem.uniqId] = true;
             } else {
                 this.selectedTx[dataItem.uniqId] = true;
                 this.totalSelected += dataItem.amount
                 this.unselected[dataItem.uniqId] = false;
+                dataItem.status = true;
             }
         },
         onLoadingCompleted() {
@@ -358,6 +368,17 @@ export default {
                     }
                 });
             }
+        },
+        toggleSlider(dataItem) {
+            console.log('Slider is toggled:', dataItem);
+            dataItem.status = !dataItem.status;
+            // this.lockedCoinsChanges[dataItem.uniqId] = dataItem.status;
+            // if (this.transactions[dataItem.uniqId].locked === (!dataItem.status)) {
+            //     delete this.lockedCoinsChanges[dataItem.uniqId];
+            // }
+        },
+        isLocked(dataItem) {
+            return !dataItem.status;
         },
         closePopup() {
             if (this.totalSelected === 0 ) {

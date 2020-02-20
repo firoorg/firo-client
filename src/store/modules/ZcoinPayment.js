@@ -30,7 +30,8 @@ const state = {
     },
     isSelectingCustomInputs: false,
     selectedUtxos: [],
-    enteredAmount: 0
+    enteredAmount: 0,
+    coinChanges: []
 }
 
 const mutations = {
@@ -72,6 +73,9 @@ const mutations = {
     },
     [types.UPDATE_CUSTOM_INPUTS](state, inputs) {
         state.selectedUtxos = inputs
+    },
+    [types.UPDATE_COIN_LOCK](state, coinChanges) {
+        state.coinChanges = coinChanges
     },
     [types.ENTERED_SEND_AMOUNT](state, amount) {
         state.enteredAmount = amount
@@ -155,6 +159,10 @@ const actions = {
         commit(types.UPDATE_CUSTOM_INPUTS, inputs)
     },
 
+    [types.UPDATE_COIN_LOCK] ({ commit }, { coinChanges }) {
+        commit(types.UPDATE_COIN_LOCK, coinChanges)
+    },
+
     [types.ENTERED_SEND_AMOUNT] ({ commit }, { amount }) {
         commit(types.ENTERED_SEND_AMOUNT, amount)
     },
@@ -186,6 +194,9 @@ const actions = {
     [types.UPDATE_CUSTOM_INPUTS]({ commit }, { inputs }) {
         commit(types.UPDATE_CUSTOM_INPUTS, inputs)
     },
+    [types.UPDATE_COIN_LOCK]({ commit }, { coinChanges }) {
+        commit(types.UPDATE_COIN_LOCK, coinChanges)
+    },
 }
 
 const getters = {
@@ -210,7 +221,8 @@ const getters = {
     ),
     customInputs: (state) => state.isSelectingCustomInputs,
     selectedInputs: (state) => state.selectedUtxos,
-    enteredAmount: (state) => state.enteredAmount
+    enteredAmount: (state) => state.enteredAmount,
+    coinChanges: (state) => state.coinChanges
 }
 
 export default {
