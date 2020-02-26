@@ -405,12 +405,12 @@ export class Zcoind {
     }
 
     async lockCoins(auth: string, lockedcoins: string, unlockedcoins: string): Promise<string> {
-        const data: {txid: string} = await this.send(auth, 'create', 'lockCoins', {
-            lockedcoins,
-            unlockedcoins
+        const data = await this.send(auth, 'create', 'lockCoins', {
+            lockedcoins: lockedcoins,
+            unlockedcoins: unlockedcoins
         });
 
-        return data.txid;
+        return data;
     }
 
     // Publicly send amount satoshi XZC to recipient, subtracting the fee from the amount.

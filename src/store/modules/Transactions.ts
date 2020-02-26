@@ -103,11 +103,12 @@ const mutations = {
     // limitations in VueX.
     setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
-
+        var unspentAlreadyProcess = false;
         //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
             if (!['inputs', 'lockedcoins', 'unlockedcoins'].includes(address)) {
+                unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
                         // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
@@ -118,15 +119,15 @@ const mutations = {
                             continue;
                         }
 
+                        state.unspentUTXOs[`${tx.txid}-${tx.txIndex}-${tx.category}`] = true;
+
                         if (address === 'MINT' && tx.category === 'receive') {
                             // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
                             // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
                             // category one.
                             continue;
                         }
-
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
-
                         // mined and znode transactions without a blockHeight are orphans.
                         if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
                             // Delete previous records associated with the transaction.
@@ -141,8 +142,6 @@ const mutations = {
                             continue;
                         }
 
-                        state.unspentUTXOs[tx.uniqId] = true;
-
                         state.transactions[tx.uniqId] = tx;
 
                         // Mint transactions will have no associated address.
@@ -156,17 +155,7 @@ const mutations = {
                         state.addresses[tx.address].push(tx.uniqId);
                     }
                 }
-            } else if (['inputs'.includes(address)]) {
-                for (const outpoint of Object.values(addressData)) {
-                    for (const [id, tx] of Object.entries(state.transactions)) {
-                        if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                            logger.info("spent: %s", id);
-                            state.transactions[id].spendable = false;
-                            delete state.unspentUTXOs[id];
-                        }
-                    }
-                }
-            } else if (['lockedcoins'.includes(address)]) {
+            } else if (['lockedcoins'].includes(address)) {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
@@ -174,7 +163,7 @@ const mutations = {
                         }
                     }
                 }
-            } else if (['unlockedcoins'.includes(address)]) {
+            } else if (['unlockedcoins'].includes(address)) {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
@@ -185,10 +174,25 @@ const mutations = {
             }
         }
 
+        if (initialStateWallet.addresses['inputs']) {
+            const addressData = initialStateWallet.addresses['inputs'];
+            for (const outpoint of Object.values(addressData)) {
+                for (const [id, tx] of Object.entries(state.transactions)) {
+                    //logger.info('spent: %s', id);
+                    if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
+                        state.transactions[id].spendable = false;
+                        state.unspentUTXOs[id] = false;
+                        delete state.unspentUTXOs[id];
+                    }
+                }
+            }
+        }
+
         // Tell Vue we've updated our variables.
         // FIXME: Use Vue.set.
         state.addresses = {...state.addresses};
         state.transactions = {...state.transactions};
+        state.unspentUTXOs = {...state.unspentUTXOs};
     }
 };
 

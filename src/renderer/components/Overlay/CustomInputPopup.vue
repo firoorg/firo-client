@@ -177,26 +177,38 @@ export default {
 
         tableData () {
             const tableData = [];
+            const dups = {};
             for (const [id, isIn] of Object.entries(this.unspentUTXOs)) {
                 let tx = this.transactions[id];
-                if (!tx || !tx.blockHeight) continue;
+                if (!tx || !tx.blockHeight || !isIn) {
+                    continue;
+                }
+                if (dups[`${tx.txid}-${tx.txIndex}`]) continue;
                 if (this.$route.path == '/send/private') {
                     if (!['mint'].includes(tx.category)) {
                         continue;
                     }
-                    if (this.currentHeight < (tx.blockHeight + 6.0) - 1.0) {
+                    if (this.currentHeight < (tx.blockHeight + 5.0)) {
                         continue;
                     }
+                    if (!tx.amount) continue;
                 } else {
-                    if (!['coinbase', 'znode', 'mined', 'receive'].includes(tx.category)) {
+
+                    if (!['coinbase', 'znode', 'mined', 'receive', 'spendIn'].includes(tx.category)) {
+                        continue;
+                    }
+                    if (['coinbase', 'mined'].includes(tx.category) &&
+                        (this.currentHeight < (tx.blockHeight + 99.0))) {
                         continue;
                     }
 
-                    if (['coinbase', 'mined'].includes(tx.category) &&
-                        (this.currentHeight < (tx.blockHeight + 100.0) - 1.0)) {
+                    if (['spendIn'].includes(tx.category) &&
+                        (this.currentHeight < (tx.blockHeight + 5.0))) {
                         continue;
                     }
+                    if (!tx.address || !tx.amount) continue;
                 }
+                dups[`${tx.txid}-${tx.txIndex}`] = true;
                 let timestamp = new Date(tx.blockTime * 1000) || Infinity;
                 tableData.push({
                     id: `/transaction-info/${id}`,
@@ -341,6 +353,7 @@ export default {
                 }
                 this.unselected[dataItem.uniqId] = true;
             } else {
+                console.log('selectd:', dataItem.uniqId, ', address=', dataItem.address);
                 this.selectedTx[dataItem.uniqId] = true;
                 this.totalSelected += dataItem.amount
                 this.unselected[dataItem.uniqId] = false;
@@ -370,8 +383,8 @@ export default {
             }
         },
         toggleSlider(dataItem) {
-            console.log('Slider is toggled:', dataItem);
             dataItem.status = !dataItem.status;
+            console.log('Slider is toggled:', dataItem);
             // this.lockedCoinsChanges[dataItem.uniqId] = dataItem.status;
             // if (this.transactions[dataItem.uniqId].locked === (!dataItem.status)) {
             //     delete this.lockedCoinsChanges[dataItem.uniqId];
