@@ -193,6 +193,13 @@ const mutations = {
         state.addresses = {...state.addresses};
         state.transactions = {...state.transactions};
         state.unspentUTXOs = {...state.unspentUTXOs};
+    },
+
+    setLockState(state, uniqIds: string[]) {
+        for(const uniqId of uniqIds) {
+            state.transactions[uniqId].locked = !state.transactions[uniqId].locked;
+        }
+        state.transactions = {...state.transactions};
     }
 };
 
@@ -213,6 +220,11 @@ const actions = {
     handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
         logger.info('handleAddressEvent');
         commit('setWalletState', {isReindexing: false, initialStateWallet: addressEvent})
+    },
+
+    changeLockStatus({commit, rootGetters}, uniqIds: string[]) {
+        logger.info('changeLockStatus');
+        commit('setLockState', uniqIds)
     }
 };
 

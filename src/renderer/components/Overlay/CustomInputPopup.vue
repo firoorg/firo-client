@@ -240,7 +240,7 @@ export default {
                 a[field] !== b[field]
             );
         },
-        confirmSelect() {
+        async confirmSelect() {
             console.log('entered amount:', this.enteredAmount);
             if (this.totalSelected === 0 ) {
                 return alert("Please select at least one !");
@@ -259,17 +259,45 @@ export default {
             // get selected utxos
             const utxos = [];
             const statusChanges = [];
+            const commitedChanges = [];
             this.tableData.forEach(element => {
                 if (this.selectedTx[element.uniqId]) {
                     utxos.push(element)
                 }
                 if (element.status === this.transactions[element.uniqId].locked) {
                     statusChanges.push(element);
+                    commitedChanges.push(element.uniqId);
                 }
             });
 
             this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', utxos);
-            this.$store.commit('ZcoinPayment/UPDATE_COIN_LOCK', statusChanges);
+            //this.$store.commit('ZcoinPayment/UPDATE_COIN_LOCK', statusChanges);
+
+            var coinLocks = '';
+            var coinUnlocks = '';
+            if (statusChanges && statusChanges.length > 0) {
+                try {
+                    console.log('coin changes:', statusChanges);
+                    statusChanges.forEach(element => {
+                        console.log('string:', element);
+                        var str = `${element.txid}-${element.txIndex}`;
+                        if (element.status) {
+                            coinUnlocks = `${coinUnlocks}:${str}`;
+                        } else {
+                            coinLocks = `${coinLocks}:${str}`;
+                            console.log('locking ', element.txid);
+                        }
+                    });
+
+                    //attempting to lock/unlock coins first
+                    if (coinLocks !== '' || coinUnlocks !== '') {
+                        await this.$daemon.lockCoins(null, coinLocks, coinUnlocks);
+                    }
+                    this.$store.commit('Transactions/setLockState', commitedChanges);
+                } catch (e) {
+                    //error occurs
+                }
+            }
         },
         getRowClass (item, index) {
             const classes = []
@@ -383,12 +411,14 @@ export default {
             }
         },
         toggleSlider(dataItem) {
+            console.log('Slider is toggled:', this.selectedTx[dataItem.uniqId]);
+            if (dataItem.status && this.selectedTx[dataItem.uniqId]) {
+                this.$refs.vuetable.unselectId(dataItem.uniqId);
+                this.selectedTx[dataItem.uniqId] = false;
+                this.totalSelected -= dataItem.amount
+                this.unselected[dataItem.uniqId] = true;
+            }
             dataItem.status = !dataItem.status;
-            console.log('Slider is toggled:', dataItem);
-            // this.lockedCoinsChanges[dataItem.uniqId] = dataItem.status;
-            // if (this.transactions[dataItem.uniqId].locked === (!dataItem.status)) {
-            //     delete this.lockedCoinsChanges[dataItem.uniqId];
-            // }
         },
         isLocked(dataItem) {
             return !dataItem.status;
