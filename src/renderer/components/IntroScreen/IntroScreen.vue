@@ -70,6 +70,8 @@ import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWalle
 import IntroScreenRestartingDaemon from '@/components/IntroScreen/IntroScreenRestartingDaemon'
 import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
 import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
+import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
+import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
 
 export default {
     name: 'IntroScreen',
@@ -97,6 +99,8 @@ export default {
             steps: {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
+                createOrRestore: CreateOrRestore,
+                createWallet: CreateNewWallet,
                 settingUpLocation: IntroScreenSettingUpLocation,
                 lock: IntroScreenLockWallet,
                 restart: IntroScreenRestartingDaemon
