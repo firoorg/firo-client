@@ -242,9 +242,9 @@ export default {
         },
         async confirmSelect() {
             console.log('entered amount:', this.enteredAmount);
-            if (this.totalSelected === 0 ) {
+            /*if (this.totalSelected === 0 ) {
                 return alert("Please select at least one !");
-            }
+            }*/
 
             if (this.totalSelected < convertToSatoshi(this.enteredAmount)) {
                 return alert("Selected amount of " + convertToCoin(this.totalSelected) + " is less than required sending amount of " + this.enteredAmount);
