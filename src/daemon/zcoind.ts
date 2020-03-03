@@ -404,10 +404,10 @@ export class Zcoind {
         return data.txid;
     }
 
-    async lockCoins(auth: string, lockedcoins: string, unlockedcoins: string): Promise<string> {
+    async lockCoins(auth: string, lockedCoins: string, unlockedCoins: string): Promise<string> {
         const data = await this.send(auth, 'create', 'lockCoins', {
-            lockedcoins: lockedcoins,
-            unlockedcoins: unlockedcoins
+            lockedCoins: lockedCoins,
+            unlockedCoins: unlockedCoins
         });
 
         return data;
