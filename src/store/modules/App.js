@@ -19,7 +19,8 @@ const state = {
     passphrase: null,
     appVersion: null,
     blockchainLocation: '',
-    zcoinLink: ''
+    zcoinLink: '',
+    initialRunSet: false
 }
 
 const mutations = {
@@ -35,6 +36,10 @@ const mutations = {
 
     setInitialRun (state, value) {
         state.isInitialRun = value;
+    },
+
+    setInitialRunSet(state) {
+        state.initialRunSet = true;
     },
 
     // daemon
@@ -218,6 +223,7 @@ const actions = {
 
         if (!fs.existsSync(location)) {
             logger.warn('given location does not exist: %s', location)
+            commit('setInitialRunSet');
             return
         }
 
@@ -229,10 +235,10 @@ const actions = {
         commit(types.SET_BLOCKCHAIN_LOCATION, location)
 
         await getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location);
-
         if (fs.existsSync(path.join(location, 'wallet.dat'))) {
-            logger.info("app.setInitialRun = false");
-            commit('setInitialRun', false);
+            logger.info("app.setInitialRun = false, file = %s", path.join(location, 'wallet.dat'));
+            if (!state.initialRunSet)
+                commit('setInitialRun', false);
         } else {
             logger.info("app.setInitialRun = true");
         }
@@ -272,6 +278,8 @@ const getters = {
     isInitialRun: (state) => {
         return state.isInitialRun
     },
+
+    initialRunSet: (state) => state.initialRunSet,
 
     blockchainLocation: (state) => {
 
