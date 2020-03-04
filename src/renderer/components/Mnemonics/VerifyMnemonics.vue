@@ -1,12 +1,14 @@
 <template>
     <div>
-        <p v-html="$t('Below is your 24-word passphrase. Write it down and keep it safe. You will be shortly asked to re-enter it.')"/>
-        <p> {{mnemonics}} </p>
+        <p v-if="isVerifedFirstTime === true" v-html="$t('Type the nineth word.')"/>
+        <p v-if="isVerifedFirstTime !== true" v-html="$t('Type the third word.')"/>
+        <input v-model="word" v-if="isVerifedFirstTime === true" placeholder="Type the nineth word"/>
+        <input v-model="word" v-if="isVerifedFirstTime !== true" placeholder="Type the third word"/>
         <BaseButton
-            @click="confirmWriteDown"
+            @click="verifyWord"
             class="button"
         >
-            I have written down my seed phrase
+            Confirm
         </BaseButton>
     </div>
 </template>
@@ -18,12 +20,34 @@ export default {
     mixins: [
         GuideStepMixin
     ],
-    props: {
-        mnemonics: String
+    data() {
+        return {
+            word: '',
+            isVerifedFirstTime: false
+        }
     },
     methods: {
-        confirmWriteDown() {
-            this.actions.next();
+        async verifyWord() {
+            try {
+                const mnemonics = await this.$daemon.showMnemonics('');
+                const d = mnemonics.includes(this.word);
+                console.log("done!", d);
+                if (d != true) {
+                    return alert("Incorrect!");
+                } else {
+                    if (!this.isVerifedFirstTime) {
+                        this.isVerifedFirstTime = true;
+                        this.word = '';
+                        alert("Successfully verified the third word!");
+                    } else {
+                        alert("Successfully verified mnemonic words!");
+                        this.actions.next();
+                    }
+                }
+            } catch (e) {
+                console.log('erro:', e);
+                alert("Error! ", e.toString());
+            }
         }
     }
 }

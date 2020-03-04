@@ -128,6 +128,7 @@ export default {
 
         try {
             logger.info('api loaded! setting up modules...', encryption)
+            logger.info('---------------API STATUS-----------------%s', JSON.stringify(apiStatus));
             this.setupNetworkModules({appConfig, encryption})
         } catch (e) {
             logger.warn('error during api loading')

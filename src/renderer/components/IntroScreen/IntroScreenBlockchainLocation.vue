@@ -49,7 +49,9 @@ export default {
     computed: {
         ...mapGetters({
             hasLocation: 'App/hasBlockchainLocation',
-            location: 'App/blockchainLocation'
+            location: 'App/blockchainLocation',
+            isLocked: 'App/isLocked',
+            isInitialRun: 'App/isInitialRun'
         })
     },
 

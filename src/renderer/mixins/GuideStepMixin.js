@@ -3,6 +3,10 @@ export default {
         actions: {
             type: Object,
             required: true
+        },
+        mnemonics: {
+            type: String,
+            default: ''
         }
     },
 

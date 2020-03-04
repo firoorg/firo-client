@@ -59,7 +59,8 @@ export default {
     data () {
         return {
             eventBusName: 'popover:intro',
-            showNextButton: false
+            showNextButton: false,
+            walletEncrypted: false
         }
     },
 

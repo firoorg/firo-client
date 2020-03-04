@@ -9,7 +9,7 @@
                 <p v-html="$t('onboarding.location-daemon-restart.description')" />
             </main>
         </template>
-        <template v-else-if="!currentBlockHeight">
+        <template v-else-if="currentBlockHeight === undefined">
             <div class="icon">
                 <loading-bounce class="bounce" />
             </div>
@@ -86,7 +86,9 @@ export default {
             currentBlockHeight: 'Blockchain/currentBlockHeight',
             walletVersion: 'App/walletVersion',
             hasLocation: 'App/hasBlockchainLocation',
-            hasApiStatus: 'ApiStatus/hasApiStatus'
+            hasApiStatus: 'ApiStatus/hasApiStatus',
+            isInitialRun: 'App/isInitialRun',
+            isRestarting: 'App/isRestarting'
         })
     },
 
@@ -94,8 +96,13 @@ export default {
         // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
         // actions (like setting the passphrase) until zcoind is ready.
         hasApiStatus (val) {
+            console.log('initialRunn:', this.isInitialRun);
             if (val) {
-                this.actions.next()
+                if (this.isInitialRun) {
+                    this.actions.next();
+                } else {
+                    this.actions.goTo('lock');
+                }
             }
         }
     },
@@ -104,7 +111,12 @@ export default {
         // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
         // loaded and the watch() is set.
         if (this.hasApiStatus) {
-            this.actions.next();
+            console.log('initialRunn:', this.isInitialRun);
+            if (this.isInitialRun) {
+                this.actions.next();
+            } else {
+                this.actions.goTo('lock');
+            }
         }
     },
 

@@ -262,7 +262,7 @@ export class Zcoind {
     // return the entire response object we received from zcoind.
     async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-
+        console.log('send object:', JSON.stringify(data));
         return await this.requesterSocketSend({
             auth: {
                 passphrase: auth
@@ -437,6 +437,27 @@ export class Zcoind {
     async unlockWallet(auth: string): Promise<string> {
         const data = await this.send(auth, 'create', 'unlockWallet', {});
         console.log('unlocking wallet');
+        return data;
+    }
+
+    async importMnemonics(auth: string, mnemonics: string): Promise<string> {
+        const data = await this.send(auth, 'create', 'importMnemonics', {});
+        console.log('importing mnemonics to wallet');
+        return data;
+    }
+
+    async showMnemonics(auth: string): Promise<string> {
+        const data = await this.send(auth, 'create', 'showMnemonics', {});
+        console.log('showing mnemonics to wallet');
+        return data;
+    }
+
+    async verifyMnemonicsWord(auth: string, word: string, index: string) : Promise<boolean> {
+        const str = `${word}-${index}`;
+        const data = await this.send(auth, 'create', 'verifyMnemonicsWord', {
+            wordindex: str
+        });
+        console.log('string data:', data);
         return data;
     }
 

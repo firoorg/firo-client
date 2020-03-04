@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="createnewwallet">
         <p v-html="$t('Below is your 24-word passphrase. Write it down and keep it safe. You will be shortly asked to re-enter it.')"/>
-        <p> {{mnemonics}} </p>
+        <p><b> {{mnemonics}} </b></p>
         <BaseButton
             @click="confirmWriteDown"
             class="button"
@@ -18,8 +18,14 @@ export default {
     mixins: [
         GuideStepMixin
     ],
-    props: {
-        mnemonics: String
+    data() {
+        return {
+            mnemonics: ''
+        }
+    },
+    async created() {
+        this.mnemonics = await this.$daemon.showMnemonics('');
+        console.log('mnemonics:', this.mnemonics);
     },
     methods: {
         confirmWriteDown() {
@@ -32,7 +38,9 @@ export default {
 <style scoped>
     .button {
         width: 500px;
-        margin-top: 30px;
         background-color: rgb(138, 187, 138);    
+    }
+    .createnewwallet {
+        height: 1000px;
     }
 </style>

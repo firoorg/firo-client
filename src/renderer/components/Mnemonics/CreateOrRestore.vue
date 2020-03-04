@@ -25,7 +25,7 @@ export default {
         GuideStepMixin
     ],
     methods: {
-        createNewWallet() {
+        async createNewWallet() {
             this.actions.next();
         },
         restoreWallet() {
