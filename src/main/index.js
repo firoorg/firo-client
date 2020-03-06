@@ -120,6 +120,7 @@ app.on('ready', async () => {
     coreDaemonManager.setPathToSpawn(zcoindPath)
 
     if (!store.getters['App/isInitialRun']) {
+        logger.info('starting core')
         coreDaemonManager.start()
     }
 

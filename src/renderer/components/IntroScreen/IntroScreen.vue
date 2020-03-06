@@ -73,6 +73,8 @@ import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
 import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
 import VerifyMnemonics from '../Mnemonics/VerifyMnemonics.vue'
+import NoMnemonicsWarningVue from '../Mnemonics/NoMnemonicsWarning.vue'
+
 
 export default {
     name: 'IntroScreen',
@@ -101,6 +103,7 @@ export default {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
                 settingUpLocation: IntroScreenSettingUpLocation,
+                noMnemonicWarning: NoMnemonicsWarningVue,
                 createOrRestore: CreateOrRestore,
                 createWallet: CreateNewWallet,
                 verifyMnemonics: VerifyMnemonics,
@@ -140,6 +143,7 @@ export default {
         },
 
         showIntro () {
+            console.log('showIntro:', this.isReadyInitialOrRestarting, ', show intro:', this.showIntroScreen);
             return this.isReadyInitialOrRestarting  && this.showIntroScreen
         },
 
@@ -147,7 +151,8 @@ export default {
             return {
                 prev: this.prevStep,
                 next: this.nextSettingsStep,
-                goTo: this.goToStep
+                goTo: this.goToStep,
+                getCurrentStep: this.getCurrentStep
             }
         },
 
@@ -155,7 +160,7 @@ export default {
             if (this.isRestarting) {
                 return this.$t('overlay.loading.restarting-daemon')
             }
-            else if (!this.currentBlockHeight) {
+            else if (this.currentBlockHeight === undefined) {
                 return this.$t('overlay.loading.loading-blockchain')
             }
             else if (this.isRunning) {

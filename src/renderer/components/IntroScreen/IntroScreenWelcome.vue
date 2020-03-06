@@ -7,7 +7,7 @@
         <footer>
             <BaseButton
                 color="green"
-                @click="actions.next"
+                @click="next"
             >
                 {{ $t('onboarding.intro-screen.button__start--primary') }}
             </BaseButton>
@@ -34,6 +34,9 @@ export default {
     methods: {
         isEnabled () {
             return this.isInitialRun
+        },
+        next() {
+            this.actions.next();
         }
     }
 }

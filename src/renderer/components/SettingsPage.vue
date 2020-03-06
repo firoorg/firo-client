@@ -105,6 +105,15 @@
                             </template>
                         </v-popover>
                     </section>
+                    <div class="mnemonic-setting">
+                        <u><a
+                                :style="{ cursor: 'pointer'}"
+                                @click.prevent="openMnemonicSettings()"                            >
+                            <b>Show my mnemonic recovery phrase</b>
+                            </a>
+                        </u>
+                    </div>
+                    <ShowMnemonicSettings v-if="showMnemonicSetting" @close-mnemonic="closeMnemonicDialog"/>
 
                     <section class="backup">
                         <h2>Backup</h2>
@@ -172,6 +181,7 @@ import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExpl
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
 import ConnectViaTorSettings from '@/components/SettingsPage/ConnectViaTorSettings'
 import AmountToHoldInZerocoinSettings from '@/components/SettingsPage/AmountToHoldInZerocoinSettings'
+import ShowMnemonicSettings from '@/components/SettingsPage/ShowMnemonicSettings'
 
 const zcoinClientVersion = require('../../../package.json').version;
 
@@ -182,12 +192,14 @@ export default {
         AmountToHoldInZerocoinSettings,
         ConnectViaTorSettings,
         LanguageSettings,
-        BlockchainExplorerSettings
+        BlockchainExplorerSettings,
+        ShowMnemonicSettings
     },
 
     computed: {
         ...mapGetters({
-            isRestarting: 'App/isRestarting'
+            isRestarting: 'App/isRestarting',
+            hasMnemmonic: 'App/hasMnemonic'
         }),
 
         passphraseBoxClass () {
@@ -211,8 +223,13 @@ export default {
             newPassphrase: '',
             confirmNewPassphrase: '',
             openPassphrasePopover: false,
-            zcoinClientVersion
+            zcoinClientVersion,
+            showMnemonicSetting: false
         }
+    },
+
+    mounted() {
+        this.$on('close-mnemonic', this.closeMnemonicDialog);
     },
 
     methods: {
@@ -240,6 +257,11 @@ export default {
             this.openPassphrasePopover = true;
         },
 
+        async closeMnemonicDialog() {
+            console.log('closing');
+            this.showMnemonicSetting = false;
+        },
+
         // This also needs to be called on popover auto-close to cleanup data.
         closePassphrasePopover() {
             this.changePassphraseError = '';
@@ -248,6 +270,10 @@ export default {
 
         openBackupDialog() {
             this.$refs.backupDirectory.click();
+        },
+
+        openMnemonicSettings() {
+            this.showMnemonicSetting = true;
         },
 
         async doBackup() {
@@ -345,5 +371,10 @@ export default {
         a {
             color: white;
         }
+    }
+
+    .mnemonic-setting {
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 </style>

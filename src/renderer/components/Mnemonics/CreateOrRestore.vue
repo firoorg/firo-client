@@ -1,9 +1,10 @@
 <template>
     <div>
-        <h1 v-html="$t('Create Or Restore?')"/>
+        <h2 v-html="$t('Do You Want To Create A New Wallet Or Restore From Your Mnemonics?')"/>
         <BaseButton
             @click="createNewWallet"
             class="button"
+            color="green"
         >
             Create New Keychain Wallet
         </BaseButton>
@@ -11,6 +12,7 @@
         <BaseButton
             @click="restoreWallet"
             class="button"
+            color="green"
         >
             Restore Keychain Wallet Using Recovery Phrase
         </BaseButton>
@@ -39,7 +41,5 @@ export default {
     .button {
         width: 500px;
         margin-top: 30px;
-        background-color: rgb(138, 187, 138);
-        color: black;
     }
 </style>

@@ -55,6 +55,8 @@ interface ApiStatus {
             totalCount: number;
             enabledCount: number;
         };
+        hasMnemonic: boolean;
+        
     };
     meta: {
         status: number;
@@ -459,6 +461,15 @@ export class Zcoind {
         });
         console.log('string data:', data);
         return data;
+    }
+
+    async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<string> {
+        const data = await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
+        return data;
+    }
+
+    async readWalletMnemonicWarningState(auth: string) : Promise<string> {
+        return await this.send(auth, 'create', 'readWalletMnemonicWarningState', {});
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
