@@ -7,6 +7,7 @@
         <BaseButton
             @click="verifyWord"
             class="button"
+            color="green"
         >
             Confirm
         </BaseButton>
@@ -57,6 +58,5 @@ export default {
     .button {
         width: 500px;
         margin-top: 30px;
-        background-color: rgb(138, 187, 138);    
     }
 </style>

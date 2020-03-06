@@ -5,6 +5,7 @@
         <BaseButton
             @click="confirmWriteDown"
             class="button"
+            color="green"
         >
             I have written down my seed phrase
         </BaseButton>
@@ -38,7 +39,7 @@ export default {
 <style scoped>
     .button {
         width: 500px;
-        background-color: rgb(138, 187, 138);    
+        margin-bottom: 100px;   
     }
     .createnewwallet {
         height: 1000px;

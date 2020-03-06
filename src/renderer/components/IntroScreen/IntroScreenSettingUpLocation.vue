@@ -95,11 +95,46 @@ export default {
     watch: {
         // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
         // actions (like setting the passphrase) until zcoind is ready.
-        hasApiStatus (val) {
+        hasApiStatus: async function(val) {
             console.log('initialRunn:', this.isInitialRun);
             if (val) {
-                if (this.isInitialRun) {
-                    this.actions.next();
+                this.data = await this.$daemon.readWalletMnemonicWarningState('');
+                console.log('readWalletMnemonicWarningState:', this.data);
+                if (this.isInitialRun && this.data.hasMnemonic) {
+                    this.actions.goTo('createOrRestore');
+                } else {
+                    console.log('readWalletMnemonicWarningState:', this.data);
+                    if (!this.data.hasMnemonic) {
+                        if (this.data.shouldShowWarning) {
+                            this.actions.goTo('noMnemonicWarning');
+                        } else {
+                            this.actions.goTo('lock');
+                        }
+                    } else {
+                        this.actions.goTo('lock');
+                    }
+                }
+            }
+        }
+    },
+
+    async created() {
+        // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
+        // loaded and the watch() is set.
+        console.log('readWalletMnemonicWarningState:', this.data);
+        if (this.hasApiStatus) {
+            this.data = await this.$daemon.readWalletMnemonicWarningState('');
+            console.log('readWalletMnemonicWarningState:', this.data);
+            if (this.isInitialRun && this.data.hasMnemonic) {
+                this.actions.goTo('createOrRestore');
+            } else {
+                console.log('readWalletMnemonicWarningState:', this.data);
+                if (!this.data.hasMnemonic) {
+                    if (this.data.shouldShowWarning) {
+                        this.actions.goTo('noMnemonicWarning');
+                    } else {
+                        this.actions.goTo('lock');
+                    }
                 } else {
                     this.actions.goTo('lock');
                 }
@@ -107,23 +142,10 @@ export default {
         }
     },
 
-    mounted() {
-        // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
-        // loaded and the watch() is set.
-        if (this.hasApiStatus) {
-            console.log('initialRunn:', this.isInitialRun);
-            if (this.isInitialRun) {
-                this.actions.next();
-            } else {
-                this.actions.goTo('lock');
-            }
-        }
-    },
-
     methods: {
         // part of GuideStepMixin
         isEnabled () {
-            return !this.hasApiStatus;
+            return true;
         }
     }
 }
