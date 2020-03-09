@@ -31,7 +31,7 @@ export default {
             this.actions.next();
         },
         restoreWallet() {
-            this.actions.goToStep('createNewWallet');
+            this.actions.goTo('restoreAskWalletOrigin');
         }
     }
 }

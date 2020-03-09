@@ -73,6 +73,8 @@ import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
 import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
 import VerifyMnemonics from '../Mnemonics/VerifyMnemonics.vue'
+import RestoreAskWalletOrigin from '../Mnemonics/RestoreAskWalletOrigin.vue'
+import WalletRecovery from '../Mnemonics/WalletRecovery.vue'
 
 
 export default {
@@ -105,6 +107,8 @@ export default {
                 createOrRestore: CreateOrRestore,
                 createWallet: CreateNewWallet,
                 verifyMnemonics: VerifyMnemonics,
+                restoreAskWalletOrigin: RestoreAskWalletOrigin,
+                walletRecover:WalletRecovery,
                 lock: IntroScreenLockWallet,
                 restart: IntroScreenRestartingDaemon
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
@@ -150,7 +154,9 @@ export default {
                 prev: this.prevStep,
                 next: this.nextSettingsStep,
                 goTo: this.goToStep,
-                getCurrentStep: this.getCurrentStep
+                getCurrentStep: this.getCurrentStep,
+                setWalletRecoveryType: this.setWalletRecoveryType,
+                getWalletRecoveryType: this.getWalletRecoveryType
             }
         },
 
