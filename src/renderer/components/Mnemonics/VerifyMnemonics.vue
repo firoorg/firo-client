@@ -1,62 +1,60 @@
 <template>
-    <div>
-        <p v-if="isVerifedFirstTime === true" v-html="$t('Type the nineth word.')"/>
-        <p v-if="isVerifedFirstTime !== true" v-html="$t('Type the third word.')"/>
-        <input v-model="word" v-if="isVerifedFirstTime === true" placeholder="Type the nineth word"/>
-        <input v-model="word" v-if="isVerifedFirstTime !== true" placeholder="Type the third word"/>
-        <BaseButton
-            @click="verifyWord"
-            class="button"
-            color="green"
-        >
-            Confirm
-        </BaseButton>
+  <div>
+    <p>
+      <b><i>Re-type your mnemonic recovery phrase below</i></b>
+    </p>
+    <div style="text-align:center">
+      <textarea v-model="mnemonicTyped" type="text" class="field-mnemonic" />
     </div>
+    <BaseButton @click="verifyMnemonic" class="button" color="green">
+      Confirm
+    </BaseButton>
+  </div>
 </template>
 
 <script>
-import GuideStepMixin from '@/mixins/GuideStepMixin'
+import GuideStepMixin from "@/mixins/GuideStepMixin";
 export default {
-    name: 'CreateNewWallet',
-    mixins: [
-        GuideStepMixin
-    ],
-    data() {
-        return {
-            word: '',
-            isVerifedFirstTime: false
+  name: "CreateNewWallet",
+  mixins: [GuideStepMixin],
+  data() {
+    return {
+      mnemonicTyped: ""
+    };
+  },
+  methods: {
+    async verifyMnemonic() {
+      try {
+        const mnemonics = await this.$daemon.showMnemonics("");
+        const d = mnemonics === this.mnemonicTyped;
+        if (d != true) {
+          return alert("Incorrect!");
+        } else {
+          alert("Successfully verified mnemonic words!");
+          this.actions.goTo("lock");
         }
-    },
-    methods: {
-        async verifyWord() {
-            try {
-                const mnemonics = await this.$daemon.showMnemonics('');
-                const d = mnemonics.includes(this.word);
-                console.log("done!", d);
-                if (d != true) {
-                    return alert("Incorrect!");
-                } else {
-                    if (!this.isVerifedFirstTime) {
-                        this.isVerifedFirstTime = true;
-                        this.word = '';
-                        alert("Successfully verified the third word!");
-                    } else {
-                        alert("Successfully verified mnemonic words!");
-                        this.actions.goTo('lock');
-                    }
-                }
-            } catch (e) {
-                console.log('erro:', e);
-                alert("Error! ", e.toString());
-            }
-        }
+      } catch (e) {
+        console.log("erro:", e);
+        alert("Error! ", e.toString());
+      }
     }
-}
+  }
+};
 </script>
 
 <style scoped>
-    .button {
-        width: 500px;
-        margin-top: 30px;
-    }
+.button {
+  width: 500px;
+  margin-top: 30px;
+}
+
+.field-mnemonic {
+  background-color: darkgrey;
+  border: none;
+  height: 4em;
+  width: 27em;
+  left: 20px;
+  right: 20px;
+  padding: 8px;
+}
 </style>
