@@ -14,7 +14,7 @@
                 <custom-input-popup />
             </section>
 
-            <WarningWalletWithoutMnemonics v-if="!apiStatus.data.hasMnemonic && apiStatus.data.shouldShowWarning && showWarning" @close-mnemonic-warning="closeMnemonicWarning"/>
+            <WarningWalletWithoutMnemonics v-if="apiStatus.data && !apiStatus.data.hasMnemonic && apiStatus.data.shouldShowWarning && showWarning" @close-mnemonic-warning="closeMnemonicWarning"/>
         </div>
 
         <section class="tx-page-sidebar">

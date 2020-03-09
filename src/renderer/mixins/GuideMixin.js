@@ -12,7 +12,8 @@ export default {
     data () {
         return {
             steps: {},
-            currentStep: ''
+            currentStep: '',
+            walletRecoveryType: 'qt'
         }
     },
 
@@ -58,7 +59,9 @@ export default {
                 prev: this.prevStep,
                 next: this.nextStep,
                 goTo: this.goToStep,
-                currentStep: this.getCurrentStep
+                currentStep: this.getCurrentStep,
+                setWalletRecoveryType: this.setWalletRecoveryType,
+                getWalletRecoveryType: this.getWalletRecoveryType
             }
         }
     },
@@ -92,6 +95,14 @@ export default {
 
         getCurrentStep() {
             return this.currentStep;
+        },
+
+        setWalletRecoveryType(ty) {
+            this.walletRecoveryType = ty;
+        },
+
+        getWalletRecoveryType() {
+            return this.walletRecoveryType;
         },
 
         onStepChange (newStep, oldStep) {

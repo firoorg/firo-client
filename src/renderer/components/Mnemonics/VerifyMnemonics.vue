@@ -42,7 +42,7 @@ export default {
                         alert("Successfully verified the third word!");
                     } else {
                         alert("Successfully verified mnemonic words!");
-                        this.actions.next();
+                        this.actions.goTo('lock');
                     }
                 }
             } catch (e) {
