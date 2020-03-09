@@ -41,7 +41,9 @@ const state = {
         'torsetup'
     ],
     daemonSettings: {
-    }
+    },
+
+    showWarning: true
 }
 
 const mutations = {
@@ -49,6 +51,10 @@ const mutations = {
 
     [types.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN] (state, percentage) {
         state.percentageToHoldInZerocoin = percentage
+    },
+
+    [types.MNEMONIC_WARNING_SETTING] (state, showW) {
+        state.showWarning = showW
     },
 
     [types.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED] (state, ratio) {
@@ -169,7 +175,11 @@ const actions = {
             ...state.locales.available,
             ...locales
         })
-    }
+    },
+
+    [types.MNEMONIC_WARNING_SETTING] ({ state, commit }, showW) {
+        commit(types.MNEMONIC_WARNING_SETTING, showW);
+    },
 }
 
 const getters = {
@@ -199,6 +209,7 @@ const getters = {
             rootGetters['Balance/xzcZerocoinRatio'] !== state.xzcZerocoinRatioNotified &&
             rootGetters['Blockchain/isBlockchainSynced']
     },
+    showWarning: (state) => state.showWarning,
     remainingXzcToFulFillPercentageToHoldInZerocoin (state, getters, rootState, rootGetters) {
         return Math.floor((rootGetters['Balance/availableXzc'] * (state.percentageToHoldInZerocoin - rootGetters['Balance/confirmedXzcZerocoinRatio'])) / 100000000)
     },

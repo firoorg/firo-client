@@ -73,7 +73,6 @@ import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
 import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
 import VerifyMnemonics from '../Mnemonics/VerifyMnemonics.vue'
-import NoMnemonicsWarningVue from '../Mnemonics/NoMnemonicsWarning.vue'
 
 
 export default {
@@ -103,7 +102,6 @@ export default {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
                 settingUpLocation: IntroScreenSettingUpLocation,
-                noMnemonicWarning: NoMnemonicsWarningVue,
                 createOrRestore: CreateOrRestore,
                 createWallet: CreateNewWallet,
                 verifyMnemonics: VerifyMnemonics,

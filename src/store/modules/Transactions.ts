@@ -50,8 +50,7 @@ interface StateWallet {
                 [outpoint: string]: TransactionInput
             },
         }    
-    },
-    hasMnemonic?: boolean
+    }
 }
 
 // This is the data format we're given in 'transaction' events.
@@ -96,8 +95,7 @@ const state = {
     transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
     // values are keys of transactions in state.transactions associated with the address
     addresses: <{[address: string]: string[]}>{},
-    unspentUTXOs: <{[txidAndIndex:string]:boolean}>{},
-    hasMnemonic: false
+    unspentUTXOs: <{[txidAndIndex:string]:boolean}>{}
 };
 
 const mutations = {
@@ -189,13 +187,11 @@ const mutations = {
                 }
             }
         }
-        state.hasMnemonic = initialStateWallet.hasMnemonic;
         // Tell Vue we've updated our variables.
         // FIXME: Use Vue.set.
         state.addresses = {...state.addresses};
         state.transactions = {...state.transactions};
         state.unspentUTXOs = {...state.unspentUTXOs};
-        state.hasMnemonic = {...state.hasMnemonic};
     },
 
     setLockState(state, uniqIds: string[]) {
@@ -203,6 +199,16 @@ const mutations = {
             state.transactions[uniqId].locked = !state.transactions[uniqId].locked;
         }
         state.transactions = {...state.transactions};
+    },
+
+    setHasMnemonic(state, hasM: boolean) {
+        state.hasMnemonic = hasM;
+        state.hasMnemonic = {...state.hasMnemonic};
+    },
+
+    setShouldShowWarning(state, warning: boolean) {
+        state.shouldShowWarning = warning;
+        state.shouldShowWarning = {...state.shouldShowWarning};
     }
 };
 
@@ -228,6 +234,14 @@ const actions = {
     changeLockStatus({commit, rootGetters}, uniqIds: string[]) {
         logger.info('changeLockStatus');
         commit('setLockState', uniqIds)
+    },
+
+    changeHasMnemonic({commit, rootGetters}, hasM: boolean) {
+        commit('setHasMnemonic', hasM);
+    },
+
+    changeShouldShowWarning({commit, rootGetters}, warning: boolean) {
+        commit('setShouldShowWarning', warning);
     }
 };
 
@@ -235,8 +249,6 @@ const getters = {
     // a map of `${txid}-${txIndex}` to the full transaction object returned from zcoind
     transactions: (state) => state.transactions,
     unspentUTXOs: (state) => state.unspentUTXOs,
-
-    hasMnemonic: (state) => state.hasMnemonic,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,

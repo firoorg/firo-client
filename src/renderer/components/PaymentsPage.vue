@@ -13,6 +13,8 @@
             >
                 <custom-input-popup />
             </section>
+
+            <WarningWalletWithoutMnemonics v-if="!apiStatus.data.hasMnemonic && apiStatus.data.shouldShowWarning && showWarning" @close-mnemonic-warning="closeMnemonicWarning"/>
         </div>
 
         <section class="tx-page-sidebar">
@@ -26,18 +28,37 @@
 import { mapGetters } from 'vuex';
 import PaymentsList from '@/components/PaymentsList';
 import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
+import WarningWalletWithoutMnemonics from './Mnemonics/WarningWalletWithoutMnemonics.vue';
 
 export default {
     name: 'PaymentsPage',
 
     components: {
         PaymentsList,
-        CustomInputPopup
+        CustomInputPopup,
+        WarningWalletWithoutMnemonics
+    },
+    data() {
+        return {
+            data: ''
+        }
+    },
+    mounted() {
+        this.$on('close-mnemonic-warning', this.closeMnemonicWarning);
     },
     computed: {
         ...mapGetters({
-            isShowingCustomInputs: 'ZcoinPayment/customInputs'
+            isShowingCustomInputs: 'ZcoinPayment/customInputs',
+            hasApiStatus: 'ApiStatus/hasApiStatus',
+            apiStatus: 'ApiStatus/apiStatus',
+            showWarning: 'Settings/showWarning'
         }),
+    },
+
+    methods: {
+        async closeMnemonicWarning() {
+            this.$store.commit('Settings/MNEMONIC_WARNING_SETTING', false);
+        }
     }
 }
 </script>

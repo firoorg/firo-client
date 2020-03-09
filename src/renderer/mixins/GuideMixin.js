@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash'
+import { isThursday } from 'date-fns'
 
 export default {
     props: {
@@ -56,7 +57,8 @@ export default {
             return {
                 prev: this.prevStep,
                 next: this.nextStep,
-                goTo: this.goToStep
+                goTo: this.goToStep,
+                currentStep: this.getCurrentStep
             }
         }
     },
@@ -88,11 +90,14 @@ export default {
             return true
         },
 
+        getCurrentStep() {
+            return this.currentStep;
+        },
+
         onStepChange (newStep, oldStep) {
             if (this.currentStep === newStep) {
                 return
             }
-
             this.currentStep = newStep
         },
 
@@ -104,7 +109,7 @@ export default {
             if (this.currentIndex >= this.stepKeys.length - 1) {
                 return false
             }
-
+            console.log('NextStep:', this.stepKeys[this.currentIndex + 1]);
             this.$emit('step-change', this.stepKeys[this.currentIndex + 1], this.currentStep)
             return true
         },
@@ -123,6 +128,7 @@ export default {
             if (!this.steps[stepKey]) {
                 return false
             }
+            console.log('currentStep:', this.currentStep);
 
             this.$emit('step-change', stepKey, this.currentStep)
             return true

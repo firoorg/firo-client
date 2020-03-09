@@ -4,6 +4,8 @@
         
         <div class="warning-message"> <b><i><p v-html="$t('Please note that you would have to backup your wallet.dat manually to prevent coin loss.')"/></i></b></div>
 
+        <div class="warning-message"> <b><i><p v-html="$t('You can do this by going to Settings > Backup > Backup Zcoin Data and Saving it in a secure location.')"/></i></b></div>
+
         <div class="checkbox">
              <input
                 v-model="dontShowMnemonicWarning"
