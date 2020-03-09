@@ -7,12 +7,12 @@
         )
       "
     />
-    <div style="text-align:center">
+    <div style="text-align:center" class="margin-set">
       <textarea v-model="mnemonics" type="text" class="field-mnemonic" />
+      <BaseButton @click="confirmWriteDown" class="button" color="green">
+        I have written down my seed phrase
+      </BaseButton>
     </div>
-    <BaseButton @click="confirmWriteDown" class="button" color="green">
-      I have written down my seed phrase
-    </BaseButton>
   </div>
 </template>
 
@@ -40,20 +40,23 @@ export default {
 
 <style scoped>
 .button {
-  width: 500px;
-  margin-bottom: 100px;
+  width: 30em;
 }
 .createnewwallet {
-  height: 1000px;
+  height: 500px;
 }
 .field-mnemonic {
   background-color: darkgrey;
   border: none;
   height: 4em;
-  width: 27em;
+  width: 450px;
   left: 20px;
   right: 20px;
   padding: 8px;
-  margin-bottom: 1em;
+  margin-bottom: 2em;
+  margin-top: 2em;
+}
+.margin-set {
+    margin-bottom: 1em;
 }
 </style>
