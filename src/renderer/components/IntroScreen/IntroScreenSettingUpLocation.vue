@@ -96,23 +96,11 @@ export default {
         // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
         // actions (like setting the passphrase) until zcoind is ready.
         hasApiStatus: async function(val) {
-            console.log('initialRunn:', this.isInitialRun);
             if (val) {
-                this.data = await this.$daemon.readWalletMnemonicWarningState('');
-                console.log('readWalletMnemonicWarningState:', this.data);
-                if (this.isInitialRun && this.data.hasMnemonic) {
+                if (this.isInitialRun) {
                     this.actions.goTo('createOrRestore');
                 } else {
-                    console.log('readWalletMnemonicWarningState:', this.data);
-                    if (!this.data.hasMnemonic) {
-                        if (this.data.shouldShowWarning) {
-                            this.actions.goTo('noMnemonicWarning');
-                        } else {
-                            this.actions.goTo('lock');
-                        }
-                    } else {
-                        this.actions.goTo('lock');
-                    }
+                    this.actions.goTo('lock');
                 }
             }
         }
@@ -121,23 +109,11 @@ export default {
     async created() {
         // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
         // loaded and the watch() is set.
-        console.log('readWalletMnemonicWarningState:', this.data);
         if (this.hasApiStatus) {
-            this.data = await this.$daemon.readWalletMnemonicWarningState('');
-            console.log('readWalletMnemonicWarningState:', this.data);
-            if (this.isInitialRun && this.data.hasMnemonic) {
+            if (this.isInitialRun) {
                 this.actions.goTo('createOrRestore');
             } else {
-                console.log('readWalletMnemonicWarningState:', this.data);
-                if (!this.data.hasMnemonic) {
-                    if (this.data.shouldShowWarning) {
-                        this.actions.goTo('noMnemonicWarning');
-                    } else {
-                        this.actions.goTo('lock');
-                    }
-                } else {
-                    this.actions.goTo('lock');
-                }
+                this.actions.goTo('lock');
             }
         }
     },

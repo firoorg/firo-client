@@ -105,7 +105,7 @@
                             </template>
                         </v-popover>
                     </section>
-                    <div class="mnemonic-setting">
+                    <div v-if="apiStatus.data.hasMnemonic" class="mnemonic-setting">
                         <u><a
                                 :style="{ cursor: 'pointer'}"
                                 @click.prevent="openMnemonicSettings()"                            >
@@ -199,7 +199,7 @@ export default {
     computed: {
         ...mapGetters({
             isRestarting: 'App/isRestarting',
-            hasMnemmonic: 'App/hasMnemonic'
+            apiStatus: 'ApiStatus/apiStatus'
         }),
 
         passphraseBoxClass () {
@@ -273,6 +273,7 @@ export default {
         },
 
         openMnemonicSettings() {
+            console.log('hasMnemonic:', this.hasMnemonic);
             this.showMnemonicSetting = true;
         },
 
