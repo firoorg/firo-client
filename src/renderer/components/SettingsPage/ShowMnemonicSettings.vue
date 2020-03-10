@@ -13,30 +13,30 @@
             </p>
 
             <p v-if="askedPassphrase">
-              <b
-                ><i
-                  >See your reveal recovery mnemonic phrase below.</i
-                ></b
-              >
+              <b><i>See your reveal recovery mnemonic phrase below.</i></b>
             </p>
 
             <div v-if="!askedPassphrase" class="field">
               <label
                 ><i><b>Passphrase:</b></i></label
               >
-              <input v-model="passphrase" type="password" />
+              <input
+                v-model="passphrase"
+                type="password"
+                @keydown="showError = false"
+              />
             </div>
-
+            <div v-show="showError" class="red">
+              <p>
+                <b>{{ errorMessage }}!</b>
+              </p>
+            </div>
             <div v-if="askedPassphrase" class="field-mnemonic">
-              <textarea v-model="mnemonic" type="text"/>
+              <textarea v-model="mnemonic" type="text" />
             </div>
-
             <div class="mnemonic-ok">
               <u
-                ><a
-                  :style="{ cursor: 'pointer' }"
-                  @click.prevent="ok"
-                >
+                ><a :style="{ cursor: 'pointer' }" @click.prevent="ok">
                   <b><center>OK</center></b>
                 </a>
               </u>
@@ -57,22 +57,24 @@ export default {
     return {
       askedPassphrase: false,
       passphrase: "",
-      mnemonic:""
+      mnemonic: "",
+      errorMessage: "Incorrect passphrase",
+      showError: false
     };
   },
   methods: {
-      async ok() {
-          if (!this.askedPassphrase) {
-              try {
-                  this.mnemonic = await this.$daemon.showMnemonics(this.passphrase);
-                  this.askedPassphrase = true;
-              } catch(e) {
-
-              }
-          } else {
-              this.$emit('close-mnemonic');
-          }
+    async ok() {
+      if (!this.askedPassphrase) {
+        try {
+          this.mnemonic = await this.$daemon.showMnemonics(this.passphrase);
+          this.askedPassphrase = true;
+        } catch (e) {
+          this.showError = true;
+        }
+      } else {
+        this.$emit("close-mnemonic");
       }
+    }
   }
 };
 </script>
@@ -171,9 +173,9 @@ export default {
 }
 
 .mnemonic-ok {
-    margin-top: 2em;
-    margin-left: 50%;
-    margin-right: 50%;
+  margin-top: 2em;
+  margin-left: 50%;
+  margin-right: 50%;
 }
 
 .field-mnemonic {
@@ -204,5 +206,8 @@ export default {
       outline-color: red;
     }
   }
+}
+.red {
+  color: red;
 }
 </style>
