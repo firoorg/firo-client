@@ -373,6 +373,11 @@ export class Zcoind {
         });
     }
 
+
+    async verifyMnemonicValidity(mnemonic: string): Promise<string> {
+        return await this.send(null, 'create', 'verifyMnemonicValidity', {mnemonic: mnemonic});
+    }
+
     // Update an existing payment request.
     // Note: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
     // responsible for any updating of state that might be required.
@@ -454,15 +459,6 @@ export class Zcoind {
     async showMnemonics(auth: string): Promise<string> {
         const data = await this.send(auth, 'create', 'showMnemonics', {});
         console.log('showing mnemonics to wallet');
-        return data;
-    }
-
-    async verifyMnemonicsWord(auth: string, word: string, index: string) : Promise<boolean> {
-        const str = `${word}-${index}`;
-        const data = await this.send(auth, 'create', 'verifyMnemonicsWord', {
-            wordindex: str
-        });
-        console.log('string data:', data);
         return data;
     }
 

@@ -63,7 +63,7 @@ export default {
     computed: {
         ...mapGetters({
             isLocked: 'ApiStatus/isLocked',
-            hasApiStatus: 'ApiStatus/hasApiStatus'
+            hasApiStatus: 'ApiStatus/hasApiStatus',
         }),
         isEqual () {
             return this.passphrase === this.confirm
@@ -99,6 +99,7 @@ export default {
         },
         onLockWallet () {
             this.lockWallet(this.passphrase)
+            console.log('locking wallet');
             this.actions.next()
         },
         isEnabled () {

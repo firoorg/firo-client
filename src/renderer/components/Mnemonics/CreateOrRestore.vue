@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2 v-html="$t('Do You Want To Create A New Wallet Or Restore From Your Mnemonics?')"/>
+        <h2 v-html="$t('Do you want to create a new wallet or restore from your mnemonics?')"/>
         <BaseButton
             @click="createNewWallet"
             class="button"
@@ -39,7 +39,7 @@ export default {
 
 <style scoped>
     .button {
-        width: 500px;
-        margin-top: 30px;
+        width: 100%;
+        margin-top: 20px;
     }
 </style>

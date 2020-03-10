@@ -1,14 +1,16 @@
 <template>
   <div class="createnewwallet">
-    <p
-      v-html="
-        $t(
-          'Below is your 24-word passphrase. Write it down and keep it safe. You will be shortly asked to re-enter it.'
-        )
-      "
-    />
+    <div>
+        <b><i><p
+        v-html="
+            $t(
+            'Below is your 24-word passphrase. Write it down and keep it safe. You will be shortly asked to re-enter it.'
+            )
+        "
+        /></i></b>
+    </div>
     <div style="text-align:center" class="margin-set">
-      <textarea v-model="mnemonics" type="text" class="field-mnemonic" />
+      <textarea v-model="createdMnemonic" type="text" class="field-mnemonic" readonly/>
       <BaseButton @click="confirmWriteDown" class="button" color="green">
         I have written down my seed phrase
       </BaseButton>
@@ -23,12 +25,11 @@ export default {
   mixins: [GuideStepMixin],
   data() {
     return {
-      mnemonics: ""
+      createdMnemonic: ""
     };
   },
   async created() {
-    this.mnemonics = await this.$daemon.showMnemonics("");
-    console.log("mnemonics:", this.mnemonics);
+    this.createdMnemonic = await this.$daemon.showMnemonics("");
   },
   methods: {
     confirmWriteDown() {
@@ -40,7 +41,7 @@ export default {
 
 <style scoped>
 .button {
-  width: 30em;
+  width: 80%;
 }
 .createnewwallet {
   height: 500px;
@@ -49,7 +50,7 @@ export default {
   background-color: darkgrey;
   border: none;
   height: 4em;
-  width: 450px;
+  width: 100%;
   left: 20px;
   right: 20px;
   padding: 8px;

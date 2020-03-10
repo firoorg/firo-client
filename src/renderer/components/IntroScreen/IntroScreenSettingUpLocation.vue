@@ -88,7 +88,8 @@ export default {
             hasLocation: 'App/hasBlockchainLocation',
             hasApiStatus: 'ApiStatus/hasApiStatus',
             isInitialRun: 'App/isInitialRun',
-            isRestarting: 'App/isRestarting'
+            isRestarting: 'App/isRestarting',
+            walletExist: 'App/walletExist'
         })
     },
 
@@ -97,7 +98,7 @@ export default {
         // actions (like setting the passphrase) until zcoind is ready.
         hasApiStatus: async function(val) {
             if (val) {
-                if (this.isInitialRun) {
+                if (this.isInitialRun || !this.walletExist) {
                     this.actions.goTo('createOrRestore');
                 } else {
                     this.actions.goTo('lock');
@@ -110,7 +111,7 @@ export default {
         // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
         // loaded and the watch() is set.
         if (this.hasApiStatus) {
-            if (this.isInitialRun) {
+            if (this.isInitialRun || !this.walletExist) {
                 this.actions.goTo('createOrRestore');
             } else {
                 this.actions.goTo('lock');

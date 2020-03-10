@@ -75,6 +75,7 @@ import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
 import VerifyMnemonics from '../Mnemonics/VerifyMnemonics.vue'
 import RestoreAskWalletOrigin from '../Mnemonics/RestoreAskWalletOrigin.vue'
 import WalletRecovery from '../Mnemonics/WalletRecovery.vue'
+import RecoveringWallet from '../Mnemonics/RecoveringWallet.vue'
 
 
 export default {
@@ -109,6 +110,7 @@ export default {
                 verifyMnemonics: VerifyMnemonics,
                 restoreAskWalletOrigin: RestoreAskWalletOrigin,
                 walletRecover:WalletRecovery,
+                recoveringWallet:RecoveringWallet,
                 lock: IntroScreenLockWallet,
                 restart: IntroScreenRestartingDaemon
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
