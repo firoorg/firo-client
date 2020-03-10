@@ -20,7 +20,9 @@ const state = {
     appVersion: null,
     blockchainLocation: '',
     zcoinLink: '',
-    initialRunSet: false
+    initialRunSet: false,
+    walletExist: true,
+    mnemonicSetting: ''
 }
 
 const mutations = {
@@ -34,12 +36,19 @@ const mutations = {
         state.blockchainLocation = location
     },
 
+    [types.MNEMONIC_SETTING] (state, mnemonic) {
+        state.mnemonicSetting = mnemonic
+    },
+
     setInitialRun (state, value) {
         state.isInitialRun = value;
     },
 
     setInitialRunSet(state) {
         state.initialRunSet = true;
+    },
+    setWalletNotExist(state) {
+        state.walletExist = false;
     },
 
     // daemon
@@ -221,6 +230,10 @@ const actions = {
             return
         }
 
+        if (!fs.existsSync(path.join(location, 'wallet.dat'))) {
+            commit('setWalletNotExist');
+        }
+
         if (!fs.existsSync(location)) {
             logger.warn('given location does not exist: %s', location)
             commit('setInitialRunSet');
@@ -242,6 +255,10 @@ const actions = {
         } else {
             logger.info("app.setInitialRun = true");
         }
+    },
+
+    async [types.MNEMONIC_SETTING] ({ commit, state }, mnemonic) {
+        commit(types.MNEMONIC_SETTING, mnemonic);
     },
 
     // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
@@ -278,6 +295,9 @@ const getters = {
     isInitialRun: (state) => {
         return state.isInitialRun
     },
+
+    mnemonicSetting: (state) => state.mnemonicSetting,
+    walletExist: (state) => state.walletExist,
 
     initialRunSet: (state) => state.initialRunSet,
 

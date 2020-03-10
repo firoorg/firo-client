@@ -8,9 +8,14 @@
       </p>
     </div>
     <div style="text-align:center">
-      <textarea v-model="mnemonic" type="text" class="field-mnemonic" />
+      <textarea v-model="mnemonic" type="text" class="field-mnemonic" @keydown="mnemonicValid=true"/>
     </div>
-    <div v-if="actions.getWalletRecoveryType() == 'qt'" class="mnemonic-setting">
+    <div v-show="!mnemonicValid" class="red"><p><b>{{errorMessage}}!</b></p></div>
+    <br/>
+    <div
+      v-if="actions.getWalletRecoveryType() == 'qt'"
+      class="mnemonic-setting"
+    >
       <u
         ><a
           :style="{ cursor: 'pointer' }"
@@ -21,7 +26,12 @@
       </u>
     </div>
     <div v-if="showProtectivePP">
-      <input v-model="protectivePassphrase" class='field' type="password" placeholder="Type protective passphrase here"/>
+      <input
+        v-model="protectivePassphrase"
+        class="field"
+        type="password"
+        placeholder="Type protective passphrase here"
+      />
     </div>
     <div style="text-align:center">
       <BaseButton @click="submit" class="button" color="green">
@@ -33,6 +43,9 @@
 
 <script>
 import GuideStepMixin from "@/mixins/GuideStepMixin";
+import types from "~/types";
+import { mapGetters } from "vuex";
+
 export default {
   name: "WalletRecovery",
   mixins: [GuideStepMixin],
@@ -41,18 +54,37 @@ export default {
       picked: "",
       mnemonic: "",
       protectivePassphrase: "",
-      showProtectivePP: false
+      showProtectivePP: false,
+      errorMessage: "Mnemonics recovery phrase is invalid!",
+      mnemonicValid: true
     };
   },
   computed: {
     mnemonicType() {
-      return this.actions.getWalletRecoveryType() == 'qt' ? "12/24" : "24";
-    }
+      return this.actions.getWalletRecoveryType() == "qt" ? "12/24" : "24";
+    },
+    ...mapGetters({
+      isRestarting: "App/isRestarting"
+    })
   },
   methods: {
     async submit() {
-        await this.$daemon.importMnemonics('', this.mnemonic, this.protectivePassphrase);
-        this.actions.next();
+        const result = await this.$daemon.verifyMnemonicValidity(this.mnemonic);
+        console.log('validity result:', result);
+        if (!result.valid) {
+            this.mnemonicValid = false;
+            this.errorMessage = result.reason;
+            return;
+        }
+      var mnemonicSetting = `-usemnemonic::-mnemonic=${this.mnemonic}`;
+      if (this.protectivePassphrase != "") {
+        mnemonicSetting = `${mnemonicSetting}::-mnemonicpassphrase=${this.protectivePassphrase}`;
+      }
+      this.$store.dispatch(types.app.MNEMONIC_SETTING, mnemonicSetting);
+      //await this.$daemon.importMnemonics('', this.mnemonic, this.protectivePassphrase);
+      this.$store.dispatch(types.app.DAEMON_RESTART);
+      this.waitImport = true;
+      this.actions.next();
     },
     openProtectivePassphrse() {
       this.showProtectivePP = !this.showProtectivePP;
@@ -73,7 +105,7 @@ export default {
   background-color: darkgrey;
   border: none;
   height: 4em;
-  width: 27em;
+  width: 100%;
   left: 20px;
   right: 20px;
   padding: 8px;
@@ -82,7 +114,10 @@ export default {
   margin-bottom: 20px;
 }
 .field {
-    margin-bottom: 1em;
-    width: 27em;
+  margin-bottom: 1em;
+  width: 27em;
+}
+.red {
+    color: red;
 }
 </style>
