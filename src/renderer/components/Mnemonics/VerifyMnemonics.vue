@@ -6,9 +6,14 @@
     <div style="text-align:center">
       <textarea v-model="mnemonicTyped" type="text" class="field-mnemonic" />
     </div>
-    <BaseButton @click="verifyMnemonic" class="button" color="green">
-      Confirm
+    <div class="btn-group" style="text-align:center">
+        <BaseButton @click="actions.prev" class="button" color="green">
+        Back
+        </BaseButton>
+        <BaseButton @click="verifyMnemonic" class="button" color="green">
+        Confirm
     </BaseButton>
+    </div>
   </div>
 </template>
 
@@ -44,8 +49,12 @@ export default {
 
 <style scoped>
 .button {
-  width: 500px;
-  margin-top: 30px;
+  width: 35%;
+}
+
+.btn-group {
+    width: 500px;
+    margin-top: 30px;
 }
 
 .field-mnemonic {
