@@ -50,7 +50,10 @@ export default {
     }
   },
   methods: {
-    async submit() {},
+    async submit() {
+        await this.$daemon.importMnemonics('', this.mnemonic, this.protectivePassphrase);
+        this.actions.next();
+    },
     openProtectivePassphrse() {
       this.showProtectivePP = !this.showProtectivePP;
     }
