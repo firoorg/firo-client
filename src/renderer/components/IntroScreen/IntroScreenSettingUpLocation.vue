@@ -77,7 +77,8 @@ export default {
     data () {
         return {
             eventBusName: 'popover:intro',
-            showNextButton: false
+            showNextButton: false,
+            waitForInitialize: false
         }
     },
 
@@ -89,28 +90,31 @@ export default {
             hasApiStatus: 'ApiStatus/hasApiStatus',
             isInitialRun: 'App/isInitialRun',
             isRestarting: 'App/isRestarting',
-            walletExist: 'App/walletExist'
+            walletExist: 'App/walletExist',
+            isRunning: 'App/isRunning',
+            apiStatus: 'ApiStatus/apiStatus'
         })
     },
 
     watch: {
         // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
         // actions (like setting the passphrase) until zcoind is ready.
-        hasApiStatus: async function(val) {
-            if (val) {
+        apiStatus: async function(val) {
+            if (val && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
                 if (this.isInitialRun || !this.walletExist) {
                     this.actions.goTo('createOrRestore');
                 } else {
                     this.actions.goTo('lock');
                 }
             }
-        }
+        },
     },
 
     async created() {
         // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
         // loaded and the watch() is set.
-        if (this.hasApiStatus) {
+        //this.waitForInit();
+        if (this.hasApiStatus && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
             if (this.isInitialRun || !this.walletExist) {
                 this.actions.goTo('createOrRestore');
             } else {
@@ -123,6 +127,11 @@ export default {
         // part of GuideStepMixin
         isEnabled () {
             return true;
+        },
+        waitForInit() {
+            setTimeout(() => {
+                this.waitForInitialize = false;
+            }, 5000);
         }
     }
 }

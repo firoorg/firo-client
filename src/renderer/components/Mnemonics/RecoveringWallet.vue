@@ -4,40 +4,79 @@
       <loading-bounce class="bounce" />
     </div>
     <main>
-      <h2>Recovering your wallet</h2>
-      <p>Please wait, this should take less than a minute.</p>
+      <h2>Recovering your keys and wallet transaction history</h2>
+      <p>
+        Please wait, this might take a minute or more, depending on your
+        transaction history.
+      </p>
     </main>
   </div>
 </template>
 
 <script>
 import GuideStepMixin from "@/mixins/GuideStepMixin";
-import LoadingBounce from '@/components/Icons/LoadingBounce'
+import LoadingBounce from "@/components/Icons/LoadingBounce";
 import types from "~/types";
 import { mapGetters } from "vuex";
 
 export default {
   name: "RecoveringWallet",
   components: {
-      LoadingBounce
+    LoadingBounce
   },
   mixins: [GuideStepMixin],
+  data() {
+    return {
+      waitingMnemonicImport: false
+    }
+  },
   computed: {
     ...mapGetters({
-      isRunning: "App/isRunning"
+      isRunning: "App/isRunning",
+      apiStatus: "ApiStatus/apiStatus",
+      hasApiStatus: "ApiStatus/hasApiStatus"
     })
   },
   watch: {
-    isRunning(val) {
-      if (!this.isRunning) {
+    async apiStatus(val) {
+      await new Promise(r => setTimeout(r, 20000));
+      console.log('API status:', this.apiStatus);
+      if (
+        this.isRunning &&
+        this.apiStatus.data &&
+        !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized
+      ) {
         this.actions.next();
       }
     }
   },
-  mounted() {
-    console.log('WalletRecovering:', this.isRunning);
-    if (!this.isRunning) {
+  //   mounted() {
+  //     console.log("WalletRecovering:", this.isRunning);
+  //     if (!this.isRunning && this.isWalletLoadingComplete) {
+  //       this.actions.next();
+  //     }
+  //         console.log('mounted');
+
+  //   },
+
+  async created() {
+    //this.waitForImport();
+    await new Promise(r => setTimeout(r, 20000));
+    console.log('API status:', this.apiStatus);
+    if (
+      this.isRunning &&
+      this.apiStatus.data &&
+      !this.apiStatus.data.rescanning &&
+      this.apiStatus.data.walletinitialized
+    ) {
       this.actions.next();
+    }
+  },
+  methods: {
+    waitForImport() {
+      setTimeout(() => {
+        this.waitingMnemonicImport = false;
+      }, 20000);
     }
   }
 };

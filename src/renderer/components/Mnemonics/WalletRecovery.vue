@@ -8,10 +8,19 @@
       </p>
     </div>
     <div style="text-align:center">
-      <textarea v-model="mnemonic" type="text" class="field-mnemonic" @keydown="mnemonicValid=true"/>
+      <textarea
+        v-model="mnemonic"
+        type="text"
+        class="field-mnemonic"
+        @keydown="mnemonicValid = true"
+      />
     </div>
-    <div v-show="!mnemonicValid" class="red"><p><b>{{errorMessage}}!</b></p></div>
-    <br/>
+    <div v-show="!mnemonicValid" class="red">
+      <p>
+        <b>{{ errorMessage }}!</b>
+      </p>
+    </div>
+    <br />
     <div
       v-if="actions.getWalletRecoveryType() == 'qt'"
       class="mnemonic-setting"
@@ -64,18 +73,18 @@ export default {
       return this.actions.getWalletRecoveryType() == "qt" ? "12/24" : "24";
     },
     ...mapGetters({
-      isRestarting: "App/isRestarting"
+      isRestarting: "App/isRestarting",
+      apiStatus: 'ApiStatus/apiStatus'
     })
   },
   methods: {
     async submit() {
-        const result = await this.$daemon.verifyMnemonicValidity(this.mnemonic);
-        console.log('validity result:', result);
-        if (!result.valid) {
-            this.mnemonicValid = false;
-            this.errorMessage = result.reason;
-            return;
-        }
+      const result = await this.$daemon.verifyMnemonicValidity(this.mnemonic);
+      if (!result.valid) {
+        this.mnemonicValid = false;
+        this.errorMessage = result.reason;
+        return;
+      }
       var mnemonicSetting = `-usemnemonic::-mnemonic=${this.mnemonic}`;
       if (this.protectivePassphrase != "") {
         mnemonicSetting = `${mnemonicSetting}::-mnemonicpassphrase=${this.protectivePassphrase}`;
@@ -83,6 +92,11 @@ export default {
       this.$store.dispatch(types.app.MNEMONIC_SETTING, mnemonicSetting);
       //await this.$daemon.importMnemonics('', this.mnemonic, this.protectivePassphrase);
       this.$store.dispatch(types.app.DAEMON_RESTART);
+      var newStatus = JSON.parse(JSON.stringify(this.apiStatus));
+      newStatus.data.rescanning = true;
+      newStatus.data.walletinitialized = false;
+      this.$store.dispatch('ApiStatus/setApiStatus', newStatus);
+      console.log('ApiStatus/setApiStatus log:', this.apiStatus);
       this.waitImport = true;
       this.actions.next();
     },
@@ -118,6 +132,6 @@ export default {
   width: 27em;
 }
 .red {
-    color: red;
+  color: red;
 }
 </style>

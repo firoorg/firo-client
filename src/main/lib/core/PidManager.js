@@ -207,7 +207,7 @@ export default class PidManager {
     getArguments () {
         const mnemonicSetting = this.store.getters['App/mnemonicSetting'];
         const location = this.store.getters['App/blockchainLocation']
-        logger.info('Mnemonic setting:%s', mnemonicSetting);
+        const isWalletExist = fs.existsSync(join(location, "wallet.dat"));
         if (mnemonicSetting != '' && fs.existsSync(join(location, "wallet.dat"))) {
             //delete existing garbage wallet.dat to restart daemon with mnemonic
             fs.unlinkSync(join(location, "wallet.dat"));
@@ -215,14 +215,24 @@ export default class PidManager {
         const params = mnemonicSetting.split("::");
         //set mnemonic setting to empty
         if (mnemonicSetting === '') {
-            return [
-                '-clientapi=1',
-                ...this.getDataDirArgument()
-            ]
+            if (isWalletExist) {
+                return [
+                    '-clientapi=1',
+                    ...this.getDataDirArgument()
+                ]
+            } else {
+                //dont rescan as a brand new wallet wont have a transaction history
+                return [
+                    '-clientapi=1',
+                    '-rescan=0',
+                    ...this.getDataDirArgument()
+                ]
+            }
         } else {
             if (params.length === 2) {
                 return [
                     '-clientapi=1',
+                    '-rescan',
                     params[0],
                     params[1],
                     ...this.getDataDirArgument()
@@ -230,6 +240,7 @@ export default class PidManager {
             } else {
                 return [
                     '-clientapi=1',
+                    '-rescan',
                     params[0],
                     params[1],
                     params[2],
