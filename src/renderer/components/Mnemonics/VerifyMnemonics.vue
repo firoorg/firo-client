@@ -36,6 +36,9 @@ export default {
       errorMessage: 'Incorrect mnemonics!'
     };
   },
+  created() {
+      this.actions.setWalletIndexComplete(true);
+  },
   methods: {
     async verifyMnemonic() {
       try {

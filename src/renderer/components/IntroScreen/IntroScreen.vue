@@ -158,7 +158,9 @@ export default {
                 goTo: this.goToStep,
                 getCurrentStep: this.getCurrentStep,
                 setWalletRecoveryType: this.setWalletRecoveryType,
-                getWalletRecoveryType: this.getWalletRecoveryType
+                getWalletRecoveryType: this.getWalletRecoveryType,
+                setWalletIndexComplete: this.setWalletIndexComplete,
+                getWalletIndexComplete: this.getWalletIndexComplete
             }
         },
 
