@@ -13,7 +13,7 @@
             </p>
 
             <p v-if="askedPassphrase">
-              <b><i>See your reveal recovery mnemonic phrase below.</i></b>
+              <b><i>See your recovery mnemonic phrase below.</i></b>
             </p>
 
             <div v-if="!askedPassphrase" class="field">
@@ -159,7 +159,7 @@ export default {
   }
 
   input {
-    background-color: $color--comet-medium;
+    background-color: aqua;
     border: none;
     height: 1.5em;
     width: 23em;
@@ -192,7 +192,7 @@ export default {
   }
 
   textarea {
-    background-color: $color--comet-medium;
+    background-color: aqua;
     border: none;
     height: 4.5em;
     width: 28em;

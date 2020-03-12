@@ -27,7 +27,8 @@ export default {
   mixins: [GuideStepMixin],
   data() {
     return {
-      waitingMnemonicImport: false
+      waitingMnemonicImport: false,
+      waitDone: false
     }
   },
   computed: {
@@ -38,18 +39,19 @@ export default {
     })
   },
   watch: {
-    async apiStatus(val) {
-      await new Promise(r => setTimeout(r, 20000));
-      console.log('API status:', this.apiStatus);
-      if (
-        this.isRunning &&
-        this.apiStatus.data &&
-        !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized
-      ) {
-        this.actions.next();
-      }
+    apiStatus(val) {
+      //await new Promise(r => setTimeout(r, 20000));
+      // console.log('API status:', this.apiStatus);
+      // if (
+      //   this.waitDone &&
+      //   this.isRunning &&
+      //   this.apiStatus.data &&
+      //   !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized
+      // ) {
+      //   this.actions.next();
+      // }
     }
-  },
+},
   //   mounted() {
   //     console.log("WalletRecovering:", this.isRunning);
   //     if (!this.isRunning && this.isWalletLoadingComplete) {
@@ -59,24 +61,26 @@ export default {
 
   //   },
 
-  async created() {
+  created() {
     //this.waitForImport();
-    await new Promise(r => setTimeout(r, 20000));
-    console.log('API status:', this.apiStatus);
-    if (
-      this.isRunning &&
-      this.apiStatus.data &&
-      !this.apiStatus.data.rescanning &&
-      this.apiStatus.data.walletinitialized
-    ) {
-      this.actions.next();
-    }
+    //await new Promise(r => setTimeout(r, 20000));
+    this.waitForImport();
   },
   methods: {
     waitForImport() {
       setTimeout(() => {
-        this.waitingMnemonicImport = false;
+        if (this.shouldGoToNext()) {
+          this.actions.next();
+        } else {
+          setTimeout(this.waitForImport, 20000); 
+        }
       }, 20000);
+    },
+    shouldGoToNext() {
+      return this.isRunning &&
+          this.apiStatus.data &&
+          !this.apiStatus.data.rescanning &&
+          this.apiStatus.data.walletinitialized;
     }
   }
 };
@@ -91,7 +95,7 @@ export default {
 }
 
 .field-mnemonic {
-  background-color: darkgrey;
+  background-color: aqua;
   border: none;
   height: 4em;
   width: 27em;
