@@ -74,6 +74,7 @@ export default {
     watch: {
         showNextButton () {
             setTimeout(() => {
+                console.log('showNextButton');
                 this.actions.next()
             }, 5000)
         }

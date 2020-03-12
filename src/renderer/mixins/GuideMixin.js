@@ -14,7 +14,8 @@ export default {
             steps: {},
             currentStep: '',
             walletRecoveryType: 'qt',
-            isWalletLoadComplete: false
+            isWalletLoadComplete: false,
+            cachedMnemonic: ''
         }
     },
 
@@ -64,7 +65,9 @@ export default {
                 setWalletRecoveryType: this.setWalletRecoveryType,
                 getWalletRecoveryType: this.getWalletRecoveryType,
                 setWalletIndexComplete: this.setWalletIndexComplete,
-                getWalletIndexComplete: this.getWalletIndexComplete
+                getWalletIndexComplete: this.getWalletIndexComplete,
+                getCachedMnemonic: this.getCachedMnemonic,
+                setCachedMnemonic: this.setCachedMnemonic
             }
         }
     },
@@ -115,6 +118,13 @@ export default {
             this.isWalletLoadComplete = v;
         },
         
+        getCachedMnemonic() {
+            return this.cachedMnemonic;
+        },
+
+        setCachedMnemonic(cachedMnemonic_) {
+            this.cachedMnemonic = cachedMnemonic_;
+        },
 
         onStepChange (newStep, oldStep) {
             if (this.currentStep === newStep) {

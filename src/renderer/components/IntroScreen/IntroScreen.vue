@@ -160,7 +160,9 @@ export default {
                 setWalletRecoveryType: this.setWalletRecoveryType,
                 getWalletRecoveryType: this.getWalletRecoveryType,
                 setWalletIndexComplete: this.setWalletIndexComplete,
-                getWalletIndexComplete: this.getWalletIndexComplete
+                getWalletIndexComplete: this.getWalletIndexComplete,
+                getCachedMnemonic: this.getCachedMnemonic,
+                setCachedMnemonic: this.setCachedMnemonic
             }
         },
 

@@ -116,7 +116,7 @@ export default {
 }
 
 .field-mnemonic {
-  background-color: darkgrey;
+  background-color: aqua;
   border: none;
   height: 4em;
   width: 100%;

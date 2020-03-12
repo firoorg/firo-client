@@ -10,7 +10,7 @@
       </main>
     </div>
     <div v-else>
-      <div>
+      <div style="text-align:center">
         <b
           ><i
             ><p
@@ -66,6 +66,7 @@ export default {
   },
   methods: {
     confirmWriteDown() {
+      this.actions.setCachedMnemonic(this.createdMnemonic);
       this.actions.next();
     }
   }
@@ -80,7 +81,7 @@ export default {
   height: 500px;
 }
 .field-mnemonic {
-  background-color: darkgrey;
+  background-color: aqua;
   border: none;
   height: 4em;
   width: 100%;
