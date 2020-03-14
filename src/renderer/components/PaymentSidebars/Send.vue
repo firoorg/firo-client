@@ -99,6 +99,13 @@
                                     >
                                         Select Custom Inputs</a></u>
                                 </div>
+                                <div class="addressbook">
+                                    <u><a
+                                        :style="{ cursor: 'pointer'}"
+                                        @click="openAddressBook()"
+                                    >
+                                        Open Address Book</a></u>
+                                </div>
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
                                         v-model="subtractFeeFromAmount"
@@ -320,6 +327,7 @@ import CircularTimer from "@/components/Icons/CircularTimer";
 
 import {isValidAddress} from '#/lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from '#/lib/convert';
+import types from "~/types";
 
 export default {
     name: 'Send',
@@ -660,6 +668,10 @@ export default {
         async selectCustomInputs() {
             this.$store.commit('ZcoinPayment/ENTERED_SEND_AMOUNT', this.amount? this.amount : 0);
             this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+        },
+
+        openAddressBook() {
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, true);
         }
     }
 }
