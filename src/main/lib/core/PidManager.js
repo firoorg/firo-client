@@ -131,6 +131,12 @@ export default class PidManager {
             return
         }
 
+        const location = this.store.getters['App/blockchainLocation']
+        const isWalletExist = fs.existsSync(join(location, "wallet.dat"));
+        if (!isWalletExist) {
+            this.store.dispatch('App/setWalletNotExist');
+        }
+
         logger.debug('spawning with arguments %o', this.getArguments())
 
         this.child = spawn(this.pathToSpawn, this.getArguments(), {

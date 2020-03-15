@@ -104,6 +104,7 @@ export default {
                 if (this.isInitialRun || !this.walletExist) {
                     this.actions.goTo('createOrRestore');
                 } else {
+                    console.log('go to lock apistatus');
                     this.actions.goTo('lock');
                 }
             }
@@ -118,6 +119,7 @@ export default {
             if (this.isInitialRun || !this.walletExist) {
                 this.actions.goTo('createOrRestore');
             } else {
+                console.log('go to lock created');
                 this.actions.goTo('lock');
             }
         }
