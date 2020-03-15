@@ -671,7 +671,7 @@ export default {
         },
 
         openAddressBook() {
-            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, true);
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: ''});
         }
     }
 }

@@ -23,7 +23,7 @@ const state = {
     initialRunSet: false,
     walletExist: true,
     mnemonicSetting: '',
-    openAddressBook: false
+    openAddressBook: null
 }
 
 const mutations = {
