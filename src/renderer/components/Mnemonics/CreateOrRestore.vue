@@ -28,6 +28,8 @@ export default {
     ],
     methods: {
         async createNewWallet() {
+            const mnemonic = await this.$daemon.showMnemonics("");
+            this.actions.setCachedMnemonic(mnemonic);
             this.actions.next();
         },
         restoreWallet() {

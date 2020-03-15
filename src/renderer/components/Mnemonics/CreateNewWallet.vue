@@ -57,12 +57,8 @@ export default {
       apiStatus: "ApiStatus/apiStatus"
     })
   },
-  async created() {
-    try {
-      this.createdMnemonic = await this.$daemon.showMnemonics("");
-    } catch (e) {
-      console.log("error in loading mnemonic:", e);
-    }
+  created() {
+    this.createdMnemonic = this.actions.getCachedMnemonic();
   },
   methods: {
     confirmWriteDown() {
