@@ -96,33 +96,11 @@ export default {
         })
     },
 
-    watch: {
-        // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
-        // actions (like setting the passphrase) until zcoind is ready.
-        apiStatus: async function(val) {
-            if (val && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
-                if (this.isInitialRun || !this.walletExist) {
-                    this.actions.goTo('createOrRestore');
-                } else {
-                    console.log('go to lock apistatus');
-                    this.actions.goTo('lock');
-                }
-            }
-        },
-    },
-
-    async created() {
+    created() {
         // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
         // loaded and the watch() is set.
         //this.waitForInit();
-        if (this.hasApiStatus && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
-            if (this.isInitialRun || !this.walletExist) {
-                this.actions.goTo('createOrRestore');
-            } else {
-                console.log('go to lock created');
-                this.actions.goTo('lock');
-            }
-        }
+        this.waitForSettingupLocation();
     },
 
     methods: {
@@ -130,11 +108,21 @@ export default {
         isEnabled () {
             return true;
         },
-        waitForInit() {
+        waitForSettingupLocation() {
             setTimeout(() => {
-                this.waitForInitialize = false;
+                if (this.hasApiStatus && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
+                    if (this.isInitialRun || !this.walletExist) {
+                        this.actions.goTo('createOrRestore');
+                    } else {
+                        console.log('go to lock created');
+                        this.actions.goTo('lock');
+                    }
+                } else {
+                    this.waitForSettingupLocation();
+                }
             }, 5000);
-        }
+        },
+        
     }
 }
 </script>

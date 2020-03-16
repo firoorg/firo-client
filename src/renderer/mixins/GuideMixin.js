@@ -15,7 +15,8 @@ export default {
             currentStep: '',
             walletRecoveryType: 'qt',
             isWalletLoadComplete: false,
-            cachedMnemonic: ''
+            cachedMnemonic: '',
+            isMnemonicVerified: false
         }
     },
 
@@ -67,7 +68,9 @@ export default {
                 setWalletIndexComplete: this.setWalletIndexComplete,
                 getWalletIndexComplete: this.getWalletIndexComplete,
                 getCachedMnemonic: this.getCachedMnemonic,
-                setCachedMnemonic: this.setCachedMnemonic
+                setCachedMnemonic: this.setCachedMnemonic,
+                setIsMnemonicVerified: this.setIsMnemonicVerified,
+                getIsMnemonicVerified: this.getIsMnemonicVerified
             }
         }
     },
@@ -120,6 +123,14 @@ export default {
         
         getCachedMnemonic() {
             return this.cachedMnemonic;
+        },
+
+        getIsMnemonicVerified() {
+            return this.isMnemonicVerified;
+        },
+
+        setIsMnemonicVerified() {
+            this.isMnemonicVerified = true;
         },
 
         setCachedMnemonic(cachedMnemonic_) {
