@@ -670,8 +670,11 @@ export default {
             this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         },
 
-        openAddressBook() {
-            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: ''});
+        async openAddressBook() {
+            const addressBook = await this.$daemon.readAddressBook();
+            console.log('Addressbook:', addressBook);
+            this.$store.dispatch('Transactions/setAddressBook', addressBook);
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'send'});
         }
     }
 }
