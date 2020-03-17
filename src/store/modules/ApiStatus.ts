@@ -1,4 +1,7 @@
 import { isEqual } from 'lodash';
+import { createLogger } from '../../lib/logger';
+
+const logger = createLogger('zcoin:store:Transactions');
 
 const state = {
     // ApiStatus from src/daemon/zcoind
@@ -13,10 +16,12 @@ const mutations = {
 
 const actions = {
     setApiStatus({state, commit}, apiStatus) {
+        logger.info('-----------------------------API STATUS DATA ----------------------------- %s', JSON.stringify(apiStatus));
         // We first check if apiStatus has changed so we don't have to draw updates when it hasn't.
         if (!isEqual(state.apiStatus, apiStatus)) {
             commit('setApiStatus', apiStatus);
         }
+        logger.info('-----------------------------API STATUS DATA -----------------------------');
     }
 };
 

@@ -3,6 +3,10 @@ export default {
         actions: {
             type: Object,
             required: true
+        },
+        mnemonics: {
+            type: String,
+            default: ''
         }
     },
 
@@ -16,10 +20,10 @@ export default {
         } else if (options.parent && options.parent.$store) {
             this.$store = options.parent.$store
         }
-
+        console.log('ignoring step:', this.actions.getCurrentStep());
         // skip if not enabled due to the current state
         if (!this.isEnabled()) {
-            this.actions.next()
+            this.actions.next();
         }
     },
 

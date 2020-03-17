@@ -70,6 +70,13 @@ import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWalle
 import IntroScreenRestartingDaemon from '@/components/IntroScreen/IntroScreenRestartingDaemon'
 import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
 import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
+import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
+import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
+import VerifyMnemonics from '../Mnemonics/VerifyMnemonics.vue'
+import RestoreAskWalletOrigin from '../Mnemonics/RestoreAskWalletOrigin.vue'
+import WalletRecovery from '../Mnemonics/WalletRecovery.vue'
+import RecoveringWallet from '../Mnemonics/RecoveringWallet.vue'
+
 
 export default {
     name: 'IntroScreen',
@@ -98,6 +105,12 @@ export default {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
                 settingUpLocation: IntroScreenSettingUpLocation,
+                createOrRestore: CreateOrRestore,
+                createWallet: CreateNewWallet,
+                verifyMnemonics: VerifyMnemonics,
+                restoreAskWalletOrigin: RestoreAskWalletOrigin,
+                walletRecover:WalletRecovery,
+                recoveringWallet:RecoveringWallet,
                 lock: IntroScreenLockWallet,
                 restart: IntroScreenRestartingDaemon
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
@@ -134,6 +147,7 @@ export default {
         },
 
         showIntro () {
+            console.log('showIntro:', this.isReadyInitialOrRestarting, ', show intro:', this.showIntroScreen);
             return this.isReadyInitialOrRestarting  && this.showIntroScreen
         },
 
@@ -141,7 +155,14 @@ export default {
             return {
                 prev: this.prevStep,
                 next: this.nextSettingsStep,
-                goTo: this.goToStep
+                goTo: this.goToStep,
+                getCurrentStep: this.getCurrentStep,
+                setWalletRecoveryType: this.setWalletRecoveryType,
+                getWalletRecoveryType: this.getWalletRecoveryType,
+                setWalletIndexComplete: this.setWalletIndexComplete,
+                getWalletIndexComplete: this.getWalletIndexComplete,
+                getCachedMnemonic: this.getCachedMnemonic,
+                setCachedMnemonic: this.setCachedMnemonic
             }
         },
 
@@ -149,7 +170,7 @@ export default {
             if (this.isRestarting) {
                 return this.$t('overlay.loading.restarting-daemon')
             }
-            else if (!this.currentBlockHeight) {
+            else if (this.currentBlockHeight === undefined) {
                 return this.$t('overlay.loading.loading-blockchain')
             }
             else if (this.isRunning) {

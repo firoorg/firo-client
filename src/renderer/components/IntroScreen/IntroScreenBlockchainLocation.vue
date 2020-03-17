@@ -49,7 +49,9 @@ export default {
     computed: {
         ...mapGetters({
             hasLocation: 'App/hasBlockchainLocation',
-            location: 'App/blockchainLocation'
+            location: 'App/blockchainLocation',
+            isLocked: 'App/isLocked',
+            isInitialRun: 'App/isInitialRun'
         })
     },
 
@@ -87,7 +89,9 @@ export default {
         },
 
         isEnabled () {
-            return !this.hasLocation || !fs.existsSync(this.location)
+            if (!this.hasLocation || !fs.existsSync(this.location)) return true;
+            this.$store.dispatch(types.app.DAEMON_START)
+            return false;
         }
     }
 }

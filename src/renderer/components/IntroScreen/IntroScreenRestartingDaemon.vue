@@ -59,7 +59,8 @@ export default {
     data () {
         return {
             eventBusName: 'popover:intro',
-            showNextButton: false
+            showNextButton: false,
+            walletEncrypted: false
         }
     },
 
@@ -73,6 +74,7 @@ export default {
     watch: {
         showNextButton () {
             setTimeout(() => {
+                console.log('showNextButton');
                 this.actions.next()
             }, 5000)
         }

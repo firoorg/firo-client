@@ -131,12 +131,19 @@ export default class PidManager {
             return
         }
 
+        const location = this.store.getters['App/blockchainLocation']
+        const isWalletExist = fs.existsSync(join(location, "wallet.dat"));
+        if (!isWalletExist) {
+            this.store.dispatch('App/setWalletNotExist');
+        }
+
         logger.debug('spawning with arguments %o', this.getArguments())
 
         this.child = spawn(this.pathToSpawn, this.getArguments(), {
             detached: process.env.NODE_ENV !== 'production', // run detached in dev to allow hot reloading
             stdio: 'ignore'
         })
+        this.store.dispatch(types.app.MNEMONIC_SETTING, '');
         // start network to receive path
         this.onStarted()
 
@@ -204,10 +211,49 @@ export default class PidManager {
     }
 
     getArguments () {
-        return [
-            '-clientapi=1',
-            ...this.getDataDirArgument()
-        ]
+        const mnemonicSetting = this.store.getters['App/mnemonicSetting'];
+        const location = this.store.getters['App/blockchainLocation']
+        const isWalletExist = fs.existsSync(join(location, "wallet.dat"));
+        if (mnemonicSetting != '' && fs.existsSync(join(location, "wallet.dat"))) {
+            //delete existing garbage wallet.dat to restart daemon with mnemonic
+            fs.unlinkSync(join(location, "wallet.dat"));
+        }
+        const params = mnemonicSetting.split("::");
+        //set mnemonic setting to empty
+        if (mnemonicSetting === '') {
+            if (isWalletExist) {
+                return [
+                    '-clientapi=1',
+                    ...this.getDataDirArgument()
+                ]
+            } else {
+                //dont rescan as a brand new wallet wont have a transaction history
+                return [
+                    '-clientapi=1',
+                    '-rescan=0',
+                    ...this.getDataDirArgument()
+                ]
+            }
+        } else {
+            if (params.length === 2) {
+                return [
+                    '-clientapi=1',
+                    '-rescan',
+                    params[0],
+                    params[1],
+                    ...this.getDataDirArgument()
+                ]
+            } else {
+                return [
+                    '-clientapi=1',
+                    '-rescan',
+                    params[0],
+                    params[1],
+                    params[2],
+                    ...this.getDataDirArgument()
+                ]
+            }
+        }
     }
 
     getDataDirArgument () {

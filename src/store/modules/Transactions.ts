@@ -187,7 +187,6 @@ const mutations = {
                 }
             }
         }
-
         // Tell Vue we've updated our variables.
         // FIXME: Use Vue.set.
         state.addresses = {...state.addresses};
@@ -200,6 +199,16 @@ const mutations = {
             state.transactions[uniqId].locked = !state.transactions[uniqId].locked;
         }
         state.transactions = {...state.transactions};
+    },
+
+    setHasMnemonic(state, hasM: boolean) {
+        state.hasMnemonic = hasM;
+        state.hasMnemonic = {...state.hasMnemonic};
+    },
+
+    setShouldShowWarning(state, warning: boolean) {
+        state.shouldShowWarning = warning;
+        state.shouldShowWarning = {...state.shouldShowWarning};
     }
 };
 
@@ -225,6 +234,14 @@ const actions = {
     changeLockStatus({commit, rootGetters}, uniqIds: string[]) {
         logger.info('changeLockStatus');
         commit('setLockState', uniqIds)
+    },
+
+    changeHasMnemonic({commit, rootGetters}, hasM: boolean) {
+        commit('setHasMnemonic', hasM);
+    },
+
+    changeShouldShowWarning({commit, rootGetters}, warning: boolean) {
+        commit('setShouldShowWarning', warning);
     }
 };
 

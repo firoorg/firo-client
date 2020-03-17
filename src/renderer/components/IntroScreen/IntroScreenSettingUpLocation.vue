@@ -9,7 +9,7 @@
                 <p v-html="$t('onboarding.location-daemon-restart.description')" />
             </main>
         </template>
-        <template v-else-if="!currentBlockHeight">
+        <template v-else-if="currentBlockHeight === undefined">
             <div class="icon">
                 <loading-bounce class="bounce" />
             </div>
@@ -77,7 +77,8 @@ export default {
     data () {
         return {
             eventBusName: 'popover:intro',
-            showNextButton: false
+            showNextButton: false,
+            waitForInitialize: false
         }
     },
 
@@ -86,32 +87,53 @@ export default {
             currentBlockHeight: 'Blockchain/currentBlockHeight',
             walletVersion: 'App/walletVersion',
             hasLocation: 'App/hasBlockchainLocation',
-            hasApiStatus: 'ApiStatus/hasApiStatus'
+            hasApiStatus: 'ApiStatus/hasApiStatus',
+            isInitialRun: 'App/isInitialRun',
+            isRestarting: 'App/isRestarting',
+            walletExist: 'App/walletExist',
+            isRunning: 'App/isRunning',
+            apiStatus: 'ApiStatus/apiStatus'
         })
     },
 
     watch: {
         // Proceed to the next screen when the apiStatus has loaded. This is required so that we don't try to take any
         // actions (like setting the passphrase) until zcoind is ready.
-        hasApiStatus (val) {
-            if (val) {
-                this.actions.next()
+        apiStatus: async function(val) {
+            if (val && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
+                if (this.isInitialRun || !this.walletExist) {
+                    this.actions.goTo('createOrRestore');
+                } else {
+                    console.log('go to lock apistatus');
+                    this.actions.goTo('lock');
+                }
             }
-        }
+        },
     },
 
-    mounted() {
+    async created() {
         // This is needed to prevent the condition where hasApiStatus is set to true between the time the component is
         // loaded and the watch() is set.
-        if (this.hasApiStatus) {
-            this.actions.next();
+        //this.waitForInit();
+        if (this.hasApiStatus && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
+            if (this.isInitialRun || !this.walletExist) {
+                this.actions.goTo('createOrRestore');
+            } else {
+                console.log('go to lock created');
+                this.actions.goTo('lock');
+            }
         }
     },
 
     methods: {
         // part of GuideStepMixin
         isEnabled () {
-            return !this.hasApiStatus;
+            return true;
+        },
+        waitForInit() {
+            setTimeout(() => {
+                this.waitForInitialize = false;
+            }, 5000);
         }
     }
 }

@@ -55,6 +55,8 @@ interface ApiStatus {
             totalCount: number;
             enabledCount: number;
         };
+        hasMnemonic: boolean;
+
     };
     meta: {
         status: number;
@@ -262,7 +264,7 @@ export class Zcoind {
     // return the entire response object we received from zcoind.
     async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-
+        console.log('send object:', JSON.stringify(data));
         return await this.requesterSocketSend({
             auth: {
                 passphrase: auth
@@ -371,6 +373,11 @@ export class Zcoind {
         });
     }
 
+
+    async verifyMnemonicValidity(mnemonic: string): Promise<string> {
+        return await this.send(null, 'create', 'verifyMnemonicValidity', {mnemonic: mnemonic});
+    }
+
     // Update an existing payment request.
     // Note: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
     // responsible for any updating of state that might be required.
@@ -438,6 +445,30 @@ export class Zcoind {
         const data = await this.send(auth, 'create', 'unlockWallet', {});
         console.log('unlocking wallet');
         return data;
+    }
+
+    async importMnemonics(auth: string, mnemonics: string, passProtective: string): Promise<string> {
+        const data = await this.send(auth, 'create', 'importMnemonics', {
+            mnemonic: mnemonics,
+            protective: passProtective
+        });
+        console.log('importing mnemonics to wallet');
+        return data;
+    }
+
+    async showMnemonics(auth: string): Promise<string> {
+        const data = await this.send(auth, 'create', 'showMnemonics', {});
+        console.log('showing mnemonics to wallet');
+        return data;
+    }
+
+    async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<string> {
+        const data = await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
+        return data;
+    }
+
+    async readWalletMnemonicWarningState(auth: string) : Promise<string> {
+        return await this.send(auth, 'create', 'readWalletMnemonicWarningState', {});
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',

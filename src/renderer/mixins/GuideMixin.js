@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash'
+import { isThursday } from 'date-fns'
 
 export default {
     props: {
@@ -11,7 +12,10 @@ export default {
     data () {
         return {
             steps: {},
-            currentStep: ''
+            currentStep: '',
+            walletRecoveryType: 'qt',
+            isWalletLoadComplete: false,
+            cachedMnemonic: ''
         }
     },
 
@@ -56,7 +60,14 @@ export default {
             return {
                 prev: this.prevStep,
                 next: this.nextStep,
-                goTo: this.goToStep
+                goTo: this.goToStep,
+                currentStep: this.getCurrentStep,
+                setWalletRecoveryType: this.setWalletRecoveryType,
+                getWalletRecoveryType: this.getWalletRecoveryType,
+                setWalletIndexComplete: this.setWalletIndexComplete,
+                getWalletIndexComplete: this.getWalletIndexComplete,
+                getCachedMnemonic: this.getCachedMnemonic,
+                setCachedMnemonic: this.setCachedMnemonic
             }
         }
     },
@@ -88,11 +99,37 @@ export default {
             return true
         },
 
+        getCurrentStep() {
+            return this.currentStep;
+        },
+
+        setWalletRecoveryType(ty) {
+            this.walletRecoveryType = ty;
+        },
+
+        getWalletRecoveryType() {
+            return this.walletRecoveryType;
+        },
+
+        getWalletIndexComplete() {
+            return this.isWalletLoadComplete;
+        },
+        setWalletIndexComplete(v) {
+            this.isWalletLoadComplete = v;
+        },
+        
+        getCachedMnemonic() {
+            return this.cachedMnemonic;
+        },
+
+        setCachedMnemonic(cachedMnemonic_) {
+            this.cachedMnemonic = cachedMnemonic_;
+        },
+
         onStepChange (newStep, oldStep) {
             if (this.currentStep === newStep) {
                 return
             }
-
             this.currentStep = newStep
         },
 
@@ -104,7 +141,7 @@ export default {
             if (this.currentIndex >= this.stepKeys.length - 1) {
                 return false
             }
-
+            console.log('NextStep:', this.stepKeys[this.currentIndex + 1]);
             this.$emit('step-change', this.stepKeys[this.currentIndex + 1], this.currentStep)
             return true
         },
@@ -123,6 +160,7 @@ export default {
             if (!this.steps[stepKey]) {
                 return false
             }
+            console.log('currentStep:', this.currentStep);
 
             this.$emit('step-change', stepKey, this.currentStep)
             return true
