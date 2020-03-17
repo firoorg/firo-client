@@ -120,7 +120,7 @@ export default {
                 } else {
                     this.waitForSettingupLocation();
                 }
-            }, 30000);
+            }, 50000);
         },
         
     }
