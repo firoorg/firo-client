@@ -92,7 +92,8 @@ export default {
             isRestarting: 'App/isRestarting',
             walletExist: 'App/walletExist',
             isRunning: 'App/isRunning',
-            apiStatus: 'ApiStatus/apiStatus'
+            apiStatus: 'ApiStatus/apiStatus',
+            initialRunSet: 'App/initialRunSet'
         })
     },
 
@@ -110,7 +111,7 @@ export default {
         },
         waitForSettingupLocation() {
             setTimeout(() => {
-                if (this.hasApiStatus && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
+                if (this.hasApiStatus && this.initialRunSet && this.apiStatus.data && !this.apiStatus.data.rescanning && this.apiStatus.data.walletinitialized) {
                     if (this.isInitialRun || !this.walletExist) {
                         this.actions.goTo('createOrRestore');
                     } else {
@@ -120,7 +121,7 @@ export default {
                 } else {
                     this.waitForSettingupLocation();
                 }
-            }, 50000);
+            }, 5000);
         },
         
     }
