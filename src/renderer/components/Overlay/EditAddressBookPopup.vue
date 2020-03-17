@@ -20,16 +20,16 @@
               <label
                 ><i><b>Label:</b></i></label
               >
-              <input v-if="!isCreateNew()" v-model="labelResult" value="label"/>
-              <input v-else v-model="labelResult" value="" placeholder="Type label here"/>
+              <input type="text" v-if="!isCreateNew()" v-model="labelResult" @input="label"/>
+              <input type="text" v-else v-model="labelResult" value="" placeholder="Type label here"/>
             </div>
 
             <div class="field">
               <label
                 ><i><b>Address:</b></i></label
               >
-              <input v-if="!isCreateNew()" v-model="addressResult" value="address"/>
-              <input v-else v-model="addressResult" value="" placeholder="Type address here"/>
+              <input type="text" v-if="!isCreateNew()" v-model="addressResult" @input="address"/>
+              <input type="text" v-else v-model="addressResult" value="" placeholder="Type address here"/>
             </div>
 
             <div v-show="showError" class="red">
@@ -93,10 +93,11 @@ export default {
       try {
         if (this.isCreateNew()) {
           //add
+          console.log('address:', this.addressResult)
           await this.$daemon.editAddressBook(this.addressResult, 
                                             this.labelResult, 
                                             this.openAddressBook.purpose,
-                                            'abc',
+                                            'add',
                                             '',
                                             '');
         } else {
@@ -111,7 +112,7 @@ export default {
         this.$emit("close-edit-address-book");
       } catch(e) {
         console.log('error:', e)
-        this.errorMessage = e.message;
+        this.errorMessage = e.error.message;
         this.showError = true;
       }
     },

@@ -74,8 +74,8 @@
       </base-button>
     </div>
     <EditAddressBookPopup
-      label="editedLabel"
-      address="editedAddress"
+      :label="editedLabel"
+      :address="editedAddress"
       v-if="showEditAddressBook"
       @close-edit-address-book="closeEditAddressBook"
     />
@@ -216,8 +216,12 @@ export default {
       this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: item.address, purpose: item.purpose});
     },
 
-    closeEditAddressBook() {
+    async closeEditAddressBook() {
       this.showEditAddressBook = false;
+      const addressBook = await this.$daemon.readAddressBook();
+      console.log('Addressbook:', addressBook);
+      this.$store.dispatch('Transactions/setAddressBook', addressBook);
+      this.$refs.vuetable.reload();
     },
     comparePayments(a, b) {
       return !["blockHeight", "timestamp", "amount", "txId"].find(
@@ -274,43 +278,6 @@ export default {
         pagination: pagination,
         data: _.slice(local, from, to)
       };
-    },
-    toggleAllCheckbox(isChecked) {
-      if (!isChecked) {
-        this.totalSelected = 0;
-        this.selectedTx = {};
-        this.tableData.forEach(element => {
-          this.unselected[element.uniqId] = true;
-        });
-      } else {
-        let sum = 0;
-        this.tableData.forEach(element => {
-          sum += element.amount;
-          this.selectedTx[element.uniqId] = true;
-          this.unselected[element.uniqId] = false;
-        });
-        this.totalSelected = sum;
-      }
-    },
-    toggleCheckbox(isCheck, dataItem) {
-      if (!isCheck) {
-        this.selectedTx[dataItem.uniqId] = false;
-        if (dataItem.status) {
-          this.totalSelected -= dataItem.amount;
-        }
-        this.unselected[dataItem.uniqId] = true;
-      } else {
-        console.log(
-          "selectd:",
-          dataItem.uniqId,
-          ", address=",
-          dataItem.address
-        );
-        this.selectedTx[dataItem.uniqId] = true;
-        this.totalSelected += dataItem.amount;
-        this.unselected[dataItem.uniqId] = false;
-        dataItem.status = true;
-      }
     },
     onLoadingCompleted() {
       if (this.selectedUtxos) {
