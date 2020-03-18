@@ -237,6 +237,7 @@ const actions = {
 
         if (!fs.existsSync(path.join(location, 'wallet.dat'))) {
             commit('setWalletNotExist');
+            commit('setInitialRunSet');
         }
 
         if (!fs.existsSync(location)) {
