@@ -221,7 +221,12 @@ export default {
       const addressBook = await this.$daemon.readAddressBook();
       console.log('Addressbook:', addressBook);
       this.$store.dispatch('Transactions/setAddressBook', addressBook);
-      this.$refs.vuetable.reload();
+      //this.$refs.vuetable.reload();
+      this.tableData.push({
+        label: 'added label',
+        address: 'added address',
+        purpose: 'send'
+      })
     },
     comparePayments(a, b) {
       return !["blockHeight", "timestamp", "amount", "txId"].find(
