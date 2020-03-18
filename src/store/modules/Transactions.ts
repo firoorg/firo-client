@@ -223,6 +223,16 @@ const mutations = {
             state.addressBook[e.address] = e;
         })
         state.addressBook = {...state.addressBook};
+    },
+
+    deleteAddressItem(state, address: string) {
+        delete state.addressBook[address];
+        state.addressBook = {...state.addressBook};
+    },
+
+    addAddressItem(state, item: AddressBookItem) {
+        state.addressBook[item.address] = item;
+        state.addressBook = {...state.addressBook};
     }
 };
 
@@ -260,6 +270,14 @@ const actions = {
 
     setAddressBook({commit, rootGetters}, addressBook_: AddressBookItem[]) {
         commit('setAddressBook', addressBook_);
+    },
+
+    deleteAddressItem({commit, rootGetters}, address:string) {
+        commit('deleteAddressItem', address);
+    },
+
+    addAddressItem({commit, rootGetters}, {address_, label_, purpose_}) {
+        commit('addAddressItem', <AddressBookItem> {address: address_, label: label_, purpose: purpose_});
     }
 };
 

@@ -39,7 +39,7 @@
             </div>
 
             <div class="btn-group" style="text-align:center">
-              <BaseButton @click.prevent="$emit('close-edit-address-book')" class="button" color="green">
+              <BaseButton @click.prevent="$emit('close-edit-address-book', {updated: false})" class="button" color="green">
                 Cancel
               </BaseButton>
               <BaseButton @click.prevent="submit" class="button" color="green">
@@ -67,6 +67,10 @@ export default {
       type: String,
       default: ""
     }
+  },
+  created() {
+    this.labelResult = this.label;
+    this.addressResult = this.address;
   },
   computed: {
     ...mapGetters({
@@ -100,6 +104,10 @@ export default {
                                             'add',
                                             '',
                                             '');
+          this.$store.dispatch('Transactions/addAddressItem', 
+                  {address: this.addressResult, label: this.labelResult, purpose: this.openAddressBook.purpose});
+          this.$emit("close-edit-address-book", {updated: true, oldaddress: '', oldlabel: '', newaddress: this.addressResult,
+                                                newlabel: this.labelResult, purpose: this.openAddressBook.purpose});
         } else {
           //edit
           await this.$daemon.editAddressBook(this.address, 
@@ -108,8 +116,12 @@ export default {
                                             'edit',
                                             this.addressResult,
                                             this.labelResult);
+          this.$store.dispatch('Transactions/deleteAddressItem', this.address);
+          this.$store.dispatch('Transactions/addAddressItem',
+                  {address: this.addressResult, label: this.labelResult, purpose: this.openAddressBook.purpose});
+          this.$emit("close-edit-address-book", {updated: true, oldaddress: this.address, oldlabel: this.label, newaddress: this.addressResult,
+                                                newlabel: this.labelResult, purpose: this.openAddressBook.purpose});
         }
-        this.$emit("close-edit-address-book");
       } catch(e) {
         console.log('error:', e)
         this.errorMessage = e.error.message;

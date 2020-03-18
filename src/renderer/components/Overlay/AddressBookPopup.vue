@@ -74,8 +74,8 @@
       </base-button>
     </div>
     <EditAddressBookPopup
-      :label="editedLabel"
-      :address="editedAddress"
+      v-bind:label="editedLabel"
+      v-bind:address="editedAddress"
       v-if="showEditAddressBook"
       @close-edit-address-book="closeEditAddressBook"
     />
@@ -154,14 +154,6 @@ export default {
     noDataMessage: {
       type: String,
       default: "No usable Transaction Ouput"
-    },
-    editedLabel: {
-      type: String,
-      default: ""
-    },
-    editedAddress: {
-      type: String,
-      default: ""
     }
   },
   data() {
@@ -171,7 +163,9 @@ export default {
       totalSelected: 0,
       selectedTx: {},
       unselected: {},
-      showEditAddressBook: false
+      showEditAddressBook: false,
+      editedLabel: '',
+      editedAddress: ''
     };
   },
   computed: {
@@ -216,17 +210,29 @@ export default {
       this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: item.address, purpose: item.purpose});
     },
 
-    async closeEditAddressBook() {
+    //data:{updated: bool, oldaddress, oldlabel, newaddress, newlabel, purpose}
+    async closeEditAddressBook(data) {
       this.showEditAddressBook = false;
-      const addressBook = await this.$daemon.readAddressBook();
-      console.log('Addressbook:', addressBook);
-      this.$store.dispatch('Transactions/setAddressBook', addressBook);
-      //this.$refs.vuetable.reload();
-      this.tableData.push({
-        label: 'added label',
-        address: 'added address',
-        purpose: 'send'
-      })
+      if (!data.updated) return;  //cancel
+      if (data.oldaddress === '') {
+        //add new address
+        this.tableData.push({
+          label: data.newlabel,
+          address: data.newaddress,
+          purpose: data.purpose
+        });
+      } else {
+        //edit existing address
+        this.tableData.forEach(item => {
+          if (item.address === data.oldaddress) {
+            item.address = data.newaddress;
+            item.label = data.newlabel;
+            item.purpose = data.purpose;
+          }
+        });
+      }
+      
+      this.$refs.vuetable.reload();
     },
     comparePayments(a, b) {
       return !["blockHeight", "timestamp", "amount", "txId"].find(
@@ -315,9 +321,16 @@ export default {
 
     async deleteAddress(item) {
       try {
-
+        await this.$daemon.editAddressBook(this.address, 
+                                            this.label, 
+                                            this.openAddressBook.purpose,
+                                            'delete',
+                                            '',
+                                            '');
+        this.$store.dispatch('Transactions/deleteAddressItem', this.address);
+        this.$refs.vuetable.data.splice(rowIndex, 1);
       } catch (e) {
-        
+        console.log(e);
       }
     },
 
