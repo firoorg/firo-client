@@ -131,12 +131,14 @@ export default class PidManager {
             return
         }
 
+        const hasLocation = this.store.getters['App/hasBlockchainLocation']
         const location = this.store.getters['App/blockchainLocation']
-        const isWalletExist = fs.existsSync(join(location, "wallet.dat"));
-        if (!isWalletExist) {
-            this.store.commit('setWalletNotExist');
-            this.store.commit('setInitialRunSet');
-            this.store.dispatch('App/setWalletNotExist');
+        const exists = hasLocation ? fs.existsSync(location) : false
+        logger.info('--------------- SETTING UP WALLET EXIST ---- %s, %s', join(location, "wallet.dat").toString(), this.pathToSpawn);
+        if (!exists || !fs.existsSync(join(location, 'wallet.dat'))) {
+            logger.info('--------------- SETTING UP WALLET EXIST ----')
+            this.store.commit('App/setWalletNotExist');
+            this.store.commit('App/setInitialRunSet');
         }
 
         logger.debug('spawning with arguments %o', this.getArguments())
@@ -215,6 +217,7 @@ export default class PidManager {
     getArguments () {
         const mnemonicSetting = this.store.getters['App/mnemonicSetting'];
         const location = this.store.getters['App/blockchainLocation']
+        logger.info('----------getArguments----------')
         const isWalletExist = fs.existsSync(join(location, "wallet.dat"));
         if (mnemonicSetting != '' && fs.existsSync(join(location, "wallet.dat"))) {
             //delete existing garbage wallet.dat to restart daemon with mnemonic
