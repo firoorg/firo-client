@@ -41,8 +41,9 @@
       >
         <div
           class="action-group"
-          v-clipboard="props.rowData.address"
+          v-clipboard="() => props.rowData.address"
           :style="{ cursor: 'pointer' }"
+          @click.prevent="showCopied(props.rowData.address)"
           style="text-align:center"
         >
           <copy-address-icon />
@@ -100,6 +101,9 @@ import EditAddressBookPopup from "@/components/Overlay/EditAddressBookPopup";
 import DropDown from "@/components/base/DropDown";
 import types from "~/types";
 import Vue from "vue";
+import Toasted from 'vue-toasted';
+Vue.use(Toasted)
+
 import VueClipboards from "vue-clipboards";
 Vue.use(VueClipboards);
 
@@ -223,6 +227,10 @@ export default {
       });
     },
 
+    showCopied(addr) {
+      this.$toasted.success('Copied ' + addr + ".", {position: 'top-center', duration: 2000});
+    },
+
     //data:{updated: bool, oldaddress, oldlabel, newaddress, newlabel, purpose}
     async closeEditAddressBook(data) {
       this.showEditAddressBook = false;
@@ -334,8 +342,10 @@ export default {
     },
 
     async deleteAddress(item) {
-      let agree = confirm("Are you sure of deleting " + item.address + " from your address book?");
-      if (!agree) return
+      let agree = confirm(
+        "Are you sure of deleting " + item.address + " from your address book?"
+      );
+      if (!agree) return;
 
       try {
         console.log("deleting address:", item.address);
