@@ -285,15 +285,18 @@ export class Zcoind {
         let release = await this.requestMutex.lock();
         logger.debug("Acquired requestMutex");
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 logger.debug("message raw:%O", message);
                 logger.debug("message:%O", JSON.stringify(message));
                 this.requesterSocket.send(JSON.stringify(message));
             } catch (e) {
-                logger.error("Error sending data to zcoind: %O", e);
-                reject(e);
-                release();
+                try {
+                    await this.sendError(e);
+                } finally {
+                    release();
+                    reject(e);
+                }
                 return;
             }
 
@@ -329,7 +332,11 @@ export class Zcoind {
         });
     }
 
-
+    // This is called when an error sending to zcoind has occurred. It should be synchrnonous, as further messages may
+    // be sent once it is completed.
+    async sendError(error: any) {
+        logger.error("Error sending data to zcoind: %O", error);
+    }
 
     // Actions
 
