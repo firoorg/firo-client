@@ -68,6 +68,13 @@
                                         :placeholder="$t('send.public.detail-public-send.placeholder__address')"
                                     />
                                 </div>
+                                <div class="addressbook">
+                                    <u><a
+                                        :style="{ cursor: 'pointer'}"
+                                        @click="openAddressBook()"
+                                    >
+                                        Open Address Book</a></u>
+                                </div>
                             </div>
 
                             <div class="field amount-field">
@@ -98,13 +105,6 @@
                                         @click="selectCustomInputs()"
                                     >
                                         Select Custom Inputs</a></u>
-                                </div>
-                                <div class="addressbook">
-                                    <u><a
-                                        :style="{ cursor: 'pointer'}"
-                                        @click="openAddressBook()"
-                                    >
-                                        Open Address Book</a></u>
                                 </div>
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
@@ -385,7 +385,9 @@ export default {
             availableZerocoin: 'Balance/availableZerocoin',
             totalBalance: 'Balance/total',
             maxPrivateSend: 'Balance/maxPrivateSend',
-            selectedUtxos: 'ZcoinPayment/selectedInputs'
+            selectedUtxos: 'ZcoinPayment/selectedInputs',
+            addressBook: 'Transactions/addressBook',
+            addressBookStt: 'App/openAddressBook'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -491,6 +493,12 @@ export default {
 
         isValidated: {
             handler: 'maybeShowFee'
+        },
+        
+        addressBookStt(val) {
+            if (val.address != '') {
+                this.address = val.address;
+            }
         }
     },
 
@@ -671,9 +679,11 @@ export default {
         },
 
         async openAddressBook() {
-            const addressBook = await this.$daemon.readAddressBook();
-            console.log('Addressbook:', addressBook);
-            this.$store.dispatch('Transactions/setAddressBook', addressBook);
+            console.log('Addressbook:', this.addressBook);
+            if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
+                const ab = await this.$daemon.readAddressBook();
+                this.$store.dispatch('Transactions/setAddressBook', ab);
+            }
             this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'send'});
         }
     }

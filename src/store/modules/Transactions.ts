@@ -276,8 +276,8 @@ const actions = {
         commit('deleteAddressItem', address);
     },
 
-    addAddressItem({commit, rootGetters}, {address_, label_, purpose_}) {
-        commit('addAddressItem', <AddressBookItem> {address: address_, label: label_, purpose: purpose_});
+    addAddressItem({commit, rootGetters}, item:AddressBookItem) {
+        commit('addAddressItem', item);
     }
 };
 

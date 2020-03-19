@@ -21,7 +21,10 @@
 
       <div slot="address" slot-scope="props" class="vuetable-address">
         <u
-          ><a :style="{ cursor: 'pointer' }" @click.prevent="selectAddress(props.rowData)">
+          ><a
+            :style="{ cursor: 'pointer' }"
+            @click.prevent="selectAddress(props.rowData)"
+          >
             {{ props.rowData.address }}
           </a>
         </u>
@@ -40,14 +43,16 @@
           class="action-group"
           v-clipboard="props.rowData.address"
           :style="{ cursor: 'pointer' }"
+          style="text-align:center"
         >
           <copy-address-icon />
         </div>
 
         <div
-          class="action-group"
+          class="action-group action-group-edit"
           @click="editAddress(props.rowData)"
           :style="{ cursor: 'pointer' }"
+          style="text-align:center"
         >
           <edit-address-icon />
         </div>
@@ -56,8 +61,9 @@
           class="action-group"
           @click="deleteAddress(props.rowData)"
           :style="{ cursor: 'pointer' }"
-        ></div>
-        <delete-address-icon />
+        >
+          <delete-address-icon />
+        </div>
       </div>
     </vuetable>
 
@@ -93,8 +99,8 @@ import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePag
 import EditAddressBookPopup from "@/components/Overlay/EditAddressBookPopup";
 import DropDown from "@/components/base/DropDown";
 import types from "~/types";
-import Vue from 'vue';
-import VueClipboards from 'vue-clipboards';
+import Vue from "vue";
+import VueClipboards from "vue-clipboards";
 Vue.use(VueClipboards);
 
 const tableFields = [
@@ -108,7 +114,7 @@ const tableFields = [
     name: "address",
     title: "Address",
     sortField: "address",
-    width: "60%"
+    width: "58%"
   },
   {
     name: "purpose",
@@ -116,7 +122,7 @@ const tableFields = [
   },
   {
     name: "actions",
-    width: "10%"
+    width: "12%"
   }
 ];
 
@@ -164,9 +170,26 @@ export default {
       selectedTx: {},
       unselected: {},
       showEditAddressBook: false,
-      editedLabel: '',
-      editedAddress: ''
+      editedLabel: "",
+      editedAddress: "",
+      needReloadData: false,
+      rows: []
     };
+  },
+  created() {
+    for (const [address, item] of Object.entries(this.addressBook)) {
+      console.log("tabledata:", item);
+      if (
+        this.openAddressBook.purpose == "unknown" ||
+        this.openAddressBook.purpose == item.purpose
+      ) {
+        this.rows.push({
+          label: item.label,
+          address: address,
+          purpose: item.purpose
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -175,21 +198,7 @@ export default {
     }),
 
     tableData() {
-      const tableData = [];
-      for (const [address, item] of Object.entries(this.addressBook)) {
-        console.log("tabledata:", item);
-        if (
-          this.openAddressBook.purpose == "unknown" ||
-          this.openAddressBook.purpose == item.purpose
-        ) {
-          tableData.push({
-            label: item.label,
-            address: address,
-            purpose: item.purpose
-          });
-        }
-      }
-      return tableData;
+      return this.rows;
     },
 
     filteredTableData() {
@@ -207,23 +216,28 @@ export default {
   },
   methods: {
     selectAddress(item) {
-      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: item.address, purpose: item.purpose});
+      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
+        open: false,
+        address: item.address,
+        purpose: item.purpose
+      });
     },
 
     //data:{updated: bool, oldaddress, oldlabel, newaddress, newlabel, purpose}
     async closeEditAddressBook(data) {
       this.showEditAddressBook = false;
-      if (!data.updated) return;  //cancel
-      if (data.oldaddress === '') {
+      console.log("closeEditAddressBook:", data);
+      if (!data.updated) return; //cancel
+      if (data.oldaddress === "") {
         //add new address
-        this.tableData.push({
+        this.rows.push({
           label: data.newlabel,
           address: data.newaddress,
           purpose: data.purpose
         });
       } else {
         //edit existing address
-        this.tableData.forEach(item => {
+        this.rows.forEach(item => {
           if (item.address === data.oldaddress) {
             item.address = data.newaddress;
             item.label = data.newlabel;
@@ -231,7 +245,7 @@ export default {
           }
         });
       }
-      
+
       this.$refs.vuetable.reload();
     },
     comparePayments(a, b) {
@@ -320,23 +334,31 @@ export default {
     },
 
     async deleteAddress(item) {
+      let agree = confirm("Are you sure of deleting " + item.address + " from your address book?");
+      if (!agree) return
+
       try {
-        await this.$daemon.editAddressBook(this.address, 
-                                            this.label, 
-                                            this.openAddressBook.purpose,
-                                            'delete',
-                                            '',
-                                            '');
-        this.$store.dispatch('Transactions/deleteAddressItem', this.address);
-        this.$refs.vuetable.data.splice(rowIndex, 1);
+        console.log("deleting address:", item.address);
+        await this.$daemon.editAddressBook(
+          item.address,
+          item.label,
+          this.openAddressBook.purpose,
+          "delete",
+          "",
+          ""
+        );
+        this.$store.dispatch("Transactions/deleteAddressItem", item.address);
+        const index = this.rows.findIndex(v => v.address == item.address);
+        this.rows.splice(index, 1);
+        this.$refs.vuetable.reload();
       } catch (e) {
         console.log(e);
       }
     },
 
     addNewAddress() {
-      this.editedLabel = '';
-      this.editedAddress = '';
+      this.editedLabel = "";
+      this.editedAddress = "";
       this.showEditAddressBook = true;
     },
 
@@ -423,5 +445,9 @@ export default {
 }
 .action-group {
   display: inline;
+}
+.action-group-edit {
+  margin-left: 8px;
+  margin-right: 8px;
 }
 </style>

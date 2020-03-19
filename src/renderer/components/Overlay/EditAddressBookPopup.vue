@@ -20,7 +20,7 @@
               <label
                 ><i><b>Label:</b></i></label
               >
-              <input type="text" v-if="!isCreateNew()" v-model="labelResult" @input="label"/>
+              <input type="text" v-if="!isCreateNew()" v-model="labelResult"/>
               <input type="text" v-else v-model="labelResult" value="" placeholder="Type label here"/>
             </div>
 
@@ -28,7 +28,7 @@
               <label
                 ><i><b>Address:</b></i></label
               >
-              <input type="text" v-if="!isCreateNew()" v-model="addressResult" @input="address"/>
+              <input type="text" v-if="!isCreateNew()" v-model="addressResult"/>
               <input type="text" v-else v-model="addressResult" value="" placeholder="Type address here"/>
             </div>
 
@@ -39,7 +39,7 @@
             </div>
 
             <div class="btn-group" style="text-align:center">
-              <BaseButton @click.prevent="$emit('close-edit-address-book', {updated: false})" class="button" color="green">
+              <BaseButton @click.prevent="$emit('close-edit-address-book', {updated: false});" class="button" color="green">
                 Cancel
               </BaseButton>
               <BaseButton @click.prevent="submit" class="button" color="green">
@@ -95,9 +95,9 @@ export default {
         return;
       }
       try {
+        console.log('address edit:', this.address, ', label:', this.label)
         if (this.isCreateNew()) {
           //add
-          console.log('address:', this.addressResult)
           await this.$daemon.editAddressBook(this.addressResult, 
                                             this.labelResult, 
                                             this.openAddressBook.purpose,
