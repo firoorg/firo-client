@@ -8,7 +8,7 @@ import { createLogger } from '../lib/logger';
 
 const logger = createLogger('zcoin:daemon');
 
-// FIXME: This is not thrown consistently. See documention of individual calls for details.
+// FIXME: This is not thrown consistently. See documentation of individual calls for details.
 class ZcoindErrorResponse extends Error {
     constructor(call, error) {
         super(`${call} call failed due to ${JSON.stringify(error)}`);
@@ -17,7 +17,7 @@ class ZcoindErrorResponse extends Error {
     }
 }
 
-// FIXME: This is not thrown consistently. See documention of individual calls for details.
+// FIXME: This is not thrown consistently. See documentation of individual calls for details.
 class UnexpectedZcoindResponse extends Error {
     constructor(call: string, response: any) {
         super(`unexpected response to ${call} ${JSON.stringify(response)}`);
@@ -25,7 +25,7 @@ class UnexpectedZcoindResponse extends Error {
     }
 }
 
-// FIXME: This is not thrown consistently. See documention of individual calls for details.
+// FIXME: This is not thrown consistently. See documentation of individual calls for details.
 class IncorrectPassphrase extends Error {
     constructor() {
         super('incorrect passphrase');
