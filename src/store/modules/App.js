@@ -232,12 +232,15 @@ const actions = {
 
         if (!fs.existsSync(path.join(location, 'wallet.dat'))) {
             commit('setWalletNotExist');
+            commit('setInitialRunSet');
         }
 
         if (!fs.existsSync(location)) {
             logger.warn('given location does not exist: %s', location)
             commit('setInitialRunSet');
             return
+        } else {
+
         }
 
         // todo: could potentially watch the location to catch cases where the user freakes out and...
@@ -250,8 +253,10 @@ const actions = {
         await getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, location);
         if (fs.existsSync(path.join(location, 'wallet.dat'))) {
             logger.info("app.setInitialRun = false, file = %s", path.join(location, 'wallet.dat'));
-            if (!state.initialRunSet)
+            if (!state.initialRunSet) {
                 commit('setInitialRun', false);
+                commit('setInitialRunSet');
+            }
         } else {
             logger.info("app.setInitialRun = true");
         }
