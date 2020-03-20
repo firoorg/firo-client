@@ -48,11 +48,11 @@ interface StateWallet {
             inputs?: {
                 [outpoint: string]: TransactionInput
             },
-            lockedcoins?: {
+            lockedCoins?: {
                 [outpoint: string]: TransactionInput
             },
     
-            unlockedcoins?: {
+            unlockedCoins?: {
                 [outpoint: string]: TransactionInput
             },
         }    
@@ -73,11 +73,11 @@ interface TransactionEvent {
             [outpoint: string]: TransactionInput
         },
 
-        lockedcoins?: {
+        lockedCoins?: {
             [outpoint: string]: TransactionInput
         },
 
-        unlockedcoins?: {
+        unlockedCoins?: {
             [outpoint: string]: TransactionInput
         },
 
@@ -114,7 +114,7 @@ const mutations = {
         //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
-            if (!['inputs', 'lockedcoins', 'unlockedcoins'].includes(address)) {
+            if (!['inputs', 'lockedCoins', 'unlockedCoins'].includes(address)) {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
@@ -162,7 +162,7 @@ const mutations = {
                         state.addresses[tx.address].push(tx.uniqId);
                     }
                 }
-            } else if (['lockedcoins'].includes(address)) {
+            } else if (['lockedCoins'].includes(address)) {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
@@ -170,7 +170,7 @@ const mutations = {
                         }
                     }
                 }
-            } else if (['unlockedcoins'].includes(address)) {
+            } else if (['unlockedCoins'].includes(address)) {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {

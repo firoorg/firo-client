@@ -31,8 +31,8 @@
                 <b>{{ errorMessage }}!</b>
               </p>
             </div>
-            <div v-if="askedPassphrase" class="field-mnemonic">
-              <textarea v-model="mnemonic" type="text" />
+            <div v-if="askedPassphrase">
+              <textarea v-model="mnemonic" class="field-mnemonic" type="text" readonly/>
             </div>
             <div class="mnemonic-ok">
               <u
@@ -159,7 +159,7 @@ export default {
   }
 
   input {
-    background-color: aqua;
+    background-color: $color--comet-medium;
     border: none;
     height: 1.5em;
     width: 23em;
@@ -179,33 +179,14 @@ export default {
 }
 
 .field-mnemonic {
-  display: table-row;
-
-  label,
-  textarea {
-    display: table-cell;
-  }
-
-  label {
-    padding-right: 2em;
-    padding-top: 1em;
-  }
-
-  textarea {
-    background-color: aqua;
-    border: none;
-    height: 4.5em;
-    width: 28em;
-    padding-bottom: 1em;
-    left: 20px;
-    right: 20px;
-    padding: 8px;
-
-    &.non-matching {
-      outline-style: auto;
-      outline-color: red;
-    }
-  }
+  background-color: $color--comet-medium;
+  border: none;
+  height: 70px;
+  width: 480px;
+  left: 20px;
+  right: 20px;
+  padding: 8px;
+  resize: none;
 }
 .red {
   color: red;
