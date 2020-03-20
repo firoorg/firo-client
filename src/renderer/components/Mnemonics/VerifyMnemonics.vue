@@ -223,7 +223,7 @@ export default {
   border-color: transparent;
   background-color: $color--comet-medium;
   width: 24%;
-  color:blue;
+  font-weight:bold;
 }
 
 .field-mnemonic-animated {
