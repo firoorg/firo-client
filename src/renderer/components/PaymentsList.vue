@@ -93,6 +93,9 @@ export default {
 
             for (const [id, tx] of Object.entries(this.transactions)) {
                 this.$log.error(`transaction ${id}`);
+                if (tx.isChange) {
+                    continue;
+                }
                 // Mints are handled separately.
                 if (tx.category === 'mint') {
                     continue;
