@@ -216,7 +216,7 @@ export default {
   }
 
   input {
-    background-color: aqua;
+    background-color: $color--comet-medium;
     border: none;
     height: 1.5em;
     width: 23em;
