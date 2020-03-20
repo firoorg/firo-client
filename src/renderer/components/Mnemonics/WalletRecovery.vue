@@ -107,7 +107,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .button {
   width: 200px;
 }
@@ -116,13 +116,14 @@ export default {
 }
 
 .field-mnemonic {
-  background-color: aqua;
+  background-color: $color--comet-medium;
   border: none;
-  height: 4em;
-  width: 100%;
+  height: 70px;
+  width: 480px;
   left: 20px;
   right: 20px;
   padding: 8px;
+  resize: none;
 }
 .mnemonic-setting {
   margin-bottom: 20px;
