@@ -151,7 +151,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .button {
   width: 35%;
 }
@@ -162,13 +162,14 @@ export default {
 }
 
 .field-mnemonic {
-  background-color: aqua;
+  background-color: $color--comet-medium;
   border: none;
   height: 4em;
   width: 100%;
   left: 20px;
   right: 20px;
   padding: 8px;
+  resize: none;
 }
 .red {
     color: red;
@@ -213,22 +214,23 @@ export default {
 .missing {
   border: none;
   border-color: transparent;
-  background-color: aqua;
+  background-color: $color--comet-medium;
   width: 24%;
 }
 
 .missing-tag {
   border: none;
   border-color: transparent;
-  background-color: aqua;
+  background-color: $color--comet-medium;
   width: 24%;
-  color:blue;
+  font-weight:bold;
 }
 
 .field-mnemonic-animated {
-  background-color:aqua;
+  background-color:$color--comet-medium;
   border: none;
-  height: 10em;
+  height: 100;
+  width: 450;
   padding: 8px;
   display: left;
   width: 100%;
