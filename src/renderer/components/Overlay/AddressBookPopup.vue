@@ -98,7 +98,6 @@ import EditAddressIcon from "@/components//Icons/EditAddressIcon";
 import DeleteAddressIcon from "@/components//Icons/DeleteAddressIcon";
 import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
 import EditAddressBookPopup from "@/components/Overlay/EditAddressBookPopup";
-import DropDown from "@/components/base/DropDown";
 import types from "~/types";
 import Vue from "vue";
 import Toasted from 'vue-toasted';
@@ -138,7 +137,6 @@ export default {
     EditAddressIcon,
     DeleteAddressIcon,
     AnimatedTablePagination,
-    DropDown,
     EditAddressBookPopup,
     VueClipboards
   },
