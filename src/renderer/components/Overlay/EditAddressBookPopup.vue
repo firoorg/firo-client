@@ -20,16 +20,32 @@
               <label
                 ><i><b>Label:</b></i></label
               >
-              <input type="text" v-if="!isCreateNew()" v-model="labelResult"/>
-              <input type="text" v-else v-model="labelResult" value="" placeholder="Type label here"/>
+              <input type="text" v-if="!isCreateNew()" v-model="labelResult" />
+              <input
+                type="text"
+                v-else
+                v-model="labelResult"
+                value=""
+                placeholder="Type label here"
+              />
             </div>
 
             <div class="field">
               <label
                 ><i><b>Address:</b></i></label
               >
-              <input type="text" v-if="!isCreateNew()" v-model="addressResult"/>
-              <input type="text" v-else v-model="addressResult" value="" placeholder="Type address here"/>
+              <input
+                type="text"
+                v-if="!isCreateNew()"
+                v-model="addressResult"
+              />
+              <input
+                type="text"
+                v-else
+                v-model="addressResult"
+                value=""
+                placeholder="Type address here"
+              />
             </div>
 
             <div v-show="showError" class="red">
@@ -39,7 +55,13 @@
             </div>
 
             <div class="btn-group" style="text-align:center">
-              <BaseButton @click.prevent="$emit('close-edit-address-book', {updated: false});" class="button" color="green">
+              <BaseButton
+                @click.prevent="
+                  $emit('close-edit-address-book', { updated: false })
+                "
+                class="button"
+                color="green"
+              >
                 Cancel
               </BaseButton>
               <BaseButton @click.prevent="submit" class="button" color="green">
@@ -74,8 +96,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      addressBook: 'Transactions/addressBook',
-      openAddressBook: 'App/openAddressBook'
+      addressBook: "Transactions/addressBook",
+      openAddressBook: "App/openAddressBook"
     })
   },
   data() {
@@ -95,35 +117,67 @@ export default {
         return;
       }
       try {
-        console.log('address edit:', this.address, ', label:', this.label)
+        console.log("address edit:", this.address, ", label:", this.label);
         if (this.isCreateNew()) {
           //add
-          await this.$daemon.editAddressBook(this.addressResult, 
-                                            this.labelResult, 
-                                            this.openAddressBook.purpose,
-                                            'add',
-                                            '',
-                                            '');
-          this.$store.dispatch('Transactions/addAddressItem', 
-                  {address: this.addressResult, label: this.labelResult, purpose: this.openAddressBook.purpose});
-          this.$emit("close-edit-address-book", {updated: true, oldaddress: '', oldlabel: '', newaddress: this.addressResult,
-                                                newlabel: this.labelResult, purpose: this.openAddressBook.purpose});
+          const ret = await this.$daemon.editAddressBook(
+            this.addressResult,
+            this.labelResult,
+            this.openAddressBook.purpose,
+            "add",
+            "",
+            ""
+          );
+          if (ret != "success") {
+            this.errorMessage = ret;
+            this.showError = true;
+            return;
+          }
+          this.$store.dispatch("Transactions/addAddressItem", {
+            address: this.addressResult,
+            label: this.labelResult,
+            purpose: this.openAddressBook.purpose
+          });
+          this.$emit("close-edit-address-book", {
+            updated: true,
+            oldaddress: "",
+            oldlabel: "",
+            newaddress: this.addressResult,
+            newlabel: this.labelResult,
+            purpose: this.openAddressBook.purpose
+          });
         } else {
           //edit
-          await this.$daemon.editAddressBook(this.address, 
-                                            this.label, 
-                                            this.openAddressBook.purpose,
-                                            'edit',
-                                            this.addressResult,
-                                            this.labelResult);
-          this.$store.dispatch('Transactions/deleteAddressItem', this.address);
-          this.$store.dispatch('Transactions/addAddressItem',
-                  {address: this.addressResult, label: this.labelResult, purpose: this.openAddressBook.purpose});
-          this.$emit("close-edit-address-book", {updated: true, oldaddress: this.address, oldlabel: this.label, newaddress: this.addressResult,
-                                                newlabel: this.labelResult, purpose: this.openAddressBook.purpose});
+          const ret = await this.$daemon.editAddressBook(
+            this.address,
+            this.label,
+            this.openAddressBook.purpose,
+            "edit",
+            this.addressResult,
+            this.labelResult
+          );
+          if (ret != "success") {
+            this.errorMessage = ret;
+            this.showError = true;
+            return;
+          }
+          this.$store.dispatch("Transactions/deleteAddressItem", this.address);
+          this.$store.dispatch("Transactions/addAddressItem", {
+            address: this.addressResult,
+            label: this.labelResult,
+            purpose: this.openAddressBook.purpose
+          });
+          this.$emit("close-edit-address-book", {
+            updated: true,
+            oldaddress: this.address,
+            oldlabel: this.label,
+            newaddress: this.addressResult,
+            newlabel: this.labelResult,
+            purpose: this.openAddressBook.purpose
+          });
         }
-      } catch(e) {
-        console.log('error:', e)
+      } catch (e) {
+        console.log("error:", e);
         this.errorMessage = e.error.message;
         this.showError = true;
       }
