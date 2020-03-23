@@ -29,6 +29,12 @@ interface TransactionInput {
     index: number;
 }
 
+interface AddressBookItem {
+    address: string;
+    label: string;
+    purpose: string;
+}
+
 // This is the data format for initial/stateWallet.
 interface StateWallet {
     addresses: {
@@ -95,7 +101,8 @@ const state = {
     transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
     // values are keys of transactions in state.transactions associated with the address
     addresses: <{[address: string]: string[]}>{},
-    unspentUTXOs: <{[txidAndIndex:string]:boolean}>{}
+    unspentUTXOs: <{[txidAndIndex:string]:boolean}>{},
+    addressBook: <{[address: string]: AddressBookItem}>{}
 };
 
 const mutations = {
@@ -209,6 +216,23 @@ const mutations = {
     setShouldShowWarning(state, warning: boolean) {
         state.shouldShowWarning = warning;
         state.shouldShowWarning = {...state.shouldShowWarning};
+    },
+
+    setAddressBook(state, addressBook_: AddressBookItem[]) {
+        addressBook_.forEach(e => {
+            state.addressBook[e.address] = e;
+        })
+        state.addressBook = {...state.addressBook};
+    },
+
+    deleteAddressItem(state, address: string) {
+        delete state.addressBook[address];
+        state.addressBook = {...state.addressBook};
+    },
+
+    addAddressItem(state, item: AddressBookItem) {
+        state.addressBook[item.address] = item;
+        state.addressBook = {...state.addressBook};
     }
 };
 
@@ -242,6 +266,18 @@ const actions = {
 
     changeShouldShowWarning({commit, rootGetters}, warning: boolean) {
         commit('setShouldShowWarning', warning);
+    },
+
+    setAddressBook({commit, rootGetters}, addressBook_: AddressBookItem[]) {
+        commit('setAddressBook', addressBook_);
+    },
+
+    deleteAddressItem({commit, rootGetters}, address:string) {
+        commit('deleteAddressItem', address);
+    },
+
+    addAddressItem({commit, rootGetters}, item:AddressBookItem) {
+        commit('addAddressItem', item);
     }
 };
 
@@ -249,6 +285,7 @@ const getters = {
     // a map of `${txid}-${txIndex}` to the full transaction object returned from zcoind
     transactions: (state) => state.transactions,
     unspentUTXOs: (state) => state.unspentUTXOs,
+    addressBook: (state) => state.addressBook,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,

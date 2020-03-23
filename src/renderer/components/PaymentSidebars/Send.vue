@@ -68,6 +68,13 @@
                                         :placeholder="$t('send.public.detail-public-send.placeholder__address')"
                                     />
                                 </div>
+                                <div class="addressbook">
+                                    <u><a
+                                        :style="{ cursor: 'pointer'}"
+                                        @click="openAddressBook()"
+                                    >
+                                        Open Address Book</a></u>
+                                </div>
                             </div>
 
                             <div class="field amount-field">
@@ -320,6 +327,7 @@ import CircularTimer from "@/components/Icons/CircularTimer";
 
 import {isValidAddress} from '#/lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from '#/lib/convert';
+import types from "~/types";
 
 export default {
     name: 'Send',
@@ -377,7 +385,9 @@ export default {
             availableZerocoin: 'Balance/availableZerocoin',
             totalBalance: 'Balance/total',
             maxPrivateSend: 'Balance/maxPrivateSend',
-            selectedUtxos: 'ZcoinPayment/selectedInputs'
+            selectedUtxos: 'ZcoinPayment/selectedInputs',
+            addressBook: 'Transactions/addressBook',
+            addressBookStt: 'App/openAddressBook'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -483,6 +493,12 @@ export default {
 
         isValidated: {
             handler: 'maybeShowFee'
+        },
+        
+        addressBookStt(val) {
+            if (val.address != '') {
+                this.address = val.address;
+            }
         }
     },
 
@@ -660,6 +676,15 @@ export default {
         async selectCustomInputs() {
             this.$store.commit('ZcoinPayment/ENTERED_SEND_AMOUNT', this.amount? this.amount : 0);
             this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+        },
+
+        async openAddressBook() {
+            console.log('Addressbook:', this.addressBook);
+            if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
+                const ab = await this.$daemon.readAddressBook();
+                this.$store.dispatch('Transactions/setAddressBook', ab);
+            }
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'send'});
         }
     }
 }

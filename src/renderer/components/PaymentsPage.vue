@@ -14,6 +14,13 @@
                 <custom-input-popup />
             </section>
 
+            <section
+                v-if="openAddressBook != null && openAddressBook.open"
+                class="overlay centered"
+            >
+                <address-book-popup />
+            </section>
+
             <WarningWalletWithoutMnemonics v-if="apiStatus.data && !apiStatus.data.hasMnemonic && apiStatus.data.shouldShowWarning && showWarning" @close-mnemonic-warning="closeMnemonicWarning"/>
         </div>
 
@@ -28,6 +35,7 @@
 import { mapGetters } from 'vuex';
 import PaymentsList from '@/components/PaymentsList';
 import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
+import AddressBookPopup from '@/components/Overlay/AddressBookPopup';
 import WarningWalletWithoutMnemonics from './Mnemonics/WarningWalletWithoutMnemonics.vue';
 
 export default {
@@ -36,7 +44,8 @@ export default {
     components: {
         PaymentsList,
         CustomInputPopup,
-        WarningWalletWithoutMnemonics
+        WarningWalletWithoutMnemonics,
+        AddressBookPopup
     },
     data() {
         return {
@@ -51,7 +60,8 @@ export default {
             isShowingCustomInputs: 'ZcoinPayment/customInputs',
             hasApiStatus: 'ApiStatus/hasApiStatus',
             apiStatus: 'ApiStatus/apiStatus',
-            showWarning: 'Settings/showWarning'
+            showWarning: 'Settings/showWarning',
+            openAddressBook: 'App/openAddressBook'
         }),
     },
 
