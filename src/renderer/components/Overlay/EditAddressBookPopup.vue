@@ -4,6 +4,10 @@
       <div class="modal-mask">
         <div class="modal-wrapper">
           <div class="modal-container">
+            <a class="close" @click="$emit('close-edit-address-book', { updated: false })">&times;</a>
+            <h4>
+              Address Book
+            </h4>
             <p v-if="isCreateNew()">
               <b
                 ><i
@@ -120,7 +124,7 @@ export default {
         console.log("address edit:", this.address, ", label:", this.label);
         if (this.isCreateNew()) {
           //add
-          const ret = await this.$daemon.editAddressBook(
+          await this.$daemon.editAddressBook(
             this.addressResult,
             this.labelResult,
             this.openAddressBook.purpose,
@@ -128,11 +132,6 @@ export default {
             "",
             ""
           );
-          if (ret != "success") {
-            this.errorMessage = ret;
-            this.showError = true;
-            return;
-          }
           this.$store.dispatch("Transactions/addAddressItem", {
             address: this.addressResult,
             label: this.labelResult,
@@ -148,7 +147,7 @@ export default {
           });
         } else {
           //edit
-          const ret = await this.$daemon.editAddressBook(
+          await this.$daemon.editAddressBook(
             this.address,
             this.label,
             this.openAddressBook.purpose,
@@ -156,11 +155,6 @@ export default {
             this.addressResult,
             this.labelResult
           );
-          if (ret != "success") {
-            this.errorMessage = ret;
-            this.showError = true;
-            return;
-          }
           this.$store.dispatch("Transactions/deleteAddressItem", this.address);
           this.$store.dispatch("Transactions/addAddressItem", {
             address: this.addressResult,
@@ -216,6 +210,17 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
   font-style: bold;
+  .close {
+    position: absolute;
+    top: 215px;
+    right: 430px;
+    transition: all 200ms;
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+  }
 }
 
 .modal-header h3 {
