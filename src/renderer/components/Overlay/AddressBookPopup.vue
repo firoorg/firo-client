@@ -86,6 +86,13 @@
       v-if="showEditAddressBook"
       @close-edit-address-book="closeEditAddressBook"
     />
+
+    <AddressDeleteConfirm
+      v-bind:label="deletedLabel"
+      v-bind:address="deletedAddress"
+      v-if="showDeleteAddressConfirm"
+      @close-delete-address-book="closeDeleteAddressBook"
+    />
   </section>
 </template>
 
@@ -98,6 +105,7 @@ import EditAddressIcon from "@/components//Icons/EditAddressIcon";
 import DeleteAddressIcon from "@/components//Icons/DeleteAddressIcon";
 import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
 import EditAddressBookPopup from "@/components/Overlay/EditAddressBookPopup";
+import AddressDeleteConfirm from "@/components/Overlay/AddressDeleteConfirm";
 import types from "~/types";
 import Vue from "vue";
 import Toasted from 'vue-toasted';
@@ -138,7 +146,8 @@ export default {
     DeleteAddressIcon,
     AnimatedTablePagination,
     EditAddressBookPopup,
-    VueClipboards
+    VueClipboards,
+    AddressDeleteConfirm
   },
   props: {
     trackBy: {
@@ -172,8 +181,11 @@ export default {
       selectedTx: {},
       unselected: {},
       showEditAddressBook: false,
+      showDeleteAddressConfirm: false,
       editedLabel: "",
       editedAddress: "",
+      deletedLabel: "",
+      deletedAddress: "",
       needReloadData: false,
       rows: []
     };
@@ -227,6 +239,28 @@ export default {
 
     showCopied(addr) {
       this.$toasted.success('Copied ' + addr + ".", {position: 'top-center', duration: 2000});
+    },
+
+    async closeDeleteAddressBook(data) {
+      this.showDeleteAddressConfirm = false;
+      if (!data.updated) return;
+      try {
+        console.log("deleting address:", data.address);
+        await this.$daemon.editAddressBook(
+          data.address,
+          data.label,
+          this.openAddressBook.purpose,
+          "delete",
+          "",
+          ""
+        );
+        this.$store.dispatch("Transactions/deleteAddressItem", data.address);
+        const index = this.rows.findIndex(v => v.address == data.address);
+        this.rows.splice(index, 1);
+        this.$refs.vuetable.reload();
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     //data:{updated: bool, oldaddress, oldlabel, newaddress, newlabel, purpose}
@@ -340,28 +374,9 @@ export default {
     },
 
     async deleteAddress(item) {
-      let agree = confirm(
-        "Are you sure of deleting " + item.address + " from your address book?"
-      );
-      if (!agree) return;
-
-      try {
-        console.log("deleting address:", item.address);
-        await this.$daemon.editAddressBook(
-          item.address,
-          item.label,
-          this.openAddressBook.purpose,
-          "delete",
-          "",
-          ""
-        );
-        this.$store.dispatch("Transactions/deleteAddressItem", item.address);
-        const index = this.rows.findIndex(v => v.address == item.address);
-        this.rows.splice(index, 1);
-        this.$refs.vuetable.reload();
-      } catch (e) {
-        console.log(e);
-      }
+      this.showDeleteAddressConfirm = true;
+      this.deletedLabel = item.label;
+      this.deletedAddress = item.address;
     },
 
     addNewAddress() {
