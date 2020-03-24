@@ -129,6 +129,7 @@ const tableFields = [
   },
   {
     name: "purpose",
+    title: 'Type',
     width: "15%"
   },
   {
@@ -195,12 +196,12 @@ export default {
       console.log("tabledata:", item);
       if (
         this.openAddressBook.purpose == "unknown" ||
-        this.openAddressBook.purpose == item.purpose
+        this.openAddressBook.purpose.toLowerCase() == item.purpose.toLowerCase()
       ) {
         this.rows.push({
           label: item.label,
           address: address,
-          purpose: item.purpose
+          purpose: item.purpose.substring(0,1).toUpperCase() + item.purpose.substring(1).toLowerCase()
         });
       }
     }
@@ -220,7 +221,7 @@ export default {
     },
 
     purpose() {
-      return this.openAddressBook.purpose;
+      return this.openAddressBook.purpose.toLowerCase();
     }
   },
   watch: {
@@ -233,7 +234,7 @@ export default {
       this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
         open: false,
         address: item.address,
-        purpose: item.purpose
+        purpose: item.purpose.toLowerCase()
       });
     },
 
@@ -249,7 +250,7 @@ export default {
         await this.$daemon.editAddressBook(
           data.address,
           data.label,
-          this.openAddressBook.purpose,
+          this.openAddressBook.purpose.toLowerCase(),
           "delete",
           "",
           ""
@@ -273,7 +274,7 @@ export default {
         this.rows.push({
           label: data.newlabel,
           address: data.newaddress,
-          purpose: data.purpose
+          purpose: data.purpose.toLowerCase()
         });
       } else {
         //edit existing address
@@ -281,7 +282,7 @@ export default {
           if (item.address === data.oldaddress) {
             item.address = data.newaddress;
             item.label = data.newlabel;
-            item.purpose = data.purpose;
+            item.purpose = data.purpose.toLowerCase();
           }
         });
       }

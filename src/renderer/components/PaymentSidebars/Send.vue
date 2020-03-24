@@ -496,7 +496,7 @@ export default {
         },
         
         addressBookStt(val) {
-            if (val.address != '') {
+            if (val.address != '' && val.purpose.toLowerCase() == 'send') {
                 this.address = val.address;
             }
         }

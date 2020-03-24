@@ -46,6 +46,24 @@
                             XZC
                         </div>
                     </div>
+                    <div class="control" v-if="!isReceivingAddressSelected()">
+                        <u><a
+                                :style="{ cursor: 'pointer'}"
+                                @click="selectReceivingAddresses()"
+                            >
+                            Select receiving addresses</a>
+                        </u>
+                    </div>
+                    <div class="control" v-else>
+                        Address <i>{{addressBookStt.address.substring(0, 10)}}..{{addressBookStt.address.substring(addressBookStt.address.length - 10)}}</i> is selected!
+                        <br>
+                        <u><a
+                                :style="{ cursor: 'pointer'}"
+                                @click="cancelSelectReceivingAddresses()"
+                            >
+                            Calcel</a> 
+                        </u> to generate a new address for payment request.
+                    </div>
                 </div>
 
                 <div class="field message-field">
@@ -82,6 +100,7 @@
 <script>
 import {mapGetters} from "vuex";
 import {convertToSatoshi} from "#/lib/convert";
+import types from "~/types";
 
 export default {
     name: 'CreatePaymentRequest',
@@ -100,7 +119,9 @@ export default {
 
     computed: {
         ...mapGetters({
-            paymentRequests: 'PaymentRequest/paymentRequests'
+            paymentRequests: 'PaymentRequest/paymentRequests',
+            addressBook: 'Transactions/addressBook',
+            addressBookStt: 'App/openAddressBook'
         }),
 
         canCreateRequest () {
@@ -135,9 +156,10 @@ export default {
             }
 
             const label = this.label || (this.amount ? `Request for ${this.amount} XZC` : 'Payment Request');
-            const pr = await this.$daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message);
+            const address = (this.addressBookStt && this.addressBookStt.address) ? this.addressBookStt.address : ''; 
+            const pr = await this.$daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message, address);
             this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', pr);
-
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: ''});
             this.label = '';
             this.amount = '';
             this.message = '';
@@ -155,9 +177,32 @@ export default {
 
                 if (this.paymentRequests[pr.address]) {
                     this.$router.push('/payment-request/' + pr.address);
+                    if (!this.addressBook[pr.address]) {
+                        this.$store.dispatch("Transactions/addAddressItem", {
+                            address: pr.address,
+                            label: "",
+                            purpose: "receive"
+                        });
+                    }
                     break;
                 }
             }
+        },
+
+        async selectReceivingAddresses() {
+            if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
+                const ab = await this.$daemon.readAddressBook();
+                this.$store.dispatch('Transactions/setAddressBook', ab);
+            }
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'receive'});
+        },
+
+        cancelSelectReceivingAddresses() {
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: ''});
+        },
+
+        isReceivingAddressSelected() {
+            return this.addressBookStt.address != '' && this.addressBookStt.purpose.toLowerCase() == 'receive';
         }
     }
 }
