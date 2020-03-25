@@ -15,7 +15,6 @@ import App from './App'
 import Backup from './Backup'
 import Balance from './Balance'
 import Blockchain from './Blockchain'
-import SendZcoin from './SendZcoin'
 import SpendZerocoin from './SpendZerocoin'
 import Mint from './Mint'
 import Znode from './Znode'
@@ -28,7 +27,6 @@ const modules = {
     Backup,
     Balance,
     Blockchain,
-    SendZcoin,
     SpendZerocoin,
     Mint,
     Znode,
