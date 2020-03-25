@@ -14,7 +14,6 @@ import apiStatus from './ApiStatus'
 import App from './App'
 import Balance from './Balance'
 import Blockchain from './Blockchain'
-import Znode from './Znode'
 import Settings from './Settings'
 
 const logger = createLogger('zcoin:network')
@@ -23,7 +22,6 @@ const modules = {
     App,
     Balance,
     Blockchain,
-    Znode,
     Settings
 }
 
