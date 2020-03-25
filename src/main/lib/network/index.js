@@ -15,7 +15,6 @@ import App from './App'
 import Backup from './Backup'
 import Balance from './Balance'
 import Blockchain from './Blockchain'
-import Mint from './Mint'
 import Znode from './Znode'
 import Settings from './Settings'
 
@@ -26,7 +25,6 @@ const modules = {
     Backup,
     Balance,
     Blockchain,
-    Mint,
     Znode,
     Settings
 }
