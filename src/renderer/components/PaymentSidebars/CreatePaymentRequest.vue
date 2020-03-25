@@ -202,7 +202,7 @@ export default {
         },
 
         isReceivingAddressSelected() {
-            return this.addressBookStt.address != '' && this.addressBookStt.purpose.toLowerCase() == 'receive';
+            return this.addressBookStt && this.addressBookStt.address != '' && this.addressBookStt.purpose.toLowerCase() == 'receive';
         }
     }
 }
