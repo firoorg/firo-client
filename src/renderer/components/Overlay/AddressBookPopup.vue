@@ -229,7 +229,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      this.$store.dispatch("ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP");
+      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, purpose: ''});
     }
   },
   methods: {
