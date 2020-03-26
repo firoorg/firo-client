@@ -110,7 +110,7 @@
     "typeface-overpass-mono": "0.0.71",
     "typesettings": "^4.0.0",
     "url-parse": "^1.4.4",
-    "v-tooltip": "^2.0.0-rc.33",
+    "v-tooltip": "^2.0.3",
     "vee-validate": "^2.1.7",
     "vue": "^2.6.8",
     "vue-clipboards": "^1.3.0",

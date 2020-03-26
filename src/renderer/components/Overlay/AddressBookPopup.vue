@@ -20,7 +20,7 @@
       </div>
 
       <div slot="address" slot-scope="props" class="vuetable-address">
-        <u
+        <u v-tooltip="'Select this address as transaction recipient'"
           ><a
             :style="{ cursor: 'pointer' }"
             @click.prevent="selectAddress(props.rowData)"
@@ -113,6 +113,9 @@ Vue.use(Toasted)
 
 import VueClipboards from "vue-clipboards";
 Vue.use(VueClipboards);
+
+import VTooltip from 'v-tooltip'
+Vue.use(VTooltip)
 
 const tableFields = [
   {
