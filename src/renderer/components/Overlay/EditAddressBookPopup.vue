@@ -4,21 +4,17 @@
       <div class="modal-mask">
         <div class="modal-wrapper">
           <div class="modal-container">
-            <a class="close" @click="$emit('close-edit-address-book', { updated: false })">&times;</a>
-            <h4>
-              Address Book
+            <a
+              class="close"
+              @click="$emit('close-edit-address-book', { updated: false })"
+              >&times;</a
+            >
+            <h4 v-if="isCreateNew()">
+              <i>Add New Address</i>
             </h4>
-            <p v-if="isCreateNew()">
-              <b
-                ><i
-                  >Fill label and address below to add to your address book.</i
-                ></b
-              >
-            </p>
-
-            <p v-if="!isCreateNew()">
-              <b><i>Edit your address book data below.</i></b>
-            </p>
+            <h4 v-else>
+              <i>Edit Address</i>
+            </h4>
 
             <div class="field">
               <label
@@ -58,19 +54,12 @@
               </p>
             </div>
 
-            <div class="btn-group" style="text-align:center">
-              <BaseButton
-                @click.prevent="
-                  $emit('close-edit-address-book', { updated: false })
-                "
-                class="button"
-                color="green"
-              >
-                Cancel
-              </BaseButton>
-              <BaseButton @click.prevent="submit" class="button" color="green">
-                Submit
-              </BaseButton>
+            <div class="btn-save">
+              <u
+                ><a :style="{ cursor: 'pointer' }" @click.prevent="submit">
+                  <b><center>Save</center></b>
+                </a>
+              </u>
             </div>
           </div>
         </div>
@@ -212,7 +201,7 @@ export default {
   font-style: bold;
   .close {
     position: absolute;
-    top: 215px;
+    top: 245px;
     right: 430px;
     transition: all 200ms;
     font-size: 30px;
@@ -288,46 +277,13 @@ export default {
   }
 }
 
-.confirm-btn {
-  margin-top: 2em;
-  margin-left: 50%;
-  margin-right: 50%;
-}
-
-.field-mnemonic {
-  display: table-row;
-
-  label,
-  textarea {
-    display: table-cell;
-  }
-
-  label {
-    padding-right: 2em;
-    padding-top: 1em;
-  }
-
-  textarea {
-    background-color: aqua;
-    border: none;
-    height: 4.5em;
-    width: 28em;
-    padding-bottom: 1em;
-    left: 20px;
-    right: 20px;
-    padding: 8px;
-
-    &.non-matching {
-      outline-style: auto;
-      outline-color: red;
-    }
-  }
-}
 .red {
   color: red;
 }
 
-.btn-group {
-  margin-top: 30px;
+.btn-save {
+  margin-top: 2em;
+  margin-left: 50%;
+  margin-right: 50%;
 }
 </style>
