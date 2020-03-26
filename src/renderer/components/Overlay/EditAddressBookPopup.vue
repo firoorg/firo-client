@@ -127,7 +127,7 @@ export default {
           await this.$daemon.editAddressBook(
             this.addressResult,
             this.labelResult,
-            this.openAddressBook.purpose,
+            this.openAddressBook.purpose.toLowerCase(),
             "add",
             "",
             ""
@@ -135,7 +135,7 @@ export default {
           this.$store.dispatch("Transactions/addAddressItem", {
             address: this.addressResult,
             label: this.labelResult,
-            purpose: this.openAddressBook.purpose
+            purpose: this.openAddressBook.purpose.toLowerCase()
           });
           this.$emit("close-edit-address-book", {
             updated: true,
@@ -143,14 +143,14 @@ export default {
             oldlabel: "",
             newaddress: this.addressResult,
             newlabel: this.labelResult,
-            purpose: this.openAddressBook.purpose
+            purpose: this.openAddressBook.purpose.toLowerCase()
           });
         } else {
           //edit
           await this.$daemon.editAddressBook(
             this.address,
             this.label,
-            this.openAddressBook.purpose,
+            this.openAddressBook.purpose.toLowerCase(),
             "edit",
             this.addressResult,
             this.labelResult
@@ -159,7 +159,7 @@ export default {
           this.$store.dispatch("Transactions/addAddressItem", {
             address: this.addressResult,
             label: this.labelResult,
-            purpose: this.openAddressBook.purpose
+            purpose: this.openAddressBook.purpose.toLowerCase()
           });
           this.$emit("close-edit-address-book", {
             updated: true,
@@ -167,7 +167,7 @@ export default {
             oldlabel: this.label,
             newaddress: this.addressResult,
             newlabel: this.labelResult,
-            purpose: this.openAddressBook.purpose
+            purpose: this.openAddressBook.purpose.toLowerCase()
           });
         }
       } catch (e) {
