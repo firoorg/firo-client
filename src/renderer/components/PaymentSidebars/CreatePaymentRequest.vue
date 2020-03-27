@@ -151,6 +151,7 @@ export default {
 
     methods: {
         async createRequest () {
+            await this.loadAddressBook();
             if (!this.canCreateRequest) {
                 return
             }
@@ -190,11 +191,15 @@ export default {
         },
 
         async selectReceivingAddresses() {
+            await this.loadAddressBook();
+            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'receive'});
+        },
+        
+        async loadAddressBook() {
             if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
                 const ab = await this.$daemon.readAddressBook();
                 this.$store.dispatch('Transactions/setAddressBook', ab);
             }
-            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'receive'});
         },
 
         cancelSelectReceivingAddresses() {
