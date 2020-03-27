@@ -19,8 +19,8 @@
         {{ props.rowData.label }}
       </div>
 
-      <div slot="address" slot-scope="props" class="vuetable-address">
-        <u v-tooltip="'Select this address as transaction recipient'"
+      <div slot="address" slot-scope="props" class="vuetable-address" v-tooltip="purpose=='send'?'Select this address as transaction recipient':'Select this address as payment recipient'">
+        <u
           ><a
             :style="{ cursor: 'pointer' }"
             @click.prevent="selectAddress(props.rowData)"
@@ -159,11 +159,10 @@ export default {
       default: "address"
     },
     sortOrder: {
-      type: Array,
       default: () => [
         {
           field: "label",
-          direction: "desc",
+          direction: "asec",
           sortField: "label"
         }
       ]

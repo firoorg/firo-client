@@ -61,8 +61,8 @@
                                 :style="{ cursor: 'pointer'}"
                                 @click="cancelSelectReceivingAddresses()"
                             >
-                            Calcel</a> 
-                        </u> to generate a new address for payment request.
+                            Click here</a> 
+                        </u> if you want to generate a new address for payment request.
                     </div>
                 </div>
 
