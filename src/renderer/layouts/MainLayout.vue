@@ -78,7 +78,8 @@ export default {
             networkConnectionError: 'Network/connectionError',
             showIntroScreen: 'App/showIntroScreen',
             showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
-            hasOpenAppOverlay: 'App/hasOpenOverlay'
+            hasOpenAppOverlay: 'App/hasOpenOverlay',
+            walletLoaded: 'Transactions/walletLoaded'
         }),
 
         // todo do some clean up and combine getters here
@@ -99,7 +100,7 @@ export default {
         },
 
         showIntro () {
-            return this.showIntroScreen && !this.showConnectivityOverlay
+            return (this.showIntroScreen && !this.showConnectivityOverlay) || !this.walletLoaded
         }
     },
 

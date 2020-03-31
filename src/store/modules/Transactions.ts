@@ -102,7 +102,8 @@ const state = {
     // values are keys of transactions in state.transactions associated with the address
     addresses: <{[address: string]: string[]}>{},
     unspentUTXOs: <{[txidAndIndex:string]:boolean}>{},
-    addressBook: <{[address: string]: AddressBookItem}>{}
+    addressBook: <{[address: string]: AddressBookItem}>{},
+    walletLoaded: false
 };
 
 const mutations = {
@@ -199,6 +200,7 @@ const mutations = {
         state.addresses = {...state.addresses};
         state.transactions = {...state.transactions};
         state.unspentUTXOs = {...state.unspentUTXOs};
+        state.walletLoaded = true;
     },
 
     setLockState(state, uniqIds: string[]) {
@@ -286,6 +288,7 @@ const getters = {
     transactions: (state) => state.transactions,
     unspentUTXOs: (state) => state.unspentUTXOs,
     addressBook: (state) => state.addressBook,
+    walletLoaded: (state) => state.walletLoaded,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,

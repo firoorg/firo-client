@@ -93,7 +93,7 @@ export default {
 
             for (const [id, tx] of Object.entries(this.transactions)) {
                 this.$log.error(`transaction ${id}`);
-                if (tx.isChange) {
+                if (tx.isChange && tx.category != 'mined') {
                     continue;
                 }
                 // Mints are handled separately.
