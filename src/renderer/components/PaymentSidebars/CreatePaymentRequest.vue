@@ -58,11 +58,11 @@
                         Address <i>{{addressBookStt.address.substring(0, 10)}}..{{addressBookStt.address.substring(addressBookStt.address.length - 10)}}</i> is selected!
                         <br>
                         <u><a
-                                :style="{ cursor: 'pointer'}"
+                                :style="{ cursor: 'pointer', color:'blue'}"
                                 @click="cancelSelectReceivingAddresses()"
                             >
                             Click here</a> 
-                        </u> if you want to generate a new address for payment request.
+                        </u> if you no longer want to use this address.
                     </div>
                 </div>
 

@@ -62,13 +62,13 @@ export default {
   methods: {
     async confirm() {
       if (this.dontShowMnemonicWarning) {
+        this.$store.dispatch("Transactions/changeHasMnemonic", false);
+        this.$store.dispatch("Transactions/changeShouldShowWarning", false);
         try {
           await this.$daemon.writeShowMnemonicWarning(
             "",
             !this.dontShowMnemonicWarning
           );
-          this.$store.dispatch("Transactions/changeHasMnemonic", false);
-          this.$store.dispatch("Transactions/changeShouldShowWarning", false);
         } catch (e) {
           console.log(e);
         }
