@@ -203,7 +203,7 @@ export default {
         this.rows.push({
           label: item.label,
           address: address,
-          purpose: item.purpose.substring(0,1).toUpperCase() + item.purpose.substring(1).toLowerCase()
+          purpose: this.toFirstUpperCase(item.purpose)
         });
       }
     }
@@ -276,7 +276,7 @@ export default {
         this.rows.push({
           label: data.newlabel,
           address: data.newaddress,
-          purpose: data.purpose.toLowerCase()
+          purpose: this.toFirstUpperCase(data.purpose)
         });
       } else {
         //edit existing address
@@ -284,7 +284,7 @@ export default {
           if (item.address === data.oldaddress) {
             item.address = data.newaddress;
             item.label = data.newlabel;
-            item.purpose = data.purpose.toLowerCase();
+            item.purpose = this.toFirstUpperCase(data.purpose);
           }
         });
       }
@@ -347,6 +347,11 @@ export default {
         data: _.slice(local, from, to)
       };
     },
+
+    toFirstUpperCase(a) {
+      return a.substring(0,1).toUpperCase() + a.substring(1).toLowerCase()
+    },
+
     onLoadingCompleted() {
       if (this.selectedUtxos) {
         this.selectedUtxos.forEach(element1 => {
