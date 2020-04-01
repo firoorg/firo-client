@@ -92,7 +92,8 @@ export default {
             const tableData = [];
 
             for (const [id, tx] of Object.entries(this.transactions)) {
-                if (tx.isChange) {
+                // Mined transactions are incorrectly marked as change.
+                if (tx.isChange && tx.category !== 'mined') {
                     continue;
                 }
                 // Mints are handled separately.
