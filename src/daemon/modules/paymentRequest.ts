@@ -1,7 +1,7 @@
 import { Zcoind } from '../zcoind';
 
 import { createLogger } from '../../lib/logger';
-const logger = createLogger('zcoin:daemon:address');
+const logger = createLogger('zcoin:daemon:paymentRequest');
 
 
 export async function initialize(store: any, zcoind: Zcoind) {
