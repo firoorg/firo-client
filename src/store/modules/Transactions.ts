@@ -104,7 +104,6 @@ const mutations = {
     setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
         var unspentAlreadyProcess = false;
-        //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
             if (!['inputs', 'lockedCoins', 'unlockedCoins'].includes(address)) {
@@ -221,7 +220,6 @@ const actions = {
     },
 
     handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
-        console.log('handleTransactionEvent:', transactionEvent);
         logger.info('handleTransactionEvent');
         commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
     },

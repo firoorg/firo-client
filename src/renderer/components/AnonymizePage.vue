@@ -352,11 +352,6 @@ export default {
         });
     },
 
-    mounted() {
-        console.log('joy');
-        console.log(this.coinsToMint);
-    },
-
     methods: {
         recalculatePopoverPosition () {
             // v-popover only knows to recalculate position on resize events, so fake that one happened in order to
