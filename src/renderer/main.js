@@ -85,16 +85,6 @@ sync(store, router, {
     moduleName: 'AppRouter'
 })
 
-
-// TODO: Put this in a more appropriate place.
-// Really this isn't a logically appropriate place to put our daemon interaction. It has nothing to do with rendering.
-// But the way initialization is set up, it's hard to set $daemon anywhere else where it will be available to Vue
-// instances, so we'll put it here. Hopefully this can be moved somewhere more sensible in a subsequent stage of
-// refactoring.
-Vue.prototype.$daemon = zcoind(store);
-// Allow users to access this from Chrome Dev Tools.
-window.$daemon = Vue.prototype.$daemon;
-
 // Allow users to access the store from Chrome Dev Tools.
 window.$store = store;
 
@@ -103,11 +93,24 @@ window.$store = store;
 // TODO: Figure out how to get rid of this.
 Vue.prototype.$eventHub = new Vue()
 
-/* eslint-disable no-new */
-new Vue({
-    components: { App },
-    router,
-    store,
-    i18n: i18n.getModule({ app, store }),
-    template: '<App/>'
-}).$mount('#app')
+/// Start up zcoind.
+zcoind(store)
+    .then(z => {
+        // Make zcoind accessible to Vue instances as $daemon.
+        Vue.prototype.$daemon = z;
+        // Allow users to access $daemon from Chrome Dev Tools.
+        window.$daemon = z;
+
+        // Start the GUI.
+        new Vue({
+            components: {App},
+            router,
+            store,
+            i18n: i18n.getModule({app, store}),
+            template: '<App/>'
+        }).$mount('#app');
+    })
+    .catch(e => {
+        alert(e);
+        app.exit(-1);
+    });

@@ -12,7 +12,6 @@ import { createLogger } from '#/lib/logger'
 
 import PidManager from './lib/core/PidManager'
 import menu from './lib/menu'
-import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
 
@@ -36,18 +35,7 @@ if (process.env.NODE_ENV !== 'development') {
 const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
 const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
 
-const platform = os.platform()
-const zcoindName = platform === 'win32' ? 'zcoind.exe' : 'zcoind'
-const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindName}`)
-
 const userDataPath = app.getPath('userData')
-
-logger.info('zcoin paths: %o', {
-    rootFolder,
-    unpackedRootFolder,
-    zcoindPath,
-    userDataPath
-})
 
 // build settings via electron-settings module
 if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
@@ -55,74 +43,14 @@ if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
     app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
 }
 
-// get core config
-const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
 
-const startNetwork = function () {
-    logger.info('starting network')
-
-    network.init({ store, coreDaemonManager })
+const beforeQuit = async () => {
+    app.exit(0)
 }
-
-const beforeQuit = async function (event) {
-    const isRunning = await coreDaemonManager.isRunning()
-
-    if (!(stopOnQuit && isRunning)) {
-        logger.info('no need to wait for daemon to stop. quitting...')
-        network.close()
-        store.dispatch('Window/close', 'waitForDaemonShutdown')
-        app.exit(0)
-        return
-    }
-
-    event.preventDefault()
-    logger.info('stopping daemon')
-    coreDaemonManager.stop()
-    logger.info('waiting for daemon shutdown')
-    try {
-        await coreDaemonManager.waitForDaemonShutdown()
-    }
-    catch (e) {
-        logger.warn(e)
-    }
-    finally {
-        network.close()
-        logger.debug('finally quitting')
-        store.dispatch('Window/close', 'waitForDaemonShutdown')
-        app.exit(0)
-    }
-
-}
-
-// set up the manager
-const coreDaemonManager = new PidManager({
-    name: 'zcoind',
-    pidDirectory: userDataPath,
-    autoRestart,
-    heartbeatIntervalInSeconds,
-    store,
-    onStarted: startNetwork
-})
-
-// tor proxy
-// https://electronjs.org/docs/api/app#appcommandlineappendswitchswitch-value
-// https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-// app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
 
 app.on('ready', async () => {
-    logger.info('---- Starting Zcoin client ----')
     setupLocales({ store })
     await populateStoreWithAppSettings({ store })
-
-    // start it!
-    logger.info('path to zcoind binary: %s', zcoindPath)
-
-    coreDaemonManager.setPathToSpawn(zcoindPath)
-
-    if (!store.getters['App/isInitialRun']) {
-        logger.info('starting core')
-        coreDaemonManager.start()
-    }
 
     deeplink.init({ windowManager, store })
 
@@ -131,7 +59,6 @@ app.on('ready', async () => {
     windowManager.setupAppEvents()
 
     menu.init({ app, store })
-
     store.dispatch('Window/show', 'main')
 })
 
@@ -141,7 +68,6 @@ app.on('window-all-closed', (event) => {
 
 app.on('before-quit', async (event) => {
     logger.info('application before quit')
-    await beforeQuit(event)
 })
 
 app.on('will-quit', (event) => {

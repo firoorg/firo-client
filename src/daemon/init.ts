@@ -2,19 +2,19 @@
 
 import { Zcoind } from './zcoind';
 
-// For each component in src/lib/daemon/modules, register the exported function handleEvent() as an event handler for
-// the event with the name of the module, and also call the exported initialize() function.
-//
-// Each module may export a function handler:
-//
-//     async handleEvent(vuexStore: VuexStore, zcoind: Zcoind, eventData: any)
-//
-// and also may export an initializer:
-//
-//     async initialize(zcoind: Zcoind, store: VuexStore)
-//
-function zcoind(store: any): Zcoind {
-    // Note how this type differs from the one in zcoind.ts.
+/// Start up zcoind, connect to it, and return a Zcoind instance.
+async function zcoind(store: any): Promise<Zcoind> {
+    // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
+    // the event with the name of the module, and also call the exported initialize() function.
+    //
+    // Each module may export a function handler:
+    //
+    //     async handleEvent(vuexStore: VuexStore, zcoind: Zcoind, eventData: any)
+    //
+    // and also may export an initializer:
+    //
+    //     async initialize(zcoind: Zcoind, store: VuexStore)
+    //
     const eventHandlers: {[topic: string]: (zcoind: Zcoind, eventData: any) => Promise<void>} = {};
     const initializers: {[topic: string]: (vuexStore: any, zcoind: Zcoind) => Promise<void>} = {};
 
@@ -33,7 +33,9 @@ function zcoind(store: any): Zcoind {
     }
 
     const zcoind = new Zcoind(eventHandlers);
-    zcoind.connectAndReact();
+    // FIXME: Use proper locations.
+    await zcoind.launchDaemon(process.env.ZCOIND_LOCATION, process.env.ZCOIN_DATA_DIR);
+    await zcoind.connectAndReact();
 
     for (const topic of Object.keys(initializers)) {
         // We want to do a specific check for this here because it's easy to get wrong, and if it's wrong, code will

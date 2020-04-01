@@ -2,9 +2,11 @@ import * as fs from "fs";
 import * as zmq from "zeromq";
 import * as path from "path";
 import Mutex from "await-mutex";
+const {execFile} = require("child_process");
 
 import * as constants from './constants';
 import { createLogger } from '../lib/logger';
+import * as net from "net";
 
 const logger = createLogger('zcoin:daemon');
 
@@ -92,13 +94,15 @@ function readCert(path: string): [string, string] {
     return [parsed.data.public, parsed.data.private];
 }
 
-// Daemon takes care of sending messages to the daemon and receiving subscription events.
+// We take care of starting the daemon, sending messages, and calling proper event handlers for subscription events.
 export class Zcoind {
     private statusPublisherSocket: zmq.Socket;
     // (requester|publisher)Socket will be undefined prior to the invocation of gotStatus
     private requesterSocket: zmq.Socket | undefined;
     private publisherSocket: zmq.Socket | undefined;
     private hasReceivedApiStatus: boolean;
+    // This will ensure only one request is sent at a time. It will also signal to connectAndReact when the connection
+    // to the requester and publisher sockets are made.
     private requestMutex: Mutex;
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
@@ -110,24 +114,91 @@ export class Zcoind {
     constructor(eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
         this.hasReceivedApiStatus = false;
         this.requestMutex = new Mutex();
-        // This will resolve instantly, but we don't want to let in a potential race condition by making it assign after
-        // the Promise is resolved.
         this._unlockAfterConnect = this.requestMutex.lock();
         this.eventHandlers = eventHandlers;
     }
 
-    // Connect to the daemon and take action when it serves us appropriate events.
-    connectAndReact() {
-        this.statusPublisherSocket = zmq.socket('sub');
-        // Set timeout for requester socket
-        this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
-        this.statusPublisherSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
+    /// Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
+    /// status 0, or rejects it with the error given by execFile if something goes wrong.
+    launchDaemon(zcoindLocation: string, dataDir: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            logger.info("Starting daemon...");
+            execFile(zcoindLocation,
+                ["-daemon", "-clientapi=1", "-datadir=" + dataDir],
+                {timeout: 10_000},
+                (error, stdout, stderr) => {
+                    if (error) {
+                        logger.error(`Error starting daemon (${error}): ${stderr}`);
+                        reject(error);
+                    } else {
+                        logger.info("Successfully started daemon.");
+                        resolve();
+                    }
+                }
+            );
+        }
+       );
+    }
 
-        this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
+    // Connect to the daemon and take action when it serves us appropriate events. Resolves when the daemon connection
+    // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
+    //
+    // It is a breach of contract to call us multiple times.
+    connectAndReact(): Promise<void> {
+        // Resolve if there is someone listening on address and they respond within 1s, reject otherwise.
+        let attemptConnect = (host, port) => new Promise((resolve, reject) => {
+            let socket = new net.Socket();
+            socket.setTimeout(5_000);
+            socket.on("error", (e) => {
+                socket.destroy();
+                reject(e);
+            });
+            socket.on("timeout", (e) => {
+                socket.destroy();
+                reject("timeout (5s)")
+            });
+            socket.on("connect", () => {
+                socket.destroy();
+                resolve()
+            });
+            // Yes, the port is given first.
+            socket.connect(port, host);
+        });
 
-        this.statusPublisherSocket.subscribe('apiStatus');
-        this.statusPublisherSocket.on('message', (topic, msg) => {
-            this.gotApiStatus(msg.toString());
+        return new Promise(async resolve => {
+            // We need to do this because ZMQ will just hang if the socket is unavailable.
+            let attempts = 0;
+            while (++attempts) {
+                logger.info(`Checking if zcoind is listening on ${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher} (attempt ${attempts})`);
+                try {
+                    await attemptConnect(constants.zcoindAddress.host, constants.zcoindAddress.statusPort.publisher);
+                    logger.info(`zcoind is listening (attempt: ${attempts}`);
+                    break;
+                } catch(e) {
+                    logger.info(`zcoind is not listening (attempt ${attempts}): ${e}`);
+                }
+                await new Promise(r => setTimeout(r, 3000));
+            }
+
+            logger.info("Connecting to zcoind...")
+            this.statusPublisherSocket = zmq.socket('sub');
+            // Set timeout for requester socket
+            this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
+            this.statusPublisherSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
+
+            // requestMutex will be unlocked in initializeWithApiStatus after connection to the requester and publisher
+            // sockets is complete.
+            this.requestMutex.lock().then(release => {
+                resolve();
+                release();
+            });
+
+            this.statusPublisherSocket.on('message', (topic, msg) => {
+                this.gotApiStatus(msg.toString());
+            });
+
+            this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
+            this.statusPublisherSocket.subscribe('apiStatus');
         });
     }
 
@@ -148,13 +219,13 @@ export class Zcoind {
         }
 
         if (apiStatus.meta.status < 200 || apiStatus.meta.status >= 400) {
-            logger.error("Retrieved API status with bad status %d: %O", apiStatus.meta.status, apiStatus);
+            logger.error("Received API status with bad status %d: %O", apiStatus.meta.status, apiStatus);
             throw "Bad API status";
         }
 
         if (!this.hasReceivedApiStatus) {
-            this.hasReceivedApiStatus = true;
             this.initializeWithApiStatus(apiStatus);
+            this.hasReceivedApiStatus = true;
         }
 
         if (this.eventHandlers['apiStatus']) {
@@ -206,10 +277,11 @@ export class Zcoind {
             s.curve_secretkey = clientPrivkey;
         }
 
+        logger.info("Connecting to zcoind controller ports...");
+
+        // These calls give no indication of failure.
         this.requesterSocket.connect(`tcp://${constants.zcoindAddress.host}:${reqPort}`);
         this.publisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${pubPort}`);
-
-        logger.info("Connected to zcoind");
 
         // Subscribe to all events for which we've been given a handler.
         for (const topic of Object.keys(this.eventHandlers)) {
