@@ -33,7 +33,7 @@
                                     tag="p"
                                 >
                                     <router-link
-                                        :to="{ name: 'receive-zcoin' }"
+                                        to="/receive"
                                         place="linkToCreatePaymentRequest"
                                     >
                                         {{ $t('onboarding.make-request-first.mint.button__linkToCreatePaymentRequest') }}
