@@ -101,6 +101,11 @@ zcoind(store)
         // Allow users to access $daemon from Chrome Dev Tools.
         window.$daemon = z;
 
+        // Stop zcoind when the user exits the client.
+        app.on('quit', async () => {
+            await z.stopDaemon();
+        });
+
         // Start the GUI.
         new Vue({
             components: {App},
