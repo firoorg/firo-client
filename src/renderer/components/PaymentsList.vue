@@ -92,7 +92,6 @@ export default {
             const tableData = [];
 
             for (const [id, tx] of Object.entries(this.transactions)) {
-                this.$log.error(`transaction ${id}`);
                 if (tx.isChange) {
                     continue;
                 }
