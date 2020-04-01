@@ -680,4 +680,9 @@ export class Zcoind {
             throw 'setPassphrase call failed';
         }
     }
+
+    // Stop the daemon.
+    async stopDaemon() {
+        await this.send(null, 'initial', 'stop', null);
+    }
 }

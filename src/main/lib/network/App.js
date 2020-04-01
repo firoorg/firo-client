@@ -12,19 +12,9 @@ export default {
         namespace: 'App',
 
         mutations: {
-            [types.app.DAEMON_STOP]: 'stopDaemon',
             [types.app.LOCK_WALLET]: 'lockWallet'
         }
     }),
-
-    stopDaemon () {
-        logger.info('stopping the daemon')
-
-        this.send({
-            collection: 'stop',
-            type: 'initial'
-        })
-    },
 
     lockWallet (payload) {
         logger.info('GOING TO LOCK WALLET', payload)
