@@ -7,10 +7,6 @@ import CONFIG from '../../config'
 import types from '~/types'
 import * as utils from '../../../lib/utils'
 
-// todo load modules dynamically
-// import blockchain from './blockchain'
-import apiStatus from './ApiStatus'
-
 import App from './App'
 
 const logger = createLogger('zcoin:network')
