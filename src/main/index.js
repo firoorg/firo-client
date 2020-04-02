@@ -3,14 +3,11 @@
 // Note: Initialization of refactored zcoind interaction is done in src/renderer/main.js so it can be assigned to
 // Vue.prototype.$daemon.
 
-import os from 'os'
 import { app } from 'electron'
 import { join } from 'path'
-import types from '~/types'
 
 import { createLogger } from '#/lib/logger'
 
-import PidManager from './lib/core/PidManager'
 import menu from './lib/menu'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
@@ -31,18 +28,11 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-// const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
-const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
-const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
-
-const userDataPath = app.getPath('userData')
-
 // build settings via electron-settings module
 if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
     logger.info('registering protocol handler "%s"', CONFIG.app.protocolIdentifier)
     app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
 }
-
 
 const beforeQuit = async () => {
     app.exit(0)
