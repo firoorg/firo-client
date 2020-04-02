@@ -13,14 +13,12 @@ import apiStatus from './ApiStatus'
 
 import App from './App'
 import Balance from './Balance'
-import Settings from './Settings'
 
 const logger = createLogger('zcoin:network')
 
 const modules = {
     App,
-    Balance,
-    Settings
+    Balance
 }
 
 // const networkIdentity = uuid()
