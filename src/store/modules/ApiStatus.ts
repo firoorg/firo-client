@@ -32,6 +32,7 @@ const getters = {
     // Is the wallet locked? Returns undefined if not yet loaded.
     isLocked: (state): boolean | undefined => state.apiStatus.data ? state.apiStatus.data.walletLock : undefined,
     isReindexing: (state): boolean => state.apiStatus.data.reindexing,
+    API: (state): boolean => state.apiStatus.data.modules.API,
     // We will return 0 if apiStatus hasn't yet loaded.
     localZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.localCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
