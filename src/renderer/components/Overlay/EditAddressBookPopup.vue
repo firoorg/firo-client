@@ -73,7 +73,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import {isValidAddress} from '#/lib/isValidAddress';
 
 export default {
   name: "EditAddressBookPopup",
@@ -185,14 +184,8 @@ export default {
       }
     },
     checkAddressValidity() {
-      if (this.addressResult.trim() != '' && !isValidAddress(this.addressResult)) {
-        this.showError = true;
-        this.errorMessage = "Invalid address";
-        this.xStyle = "top: 225px"
-      } else {
-        this.showError = false;
-        this.xStyle = this.xStyleDefault;
-      }
+      this.showError = false;
+      this.xStyle = this.xStyleDefault;
     }
   }
 };
