@@ -180,7 +180,7 @@ export default {
                 return this.$t('overlay.loading.loading-blockchain')
             }
             else if (this.isRunning || !this.walletLoaded) {
-                var postFix = this.walletLoaded? '':'. This might take from 5s to 3 minutes, depending on your transaction history';
+                var postFix = this.walletLoaded? '':'. This might take a few minutes, depending on your transaction history';
                 return this.$t('overlay.loading.loading-wallet') + postFix
             }
             else {
