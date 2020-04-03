@@ -6,6 +6,7 @@
           <div class="modal-container">
             <a
               class="close"
+              :style="xTopPosition"
               @click="$emit('close-mnemonic')"
               >&times;</a
             >
@@ -28,15 +29,12 @@
               <input
                 v-model="passphrase"
                 type="password"
-                @keydown="showError = false; errorMessage=' '"
+                @keydown="showError = false; xTopPosition = 'top: 285px'"
               />
             </div>
             <span class="red">
-              <p v-if="showError" class="red">
+              <p v-show="showError" class="red">
                 <b>{{ errorMessage }}</b>
-              </p>
-              <p v-else>
-                <br/>
               </p>
             </span>
             <div v-if="askedPassphrase">
@@ -67,7 +65,8 @@ export default {
       passphrase: "",
       mnemonic: "",
       errorMessage: " ",
-      showError: false
+      showError: false,
+      xTopPosition: "top: 285px"
     };
   },
   created() {
@@ -85,6 +84,7 @@ export default {
         } catch (e) {
           this.showError = true;
           this.errorMessage = 'Incorrect passphrase!';
+          this.xTopPosition = "top: 265px";
         }
       } else {
         this.$emit("close-mnemonic");
@@ -128,7 +128,6 @@ export default {
   font-style: bold;
   .close {
     position: absolute;
-    top: 265px;
     right: 430px;
     transition: all 200ms;
     font-size: 30px;
@@ -206,6 +205,7 @@ export default {
 .mnemonic-ok {
   margin-left: 50%;
   margin-right: 50%;
+  margin-top: 1em;
 }
 
 .field-mnemonic {
