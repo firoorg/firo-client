@@ -26,6 +26,7 @@
                 v-else
                 v-model="labelResult"
                 value=""
+                @keydown="showError = false"
                 placeholder="Type label here"
               />
             </div>
@@ -37,6 +38,7 @@
               <input
                 type="text"
                 v-if="!isCreateNew()"
+                @keydown="checkAddressValidity"
                 v-model="addressResult"
               />
               <input
@@ -44,6 +46,7 @@
                 v-else
                 v-model="addressResult"
                 value=""
+                @keydown="checkAddressValidity"
                 placeholder="Type address here"
               />
             </div>
@@ -70,6 +73,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import {isValidAddress} from '#/lib/isValidAddress';
 
 export default {
   name: "EditAddressBookPopup",
@@ -86,6 +90,10 @@ export default {
   created() {
     this.labelResult = this.label;
     this.addressResult = this.address;
+    window.addEventListener('keypress', this.doCommand);
+  },
+  destroyed() {
+    window.removeEventListener('keypress', this.doCommand);
   },
   computed: {
     ...mapGetters({
@@ -167,6 +175,19 @@ export default {
     },
     isCreateNew() {
       return this.label === "" && this.address === "";
+    },
+    doCommand(e) {
+      if (e.keyCode === 13) {
+        this.submit();
+      }
+    },
+    checkAddressValidity() {
+      if (this.addressResult.trim() != '' && !isValidAddress(this.addressResult)) {
+        this.showError = true;
+        this.errorMessage = "Invalid address";
+      } else {
+        this.showError = false;
+      }
     }
   }
 };

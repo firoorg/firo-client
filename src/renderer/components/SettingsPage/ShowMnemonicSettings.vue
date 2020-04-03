@@ -4,6 +4,11 @@
       <div class="modal-mask">
         <div class="modal-wrapper">
           <div class="modal-container">
+            <a
+              class="close"
+              @click="$emit('close-mnemonic')"
+              >&times;</a
+            >
             <p v-if="!askedPassphrase">
               <b
                 ><i
@@ -23,14 +28,17 @@
               <input
                 v-model="passphrase"
                 type="password"
-                @keydown="showError = false"
+                @keydown="showError = false; errorMessage=' '"
               />
             </div>
-            <div v-show="showError" class="red">
-              <p>
-                <b>{{ errorMessage }}!</b>
+            <span class="red">
+              <p v-if="showError" class="red">
+                <b>{{ errorMessage }}</b>
               </p>
-            </div>
+              <p v-else>
+                <br/>
+              </p>
+            </span>
             <div v-if="askedPassphrase">
               <textarea v-model="mnemonic" class="field-mnemonic" type="text" readonly/>
             </div>
@@ -58,9 +66,15 @@ export default {
       askedPassphrase: false,
       passphrase: "",
       mnemonic: "",
-      errorMessage: "Incorrect passphrase",
+      errorMessage: " ",
       showError: false
     };
+  },
+  created() {
+    window.addEventListener('keypress', this.doCommand);
+  },
+  destroyed() {
+    window.removeEventListener('keypress', this.doCommand);
   },
   methods: {
     async ok() {
@@ -70,9 +84,15 @@ export default {
           this.askedPassphrase = true;
         } catch (e) {
           this.showError = true;
+          this.errorMessage = 'Incorrect passphrase!';
         }
       } else {
         this.$emit("close-mnemonic");
+      }
+    },
+    doCommand(e) {
+      if (e.keyCode === 13) {
+        this.ok();
       }
     }
   }
@@ -106,6 +126,17 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
   font-style: bold;
+  .close {
+    position: absolute;
+    top: 265px;
+    right: 430px;
+    transition: all 200ms;
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+  }
 }
 
 .modal-header h3 {
@@ -173,7 +204,6 @@ export default {
 }
 
 .mnemonic-ok {
-  margin-top: 2em;
   margin-left: 50%;
   margin-right: 50%;
 }
