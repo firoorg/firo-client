@@ -6,6 +6,7 @@
           <div class="modal-container">
             <a
               class="close"
+              :style="xStyle"
               @click="$emit('close-edit-address-book', { updated: false })"
               >&times;</a
             >
@@ -26,7 +27,6 @@
                 v-else
                 v-model="labelResult"
                 value=""
-                @keydown="showError = false"
                 placeholder="Type label here"
               />
             </div>
@@ -106,7 +106,9 @@ export default {
       labelResult: "",
       addressResult: "",
       errorMessage: "Invalid address",
-      showError: false
+      showError: false,
+      xStyle: "top: 245px",
+      xStyleDefault: "top: 245px"
     };
   },
   methods: {
@@ -115,10 +117,10 @@ export default {
       if (this.isCreateNew() && this.addressBook[this.addressResult]) {
         this.errorMessage = "Duplicate address!";
         this.showError = true;
+        this.xStyle = "top: 225px"
         return;
       }
       try {
-        console.log("address edit:", this.address, ", label:", this.label);
         if (this.isCreateNew()) {
           //add
           await this.$daemon.editAddressBook(
@@ -171,6 +173,7 @@ export default {
         console.log("error:", e);
         this.errorMessage = e.error.message;
         this.showError = true;
+        this.xStyle = "top: 225px"
       }
     },
     isCreateNew() {
@@ -185,8 +188,10 @@ export default {
       if (this.addressResult.trim() != '' && !isValidAddress(this.addressResult)) {
         this.showError = true;
         this.errorMessage = "Invalid address";
+        this.xStyle = "top: 225px"
       } else {
         this.showError = false;
+        this.xStyle = this.xStyleDefault;
       }
     }
   }
@@ -222,7 +227,6 @@ export default {
   font-style: bold;
   .close {
     position: absolute;
-    top: 245px;
     right: 430px;
     transition: all 200ms;
     font-size: 30px;
