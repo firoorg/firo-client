@@ -1,23 +1,11 @@
-'use strict'
-
-// Note: Initialization of refactored zcoind interaction is done in src/renderer/main.js so it can be assigned to
-// Vue.prototype.$daemon.
-
-import { app } from 'electron'
-import { join } from 'path'
+import {app, BrowserWindow} from 'electron'
 
 import { createLogger } from '#/lib/logger'
-
-import menu from './lib/menu'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
-
 import store from '../store/main'
-
-import windowManager from './lib/windows'
-import deeplink from './lib/deeplink'
-
 import CONFIG from './config'
+
 const logger = createLogger('zcoin:main')
 
 /**
@@ -34,32 +22,26 @@ if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
     app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
 }
 
-const beforeQuit = async () => {
-    app.exit(0)
-}
-
-app.on('ready', async () => {
+app.once('ready', async () => {
     setupLocales({ store })
     await populateStoreWithAppSettings({ store })
 
-    deeplink.init({ windowManager, store })
+    // The window will be shown by the renderer process when zcoind is connected.
+    let window = new BrowserWindow({
+        show: false,
+        frame: false,
+        useContentSize: true,
+        titleBarStyle: 'hiddenInset',
+        height: 780,
+        width: 1400,
+        minWidth: 1200,
+        minHeight: 450
+    });
 
-    windowManager.connectToStore({ store, namespace: 'Window' })
-    windowManager.registerWindows(CONFIG.windows)
-    windowManager.setupAppEvents()
-
-    menu.init({ app, store })
-    store.dispatch('Window/show', 'main')
-})
-
-app.on('window-all-closed', (event) => {
-    logger.info('window-all-closed')
-})
-
-app.on('before-quit', async (event) => {
-    logger.info('application before quit')
-})
-
-app.on('will-quit', (event) => {
-    logger.info('application will quit')
-})
+    if (process.env.NODE_ENV === 'development') {
+        window.loadURL("http://localhost:9080/");
+    }
+    else {
+        window.loadFile(`file://${__dirname}/index.html#${path}`);
+    }
+});

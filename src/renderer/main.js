@@ -20,7 +20,11 @@ import store from '../store/renderer'
 
 import zcoind from '../daemon/init'
 
-const app = require('electron').remote.app
+const electron = require('electron');
+const remote = electron.remote;
+const app = electron.remote.app;
+
+let ourWindow = remote.getCurrentWindow();
 
 const customValidationRules = [
     'isZcoinAddress',
@@ -97,7 +101,7 @@ zcoind(store)
         window.$daemon = z;
 
         // Stop zcoind when the user exits the client.
-        app.on('quit', async () => {
+        app.once('quit', async () => {
             await z.stopDaemon();
         });
 
@@ -109,6 +113,8 @@ zcoind(store)
             i18n: i18n.getModule({app, store}),
             template: '<App/>'
         }).$mount('#app');
+
+        ourWindow.show();
     })
     .catch(e => {
         alert(e);
