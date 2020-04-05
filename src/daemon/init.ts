@@ -32,10 +32,9 @@ async function zcoind(store: any): Promise<Zcoind> {
         }
     }
 
-    const zcoind = new Zcoind(eventHandlers);
     // FIXME: Use proper locations.
-    await zcoind.launchDaemon(process.env.ZCOIND_LOCATION, process.env.ZCOIN_DATA_DIR);
-    await zcoind.connectAndReact();
+    const zcoind = new Zcoind(process.env.ZCOIND_LOCATION, process.env.ZCOIN_DATA_DIR, eventHandlers);
+    await zcoind.start();
 
     for (const topic of Object.keys(initializers)) {
         // We want to do a specific check for this here because it's easy to get wrong, and if it's wrong, code will

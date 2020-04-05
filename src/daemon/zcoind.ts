@@ -106,25 +106,42 @@ export class Zcoind {
     private requestMutex: Mutex;
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
-    private _unlockAfterConnect: Promise<() => void>;
+    private _unlockAfterConnect: () => void | undefined;
     private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
+
+    // The location of the zcoind binary.
+    zcoindLocation: string;
+    // The directory that zcoind will use to store its data. This must already exist.
+    zcoindDataDir: string;
 
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
     // key that will be called when an apiStatus event is receives.
-    constructor(eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
+    constructor(zcoindLocation: string, zcoindDataDir: string, eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
+        this.zcoindLocation = zcoindLocation;
+        this.zcoindDataDir = zcoindDataDir;
         this.hasReceivedApiStatus = false;
         this.requestMutex = new Mutex();
-        this._unlockAfterConnect = this.requestMutex.lock();
         this.eventHandlers = eventHandlers;
+    }
+
+    // Start the daemon and register handlers.
+    async start() {
+        // This will be null for a first connect and set when we're reconnecting.
+        if (!this._unlockAfterConnect) {
+            this._unlockAfterConnect = await this.requestMutex.lock();
+        }
+
+        await this.launchDaemon();
+        await this.connectAndReact();
     }
 
     /// Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
     /// status 0, or rejects it with the error given by execFile if something goes wrong.
-    launchDaemon(zcoindLocation: string, dataDir: string): Promise<void> {
+    private async launchDaemon(): Promise<void> {
         return new Promise((resolve, reject) => {
             logger.info("Starting daemon...");
-            execFile(zcoindLocation,
-                ["-daemon", "-clientapi=1", "-datadir=" + dataDir],
+            execFile(this.zcoindLocation,
+                ["-daemon", "-clientapi=1", "-datadir=" + this.zcoindDataDir],
                 {timeout: 10_000},
                 (error, stdout, stderr) => {
                     if (error) {
@@ -140,42 +157,43 @@ export class Zcoind {
        );
     }
 
-    // Connect to the daemon and take action when it serves us appropriate events. Resolves when the daemon connection
-    // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
-    //
-    // It is a breach of contract to call us multiple times.
-    connectAndReact(): Promise<void> {
-        // Resolve if there is someone listening on address and they respond within 1s, reject otherwise.
-        let attemptConnect = (host, port) => new Promise((resolve, reject) => {
+
+    // Determine whether or not someone is listening on host constants.zcoindAddress.host, port
+    // constants.zcoindAddress.statusPort.publisher.
+    isZcoindListening(): Promise<boolean> {
+        return new Promise(resolve => {
             let socket = new net.Socket();
             socket.setTimeout(5_000);
             socket.on("error", (e) => {
                 socket.destroy();
-                reject(e);
+                resolve(false);
             });
             socket.on("timeout", (e) => {
                 socket.destroy();
-                reject("timeout (5s)")
+                resolve(false);
             });
             socket.on("connect", () => {
                 socket.destroy();
-                resolve()
+                resolve(true);
             });
             // Yes, the port is given first.
-            socket.connect(port, host);
+            socket.connect(constants.zcoindAddress.statusPort.publisher, constants.zcoindAddress.host);
         });
+    }
 
+    // Connect to the daemon and take action when it serves us appropriate events. Resolves when the daemon connection
+    // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
+    private connectAndReact(): Promise<void> {
         return new Promise(async resolve => {
             // We need to do this because ZMQ will just hang if the socket is unavailable.
             let attempts = 0;
             while (++attempts) {
                 logger.info(`Checking if zcoind is listening on ${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher} (attempt ${attempts})`);
-                try {
-                    await attemptConnect(constants.zcoindAddress.host, constants.zcoindAddress.statusPort.publisher);
-                    logger.info(`zcoind is listening (attempt: ${attempts}`);
+                if (await this.isZcoindListening()) {
+                    logger.info(`zcoind is listening (attempt: ${attempts})`);
                     break;
-                } catch(e) {
-                    logger.info(`zcoind is not listening (attempt ${attempts}): ${e}`);
+                } else {
+                    logger.info(`zcoind is not listening (attempt ${attempts})`);
                 }
                 await new Promise(r => setTimeout(r, 3000));
             }
@@ -299,7 +317,7 @@ export class Zcoind {
         });
 
         // We can send now, so release the initial lock on this.requestMutex().
-        this._unlockAfterConnect.then(f => f());
+        this._unlockAfterConnect();
     }
 
     // We're called when a subscription event from zcoind comes up. In turn, we call the relevant subscription handlers
@@ -334,6 +352,8 @@ export class Zcoind {
     // responds with no data object; or if we fail to send to zcoind. If zcoind gives invalid JSON data, or we fail to
     // send, we reject() with the exception object. If zcoind responds with an error or responds with no data object, we
     // return the entire response object we received from zcoind.
+    //
+    // If zcoind has been shutdown with the stopDaemon() method, this method will take no action and never resolve.
     async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
         console.log('send object:', JSON.stringify(data));
@@ -348,14 +368,29 @@ export class Zcoind {
     }
 
     // Send an object through the requester socket and process the response. Refer to the documentation of send() for
-    // what we're actually doing. The reason this method is split off is that setPassphrase() is weird and requires a
-    // special case to work.
-    private async requesterSocketSend(message: any): Promise<any> {
+    // what we're actually doing. The reason this method is split off is that setPassphrase() and shutdown() are weird
+    // and requires special cases to work.
+    //
+    // If dontReleaseRequestMutex is true, requestMutex's will not be released automatically, and the release() function
+    // will be set to this._unlockAfterConnect(). This is show that messages to zcoind cannot be sent after shutdown or
+    // during restart.
+    private async requesterSocketSend(message: any, dontReleaseRequestMutex: boolean = false): Promise<any> {
+        if (!this._unlockAfterConnect) {
+            throw "Attempted to send before zcoind is started.";
+        }
+
         logger.debug("Trying to acquire requestMutex");
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
         let release = await this.requestMutex.lock();
         logger.debug("Acquired requestMutex");
+
+        // If dontReleaseRequestMutex is true, we will make release a non-op and set it to this._unlockAfterConnect so
+        // it can be released by another method at a later time.
+        if (dontReleaseRequestMutex) {
+            this._unlockAfterConnect = release;
+            release = async () => null;
+        }
 
         return new Promise(async (resolve, reject) => {
             try {
@@ -404,6 +439,43 @@ export class Zcoind {
         });
     }
 
+    // Close the sockets.
+    private closeSockets() {
+        this.statusPublisherSocket.close();
+        this.publisherSocket.close();
+        this.requesterSocket.close();
+    }
+
+    // Stop the daemon.
+    async stopDaemon() {
+        await this.requesterSocketSend({
+            auth: {
+                passphrase: null
+            },
+            type: 'initial',
+            collection: 'stop',
+            data: null
+        }, true);
+
+        while (true) {
+            logger.info("Waiting for zcoind to close its ports.");
+            if (!await this.isZcoindListening()) {
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+        }
+
+        this.closeSockets();
+        this.hasReceivedApiStatus = false;
+    }
+
+    // Restart the daemon.
+    async restartDaemon() {
+        await this.stopDaemon();
+        await this.start();
+    }
+
     // This is called when an error sending to zcoind has occurred. It should be synchrnonous, as further messages may
     // be sent once it is completed.
     async sendError(error: any) {
@@ -411,6 +483,10 @@ export class Zcoind {
     }
 
     // Actions
+
+    // See stopDaemon() for another available action.
+
+    // See restartDaemon() for another available action.
 
     // Invoke a legacy RPC command. result is whatever the JSON result of the command is, and errored is a boolean that
     // indicates whether or not an error has occurred.
@@ -679,10 +755,5 @@ export class Zcoind {
         if (!r) {
             throw 'setPassphrase call failed';
         }
-    }
-
-    // Stop the daemon.
-    async stopDaemon() {
-        await this.send(null, 'initial', 'stop', null);
     }
 }
