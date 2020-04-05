@@ -50,15 +50,6 @@ export const getters = {
     averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime,
     connections: (state) => state.connections,
     hasConnections: (state) => !!state.connections,
-    syncBlocksPerSecond: (state) => {
-        const { startTimestamp, startBlockHeight, currentTimestamp } = state.syncBlocksPerSecond
-        const { height: currentHeight } = state.currentBlock
-
-        const blocksLoaded = currentHeight - startBlockHeight
-        const time = currentTimestamp - startTimestamp
-
-        return blocksLoaded / (time / 1000)
-    },
     estimatedTimeUntilSynced: (state) => state.estimatedTimeUntilSynced,
     estimatedBlockHeight: (state, getters) => {
         const now = Date.now()
