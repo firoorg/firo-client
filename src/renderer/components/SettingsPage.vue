@@ -108,12 +108,10 @@
                         </v-popover>
                     </section>
                     <div v-if="apiStatus.data.hasMnemonic" class="mnemonic-setting">
-                        <u>
-                            <a
+                        <u><a
                                 :style="{ cursor: 'pointer'}"
-                                @click.prevent="openMnemonicSettings()"
-                            >
-                                <b>Show my mnemonic recovery phrase</b>
+                                @click.prevent="openMnemonicSettings()"                            >
+                            <b>Show my mnemonic recovery phrase</b>
                             </a>
                         </u>
                     </div>

@@ -22,7 +22,8 @@ const state = {
     zcoinLink: '',
     initialRunSet: false,
     walletExist: true,
-    mnemonicSetting: ''
+    mnemonicSetting: '',
+    openAddressBook: null
 }
 
 const mutations = {
@@ -38,6 +39,10 @@ const mutations = {
 
     [types.MNEMONIC_SETTING] (state, mnemonic) {
         state.mnemonicSetting = mnemonic
+    },
+
+    [types.OPEN_ADDRESS_BOOK] (state, open_) {
+        state.openAddressBook = open_
     },
 
     setInitialRun (state, value) {
@@ -266,6 +271,10 @@ const actions = {
         commit(types.MNEMONIC_SETTING, mnemonic);
     },
 
+    async [types.OPEN_ADDRESS_BOOK] ({ commit, state }, open_) {
+        commit(types.OPEN_ADDRESS_BOOK, open_);
+    },
+
     // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
     // the reason.
     async changeBlockchainLocation ({}, newLocation) {
@@ -302,6 +311,7 @@ const getters = {
     },
 
     mnemonicSetting: (state) => state.mnemonicSetting,
+    openAddressBook: (state) => state.openAddressBook,
     walletExist: (state) => state.walletExist,
 
     initialRunSet: (state) => state.initialRunSet,

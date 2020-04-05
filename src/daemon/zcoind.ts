@@ -546,10 +546,11 @@ export class Zcoind {
     // Create a new payment request (to be stored on the daemon-side).
     // Note: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
     // responsible for any updating of state that might be required.
-    async createPaymentRequest(amount: number | undefined, label: string, message: string): Promise<PaymentRequestData> {
+    async createPaymentRequest(amount: number | undefined, label: string, message: string, address:string): Promise<PaymentRequestData> {
         return await this.send(null, 'create', 'paymentRequest', {
             amount,
             label,
+            address,
             message
         });
     }
@@ -650,6 +651,21 @@ export class Zcoind {
 
     async readWalletMnemonicWarningState(auth: string) : Promise<string> {
         return await this.send(auth, 'create', 'readWalletMnemonicWarningState', {});
+    }
+    
+    async readAddressBook() : Promise<string> {
+        return await this.send('', 'create', 'readAddressBook', {});
+    }
+
+    async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<boolean> {
+        return await this.send('', 'create', 'editAddressBook', {
+            address: address_,
+            label: label_,
+            purpose: purpose_,
+            action: action_,
+            updatedaddress: updatedaddress_,
+            updatedlabel: updatedlabel_
+        });
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',

@@ -20,7 +20,7 @@ export default {
     name: 'MainLayout',
 
     components: {
-        Sidebar,
+        Sidebar
     }
 }
 </script>

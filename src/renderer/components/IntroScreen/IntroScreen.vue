@@ -35,7 +35,7 @@
                     </multi-step-popover>
                 </header>
 
-                <div v-show="!isReadyInitialOrRestarting">
+                <div v-show="!isReadyInitialOrRestarting || showLoadingWallet">
                     <div class="message-wrap">
                         <div class="loading-wrap">
                             <loading-bounce
@@ -43,12 +43,9 @@
                                 class="loading"
                             />
                         </div>
-
                         {{ loadingMessage }}
                     </div>
                 </div>
-
-                <footer />
             </main>
         </div>
     </div>
@@ -128,7 +125,10 @@ export default {
             isRunning: 'App/isRunning',
             isInitialRun: 'App/isInitialRun',
             currentBlockHeight: 'Blockchain/currentBlockHeight',
-            showIntroScreen: 'App/showIntroScreen'
+            showIntroScreen: 'App/showIntroScreen',
+            walletLoaded: 'Transactions/walletLoaded',
+            isLocked: 'ApiStatus/isLocked',
+            walletExist: 'App/walletExist'
         }),
 
         getCurrentSettingsClass () {
@@ -142,6 +142,10 @@ export default {
 
             return classes.join(' ')
         },
+        showLoadingWallet() {
+            return !this.walletLoaded && this.isLocked && this.walletExist
+        },
+
         isReadyInitialOrRestarting () {
             return this.isReady || this.isInitialRun || this.isRestarting
         },
@@ -175,8 +179,9 @@ export default {
             else if (this.currentBlockHeight === undefined) {
                 return this.$t('overlay.loading.loading-blockchain')
             }
-            else if (this.isRunning) {
-                return this.$t('overlay.loading.loading-wallet')
+            else if (this.isRunning || !this.walletLoaded) {
+                var postFix = this.walletLoaded? '':'. This might take a few minutes, depending on your transaction history';
+                return this.$t('overlay.loading.loading-wallet') + postFix
             }
             else {
                 return this.$t('overlay.loading.initial')
@@ -200,8 +205,17 @@ export default {
 
             this.goingToHide = true
 
+            this.hideIntroScreen();
+        },
+
+        hideIntroScreen() {
+            console.log('HIDE_INTRO_SCREEN:::');
             setTimeout(() => {
-                this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
+                if (this.walletLoaded) {
+                    this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
+                } else {
+                    this.hideIntroScreen()
+                }
             }, 500)
         }
     }

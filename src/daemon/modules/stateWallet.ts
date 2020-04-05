@@ -7,6 +7,11 @@ const logger = createLogger('zcoin:daemon:stateWallet');
 export async function initialize(store: any, zcoind: Zcoind) {
     while (true) {
         try {
+            if (!store.getters['ApiStatus/hasApiStatus'] || !store.getters['ApiStatus/API']) {
+                await new Promise((resolve) => setTimeout(resolve, 2000)); // sleep 2s
+                continue;
+            }
+
             const data = await zcoind.send(null, 'initial', 'stateWallet', {});
             store.dispatch('Transactions/setWalletState', data);
             return;
