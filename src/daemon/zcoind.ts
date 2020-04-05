@@ -36,6 +36,14 @@ class IncorrectPassphrase extends Error {
 }
 
 // This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
+class ZcoindConnectionTimeout extends Error {
+    constructor(seconds: number) {
+        super(`unable to connect to zcoind within ${seconds}s`);
+        this.name = 'ZcoindConnectionTimeout';
+    }
+}
+
+// This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
 class ZcoindAlreadyRunning extends Error {
     constructor() {
         super('zcoind is already running');
@@ -198,10 +206,14 @@ export class Zcoind {
     // Connect to the daemon and take action when it serves us appropriate events. Resolves when the daemon connection
     // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
     private connectAndReact(): Promise<void> {
-        return new Promise(async resolve => {
+        return new Promise(async (resolve, reject) => {
             // We need to do this because ZMQ will just hang if the socket is unavailable.
             let attempts = 0;
             while (++attempts) {
+                if (attempts >= 10) {
+                    reject(new ZcoindConnectionTimeout(30));
+                }
+
                 logger.info(`Checking if zcoind is listening on ${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher} (attempt ${attempts})`);
                 if (await this.isZcoindListening()) {
                     logger.info(`zcoind is listening (attempt: ${attempts})`);
