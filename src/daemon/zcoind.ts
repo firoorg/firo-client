@@ -35,6 +35,14 @@ class IncorrectPassphrase extends Error {
     }
 }
 
+// This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
+class ZcoindAlreadyRunning extends Error {
+    constructor() {
+        super('zcoind is already running');
+        this.name = 'ZcoindAlreadyRunning';
+    }
+}
+
 interface ApiStatus {
     data: {
         version: number;
@@ -129,6 +137,12 @@ export class Zcoind {
         // This will be null for a first connect and set when we're reconnecting.
         if (!this._unlockAfterConnect) {
             this._unlockAfterConnect = await this.requestMutex.lock();
+        }
+
+        // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
+        // a fairly small  window anyway,
+        if (await this.isZcoindListening()) {
+            throw new ZcoindAlreadyRunning();
         }
 
         await this.launchDaemon();
