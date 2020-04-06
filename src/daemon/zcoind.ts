@@ -517,7 +517,7 @@ export class Zcoind {
     // Invoke a legacy RPC command. result is whatever the JSON result of the command is, and errored is a boolean that
     // indicates whether or not an error has occurred.
     //
-    // Note: legacyRpc commands sometimes require auth, but they take it as a special legacyRpc command
+    // NOTE: legacyRpc commands sometimes require auth, but they take it as a special legacyRpc command
     //       (walletpassphrase) which is called prior to invoking the protected command.
     async legacyRpc(commandline: string): Promise<{result: object, errored: boolean}> {
         // Yes, it is correct to infer that zcoind can parse the argument list but cannot parse the command name.
@@ -544,8 +544,9 @@ export class Zcoind {
     }
 
     // Create a new payment request (to be stored on the daemon-side).
-    // Note: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
-    // responsible for any updating of state that might be required.
+    //
+    // NOTE: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
+    //       responsible for any updating of state that might be required.
     async createPaymentRequest(amount: number | undefined, label: string, message: string, address:string): Promise<PaymentRequestData> {
         return await this.send(null, 'create', 'paymentRequest', {
             amount,
@@ -561,8 +562,9 @@ export class Zcoind {
     }
 
     // Update an existing payment request.
-    // Note: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
-    // responsible for any updating of state that might be required.
+    //
+    // NOTE: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
+    //       responsible for any updating of state that might be required.
     async updatePaymentRequest(address: string, amount: number | undefined, label: string, message: string, state: PaymentRequestState): Promise<PaymentRequestData> {
         return await this.send(null, 'update', 'paymentRequest', {
             id: address,
@@ -772,7 +774,7 @@ export class Zcoind {
         return await this.send(null, 'initial', 'setting', null);
     }
 
-    // Set a new passphrase. We throw IncorrectPassphrase if the passphrase is incorrect, and do not return on success.
+    // Set a new passphrase. We reject() with IncorrectPassphrase if the passphrase is incorrect.
     async setPassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
         let r;
 
