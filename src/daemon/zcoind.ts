@@ -184,7 +184,7 @@ export class Zcoind {
     // constants.zcoindAddress.statusPort.publisher.
     isZcoindListening(): Promise<boolean> {
         return new Promise(resolve => {
-            let socket = new net.Socket();
+            const socket = new net.Socket();
             socket.setTimeout(5_000);
             socket.on("error", (e) => {
                 socket.destroy();
