@@ -130,7 +130,6 @@ const actions = {
             return
         }
 
-
         commit(types.IS_READY)
 
         if (state.showIntroScreen === undefined) {
@@ -244,8 +243,6 @@ const actions = {
             logger.warn('given location does not exist: %s', location)
             commit('setInitialRunSet');
             return
-        } else {
-
         }
 
         // todo: could potentially watch the location to catch cases where the user freakes out and...
@@ -309,19 +306,14 @@ const getters = {
     isInitialRun: (state) => {
         return state.isInitialRun
     },
-
     mnemonicSetting: (state) => state.mnemonicSetting,
     openAddressBook: (state) => state.openAddressBook,
     walletExist: (state) => state.walletExist,
-
     initialRunSet: (state) => state.initialRunSet,
-
     blockchainLocation: (state) => {
-
         return state.blockchainLocation
     },
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
-
     showIntroScreen: (state, getters, rootState, rootGetters) => {
         if (state.showIntroScreen !== undefined) {
             return state.showIntroScreen
@@ -363,7 +355,6 @@ const getters = {
             getters.showIncomingPaymentRequest
     },
     currentPassphrase: (state) => state.passphrase,
-
     zcoinLink: (state) => state.zcoinLink
 }
 
