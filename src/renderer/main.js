@@ -84,11 +84,6 @@ requireComponent.keys().forEach(fileName => {
     )
 })
 
-// sync router and store
-sync(store, router, {
-    moduleName: 'AppRouter'
-})
-
 // Allow users to access the store from Chrome Dev Tools.
 window.$store = store;
 
