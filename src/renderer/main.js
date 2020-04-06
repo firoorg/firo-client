@@ -5,10 +5,14 @@ import VeeValidate from 'vee-validate'
 import Scrollable from '@/directives/scrollable'
 import Focus from '@/directives/focus'
 
-import i18n from '#/lib/i18n'
-
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
+
+import i18n from '#/lib/i18n'
+
+const electron = require('electron');
+const remote = electron.remote;
+const app = electron.remote.app;
 
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 import Logger from '@/plugins/Logger'
@@ -18,10 +22,6 @@ import router from './router'
 import store from '../store/renderer'
 
 import zcoind from '../daemon/init'
-
-const electron = require('electron');
-const remote = electron.remote;
-const app = electron.remote.app;
 
 let ourWindow = remote.getCurrentWindow();
 
