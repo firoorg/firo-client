@@ -4,7 +4,6 @@ import { createLogger } from '#/lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
 import store from '../store/main'
-import CONFIG from './config'
 
 const logger = createLogger('zcoin:main')
 
@@ -16,10 +15,9 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-// build settings via electron-settings module
-if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
-    logger.info('registering protocol handler "%s"', CONFIG.app.protocolIdentifier)
-    app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
+// Register us as the handler for zcoin:// links so deeplinks work.
+if (!app.isDefaultProtocolClient('zcoin')) {
+    app.setAsDefaultProtocolClient('zcoin');
 }
 
 app.once('ready', async () => {
