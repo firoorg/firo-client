@@ -9,7 +9,6 @@ import i18n from '#/lib/i18n'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
-import { sync } from 'vuex-router-sync'
 
 import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
 import Logger from '@/plugins/Logger'
