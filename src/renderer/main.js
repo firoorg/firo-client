@@ -57,7 +57,7 @@ Vue.directive('focus', Focus)
 Vue.use(BindScopedSlotsPlugin)
 Vue.use(Logger)
 
-if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
+Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
 // automatically registering BaseComponents as Component (stripping of Base)
