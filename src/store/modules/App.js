@@ -1,9 +1,11 @@
 import fs from 'fs'
 import path from 'path'
+import {platform} from 'os'
 import * as types from '../types/App'
 import { getApp, getAppSettings } from '#/lib/utils'
 import { createLogger } from '#/lib/logger'
 import Vue from 'vue'
+import {app} from "electron";
 
 const logger = createLogger('zcoin:store:app')
 
@@ -299,6 +301,12 @@ const actions = {
 }
 
 const getters = {
+    zcoindLocation: () => {
+        const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath();
+        const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked');
+        const zcoindName = platform() === 'win32' ? 'zcoind.exe' : 'zcoind';
+        return path.join(unpackedRootFolder, `/assets/core/${platform()}/${zcoindName}`);
+    },
     isReady: (state) => state.isReady || false,
     isStopping: (state) => state.isStopping || false,
     isRunning: (state) => state.isRunning || false,
@@ -313,6 +321,7 @@ const getters = {
     blockchainLocation: (state) => {
         return state.blockchainLocation
     },
+    isInitialized: (state) => !!state.blockchainLocation,
     hasBlockchainLocation: (state, getters) => !!getters.blockchainLocation,
     showIntroScreen: (state, getters, rootState, rootGetters) => {
         if (state.showIntroScreen !== undefined) {

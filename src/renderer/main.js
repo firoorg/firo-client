@@ -88,6 +88,7 @@ window.$store = store;
 
 // Stop zcoind when the user exits the client.
 app.once('quit', async () => {
+    // window.$daemon will not be set if we are setting up.
     if (window.$daemon) {
         try {
             await window.$daemon.stopDaemon();
@@ -99,27 +100,39 @@ app.once('quit', async () => {
     }
 });
 
+if (store.getters['App/isInitialized']) {
+    // Start up zcoind.
+    zcoind(store, store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'])
+        .then(z => {
+            // Make zcoind accessible to Vue instances as $daemon.
+            Vue.prototype.$daemon = z;
+            // Allow users to access $daemon from Chrome Dev Tools and our app quit handler.
+            window.$daemon = z;
 
-/// Start up zcoind.
-zcoind(store)
-    .then(z => {
-        // Make zcoind accessible to Vue instances as $daemon.
-        Vue.prototype.$daemon = z;
-        // Allow users to access $daemon from Chrome Dev Tools.
-        window.$daemon = z;
+            // Start the GUI.
+            new Vue({
+                components: {App},
+                router,
+                store,
+                i18n: i18n.getModule({app, store}),
+                template: '<App/>'
+            }).$mount('#app');
 
-        // Start the GUI.
-        new Vue({
-            components: {App},
-            router,
-            store,
-            i18n: i18n.getModule({app, store}),
-            template: '<App/>'
-        }).$mount('#app');
+            ourWindow.show();
+        })
+        .catch(e => {
+            alert(e);
+            app.exit(-1);
+        });
+} else {
+    // Start the GUI.
+    new Vue({
+        components: {App},
+        router,
+        store,
+        i18n: i18n.getModule({app, store}),
+        template: '<App/>'
+    }).$mount('#app');
 
-        ourWindow.show();
-    })
-    .catch(e => {
-        alert(e);
-        app.exit(-1);
-    });
+    ourWindow.show();
+}

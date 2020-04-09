@@ -3,7 +3,7 @@
 import { Zcoind } from './zcoind';
 
 /// Start up zcoind, connect to it, and return a Zcoind instance.
-async function zcoind(store: any): Promise<Zcoind> {
+async function zcoind(store: any, zcoindLocation: string, zcoindDataDir: string): Promise<Zcoind> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
@@ -33,7 +33,7 @@ async function zcoind(store: any): Promise<Zcoind> {
     }
 
     // FIXME: Use proper locations.
-    const zcoind = new Zcoind(process.env.ZCOIND_LOCATION, process.env.ZCOIN_DATA_DIR, eventHandlers);
+    const zcoind = new Zcoind(zcoindLocation, zcoindDataDir, eventHandlers);
     await zcoind.start();
 
     for (const topic of Object.keys(initializers)) {
