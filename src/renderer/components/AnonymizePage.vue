@@ -573,16 +573,16 @@ export default {
         position: relative;
         cursor: pointer;
 
-        /deep/ svg > g > path,
-        /deep/ svg g > g {
+        svg > g > path,
+        svg g > g {
             transition: stroke 0.15s ease-in;
         }
 
         &:hover {
-            /deep/ svg > g > path {
+            svg > g > path {
                 stroke: $color--dark;
             }
-            /deep/ svg g g {
+            svg g g {
                 stroke: $color--comet-dark;
             }
         }

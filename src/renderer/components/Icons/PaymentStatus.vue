@@ -69,7 +69,7 @@ export default {
         padding-left: emRhythm(1);
     }
 
-    /deep/ svg {
+    svg {
         width: auto !important;
         // background: rgba(255,0,0,0.2);
     }

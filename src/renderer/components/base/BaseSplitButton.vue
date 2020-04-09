@@ -65,17 +65,17 @@ export default {
 
         align-items: stretch;
 
-        /deep/ button:first-child {
+        button:first-child {
             padding-right: emRhythm(3);
             padding-left: emRhythm(3);
         }
 
-        .popover /deep/ .trigger,
-        .popover /deep/ .trigger button {
+        .popover .trigger,
+        .popover .trigger button {
             height: 100%;
         }
 
-        /deep/ button.options-handle {
+        button.options-handle {
             margin-left: 0;
             padding: 0 emRhythm(1.5, $silent: true);
             border-left: none;

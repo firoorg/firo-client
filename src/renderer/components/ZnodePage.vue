@@ -243,21 +243,19 @@ export default {
         color: $color--white-light;
 
         .animated-table {
-            /deep/ {
-                thead th {
-                    color: $color--dark;
+            thead th {
+                color: $color--dark;
 
-                    &.sortable:hover .sort-icon {
-                        color: $color--comet-medium;
-                    }
+                &.sortable:hover .sort-icon {
+                    color: $color--comet-medium;
                 }
-                .vuetable-body tr td {
-                    border-color: $color--comet-dark-mixed;
-                }
+            }
+            .vuetable-body tr td {
+                border-color: $color--comet-dark-mixed;
             }
         }
 
-        & /deep/ .vuetable-td-authority {
+        & .vuetable-td-authority {
             span {
                 opacity: 0.5;
             }

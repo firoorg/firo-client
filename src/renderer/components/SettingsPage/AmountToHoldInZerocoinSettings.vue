@@ -69,7 +69,7 @@ export default {
         margin-right: -4px;
     }
 
-    .slider /deep/ {
+    .slider {
         .vue-slider,
         .vue-slider-process {
             border-radius: 0;

@@ -149,7 +149,7 @@ export default {
             @include font-medium()
         }
 
-        /deep/ svg {
+        svg {
             @include drop-shadow-large();
             width: auto;
             max-height: 100%;

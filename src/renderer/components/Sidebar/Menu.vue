@@ -160,7 +160,7 @@ export default {
     }
 
     a,
-    a /deep/ .trigger {
+    a .trigger {
         display: flex !important;
         flex-direction: row;
         align-items: center;

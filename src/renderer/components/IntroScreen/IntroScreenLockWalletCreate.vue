@@ -200,7 +200,7 @@ export default {
     margin-top: emRhythm(7);
     position: relative;
 
-    & /deep/ .trigger {
+    & .trigger {
         width: 100%;
     }
 

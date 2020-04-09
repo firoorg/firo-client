@@ -261,7 +261,7 @@ export default {
         .sync-progress-wrap {
             grid-area: sync;
 
-            & /deep/ .trigger {
+            & .trigger {
                 display: block !important;
                 padding-top: 1rem;
                 margin-top: -1rem;
