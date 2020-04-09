@@ -86,6 +86,20 @@ requireComponent.keys().forEach(fileName => {
 // Allow users to access the store from Chrome Dev Tools.
 window.$store = store;
 
+// Stop zcoind when the user exits the client.
+app.once('quit', async () => {
+    if (window.$daemon) {
+        try {
+            await window.$daemon.stopDaemon();
+        } catch(e) {
+            logger.error(`Error stopping daemon: ${e}`);
+        }
+    } else {
+        logger.warn("window.$daemon is not set; not trying to stop daemon");
+    }
+});
+
+
 /// Start up zcoind.
 zcoind(store)
     .then(z => {
@@ -93,11 +107,6 @@ zcoind(store)
         Vue.prototype.$daemon = z;
         // Allow users to access $daemon from Chrome Dev Tools.
         window.$daemon = z;
-
-        // Stop zcoind when the user exits the client.
-        app.once('quit', async () => {
-            await z.stopDaemon();
-        });
 
         // Start the GUI.
         new Vue({
