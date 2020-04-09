@@ -36,6 +36,15 @@ app.once('ready', async () => {
         minHeight: 450
     });
 
+    // Stop new alt-clicks from opening new BrowserWindows.
+    //
+    // NOTE: This MUST be done in the main process to work.
+    //       cf. https://github.com/electron/electron/issues/2770#issuecomment-140065309
+    //
+    // FIXME: alt-clicking on a router link will still cause the link to be highlighted even though no other action is
+    //        taken.
+    window.webContents.on('new-window', (e) => e.preventDefault());
+
     if (process.env.NODE_ENV === 'development') {
         window.loadURL("http://localhost:9080/");
     }
