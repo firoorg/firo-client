@@ -124,15 +124,15 @@ export class Zcoind {
     // that send() will block prior to connecting to the proper socket.
     private _unlockAfterConnect: () => void | undefined;
     private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
-
-    // The location of the zcoind binary.
-    zcoindLocation: string;
+    // The location of the zcoind binary, or null to use the default location.
+    zcoindLocation: string | null;
     // The directory that zcoind will use to store its data. This must already exist.
     zcoindDataDir: string;
 
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
-    // key that will be called when an apiStatus event is receives.
-    constructor(zcoindLocation: string, zcoindDataDir: string, eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
+    // key that will be called when an apiStatus event is receives. If zcoindDataDir is null (but NOT undefined or the
+    // empty string )we will not specify it and use the default location.
+    constructor(zcoindLocation: string, zcoindDataDir: string | null, eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
         this.zcoindLocation = zcoindLocation;
         this.zcoindDataDir = zcoindDataDir;
         this.hasReceivedApiStatus = false;
@@ -163,7 +163,7 @@ export class Zcoind {
         return new Promise((resolve, reject) => {
             logger.info("Starting daemon...");
             execFile(this.zcoindLocation,
-                ["-daemon", "-clientapi=1", "-datadir=" + this.zcoindDataDir],
+                ["-daemon", "-clientapi=1", ...(this.zcoindDataDir === null ? [] : ["-datadir=" + this.zcoindDataDir])],
                 {timeout: 10_000},
                 (error, stdout, stderr) => {
                     if (error) {
