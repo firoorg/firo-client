@@ -64,7 +64,6 @@ import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
 import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
 import IntroScreenSettingUpLocation from '@/components/IntroScreen/IntroScreenSettingUpLocation'
 import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
-import IntroScreenRestartingDaemon from '@/components/IntroScreen/IntroScreenRestartingDaemon'
 import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
 import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
@@ -86,7 +85,6 @@ export default {
         IntroScreenBlockchainLocation,
         IntroScreenSettingUpLocation,
         IntroScreenLockWallet,
-        IntroScreenRestartingDaemon,
         IntroScreenAmountToHoldInZerocoin,
         IntroScreenOther
     },
@@ -109,7 +107,6 @@ export default {
                 walletRecover:WalletRecovery,
                 recoveringWallet:RecoveringWallet,
                 lock: IntroScreenLockWallet,
-                restart: IntroScreenRestartingDaemon
                 // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
                 // other: IntroScreenOther
             },
