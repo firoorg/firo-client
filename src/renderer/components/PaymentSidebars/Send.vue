@@ -380,7 +380,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            network: 'Network/network',
+            network: 'ApiStatus/network',
             availableXzc: 'Balance/availableXzc',
             availableZerocoin: 'Balance/availableZerocoin',
             totalBalance: 'Balance/total',

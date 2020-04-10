@@ -22,6 +22,8 @@ const actions = {
 
 const getters = {
     apiStatus: (state) => state.apiStatus,
+    // 'mainnet', 'test', or 'regtest'
+    network: (state) => state.apiStatus.data ? state.apiStatus.data.network : undefined,
     // Do we have an apiStatus?
     hasApiStatus: (state): boolean => !!state.apiStatus.data,
     // Is the wallet locked? Returns undefined if not yet loaded.

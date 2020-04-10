@@ -57,15 +57,21 @@
                     </svg>
                     <div
                         v-if="network === 'test'"
-                        class="is-testnet-badge"
+                        class="network-badge"
                     >
                         Testnet
                     </div>
                     <div
                         v-else-if="network === 'regtest'"
-                        class="is-testnet-badge"
+                        class="network-badge"
                     >
                         Regtest
+                    </div>
+                    <div
+                        v-else-if="network !== 'mainnet'"
+                        class="network-badge"
+                    >
+                        Unknown Network
                     </div>
                 </router-link>
             </div>
@@ -98,7 +104,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            network: 'Network/network'
+            network: 'ApiStatus/network'
         })
     }
 }
@@ -137,7 +143,7 @@ export default {
             height: 100%;
         }
 
-        .is-testnet-badge {
+        .network-badge {
             color: $color--dark;
             background-color: transparent;
             background: $color--red-bright;

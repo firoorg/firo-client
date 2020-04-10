@@ -136,7 +136,7 @@ const actions = {
 
         // change source is settings input
         if (typeof urlOrUrlNetworkPair === 'string') {
-            network = rootGetters['Network/network']
+            network = rootGetters['ApiStatus/network']
             url = urlOrUrlNetworkPair
         }
         // change source is persistent settings object
@@ -220,12 +220,12 @@ const getters = {
         return toMint
     },
     b58Prefixes (state, getters, rootState, rootGetters) {
-        const network = rootGetters['Network/network']
+        const network = rootGetters['ApiStatus/network']
 
         return state.b58Prefixes[network]
     },
     getExplorerBaseUrl (state, getters, rootState, rootGetters) {
-        const network = rootGetters['Network/network']
+        const network = rootGetters['ApiStatus/network']
 
         return state.explorer[network] || ''
     },

@@ -354,13 +354,9 @@ const getters = {
     },
     hasOpenOverlay (state, getters, rootState, rootGetters) {
         const windowHasOpenModal = rootGetters['Window/hasOpenModal']
-        const networkIsConnected = rootGetters['Network/isConnected']
-        const networkConnectionError = rootGetters['Network/ConnectionError']
 
         return windowHasOpenModal ||
-            !networkIsConnected ||
             getters.showIntroScreen ||
-            networkConnectionError ||
             getters.showIncomingPaymentRequest
     },
     currentPassphrase: (state) => state.passphrase,
