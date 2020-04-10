@@ -16,7 +16,6 @@
                         trigger="manual"
                         placement="top"
                         popover-class="overlay-popover notice green range-input range-input-dark-light"
-                        :can-blur="false"
                         :delay="1000"
                         :popper-options="getPopperOptions()"
                         :boundaries-element="$refs.boundaries"

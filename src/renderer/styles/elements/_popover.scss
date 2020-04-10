@@ -368,8 +368,4 @@
             padding-top: 0;
         }
     }
-
-    &.is-blurred {
-        filter: blur($overlay--popover-blur);
-    }
 }

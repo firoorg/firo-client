@@ -5,7 +5,6 @@
         :popover-class="popoverClass + ' multi-step-popover'"
         class="timed-popover"
         trigger="manually"
-        :can-blur="canBlur"
         :delay="delay"
         :event-bus-name="eventBusName"
         v-on="$listeners"
@@ -62,10 +61,6 @@ export default {
         componentProps: {
             type: Object,
             default: () => ({})
-        },
-        canBlur: {
-            type: Boolean,
-            default: true
         },
         eventBusName: {
             type: String,

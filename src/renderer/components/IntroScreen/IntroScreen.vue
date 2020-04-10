@@ -22,7 +22,6 @@
                         :actions="getActions"
                         :delay="{ show: 350, hide: 0 }"
                         popover-class="dark overlay-popover"
-                        :can-blur="false"
                         event-bus-name="popover:intro"
                         @step-change="onStepChange"
                     >

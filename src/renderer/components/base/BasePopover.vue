@@ -40,10 +40,6 @@ export default {
     inheritAttrs: false,
 
     props: {
-        canBlur: {
-            type: Boolean,
-            default: false
-        },
         eventBusName: {
             type: String,
             default: 'popover'
@@ -65,15 +61,9 @@ export default {
             hasOpenOverlay: 'App/hasOpenOverlay'
         }),
 
-        isBlurred () {
-            return this.canBlur && this.hasOpenOverlay
-        },
-
         getPopoverClass () {
             const parent = this.$attrs['popover-class'] || ''
-            const classes = parent ? [parent] : []
-
-            return this.isBlurred ? [...classes, 'is-blurred'] : classes
+            return parent ? [parent] : []
         }
     },
 
