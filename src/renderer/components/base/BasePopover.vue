@@ -42,7 +42,7 @@ export default {
     props: {
         canBlur: {
             type: Boolean,
-            default: true
+            default: false
         },
         eventBusName: {
             type: String,
