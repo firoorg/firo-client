@@ -38,15 +38,15 @@ class IncorrectPassphrase extends Error {
 // This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
 class ZcoindConnectionTimeout extends Error {
     constructor(seconds: number) {
-        super(`unable to connect to zcoind within ${seconds}s`);
+        super(`unable to connect to zcoind within ${seconds}s; a reason this might happen is that you have another instance of zcoind not managed by Zcoin Client running`);
         this.name = 'ZcoindConnectionTimeout';
     }
 }
 
-// This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
+// This is thrown when we find a zcoind instance already listening when we haven't yet started one.
 class ZcoindAlreadyRunning extends Error {
     constructor() {
-        super('zcoind is already running');
+        super('Another zcoind instance running with -clientapi=1 is already running');
         this.name = 'ZcoindAlreadyRunning';
     }
 }
