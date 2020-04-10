@@ -105,9 +105,7 @@ export default {
                 restoreAskWalletOrigin: RestoreAskWalletOrigin,
                 walletRecover:WalletRecovery,
                 recoveringWallet:RecoveringWallet,
-                lock: IntroScreenLockWallet,
-                // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
-                // other: IntroScreenOther
+                lock: IntroScreenLockWallet
             },
             currentStep: 'welcome',
             currentSettingsValue: ''

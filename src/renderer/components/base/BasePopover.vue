@@ -30,8 +30,6 @@
 import smoothReflow from 'vue-smooth-reflow'
 import { mapGetters } from 'vuex'
 
-import { getEventBus } from '@/utils/eventBus'
-
 export default {
     name: 'BasePopover',
     mixins: [
@@ -67,21 +65,11 @@ export default {
         }
     },
 
-    /*
-    created() {
-        this.eventBus = getEventBus(this.eventBusName)
-        this.eventBus.$on('reflow', () => {
-            this.reflowSymbol = Date.now()
-        })
-    },
-    */
-
     mounted () {
         this.reflow()
     },
 
     beforeDestroy () {
-        //this.eventBus.$off('reflow')
         this.$unsmoothReflow({
             el: this.$refs.container
         })
@@ -91,7 +79,6 @@ export default {
         reflow () {
             this.$smoothReflow({
                 el: this.$refs.container,
-                // debug: true,
                 transitionEvent: {
                     selector: '.popover-content',
                 }
