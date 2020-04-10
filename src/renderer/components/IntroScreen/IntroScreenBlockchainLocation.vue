@@ -63,7 +63,8 @@ export default {
                 properties: [
                     'openDirectory',
                     'createDirectory',
-                    'promptToCreate'
+                    'promptToCreate',
+                    'showHiddenFiles'
                 ],
                 buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
             })
