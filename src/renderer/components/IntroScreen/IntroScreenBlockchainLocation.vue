@@ -4,62 +4,66 @@
 
         <p v-html="$t('onboarding.set-blockchain-location.description')" />
 
-        <footer>
-            <template v-if="!hasLocation">
-                <base-button
-                    :is-outline="true"
-                    @click="startDaemon"
-                >
-                    {{ $t('onboarding.set-blockchain-location.button__use-default-location--secondary') }}
-                </base-button>
-                <BaseButton
-                    color="green"
-                    @click="selectFolder"
-                >
-                    {{ $t('onboarding.set-blockchain-location.button__select-folder--primary') }}
-                </BaseButton>
-            </template>
+        <div v-if="!hasSelectedFolder">
             <BaseButton
-                v-else
-                color="green"
-                @click="startDaemon"
+                :is-outline="true"
+                @click.once="startDaemon"
             >
-                {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
+                {{ $t('onboarding.set-blockchain-location.button__use-default-location--secondary') }}
             </BaseButton>
-        </footer>
+
+            <BaseButton
+                color="green"
+                @click="selectFolder"
+            >
+                {{ $t('onboarding.set-blockchain-location.button__select-folder--primary') }}
+            </BaseButton>
+        </div>
+
+        <BaseButton
+            v-else
+            color="green"
+            @click.once="startDaemon"
+        >
+            {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
+        </BaseButton>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
-import path from 'path'
-import types from '~/types'
 
-import fs from 'fs'
+import zcoind from "#/daemon/init";
+import store from "#/store/renderer";
 
 const { dialog } = require('electron').remote
 
 export default {
     name: 'IntroScreenBlockchainLocation',
+
     mixins: [
         GuideStepMixin
     ],
 
+    data: () => ({
+        blockchainLocation: ''
+    }),
+
     computed: {
         ...mapGetters({
-            hasLocation: 'App/hasBlockchainLocation',
-            location: 'App/blockchainLocation',
-            isLocked: 'App/isLocked',
-            isInitialRun: 'App/isInitialRun'
-        })
+            zcoindLocation: 'App/zcoindLocation'
+        }),
+
+        hasSelectedFolder() {
+            return !!this.blockchainLocation;
+        }
     },
 
     methods: {
-        selectFolder () {
-            const returned = dialog.showOpenDialog({
+        async selectFolder () {
+            const [blockchainLocation] = dialog.showOpenDialog({
                 title: 'Select Zcoin Blockchain Location',
-                // message: 'just a message',
                 properties: [
                     'openDirectory',
                     'createDirectory',
@@ -67,33 +71,39 @@ export default {
                     'showHiddenFiles'
                 ],
                 buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
-            })
+            });
 
-
-            if (!returned || !returned[0]) {
-                this.$log.debug('user canceled the selection in the dialog box')
-                return
-            }
-
-            const [ blockchainPath ] = returned
-
-            this.$store.dispatch(types.app.SET_BLOCKCHAIN_LOCATION, blockchainPath)
-            this.$store.dispatch(types.app.DAEMON_START)
+            this.blockchainLocation = blockchainLocation;
         },
 
-        startDaemon () {
-            this.$store.dispatch(types.app.DAEMON_START)
+        async startDaemon () {
+            if (this.blockchainLocation) {
+                try {
+                    // Commit the blockchain location to our preferences file. It MAY be the empty string.
+                    await this.$store.dispatch('App/changeBlockchainLocation', this.blockchainLocation);
+                } catch (e) {
+                    // FIXME: Allow the user to reselect the location if the one they pick first is invalid.
+                    alert(`Blockchain location is invalid: ${e}`);
+                    app.exit(-1);
+                }
+            }
+
+            try {
+                const zcoind = zcoind(store, this.zcoindLocation, this.blockchainLocation || null);
+                zcoind.start();
+
+                Vue.prototype.$daemon = zcoind;
+            } catch(e) {
+                alert(`Couldn't start zcoind: ${e}`);
+                app.exit(-1);
+            }
 
             this.$nextTick(() => {
                 this.actions.next()
             })
         },
 
-        isEnabled () {
-            if (!this.hasLocation || !fs.existsSync(this.location)) return true;
-            this.$store.dispatch(types.app.DAEMON_START)
-            return false;
-        }
+        isEnabled: () => true
     }
 }
 </script>

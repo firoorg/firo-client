@@ -25,9 +25,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-
-import types from '~/types'
+const app = require("electron").remote.app;
+import { mapGetters } from 'vuex'
 
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 import EventBusMixin from '@/mixins/EventBusMixin'
@@ -62,50 +61,41 @@ export default {
 
     computed: {
         ...mapGetters({
-            isLocked: 'ApiStatus/isLocked',
             hasApiStatus: 'ApiStatus/hasApiStatus',
-        }),
-        isEqual () {
-            return this.passphrase === this.confirm
-        }
-    },
-
-    watch: {
-        isLocked (newVal) {
-            if (newVal) {
-                this.actions.next()
-            }
-        }
+        })
     },
 
     methods: {
-        ...mapActions({
-            lockWallet: types.app.LOCK_WALLET
-        }),
         goToConfirm () {
             this.eventBus.$emit('reflow')
             this.showConfirm = true
             this.confirm = ''
         },
+
         onConfirm () {
             this.eventBus.$emit('reflow')
             this.isConfirmed = true
         },
+
         onConfirmCancel () {
             this.eventBus.$emit('reflow')
             this.showConfirm = false
             this.confirm = ''
             this.passphrase = ''
         },
-        onLockWallet () {
-            this.lockWallet(this.passphrase)
-            console.log('locking wallet');
+
+        async onLockWallet () {
+            try {
+                this.$log.info("Trying to lock the wallet...");
+                console.log(`Using passphrase ${this.passphrase}`); // FIXME: Remove this.
+                await this.$daemon.setPassphrase(null, this.passphrase);
+            } catch(e) {
+                alert("Something unexpected went wrong with locking the wallet, so we can't proceed. Please report this to the Zcoin team.");
+                app.exit(-1);
+            }
+
             this.actions.next()
         },
-        isEnabled () {
-            this.$log.debug('is locked: %O', this.isLocked)
-            return this.isLocked !== true
-        }
     }
 }
 </script>

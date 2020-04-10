@@ -104,8 +104,10 @@ app.once('quit', async () => {
 });
 
 if (store.getters['App/isInitialized']) {
+    logger.info("App is already initialized. Starting up...");
+
     // Start up zcoind.
-    zcoind(store, store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'])
+    zcoind(store, store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
         .then(z => {
             // Make zcoind accessible to Vue instances as $daemon.
             Vue.prototype.$daemon = z;
@@ -128,6 +130,8 @@ if (store.getters['App/isInitialized']) {
             app.exit(-1);
         });
 } else {
+    logger.info("App is not yet initialized. Let's get 'er ready!");
+
     // Start the GUI.
     new Vue({
         components: {App},

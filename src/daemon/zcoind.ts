@@ -775,13 +775,13 @@ export class Zcoind {
     }
 
     // Set a new passphrase. We reject() with IncorrectPassphrase if the passphrase is incorrect.
-    async setPassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
+    async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
         let r;
 
         try {
             r = await this.requesterSocketSend({
                 auth: {
-                    passphrase: oldPassphrase,
+                    passphrase: oldPassphrase || '',
                     newPassphrase
                 },
                 type: 'update',

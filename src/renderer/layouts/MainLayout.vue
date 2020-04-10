@@ -1,6 +1,9 @@
 <template>
     <transition name="fade">
-        <div class="main-layout wrapper">
+        <div
+            v-if="isInitialized"
+            class="main-layout wrapper"
+        >
             <Sidebar class="aside" />
 
             <main
@@ -10,18 +13,29 @@
                 <router-view class="child" />
             </main>
         </div>
+
+        <div v-else>
+            <IntroScreen />
+        </div>
     </transition>
 </template>
 
 <script>
 import Sidebar from '@/components/Sidebar'
+import { mapGetters } from 'vuex'
+import IntroScreen from "@/components/IntroScreen/IntroScreen";
 
 export default {
     name: 'MainLayout',
 
     components: {
+        IntroScreen,
         Sidebar
-    }
+    },
+
+    computed: mapGetters({
+        isInitialized: 'App/isInitialized'
+    })
 }
 </script>
 

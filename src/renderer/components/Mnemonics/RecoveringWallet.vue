@@ -77,8 +77,7 @@ export default {
       }, 20000);
     },
     shouldGoToNext() {
-      return this.isRunning &&
-          this.apiStatus.data &&
+      return this.apiStatus.data &&
           !this.apiStatus.data.rescanning &&
           this.apiStatus.data.walletinitialized;
     }

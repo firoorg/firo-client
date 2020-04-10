@@ -21,20 +21,12 @@ import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 export default {
     name: 'IntroScreenWelcome',
+
     mixins: [
         GuideStepMixin
     ],
 
-    computed: {
-        ...mapGetters({
-            isInitialRun: 'App/isInitialRun'
-        })
-    },
-
     methods: {
-        isEnabled () {
-            return this.isInitialRun
-        },
         next() {
             this.actions.next();
         }

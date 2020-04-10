@@ -9,20 +9,8 @@ import {app} from "electron";
 const logger = createLogger('zcoin:store:app')
 
 const state = {
-    isInitialRun: true,
-    isReady: false,
-    isRunning: false,
-    isStopping: false,
-    isRestarting: false,
-    walletIsLocked: false,
-    walletVersion: 0,
-    showIntroScreen: undefined,
-    passphrase: null,
-    appVersion: null,
-    blockchainLocation: '',
+    isInitialized: false,
     zcoinLink: '',
-    initialRunSet: false,
-    walletExist: true,
     mnemonicSetting: '',
     openAddressBook: null
 }
@@ -34,6 +22,16 @@ const mutations = {
 
     [types.OPEN_ADDRESS_BOOK] (state, open_) {
         state.openAddressBook = open_
+    },
+
+    // This is called when app settings are read. It DOES NOT persist information to disk itself. (cf. setIsInitialized)
+    SET_IS_INITIALIZED (state, value) {
+        this.isInitialized = value;
+    },
+
+    // This is called when app settings are read. It DOES NOT persist information itself. (cf. changeBlockchainLocation)
+    SET_BLOCKCHAIN_LOCATION (state, location) {
+        state.blockchainLocation = location;
     },
 
     // This triggers a watcher in App.vue.
@@ -51,29 +49,45 @@ const actions = {
         commit(types.OPEN_ADDRESS_BOOK, open_);
     },
 
-    async SET_BLOCKCHAIN_LOCATION ({state}, location) {
-        state.blockchainLocation = location;
+    async SET_IS_INITIALIZED({commit}, value) {
+        commit('SET_IS_INITIALIZED', value);
     },
 
-    // Change the blockchain location to newLocation, creating it if it does not exist. If we fail, we will through with
-    // the reason.
-    async changeBlockchainLocation ({}, newLocation) {
-        if (!path.isAbsolute(newLocation)) {
-            throw "Location for the new blockchain must be an absolute path.";
+    // This is called when app settings are read. It DOES NOT set the blockchain location itself.
+    async SET_BLOCKCHAIN_LOCATION ({commit}, location) {
+        commit('SET_BLOCKCHAIN_LOCATION', location);
+    },
+
+    // Change the blockchain location to newLocation, creating it if it does not exist, or doing nothing if the empty
+    // string (representing the default value) is set. If we fail, we will throw with the reason.
+    async changeBlockchainLocation ({commit}, newLocation) {
+        if (newLocation !== '') {
+            if (!path.isAbsolute(newLocation)) {
+                throw "Location for the new blockchain must be an absolute path.";
+            }
+
+            if (!fs.existsSync(newLocation)) {
+                // Throws on failure.
+                fs.mkdirSync(newLocation);
+            }
+
+            try {
+                fs.accessSync(newLocation, fs.constants.W_OK | fs.constants.R_OK);
+            } catch {
+                throw `${newLocation} is not writable by the current user.`
+            }
         }
 
-        if (!fs.existsSync(newLocation)) {
-            // Throws on failure.
-            fs.mkdirSync(newLocation);
-        }
+        // This will cause src/main/lib/appSettings.js to call SET_BLOCKCHAIN_LOCATION on startup.
+        await getAppSettings().set(`app.SET_BLOCKCHAIN_LOCATION`, newLocation);
+        await commit('SET_BLOCKCHAIN_LOCATION', newLocation);
+    },
 
-        try {
-            fs.accessSync(newLocation, fs.constants.W_OK | fs.constants.R_OK);
-        } catch {
-            throw `${newLocation} is not writable by the current user.`
-        }
-
-        await getAppSettings().set(`app.${types.SET_BLOCKCHAIN_LOCATION}`, newLocation);
+    // Mark down that we have been initialized in settings.
+    async setIsInitialized({commit}) {
+        // This will cause src/main/lib/appSettings.js to call on startup.
+        await getAppSettings().set(`app.SET_IS_INITIALIZED`, true);
+        await commit('SET_BLOCKCHAIN_LOCATION', newLocation);
     },
 
     gotLink ({commit}, url) {
