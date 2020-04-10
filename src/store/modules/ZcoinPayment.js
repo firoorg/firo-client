@@ -166,6 +166,28 @@ const actions = {
     [types.ENTERED_SEND_AMOUNT] ({ commit }, { amount }) {
         commit(types.ENTERED_SEND_AMOUNT, amount)
     },
+
+    [types.SEND_ZCOIN] ({ dispatch, commit, state }, { payments, fee, auth }) {
+        // const { address, amount } = payment
+
+        commit(types.SEND_ZCOIN, {
+            data: {
+                payments: payments.map((payment) => ({
+                    label: payment.label,
+                    amount: payment.amount,
+                    address: payment.address
+                })),
+                fee: state.addPaymentForm.totalTxFee
+            },
+            auth: {
+                ...auth
+            }
+        })
+
+        dispatch(allTypes.app.CLEAR_PASSPHRASE, null, { root: true })
+        // todo think about when to clear pending payments and if we're waiting for a
+        // confirmation per payment/denomination we need some identifier which doesn't exist right now
+    },
     [types.TOGGLE_CUSTOM_INPUTS_POPUP]({ commit }) {
         commit(types.TOGGLE_CUSTOM_INPUTS_POPUP)
     },
