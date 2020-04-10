@@ -1,7 +1,4 @@
 import { isEqual } from 'lodash';
-import { createLogger } from '../../lib/logger';
-
-const logger = createLogger('zcoin:store:Transactions');
 
 const state = {
     // ApiStatus from src/daemon/zcoind
