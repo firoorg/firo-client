@@ -23,6 +23,9 @@ import store from '../store/renderer'
 
 import zcoind from '../daemon/init'
 
+import { createLogger } from '#/lib/logger';
+const logger = createLogger('zcoin:renderer:main.js');
+
 let ourWindow = remote.getCurrentWindow();
 
 const customValidationRules = [
