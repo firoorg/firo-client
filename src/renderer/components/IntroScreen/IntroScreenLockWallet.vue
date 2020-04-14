@@ -14,7 +14,7 @@
         :on-cancel="onConfirmCancel"
         :on-confirm="onConfirm"
         :confirm.sync="confirm"
-        :is-equal="isEqual"
+        :target-passphrase="passphrase"
     />
     <component
         :is="'IntroScreenLockWalletWarning'"

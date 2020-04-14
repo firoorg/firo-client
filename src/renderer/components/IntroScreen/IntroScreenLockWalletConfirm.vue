@@ -9,7 +9,7 @@
                     v-focus
                     type="password"
                     :placeholder="$t('onboarding.confirm-passphrase.placeholder__confirm-passphrase')"
-                    @input="onChange"
+                    v-model="confirmPassphrase"
                 >
             </div>
         </div>
@@ -36,6 +36,11 @@
 <script>
 export default {
     name: 'IntroScreenLockWalletConfirm',
+
+    data: () => ({
+        confirmPassphrase: ""
+    }),
+
     props: {
         onCancel: {
             type: Function,
@@ -45,18 +50,19 @@ export default {
             type: Function,
             required: true
         },
-        isEqual: {
-            type: Boolean,
+        targetPassphrase: {
+            type: String,
             required: true
         }
     },
 
-    methods: {
-        onChange (event) {
-            const { value } = event.target
-            this.$emit('update:confirm', value)
-        },
+    computed: {
+        isEqual() {
+            return this.targetPassphrase === this.confirmPassphrase;
+        }
+    },
 
+    methods: {
         onSubmitForm () {
             if (!this.isEqual) {
                 return
