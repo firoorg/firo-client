@@ -428,7 +428,7 @@ export class Zcoind {
     // return the entire response object we received from zcoind.
     //
     // If zcoind has been shutdown with the stopDaemon() method, this method will take no action and never resolve.
-    async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
+    async send(auth: string | null, type: string, collection: string, data: any): Promise<any> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
         console.log('send object:', JSON.stringify(data));
         return await this.requesterSocketSend({
