@@ -822,8 +822,16 @@ export class Zcoind {
         return await this.send(null, 'initial', 'setting', null);
     }
 
-    // Set a new passphrase. We reject() with IncorrectPassphrase if the passphrase is incorrect.
+    // Set the passphrase to newPassphrase. If there is an existing passphrase, it must be passed as oldPassphrase. We
+    // reject() with IncorrectPassphrase if the oldPassphrase is incorrect.
+    //
+    // If the wallet is unencrypted (ie. oldPassphrase is set to null) THE DAEMON WILL STOP after successfully
+    // returning. The caller is responsible for restarting the daemon.
     async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
+        if (oldPassphrase === null) {
+            return await this.send(newPassphrase, 'create', 'setPassphrase', null);
+        }
+
         let r;
 
         try {
