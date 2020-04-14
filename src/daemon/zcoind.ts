@@ -116,7 +116,7 @@ export class Zcoind {
     // (requester|publisher)Socket will be undefined prior to the invocation of gotStatus
     private requesterSocket: zmq.Socket | undefined;
     private publisherSocket: zmq.Socket | undefined;
-    private hasReceivedApiStatus: boolean;
+    private latestApiStatus: ApiStatus | undefined;
     // This is used to indicate that zcoind has loaded the block index.
     private awaitBlockIndexMutex: Mutex;
     // This is the unlocking function for awaitBlockIndexMutex. It will be reset to undefined after it has been unlcoked.
@@ -142,7 +142,6 @@ export class Zcoind {
     constructor(zcoindLocation: string, zcoindDataDir: string | null, eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
         this.zcoindLocation = zcoindLocation;
         this.zcoindDataDir = zcoindDataDir;
-        this.hasReceivedApiStatus = false;
         this.requestMutex = new Mutex();
         this.awaitBlockIndexMutex = new Mutex();
         this.zcoindRestartMutex = new Mutex();
@@ -321,10 +320,11 @@ export class Zcoind {
             throw "Bad API status";
         }
 
-        if (!this.hasReceivedApiStatus) {
+        if (!this.latestApiStatus) {
             this.initializeWithApiStatus(apiStatus);
-            this.hasReceivedApiStatus = true;
         }
+
+        this.latestApiStatus = apiStatus;
 
         // blocks will be set to -1 while the block index is loading.
         if (apiStatus.data && apiStatus.data.blocks >= 0) {
@@ -550,7 +550,7 @@ export class Zcoind {
         await this.awaitZcoindNotListening();
 
         this.closeSockets();
-        this.hasReceivedApiStatus = false;
+        this.latestApiStatus = undefined;
     }
 
     // Restart the daemon.
@@ -868,5 +868,15 @@ export class Zcoind {
         if (!r) {
             throw 'setPassphrase call failed';
         }
+    }
+
+    // Return the API status, waiting until one is available to return. We will reject() if we haven't been given an
+    // apiStatus yet (ie. before start() has resolved) or if zcoind has subsequently been shut down.
+    apiStatus(): ApiStatus {
+        if (!this.latestApiStatus) {
+            throw "We don't appear to be connected to zcoind."
+        }
+
+        return this.latestApiStatus;
     }
 }
