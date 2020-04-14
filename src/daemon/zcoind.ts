@@ -212,6 +212,7 @@ export class Zcoind {
             while (++attempts) {
                 if (attempts >= 10) {
                     reject(new ZcoindConnectionTimeout(30));
+                    return;
                 }
 
                 logger.info(`Checking if zcoind is listening on ${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher} (attempt ${attempts})`);
