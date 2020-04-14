@@ -117,12 +117,19 @@ export class Zcoind {
     private requesterSocket: zmq.Socket | undefined;
     private publisherSocket: zmq.Socket | undefined;
     private hasReceivedApiStatus: boolean;
+    // This is used to indicate that zcoind has loaded the block index.
+    private awaitBlockIndexMutex: Mutex;
+    // This is the unlocking function for awaitBlockIndexMutex. It will be reset to undefined after it has been unlcoked.
+    private _unlockAfterBlockIndex: (() => void) | undefined;
     // This will ensure only one request is sent at a time. It will also signal to connectAndReact when the connection
     // to the requester and publisher sockets are made.
     private requestMutex: Mutex;
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
-    private _unlockAfterConnect: () => void | undefined;
+    private _unlockAfterConnect: (() => void) | undefined;
+    // This Mutex is used to identify when zcoind is restarted so we can poison awaitBlockIndex callers.
+    private zcoindRestartMutex: Mutex;
+    private _unlockOnZcoindRestart: (() => void) | undefined;
     private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
     // The location of the zcoind binary, or null to use the default location.
     zcoindLocation: string | null;
@@ -137,6 +144,8 @@ export class Zcoind {
         this.zcoindDataDir = zcoindDataDir;
         this.hasReceivedApiStatus = false;
         this.requestMutex = new Mutex();
+        this.awaitBlockIndexMutex = new Mutex();
+        this.zcoindRestartMutex = new Mutex();
         this.eventHandlers = eventHandlers;
     }
 
@@ -147,6 +156,16 @@ export class Zcoind {
             this._unlockAfterConnect = await this.requestMutex.lock();
         }
 
+        this._unlockAfterBlockIndex = await this.awaitBlockIndexMutex.lock();
+
+        // This won't be set on the first call to start().
+        if (this._unlockOnZcoindRestart) {
+            this.zcoindRestartMutex = new Mutex();
+            // Unlock the old Mutex so that awaitBlockIndex can be poisoned.
+            this._unlockOnZcoindRestart();
+        }
+        this._unlockOnZcoindRestart = await this.zcoindRestartMutex.lock();
+
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
         // a fairly small  window anyway,
         if (await this.isZcoindListening()) {
@@ -155,6 +174,25 @@ export class Zcoind {
 
         await this.launchDaemon();
         await this.connectAndReact();
+    }
+
+    // Resolve when zcoind has loaded the block index.
+    awaitBlockIndex(): Promise<void> {
+        if (!this._unlockAfterConnect) {
+            throw "zcoind must be started before awaitBlockIndex() can be called.";
+        }
+
+        return new Promise((resolve, reject) => {
+            this.awaitBlockIndexMutex.lock().then(release => {
+                resolve();
+                release();
+            });
+
+            this.zcoindRestartMutex.lock().then(release => {
+                reject("zcoind restarted without receiving the block index");
+                release();
+            });
+        });
     }
 
     /// Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
@@ -271,6 +309,15 @@ export class Zcoind {
         if (!this.hasReceivedApiStatus) {
             this.initializeWithApiStatus(apiStatus);
             this.hasReceivedApiStatus = true;
+        }
+
+        // blocks will be set to -1 while the block index is loading.
+        if (apiStatus.data && apiStatus.data.blocks >= 0) {
+            if (this._unlockAfterBlockIndex) {
+                // Unlock this.blockIndexMutex so awaitBlockIndex can resolve.
+                this._unlockAfterBlockIndex();
+                this._unlockAfterBlockIndex = undefined;
+            }
         }
 
         if (this.eventHandlers['apiStatus']) {
