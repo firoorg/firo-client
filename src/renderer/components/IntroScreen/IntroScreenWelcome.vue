@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 export default {
