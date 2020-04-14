@@ -32,7 +32,6 @@ async function zcoind(store: any, zcoindLocation: string, zcoindDataDir: string)
         }
     }
 
-    // FIXME: Use proper locations.
     const zcoind = new Zcoind(zcoindLocation, zcoindDataDir, eventHandlers);
     await zcoind.start();
 
