@@ -841,13 +841,14 @@ export class Zcoind {
     // will fail if zcoind is already listening, and if start() is called immediately after setPassphrase(), zcoind may
     // not have had time to close its ports.
     async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
-        if (oldPassphrase === null) {
-            return await this.send(newPassphrase, 'create', 'setPassphrase', null);
-        }
 
         let r;
 
         try {
+            if (oldPassphrase === null) {
+                return await this.send(newPassphrase, 'create', 'setPassphrase', null);
+            }
+
             r = await this.requesterSocketSend({
                 auth: {
                     passphrase: oldPassphrase || '',
