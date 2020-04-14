@@ -879,4 +879,13 @@ export class Zcoind {
 
         return this.latestApiStatus;
     }
+
+    // Has our wallet been locked yet?
+    isWalletLocked(): boolean {
+        if (!this.latestApiStatus || !this.latestApiStatus.data || typeof this.latestApiStatus.data.walletLock !== 'boolean') {
+            throw "apiStatus has not yet been loaded or has invalid data.";
+        }
+
+        return this.latestApiStatus.data.walletLock;
+    }
 }
