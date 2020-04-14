@@ -31,13 +31,14 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapGetters } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 import zcoind from "#/daemon/init";
 import store from "#/store/renderer";
 
-const { dialog } = require('electron').remote
+const remote = require('electron').remote;
 
 export default {
     name: 'IntroScreenBlockchainLocation',
@@ -62,7 +63,7 @@ export default {
 
     methods: {
         async selectFolder () {
-            const [blockchainLocation] = dialog.showOpenDialog({
+            const [blockchainLocation] = remote.dialog.showOpenDialog({
                 title: 'Select Zcoin Blockchain Location',
                 properties: [
                     'openDirectory',
@@ -89,21 +90,15 @@ export default {
             }
 
             try {
-                const zcoind = zcoind(store, this.zcoindLocation, this.blockchainLocation || null);
-                zcoind.start();
-
-                Vue.prototype.$daemon = zcoind;
+                window.$daemon = await zcoind(store, this.zcoindLocation, this.blockchainLocation || null);
+                Vue.prototype.$daemon = window.$daemon;
             } catch(e) {
                 alert(`Couldn't start zcoind: ${e}`);
-                app.exit(-1);
+                remote.app.exit(-1);
             }
 
-            this.$nextTick(() => {
-                this.actions.next()
-            })
-        },
-
-        isEnabled: () => true
+            this.actions.next()
+        }
     }
 }
 </script>
