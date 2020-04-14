@@ -150,6 +150,10 @@ export class Zcoind {
     }
 
     // Start the daemon and register handlers.
+    //
+    // If zcoind is already listening, we will reject(). If you would like to wait for an existing zcoind instance to
+    // stop before calling us (assuming that it was invoked with -clientapi), you can await awaitZcoindNotListening()
+    // prior to invoking us.
     async start() {
         // This will be null for a first connect and set when we're reconnecting.
         if (!this._unlockAfterConnect) {
@@ -193,6 +197,17 @@ export class Zcoind {
                 release();
             });
         });
+    }
+
+    // Resolve when we determine that zcoind isn't listening by attempting a connection every 1s.
+    async awaitZcoindNotListening() {
+        while (true) {
+            if (!await this.isZcoindListening()) {
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+        }
     }
 
     /// Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
@@ -531,14 +546,8 @@ export class Zcoind {
             data: null
         }, true);
 
-        while (true) {
-            logger.info("Waiting for zcoind to close its ports.");
-            if (!await this.isZcoindListening()) {
-                break;
-            }
-
-            await new Promise(r => setTimeout(r, 1000));
-        }
+        logger.info("Waiting for zcoind to close its ports.");
+        await this.awaitZcoindNotListening();
 
         this.closeSockets();
         this.hasReceivedApiStatus = false;
@@ -822,11 +831,15 @@ export class Zcoind {
         return await this.send(null, 'initial', 'setting', null);
     }
 
-    // Set the passphrase to newPassphrase. If there is an existing passphrase, it must be passed as oldPassphrase. We
-    // reject() with IncorrectPassphrase if the oldPassphrase is incorrect.
+    // Set the passphrase to newPassphrase. If there is an existing passphrase, it must be passed as oldPassphrase; or
+    // else null mast be passed in its stead.
     //
-    // If the wallet is unencrypted (ie. oldPassphrase is set to null) THE DAEMON WILL STOP after successfully
-    // returning. The caller is responsible for restarting the daemon.
+    // We reject() with IncorrectPassphrase if the oldPassphrase is incorrect.
+    //
+    // If the wallet is unencrypted THE DAEMON WILL STOP after successfully returning. The caller is responsible for
+    // restarting the daemon. The caller should await awaitZcoindNotListening() prior to calling start(), as start()
+    // will fail if zcoind is already listening, and if start() is called immediately after setPassphrase(), zcoind may
+    // not have had time to close its ports.
     async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
         if (oldPassphrase === null) {
             return await this.send(newPassphrase, 'create', 'setPassphrase', null);
