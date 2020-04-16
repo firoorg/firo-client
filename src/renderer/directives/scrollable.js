@@ -10,7 +10,6 @@ export default {
         }
 
         const defaults = {
-            wheelPropagation: true,
             suppressScrollX: true
         }
 
