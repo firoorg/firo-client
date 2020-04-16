@@ -106,7 +106,7 @@ export default {
             this.$log.info("Waiting for the block index to load...");
             await this.$daemon.awaitBlockIndex();
 
-            this.actions.next()
+            await $store.dispatch('App/setIsInitialized');
         },
     }
 }

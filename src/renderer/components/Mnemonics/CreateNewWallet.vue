@@ -1,6 +1,6 @@
 <template>
   <div class="createnewwallet">
-    <div v-if="createdMnemonic == '' && !actions.getWalletIndexComplete() && apiStatus.data.rescanning" class="waiting">
+    <div v-if="createdMnemonic == '' && !actions.getWalletIndexComplete() && isRescanning" class="waiting">
       <div class="icon">
         <loading-bounce class="bounce" />
       </div>
@@ -40,26 +40,41 @@
 import GuideStepMixin from "@/mixins/GuideStepMixin";
 import LoadingBounce from "@/components/Icons/LoadingBounce";
 import { mapGetters } from "vuex";
+
 export default {
   name: "CreateNewWallet",
+
   components: {
     LoadingBounce
   },
+
   mixins: [GuideStepMixin],
+
   data() {
     return {
       createdMnemonic: ""
     };
   },
+
   computed: {
     ...mapGetters({
       isRunning: "App/isRunning",
       apiStatus: "ApiStatus/apiStatus"
-    })
+    }),
+
+    isRescanning() {
+      if (!this.apiStatus || !this.apiStatus.data || this.apiStatus.data.isRescanning === undefined) {
+        throw "apiStatus.data.isRescanning has not yet loaded.";
+      }
+
+      return apiStatus.data.isRescanning;
+    }
   },
+
   created() {
     this.createdMnemonic = this.actions.getCachedMnemonic();
   },
+
   methods: {
     confirmWriteDown() {
       this.actions.setCachedMnemonic(this.createdMnemonic);
