@@ -8,17 +8,11 @@ export const populateStoreWithAppSettings = async function ({ store }) {
     for (const [categoryKey, value] of Object.entries(await getAppSettings().getAll())) {
         logger.info(`key ${categoryKey} with value ${value}`);
 
-        const [category, ...key_] = categoryKey.split('.');
-        const key = key_.join('.');
+        const action = categoryKey[0].toUpperCase() + categoryKey.substr(1).replace('.', '/');
 
-        try {
-            if (!(types[category] && types[category][key])) {
-                logger.warn(`Unknown key ${categoryKey} with value ${value}`);
-            }
-        } catch(e) {
-            logger.error(e);
+        if (!store._actions[action]) {
+            throw `Unknown action: ${action}`;
         }
-
-        await store.dispatch(types[category][key], value);
+        await store.dispatch(action, value);
     }
 };
