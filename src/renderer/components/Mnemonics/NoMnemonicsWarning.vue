@@ -62,9 +62,6 @@ export default {
                 
                 this.actions.goTo('lock');
             }
-        },
-        isEnabled() {
-            return true;
         }
     }
 }

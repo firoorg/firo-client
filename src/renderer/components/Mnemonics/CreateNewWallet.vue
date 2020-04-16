@@ -64,9 +64,6 @@ export default {
     confirmWriteDown() {
       this.actions.setCachedMnemonic(this.createdMnemonic);
       this.actions.next();
-    },
-    isEnabled() {
-      return true;
     }
   }
 };

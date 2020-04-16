@@ -97,7 +97,12 @@ export default {
                 remote.app.exit(-1);
             }
 
-            this.actions.next()
+            if (this.$daemon.isWalletLocked()) {
+                await this.$store.dispatch("App/setIsInitialized");
+                // This will end the initialization
+            } else {
+                this.actions.next()
+            }
         }
     }
 }

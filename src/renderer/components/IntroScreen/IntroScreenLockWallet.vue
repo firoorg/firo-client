@@ -38,16 +38,19 @@ import IntroScreenLockWalletWarning from './IntroScreenLockWalletWarning'
 
 export default {
     name: 'IntroScreenLockWallet',
+
     components: {
         IntroScreenLockWalletWaiting,
         IntroScreenLockWalletCreate,
         IntroScreenLockWalletConfirm,
         IntroScreenLockWalletWarning
     },
+
     mixins: [
         GuideStepMixin,
         EventBusMixin
     ],
+
     data () {
         return {
             eventBusName: 'popover:intro',
@@ -86,13 +89,22 @@ export default {
 
         async onLockWallet () {
             try {
-                this.$log.info("Trying to lock the wallet...");
-                console.log(`Using passphrase ${this.passphrase}`); // FIXME: Remove this.
+                this.$log.info("Trying to lock the wallet... This will shutdown zcoind.");
+                // This call will shutdown zcoind.
                 await this.$daemon.setPassphrase(null, this.passphrase);
             } catch(e) {
                 alert("Something unexpected went wrong with locking the wallet, so we can't proceed. Please report this to the Zcoin team.");
                 app.exit(-1);
             }
+
+            this.$log.info("Waiting for zcoind to stop listening so we can restart it...");
+            await this.$daemon.awaitZcoindNotListening();
+
+            this.$log.info("Restarting zcoind...");
+            await this.$daemon.start();
+
+            this.$log.info("Waiting for the block index to load...");
+            await this.$daemon.awaitBlockIndex();
 
             this.actions.next()
         },

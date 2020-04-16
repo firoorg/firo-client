@@ -12,7 +12,8 @@ const state = {
     isInitialized: false,
     zcoinLink: '',
     mnemonicSetting: '',
-    openAddressBook: null
+    openAddressBook: null,
+    blockchainLocation: ''
 }
 
 const mutations = {
@@ -25,8 +26,9 @@ const mutations = {
     },
 
     // This is called when app settings are read. It DOES NOT persist information to disk itself. (cf. setIsInitialized)
+    // We will cause MainLayout.vue to stop showing IntroScreen.
     SET_IS_INITIALIZED (state, value) {
-        this.isInitialized = value;
+        state.isInitialized = value;
     },
 
     // This is called when app settings are read. It DOES NOT persist information itself. (cf. changeBlockchainLocation)
@@ -83,11 +85,15 @@ const actions = {
         await commit('SET_BLOCKCHAIN_LOCATION', newLocation);
     },
 
-    // Mark down that we have been initialized in settings.
-    async setIsInitialized({commit}) {
+    // Mark down that we have been initialized in settings. This will cause MainLayout.vue to stop showing IntroScreen.
+    async setIsInitialized({commit, getters}) {
+        if (getters.blockchainLocation === undefined) {
+            throw "Trying to mark us as initialized when App.blockchainLocation has not been set.";
+        }
+
         // This will cause src/main/lib/appSettings.js to call on startup.
         await getAppSettings().set(`app.SET_IS_INITIALIZED`, true);
-        await commit('SET_BLOCKCHAIN_LOCATION', newLocation);
+        await commit('SET_IS_INITIALIZED', true);
     },
 
     gotLink ({commit}, url) {

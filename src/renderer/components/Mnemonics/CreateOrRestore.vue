@@ -34,9 +34,6 @@ export default {
         },
         restoreWallet() {
             this.actions.goTo('restoreAskWalletOrigin');
-        },
-        isEnabled() {
-            return true;
         }
     }
 }
