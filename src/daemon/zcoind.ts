@@ -51,7 +51,7 @@ class ZcoindAlreadyRunning extends Error {
     }
 }
 
-interface ApiStatus {
+export interface ApiStatus {
     data: {
         version: number;
         protocolVersion: number;
@@ -82,9 +82,101 @@ interface ApiStatus {
     error: string | null;
 }
 
-type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
+// one transaction output, of which a transaction may have many.
+export interface TransactionOutput {
+    // A unique ID generated on our side (not present in the API) which identifies the transaction. It will be different
+    // for outgoing and incoming versions of the same
+    // transactions.
+    uniqId: string;
 
-interface PaymentRequestData {
+    category: string;
+    txid: string;
+    txIndex: number;
+    firstSeenAt: number;
+    label: string;
+    fee: number;
+    amount: number;
+    address?: string;
+    blockHeight?: number;
+    blockHash?: number;
+    blockTime?: number;
+    spendable: boolean;
+    locked: boolean;
+}
+
+export interface TransactionInput {
+    txid: string;
+    index: number;
+}
+
+export interface AddressBookItem {
+    address: string;
+    label: string;
+    purpose: string;
+}
+
+// This is the data format for initial/stateWallet.
+export interface StateWallet {
+    addresses: {
+        // maybeAddress could also be the string "MINT"
+        [maybeAddress: string]: {
+            txids: {
+                [grouping: string]: {
+                    [maybeTxid: string]: TransactionOutput
+                }
+            },
+            inputs?: {
+                [outpoint: string]: TransactionInput
+            },
+            lockedCoins?: {
+                [outpoint: string]: TransactionInput
+            },
+
+            unlockedCoins?: {
+                [outpoint: string]: TransactionInput
+            },
+        }
+    }
+}
+
+// This is the data format we're given in 'transaction' events.
+export interface TransactionEvent {
+    // maybeAddress could also be the string "MINT"
+    [maybeAddress: string]: {
+        txids: {
+            [grouping: string]: {
+                [txid: string]: TransactionOutput
+            }
+        },
+
+        inputs?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        lockedCoins?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        unlockedCoins?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        total: {
+            [txCategory: string]: {
+                send?: number;
+                mint?: number;
+                spend?: number;
+                mined?: number;
+                znode?: number;
+                receive?: number;
+            }
+        }
+    }
+}
+
+export type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
+
+export interface PaymentRequestData {
     address: string;
     createdAt: number;
     amount: number;
@@ -871,6 +963,10 @@ export class Zcoind {
         }
     }
 
+    async getStateWallet(): Promise<StateWallet> {
+        return await this.send(null, 'initial', 'stateWallet', null);
+    }
+
     // Return the API status, waiting until one is available to return. We will reject() if we haven't been given an
     // apiStatus yet (ie. before start() has resolved) or if zcoind has subsequently been shut down.
     apiStatus(): ApiStatus {
@@ -888,5 +984,11 @@ export class Zcoind {
         }
 
         return this.latestApiStatus.data.walletLock;
+    }
+
+    // Have we ever used this wallet? We detect this by determining if we have any receiving addresses.
+    async hasBeenUsed(): Promise<boolean> {
+        const stateWallet = await this.getStateWallet();
+        return !!stateWallet.addresses.length;
     }
 }
