@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron'
+import {app, protocol, BrowserWindow} from 'electron'
 
 import { createLogger } from '#/lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
@@ -15,8 +15,9 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-// Register us as the handler for zcoin:// links so deeplinks work.
+// Register us as the handler for zcoin:// links so deeplinks work. Actual handling of them is done in main.js.
 if (!app.isDefaultProtocolClient('zcoin')) {
+    logger.info("Setting Zcoin Client as the default handler for zcoin:// links...");
     app.setAsDefaultProtocolClient('zcoin');
 }
 

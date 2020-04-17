@@ -23,6 +23,8 @@ import store from '../store/renderer'
 
 import zcoind from '../daemon/init'
 
+import {convertToCoin} from "#/lib/convert";
+
 import { createLogger } from '#/lib/logger';
 const logger = createLogger('zcoin:renderer:main.js');
 
@@ -101,6 +103,32 @@ app.once('quit', async () => {
     } else {
         logger.warn("window.$daemon is not set; not trying to stop daemon");
     }
+});
+
+// Actually handle deeplinks.
+logger.info("Registering protocol handler for zcoin links...");
+app.on('open-url', (event, url) => {
+    if (!store.getters['App/isInitialized']) {
+        logger.error(`We're not yet initialized. Ignoring deeplink ${url}...`);
+        return;
+    }
+
+    logger.info(`Opening deeplink: ${url}`);
+
+    const m = (pattern) => (url.match(pattern) || [])[1];
+
+    const address = m(/^zcoin:\/\/(\w+)/);
+    const amount = m(/[\?&]amount=([0-9]+)/);
+    const label = m(/[\?&]message=([^&]+)/);
+
+    router.push({
+        path: '/send/private',
+        query: {
+            address: address,
+            amount: amount && convertToCoin(amount),
+            label: decodeURI(label || '')
+        }
+    });
 });
 
 function startVue() {

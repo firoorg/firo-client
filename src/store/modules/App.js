@@ -10,7 +10,6 @@ const logger = createLogger('zcoin:store:app')
 
 const state = {
     isInitialized: false,
-    zcoinLink: '',
     mnemonicSetting: '',
     openAddressBook: null,
     blockchainLocation: ''
@@ -34,11 +33,6 @@ const mutations = {
     // This is called when app settings are read. It DOES NOT persist information itself. (cf. changeBlockchainLocation)
     SET_BLOCKCHAIN_LOCATION (state, location) {
         state.blockchainLocation = location;
-    },
-
-    // This triggers a watcher in App.vue.
-    gotLink (state, url) {
-        state.zcoinLink = url;
     }
 }
 
@@ -94,10 +88,6 @@ const actions = {
         // This will cause src/main/lib/appSettings.js to call on startup.
         await getAppSettings().set(`app.SET_IS_INITIALIZED`, true);
         await commit('SET_IS_INITIALIZED', true);
-    },
-
-    gotLink ({commit}, url) {
-        commit('gotLink', url);
     }
 }
 
@@ -113,8 +103,6 @@ const getters = {
 
     mnemonicSetting: (state) => state.mnemonicSetting,
     openAddressBook: (state) => state.openAddressBook,
-
-    zcoinLink: (state) => state.zcoinLink,
 }
 
 export default {
