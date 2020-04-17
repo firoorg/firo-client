@@ -74,7 +74,7 @@ export default {
                 recoveringWallet:RecoveringWallet,
                 lock: IntroScreenLockWallet
             },
-            currentStep: 'welcome',
+            currentStep: 'welcome'
         }
     },
 

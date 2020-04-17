@@ -103,26 +103,37 @@ app.once('quit', async () => {
     }
 });
 
+function startVue() {
+    // Start the GUI.
+    new Vue({
+        components: {App},
+        router,
+        store,
+        i18n: i18n.getModule({app, store}),
+        template: '<App/>'
+    }).$mount('#app');
+}
+
 if (store.getters['App/isInitialized']) {
     logger.info("App is already initialized. Starting up...");
 
     // Start up zcoind.
     zcoind(store, store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
-        .then(z => {
-            // Make zcoind accessible to Vue instances as $daemon.
-            Vue.prototype.$daemon = z;
-            // Allow users to access $daemon from Chrome Dev Tools and our app quit handler.
-            window.$daemon = z;
+        .then(async z => {
+            // This might happen if the user has a wallet made with another client or deleted their wallet.dat without
+            // deleting our settings file.
+            if (!z.isWalletLocked())  {
+                logger.warn("isInitialized is set, but wallet doesn't appear to be locked. Redoing initialization...");
+                store.commit('App/SET_IS_INITIALIZED', false);
+                await z.stopDaemon();
+            } else {
+                // Make zcoind accessible to Vue instances as this.$daemon.
+                Vue.prototype.$daemon = z;
+                // Allow users to access $daemon from Chrome Dev Tools and our app quit handler.
+                window.$daemon = z;
+            }
 
-            // Start the GUI.
-            new Vue({
-                components: {App},
-                router,
-                store,
-                i18n: i18n.getModule({app, store}),
-                template: '<App/>'
-            }).$mount('#app');
-
+            startVue();
             ourWindow.show();
         })
         .catch(e => {
@@ -132,14 +143,6 @@ if (store.getters['App/isInitialized']) {
 } else {
     logger.info("App is not yet initialized. Let's get 'er ready!");
 
-    // Start the GUI.
-    new Vue({
-        components: {App},
-        router,
-        store,
-        i18n: i18n.getModule({app, store}),
-        template: '<App/>'
-    }).$mount('#app');
-
+    startVue();
     ourWindow.show();
 }

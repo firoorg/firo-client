@@ -23,9 +23,11 @@
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 export default {
     name: 'CreateOrRestore',
+
     mixins: [
         GuideStepMixin
     ],
+
     methods: {
         async createNewWallet() {
             const mnemonic = await this.$daemon.showMnemonics("");

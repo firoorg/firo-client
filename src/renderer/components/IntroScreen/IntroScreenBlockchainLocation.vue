@@ -98,10 +98,15 @@ export default {
             }
 
             if (this.$daemon.isWalletLocked()) {
+                // This wallet is already locked. End the setup procedure.
                 await this.$store.dispatch("App/setIsInitialized");
-                // This will end the initialization
+            } else if (await this.$daemon.hasBeenUsed()) {
+                // This means that the wallet has been used but is unencrypted. We will prompt the user to lock it, but
+                // not show the mnemonic setup screen.
+                this.actions.goTo("lock");
             } else {
-                this.actions.next()
+                // This path is taken when the user is legitimately setting up a new wallet.
+                this.actions.goTo("createOrRestore");
             }
         }
     }
