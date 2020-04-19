@@ -184,6 +184,8 @@ export interface PaymentRequestData {
     state: PaymentRequestState;
 }
 
+export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null};
+
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
 // file.
 function readCert(path: string): [string, string] {
@@ -252,9 +254,9 @@ export class Zcoind {
     // resolves. When all of them resolve() (or reject()), awaitInitializersCompleted() will resolve.
     //
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
-    // key that will be called when an apiStatus event is receives. If zcoindDataDir is null (but NOT undefined or the
-    // empty string )we will not specify it and use the default location.
-    constructor(zcoindLocation: string, zcoindDataDir: string | null, eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
+    // key that will be called when an apiStatus event is receives.
+    constructor(zcoindLocation: string, zcoindDataDir: string | null, initializers: ZcoindInitializationFunction[],
+                eventHandlers: {[eventName: string]: ZcoindEventHandler}) {
         this.zcoindLocation = zcoindLocation;
         this.zcoindDataDir = zcoindDataDir;
         this.requestMutex = new Mutex();
@@ -266,10 +268,13 @@ export class Zcoind {
 
     // Start the daemon and register handlers.
     //
+    // If mnemonicSettings is set, we start up the daemon with the directive to initialize it with the given mnemonic
+    // and passphrase. These are not passed in the constructor because we don't want to pass them again if we restart.
+    //
     // If zcoind is already listening, we will reject(). If you would like to wait for an existing zcoind instance to
     // stop before calling us (assuming that it was invoked with -clientapi), you can await awaitZcoindNotListening()
     // prior to invoking us.
-    async start() {
+    async start(mnemonicSettings?: MnemonicSettings) {
         // This will be null for a first connect and set when we're reconnecting.
         if (!this._unlockAfterConnect) {
             this._unlockAfterConnect = await this.requestMutex.lock();
@@ -318,7 +323,7 @@ export class Zcoind {
             throw new ZcoindAlreadyRunning();
         }
 
-        await this.launchDaemon();
+        await this.launchDaemon(mnemonicSettings);
         await this.connectAndReact();
     }
 
@@ -367,13 +372,29 @@ export class Zcoind {
         }
     }
 
-    /// Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
-    /// status 0, or rejects it with the error given by execFile if something goes wrong.
-    private async launchDaemon(): Promise<void> {
+    // Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
+    // status 0, or rejects it with the error given by execFile if something goes wrong.
+    //
+    // If mnemonicSettings is set, we start up the daemon with the directive to initialize it with the given mnemonic
+    // and passphrase.
+    private async launchDaemon(mnemonicSettings?: MnemonicSettings): Promise<void> {
         return new Promise((resolve, reject) => {
+            // These are the arguments that will be passed to zcoind.
+            const args = ["-daemon", "-clientapi=1"];
+            if (this.zcoindDataDir) {
+                args.push(`-datadir=${this.zcoindDataDir}`);
+            }
+            if (mnemonicSettings) {
+                args.push("-usemnemonic");
+                args.push(`-mnemonic=${mnemonicSettings.mnemonic}`);
+                if (mnemonicSettings.mnemonicPassphrase) {
+                    args.push(`-mnemonicpassphrase=${mnemonicSettings.mnemonicPassphrase}`);
+                }
+            }
+
             logger.info("Starting daemon...");
             execFile(this.zcoindLocation,
-                ["-daemon", "-clientapi=1", ...(this.zcoindDataDir === null ? [] : ["-datadir=" + this.zcoindDataDir])],
+                args,
                 {timeout: 10_000},
                 (error, stdout, stderr) => {
                     if (error) {
