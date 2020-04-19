@@ -175,7 +175,6 @@ export interface TransactionEvent {
 }
 
 export type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
-
 export interface PaymentRequestData {
     address: string;
     createdAt: number;
@@ -202,6 +201,13 @@ function readCert(path: string): [string, string] {
     return [parsed.data.public, parsed.data.private];
 }
 
+export type ZcoindEventHandler = (daemon: Zcoind, eventData: any) => Promise<void>;
+export type ZcoindInitializationFunction = (daemon: Zcoind) => Promise<void>;
+
+// These are types related to Mutex.
+type UnlockerFunction = () => void;
+type MaybeUnlockerFunction = UnlockerFunction | undefined;
+
 // We take care of starting the daemon, sending messages, and calling proper event handlers for subscription events.
 export class Zcoind {
     private statusPublisherSocket: zmq.Socket;
@@ -212,22 +218,39 @@ export class Zcoind {
     // This is used to indicate that zcoind has loaded the block index.
     private awaitBlockIndexMutex: Mutex;
     // This is the unlocking function for awaitBlockIndexMutex. It will be reset to undefined after it has been unlcoked.
-    private _unlockAfterBlockIndex: (() => void) | undefined;
+    private _unlockAfterBlockIndex: MaybeUnlockerFunction;
     // This will ensure only one request is sent at a time. It will also signal to connectAndReact when the connection
     // to the requester and publisher sockets are made.
     private requestMutex: Mutex;
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
-    private _unlockAfterConnect: (() => void) | undefined;
+    private _unlockAfterConnect: MaybeUnlockerFunction;
     // This Mutex is used to identify when zcoind is restarted so we can poison awaitBlockIndex callers.
     private zcoindRestartMutex: Mutex;
-    private _unlockOnZcoindRestart: (() => void) | undefined;
+    private _unlockOnZcoindRestart: MaybeUnlockerFunction;
+    // This Mutex is used to identify when all initializers have run to completion.
+    private initializersCompletedMutex: Mutex;
+    // This is released when an initializer rejects.
+    private initializersPoisonedMutex: Mutex;
+    private _unlockWhenInitializersCompleted: MaybeUnlockerFunction;
+    // An array of rejections from our initializers. Hopefully, this will be empty.
+    private initializerRejections: any[];
     private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
+    // These are the functions that will be called after awaitBlockIndex() resolves.
+    initializers: ZcoindInitializationFunction[];
     // The location of the zcoind binary, or null to use the default location.
     zcoindLocation: string | null;
     // The directory that zcoind will use to store its data. This must already exist.
     zcoindDataDir: string;
 
+    // zcoindLocation is the location of the zcoind binary.
+    //
+    // If zcoindDataDir is null (but NOT undefined or the empty string) we will not specify it and use the default
+    // location.
+    //
+    // All the functions in initializers will be called with zcoind as their only argument after awaitBlockIndex()
+    // resolves. When all of them resolve() (or reject()), awaitInitializersCompleted() will resolve.
+    //
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
     // key that will be called when an apiStatus event is receives. If zcoindDataDir is null (but NOT undefined or the
     // empty string )we will not specify it and use the default location.
@@ -237,6 +260,7 @@ export class Zcoind {
         this.requestMutex = new Mutex();
         this.awaitBlockIndexMutex = new Mutex();
         this.zcoindRestartMutex = new Mutex();
+        this.initializers = initializers;
         this.eventHandlers = eventHandlers;
     }
 
@@ -261,6 +285,33 @@ export class Zcoind {
         }
         this._unlockOnZcoindRestart = await this.zcoindRestartMutex.lock();
 
+        this.initializerRejections = [];
+        this.initializersCompletedMutex = new Mutex();
+        this.initializersPoisonedMutex = new Mutex();
+        const unlockWhenInitializersResolve = this.initializersCompletedMutex.lock();
+        const unlockWhenInitializersReject = this.initializersPoisonedMutex.lock();
+        // This must be called AFTER this.awaitBlockIndexMutex and this.zcoindRestartMutex are locked.
+        this.awaitBlockIndex().then(async () => {
+            const initializerPromises = this.initializers.map(initializer => initializer(this));
+            const rejections = [];
+
+            for (const promise of initializerPromises) {
+                try {
+                    await promise;
+                } catch(e) {
+                    rejections.push(e);
+                }
+            }
+
+            if (rejections.length > 0) {
+                this.initializerRejections = rejections;
+                unlockWhenInitializersReject.then(release=>release());
+                throw rejections;
+            } else {
+                unlockWhenInitializersResolve.then(release=>release());
+            }
+        });
+
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
         // a fairly small  window anyway,
         if (await this.isZcoindListening()) {
@@ -269,6 +320,21 @@ export class Zcoind {
 
         await this.launchDaemon();
         await this.connectAndReact();
+    }
+
+    // We resolve when all our initializers have resolved, or, if any of them have rejected, we wait for all to complete
+    // and then reject() with an Array containing all the rejections we received.
+    awaitInitializersCompleted(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.initializersCompletedMutex.lock().then((unlock) => {
+                resolve();
+                unlock();
+            });
+            this.initializersPoisonedMutex.lock().then((unlock) => {
+                reject(this.initializerRejections);
+                unlock();
+            });
+        })
     }
 
     // Resolve when zcoind has loaded the block index.

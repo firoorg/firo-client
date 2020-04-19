@@ -148,6 +148,9 @@ if (store.getters['App/isInitialized']) {
     // Start up zcoind.
     zcoind(store, store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
         .then(async z => {
+            // Make sure our state is updated before proceeding.
+            await z.awaitInitializersCompleted();
+
             // This might happen if the user has a wallet made with another client or deleted their wallet.dat without
             // deleting our settings file.
             if (!z.isWalletLocked())  {

@@ -56,12 +56,6 @@ const mutations = {
     }
 }
 
-const actions = {
-    updateBalance({ commit }, balance) {
-        commit('updateBalance', balance)
-    }
-}
-
 const getters = {
     total: (state) => state.total.all,
     immatureXzc: (state, getters, rootState, rootGetters) => {
@@ -115,6 +109,5 @@ export default {
     namespaced: true,
     state,
     mutations,
-    actions,
     getters
 }

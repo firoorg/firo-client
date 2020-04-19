@@ -33,12 +33,6 @@ export const mutations = {
     }
 }
 
-export const actions = {
-    updateBlockchain({commit}, data) {
-        commit('updateBlockchain', data);
-    }
-}
-
 export const getters = {
     currentBlockHeight: (state) => state.currentBlock.height,
     currentBlockTimestamp: (state) => state.currentBlock.timestamp,
@@ -65,6 +59,5 @@ export default {
     namespaced: true,
     state,
     mutations,
-    actions,
     getters
 }

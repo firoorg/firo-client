@@ -51,16 +51,6 @@ const mutations = {
     }
 };
 
-const actions = {
-    setStateWithZnodeList({commit}, znodeList: ZnodeList) {
-        commit('setStateWithZnodeList', znodeList);
-    },
-
-    setZnodeCount({commit}, znodeCount: number) {
-        commit('setZnodeCount', znodeCount)
-    }
-}
-
 const getters = {
     znodeCount: (state): number => state.znodeCount,
     znodes: (state): {[txid: string]: Znode} => state.znodes,
@@ -92,6 +82,5 @@ export default {
     namespaced: true,
     state,
     mutations,
-    actions,
     getters,
 }
