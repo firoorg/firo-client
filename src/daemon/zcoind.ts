@@ -954,6 +954,7 @@ export class Zcoind {
         }
     }
 
+    // Get the initial state of the wallet, which includes the information in the StateWallet interface.
     async getStateWallet(): Promise<StateWallet> {
         return await this.send(null, 'initial', 'stateWallet', null);
     }
