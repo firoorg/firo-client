@@ -780,15 +780,6 @@ export class Zcoind {
         return data;
     }
 
-    async importMnemonics(auth: string, mnemonics: string, passProtective: string): Promise<string> {
-        const data = await this.send(auth, 'create', 'importMnemonics', {
-            mnemonic: mnemonics,
-            protective: passProtective
-        });
-        console.log('importing mnemonics to wallet');
-        return data;
-    }
-
     async showMnemonics(auth: string): Promise<string> {
         const data = await this.send(auth, 'create', 'showMnemonics', {});
         console.log('showing mnemonics to wallet');

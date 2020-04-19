@@ -90,7 +90,6 @@ export default {
         mnemonicSetting = `${mnemonicSetting}::-mnemonicpassphrase=${this.protectivePassphrase}`;
       }
       this.$store.dispatch(types.app.MNEMONIC_SETTING, mnemonicSetting);
-      //await this.$daemon.importMnemonics('', this.mnemonic, this.protectivePassphrase);
       await this.$daemon.restartDaemon();
       var newStatus = JSON.parse(JSON.stringify(this.apiStatus));
       newStatus.data.rescanning = true;
