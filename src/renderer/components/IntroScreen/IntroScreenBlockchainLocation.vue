@@ -7,7 +7,7 @@
         <div v-if="!hasSelectedFolder">
             <BaseButton
                 :is-outline="true"
-                @click.once="startDaemon"
+                @click="continueSetup"
             >
                 {{ $t('onboarding.set-blockchain-location.button__use-default-location--secondary') }}
             </BaseButton>
@@ -23,7 +23,7 @@
         <BaseButton
             v-else
             color="green"
-            @click.once="startDaemon"
+            @click.once="continueSetup"
         >
             {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
         </BaseButton>
@@ -32,11 +32,11 @@
 
 <script>
 import Vue from 'vue'
+import { existsSync } from 'fs'
 import { mapGetters } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 import zcoind from "#/daemon/init";
-import store from "#/store/renderer";
 
 const remote = require('electron').remote;
 
@@ -48,12 +48,15 @@ export default {
     ],
 
     data: () => ({
-        blockchainLocation: ''
+        blockchainLocation: '',
+        network: 'regtest' // FIXME: Allow the user to set the network.
     }),
 
     computed: {
         ...mapGetters({
-            zcoindLocation: 'App/zcoindLocation'
+            zcoindLocation: 'App/zcoindLocation',
+            defaultZcoinRootDirectory: 'App/defaultZcoinRootDirectory',
+            walletLocation: 'App/walletLocation'
         }),
 
         hasSelectedFolder() {
@@ -77,35 +80,55 @@ export default {
             this.blockchainLocation = blockchainLocation;
         },
 
-        async startDaemon () {
-            if (this.blockchainLocation) {
-                try {
-                    // Commit the blockchain location to our preferences file. It MAY be the empty string.
-                    await this.$store.dispatch('App/changeBlockchainLocation', this.blockchainLocation);
-                } catch (e) {
-                    // FIXME: Allow the user to reselect the location if the one they pick first is invalid.
-                    alert(`Blockchain location is invalid: ${e}`);
-                    app.exit(-1);
-                }
-            }
+        async continueSetup() {
+            this.$log.info(`Setting zcoinClientNetwork: ${this.network}`);
+            this.$store.commit('App/setZcoinClientNetwork', this.network);
 
+            // Wait for setZcoinClientNetwork to propagate before continuing.
+            await new Promise((r) => this.$nextTick(r));
+
+            // changeBlockchainLocation needs to be called before walletLocation can be accessed.
+            const dataDir = this.blockchainLocation || this.defaultZcoinRootDirectory;
             try {
-                window.$daemon = await zcoind(store, this.zcoindLocation, this.blockchainLocation || null);
-                Vue.prototype.$daemon = window.$daemon;
-            } catch(e) {
-                alert(`Couldn't start zcoind: ${e}`);
+                this.$log.info(`Setting blockchain location: ${dataDir}`);
+                // Commit the blockchain location to our preferences file. setZcoinClientNetwork must be called before us.
+                this.$store.commit('App/changeBlockchainLocation', dataDir);
+            } catch (e) {
+                // FIXME: Allow the user to reselect the location if the one they pick first is invalid.
+                alert(`Blockchain location is invalid: ${e}`);
                 remote.app.exit(-1);
             }
 
-            if (this.$daemon.isWalletLocked()) {
-                // This wallet is already locked. End the setup procedure.
-                await this.$store.dispatch("App/setIsInitialized");
-            } else if (await this.$daemon.hasBeenUsed()) {
-                // This means that the wallet has been used but is unencrypted. We will prompt the user to lock it, but
-                // not show the mnemonic setup screen.
-                this.actions.goTo("lock");
+            // Wait for changeBlockchainLocation to propagate before continuing.
+            await new Promise((r) => this.$nextTick(r));
+
+            // The wallet already exists, so we don't need to go through the mnemonics screen.
+            if (existsSync(this.walletLocation)) {
+                window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.blockchainLocation);
+                await $daemon.awaitInitializersCompleted();
+
+                if ($daemon.isWalletLocked()) {
+                    // This wallet is already locked. End the setup procedure.
+                    this.$store.commit("App/setIsInitialized", true);
+                    // We will be destroyed automatically from MainLayout.
+                } else {
+                    // The wallet exists, but isn't yet locked. This is probably the result of some form of error.
+                    if (await $daemon.hasBeenUsed()) {
+                        this.$log.info("The user has an existing, unlocked wallet.dat with addresses in it.");
+                        alert(`You have an existing, unlocked wallet.dat (located at ${this.walletLocation} that ` +
+                              "already generated addresses. Try locking it and starting the client again.");
+                        remote.app.exit(-1);
+                    } else {
+                        this.$log.error("The user has an existing, unlocked wallet.dat with no addresses.");
+                        alert("It looks like you have an existing wallet.dat, but it has no addresses in it. This " +
+                              "is probably the result of exiting the client before setup could be completed. Manually " +
+                              `backup the existing wallet.dat (located at ${this.walletLocation}) and try starting ` +
+                              "client again.");
+                        remote.app.exit(-1);
+                    }
+                }
             } else {
-                // This path is taken when the user is legitimately setting up a new wallet.
+                // wallet.dat doesn't exist, so we should set it up with a mnemonic.
                 this.actions.goTo("createOrRestore");
             }
         }

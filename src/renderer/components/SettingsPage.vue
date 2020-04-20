@@ -239,7 +239,7 @@ export default {
     methods: {
         async restartDaemon() {
             this.isRestarting = true;
-            await this.$daemon.restartDaemon();
+            await $daemon.restartDaemon();
             this.isRestarting = false;
         },
 
@@ -249,7 +249,7 @@ export default {
             }
 
             try {
-                await this.$daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
+                await $daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
             } catch (e) {
                 if (e.name === 'IncorrectPassphrase') {
                     this.changePassphraseError = 'Incorrect Passphrase';
@@ -288,7 +288,7 @@ export default {
             this.popoverStep = 'wait';
 
             try {
-                await this.$daemon.backup(backupDirectory);
+                await $daemon.backup(backupDirectory);
                 this.popoverStep = 'success';
             } catch (e) {
                 this.errorMessage = (e.error && e.error.message) ? e.error.message : String(e);

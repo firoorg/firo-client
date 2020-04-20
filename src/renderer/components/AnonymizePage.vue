@@ -411,7 +411,7 @@ export default {
             this.recalculatePopoverPosition();
 
             try {
-                await this.$daemon.mintZerocoin(passphrase, this.coinsToMint);
+                await $daemon.mintZerocoin(passphrase, this.coinsToMint);
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.
                 if (e.error && e.error.code === -14) {

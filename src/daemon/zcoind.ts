@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as zmq from "zeromq";
 import * as path from "path";
+import {validateMnemonic} from "bip39";
 import Mutex from "await-mutex";
 const {execFile} = require("child_process");
 
@@ -185,6 +186,7 @@ export interface PaymentRequestData {
 }
 
 export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null};
+export {validateMnemonic, generateMnemonic} from "bip39";
 
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
 // file.
@@ -212,6 +214,8 @@ type MaybeUnlockerFunction = UnlockerFunction | undefined;
 
 // We take care of starting the daemon, sending messages, and calling proper event handlers for subscription events.
 export class Zcoind {
+    // This is the network we will tell zcoind to connect to.
+    private zcoindNetwork: 'mainnet' | 'test' | 'regtest';
     private statusPublisherSocket: zmq.Socket;
     // (requester|publisher)Socket will be undefined prior to the invocation of gotStatus
     private requesterSocket: zmq.Socket | undefined;
@@ -247,6 +251,8 @@ export class Zcoind {
 
     // zcoindLocation is the location of the zcoind binary.
     //
+    // network is the network zcoind should connect to.
+    //
     // If zcoindDataDir is null (but NOT undefined or the empty string) we will not specify it and use the default
     // location.
     //
@@ -255,26 +261,62 @@ export class Zcoind {
     //
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
     // key that will be called when an apiStatus event is receives.
-    constructor(zcoindLocation: string, zcoindDataDir: string | null, initializers: ZcoindInitializationFunction[],
-                eventHandlers: {[eventName: string]: ZcoindEventHandler}) {
+    constructor(network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string | null,
+                initializers: ZcoindInitializationFunction[], eventHandlers: {[eventName: string]: ZcoindEventHandler}) {
+        if (!['mainnet', 'test', 'regtest'].includes(network)) {
+            throw "network must be one of 'mainnet', 'test', or 'regtest'";
+        }
+        this.zcoindNetwork = network;
         this.zcoindLocation = zcoindLocation;
         this.zcoindDataDir = zcoindDataDir;
+
         this.requestMutex = new Mutex();
         this.awaitBlockIndexMutex = new Mutex();
         this.zcoindRestartMutex = new Mutex();
         this.initializers = initializers;
         this.eventHandlers = eventHandlers;
+
+
     }
 
     // Start the daemon and register handlers.
     //
     // If mnemonicSettings is set, we start up the daemon with the directive to initialize it with the given mnemonic
     // and passphrase. These are not passed in the constructor because we don't want to pass them again if we restart.
+    // wallet.dat MUST NOT exist if this option is passed; we will check for it and throw if it does.
     //
     // If zcoind is already listening, we will reject(). If you would like to wait for an existing zcoind instance to
     // stop before calling us (assuming that it was invoked with -clientapi), you can await awaitZcoindNotListening()
     // prior to invoking us.
     async start(mnemonicSettings?: MnemonicSettings) {
+        if (mnemonicSettings) {
+            if (!validateMnemonic((mnemonicSettings.mnemonic))) {
+                throw "invalid mnemonic";
+            }
+
+            let walletLocation;
+            switch (this.zcoindNetwork) {
+                case "mainnet":
+                    walletLocation = path.join(this.zcoindDataDir, "wallet.dat");
+                    break;
+
+                case "test":
+                    walletLocation = path.join(this.zcoindDataDir, "testnet3", "wallet.dat");
+                    break;
+
+                case "regtest":
+                    walletLocation = path.join(this.zcoindDataDir, "regtest", "wallet.dat");
+                    break
+
+                default:
+                    throw "unreachable";
+            }
+
+            if (fs.existsSync(walletLocation)) {
+                throw "Zcoind.start() called with mnemonicSettings set, but wallet.dat already exists";
+            }
+        }
+
         // This will be null for a first connect and set when we're reconnecting.
         if (!this._unlockAfterConnect) {
             this._unlockAfterConnect = await this.requestMutex.lock();
@@ -385,11 +427,29 @@ export class Zcoind {
                 args.push(`-datadir=${this.zcoindDataDir}`);
             }
             if (mnemonicSettings) {
+                // We need to reindex when recovering from a mnemonic.
+                args.push("-reindex=1");
                 args.push("-usemnemonic");
                 args.push(`-mnemonic=${mnemonicSettings.mnemonic}`);
                 if (mnemonicSettings.mnemonicPassphrase) {
                     args.push(`-mnemonicpassphrase=${mnemonicSettings.mnemonicPassphrase}`);
                 }
+            }
+            switch (this.zcoindNetwork) {
+                case 'mainnet':
+                    args.push("-mainnet=1");
+                    break;
+
+                case 'test':
+                    args.push("-testnet=1");
+                    break;
+
+                case 'regtest':
+                    args.push("-regtest=1");
+                    break;
+
+                default:
+                    throw "unreachable";
             }
 
             logger.info("Starting daemon...");
@@ -624,7 +684,6 @@ export class Zcoind {
     // If zcoind has been shutdown with the stopDaemon() method, this method will take no action and never resolve.
     async send(auth: string | null, type: string, collection: string, data: any): Promise<any> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-        console.log('send object:', JSON.stringify(data));
         return await this.requesterSocketSend({
             auth: {
                 passphrase: auth
@@ -857,25 +916,20 @@ export class Zcoind {
                 selected
             }
         });
-        console.log('privateSend data:', data);
         return data;
     }
 
     async unlockWallet(auth: string): Promise<string> {
         const data = await this.send(auth, 'create', 'unlockWallet', {});
-        console.log('unlocking wallet');
         return data;
     }
 
     async showMnemonics(auth: string): Promise<string> {
-        const data = await this.send(auth, 'create', 'showMnemonics', {});
-        console.log('showing mnemonics to wallet');
-        return data;
+        return await this.send(auth, 'create', 'showMnemonics', {});
     }
 
     async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<string> {
-        const data = await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
-        return data;
+        return await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
     }
 
     async readWalletMnemonicWarningState(auth: string) : Promise<string> {

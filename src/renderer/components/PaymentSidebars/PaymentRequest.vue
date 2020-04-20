@@ -184,7 +184,7 @@ export default {
             this.$router.push("/");
 
             try {
-                await this.$daemon.updatePaymentRequest(pr.address, pr.amount, pr.label, pr.message, 'archived');
+                await $daemon.updatePaymentRequest(pr.address, pr.amount, pr.label, pr.message, 'archived');
             } catch (e) {
                 // Errors deleting a payment request should never occur during normal operation, so fancy error handling
                 // isn't required.

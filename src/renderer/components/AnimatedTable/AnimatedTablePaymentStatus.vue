@@ -93,7 +93,7 @@ export default {
                 label: 'Rebroadcast Transaction',
                 click: async () => {
                     try {
-                        await this.$daemon.rebroadcast(this.rowData.txid);
+                        await $daemon.rebroadcast(this.rowData.txid);
                         alert('Rebroadcast tx ' + this.rowData.txid);
                     } catch (e) {
                         alert('Error rebroadcasting tx ' + this.rowData.txid + ': ' + e);

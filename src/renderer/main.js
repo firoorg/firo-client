@@ -8,6 +8,8 @@ import Focus from '@/directives/focus'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
+import {existsSync} from 'fs';
+
 import i18n from '#/lib/i18n'
 
 const electron = require('electron');
@@ -93,15 +95,15 @@ window.$store = store;
 
 // Stop zcoind when the user exits the client.
 app.once('quit', async () => {
-    // window.$daemon will not be set if we are setting up.
-    if (window.$daemon) {
+    // $daemon will not be set if we are setting up.
+    if ($daemon) {
         try {
-            await window.$daemon.stopDaemon();
+            await $daemon.stopDaemon();
         } catch(e) {
             logger.error(`Error stopping daemon: ${e}`);
         }
     } else {
-        logger.warn("window.$daemon is not set; not trying to stop daemon");
+        logger.warn("$daemon is not set; not trying to stop daemon");
     }
 });
 
@@ -142,26 +144,23 @@ function startVue() {
     }).$mount('#app');
 }
 
-if (store.getters['App/isInitialized']) {
+if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLocation'])) {
     logger.info("App is already initialized. Starting up...");
 
     // Start up zcoind.
-    zcoind(store, store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
+    zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
         .then(async z => {
-            // Make sure our state is updated before proceeding.
-            await z.awaitInitializersCompleted();
+            // Make $daemon globally accessible.
+            window.$daemon = z;
 
-            // This might happen if the user has a wallet made with another client or deleted their wallet.dat without
-            // deleting our settings file.
-            if (!z.isWalletLocked())  {
-                logger.warn("isInitialized is set, but wallet doesn't appear to be locked. Redoing initialization...");
-                store.commit('App/SET_IS_INITIALIZED', false);
-                await z.stopDaemon();
-            } else {
-                // Make zcoind accessible to Vue instances as this.$daemon.
-                Vue.prototype.$daemon = z;
-                // Allow users to access $daemon from Chrome Dev Tools and our app quit handler.
-                window.$daemon = z;
+            // Make sure our state is updated before proceeding.
+            await $daemon.awaitInitializersCompleted();
+
+            if (!$daemon.isWalletLocked())  {
+                logger.error("Shutting down: Zcoin Client doesn't work with unencrypted wallets.");
+                alert("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
+                await $daemon.stopDaemon();
+                app.exit(-1);
             }
 
             startVue();
@@ -173,6 +172,8 @@ if (store.getters['App/isInitialized']) {
         });
 } else {
     logger.info("App is not yet initialized. Let's get 'er ready!");
+
+    store.commit('App/setIsInitialized', false);
 
     startVue();
     ourWindow.show();

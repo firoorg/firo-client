@@ -1,9 +1,10 @@
 // Initialization routines for zcoind.
 
-import { Zcoind } from './zcoind';
+import { Zcoind, MnemonicSettings } from './zcoind';
 
 /// Start up zcoind, connect to it, and return a Zcoind instance.
-async function zcoind(store: any, zcoindLocation: string, zcoindDataDir: string): Promise<Zcoind> {
+async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string,
+                      mnemonicSettings?: MnemonicSettings): Promise<Zcoind> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
@@ -38,9 +39,8 @@ async function zcoind(store: any, zcoindLocation: string, zcoindDataDir: string)
             );
         }
     }
-
-    const zcoind = new Zcoind(zcoindLocation, zcoindDataDir, initializers, eventHandlers);
-    await zcoind.start();
+    const zcoind = new Zcoind(network, zcoindLocation, zcoindDataDir, initializers, eventHandlers);
+    await zcoind.start(mnemonicSettings);
 
     return zcoind;
 }

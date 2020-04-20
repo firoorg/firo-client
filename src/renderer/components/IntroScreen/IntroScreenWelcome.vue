@@ -27,7 +27,7 @@ export default {
 
     methods: {
         next() {
-            this.actions.next();
+            this.actions.goTo("location");
         }
     }
 }

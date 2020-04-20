@@ -249,7 +249,7 @@ export default {
       if (!data.updated) return;
       try {
         console.log("deleting address:", data.address);
-        await this.$daemon.editAddressBook(
+        await $daemon.editAddressBook(
           data.address,
           data.label,
           this.openAddressBook.purpose.toLowerCase(),

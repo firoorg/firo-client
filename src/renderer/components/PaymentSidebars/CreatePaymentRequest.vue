@@ -158,7 +158,7 @@ export default {
 
             const label = this.label || (this.amount ? `Request for ${this.amount} XZC` : 'Payment Request');
             const address = (this.addressBookStt && this.addressBookStt.address) ? this.addressBookStt.address : ''; 
-            const pr = await this.$daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message, address);
+            const pr = await $daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message, address);
             this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', pr);
             this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: ''});
             this.label = '';
@@ -197,7 +197,7 @@ export default {
         
         async loadAddressBook() {
             if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
-                const ab = await this.$daemon.readAddressBook();
+                const ab = await $daemon.readAddressBook();
                 this.$store.dispatch('Transactions/setAddressBook', ab);
             }
         },

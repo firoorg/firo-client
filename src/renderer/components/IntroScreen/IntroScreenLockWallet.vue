@@ -1,10 +1,7 @@
 <template>
-    <intro-screen-lock-wallet-waiting
-        v-if="!hasApiStatus"
-    />
     <component
         :is="'IntroScreenLockWalletCreate'"
-        v-else-if="!showConfirm"
+        v-if="!showConfirm"
         :passphrase.sync="passphrase"
         :go-to-confirm="goToConfirm"
     />
@@ -19,28 +16,29 @@
     <component
         :is="'IntroScreenLockWalletWarning'"
         v-else
-        :prev="actions.prev"
-        :next="onLockWallet"
+        :prev="reenterPassphrase"
+        :next="lockWallet"
     />
 </template>
 
 <script>
-const app = require("electron").remote.app;
+import Vue from 'vue';
 import { mapGetters } from 'vuex'
 
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 import EventBusMixin from '@/mixins/EventBusMixin'
 
-import IntroScreenLockWalletWaiting from './IntroScreenLockWalletWaiting'
 import IntroScreenLockWalletCreate from './IntroScreenLockWalletCreate'
 import IntroScreenLockWalletConfirm from './IntroScreenLockWalletConfirm'
 import IntroScreenLockWalletWarning from './IntroScreenLockWalletWarning'
+
+import zcoind from "#/daemon/init";
+const app = require("electron").remote.app;
 
 export default {
     name: 'IntroScreenLockWallet',
 
     components: {
-        IntroScreenLockWalletWaiting,
         IntroScreenLockWalletCreate,
         IntroScreenLockWalletConfirm,
         IntroScreenLockWalletWarning
@@ -64,7 +62,9 @@ export default {
 
     computed: {
         ...mapGetters({
-            hasApiStatus: 'ApiStatus/hasApiStatus',
+            zcoinClientNetwork: 'App/zcoinClientNetwork',
+            zcoindLocation: 'App/zcoindLocation',
+            blockchainLocation: 'App/blockchainLocation'
         })
     },
 
@@ -87,26 +87,59 @@ export default {
             this.passphrase = ''
         },
 
-        async onLockWallet () {
+        reenterPassphrase() {
+            this.passphrase = '';
+            this.confirm = '';
+            this.showConfirm = false;
+            this.isConfirmed = false;
+            this.eventBus.$emit('reflow');
+        },
+
+        async lockWallet() {
+            const mnemonic = this.actions.getCachedMnemonic();
+
+            try {
+                window.$daemon = await zcoind(this.$store, this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation, mnemonic);
+            } catch(e) {
+                this.$log.error(`Failed to start zcoind: ${e}`);
+                alert(`Failed to start zcoind: ${e}`);
+                app.exit(-1);
+            }
+
+            await $daemon.awaitInitializersCompleted();
+
             try {
                 this.$log.info("Trying to lock the wallet... This will shutdown zcoind.");
                 // This call will shutdown zcoind.
-                await this.$daemon.setPassphrase(null, this.passphrase);
+                await $daemon.setPassphrase(null, this.passphrase);
             } catch(e) {
                 alert("Something unexpected went wrong with locking the wallet, so we can't proceed. Please report this to the Zcoin team.");
                 app.exit(-1);
             }
 
             this.$log.info("Waiting for zcoind to stop listening so we can restart it...");
-            await this.$daemon.awaitZcoindNotListening();
+            await $daemon.awaitZcoindNotListening();
 
             this.$log.info("Restarting zcoind...");
-            await this.$daemon.start();
+            await $daemon.start();
 
-            this.$log.info("Waiting for the block index to load...");
-            await this.$daemon.awaitBlockIndex();
+            this.$log.info("Waiting for initializers to complete...");
+            await $daemon.awaitInitializersCompleted();
 
-            await $store.dispatch('App/setIsInitialized');
+            const mnemonicSanityCheck = await $daemon.showMnemonics(this.passphrase);
+            if (mnemonicSanityCheck !== mnemonic.mnemonic) {
+                // This should never happen.
+                alert("Mnemonic sanity check failed; this is a bug in the client.\n" +
+                      `Mnemonic we tried to set: ${mnemonic.mnemonic}\n` +
+                      `Mnemonic zcoind gave us: ${mnemonicSanityCheck}\n` +
+                       "Seek help from the Zcoin team; do not try to use the client again."
+                );
+                app.exit(-1);
+            }
+            this.$log.info("Mnemonic sanity check passed.");
+
+            $store.commit('App/setIsInitialized', true);
+            // We will be destroyed automatically from MainLayout.
         },
     }
 }

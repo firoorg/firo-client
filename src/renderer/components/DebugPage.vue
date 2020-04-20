@@ -116,7 +116,7 @@ export default {
         this.focusInput();
 
         // Get the list of available commands.
-        this.$daemon.legacyRpcCommands().then(commands => {
+        $daemon.legacyRpcCommands().then(commands => {
             this.availableCommands = commands.concat(Object.keys(this.clientHelp));
         })
     },
@@ -335,7 +335,7 @@ export default {
         },
 
         async legacyRpc(commandline) {
-            const response = await this.$daemon.legacyRpc(commandline);
+            const response = await $daemon.legacyRpc(commandline);
 
             if (response.result) {
                 return response.result;

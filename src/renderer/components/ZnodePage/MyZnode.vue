@@ -323,7 +323,7 @@ export default {
         // Attempt to start the Znode.
         async tryStartZnode() {
             try {
-                await this.$daemon.startZnode(this.passphrase, this.znode.label);
+                await $daemon.startZnode(this.passphrase, this.znode.label);
             } catch (e) {
                 if (e.name === 'ZcoindErrorResponse') {
                     this.removeOutsideClickListener();

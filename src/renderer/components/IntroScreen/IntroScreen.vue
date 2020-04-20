@@ -93,8 +93,6 @@ export default {
 
         getActions() {
             return {
-                prev: this.prevStep,
-                next: this.nextStep,
                 goTo: this.goToStep,
                 getCurrentStep: this.getCurrentStep,
                 setWalletRecoveryType: this.setWalletRecoveryType,

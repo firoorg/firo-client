@@ -53,7 +53,7 @@ export default {
             if (this.hasApiStatus) {
                 if (this.dontShowMnemonicWarning) {
                     try {
-                        await this.$daemon.writeShowMnemonicWarning('', !this.dontShowMnemonicWarning);
+                        await $daemon.writeShowMnemonicWarning('', !this.dontShowMnemonicWarning);
                         console.log('initialRunn:', this.isInitialRun);
                     } catch(e) {
                         console.log(e);
