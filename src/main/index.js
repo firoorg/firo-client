@@ -37,6 +37,13 @@ app.once('ready', async () => {
         minHeight: 450
     });
 
+    // Fire the shutdown-requested listener in renderer/main.js when the user tries to close us.
+    window.on('close', (event) => {
+        event.preventDefault();
+        // This is picked up by a listener in renderer/main.js, which is responsible for actually exiting the applicaiton.
+        window.webContents.emit("shutdown-requested", event);
+    });
+
     // Stop new alt-clicks from opening new BrowserWindows.
     //
     // NOTE: This MUST be done in the main process to work.

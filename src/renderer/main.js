@@ -105,10 +105,17 @@ function setWaitingReason(reason) {
     $store.commit('App/setWaitingReason', reason);
 }
 
-// Stop zcoind when the user exits the client.
-app.once('quit', async () => {
+// This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
+// process now.
+ourWindow.webContents.on('shutdown-requested', async () => {
+    if ($store.getters['App/waitingReason']) {
+        logger.warn("Ignoring shutdown attempt in a critical period.");
+        return;
+    }
+
     // $daemon will not be set if we are setting up.
     if ($daemon) {
+        setWaitingReason("Shutting down zcoind...");
         try {
             await $daemon.stopDaemon();
         } catch(e) {
@@ -117,6 +124,9 @@ app.once('quit', async () => {
     } else {
         logger.warn("$daemon is not set; not trying to stop daemon");
     }
+
+    logger.info("Exiting app...");
+    app.exit();
 });
 
 // Actually handle deeplinks.
