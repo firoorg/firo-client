@@ -1,32 +1,47 @@
 <template>
     <div>
-        <h1 v-html="$t('onboarding.set-blockchain-location.title')" />
+        <h1>
+            Configuration
+        </h1>
 
-        <p v-html="$t('onboarding.set-blockchain-location.description')" />
+        <div id="config-options">
+            <div class="config-option" id="datadir">
+                <label for="datadir-value">
+                    Data Directory:
+                </label>
 
-        <div v-if="!hasSelectedFolder">
-            <BaseButton
-                :is-outline="true"
-                @click.once="continueSetup"
-            >
-                {{ $t('onboarding.set-blockchain-location.button__use-default-location--secondary') }}
-            </BaseButton>
+                <div class="value">
+                    <span id="datadir-value">
+                        {{ dataDir }}
+                    </span>
 
-            <BaseButton
-                color="green"
-                @click="selectFolder"
-            >
-                {{ $t('onboarding.set-blockchain-location.button__select-folder--primary') }}
-            </BaseButton>
+                    <a id="change-datadir" href="#" @click="changeDataDir">
+                        Change
+                    </a>
+                </div>
+            </div>
+
+            <div class="config-option" id="network">
+                 <label for="network-value">
+                     Network:
+                 </label>
+
+                <select class="value" id="network-value" v-model="network">
+                    <option value="mainnet">Mainnet (default)</option>
+                    <option value="test">Testnet</option>
+                    <option value="regtest">Regtest</option>
+                </select>
+            </div>
         </div>
 
-        <BaseButton
-            v-else
-            color="green"
-            @click.once="continueSetup"
-        >
-            {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
-        </BaseButton>
+        <div id="setup-button">
+            <BaseButton
+                color="green"
+                @click="continueSetup"
+            >
+                {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
+            </BaseButton>
+        </div>
     </div>
 </template>
 
@@ -47,8 +62,8 @@ export default {
     ],
 
     data: () => ({
-        blockchainLocation: '',
-        network: 'regtest' // FIXME: Allow the user to set the network.
+        dataDir: '',
+        network: 'mainnet'
     }),
 
     computed: {
@@ -57,10 +72,10 @@ export default {
             defaultZcoinRootDirectory: 'App/defaultZcoinRootDirectory',
             walletLocation: 'App/walletLocation'
         }),
+    },
 
-        hasSelectedFolder() {
-            return !!this.blockchainLocation;
-        }
+    mounted() {
+        this.dataDir = this.defaultZcoinRootDirectory;
     },
 
     methods: {
@@ -68,9 +83,9 @@ export default {
             setWaitingReason: 'App/setWaitingReason'
         }),
 
-        async selectFolder () {
-            const [blockchainLocation] = remote.dialog.showOpenDialog({
-                title: 'Select Zcoin Blockchain Location',
+        async changeDataDir() {
+            this.dataDir = remote.dialog.showOpenDialog({
+                title: 'Select Zcoin Data Directory',
                 properties: [
                     'openDirectory',
                     'createDirectory',
@@ -78,9 +93,7 @@ export default {
                     'showHiddenFiles'
                 ],
                 buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
-            });
-
-            this.blockchainLocation = blockchainLocation;
+            })[0];
         },
 
         async continueSetup() {
@@ -91,15 +104,12 @@ export default {
             await new Promise((r) => this.$nextTick(r));
 
             // changeBlockchainLocation needs to be called before walletLocation can be accessed.
-            const dataDir = this.blockchainLocation || this.defaultZcoinRootDirectory;
             try {
-                this.$log.info(`Setting blockchain location: ${dataDir}`);
+                this.$log.info(`Setting blockchain location: ${this.dataDir}`);
                 // Commit the blockchain location to our preferences file. setZcoinClientNetwork must be called before us.
-                this.$store.commit('App/changeBlockchainLocation', dataDir);
+                this.$store.commit('App/changeBlockchainLocation', this.dataDir);
             } catch (e) {
-                // FIXME: Allow the user to reselect the location if the one they pick first is invalid.
-                alert(`Blockchain location is invalid: ${e}`);
-                remote.app.quit();
+                alert(`Data directory ${this.dataDir} is invalid: ${e}`);
             }
 
             // Wait for changeBlockchainLocation to propagate before continuing.
@@ -108,7 +118,7 @@ export default {
             // The wallet already exists, so we don't need to go through the mnemonics screen.
             if (existsSync(this.walletLocation)) {
                 this.setWaitingReason("Starting zcoind...");
-                window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, dataDir);
+                window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.dataDir);
                 this.setWaitingReason("Loading state from zcoind...");
                 await $daemon.awaitInitializersCompleted();
 
@@ -143,6 +153,43 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+#config-options {
+    display: table;
 
+    label {
+        font-size: 1.2em;
+        padding-right: 0.5em;
+    }
+
+    #datadir {
+        #datadir-value {
+            font-weight: bold;
+        }
+
+        #change-datadir {
+            font: {
+                style: italic;
+                size: 0.9em;
+            }
+        }
+    }
+
+    .config-option {
+        display: table-row;
+
+        label, .value {
+            display: table-cell;
+        }
+    }
+}
+
+#setup-button {
+    width: fit-content;
+    margin: {
+        left: auto;
+        right: auto;
+        top: 1em;
+    }
+}
 </style>
