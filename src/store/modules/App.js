@@ -15,7 +15,7 @@ const state = {
     blockchainLocation: '',
     // This is the value read from our configuration, not what is given to us in APIStatus.
     zcoinClientNetwork: '',
-    waitingReason: ''
+    waitingReason: 'Loading...'
 }
 
 const mutations = {

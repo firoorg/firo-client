@@ -93,6 +93,18 @@ requireComponent.keys().forEach(fileName => {
 // Allow global access to the store.
 window.$store = store;
 
+// Show the waiting screen with reason, or, if reason may be undefined, close it.
+//
+// Note that the app starts off with the reason "Loading..." in order to not show the main window for a short time
+// before starting the daemon.
+function setWaitingReason(reason) {
+    if (reason) {
+        logger.info("Waiting: " + reason);
+    }
+
+    $store.commit('App/setWaitingReason', reason);
+}
+
 // Stop zcoind when the user exits the client.
 app.once('quit', async () => {
     // $daemon will not be set if we are setting up.
@@ -144,15 +156,6 @@ function startVue() {
     }).$mount('#app');
 }
 
-// reason may be undefined, in which case WaitingScreen will be closed.
-function setWaitingReason(reason) {
-    if (reason) {
-        logger.info("Waiting: " + reason);
-    }
-
-    $store.commit('App/setWaitingReason', reason);
-}
-
 if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLocation'])) {
     setWaitingReason("Starting up zcoind...");
 
@@ -184,6 +187,8 @@ if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLo
             app.exit(-1);
         });
 } else {
+    setWaitingReason(undefined);
+
     logger.info("App is not yet initialized. Let's get 'er ready!");
 
     store.commit('App/setIsInitialized', false);
