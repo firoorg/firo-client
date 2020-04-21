@@ -14,7 +14,8 @@ const state = {
     openAddressBook: null,
     blockchainLocation: '',
     // This is the value read from our configuration, not what is given to us in APIStatus.
-    zcoinClientNetwork: ''
+    zcoinClientNetwork: '',
+    waitingReason: ''
 }
 
 const mutations = {
@@ -87,6 +88,11 @@ const mutations = {
 
         state.isInitialized = isInitialized;
         getAppSettings().set(`app.SET_IS_INITIALIZED`, isInitialized);
+    },
+
+    // This determines whether WaitingScreen will be shown from MainLayout.
+    setWaitingReason(state, value) {
+        state.waitingReason = value;
     }
 }
 
@@ -163,8 +169,11 @@ const getters = {
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
 
+    // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
+    // overlay.
+    waitingReason: (state) => state.waitingReason || undefined,
     mnemonicSetting: (state) => state.mnemonicSetting,
-    openAddressBook: (state) => state.openAddressBook,
+    openAddressBook: (state) => state.openAddressBook
 }
 
 export default {

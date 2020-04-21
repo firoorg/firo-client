@@ -1,7 +1,11 @@
 <template>
     <transition name="fade">
+        <div v-if="waitingReason">
+            <WaitingScreen :reason="waitingReason" />
+        </div>
+
         <div
-            v-if="isInitialized"
+            v-else-if="isInitialized"
             class="main-layout wrapper"
         >
             <Sidebar class="aside" />
@@ -21,20 +25,23 @@
 </template>
 
 <script>
-import Sidebar from '@/components/Sidebar'
 import { mapGetters } from 'vuex'
+import Sidebar from '@/components/Sidebar'
 import IntroScreen from "@/components/IntroScreen/IntroScreen";
+import WaitingScreen from "@/components/WaitingScreen";
 
 export default {
     name: 'MainLayout',
 
     components: {
         IntroScreen,
-        Sidebar
+        Sidebar,
+        WaitingScreen
     },
 
     computed: mapGetters({
-        isInitialized: 'App/isInitialized'
+        isInitialized: 'App/isInitialized',
+        waitingReason: 'App/waitingReason'
     })
 }
 </script>

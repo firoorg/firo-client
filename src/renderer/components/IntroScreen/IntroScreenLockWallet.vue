@@ -95,12 +95,22 @@ export default {
             this.eventBus.$emit('reflow');
         },
 
-        async lockWallet() {
-            const mnemonic = this.actions.getCachedMnemonic();
+        // Log reason at info level and put up a loading screen showing why we're waiting. reason may be undefined, in
+        // which case the screen will go away.
+        async setWaitingReason(reason) {
+            if (reason) {
+                this.$log.info(reason);
+            }
 
+            this.$store.commit('App/setWaitingReason', reason);
+            await new Promise(r => this.$nextTick((r))); // await UI update
+        },
+
+        async lockWallet() {
+            await this.setWaitingReason("Telling zcoind to start and reindex with our mnemonic...");
+            const mnemonic = this.actions.getCachedMnemonic();
             let initialDaemon;
             try {
-                this.$log.info("Starting zcoind with mnemonic and no initializers or handlers...");
                 initialDaemon = new Zcoind(this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation, [], {});
                 await initialDaemon.start(mnemonic);
             } catch(e) {
@@ -109,10 +119,11 @@ export default {
                 app.exit(-1);
             }
 
+            await this.setWaitingReason("Waiting for zcoind to load the block index...");
             await initialDaemon.awaitBlockIndex();
 
+            await this.setWaitingReason("Locking the wallet...");
             try {
-                this.$log.info("Trying to lock the wallet... This will shutdown zcoind.");
                 // This call will shutdown zcoind.
                 await initialDaemon.setPassphrase(null, this.passphrase);
             } catch(e) {
@@ -121,12 +132,11 @@ export default {
                 app.exit(-1);
             }
 
-            this.$log.info("Waiting for zcoind to stop listening so we can restart it...");
+            await this.setWaitingReason("Waiting for zcoind to stop listening so we can restart it...");
             await initialDaemon.awaitZcoindNotListening();
 
-            this.$log.info("Starting zcoind normally...");
+            await this.setWaitingReason("Starting zcoind..");
             try {
-                this.$log.info("Starting zcoind with mnemonic and no initializers or handlers...");
                 window.$daemon = await zcoind(this.$store, this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation);
             } catch(e) {
                 this.$log.error(`Failed to start zcoind normally: ${e}`);
@@ -134,8 +144,8 @@ export default {
                 app.exit(-1);
             }
 
+            await this.setWaitingReason("Waiting to update our state with data from zcoind...");
             try {
-                this.$log.info("Waiting for initializers to complete...");
                 await $daemon.awaitInitializersCompleted();
             } catch(e) {
                 this.$log.error(`initializers failed to complete: ${e}`);
@@ -143,7 +153,7 @@ export default {
                 app.exit(-1);
             }
 
-            this.$log.info("Sanity checking mnemonic...");
+            await this.setWaitingReason("Sanity checking mnemonic...");
             const mnemonicSanityCheck = await $daemon.showMnemonics(this.passphrase);
             if (mnemonicSanityCheck !== mnemonic.mnemonic) {
                 // This should never happen.
@@ -156,6 +166,7 @@ export default {
                 app.exit(-1);
             }
             this.$log.info("Mnemonic sanity check passed.");
+            this.setWaitingReason(undefined);
 
             this.$log.info("Marking app as initialized...");
             this.$store.commit('App/setIsInitialized', true);

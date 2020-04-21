@@ -33,7 +33,7 @@
 <script>
 import Vue from 'vue'
 import { existsSync } from 'fs'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 import zcoind from "#/daemon/init";
@@ -65,6 +65,10 @@ export default {
     },
 
     methods: {
+        ...mapMutations({
+            setWaitingReason: 'App/setWaitingReason'
+        }),
+
         async selectFolder () {
             const [blockchainLocation] = remote.dialog.showOpenDialog({
                 title: 'Select Zcoin Blockchain Location',
@@ -104,10 +108,13 @@ export default {
 
             // The wallet already exists, so we don't need to go through the mnemonics screen.
             if (existsSync(this.walletLocation)) {
+                this.setWaitingReason("Starting zcoind...");
                 window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.blockchainLocation);
+                this.setWaitingReason("Loading state from zcoind...");
                 await $daemon.awaitInitializersCompleted();
 
                 if ($daemon.isWalletLocked()) {
+                    this.setWaitingReason(undefined);
                     // This wallet is already locked. End the setup procedure.
                     this.$store.commit("App/setIsInitialized", true);
                     // We will be destroyed automatically from MainLayout.
@@ -128,6 +135,7 @@ export default {
                     }
                 }
             } else {
+                this.setWaitingReason(undefined);
                 // wallet.dat doesn't exist, so we should set it up with a mnemonic.
                 this.actions.goTo("createOrRestore");
             }

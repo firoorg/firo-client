@@ -1,7 +1,5 @@
 <template>
     <section class="settings-page">
-        <RestartingOverlay v-if="isRestarting" />
-
         <div class="window-height">
             <div>
                 <div class="settings-page-inner">
@@ -176,10 +174,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import types from '~/types'
+import { mapGetters, mapMutations } from 'vuex'
 
-import RestartingOverlay from '@/components/Overlay/RestartingOverlay'
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
 import ConnectViaTorSettings from '@/components/SettingsPage/ConnectViaTorSettings'
@@ -192,7 +188,6 @@ export default {
     name: 'SettingsPage',
 
     components: {
-        RestartingOverlay,
         AmountToHoldInZerocoinSettings,
         ConnectViaTorSettings,
         LanguageSettings,
@@ -219,7 +214,6 @@ export default {
 
     data () {
         return {
-            isRestarting: false,
             popoverStep: 'initial',
             errorMessage: '',
             changePassphraseError: '',
@@ -237,10 +231,14 @@ export default {
     },
 
     methods: {
+        ...mapMutations({
+            setWaitingReason: 'App/setWaitingReason'
+        }),
+
         async restartDaemon() {
-            this.isRestarting = true;
+            this.setWaitingReason("Restarting daemon...");
             await $daemon.restartDaemon();
-            this.isRestarting = false;
+            this.setWaitingReason(undefined);
         },
 
         async changePassphrase() {

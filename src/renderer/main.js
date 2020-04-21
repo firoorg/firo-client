@@ -90,7 +90,7 @@ requireComponent.keys().forEach(fileName => {
     )
 })
 
-// Allow users to access the store from Chrome Dev Tools.
+// Allow global access to the store.
 window.$store = store;
 
 // Stop zcoind when the user exits the client.
@@ -144,14 +144,28 @@ function startVue() {
     }).$mount('#app');
 }
 
+// reason may be undefined, in which case WaitingScreen will be closed.
+function setWaitingReason(reason) {
+    if (reason) {
+        logger.info("Waiting: " + reason);
+    }
+
+    $store.commit('App/setWaitingReason', reason);
+}
+
 if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLocation'])) {
-    logger.info("App is already initialized. Starting up...");
+    setWaitingReason("Starting up zcoind...");
+
+    startVue();
+    ourWindow.show();
 
     // Start up zcoind.
     zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;
+
+            setWaitingReason("Loading our state from zcoind...");
 
             // Make sure our state is updated before proceeding.
             await $daemon.awaitInitializersCompleted();
@@ -163,8 +177,7 @@ if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLo
                 app.exit(-1);
             }
 
-            startVue();
-            ourWindow.show();
+            setWaitingReason(undefined);
         })
         .catch(e => {
             alert(e);
