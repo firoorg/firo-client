@@ -176,15 +176,14 @@ if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLo
             if (!$daemon.isWalletLocked())  {
                 logger.error("Shutting down: Zcoin Client doesn't work with unencrypted wallets.");
                 alert("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
-                await $daemon.stopDaemon();
-                app.exit(-1);
+                app.quit();
             }
 
             setWaitingReason(undefined);
         })
         .catch(e => {
             alert(e);
-            app.exit(-1);
+            app.quit();
         });
 } else {
     setWaitingReason(undefined);

@@ -99,7 +99,7 @@ export default {
             } catch (e) {
                 // FIXME: Allow the user to reselect the location if the one they pick first is invalid.
                 alert(`Blockchain location is invalid: ${e}`);
-                remote.app.exit(-1);
+                remote.app.quit();
             }
 
             // Wait for changeBlockchainLocation to propagate before continuing.
@@ -123,14 +123,14 @@ export default {
                         this.$log.info("The user has an existing, unlocked wallet.dat with addresses in it.");
                         alert(`You have an existing, unlocked wallet.dat (located at ${this.walletLocation} that ` +
                               "already generated addresses. Try locking it and starting the client again.");
-                        remote.app.exit(-1);
+                        remote.app.quit();
                     } else {
                         this.$log.error("The user has an existing, unlocked wallet.dat with no addresses.");
                         alert("It looks like you have an existing wallet.dat, but it has no addresses in it. This " +
                               "is probably the result of exiting the client before setup could be completed. Manually " +
                               `backup the existing wallet.dat (located at ${this.walletLocation}) and try starting ` +
                               "client again.");
-                        remote.app.exit(-1);
+                        remote.app.quit();
                     }
                 }
             } else {
