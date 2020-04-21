@@ -7,7 +7,7 @@
         <div v-if="!hasSelectedFolder">
             <BaseButton
                 :is-outline="true"
-                @click="continueSetup"
+                @click.once="continueSetup"
             >
                 {{ $t('onboarding.set-blockchain-location.button__use-default-location--secondary') }}
             </BaseButton>
@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { existsSync } from 'fs'
 import { mapGetters, mapMutations } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
@@ -109,7 +108,7 @@ export default {
             // The wallet already exists, so we don't need to go through the mnemonics screen.
             if (existsSync(this.walletLocation)) {
                 this.setWaitingReason("Starting zcoind...");
-                window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.blockchainLocation);
+                window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, dataDir);
                 this.setWaitingReason("Loading state from zcoind...");
                 await $daemon.awaitInitializersCompleted();
 
