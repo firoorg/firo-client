@@ -82,7 +82,7 @@ export default {
             let dataSubDir;
             switch (this.network) {
             case "mainnet":
-                dataSubDir = getters.blockchainLocation;
+                dataSubDir = this.dataDir;
                 break;
 
             case "regtest":
