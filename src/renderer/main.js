@@ -114,7 +114,7 @@ ourWindow.webContents.on('shutdown-requested', async () => {
     }
 
     // $daemon will not be set if we are setting up.
-    if ($daemon) {
+    if (window.$daemon) {
         setWaitingReason("Shutting down zcoind...");
         try {
             await $daemon.stopDaemon();
