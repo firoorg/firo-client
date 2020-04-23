@@ -39,7 +39,7 @@
                 color="green"
                 @click="continueSetup"
             >
-                {{ $t('onboarding.set-blockchain-location.button__confirm-selection--primary') }}
+                Next
             </BaseButton>
         </div>
     </div>
