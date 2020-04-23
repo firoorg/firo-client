@@ -168,7 +168,7 @@ export default {
                         alert("It looks like you have an existing wallet.dat, but it has no addresses in it. This " +
                               "is probably the result of exiting the client before setup could be completed. Manually " +
                               `backup the existing wallet.dat (located at ${this.walletLocation}) and try starting ` +
-                              "client again.");
+                              "the client again.");
                         remote.app.quit();
                     }
                 }
