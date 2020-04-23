@@ -52,26 +52,8 @@ const mutations = {
         getAppSettings().set('app.SET_ZCOIN_CLIENT_NETWORK', network);
     },
 
-    // Change the blockchain location to newLocation, creating it if it does not exist, or doing nothing if the empty
-    // string (representing the default value) is set. If we fail, we will throw with the reason.
-    changeBlockchainLocation (state, newLocation) {
-        if (newLocation !== '') {
-            if (!path.isAbsolute(newLocation)) {
-                throw "Location for the new blockchain must be an absolute path.";
-            }
-
-            if (!fs.existsSync(newLocation)) {
-                // Throws on failure.
-                fs.mkdirSync(newLocation);
-            }
-
-            try {
-                fs.accessSync(newLocation, fs.constants.W_OK | fs.constants.R_OK);
-            } catch {
-                throw `${newLocation} is not writable by the current user.`
-            }
-        }
-
+    // Mark down the blockchain location in settings.
+    setBlockchainLocation(state, newLocation) {
         state.blockchainLocation = newLocation
         getAppSettings().set(`app.SET_BLOCKCHAIN_LOCATION`, newLocation);
     },
@@ -134,7 +116,7 @@ const getters = {
             return path.join(homedir(), ".zcoin");
 
         default:
-            throw "unkown platform";
+            throw "unknown platform";
         }
     },
     zcoindLocation: () => {
@@ -144,19 +126,25 @@ const getters = {
         return path.join(unpackedRootFolder, `/assets/core/${platform()}/${zcoindName}`);
     },
     // It is invalid to access us prior to the app being initialized.
+    //
+    // Note: This code is duplicated in IntroScreenBlockchainLocation.
     walletLocation: (state, getters) => {
+        if (!getters.blockchainLocation) {
+            return "blockchainLocation not yet set";
+        }
+
         let dataDir;
         switch (getters.zcoinClientNetwork) {
         case "mainnet":
-            dataDir = getters.defaultZcoinRootDirectory;
+            dataDir = getters.blockchainLocation;
             break;
 
         case "regtest":
-            dataDir = path.join(getters.defaultZcoinRootDirectory, "regtest");
+            dataDir = path.join(getters.blockchainLocation, "regtest");
             break;
 
         case "test":
-            dataDir = path.join(getters.defaultZcoinRootDirectory, "testnet3");
+            dataDir = path.join(getters.blockchainLocation, "testnet3");
             break;
 
         default:

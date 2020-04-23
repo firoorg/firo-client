@@ -46,13 +46,14 @@
 </template>
 
 <script>
-import { existsSync } from 'fs'
+import fs from 'fs';
+import path from 'path';
+const remote = require('electron').remote;
+
 import { mapGetters, mapMutations } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
 import zcoind from "#/daemon/init";
-
-const remote = require('electron').remote;
 
 export default {
     name: 'IntroScreenBlockchainLocation',
@@ -69,9 +70,35 @@ export default {
     computed: {
         ...mapGetters({
             zcoindLocation: 'App/zcoindLocation',
-            defaultZcoinRootDirectory: 'App/defaultZcoinRootDirectory',
-            walletLocation: 'App/walletLocation'
+            defaultZcoinRootDirectory: 'App/defaultZcoinRootDirectory'
         }),
+
+        // This code is duplicated from src/module/App.js due to potential race conditions.
+        walletLocation() {
+            if (!this.dataDir) {
+                return "dataDir not yet set";
+            }
+
+            let dataSubDir;
+            switch (this.network) {
+            case "mainnet":
+                dataSubDir = getters.blockchainLocation;
+                break;
+
+            case "regtest":
+                dataSubDir = path.join(this.dataDir, "regtest");
+                break;
+
+            case "test":
+                dataSubDir = path.join(this.dataDir, "testnet3");
+                break;
+
+            default:
+                throw `unknown network: ${this.dataDir}`;
+            }
+
+            return path.join(dataSubDir, "wallet.dat");
+        }
     },
 
     mounted() {
@@ -97,26 +124,28 @@ export default {
         },
 
         async continueSetup() {
+            // These shouldn't be possible from the file selector, but just make sure anyway.
+            if (!path.isAbsolute(this.dataDir) || !fs.existsSync(this.dataDir)) {
+                alert('Invalid data directory');
+                return;
+            }
+
+            try {
+                // Throws if permissions are insufficient.
+                fs.accessSync(this.dataDir, fs.constants.W_OK | fs.constants.R_OK | fs.constants.X_OK);
+            } catch(e) {
+                alert("You don't have permission to access the directory you selected. Please try again.")
+                return;
+            }
+
             this.$log.info(`Setting zcoinClientNetwork: ${this.network}`);
             this.$store.commit('App/setZcoinClientNetwork', this.network);
 
-            // Wait for setZcoinClientNetwork to propagate before continuing.
-            await new Promise((r) => this.$nextTick(r));
-
-            // changeBlockchainLocation needs to be called before walletLocation can be accessed.
-            try {
-                this.$log.info(`Setting blockchain location: ${this.dataDir}`);
-                // Commit the blockchain location to our preferences file. setZcoinClientNetwork must be called before us.
-                this.$store.commit('App/changeBlockchainLocation', this.dataDir);
-            } catch (e) {
-                alert(`Data directory ${this.dataDir} is invalid: ${e}`);
-            }
-
-            // Wait for changeBlockchainLocation to propagate before continuing.
-            await new Promise((r) => this.$nextTick(r));
+            this.$log.info(`Setting blockchain location: ${this.dataDir}`);
+            this.$store.commit('App/setBlockchainLocation', this.dataDir);
 
             // The wallet already exists, so we don't need to go through the mnemonics screen.
-            if (existsSync(this.walletLocation)) {
+            if (fs.existsSync(this.walletLocation)) {
                 this.setWaitingReason("Starting zcoind...");
                 window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.dataDir);
                 this.setWaitingReason("Loading state from zcoind...");
