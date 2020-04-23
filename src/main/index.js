@@ -1,9 +1,9 @@
-import {app, protocol, BrowserWindow} from 'electron'
-
+import {app, BrowserWindow, Menu} from 'electron'
 import { createLogger } from '#/lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
 import {join} from 'path'
+import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
 const logger = createLogger('zcoin:main')
@@ -25,6 +25,10 @@ if (!app.isDefaultProtocolClient('zcoin')) {
 app.once('ready', async () => {
     setupLocales({ store })
     await populateStoreWithAppSettings({ store })
+
+    // Set the application menu. This is required for keyboard shortcuts (including copy+paste) to work correctly.
+    const appMenu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(appMenu);
 
     // The window will be shown by the renderer process when zcoind is connected.
     let window = new BrowserWindow({
