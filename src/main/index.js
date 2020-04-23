@@ -3,6 +3,7 @@ import {app, protocol, BrowserWindow} from 'electron'
 import { createLogger } from '#/lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
+import {join} from 'path'
 import store from '../store/main'
 
 const logger = createLogger('zcoin:main')
@@ -57,6 +58,6 @@ app.once('ready', async () => {
         window.loadURL("http://localhost:9080/");
     }
     else {
-        window.loadFile(`file://${__dirname}/index.html#${path}`);
+        window.loadFile(`${__dirname}/index.html`);
     }
 });
