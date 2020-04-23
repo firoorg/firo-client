@@ -132,8 +132,8 @@ ourWindow.webContents.on('shutdown-requested', async () => {
 // Actually handle deeplinks.
 logger.info("Registering protocol handler for zcoin links...");
 app.on('open-url', (event, url) => {
-    if (!store.getters['App/isInitialized']) {
-        logger.error(`We're not yet initialized. Ignoring deeplink ${url}...`);
+    if (!store.getters['App/isInitialized'] || store.getters['App/waitingReason']) {
+        logger.error(`We're waiting on zcoind or not yet initialized. Ignoring deeplink ${url}...`);
         return;
     }
 
