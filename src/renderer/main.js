@@ -180,20 +180,25 @@ if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLo
 
             setWaitingReason("Loading our state from zcoind...");
 
-            // Make sure our state is updated before proceeding.
-            await $daemon.awaitInitializersCompleted();
+            try {
+                // Make sure our state is updated before proceeding.
+                await $daemon.awaitInitializersCompleted();
+            } catch(e) {
+                alert(`An error occurred in our initialisers: ${e}`);
+                app.exit();
+            }
 
             if (!$daemon.isWalletLocked())  {
                 logger.error("Shutting down: Zcoin Client doesn't work with unencrypted wallets.");
                 alert("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
-                app.quit();
+                app.exit();
             }
 
             setWaitingReason(undefined);
         })
         .catch(e => {
-            alert(e);
-            app.quit();
+            alert(`An error occured starting zcoind: ${e}`);
+            app.exit();
         });
 } else {
     setWaitingReason(undefined);
