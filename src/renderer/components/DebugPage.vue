@@ -331,7 +331,7 @@ export default {
 
         resetClientConfig() {
             this.$store.commit('App/setIsInitialized', false);
-            this.$nextTick(() => app.quit());
+            this.$nextTick($quitApp);
         }
     }
 }

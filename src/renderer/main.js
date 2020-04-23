@@ -105,14 +105,8 @@ function setWaitingReason(reason) {
     $store.commit('App/setWaitingReason', reason);
 }
 
-// This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
-// process now.
-ourWindow.webContents.on('shutdown-requested', async () => {
-    if ($store.getters['App/waitingReason']) {
-        logger.warn("Ignoring shutdown attempt in a critical period.");
-        return;
-    }
-
+// Quit the application, shutting down $daemon if it exists. We never resolve.
+window.$quitApp = async () => {
     // $daemon will not be set if we are setting up.
     if (window.$daemon) {
         setWaitingReason("Shutting down zcoind...");
@@ -127,6 +121,20 @@ ourWindow.webContents.on('shutdown-requested', async () => {
 
     logger.info("Exiting app...");
     app.exit();
+
+    // Execution may momentarily resume, so wait forever to avoid giving control back to the caller awaiting us.
+    await new Promise(r=>undefined);
+}
+
+// This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
+// process now.
+ourWindow.webContents.on('shutdown-requested', async () => {
+    if ($store.getters['App/waitingReason']) {
+        logger.warn("Ignoring shutdown attempt in a critical period.");
+        return;
+    }
+
+    await $quitApp();
 });
 
 // Actually handle deeplinks.
@@ -185,20 +193,20 @@ if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLo
                 await $daemon.awaitInitializersCompleted();
             } catch(e) {
                 alert(`An error occurred in our initialisers: ${e}`);
-                app.exit();
+                $quitApp();
             }
 
             if (!$daemon.isWalletLocked())  {
                 logger.error("Shutting down: Zcoin Client doesn't work with unencrypted wallets.");
                 alert("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
-                app.exit();
+                $quitApp();
             }
 
             setWaitingReason(undefined);
         })
         .catch(e => {
             alert(`An error occured starting zcoind: ${e}`);
-            app.exit();
+            $quitApp();
         });
 } else {
     setWaitingReason(undefined);

@@ -116,7 +116,7 @@ export default {
             } catch(e) {
                 this.$log.error(`Failed to start zcoind with mnemonic: ${e}`);
                 alert(`Failed to start zcoind with mnemonic: ${e}`);
-                app.quit();
+                await $quitApp();
             }
 
             await this.setWaitingReason("Waiting for zcoind to load the block index...");
@@ -129,7 +129,7 @@ export default {
             } catch(e) {
                 this.$log.error("Something unexpected went wrong with locking the wallet, so we can't proceed.");
                 alert("Something unexpected went wrong with locking the wallet, so we can't proceed. Please report this to the Zcoin team.");
-                app.quit();
+                await $quitApp();
             }
 
             await this.setWaitingReason("Waiting for zcoind to stop listening so we can restart it...");
@@ -141,7 +141,7 @@ export default {
             } catch(e) {
                 this.$log.error(`Failed to start zcoind normally: ${e}`);
                 alert(`Failed to start zcoind normally: ${e}`);
-                app.quit();
+                await $quitApp();
             }
 
             await this.setWaitingReason("Waiting to update our state with data from zcoind...");
@@ -150,7 +150,7 @@ export default {
             } catch(e) {
                 this.$log.error(`initializers failed to complete: ${e}`);
                 alert(`initializers failed to complete: ${e}`);
-                app.quit();
+                await $quitApp();
             }
 
             await this.setWaitingReason("Sanity checking mnemonic...");
@@ -163,7 +163,7 @@ export default {
                       `Mnemonic zcoind gave us: ${mnemonicSanityCheck}\n\n` +
                        "Seek help from the Zcoin team; do not try to use the client again."
                 );
-                app.quit();
+                await $quitApp();
             }
             this.$log.info("Mnemonic sanity check passed.");
             this.setWaitingReason(undefined);
