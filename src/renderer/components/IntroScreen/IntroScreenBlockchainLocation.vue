@@ -147,9 +147,18 @@ export default {
             // The wallet already exists, so we don't need to go through the mnemonics screen.
             if (fs.existsSync(this.walletLocation)) {
                 this.setWaitingReason("Starting zcoind...");
-                window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.dataDir);
+                try {
+                    window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.dataDir);
+                } catch(e) {
+                    await $quitApp(`Error starting zcoind: ${e}`);
+                }
+
                 this.setWaitingReason("Loading state from zcoind...");
-                await $daemon.awaitInitializersCompleted();
+                try {
+                    await $daemon.awaitInitializersCompleted();
+                } catch(e) {
+                    await $quitApp(`Error running our initializers: ${e}`);
+                }
 
                 if ($daemon.isWalletLocked()) {
                     this.setWaitingReason(undefined);
