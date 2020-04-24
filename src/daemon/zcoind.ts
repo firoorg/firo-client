@@ -89,7 +89,7 @@ export interface TransactionOutput {
     // for outgoing and incoming versions of the same
     // transactions.
     uniqId: string;
-
+    isChange: boolean;
     category: string;
     txid: string;
     txIndex: number;
