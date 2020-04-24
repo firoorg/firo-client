@@ -159,21 +159,16 @@ export default {
                 } else {
                     // The wallet exists, but isn't yet locked. This is probably the result of some form of error.
                     if (await $daemon.hasBeenUsed()) {
-                        this.$log.info("The user has an existing, unlocked wallet.dat with addresses in it.");
-                        alert(`You have an existing, unlocked wallet.dat (located at ${this.walletLocation} that ` +
-                              "already generated addresses. Try locking it and starting the client again.");
-                        await $quitApp();
+                        await $quitApp(`You have an existing, unlocked wallet.dat (located at ${this.walletLocation}) ` +
+                              "with addresses in it. Try locking it and starting the client again.");
                     } else {
-                        this.$log.error("The user has an existing, unlocked wallet.dat with no addresses.");
-                        alert("It looks like you have an existing wallet.dat, but it has no addresses in it. This " +
-                              "is probably the result of exiting the client before setup could be completed. Manually " +
-                              `backup the existing wallet.dat (located at ${this.walletLocation}) and try starting ` +
-                              "the client again.");
-                        await $quitApp();
+                        await $quitApp("It looks like you have an existing wallet.dat, but it has no addresses in it. " +
+                              "This is probably the result of a bug or the client exiting before setup could be " +
+                              `completed. Manually backup the existing wallet.dat (located at ${this.walletLocation}) ` +
+                              "and try starting the client again.");
                     }
                 }
             } else {
-                this.setWaitingReason(undefined);
                 // wallet.dat doesn't exist, so we should set it up with a mnemonic.
                 this.actions.goTo("createOrRestore");
             }

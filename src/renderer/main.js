@@ -105,8 +105,14 @@ function setWaitingReason(reason) {
     $store.commit('App/setWaitingReason', reason);
 }
 
-// Quit the application, shutting down $daemon if it exists. We never resolve.
-window.$quitApp = async () => {
+// Quit the application, shutting down $daemon if it exists. If message is set, log it and show it to the user before
+// continuing. We never resolve.
+window.$quitApp = async (message=undefined) => {
+    if (message) {
+        logger.error(message);
+        alert(message);
+    }
+
     // $daemon will not be set if we are setting up.
     if (window.$daemon) {
         setWaitingReason("Shutting down zcoind...");
@@ -192,21 +198,17 @@ if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLo
                 // Make sure our state is updated before proceeding.
                 await $daemon.awaitInitializersCompleted();
             } catch(e) {
-                alert(`An error occurred in our initialisers: ${e}`);
-                $quitApp();
+                await $quitApp(`An error occurred in our initializers: ${e}`);
             }
 
             if (!$daemon.isWalletLocked())  {
-                logger.error("Shutting down: Zcoin Client doesn't work with unencrypted wallets.");
-                alert("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
-                $quitApp();
+                await $quitApp("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
             }
 
             setWaitingReason(undefined);
         })
-        .catch(e => {
-            alert(`An error occured starting zcoind: ${e}`);
-            $quitApp();
+        .catch(async e => {
+            await $quitApp(`An error occured starting zcoind: ${e}`);
         });
 } else {
     setWaitingReason(undefined);

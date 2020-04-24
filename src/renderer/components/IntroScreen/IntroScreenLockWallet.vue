@@ -114,9 +114,7 @@ export default {
                 initialDaemon = new Zcoind(this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation, [], {});
                 await initialDaemon.start(mnemonic);
             } catch(e) {
-                this.$log.error(`Failed to start zcoind with mnemonic: ${e}`);
-                alert(`Failed to start zcoind with mnemonic: ${e}`);
-                await $quitApp();
+                await $quitApp(`Failed to start zcoind with mnemonic: ${e}`);
             }
 
             await this.setWaitingReason("Waiting for zcoind to load the block index...");
@@ -127,9 +125,7 @@ export default {
                 // This call will shutdown zcoind.
                 await initialDaemon.setPassphrase(null, this.passphrase);
             } catch(e) {
-                this.$log.error("Something unexpected went wrong with locking the wallet, so we can't proceed.");
-                alert("Something unexpected went wrong with locking the wallet, so we can't proceed. Please report this to the Zcoin team.");
-                await $quitApp();
+                await $quitApp("Something unexpected went wrong with locking the wallet, so we can't proceed.");
             }
 
             await this.setWaitingReason("Waiting for zcoind to stop listening so we can restart it...");
@@ -139,31 +135,21 @@ export default {
             try {
                 window.$daemon = await zcoind(this.$store, this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation);
             } catch(e) {
-                this.$log.error(`Failed to start zcoind normally: ${e}`);
-                alert(`Failed to start zcoind normally: ${e}`);
-                await $quitApp();
+                await $quitApp(`Failed to start zcoind normally: ${e}`);
             }
 
             await this.setWaitingReason("Waiting to update our state with data from zcoind...");
             try {
                 await $daemon.awaitInitializersCompleted();
             } catch(e) {
-                this.$log.error(`initializers failed to complete: ${e}`);
-                alert(`initializers failed to complete: ${e}`);
-                await $quitApp();
+                await $quitApp(`initializers failed to complete: ${e}`);
             }
 
             await this.setWaitingReason("Sanity checking mnemonic...");
             const mnemonicSanityCheck = await $daemon.showMnemonics(this.passphrase);
             if (mnemonicSanityCheck !== mnemonic.mnemonic) {
                 // This should never happen.
-                this.$log.error("Mnemonic sanity check failed. This is a bug.");
-                alert("Mnemonic sanity check failed; this is a bug in the client.\n\n" +
-                      `Mnemonic we tried to set: ${mnemonic.mnemonic}\n` +
-                      `Mnemonic zcoind gave us: ${mnemonicSanityCheck}\n\n` +
-                       "Seek help from the Zcoin team; do not try to use the client again."
-                );
-                await $quitApp();
+                await $quitApp("Mnemonic sanity check failed. This is a bug. Seek help from the Zcoin team; do not try to use the client again.");
             }
             this.$log.info("Mnemonic sanity check passed.");
             this.setWaitingReason(undefined);
