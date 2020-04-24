@@ -238,6 +238,8 @@ export default {
         async restartDaemon() {
             this.setWaitingReason("Restarting daemon...");
             await $daemon.restartDaemon();
+            this.setWaitingReason("Loading our data...");
+            await $daemon.awaitInitializersCompleted();
             this.setWaitingReason(undefined);
         },
 
