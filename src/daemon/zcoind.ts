@@ -721,8 +721,6 @@ export class Zcoind {
 
         return new Promise(async (resolve, reject) => {
             try {
-                logger.debug("message raw:%O", message);
-                logger.debug("message:%O", JSON.stringify(message));
                 this.requesterSocket.send(JSON.stringify(message));
             } catch (e) {
                 try {
