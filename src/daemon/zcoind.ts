@@ -85,10 +85,9 @@ export interface ApiStatus {
 
 // one transaction output, of which a transaction may have many.
 export interface TransactionOutput {
-    // A unique ID generated on our side (not present in the API) which identifies the transaction. It will be different
-    // for outgoing and incoming versions of the same
-    // transactions.
-    uniqId: string;
+    // A unique ID generated on the client side (outside this file) which identifies the transaction. It will be
+    // different for outgoing and incoming versions of the same transactions.
+    uniqId?: string;
     isChange: boolean;
     category: string;
     txid: string;
