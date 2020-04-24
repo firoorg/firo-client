@@ -27,14 +27,6 @@ const mutations = {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
-                        // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
-                        // transactions should occur only during reindex, and they'll later be sent out with Transaction
-                        // events when block data is associated with them again.
-                        if (isReindexing && !tx.blockHeight) {
-                            logger.warn(`Ignoring transaction ${tx} with no block data received during sync.`);
-                            continue;
-                        }
-
                         state.unspentUTXOs[`${tx.txid}-${tx.txIndex}-${tx.category}`] = true;
 
                         if (address === 'MINT' && tx.category === 'receive') {
