@@ -68,7 +68,7 @@
                         Regtest
                     </div>
                     <div
-                        v-else-if="network !== 'mainnet'"
+                        v-else-if="network !== 'main'"
                         class="network-badge"
                     >
                         Unknown Network
