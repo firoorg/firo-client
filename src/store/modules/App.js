@@ -1,10 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import {platform, homedir} from 'os'
+import {homedir} from 'os'
 import * as types from '../types/App'
-import { getAppSettings } from '#/lib/utils'
+import { getAppSettings, getApp } from '#/lib/utils'
 import { createLogger } from '#/lib/logger'
-import {app} from "electron";
 
 const logger = createLogger('zcoin:store:app')
 
@@ -106,7 +105,7 @@ const actions = {
 
 const getters = {
     defaultZcoinRootDirectory: () => {
-        switch (platform()) {
+        switch (process.platform) {
         // This is the ID for *all* Windows versions
         case "win32":
             return path.join(homedir(), "AppData", "Roaming", "Zcoin");
@@ -122,10 +121,16 @@ const getters = {
         }
     },
     zcoindLocation: () => {
-        const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath();
-        const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked');
-        const zcoindName = platform() === 'win32' ? 'zcoind.exe' : 'zcoind';
-        return path.join(unpackedRootFolder, `/assets/core/${platform()}/${zcoindName}`);
+        const zcoindName = process.platform === 'win32' ? 'zcoind.exe' : 'zcoind';
+
+        let appDirectory;
+        if (process.env.NODE_ENV === "development") {
+            appDirectory = process.cwd();
+        } else {
+            appDirectory = getApp().getAppPath().replace('app.asar', 'app.asar.unpacked');
+        }
+
+        return path.resolve(appDirectory, 'assets', 'core', process.platform, zcoindName);
     },
     // It is invalid to access us prior to the app being initialized.
     //
