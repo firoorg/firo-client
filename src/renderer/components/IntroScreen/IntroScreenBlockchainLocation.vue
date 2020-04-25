@@ -124,10 +124,22 @@ export default {
         },
 
         async continueSetup() {
-            // These shouldn't be possible from the file selector, but just make sure anyway.
-            if (!path.isAbsolute(this.dataDir) || !fs.existsSync(this.dataDir)) {
-                alert('Invalid data directory');
+            if (!path.isAbsolute(this.dataDir)) {
+                // These shouldn't be possible from the file selector, but just make sure anyway.
+                alert('dataDir must be an absolute path');
                 return;
+            }
+
+            // If this.dataDir is the default directory and does not exist, try to create it.
+            if (!fs.existsSync(this.dataDir) && this.dataDir === this.defaultZcoinRootDirectory) {
+                try {
+                    fs.mkdirSync(this.dataDir);
+                    this.$log.info(`Created default zcoin dataDir ${this.dataDir}`);
+                } catch(e) {
+                    this.$log.warn(`Failed to create default zcoin dataDir ${this.dataDir}`);
+                    alert("dataDir didn't exist and we weren't able to create it");
+                    return;
+                }
             }
 
             try {
