@@ -60,12 +60,14 @@ const mutations = {
 
     // Mark down that we have been initialized in settings. This will cause MainLayout.vue to stop showing IntroScreen.
     setIsInitialized(state, isInitialized) {
-        if (!state.blockchainLocation) {
-            throw "Trying to mark us as initialized when App.blockchainLocation has not been set.";
-        }
+        if (isInitialized) {
+            if (!state.blockchainLocation) {
+                throw "Trying to mark us as initialized when App.blockchainLocation has not been set.";
+            }
 
-        if (!state.zcoinClientNetwork) {
-            throw "Trying to mark us as initialized when App.zcoinClientNetwork has not been set."
+            if (!state.zcoinClientNetwork) {
+                throw "Trying to mark us as initialized when App.zcoinClientNetwork has not been set."
+            }
         }
 
         state.isInitialized = isInitialized;
