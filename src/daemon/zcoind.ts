@@ -445,6 +445,8 @@ export class Zcoind {
 
                 case 'regtest':
                     args.push("-regtest=1");
+                    // dandelion=0 needs to be set for mining to actually include transactions on regtest.
+                    args.push("-dandelion=0");
                     break;
 
                 default:
