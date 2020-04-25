@@ -30,6 +30,8 @@ import {convertToCoin} from "#/lib/convert";
 import { createLogger } from '#/lib/logger';
 const logger = createLogger('zcoin:renderer:main.js');
 
+logger.info("Entering renderer/main.js...");
+
 let ourWindow = remote.getCurrentWindow();
 
 const customValidationRules = [

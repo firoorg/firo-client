@@ -60,9 +60,12 @@ app.once('ready', async () => {
     window.webContents.on('new-window', (e) => e.preventDefault());
 
     if (process.env.NODE_ENV === 'development') {
+        logger.info("Loading development environment at localhost:9080...");
         window.loadURL("http://localhost:9080/");
     }
     else {
-        window.loadFile(join(__dirname, 'index.html'));
+        const indexDotHtml = join(__dirname, 'index.html');
+        logger.info(`Loading production environment at ${indexDotHtml}...`);
+        window.loadFile(indexDotHtml);
     }
 });
