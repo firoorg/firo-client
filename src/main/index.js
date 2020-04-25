@@ -19,6 +19,7 @@ if (process.env.NODE_ENV !== 'development') {
 // Register us as the handler for zcoin:// links so deeplinks work. Actual handling of them is done in main.js.
 if (!app.isDefaultProtocolClient('zcoin')) {
     logger.info("Setting Zcoin Client as the default handler for zcoin:// links...");
+    // This can sometimes fail, in which case it will not throw but will print an error to stderr.
     app.setAsDefaultProtocolClient('zcoin');
 }
 
