@@ -76,6 +76,7 @@
       ]
     },
     "linux": {
+      "category": "Network",
       "icon": "assets/icons",
       "files": [
         "!assets/core/darwin",
