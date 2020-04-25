@@ -33,7 +33,7 @@ app.once('ready', async () => {
     // The window will be shown by the renderer process when zcoind is connected.
     let window = new BrowserWindow({
         show: false,
-        frame: false,
+        frame: process.platform !== 'darwin',
         useContentSize: true,
         titleBarStyle: 'hiddenInset',
         height: 780,
