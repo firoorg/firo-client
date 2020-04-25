@@ -26,20 +26,10 @@ error message.)
 
 Once zcoind is built, the relevant binaries will be located in `./zcoin/src/`.
 
-Now you must make a symbolic link from in your platform-specific directory to the generated binaries.
-
-On OSX, this can be accomplished by running the following command from the `zcoin-client` (assuming you also ran `git`
-from this directory):
-
-```bash
-for x in zcoind zcoin-tx zcoin-cli; do ln -s "$PWD/zcoin/src/$x" "assets/core/darwin/$x"; done
-```
-
-Or on Linux,
-
-```bash
-for x in zcoind zcoin-tx zcoin-cli; do ln -s "$PWD/zcoin/src/$x" "assets/core/linux/$x"; done
-```
+Now you must make copy the zcoind binary into the appropriate assets directory, either `assets/core/win32`,
+`assets/core/linux`, or `assets/core/darwin`. e.g.
+`mkdir -p assets/core/linux && cp ../zcoin/src/zcoind assets/core/linux`. In order to compile Zcoin Client binaries on
+other platforms, you must include zcoind binaries built for that platform in the appropriate directory.
 
 #### Updating zcoind
 
