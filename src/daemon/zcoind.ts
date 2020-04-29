@@ -3,7 +3,7 @@ import * as zmq from "zeromq";
 import * as path from "path";
 import {validateMnemonic} from "bip39";
 import Mutex from "await-mutex";
-const {execFile} = require("child_process");
+const {spawn} = require("child_process");
 
 import * as constants from './constants';
 import { createLogger } from '../lib/logger';
@@ -414,7 +414,7 @@ export class Zcoind {
     }
 
     // Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
-    // status 0, or rejects it with the error given by execFile if something goes wrong.
+    // status 0, or rejects it with the error given by spawn if something goes wrong.
     //
     // If mnemonicSettings is set, we start up the daemon with the directive to initialize it with the given mnemonic
     // and passphrase.
@@ -458,19 +458,17 @@ export class Zcoind {
             }
 
             logger.info("Starting daemon...");
-            execFile(this.zcoindLocation,
-                args,
-                {timeout: 10_000},
-                (error, stdout, stderr) => {
-                    if (error) {
-                        logger.error(`Error starting daemon (${error}): ${stderr}`);
-                        reject(error);
-                    } else {
-                        logger.info("Successfully started daemon.");
-                        resolve();
-                    }
+            const zcoindProcess = spawn(this.zcoindLocation, args);
+            zcoindProcess.on('exit', (code) => {
+                if (code === 0) {
+                    logger.info("zcoind started successfully.");
+                    resolve();
+                } else {
+                    const stderr = zcoindProcess.stderr.read();
+                    logger.info(`zcoind exited with code ${code}: ${stderr}`);
+                    reject(`zcoind exited with code ${code}: ${stderr}`);
                 }
-            );
+            });
         }
        );
     }
