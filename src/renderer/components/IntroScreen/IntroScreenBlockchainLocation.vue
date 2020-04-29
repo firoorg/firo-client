@@ -130,6 +130,14 @@ export default {
                 return;
             }
 
+            if (["testnet3", "regtest"].includes(path.basename(this.dataDir))) {
+                if (!confirm(`Your wallet will be on the ${this.network} network, and will be located at ` +
+                            `"${this.walletLocation}". You probably meant to select the parent directory ` +
+                            `(${path.dirname(this.dataDir)}) instead. Are you sure you want to continue?`)) {
+                    return;
+                }
+            }
+
             // If this.dataDir is the default directory and does not exist, try to create it.
             if (!fs.existsSync(this.dataDir) && this.dataDir === this.defaultZcoinRootDirectory) {
                 try {
