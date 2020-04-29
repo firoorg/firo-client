@@ -145,7 +145,25 @@ ourWindow.webContents.on('shutdown-requested', async () => {
     await $quitApp();
 });
 
-// Actually handle deeplinks.
+// Handle zcoin:// links on Windows.
+app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (ourWindow.isMinimized()) {
+        ourWindow.restore();
+    }
+    ourWindow.focus();
+
+    // Emulate the link-opening behaviour of OSX.
+    if (process.platform === "win32") {
+        const url = commandLine.slice(1).join(" ");
+
+        if (url) {
+            app.emit('open-url', event, url);
+        }
+    }
+});
+
+// Actually handle deeplinks. open-url is emitted by our own code on Windows.
 logger.info("Registering protocol handler for zcoin links...");
 app.on('open-url', (event, url) => {
     if (!store.getters['App/isInitialized'] || store.getters['App/waitingReason']) {

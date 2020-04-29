@@ -16,7 +16,14 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = join(__dirname, 'static').replace(/\\/g, '\\\\')
 }
 
-// Register us as the handler for zcoin:// links so deeplinks work. Actual handling of them is done in main.js.
+// We don't want multiple copies of our application running.
+if (!app.requestSingleInstanceLock()) {
+    // The second-instance handler will be fired automatically.
+    app.exit();
+    process.exit();
+}
+
+// Register us as the handler for zcoin:// links. Actual handling of them is done in main.js.
 if (!app.isDefaultProtocolClient('zcoin')) {
     logger.info("Setting Zcoin Client as the default handler for zcoin:// links...");
     // This can sometimes fail, in which case it will not throw but will print an error to stderr.
@@ -32,7 +39,7 @@ app.once('ready', async () => {
     Menu.setApplicationMenu(appMenu);
 
     // The window will be shown by the renderer process when zcoind is connected.
-    let window = new BrowserWindow({
+    const ourWindow = new BrowserWindow({
         show: false,
         frame: process.platform !== 'darwin',
         useContentSize: true,
@@ -44,10 +51,10 @@ app.once('ready', async () => {
     });
 
     // Fire the shutdown-requested listener in renderer/main.js when the user tries to close us.
-    window.on('close', (event) => {
+    ourWindow.on('close', (event) => {
         event.preventDefault();
         // This is picked up by a listener in renderer/main.js, which is responsible for actually exiting the applicaiton.
-        window.webContents.emit("shutdown-requested", event);
+        ourWindow.webContents.emit("shutdown-requested", event);
     });
 
     // Stop new alt-clicks from opening new BrowserWindows.
@@ -57,15 +64,15 @@ app.once('ready', async () => {
     //
     // FIXME: alt-clicking on a router link will still cause the link to be highlighted even though no other action is
     //        taken.
-    window.webContents.on('new-window', (e) => e.preventDefault());
+    ourWindow.webContents.on('new-window', (e) => e.preventDefault());
 
     if (process.env.NODE_ENV === 'development') {
         logger.info("Loading development environment at localhost:9080...");
-        window.loadURL("http://localhost:9080/");
+        ourWindow.loadURL("http://localhost:9080/");
     }
     else {
         const indexDotHtml = join(__dirname, 'index.html');
         logger.info(`Loading production environment at ${indexDotHtml}...`);
-        window.loadFile(indexDotHtml);
+        ourWindow.loadFile(indexDotHtml);
     }
 });
