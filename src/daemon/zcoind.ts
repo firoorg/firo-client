@@ -413,6 +413,17 @@ export class Zcoind {
         }
     }
 
+    // Resolve when we determine that zcoind is listening by attempting a connection every 1s.
+    async awaitZcoindListening() {
+        while (true) {
+            if (await this.isZcoindListening()) {
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+
     // Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
     // status 0, or rejects it with the error given by spawn if something goes wrong.
     //
@@ -472,10 +483,7 @@ export class Zcoind {
 
             // zcoind on Windows doesn't currently support the -daemon flag. Remove when it does.
             if (process.platform === "win32") {
-                setTimeout(() => {
-                    logger.info("zcoind hasn't exited in 5s, so we're assuming it started successfully.");
-                    resolve();
-                }, 5_000);
+                this.awaitZcoindListening().then(() => resolve());
             }
         }
        );
@@ -509,23 +517,18 @@ export class Zcoind {
     // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
     private connectAndReact(): Promise<void> {
         return new Promise(async (resolve, reject) => {
+            logger.info("Waiting for zcoind to open its ports...");
             // We need to do this because ZMQ will just hang if the socket is unavailable.
-            let attempts = 0;
-            while (++attempts) {
-                if (attempts >= 10) {
+            await new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    logger.error("zcoind has not opened it ports after 30 seconds");
                     reject(new ZcoindConnectionTimeout(30));
-                    return;
-                }
-
-                logger.info(`Checking if zcoind is listening on ${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher} (attempt ${attempts})`);
-                if (await this.isZcoindListening()) {
-                    logger.info(`zcoind is listening (attempt: ${attempts})`);
-                    break;
-                } else {
-                    logger.info(`zcoind is not listening (attempt ${attempts})`);
-                }
-                await new Promise(r => setTimeout(r, 3000));
-            }
+                }, 30_000);
+                this.awaitZcoindListening().then(() => {
+                    logger.info("zcoind's ports are open.");
+                    resolve();
+                });
+            })
 
             logger.info("Connecting to zcoind...")
             this.statusPublisherSocket = zmq.socket('sub');
