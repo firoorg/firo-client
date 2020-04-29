@@ -111,7 +111,7 @@ export default {
         }),
 
         async changeDataDir() {
-            this.dataDir = remote.dialog.showOpenDialog({
+            this.dataDir = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
                 title: 'Select Zcoin Data Directory',
                 properties: [
                     'openDirectory',
