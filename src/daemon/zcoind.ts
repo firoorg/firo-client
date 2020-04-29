@@ -420,6 +420,10 @@ export class Zcoind {
     // and passphrase.
     private async launchDaemon(mnemonicSettings?: MnemonicSettings): Promise<void> {
         return new Promise((resolve, reject) => {
+            if (!fs.existsSync(this.zcoindLocation)) {
+                throw "zcoind (${this.zcoindLocation) does not exist.";
+            }
+
             // These are the arguments that will be passed to zcoind.
             const args = ["-daemon", "-clientapi=1"];
             if (this.zcoindDataDir) {
