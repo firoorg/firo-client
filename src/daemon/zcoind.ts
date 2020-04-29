@@ -469,6 +469,14 @@ export class Zcoind {
                     reject(`zcoind exited with code ${code}: ${stderr}`);
                 }
             });
+
+            // zcoind on Windows doesn't currently support the -daemon flag. Remove when it does.
+            if (process.platform === "win32") {
+                setTimeout(() => {
+                    logger.info("zcoind hasn't exited in 5s, so we're assuming it started successfully.");
+                    resolve();
+                }, 5_000);
+            }
         }
        );
     }
