@@ -1,8 +1,8 @@
 import { Zcoind } from '../zcoind';
 
 export async function handleEvent(store: any, zcoind: Zcoind, data: any) {
-    store.dispatch('Znode/setStateWithZnodeList', data.nodes);
-    store.dispatch('Znode/setZnodeCount', data.total);
+    store.commit('Znode/setStateWithZnodeList', data.nodes);
+    store.commit('Znode/setZnodeCount', data.total);
 }
 
 export async function initialize(store: any, zcoind: Zcoind) {
