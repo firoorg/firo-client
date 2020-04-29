@@ -425,14 +425,14 @@ export class Zcoind {
             }
 
             // These are the arguments that will be passed to zcoind.
-            const args = ["-daemon", "-clientapi=1"];
+            const args = ["-daemon=1", "-clientapi=1"];
             if (this.zcoindDataDir) {
                 args.push(`-datadir=${this.zcoindDataDir}`);
             }
             if (mnemonicSettings) {
                 // We need to reindex when recovering from a mnemonic.
                 args.push("-reindex=1");
-                args.push("-usemnemonic");
+                args.push("-usemnemonic=1");
                 args.push(`-mnemonic=${mnemonicSettings.mnemonic}`);
                 if (mnemonicSettings.mnemonicPassphrase) {
                     args.push(`-mnemonicpassphrase=${mnemonicSettings.mnemonicPassphrase}`);
