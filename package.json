@@ -32,6 +32,12 @@
     "productName": "Zcoin Client",
     "appId": "com.zcoin.client",
     "asar": true,
+    "protocols": {
+      "name": "zcoin",
+      "schemes": [
+        "zcoin"
+      ]
+    },
     "directories": {
       "output": "build",
       "buildResources": "assets"
