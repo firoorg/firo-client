@@ -4,6 +4,7 @@ import { createLogger } from '../../lib/logger';
 const logger = createLogger('zcoin:daemon:blockchain');
 
 export async function handleEvent(store: any, zcoind: Zcoind, data: any) {
+    logger.info("Got block event: %O", data);
     store.commit('Blockchain/updateBlockchain', data);
 }
 
