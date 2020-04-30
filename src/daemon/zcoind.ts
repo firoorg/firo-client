@@ -436,7 +436,10 @@ export class Zcoind {
             }
 
             // These are the arguments that will be passed to zcoind.
-            const args = ["-daemon=1", "-clientapi=1"];
+            const args = ["-clientapi=1"];
+            if (process.platform !== "win32") {
+                args.push("-daemon=1");
+            }
             if (this.zcoindDataDir) {
                 args.push(`-datadir=${this.zcoindDataDir}`);
             }
@@ -469,19 +472,41 @@ export class Zcoind {
             }
 
             logger.info("Starting daemon...");
-            execFile(this.zcoindLocation,
-                args,
-                {timeout: 10_000},
-                (error, stdout, stderr) => {
+            if (process.platform === "win32") {
+                let hasResolved = false;
+
+                execFile(this.zcoindLocation, args,{}, (error, stdout, stderr) => {
+                    if (hasResolved) return;
+
                     if (error) {
                         logger.error(`Error starting daemon (${error}): ${stderr}`);
-                        reject(error);
-                    } else {
-                        logger.info("Successfully started daemon.");
-                        resolve();
+                        hasResolved = true;
+                        reject(`${error}: ${stderr}`);
                     }
-                }
-            );
+                });
+
+                this.awaitZcoindListening().then(() => {
+                    if (hasResolved) return;
+
+                    logger.info("zcoind is listening. Inferring that we've successfully started the daemon.");
+                    hasResolved = true;
+                    resolve();
+                })
+            } else {
+                execFile(this.zcoindLocation,
+                    args,
+                    {timeout: 10_000},
+                    (error, stdout, stderr) => {
+                        if (error) {
+                            logger.error(`Error starting daemon (${error}): ${stderr}`);
+                            reject(`${error}: ${stderr}`);
+                        } else {
+                            logger.info(`Successfully started daemon: ${stdout}`);
+                            resolve();
+                        }
+                    }
+                );
+            }
         }
        );
     }
