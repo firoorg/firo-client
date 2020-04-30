@@ -539,15 +539,24 @@ export class Zcoind {
     // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
     private connectAndReact(): Promise<void> {
         return new Promise(async (resolve, reject) => {
+            let finished = false;
             logger.info("Waiting for zcoind to open its ports...");
             // We need to do this because ZMQ will just hang if the socket is unavailable.
             await new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    logger.error("zcoind has not opened it ports after 30 seconds");
+                    if (!finished) {
+                        logger.error("zcoind has not opened it ports after 30 seconds");
+                        finished = true;
+                    }
+
                     reject(new ZcoindConnectionTimeout(30));
                 }, 30_000);
                 this.awaitZcoindListening().then(() => {
-                    logger.info("zcoind's ports are open.");
+                    if (!finished) {
+                        logger.info("zcoind's ports are open.");
+                        finished = true;
+                    }
+
                     resolve();
                 });
             })
