@@ -566,9 +566,7 @@ export default {
             try {
                 this.transactionFee = await p;
             } catch (e) {
-                console.log('q');
                 if (e.error && e.error.code === -6) {
-                    console.log('z');
                     this.totalAmountExceedsBalance = true;
                 }
             }
