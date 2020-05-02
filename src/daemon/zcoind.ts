@@ -16,7 +16,6 @@ class ZcoindErrorResponse extends Error {
     constructor(call, error) {
         super(`${call} call failed due to ${JSON.stringify(error)}`);
         this.name = 'ZcoindErrorResponse';
-        this.message = error;
     }
 }
 
