@@ -613,6 +613,7 @@ export class Zcoind {
         // blocks will be set to -1 while the block index is loading.
         if (apiStatus.data && apiStatus.data.blocks >= 0) {
             if (this._unlockAfterBlockIndex) {
+                logger.info("Got apiStatus %O; unlocking blockIndexMutex()", apiStatus.data);
                 // Unlock this.blockIndexMutex so awaitBlockIndex can resolve.
                 this._unlockAfterBlockIndex();
                 this._unlockAfterBlockIndex = undefined;
