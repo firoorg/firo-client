@@ -239,7 +239,11 @@ export default {
             this.setWaitingReason("Restarting daemon...");
             await $daemon.restartDaemon();
             this.setWaitingReason("Loading our data...");
-            await $daemon.awaitInitializersCompleted();
+            try {
+                await $daemon.awaitInitializersCompleted();
+            } catch(e) {
+                await $quitApp(`Shutting down because initializers didn't complete successfully: ${e}`);
+            }
             this.setWaitingReason(undefined);
         },
 
