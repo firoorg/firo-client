@@ -69,8 +69,12 @@ class AppSettings {
 
                         const result = {};
                         for (const regItem of regItems) {
-                            console.log(`key: ${regItem.key} ${regItem.name} ${regItem.value}`);
-                            result[regItem.name] = JSON.parse(regItem.value);
+                            console.log(`found Windows registry entry: ${regItem.key}/${regItem.name}: ${regItem.value}`);
+                            try {
+                                result[regItem.name] = JSON.parse(regItem.value);
+                            } catch(e) {
+                                console.error(`registry entry ${regItem.key}/${regItem.name} had invalid JSON: ${regItem.value}`);
+                            }
                         }
 
                         resolve(result);
