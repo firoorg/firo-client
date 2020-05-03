@@ -117,8 +117,8 @@ export default {
                 await $quitApp(`Failed to start zcoind with mnemonic: ${e}`);
             }
 
-            await this.setWaitingReason("Waiting for zcoind to load the block index...");
-            await initialDaemon.awaitBlockIndex();
+            await this.setWaitingReason("Waiting for zcoind API to be ready...");
+            await initialDaemon.awaitApiIsReady();
 
             await this.setWaitingReason("Locking the wallet...");
             try {

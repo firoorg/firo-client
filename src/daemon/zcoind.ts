@@ -220,27 +220,26 @@ export class Zcoind {
     private publisherSocket: zmq.Socket | undefined;
     private latestApiStatus: ApiStatus | undefined;
     // This is used to indicate that zcoind has loaded the block index.
-    private awaitBlockIndexMutex: Mutex;
-    // This is the unlocking function for awaitBlockIndexMutex. It will be reset to undefined after it has been unlcoked.
-    private _unlockAfterBlockIndex: MaybeUnlockerFunction;
+    private apiIsReadyMutex: Mutex;
+    // This is the unlocking function for apiIsReadyMutex. It will be reset to undefined after it has been unlcoked.
+    private _unlockWhenApiIsReady: MaybeUnlockerFunction;
     // This will ensure only one request is sent at a time. It will also signal to connectAndReact when the connection
     // to the requester and publisher sockets are made.
     private requestMutex: Mutex;
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
     private _unlockAfterConnect: MaybeUnlockerFunction;
-    // This Mutex is used to identify when zcoind is restarted so we can poison awaitBlockIndex callers.
+    // This Mutex is used to identify when zcoind is restarted so we can poison awaitApiIsReady callers.
     private zcoindRestartMutex: Mutex;
     private _unlockOnZcoindRestart: MaybeUnlockerFunction;
     // This Mutex is used to identify when all initializers have run to completion.
     private initializersCompletedMutex: Mutex;
     // This is released when an initializer rejects.
     private initializersPoisonedMutex: Mutex;
-    private _unlockWhenInitializersCompleted: MaybeUnlockerFunction;
     // An array of rejections from our initializers. Hopefully, this will be empty.
     private initializerRejections: any[];
     private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
-    // These are the functions that will be called after awaitBlockIndex() resolves.
+    // These are the functions that will be called after awaitApiIsReady() resolves.
     initializers: ZcoindInitializationFunction[];
     // The location of the zcoind binary, or null to use the default location.
     zcoindLocation: string | null;
@@ -254,7 +253,7 @@ export class Zcoind {
     // If zcoindDataDir is null (but NOT undefined or the empty string) we will not specify it and use the default
     // location.
     //
-    // All the functions in initializers will be called with zcoind as their only argument after awaitBlockIndex()
+    // All the functions in initializers will be called with zcoind as their only argument after awaitApiIsReady()
     // resolves. When all of them resolve() (or reject()), awaitInitializersCompleted() will resolve.
     //
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
@@ -269,7 +268,7 @@ export class Zcoind {
         this.zcoindDataDir = zcoindDataDir;
 
         this.requestMutex = new Mutex();
-        this.awaitBlockIndexMutex = new Mutex();
+        this.apiIsReadyMutex = new Mutex();
         this.zcoindRestartMutex = new Mutex();
         this.initializers = initializers;
         this.eventHandlers = eventHandlers;
@@ -320,12 +319,12 @@ export class Zcoind {
             this._unlockAfterConnect = await this.requestMutex.lock();
         }
 
-        this._unlockAfterBlockIndex = await this.awaitBlockIndexMutex.lock();
+        this._unlockWhenApiIsReady = await this.apiIsReadyMutex.lock();
 
         // This won't be set on the first call to start().
         if (this._unlockOnZcoindRestart) {
             this.zcoindRestartMutex = new Mutex();
-            // Unlock the old Mutex so that awaitBlockIndex can be poisoned.
+            // Unlock the old Mutex so that awaitApiIsReady can be poisoned.
             this._unlockOnZcoindRestart();
         }
         this._unlockOnZcoindRestart = await this.zcoindRestartMutex.lock();
@@ -335,8 +334,8 @@ export class Zcoind {
         this.initializersPoisonedMutex = new Mutex();
         const unlockWhenInitializersResolve = this.initializersCompletedMutex.lock();
         const unlockWhenInitializersReject = this.initializersPoisonedMutex.lock();
-        // This must be called AFTER this.awaitBlockIndexMutex and this.zcoindRestartMutex are locked.
-        this.awaitBlockIndex().then(async () => {
+        // This must be called AFTER this.apiIsReadyMutex and this.zcoindRestartMutex are locked.
+        this.awaitApiIsReady().then(async () => {
             const initializerPromises = this.initializers.map(initializer => initializer(this));
             const rejections = [];
 
@@ -383,13 +382,13 @@ export class Zcoind {
     }
 
     // Resolve when zcoind has loaded the block index.
-    awaitBlockIndex(): Promise<void> {
+    awaitApiIsReady(): Promise<void> {
         if (!this._unlockAfterConnect) {
-            throw "zcoind must be started before awaitBlockIndex() can be called.";
+            throw "zcoind must be started before awaitApiIsReady() can be called.";
         }
 
         return new Promise((resolve, reject) => {
-            this.awaitBlockIndexMutex.lock().then(release => {
+            this.apiIsReadyMutex.lock().then(release => {
                 resolve();
                 release();
             });
@@ -610,12 +609,12 @@ export class Zcoind {
         this.latestApiStatus = apiStatus;
 
         // blocks will be set to -1 while the block index is loading.
-        if (apiStatus.data && apiStatus.data.blocks >= 0) {
-            if (this._unlockAfterBlockIndex) {
-                logger.info("Got apiStatus %O; unlocking blockIndexMutex()", apiStatus.data);
-                // Unlock this.blockIndexMutex so awaitBlockIndex can resolve.
-                this._unlockAfterBlockIndex();
-                this._unlockAfterBlockIndex = undefined;
+        if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
+            if (this._unlockWhenApiIsReady) {
+                logger.info("Got apiStatus %O; unlocking apiIsReadyMutex", apiStatus.data);
+                // Unlock this.apiIsReadyMutex so awaitApiIsReady can resolve.
+                this._unlockWhenApiIsReady();
+                this._unlockWhenApiIsReady = undefined;
             }
         }
 
