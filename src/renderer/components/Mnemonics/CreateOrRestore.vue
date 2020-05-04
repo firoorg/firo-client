@@ -41,7 +41,7 @@ export default {
         async createNewWallet() {
             if (!this.actions.getCachedMnemonic()) {
                 // 256 bits of entropy translates into a 24 word mnemonic.
-                this.actions.setCachedMnemonic({mnemonic: generateMnemonic(256), mnemonicPassphrase: null});
+                this.actions.setCachedMnemonic({mnemonic: generateMnemonic(256), mnemonicPassphrase: null, isNewMnemonic: true});
             }
 
             this.actions.goTo("createWallet");

@@ -183,7 +183,7 @@ export interface PaymentRequestData {
     state: PaymentRequestState;
 }
 
-export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null};
+export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean};
 export {validateMnemonic, generateMnemonic} from "bip39";
 
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
@@ -442,8 +442,17 @@ export class Zcoind {
                 args.push(`-datadir=${this.zcoindDataDir}`);
             }
             if (mnemonicSettings) {
-                // We need to reindex when recovering from a mnemonic.
-                args.push("-rescan=1");
+                // This is typed as a boolean, but since we are indirectly called from JS there's really not any type
+                // checking, and we don't want to silently do weird things.
+                if (typeof mnemonicSettings.isNewMnemonic !== 'boolean') {
+                    throw "mnemonicSettings.isNewMnemonic must be a boolean";
+                }
+
+                if (!mnemonicSettings.isNewMnemonic) {
+                    // We need to rescan when recovering from a mnemonic.
+                    args.push("-rescan=1");
+                }
+
                 args.push("-usemnemonic=1");
                 args.push(`-mnemonic=${mnemonicSettings.mnemonic}`);
                 if (mnemonicSettings.mnemonicPassphrase) {

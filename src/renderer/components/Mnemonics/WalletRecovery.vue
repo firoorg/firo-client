@@ -92,7 +92,7 @@ export default {
                 return;
             }
 
-            this.actions.setCachedMnemonic({mnemonic: this.mnemonic, mnemonicPassphrase: this.protectivePassphrase || null});
+            this.actions.setCachedMnemonic({mnemonic: this.mnemonic, mnemonicPassphrase: this.protectivePassphrase || null, isNewMnemonic: false});
             this.actions.goTo("lock");
         },
         openProtectivePassphrse() {

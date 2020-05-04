@@ -107,8 +107,14 @@ export default {
         },
 
         async lockWallet() {
-            await this.setWaitingReason("Telling zcoind to start and reindex with our mnemonic...");
             const mnemonic = this.actions.getCachedMnemonic();
+
+            if (mnemonic.isNewMnemonic) {
+                await this.setWaitingReason("Initializing zcoind with our mnemonic...");
+            } else {
+                await this.setWaitingReason("Setting our mnemonic and rescanning the blockchain. This may take a while...");
+            }
+
             let initialDaemon;
             try {
                 initialDaemon = new Zcoind(this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation, [], {});
