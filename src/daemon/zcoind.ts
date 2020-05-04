@@ -443,7 +443,7 @@ export class Zcoind {
             }
             if (mnemonicSettings) {
                 // We need to reindex when recovering from a mnemonic.
-                args.push("-reindex=1");
+                args.push("-rescan=1");
                 args.push("-usemnemonic=1");
                 args.push(`-mnemonic=${mnemonicSettings.mnemonic}`);
                 if (mnemonicSettings.mnemonicPassphrase) {
