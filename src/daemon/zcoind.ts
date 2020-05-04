@@ -561,6 +561,7 @@ export class Zcoind {
 
             logger.info("Connecting to zcoind...")
             this.statusPublisherSocket = zmq.socket('sub');
+
             // Set timeout for requester socket
             this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
             this.statusPublisherSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
@@ -577,8 +578,35 @@ export class Zcoind {
             });
 
             this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
-            this.statusPublisherSocket.subscribe('apiStatus');
+            this.subscribeToApiStatus();
         });
+    }
+
+    // This method is needed because zcoind may accept the connection but fail to queue or respond to apiStatus
+    // subscriptions. (To my knowledge, this occurs when zcoind is rescanning the block database, which seems to occur
+    // after zcoind has been loaded with the same datadir on a new operating system.)
+    //
+    // We'll subscribe to apiStatus, and then keep trying to subscribe every 1.5s until we actually get an apiStatus
+    // message.
+    private subscribeToApiStatus() {
+        if (this.latestApiStatus) {
+            return;
+        }
+
+        try {
+            // If it's not ignored, this call is idempotent, and safe even when the socket is not yet open, but will
+            // throw if the socket is closed already, which might be the case if we've closed the connection a short
+            // time after opening it.
+            this.statusPublisherSocket.subscribe('apiStatus');
+        } catch(e) {
+            if (e.name === "TypeError" && e.message === "Socket is closed") {
+                return;
+            }
+
+            throw e;
+        }
+
+        setTimeout(() => this.subscribeToApiStatus(), 1500);
     }
 
     // This function is called when the API status is received. It initialises the (separate) sockets by which we'll
