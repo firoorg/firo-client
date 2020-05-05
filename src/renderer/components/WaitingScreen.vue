@@ -70,8 +70,10 @@ export default {
         }
 
         .waiting {
-            height: min-content;
             color: $color--green;
+            height: min-content;
+            width: fit-content;
+            margin: auto;
 
             .bounce, .header-text {
                 display: inline-block;
