@@ -200,7 +200,14 @@ function startVue() {
     }).$mount('#app');
 }
 
-if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLocation'])) {
+if (process.env.ZCOIN_CLIENT_REPL === 'true') {
+    // Allow shutting down.
+    setWaitingReason(undefined);
+
+    window.Zcoind = require('../daemon/zcoind').Zcoind;
+
+    ourWindow.webContents.openDevTools();
+} else if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLocation'])) {
     setWaitingReason("Starting up zcoind...");
 
     startVue();
