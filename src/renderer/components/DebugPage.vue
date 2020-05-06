@@ -106,8 +106,8 @@ export default {
                     longHelp: 'clear the console'
                 },
 
-                resetClientConfig: {
-                    shortHelp: 'resetClientConfig',
+                resetclientconfig: {
+                    shortHelp: 'resetclientconfig',
                     longHelp: 'Reset the configuration of the client, allowing you to go through setup again.'
                 }
             }
@@ -279,7 +279,7 @@ export default {
 
             if (input === 'clear') {
                 this.sessionLog = [];
-            } else if (input.match(/^\s*resetClientConfig\s*$/)) {
+            } else if (input.match(/^\s*resetclientconfig\s*$/)) {
                 this.resetClientConfig();
             } else if (input.match(/^\s*help\s*$/)) { // Add our own commands to help.
                 let output = await this.legacyRpc("help");
