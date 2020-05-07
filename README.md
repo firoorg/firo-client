@@ -63,7 +63,7 @@ can be changed with the environment variable `ZCOIN_CLIENT_DEBUG_LEVEL`.
 
 ## REPL
 
-If the client is started with the `ZCOIN_CLIENT_REPL` environment variable set to `true`, the client will no start
+If the client is started with the `ZCOIN_CLIENT_REPL` environment variable set to `true`, the client will not start
 and instead Chrome Dev Tools will be launched with the global variable Zcoind set to the Zcoind class from
 `src/daemon/zcoind.ts`. It can then be used to interact with the daemon as documented in that file. The daemon will
 NOT be stopped automatically on exit.
