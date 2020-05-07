@@ -41,7 +41,7 @@ export const getters = {
     isBlockchainSynced: (state, getters, rootState, rootGetters) => getters.status.isBlockchainSynced || rootGetters['ApiStatus/network'] === 'regtest',
     isWinnersListSynced: (state, getters) => getters.status.isWinnersListSynced,
     isZnodeListSynced: (state, getters) => getters.status.isZnodeListSynced,
-    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime,
+    averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime * 1000,
     connections: (state) => state.connections,
     hasConnections: (state) => !!state.connections,
     estimatedTimeUntilSynced: (state) => state.estimatedTimeUntilSynced,
