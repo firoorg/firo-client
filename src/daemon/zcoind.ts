@@ -186,6 +186,10 @@ export interface PaymentRequestData {
 export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean};
 export {validateMnemonic, generateMnemonic} from "bip39";
 
+// CoinControl is an array of [txid, txindex] pairs.
+export type CoinControl = [string, number][];
+const coinControlToString = (coinControl: CoinControl) => coinControl.map(e => `${e[0]}-${e[1]}`).join(':');
+
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
 // file.
 function readCert(path: string): [string, string] {
@@ -953,7 +957,11 @@ export class Zcoind {
 
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
-    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, selected: string): Promise<string> {
+    //
+    // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
+    // this transaction.
+    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
+                     subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
         const data: {txid: string} = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
@@ -964,7 +972,7 @@ export class Zcoind {
             feePerKb,
             subtractFeeFromAmount,
             coinControl: {
-                selected
+                selected: coinControl ? coinControlToString(coinControl) : ''
             }
         });
 
@@ -980,10 +988,14 @@ export class Zcoind {
         return data;
     }
 
-    // Publicly send amount satoshi XZC to recipient, subtracting the fee from the amount.
+    // Privately send amount satoshi XZC to recipient, subtracting the fee from the amount.
+    //
+    // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
+    // this transaction.
     //
     // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean, selected: string): Promise<string> {
+    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
+                      coinControl?: CoinControl): Promise<string> {
         const data = await this.send(auth, 'create', 'sendPrivate', {
             outputs: [
                 {
@@ -994,7 +1006,7 @@ export class Zcoind {
             label,
             subtractFeeFromAmount,
             coinControl: {
-                selected
+                selected: coinControl ? coinControlToString(coinControl) : ''
             }
         });
         return data;
