@@ -157,7 +157,7 @@ export default {
             }
 
             const label = this.label || (this.amount ? `Request for ${this.amount} XZC` : 'Payment Request');
-            const address = (this.addressBookStt && this.addressBookStt.address) ? this.addressBookStt.address : ''; 
+            const address = (this.addressBookStt && this.addressBookStt.address) ? this.addressBookStt.address : undefined;
             const pr = await $daemon.createPaymentRequest(convertToSatoshi(this.amount), label, this.message, address);
             this.$store.dispatch('PaymentRequest/addOrUpdatePaymentRequestFromResponse', pr);
             this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, address: ''});

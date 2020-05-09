@@ -919,9 +919,11 @@ export class Zcoind {
 
     // Create a new payment request (to be stored on the daemon-side).
     //
+    // If address is not specified, a new address will be created.
+    //
     // NOTE: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
     //       responsible for any updating of state that might be required.
-    async createPaymentRequest(amount: number | undefined, label: string, message: string, address:string): Promise<PaymentRequestData> {
+    async createPaymentRequest(amount: number | undefined, label: string, message: string, address?: string): Promise<PaymentRequestData> {
         return await this.send(null, 'create', 'paymentRequest', {
             amount,
             label,
