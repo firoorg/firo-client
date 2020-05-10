@@ -207,7 +207,9 @@ if (process.env.ZCOIN_CLIENT_REPL === 'true') {
     window.Zcoind = require('../daemon/zcoind').Zcoind;
 
     ourWindow.webContents.openDevTools();
-} else if (store.getters['App/isInitialized'] && existsSync(store.getters['App/walletLocation'])) {
+} else if (store.getters['App/isInitialized'] &&
+           existsSync(store.getters['App/walletLocation']) &&
+           process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
     setWaitingReason("Starting up zcoind...");
 
     startVue();
