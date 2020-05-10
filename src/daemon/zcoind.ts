@@ -791,18 +791,28 @@ export class Zcoind {
             throw "Attempted to send before zcoind is started.";
         }
 
-        logger.debug("Trying to acquire requestMutex");
+        let forCallName = '';
+        if (message.collection) {
+            forCallName = ` for ${message.type}/${message.collection}`;
+        }
+
+        logger.debug(`Trying to acquire requestMutex${forCallName}...`);
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
-        let release = await this.requestMutex.lock();
-        logger.debug("Acquired requestMutex");
+        let releaseLock = await this.requestMutex.lock();
+        logger.debug(`Acquired requestMutex${forCallName}`);
 
         // If dontReleaseRequestMutex is true, we will make release a non-op and set it to this._unlockAfterConnect so
         // it can be released by another method at a later time.
         if (dontReleaseRequestMutex) {
-            this._unlockAfterConnect = release;
-            release = async () => null;
+            this._unlockAfterConnect = releaseLock;
+            releaseLock = async () => null;
         }
+
+        const release = () => {
+            logger.debug(`Releasing requestMutex${forCallName}...`)
+            releaseLock();
+        };
 
         return new Promise(async (resolve, reject) => {
             try {
@@ -830,7 +840,7 @@ export class Zcoind {
                     return;
                 }
 
-                logger.debug("received reply from zcoind: %O", message);
+                logger.debug(`received reply from zcoind${forCallName}: %O`, message);
 
                 if (typeof message === 'object' &&
                     !message.error &&
@@ -840,7 +850,7 @@ export class Zcoind {
                 ) {
                     resolve(message.data);
                 } else {
-                    logger.error("zcoind replied with an error: %O", message);
+                    logger.error(`zcoind replied with an error${forCallName}: %O`, message);
                     reject(message);
                 }
 
