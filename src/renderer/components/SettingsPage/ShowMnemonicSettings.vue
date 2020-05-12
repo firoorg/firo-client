@@ -79,7 +79,7 @@ export default {
     async ok() {
       if (!this.askedPassphrase) {
         try {
-          this.mnemonic = await this.$daemon.showMnemonics(this.passphrase);
+          this.mnemonic = await $daemon.showMnemonics(this.passphrase);
           this.askedPassphrase = true;
         } catch (e) {
           this.showError = true;

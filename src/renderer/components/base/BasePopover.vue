@@ -30,8 +30,6 @@
 import smoothReflow from 'vue-smooth-reflow'
 import { mapGetters } from 'vuex'
 
-import { getEventBus } from '@/utils/eventBus'
-
 export default {
     name: 'BasePopover',
     mixins: [
@@ -40,10 +38,6 @@ export default {
     inheritAttrs: false,
 
     props: {
-        canBlur: {
-            type: Boolean,
-            default: true
-        },
         eventBusName: {
             type: String,
             default: 'popover'
@@ -65,33 +59,17 @@ export default {
             hasOpenOverlay: 'App/hasOpenOverlay'
         }),
 
-        isBlurred () {
-            return this.canBlur && this.hasOpenOverlay
-        },
-
         getPopoverClass () {
             const parent = this.$attrs['popover-class'] || ''
-            const classes = parent ? [parent] : []
-
-            return this.isBlurred ? [...classes, 'is-blurred'] : classes
+            return parent ? [parent] : []
         }
     },
-
-    /*
-    created() {
-        this.eventBus = getEventBus(this.eventBusName)
-        this.eventBus.$on('reflow', () => {
-            this.reflowSymbol = Date.now()
-        })
-    },
-    */
 
     mounted () {
         this.reflow()
     },
 
     beforeDestroy () {
-        //this.eventBus.$off('reflow')
         this.$unsmoothReflow({
             el: this.$refs.container
         })
@@ -101,7 +79,6 @@ export default {
         reflow () {
             this.$smoothReflow({
                 el: this.$refs.container,
-                // debug: true,
                 transitionEvent: {
                     selector: '.popover-content',
                 }

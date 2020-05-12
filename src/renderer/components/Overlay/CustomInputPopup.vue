@@ -291,7 +291,7 @@ export default {
 
                     //attempting to lock/unlock coins first
                     if (coinLocks !== '' || coinUnlocks !== '') {
-                        await this.$daemon.lockCoins(null, coinLocks, coinUnlocks);
+                        await $daemon.lockCoins(null, coinLocks, coinUnlocks);
                     }
                     this.$store.commit('Transactions/setLockState', commitedChanges);
                 } catch (e) {

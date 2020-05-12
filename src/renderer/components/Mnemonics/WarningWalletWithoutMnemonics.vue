@@ -65,7 +65,7 @@ export default {
         this.$store.dispatch("Transactions/changeHasMnemonic", false);
         this.$store.dispatch("Transactions/changeShouldShowWarning", false);
         try {
-          this.$daemon.writeShowMnemonicWarning(
+          $daemon.writeShowMnemonicWarning(
             "",
             !this.dontShowMnemonicWarning
           );

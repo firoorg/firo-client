@@ -10,7 +10,6 @@
             <base-popover
                 :open="!!(hasFeedback && passphraseLength)"
                 trigger="manually"
-                :can-blur="false"
                 :boundaries-element="this.$refs.inner"
                 :popover-class="['notice', 'overlay-popover', { 'error': hasWarning }]"
                 placement="top-start"
@@ -200,7 +199,7 @@ export default {
     margin-top: emRhythm(7);
     position: relative;
 
-    & /deep/ .trigger {
+    & .trigger {
         width: 100%;
     }
 

@@ -4,47 +4,21 @@
             ref="grid"
             class="grid"
         >
-            <main
-                class="content"
-                :class="getCurrentSettingsClass"
-            >
-                <header>
-                    <zcoin-logo-text
-                        v-show="!goingToHide"
-                        class="logo"
-                    />
+            <main class="content">
+                <div>
+                    <zcoin-logo-text class="logo" />
                     <multi-step-popover
-                        :is-open="showIntro"
                         placement="right-center"
+                        :is-open="true"
                         :steps="steps"
                         :current-step="currentStep"
                         :boundaries-element="$refs.grid"
                         :actions="getActions"
                         :delay="{ show: 350, hide: 0 }"
                         popover-class="dark overlay-popover"
-                        :can-blur="false"
                         event-bus-name="popover:intro"
                         @step-change="onStepChange"
-                    >
-                        <a
-                            href="#"
-                            class="logo-trigger"
-                        >
-                            click
-                        </a>
-                    </multi-step-popover>
-                </header>
-
-                <div v-show="!isReadyInitialOrRestarting || showLoadingWallet">
-                    <div class="message-wrap">
-                        <div class="loading-wrap">
-                            <loading-bounce
-                                color="dark"
-                                class="loading"
-                            />
-                        </div>
-                        {{ loadingMessage }}
-                    </div>
+                    />
                 </div>
             </main>
         </div>
@@ -54,7 +28,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import GuideMixin from '@/mixins/GuideMixin'
-import types from '~/types'
 
 import ZcoinLogoText from '@/components/Icons/ZcoinLogoText'
 import LoadingBounce from '@/components/Icons/LoadingBounce'
@@ -62,17 +35,12 @@ import LoadingBounce from '@/components/Icons/LoadingBounce'
 import MultiStepPopover from '@/components/Notification/MultiStepPopover'
 import IntroScreenWelcome from '@/components/IntroScreen/IntroScreenWelcome'
 import IntroScreenBlockchainLocation from '@/components/IntroScreen/IntroScreenBlockchainLocation'
-import IntroScreenSettingUpLocation from '@/components/IntroScreen/IntroScreenSettingUpLocation'
 import IntroScreenLockWallet from '@/components/IntroScreen/IntroScreenLockWallet'
-import IntroScreenRestartingDaemon from '@/components/IntroScreen/IntroScreenRestartingDaemon'
-import IntroScreenAmountToHoldInZerocoin from '@/components/IntroScreen/IntroScreenAmountToHoldInZerocoin'
-import IntroScreenOther from '@/components/IntroScreen/IntroScreenOther'
 import CreateOrRestore from '../Mnemonics/CreateOrRestore.vue'
 import CreateNewWallet from '../Mnemonics/CreateNewWallet.vue'
 import VerifyMnemonics from '../Mnemonics/VerifyMnemonics.vue'
 import RestoreAskWalletOrigin from '../Mnemonics/RestoreAskWalletOrigin.vue'
 import WalletRecovery from '../Mnemonics/WalletRecovery.vue'
-import RecoveringWallet from '../Mnemonics/RecoveringWallet.vue'
 
 
 export default {
@@ -84,11 +52,7 @@ export default {
         ZcoinLogoText,
         IntroScreenWelcome,
         IntroScreenBlockchainLocation,
-        IntroScreenSettingUpLocation,
-        IntroScreenLockWallet,
-        IntroScreenRestartingDaemon,
-        IntroScreenAmountToHoldInZerocoin,
-        IntroScreenOther
+        IntroScreenLockWallet
     },
 
     mixins: [
@@ -101,20 +65,14 @@ export default {
             steps: {
                 welcome: IntroScreenWelcome,
                 location: IntroScreenBlockchainLocation,
-                settingUpLocation: IntroScreenSettingUpLocation,
                 createOrRestore: CreateOrRestore,
                 createWallet: CreateNewWallet,
                 verifyMnemonics: VerifyMnemonics,
                 restoreAskWalletOrigin: RestoreAskWalletOrigin,
                 walletRecover:WalletRecovery,
-                recoveringWallet:RecoveringWallet,
-                lock: IntroScreenLockWallet,
-                restart: IntroScreenRestartingDaemon
-                // amountToHoldInZerocoin: IntroScreenAmountToHoldInZerocoin,
-                // other: IntroScreenOther
+                lock: IntroScreenLockWallet
             },
-            currentStep: 'welcome',
-            currentSettingsValue: ''
+            currentStep: 'welcome'
         }
     },
 
@@ -131,34 +89,8 @@ export default {
             walletExist: 'App/walletExist'
         }),
 
-        getCurrentSettingsClass () {
-            const classes = [
-                this.showIntro ? 'is-open' : ''
-            ]
-
-            classes.push('setting-' + this.currentSettingsValue
-                .replace('IntroScreen', '')
-                .toLowerCase())
-
-            return classes.join(' ')
-        },
-        showLoadingWallet() {
-            return !this.walletLoaded && this.isLocked && this.walletExist
-        },
-
-        isReadyInitialOrRestarting () {
-            return this.isReady || this.isInitialRun || this.isRestarting
-        },
-
-        showIntro () {
-            console.log('showIntro:', this.isReadyInitialOrRestarting, ', show intro:', this.showIntroScreen);
-            return this.isReadyInitialOrRestarting  && this.showIntroScreen
-        },
-
-        getActions () {
+        getActions() {
             return {
-                prev: this.prevStep,
-                next: this.nextSettingsStep,
                 goTo: this.goToStep,
                 getCurrentStep: this.getCurrentStep,
                 setWalletRecoveryType: this.setWalletRecoveryType,
@@ -170,22 +102,6 @@ export default {
                 setIsMnemonicVerified: this.setIsMnemonicVerified,
                 getIsMnemonicVerified: this.getIsMnemonicVerified
             }
-        },
-
-        loadingMessage () {
-            if (this.isRestarting) {
-                return this.$t('overlay.loading.restarting-daemon')
-            }
-            else if (this.currentBlockHeight === undefined) {
-                return this.$t('overlay.loading.loading-blockchain')
-            }
-            else if (this.isRunning || !this.walletLoaded) {
-                var postFix = this.walletLoaded? '':'. This might take a few minutes, depending on your transaction history';
-                return this.$t('overlay.loading.loading-wallet') + postFix
-            }
-            else {
-                return this.$t('overlay.loading.initial')
-            }
         }
     },
 
@@ -195,29 +111,6 @@ export default {
 
     beforeDestroy () {
         this.$off('step-change', this.onStepChange)
-    },
-
-    methods: {
-        nextSettingsStep () {
-            if (this.nextStep()) {
-                return
-            }
-
-            this.goingToHide = true
-
-            this.hideIntroScreen();
-        },
-
-        hideIntroScreen() {
-            console.log('HIDE_INTRO_SCREEN:::');
-            setTimeout(() => {
-                if (this.walletLoaded) {
-                    this.$store.dispatch(types.app.HIDE_INTRO_SCREEN)
-                } else {
-                    this.hideIntroScreen()
-                }
-            }, 500)
-        }
     }
 }
 </script>

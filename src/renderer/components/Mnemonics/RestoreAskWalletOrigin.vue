@@ -6,14 +6,15 @@
         </div>
         <br>
         <div class="margin-set">
-            <input type="radio" id="one" value="One" v-model="picked">
-            <label for="one">I used this app to create my keychain wallet.</label>
+            <input type="radio" id="client" value="client" v-model="picked">
+            <label for="client">I used this app to create my keychain wallet.</label>
             <br>
-            <input type="radio" id="two" value="Two" v-model="picked">
-            <label for="two">I used the Qt app to create my keychain wallet.</label>
+            <input type="radio" id="qt" value="qt" v-model="picked">
+            <label for="qt">I used the Qt app to create my keychain wallet.</label>
             <br>
             <br>
         </div>
+
         <div style="text-align:center">
             <BaseButton @click="submit" class="button" color="green">
                 Submit
@@ -23,27 +24,37 @@
 </template>
 
 <script>
-import GuideStepMixin from '@/mixins/GuideStepMixin'
+import GuideStepMixin from '@/mixins/GuideStepMixin';
+
 export default {
     name: 'RestoreAskWalletOrigin',
+
     mixins: [
         GuideStepMixin
     ],
+
     data() {
         return {
             picked: ''
         }
     },
+
     methods: {
-        async submit() {
-            console.log('wallet:', this.actions)
-            if (this.picked === 'One') {
-                this.actions.setWalletRecoveryType('client');
-                this.actions.next();
-            } else if (this.picked === 'Two') {
-                this.actions.setWalletRecoveryType('qt');
-                this.actions.next();
+        submit() {
+            switch (this.picked) {
+                case "qt":
+                    this.actions.setWalletRecoveryType('qt');
+                    break;
+
+                case "client":
+                    this.actions.setWalletRecoveryType('client');
+                    break;
+
+                default:
+                    return;
             }
+
+            this.actions.goTo("walletRecover");
         }
     }
 }

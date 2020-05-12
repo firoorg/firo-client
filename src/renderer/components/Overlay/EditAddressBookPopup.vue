@@ -122,7 +122,7 @@ export default {
       try {
         if (this.isCreateNew()) {
           //add
-          await this.$daemon.editAddressBook(
+          await $daemon.editAddressBook(
             this.addressResult,
             this.labelResult,
             this.openAddressBook.purpose.toLowerCase(),
@@ -145,7 +145,7 @@ export default {
           });
         } else {
           //edit
-          await this.$daemon.editAddressBook(
+          await $daemon.editAddressBook(
             this.address,
             this.label,
             this.openAddressBook.purpose.toLowerCase(),

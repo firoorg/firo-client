@@ -2,9 +2,14 @@ import { app, remote } from 'electron'
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
-
+import Mutex from 'await-mutex';
 
 class AppSettings {
+    constructor() {
+        // Used to make sure set() doesn't run into a race condition.
+        this.mutex = new Mutex();
+    }
+
     /**
      * Get application settings in an OS-native way (registry, .config, plist file), returning {} if the file does not
      * yet exist.
@@ -35,35 +40,44 @@ class AppSettings {
                 return {};
             }
 
-        // Our settings are saved as a JSON-encoded object as the default value of \Software\Zcoin\Zcoin_Client\Settings.
+        // Settings are saved as values in the \Software\Zcoin\Zcoin_Client\Settings registry entry.
         case "win32":
             const Registry = require('winreg');
             const regKey = new Registry({
                 hive: Registry.HKCU,
-                key:  '\\Software\\Zcoin\\Zcoin_Client\\Settings'
+                key: `\\Software\\Zcoin\\Zcoin_Client\\Settings`
             });
 
-            return new Promise(resolve => {
+            return new Promise((resolve, reject) => {
                 regKey.keyExists((err, exists) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
                     if (!exists) {
                         resolve({});
                         return;
                     }
 
-                    // The empty string is the default value.
-                    regKey.get('', (err, item) => {
+                    regKey.values((err, regItems) => {
                         if (err) {
-                            throw err;
-                        }
-
-                        // item will be null when we're calling this from this.set() during initialization.
-                        if (!item) {
-                            resolve({});
+                            console.log(`Error: ${err}`)
+                            reject(err);
                             return;
                         }
 
-                        const settings = JSON.parse(item.value);
-                        resolve(settings);
+                        const result = {};
+                        for (const regItem of regItems) {
+                            console.log(`found Windows registry entry: ${regItem.key}/${regItem.name}: ${regItem.value}`);
+                            try {
+                                result[regItem.name] = JSON.parse(regItem.value);
+                            } catch(e) {
+                                console.error(`registry entry ${regItem.key}/${regItem.name} had invalid JSON: ${regItem.value}`);
+                            }
+                        }
+
+                        resolve(result);
                     });
                 });
             });
@@ -90,6 +104,12 @@ class AppSettings {
      * @param {Object} value
      */
     async set(key, value) {
+        console.info(`Acquiring mutex to set setting ${key} = ${value}`);
+        // Make sure only one set() function can be running at once so we don't race in the period between reading
+        // settings and writing them.
+        const release = await this.mutex.lock();
+        console.info(`Acquired mutex to set setting ${key} = ${value}`);
+
         switch (process.platform) {
         case "darwin":
             const plist = require('simple-plist');
@@ -105,6 +125,7 @@ class AppSettings {
             parsed[key] = value;
             plist.writeBinaryFileSync(plistLocation, parsed);
 
+            release();
             break;
 
 
@@ -126,40 +147,41 @@ class AppSettings {
 
             fs.writeFileSync(configLocation, JSON.stringify(config));
 
+            release();
             break;
 
         // Our settings are saved as a JSON-encoded object as the default value of \Software\Zcoin\Zcoin_Client\Settings.
         case "win32":
             const Registry = require('winreg');
-            const regKey = new Registry({
-                hive: Registry.HKCU,
-                key:  '\\Software\\Zcoin\\Zcoin_Client\\Settings'
-            });
+            const regKey = new Registry({ hive: Registry.HKCU, key:  `\\Software\\Zcoin\\Zcoin_Client\\Settings` });
 
             return new Promise((resolve, reject) => {
                 // Creating the key even if it exists is fine.
                 regKey.create(async (err) => {
                     if (err) {
+                        console.log(`Error creating registry key: ${err}`);
                         reject(err);
+                        release();
                     }
 
-                    const settings = await this.getAll();
-                    settings[key] = value;
-                    const encodedSettings = JSON.stringify(settings);
-
                     // Empty string represents the default value.
-                    regKey.set('', 'REG_SZ', encodedSettings, (err) => {
+                    regKey.set(key, 'REG_SZ', JSON.stringify(value), (err) => {
                         if (err) {
+                            console.log(`Error setting setting ${key} to ${value}`);
                             reject(err);
+                            release();
                         } else {
+                            console.log(`Set setting setting ${key} to ${value}`);
                             resolve(undefined);
+                            release();
                         }
-                    })
+                    });
                 });
             });
 
 
         default:
+            release();
             throw 'unsupported platform';
         }
     }

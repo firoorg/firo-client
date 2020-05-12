@@ -1,8 +1,5 @@
-import * as types from '~/types/Balance'
-
 import { createLogger } from '#/lib/logger'
 import { convertToSatoshi } from "#/lib/convert";
-import {max} from "vee-validate/dist/rules.esm";
 
 const logger = createLogger('zcoin:store:balance')
 
@@ -25,7 +22,7 @@ const state = {
 }
 
 const mutations = {
-    [types.UPDATE_BALANCE] (state, balance) {
+    updateBalance(state, balance) {
         logger.debug('going to update balance %O', balance)
 
         // FIXME: This just aliases different names used in zcoind (where zcoind's public becomes our xzc, and its
@@ -56,20 +53,6 @@ const mutations = {
         }
 
         state.unspentMints = balance.unspentMints || {};
-    }
-}
-
-const actions = {
-    [types.SET_INITIAL_STATE] ({ dispatch, commit, state }, initialState) {
-        dispatch(types.UPDATE_BALANCE, initialState)
-    },
-
-    [types.ON_BALANCE_SUBSCRIPTION] ({ dispatch }, balance) {
-        dispatch(types.UPDATE_BALANCE, balance)
-    },
-
-    [types.UPDATE_BALANCE] ({ commit }, balance) {
-        commit(types.UPDATE_BALANCE, balance)
     }
 }
 
@@ -126,6 +109,5 @@ export default {
     namespaced: true,
     state,
     mutations,
-    actions,
     getters
 }

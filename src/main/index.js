@@ -1,27 +1,11 @@
-'use strict'
-
-// Note: Initialization of refactored zcoind interaction is done in src/renderer/main.js so it can be assigned to
-// Vue.prototype.$daemon.
-
-import os from 'os'
-import { app } from 'electron'
-import { join } from 'path'
-import types from '~/types'
-
+import {app, BrowserWindow, Menu} from 'electron'
 import { createLogger } from '#/lib/logger'
-
-import PidManager from './lib/core/PidManager'
-import menu from './lib/menu'
-import network from './lib/network'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from '#/lib/i18n'
-
+import {join} from 'path'
+import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
-import windowManager from './lib/windows'
-import deeplink from './lib/deeplink'
-
-import CONFIG from './config'
 const logger = createLogger('zcoin:main')
 
 /**
@@ -29,141 +13,66 @@ const logger = createLogger('zcoin:main')
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-    global.__static = join(__dirname, '/static').replace(/\\/g, '\\\\')
+    global.__static = join(__dirname, 'static').replace(/\\/g, '\\\\')
 }
 
-// const rootFolder = __static // process.env.NODE_ENV === 'development' ? process.cwd() : __static
-const rootFolder = process.env.NODE_ENV === 'development' ? process.cwd() : app.getAppPath()
-const unpackedRootFolder = rootFolder.replace('app.asar', 'app.asar.unpacked')
-
-const platform = os.platform()
-const zcoindName = platform === 'win32' ? 'zcoind.exe' : 'zcoind'
-const zcoindPath = join(unpackedRootFolder, `/assets/core/${platform}/${zcoindName}`)
-
-const userDataPath = app.getPath('userData')
-
-logger.info('zcoin paths: %o', {
-    rootFolder,
-    unpackedRootFolder,
-    zcoindPath,
-    userDataPath
-})
-
-// build settings via electron-settings module
-if (!app.isDefaultProtocolClient(CONFIG.app.protocolIdentifier)) {
-    logger.info('registering protocol handler "%s"', CONFIG.app.protocolIdentifier)
-    app.setAsDefaultProtocolClient(CONFIG.app.protocolIdentifier)
+// We don't want multiple copies of our application running.
+if (!app.requestSingleInstanceLock()) {
+    // The second-instance handler will be fired automatically.
+    app.exit();
+    process.exit();
 }
 
-// get core config
-const { autoRestart, heartbeatIntervalInSeconds, stopOnQuit } = CONFIG.app.core
-
-const startNetwork = function () {
-    logger.info('starting network')
-
-    network.init({ store, coreDaemonManager })
+// Register us as the handler for zcoin:// links. Actual handling of them is done in main.js.
+if (!app.isDefaultProtocolClient('zcoin')) {
+    logger.info("Setting Zcoin Client as the default handler for zcoin:// links...");
+    // This can sometimes fail, in which case it will not throw but will print an error to stderr.
+    app.setAsDefaultProtocolClient('zcoin');
 }
 
-const beforeQuit = async function (event) {
-    const isRunning = await coreDaemonManager.isRunning()
-
-    if (!(stopOnQuit && isRunning)) {
-        logger.info('no need to wait for daemon to stop. quitting...')
-        network.close()
-        store.dispatch('Window/close', 'waitForDaemonShutdown')
-        app.exit(0)
-        return
-    }
-
-    event.preventDefault()
-    logger.info('stopping daemon')
-    coreDaemonManager.stop()
-    logger.info('waiting for daemon shutdown')
-    try {
-        await coreDaemonManager.waitForDaemonShutdown()
-    }
-    catch (e) {
-        logger.warn(e)
-    }
-    finally {
-        network.close()
-        logger.debug('finally quitting')
-        store.dispatch('Window/close', 'waitForDaemonShutdown')
-        app.exit(0)
-    }
-
-}
-
-// set up the manager
-const coreDaemonManager = new PidManager({
-    name: 'zcoind',
-    pidDirectory: userDataPath,
-    autoRestart,
-    heartbeatIntervalInSeconds,
-    store,
-    onStarted: startNetwork
-})
-
-// tor proxy
-// https://electronjs.org/docs/api/app#appcommandlineappendswitchswitch-value
-// https://stackoverflow.com/questions/37393248/how-connect-to-proxy-in-electron-webview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-// app.commandLine.appendSwitch('proxy-server', 'socks5://127.0.0.1:9050')
-
-app.on('ready', async () => {
-    logger.info('---- Starting Zcoin client ----')
+app.once('ready', async () => {
     setupLocales({ store })
     await populateStoreWithAppSettings({ store })
 
-    // start it!
-    logger.info('path to zcoind binary: %s', zcoindPath)
+    // Set the application menu. This is required for keyboard shortcuts (including copy+paste) to work correctly.
+    const appMenu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(appMenu);
 
-    coreDaemonManager.setPathToSpawn(zcoindPath)
+    // The window will be shown by the renderer process when zcoind is connected.
+    const ourWindow = new BrowserWindow({
+        show: false,
+        frame: process.platform !== 'darwin',
+        useContentSize: true,
+        titleBarStyle: 'hiddenInset',
+        height: 780,
+        width: 1400,
+        minWidth: 1200,
+        minHeight: 450
+    });
 
-    if (!store.getters['App/isInitialRun']) {
-        logger.info('starting core')
-        coreDaemonManager.start()
+    // Fire the shutdown-requested listener in renderer/main.js when the user tries to close us.
+    ourWindow.on('close', (event) => {
+        event.preventDefault();
+        // This is picked up by a listener in renderer/main.js, which is responsible for actually exiting the applicaiton.
+        ourWindow.webContents.emit("shutdown-requested", event);
+    });
+
+    // Stop new alt-clicks from opening new BrowserWindows.
+    //
+    // NOTE: This MUST be done in the main process to work.
+    //       cf. https://github.com/electron/electron/issues/2770#issuecomment-140065309
+    //
+    // FIXME: alt-clicking on a router link will still cause the link to be highlighted even though no other action is
+    //        taken.
+    ourWindow.webContents.on('new-window', (e) => e.preventDefault());
+
+    if (process.env.NODE_ENV === 'development') {
+        logger.info("Loading development environment at localhost:9080...");
+        ourWindow.loadURL("http://localhost:9080/");
     }
-
-    deeplink.init({ windowManager, store })
-
-    windowManager.connectToStore({ store, namespace: 'Window' })
-    windowManager.registerWindows(CONFIG.windows)
-    windowManager.setupAppEvents()
-
-    menu.init({ app, store })
-
-    store.dispatch('Window/show', 'main')
-})
-
-app.on('window-all-closed', (event) => {
-    logger.info('window-all-closed')
-})
-
-app.on('before-quit', async (event) => {
-    logger.info('application before quit')
-    await beforeQuit(event)
-})
-
-app.on('will-quit', (event) => {
-    logger.info('application will quit')
-})
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */
+    else {
+        const indexDotHtml = join(__dirname, 'index.html');
+        logger.info(`Loading production environment at ${indexDotHtml}...`);
+        ourWindow.loadFile(indexDotHtml);
+    }
+});

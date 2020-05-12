@@ -33,7 +33,7 @@
                                     tag="p"
                                 >
                                     <router-link
-                                        :to="{ name: 'receive-zcoin' }"
+                                        to="/receive"
                                         place="linkToCreatePaymentRequest"
                                     >
                                         {{ $t('onboarding.make-request-first.mint.button__linkToCreatePaymentRequest') }}
@@ -352,11 +352,6 @@ export default {
         });
     },
 
-    mounted() {
-        console.log('joy');
-        console.log(this.coinsToMint);
-    },
-
     methods: {
         recalculatePopoverPosition () {
             // v-popover only knows to recalculate position on resize events, so fake that one happened in order to
@@ -416,7 +411,7 @@ export default {
             this.recalculatePopoverPosition();
 
             try {
-                await this.$daemon.mintZerocoin(passphrase, this.coinsToMint);
+                await $daemon.mintZerocoin(passphrase, this.coinsToMint);
             } catch (e) {
                 // Error code -14 indicates an incorrect passphrase.
                 if (e.error && e.error.code === -14) {
@@ -578,16 +573,16 @@ export default {
         position: relative;
         cursor: pointer;
 
-        /deep/ svg > g > path,
-        /deep/ svg g > g {
+        svg > g > path,
+        svg g > g {
             transition: stroke 0.15s ease-in;
         }
 
         &:hover {
-            /deep/ svg > g > path {
+            svg > g > path {
                 stroke: $color--dark;
             }
-            /deep/ svg g g {
+            svg g g {
                 stroke: $color--comet-dark;
             }
         }

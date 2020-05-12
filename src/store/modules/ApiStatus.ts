@@ -1,7 +1,4 @@
 import { isEqual } from 'lodash';
-import { createLogger } from '../../lib/logger';
-
-const logger = createLogger('zcoin:store:Transactions');
 
 const state = {
     // ApiStatus from src/daemon/zcoind
@@ -16,17 +13,17 @@ const mutations = {
 
 const actions = {
     setApiStatus({state, commit}, apiStatus) {
-        logger.info('-----------------------------API STATUS DATA ----------------------------- %s', JSON.stringify(apiStatus));
         // We first check if apiStatus has changed so we don't have to draw updates when it hasn't.
         if (!isEqual(state.apiStatus, apiStatus)) {
             commit('setApiStatus', apiStatus);
         }
-        logger.info('-----------------------------API STATUS DATA -----------------------------');
     }
 };
 
 const getters = {
     apiStatus: (state) => state.apiStatus,
+    // 'main', 'test', or 'regtest'
+    network: (state) => state.apiStatus.data ? state.apiStatus.data.network : undefined,
     // Do we have an apiStatus?
     hasApiStatus: (state): boolean => !!state.apiStatus.data,
     // Is the wallet locked? Returns undefined if not yet loaded.

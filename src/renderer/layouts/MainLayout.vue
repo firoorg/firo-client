@@ -1,117 +1,48 @@
 <template>
     <transition name="fade">
+        <div v-if="waitingReason">
+            <WaitingScreen :reason="waitingReason" />
+        </div>
+
         <div
-            v-if="show"
+            v-else-if="isInitialized"
             class="main-layout wrapper"
-            :class="{ 'has-overlay': hasOpenOverlay }"
         >
-            <transition
-                name="fade"
-                :duration="overlayDuration"
-            >
-                <ConnectivityOverlay v-if="showConnectivityOverlay" />
-                <IntroScreen v-else-if="showIntro" />
-                <restarting-overlay v-else-if="showRestartingOverlay" />
-            </transition>
-
-            <NotificationCenter />
-
-            <transition
-                name="fade"
-                :duration="overlayDuration"
-            >
-                <div
-                    v-if="hasOpenModal"
-                    class="active-window-overlay"
-                />
-            </transition>
-            <!--<header class="header">
-                Header
-            </header>-->
             <Sidebar class="aside" />
+
             <main
                 ref="main"
                 class="main default-tooltip-boundary"
             >
-                <transition name="fade">
-                    <router-view class="child" />
-                </transition>
+                <router-view class="child" />
             </main>
-            <!--<footer class="footer"></footer>-->
+        </div>
+
+        <div v-else>
+            <IntroScreen />
         </div>
     </transition>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { sleep } from '../../lib/utils'
-import types from '~/types'
-
 import Sidebar from '@/components/Sidebar'
-import NotificationCenter from '@/components/NotificationCenter'
-import ConnectivityOverlay from '@/components/Overlay/ConnectivityOverlay'
-import IntroScreen from '@/components/IntroScreen/IntroScreen'
-import RestartingOverlay from '@/components/Overlay/RestartingOverlay'
+import IntroScreen from "@/components/IntroScreen/IntroScreen";
+import WaitingScreen from "@/components/WaitingScreen";
 
 export default {
     name: 'MainLayout',
+
     components: {
         IntroScreen,
         Sidebar,
-        NotificationCenter,
-        ConnectivityOverlay,
-        RestartingOverlay
+        WaitingScreen
     },
 
-    data () {
-        return {
-            show: false,
-            overlayDuration: 100
-        }
-    },
-
-    computed: {
-        ...mapGetters({
-            isRestarting: 'App/isRestarting',
-            hasOpenModal: 'Window/hasOpenModal',
-            networkConnectionLost: 'Network/connectionLost',
-            networkConnectionError: 'Network/connectionError',
-            showIntroScreen: 'App/showIntroScreen',
-            showIncomingPaymentRequest: 'App/showIncomingPaymentRequest',
-            hasOpenAppOverlay: 'App/hasOpenOverlay',
-            walletLoaded: 'Transactions/walletLoaded'
-        }),
-
-        // todo do some clean up and combine getters here
-        hasOpenOverlay () {
-            return this.hasOpenModal ||
-                    this.hasOpenAppOverlay ||
-                    this.showConnectivityOverlay ||
-                    this.showIntro ||
-                    this.showRestartingOverlay
-        },
-
-        showConnectivityOverlay () {
-            return ((this.networkConnectionLost || this.networkConnectionError) && !this.isRestarting)
-        },
-
-        showRestartingOverlay () {
-            return this.isRestarting && !this.showIntro
-        },
-
-        showIntro () {
-            return (this.showIntroScreen && !this.showConnectivityOverlay) || !this.walletLoaded
-        }
-    },
-
-    mounted () {
-        this.show = true
-    },
-
-    async created () {
-        await sleep(1000)
-        this.overlayDuration = 1000
-    },
+    computed: mapGetters({
+        isInitialized: 'App/isInitialized',
+        waitingReason: 'App/waitingReason'
+    })
 }
 </script>
 

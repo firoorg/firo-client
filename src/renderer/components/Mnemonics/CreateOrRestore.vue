@@ -21,22 +21,33 @@
 
 <script>
 import GuideStepMixin from '@/mixins/GuideStepMixin'
+import {mapGetters} from "vuex";
+import {generateMnemonic} from "#/daemon/zcoind";
+
 export default {
     name: 'CreateOrRestore',
+
     mixins: [
         GuideStepMixin
     ],
+
+    computed: mapGetters({
+        zcoindNetwork: 'App/zcoinClientNetwork',
+        zcoindLocation: 'App/zcoindLocation',
+        blockchainLocation: 'App/blockchainLocation'
+    }),
+
     methods: {
         async createNewWallet() {
-            const mnemonic = await this.$daemon.showMnemonics("");
-            this.actions.setCachedMnemonic(mnemonic);
-            this.actions.next();
+            if (!this.actions.getCachedMnemonic()) {
+                // 256 bits of entropy translates into a 24 word mnemonic.
+                this.actions.setCachedMnemonic({mnemonic: generateMnemonic(256), mnemonicPassphrase: null, isNewMnemonic: true});
+            }
+
+            this.actions.goTo("createWallet");
         },
         restoreWallet() {
             this.actions.goTo('restoreAskWalletOrigin');
-        },
-        isEnabled() {
-            return true;
         }
     }
 }

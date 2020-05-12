@@ -1,23 +1,25 @@
 import * as fs from "fs";
 import * as zmq from "zeromq";
 import * as path from "path";
+import {validateMnemonic} from "bip39";
 import Mutex from "await-mutex";
+const {execFile} = require("child_process");
 
 import * as constants from './constants';
 import { createLogger } from '../lib/logger';
+import * as net from "net";
 
 const logger = createLogger('zcoin:daemon');
 
-// FIXME: This is not thrown consistently. See documention of individual calls for details.
+// FIXME: This is not thrown consistently. See documentation of individual calls for details.
 class ZcoindErrorResponse extends Error {
     constructor(call, error) {
         super(`${call} call failed due to ${JSON.stringify(error)}`);
         this.name = 'ZcoindErrorResponse';
-        this.message = error;
     }
 }
 
-// FIXME: This is not thrown consistently. See documention of individual calls for details.
+// FIXME: This is not thrown consistently. See documentation of individual calls for details.
 class UnexpectedZcoindResponse extends Error {
     constructor(call: string, response: any) {
         super(`unexpected response to ${call} ${JSON.stringify(response)}`);
@@ -25,7 +27,7 @@ class UnexpectedZcoindResponse extends Error {
     }
 }
 
-// FIXME: This is not thrown consistently. See documention of individual calls for details.
+// FIXME: This is not thrown consistently. See documentation of individual calls for details.
 class IncorrectPassphrase extends Error {
     constructor() {
         super('incorrect passphrase');
@@ -33,7 +35,23 @@ class IncorrectPassphrase extends Error {
     }
 }
 
-interface ApiStatus {
+// This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
+class ZcoindConnectionTimeout extends Error {
+    constructor(seconds: number) {
+        super(`unable to connect to zcoind within ${seconds}s; a reason this might happen is that you have another instance of zcoind not managed by Zcoin Client running`);
+        this.name = 'ZcoindConnectionTimeout';
+    }
+}
+
+// This is thrown when we find a zcoind instance already listening when we haven't yet started one.
+class ZcoindAlreadyRunning extends Error {
+    constructor() {
+        super('Another zcoind instance running with -clientapi=1 is already running');
+        this.name = 'ZcoindAlreadyRunning';
+    }
+}
+
+export interface ApiStatus {
     data: {
         version: number;
         protocolVersion: number;
@@ -64,9 +82,99 @@ interface ApiStatus {
     error: string | null;
 }
 
-type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
+// one transaction output, of which a transaction may have many.
+export interface TransactionOutput {
+    // A unique ID generated on the client side (outside this file) which identifies the transaction. It will be
+    // different for outgoing and incoming versions of the same transactions.
+    uniqId?: string;
+    isChange: boolean;
+    category: string;
+    txid: string;
+    txIndex: number;
+    firstSeenAt: number;
+    label: string;
+    fee: number;
+    amount: number;
+    address?: string;
+    blockHeight?: number;
+    blockHash?: number;
+    blockTime?: number;
+    spendable: boolean;
+    locked: boolean;
+}
 
-interface PaymentRequestData {
+export interface TransactionInput {
+    txid: string;
+    index: number;
+}
+
+export interface AddressBookItem {
+    address: string;
+    label: string;
+    purpose: string;
+}
+
+// This is the data format for initial/stateWallet.
+export interface StateWallet {
+    addresses: {
+        // maybeAddress could also be the string "MINT"
+        [maybeAddress: string]: {
+            txids: {
+                [grouping: string]: {
+                    [maybeTxid: string]: TransactionOutput
+                }
+            },
+            inputs?: {
+                [outpoint: string]: TransactionInput
+            },
+            lockedCoins?: {
+                [outpoint: string]: TransactionInput
+            },
+
+            unlockedCoins?: {
+                [outpoint: string]: TransactionInput
+            },
+        }
+    }
+}
+
+// This is the data format we're given in 'transaction' events.
+export interface TransactionEvent {
+    // maybeAddress could also be the string "MINT"
+    [maybeAddress: string]: {
+        txids: {
+            [grouping: string]: {
+                [txid: string]: TransactionOutput
+            }
+        },
+
+        inputs?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        lockedCoins?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        unlockedCoins?: {
+            [outpoint: string]: TransactionInput
+        },
+
+        total: {
+            [txCategory: string]: {
+                send?: number;
+                mint?: number;
+                spend?: number;
+                mined?: number;
+                znode?: number;
+                receive?: number;
+            }
+        }
+    }
+}
+
+export type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
+export interface PaymentRequestData {
     address: string;
     createdAt: number;
     amount: number;
@@ -74,6 +182,9 @@ interface PaymentRequestData {
     message: string;
     state: PaymentRequestState;
 }
+
+export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean};
+export {validateMnemonic, generateMnemonic} from "bip39";
 
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
 // file.
@@ -92,43 +203,419 @@ function readCert(path: string): [string, string] {
     return [parsed.data.public, parsed.data.private];
 }
 
-// Daemon takes care of sending messages to the daemon and receiving subscription events.
+export type ZcoindEventHandler = (daemon: Zcoind, eventData: any) => Promise<void>;
+export type ZcoindInitializationFunction = (daemon: Zcoind) => Promise<void>;
+
+// These are types related to Mutex.
+type UnlockerFunction = () => void;
+type MaybeUnlockerFunction = UnlockerFunction | undefined;
+
+// We take care of starting the daemon, sending messages, and calling proper event handlers for subscription events.
 export class Zcoind {
+    // This is the network we will tell zcoind to connect to.
+    private zcoindNetwork: 'mainnet' | 'test' | 'regtest';
     private statusPublisherSocket: zmq.Socket;
     // (requester|publisher)Socket will be undefined prior to the invocation of gotStatus
     private requesterSocket: zmq.Socket | undefined;
     private publisherSocket: zmq.Socket | undefined;
-    private hasReceivedApiStatus: boolean;
+    private latestApiStatus: ApiStatus | undefined;
+    // This is used to indicate that zcoind has loaded the block index.
+    private apiIsReadyMutex: Mutex;
+    // This is the unlocking function for apiIsReadyMutex. It will be reset to undefined after it has been unlcoked.
+    private _unlockWhenApiIsReady: MaybeUnlockerFunction;
+    // This will ensure only one request is sent at a time. It will also signal to connectAndReact when the connection
+    // to the requester and publisher sockets are made.
     private requestMutex: Mutex;
     // This is the unlocking function for requestMutex which will be called after we are connected. This is required so
     // that send() will block prior to connecting to the proper socket.
-    private _unlockAfterConnect: Promise<() => void>;
+    private _unlockAfterConnect: MaybeUnlockerFunction;
+    // This Mutex is used to identify when zcoind is restarted so we can poison awaitApiIsReady callers.
+    private zcoindRestartMutex: Mutex;
+    private _unlockOnZcoindRestart: MaybeUnlockerFunction;
+    // This Mutex is used to identify when all initializers have run to completion.
+    private initializersCompletedMutex: Mutex;
+    // This is released when an initializer rejects.
+    private initializersPoisonedMutex: Mutex;
+    // An array of rejections from our initializers. Hopefully, this will be empty.
+    private initializerRejections: any[];
     private eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>};
+    // These are the functions that will be called after awaitApiIsReady() resolves.
+    initializers: ZcoindInitializationFunction[];
+    // The location of the zcoind binary, or null to use the default location.
+    zcoindLocation: string | null;
+    // The directory that zcoind will use to store its data. This must already exist.
+    zcoindDataDir: string;
 
+    // zcoindLocation is the location of the zcoind binary.
+    //
+    // network is the network zcoind should connect to.
+    //
+    // If zcoindDataDir is null (but NOT undefined or the empty string) we will not specify it and use the default
+    // location.
+    //
+    // All the functions in initializers will be called with zcoind as their only argument after awaitApiIsReady()
+    // resolves. When all of them resolve() (or reject()), awaitInitializersCompleted() will resolve.
+    //
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
     // key that will be called when an apiStatus event is receives.
-    constructor(eventHandlers: {[eventName: string]: (daemon: Zcoind, eventData: any) => Promise<void>}) {
-        this.hasReceivedApiStatus = false;
+    constructor(network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string | null,
+                initializers: ZcoindInitializationFunction[], eventHandlers: {[eventName: string]: ZcoindEventHandler}) {
+        if (!['mainnet', 'test', 'regtest'].includes(network)) {
+            throw "network must be one of 'mainnet', 'test', or 'regtest'";
+        }
+        this.zcoindNetwork = network;
+        this.zcoindLocation = zcoindLocation;
+        this.zcoindDataDir = zcoindDataDir;
+
         this.requestMutex = new Mutex();
-        // This will resolve instantly, but we don't want to let in a potential race condition by making it assign after
-        // the Promise is resolved.
-        this._unlockAfterConnect = this.requestMutex.lock();
+        this.apiIsReadyMutex = new Mutex();
+        this.zcoindRestartMutex = new Mutex();
+        this.initializers = initializers;
         this.eventHandlers = eventHandlers;
+
+
     }
 
-    // Connect to the daemon and take action when it serves us appropriate events.
-    connectAndReact() {
-        this.statusPublisherSocket = zmq.socket('sub');
-        // Set timeout for requester socket
-        this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
-        this.statusPublisherSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
+    // Start the daemon and register handlers.
+    //
+    // If mnemonicSettings is set, we start up the daemon with the directive to initialize it with the given mnemonic
+    // and passphrase. These are not passed in the constructor because we don't want to pass them again if we restart.
+    // wallet.dat MUST NOT exist if this option is passed; we will check for it and throw if it does.
+    //
+    // If zcoind is already listening, we will reject(). If you would like to wait for an existing zcoind instance to
+    // stop before calling us (assuming that it was invoked with -clientapi), you can await awaitZcoindNotListening()
+    // prior to invoking us.
+    async start(mnemonicSettings?: MnemonicSettings) {
+        if (mnemonicSettings) {
+            if (!validateMnemonic((mnemonicSettings.mnemonic))) {
+                throw "invalid mnemonic";
+            }
 
-        this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
+            let walletLocation;
+            switch (this.zcoindNetwork) {
+                case "mainnet":
+                    walletLocation = path.join(this.zcoindDataDir, "wallet.dat");
+                    break;
 
-        this.statusPublisherSocket.subscribe('apiStatus');
-        this.statusPublisherSocket.on('message', (topic, msg) => {
-            this.gotApiStatus(msg.toString());
+                case "test":
+                    walletLocation = path.join(this.zcoindDataDir, "testnet3", "wallet.dat");
+                    break;
+
+                case "regtest":
+                    walletLocation = path.join(this.zcoindDataDir, "regtest", "wallet.dat");
+                    break
+
+                default:
+                    throw "unreachable";
+            }
+
+            if (fs.existsSync(walletLocation)) {
+                throw "Zcoind.start() called with mnemonicSettings set, but wallet.dat already exists";
+            }
+        }
+
+        // This will be null for a first connect and set when we're reconnecting.
+        if (!this._unlockAfterConnect) {
+            this._unlockAfterConnect = await this.requestMutex.lock();
+        }
+
+        this._unlockWhenApiIsReady = await this.apiIsReadyMutex.lock();
+
+        // This won't be set on the first call to start().
+        if (this._unlockOnZcoindRestart) {
+            this.zcoindRestartMutex = new Mutex();
+            // Unlock the old Mutex so that awaitApiIsReady can be poisoned.
+            this._unlockOnZcoindRestart();
+        }
+        this._unlockOnZcoindRestart = await this.zcoindRestartMutex.lock();
+
+        this.initializerRejections = [];
+        this.initializersCompletedMutex = new Mutex();
+        this.initializersPoisonedMutex = new Mutex();
+        const unlockWhenInitializersResolve = this.initializersCompletedMutex.lock();
+        const unlockWhenInitializersReject = this.initializersPoisonedMutex.lock();
+        // This must be called AFTER this.apiIsReadyMutex and this.zcoindRestartMutex are locked.
+        this.awaitApiIsReady().then(async () => {
+            const initializerPromises = this.initializers.map(initializer => initializer(this));
+            const rejections = [];
+
+            for (const promise of initializerPromises) {
+                try {
+                    await promise;
+                } catch(e) {
+                    rejections.push(e);
+                }
+            }
+
+            if (rejections.length > 0) {
+                this.initializerRejections = rejections;
+                unlockWhenInitializersReject.then(release=>release());
+                throw rejections;
+            } else {
+                unlockWhenInitializersResolve.then(release=>release());
+            }
         });
+
+        // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
+        // a fairly small  window anyway,
+        if (await this.isZcoindListening()) {
+            throw new ZcoindAlreadyRunning();
+        }
+
+        await this.launchDaemon(mnemonicSettings);
+        await this.connectAndReact();
+    }
+
+    // We resolve when all our initializers have resolved, or, if any of them have rejected, we wait for all to complete
+    // and then reject() with an Array containing all the rejections we received.
+    awaitInitializersCompleted(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.initializersCompletedMutex.lock().then((unlock) => {
+                resolve();
+                unlock();
+            });
+            this.initializersPoisonedMutex.lock().then((unlock) => {
+                reject(this.initializerRejections);
+                unlock();
+            });
+        })
+    }
+
+    // Resolve when zcoind has loaded the block index.
+    awaitApiIsReady(): Promise<void> {
+        if (!this._unlockAfterConnect) {
+            throw "zcoind must be started before awaitApiIsReady() can be called.";
+        }
+
+        return new Promise((resolve, reject) => {
+            this.apiIsReadyMutex.lock().then(release => {
+                resolve();
+                release();
+            });
+
+            this.zcoindRestartMutex.lock().then(release => {
+                reject("zcoind restarted without receiving the block index");
+                release();
+            });
+        });
+    }
+
+    // Resolve when we determine that zcoind isn't listening by attempting a connection every 1s.
+    async awaitZcoindNotListening() {
+        while (true) {
+            if (!await this.isZcoindListening()) {
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+
+    // Resolve when we determine that zcoind is listening by attempting a connection every 1s.
+    async awaitZcoindListening() {
+        while (true) {
+            if (await this.isZcoindListening()) {
+                break;
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+
+    // Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
+    // status 0, or rejects it with the error given by execFile if something goes wrong.
+    //
+    // If mnemonicSettings is set, we start up the daemon with the directive to initialize it with the given mnemonic
+    // and passphrase.
+    private async launchDaemon(mnemonicSettings?: MnemonicSettings): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (!fs.existsSync(this.zcoindLocation)) {
+                throw "zcoind (${this.zcoindLocation) does not exist.";
+            }
+
+            // These are the arguments that will be passed to zcoind.
+            const args = ["-clientapi=1"];
+            if (process.platform !== "win32") {
+                args.push("-daemon=1");
+            }
+            if (this.zcoindDataDir) {
+                args.push(`-datadir=${this.zcoindDataDir}`);
+            }
+            if (mnemonicSettings) {
+                // This is typed as a boolean, but since we are indirectly called from JS there's really not any type
+                // checking, and we don't want to silently do weird things.
+                if (typeof mnemonicSettings.isNewMnemonic !== 'boolean') {
+                    throw "mnemonicSettings.isNewMnemonic must be a boolean";
+                }
+
+                if (!mnemonicSettings.isNewMnemonic) {
+                    // We need to rescan when recovering from a mnemonic.
+                    args.push("-rescan=1");
+                }
+
+                args.push("-usemnemonic=1");
+                args.push(`-mnemonic=${mnemonicSettings.mnemonic}`);
+                if (mnemonicSettings.mnemonicPassphrase) {
+                    args.push(`-mnemonicpassphrase=${mnemonicSettings.mnemonicPassphrase}`);
+                }
+            }
+            switch (this.zcoindNetwork) {
+                case 'mainnet':
+                    args.push("-mainnet=1");
+                    break;
+
+                case 'test':
+                    args.push("-testnet=1");
+                    break;
+
+                case 'regtest':
+                    args.push("-regtest=1");
+                    // dandelion=0 needs to be set for mining to actually include transactions on regtest.
+                    args.push("-dandelion=0");
+                    break;
+
+                default:
+                    throw "unreachable";
+            }
+
+            logger.info("Starting daemon...");
+            if (process.platform === "win32") {
+                let hasResolved = false;
+
+                execFile(this.zcoindLocation, args,{}, (error, stdout, stderr) => {
+                    if (hasResolved) return;
+
+                    if (error) {
+                        logger.error(`Error starting daemon (${error}): ${stderr}`);
+                        hasResolved = true;
+                        reject(`${error}: ${stderr}`);
+                    }
+                });
+
+                this.awaitZcoindListening().then(() => {
+                    if (hasResolved) return;
+
+                    logger.info("zcoind is listening. Inferring that we've successfully started the daemon.");
+                    hasResolved = true;
+                    resolve();
+                })
+            } else {
+                execFile(this.zcoindLocation,
+                    args,
+                    {timeout: 10_000},
+                    (error, stdout, stderr) => {
+                        if (error) {
+                            logger.error(`Error starting daemon (${error}): ${stderr}`);
+                            reject(`${error}: ${stderr}`);
+                        } else {
+                            logger.info(`Successfully started daemon: ${stdout}`);
+                            resolve();
+                        }
+                    }
+                );
+            }
+        }
+       );
+    }
+
+
+    // Determine whether or not someone is listening on host constants.zcoindAddress.host, port
+    // constants.zcoindAddress.statusPort.publisher.
+    isZcoindListening(): Promise<boolean> {
+        return new Promise(resolve => {
+            const socket = new net.Socket();
+            socket.setTimeout(5_000);
+            socket.on("error", (e) => {
+                socket.destroy();
+                resolve(false);
+            });
+            socket.on("timeout", (e) => {
+                socket.destroy();
+                resolve(false);
+            });
+            socket.on("connect", () => {
+                socket.destroy();
+                resolve(true);
+            });
+            // Yes, the port is given first.
+            socket.connect(constants.zcoindAddress.statusPort.publisher, constants.zcoindAddress.host);
+        });
+    }
+
+    // Connect to the daemon and take action when it serves us appropriate events. Resolves when the daemon connection
+    // is made successfully. We will continue to try reconnecting to the zcoind statusPort until a connection is made.
+    private connectAndReact(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            let finished = false;
+            logger.info("Waiting for zcoind to open its ports...");
+            // We need to do this because ZMQ will just hang if the socket is unavailable.
+            await new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (!finished) {
+                        logger.error("zcoind has not opened it ports after 30 seconds");
+                        finished = true;
+                    }
+
+                    reject(new ZcoindConnectionTimeout(30));
+                }, 30_000);
+                this.awaitZcoindListening().then(() => {
+                    if (!finished) {
+                        logger.info("zcoind's ports are open.");
+                        finished = true;
+                    }
+
+                    resolve();
+                });
+            })
+
+            logger.info("Connecting to zcoind...")
+            this.statusPublisherSocket = zmq.socket('sub');
+
+            // Set timeout for requester socket
+            this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
+            this.statusPublisherSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
+
+            // requestMutex will be unlocked in initializeWithApiStatus after connection to the requester and publisher
+            // sockets is complete.
+            this.requestMutex.lock().then(release => {
+                resolve();
+                release();
+            });
+
+            this.statusPublisherSocket.on('message', (topic, msg) => {
+                this.gotApiStatus(msg.toString());
+            });
+
+            this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
+            this.subscribeToApiStatus();
+        });
+    }
+
+    // This method is needed because zcoind may accept the connection but fail to queue or respond to apiStatus
+    // subscriptions. (To my knowledge, this occurs when zcoind is rescanning the block database, which seems to occur
+    // after zcoind has been loaded with the same datadir on a new operating system.)
+    //
+    // We'll subscribe to apiStatus, and then keep trying to subscribe every 1.5s until we actually get an apiStatus
+    // message.
+    private subscribeToApiStatus() {
+        if (this.latestApiStatus) {
+            return;
+        }
+
+        try {
+            // If it's not ignored, this call is idempotent, and safe even when the socket is not yet open, but will
+            // throw if the socket is closed already, which might be the case if we've closed the connection a short
+            // time after opening it.
+            this.statusPublisherSocket.subscribe('apiStatus');
+        } catch(e) {
+            if (e.name === "TypeError" && e.message === "Socket is closed") {
+                return;
+            }
+
+            throw e;
+        }
+
+        setTimeout(() => this.subscribeToApiStatus(), 1500);
     }
 
     // This function is called when the API status is received. It initialises the (separate) sockets by which we'll
@@ -148,13 +635,24 @@ export class Zcoind {
         }
 
         if (apiStatus.meta.status < 200 || apiStatus.meta.status >= 400) {
-            logger.error("Retrieved API status with bad status %d: %O", apiStatus.meta.status, apiStatus);
+            logger.error("Received API status with bad status %d: %O", apiStatus.meta.status, apiStatus);
             throw "Bad API status";
         }
 
-        if (!this.hasReceivedApiStatus) {
-            this.hasReceivedApiStatus = true;
+        if (!this.latestApiStatus) {
             this.initializeWithApiStatus(apiStatus);
+        }
+
+        this.latestApiStatus = apiStatus;
+
+        // blocks will be set to -1 while the block index is loading.
+        if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
+            if (this._unlockWhenApiIsReady) {
+                logger.info("Got apiStatus %O; unlocking apiIsReadyMutex", apiStatus.data);
+                // Unlock this.apiIsReadyMutex so awaitApiIsReady can resolve.
+                this._unlockWhenApiIsReady();
+                this._unlockWhenApiIsReady = undefined;
+            }
         }
 
         if (this.eventHandlers['apiStatus']) {
@@ -206,10 +704,11 @@ export class Zcoind {
             s.curve_secretkey = clientPrivkey;
         }
 
+        logger.info("Connecting to zcoind controller ports...");
+
+        // These calls give no indication of failure.
         this.requesterSocket.connect(`tcp://${constants.zcoindAddress.host}:${reqPort}`);
         this.publisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${pubPort}`);
-
-        logger.info("Connected to zcoind");
 
         // Subscribe to all events for which we've been given a handler.
         for (const topic of Object.keys(this.eventHandlers)) {
@@ -227,7 +726,7 @@ export class Zcoind {
         });
 
         // We can send now, so release the initial lock on this.requestMutex().
-        this._unlockAfterConnect.then(f => f());
+        this._unlockAfterConnect();
     }
 
     // We're called when a subscription event from zcoind comes up. In turn, we call the relevant subscription handlers
@@ -262,9 +761,10 @@ export class Zcoind {
     // responds with no data object; or if we fail to send to zcoind. If zcoind gives invalid JSON data, or we fail to
     // send, we reject() with the exception object. If zcoind responds with an error or responds with no data object, we
     // return the entire response object we received from zcoind.
-    async send(auth: string | null, type: string, collection: string, data: object): Promise<any> {
+    //
+    // If zcoind has been shutdown with the stopDaemon() method, this method will take no action and never resolve.
+    async send(auth: string | null, type: string, collection: string, data: any): Promise<any> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-        console.log('send object:', JSON.stringify(data));
         return await this.requesterSocketSend({
             auth: {
                 passphrase: auth
@@ -276,24 +776,40 @@ export class Zcoind {
     }
 
     // Send an object through the requester socket and process the response. Refer to the documentation of send() for
-    // what we're actually doing. The reason this method is split off is that setPassphrase() is weird and requires a
-    // special case to work.
-    private async requesterSocketSend(message: any): Promise<any> {
+    // what we're actually doing. The reason this method is split off is that setPassphrase() and shutdown() are weird
+    // and requires special cases to work.
+    //
+    // If dontReleaseRequestMutex is true, requestMutex's will not be released automatically, and the release() function
+    // will be set to this._unlockAfterConnect(). This is show that messages to zcoind cannot be sent after shutdown or
+    // during restart.
+    private async requesterSocketSend(message: any, dontReleaseRequestMutex: boolean = false): Promise<any> {
+        if (!this._unlockAfterConnect) {
+            throw "Attempted to send before zcoind is started.";
+        }
+
         logger.debug("Trying to acquire requestMutex");
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
         let release = await this.requestMutex.lock();
         logger.debug("Acquired requestMutex");
 
-        return new Promise((resolve, reject) => {
+        // If dontReleaseRequestMutex is true, we will make release a non-op and set it to this._unlockAfterConnect so
+        // it can be released by another method at a later time.
+        if (dontReleaseRequestMutex) {
+            this._unlockAfterConnect = release;
+            release = async () => null;
+        }
+
+        return new Promise(async (resolve, reject) => {
             try {
-                logger.debug("message raw:%O", message);
-                logger.debug("message:%O", JSON.stringify(message));
                 this.requesterSocket.send(JSON.stringify(message));
             } catch (e) {
-                logger.error("Error sending data to zcoind: %O", e);
-                reject(e);
-                release();
+                try {
+                    await this.sendError(e);
+                } finally {
+                    release();
+                    reject(e);
+                }
                 return;
             }
 
@@ -329,14 +845,53 @@ export class Zcoind {
         });
     }
 
+    // Close the sockets.
+    private closeSockets() {
+        this.statusPublisherSocket.close();
+        this.publisherSocket.close();
+        this.requesterSocket.close();
+    }
 
+    // Stop the daemon.
+    async stopDaemon() {
+        await this.requesterSocketSend({
+            auth: {
+                passphrase: null
+            },
+            type: 'initial',
+            collection: 'stop',
+            data: null
+        }, true);
+
+        logger.info("Waiting for zcoind to close its ports.");
+        await this.awaitZcoindNotListening();
+
+        this.closeSockets();
+        this.latestApiStatus = undefined;
+    }
+
+    // Restart the daemon.
+    async restartDaemon() {
+        await this.stopDaemon();
+        await this.start();
+    }
+
+    // This is called when an error sending to zcoind has occurred. It should be synchrnonous, as further messages may
+    // be sent once it is completed.
+    async sendError(error: any) {
+        logger.error("Error sending data to zcoind: %O", error);
+    }
 
     // Actions
+
+    // See stopDaemon() for another available action.
+
+    // See restartDaemon() for another available action.
 
     // Invoke a legacy RPC command. result is whatever the JSON result of the command is, and errored is a boolean that
     // indicates whether or not an error has occurred.
     //
-    // Note: legacyRpc commands sometimes require auth, but they take it as a special legacyRpc command
+    // NOTE: legacyRpc commands sometimes require auth, but they take it as a special legacyRpc command
     //       (walletpassphrase) which is called prior to invoking the protected command.
     async legacyRpc(commandline: string): Promise<{result: object, errored: boolean}> {
         // Yes, it is correct to infer that zcoind can parse the argument list but cannot parse the command name.
@@ -363,8 +918,9 @@ export class Zcoind {
     }
 
     // Create a new payment request (to be stored on the daemon-side).
-    // Note: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
-    // responsible for any updating of state that might be required.
+    //
+    // NOTE: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
+    //       responsible for any updating of state that might be required.
     async createPaymentRequest(amount: number | undefined, label: string, message: string, address:string): Promise<PaymentRequestData> {
         return await this.send(null, 'create', 'paymentRequest', {
             amount,
@@ -380,8 +936,9 @@ export class Zcoind {
     }
 
     // Update an existing payment request.
-    // Note: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
-    // responsible for any updating of state that might be required.
+    //
+    // NOTE: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
+    //       responsible for any updating of state that might be required.
     async updatePaymentRequest(address: string, amount: number | undefined, label: string, message: string, state: PaymentRequestState): Promise<PaymentRequestData> {
         return await this.send(null, 'update', 'paymentRequest', {
             id: address,
@@ -438,34 +995,20 @@ export class Zcoind {
                 selected
             }
         });
-        console.log('privateSend data:', data);
         return data;
     }
 
     async unlockWallet(auth: string): Promise<string> {
         const data = await this.send(auth, 'create', 'unlockWallet', {});
-        console.log('unlocking wallet');
-        return data;
-    }
-
-    async importMnemonics(auth: string, mnemonics: string, passProtective: string): Promise<string> {
-        const data = await this.send(auth, 'create', 'importMnemonics', {
-            mnemonic: mnemonics,
-            protective: passProtective
-        });
-        console.log('importing mnemonics to wallet');
         return data;
     }
 
     async showMnemonics(auth: string): Promise<string> {
-        const data = await this.send(auth, 'create', 'showMnemonics', {});
-        console.log('showing mnemonics to wallet');
-        return data;
+        return await this.send(auth, 'create', 'showMnemonics', {});
     }
 
     async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<string> {
-        const data = await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
-        return data;
+        return await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
     }
 
     async readWalletMnemonicWarningState(auth: string) : Promise<string> {
@@ -591,14 +1134,27 @@ export class Zcoind {
         return await this.send(null, 'initial', 'setting', null);
     }
 
-    // Set a new passphrase. We throw IncorrectPassphrase if the passphrase is incorrect, and do not return on success.
-    async setPassphrase(oldPassphrase: string, newPassphrase: string): Promise<void> {
+    // Set the passphrase to newPassphrase. If there is an existing passphrase, it must be passed as oldPassphrase; or
+    // else null mast be passed in its stead.
+    //
+    // We reject() with IncorrectPassphrase if the oldPassphrase is incorrect.
+    //
+    // If the wallet is unencrypted THE DAEMON WILL STOP after successfully returning. The caller is responsible for
+    // restarting the daemon. The caller should await awaitZcoindNotListening() prior to calling start(), as start()
+    // will fail if zcoind is already listening, and if start() is called immediately after setPassphrase(), zcoind may
+    // not have had time to close its ports.
+    async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
+
         let r;
 
         try {
+            if (oldPassphrase === null) {
+                return await this.send(newPassphrase, 'create', 'setPassphrase', null);
+            }
+
             r = await this.requesterSocketSend({
                 auth: {
-                    passphrase: oldPassphrase,
+                    passphrase: oldPassphrase || '',
                     newPassphrase
                 },
                 type: 'update',
@@ -616,5 +1172,35 @@ export class Zcoind {
         if (!r) {
             throw 'setPassphrase call failed';
         }
+    }
+
+    // Get the initial state of the wallet, which includes the information in the StateWallet interface.
+    async getStateWallet(): Promise<StateWallet> {
+        return await this.send(null, 'initial', 'stateWallet', null);
+    }
+
+    // Return the API status, waiting until one is available to return. We will reject() if we haven't been given an
+    // apiStatus yet (ie. before start() has resolved) or if zcoind has subsequently been shut down.
+    apiStatus(): ApiStatus {
+        if (!this.latestApiStatus) {
+            throw "We don't appear to be connected to zcoind."
+        }
+
+        return this.latestApiStatus;
+    }
+
+    // Has our wallet been locked yet?
+    isWalletLocked(): boolean {
+        if (!this.latestApiStatus || !this.latestApiStatus.data || typeof this.latestApiStatus.data.walletLock !== 'boolean') {
+            throw "apiStatus has not yet been loaded or has invalid data.";
+        }
+
+        return this.latestApiStatus.data.walletLock;
+    }
+
+    // Have we ever used this wallet? We detect this by determining if we have any receiving addresses.
+    async hasBeenUsed(): Promise<boolean> {
+        const stateWallet = await this.getStateWallet();
+        return !!stateWallet.addresses.length;
     }
 }

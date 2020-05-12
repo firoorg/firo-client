@@ -1,98 +1,7 @@
-import { createLogger } from '../../lib/logger';
+import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/zcoind';
 
+import { createLogger } from '../../lib/logger'
 const logger = createLogger('zcoin:store:Transactions');
-
-// one transaction output, of which a transaction may have many.
-interface TransactionOutput {
-    // A unique ID generated on our side (not present in the API) which identifies the transaction. It will be different
-    // for outgoing and incoming versions of the same
-    // transactions.
-    uniqId: string;
-
-    category: string;
-    txid: string;
-    txIndex: number;
-    firstSeenAt: number;
-    label: string;
-    fee: number;
-    amount: number;
-    address?: string;
-    blockHeight?: number;
-    blockHash?: number;
-    blockTime?: number;
-    spendable: boolean;
-    locked: boolean;
-}
-
-interface TransactionInput {
-    txid: string;
-    index: number;
-}
-
-interface AddressBookItem {
-    address: string;
-    label: string;
-    purpose: string;
-}
-
-// This is the data format for initial/stateWallet.
-interface StateWallet {
-    addresses: {
-        // maybeAddress could also be the string "MINT"
-        [maybeAddress: string]: {
-            txids: {
-                [grouping: string]: {
-                    [maybeTxid: string]: TransactionOutput
-                }
-            },
-            inputs?: {
-                [outpoint: string]: TransactionInput
-            },
-            lockedCoins?: {
-                [outpoint: string]: TransactionInput
-            },
-    
-            unlockedCoins?: {
-                [outpoint: string]: TransactionInput
-            },
-        }    
-    }
-}
-
-// This is the data format we're given in 'transaction' events.
-interface TransactionEvent {
-    // maybeAddress could also be the string "MINT"
-    [maybeAddress: string]: {
-        txids: {
-            [grouping: string]: {
-                [txid: string]: TransactionOutput
-            }
-        },
-
-        inputs?: {
-            [outpoint: string]: TransactionInput
-        },
-
-        lockedCoins?: {
-            [outpoint: string]: TransactionInput
-        },
-
-        unlockedCoins?: {
-            [outpoint: string]: TransactionInput
-        },
-
-        total: {
-            [txCategory: string]: {
-                send?: number;
-                mint?: number;
-                spend?: number;
-                mined?: number;
-                znode?: number;
-                receive?: number;
-            }
-        }
-    }
-}
 
 // This is the data format we're given in 'address' events.
 type AddressEvent = StateWallet;
@@ -112,21 +21,12 @@ const mutations = {
     setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
         var unspentAlreadyProcess = false;
-        //console.log('ListSpent:', initialStateWallet.listspent);
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
             if (!['inputs', 'lockedCoins', 'unlockedCoins'].includes(address)) {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
-                        // If we're reindexing, ignore transactions which don't have a blockHeight set. These sort of
-                        // transactions should occur only during reindex, and they'll later be sent out with Transaction
-                        // events when block data is associated with them again.
-                        if (isReindexing && !tx.blockHeight) {
-                            logger.warn(`Ignoring transaction ${tx} with no block data received during sync.`);
-                            continue;
-                        }
-
                         state.unspentUTXOs[`${tx.txid}-${tx.txIndex}-${tx.category}`] = true;
 
                         if (address === 'MINT' && tx.category === 'receive') {
@@ -247,7 +147,6 @@ const actions = {
     },
 
     handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
-        console.log('handleTransactionEvent:', transactionEvent);
         logger.info('handleTransactionEvent');
         commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
     },

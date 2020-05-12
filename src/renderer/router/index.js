@@ -81,10 +81,6 @@ export default new Router({
                     component: require('@/components/DebugPage').default
                 }
             ]
-        },
-        {
-            path: '/wait-for-daemon',
-            component: require('@/layouts/WaitForDaemon').default
         }
     ]
 })

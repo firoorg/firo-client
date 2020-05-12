@@ -395,7 +395,7 @@ export default {
                             background: $color--green;
                         }
 
-                        & /deep/ .tag {
+                        & .tag {
                             border-color: mix($color--comet-dark-mixed, $color--comet-dark);
                         }
 
@@ -415,7 +415,7 @@ export default {
                     }
 
                     &.is-incoming {
-                        /deep/ .payment-request-table-status path {
+                        .payment-request-table-status path {
                             fill: $color--white;
                         }
                     }
@@ -427,7 +427,7 @@ export default {
                             background: $color--orange;
                         }
 
-                        & /deep/ .tag {
+                        & .tag {
                             border-color: mix($color--orange, $color--orange-dark);
                         }
 
@@ -446,11 +446,11 @@ export default {
                         }
                     }
 
-                    & /deep/ .tag {
+                    & .tag {
                         border-color: mix($color--green, $color--green-dark);
                     }
 
-                    & /deep/ .payment-request-table-status {
+                    & .payment-request-table-status {
                         &.is-fulfilled path {
                             stroke: $color--white;
                         }

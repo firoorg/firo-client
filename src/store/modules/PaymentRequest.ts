@@ -32,10 +32,6 @@ const mutations = {
 };
 
 const actions = {
-    setStateWithInitialPaymentRequest({commit}, initialPaymentRequestState: {[address: string]: PaymentRequest}) {
-        commit('setStateWithInitialPaymentRequest', initialPaymentRequestState);
-    },
-
     addOrUpdatePaymentRequestFromResponse({commit}, paymentRequest: PaymentRequest) {
         commit('addOrUpdatePaymentRequestFromResponse', paymentRequest);
     }

@@ -34,8 +34,8 @@ export default {
                 return this.isConnectedViaTor
             },
             async set (val) {
-                await this.$daemon.updateSettings({torsetup: val ? '1' : '0'});
-                this.$store.commit('Settings/setDaemonSettings', await this.$daemon.getSettings());
+                await $daemon.updateSettings({torsetup: val ? '1' : '0'});
+                this.$store.commit('Settings/setDaemonSettings', await $daemon.getSettings());
                 this.$emit('toggle-tor')
             }
         }

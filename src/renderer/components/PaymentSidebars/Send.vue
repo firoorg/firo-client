@@ -380,7 +380,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            network: 'Network/network',
+            network: 'ApiStatus/network',
             availableXzc: 'Balance/availableXzc',
             availableZerocoin: 'Balance/availableZerocoin',
             totalBalance: 'Balance/total',
@@ -558,17 +558,15 @@ export default {
 
             let p;
             if (this.privateOrPublic === 'private') {
-                p = this.$daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
             } else {
-                p = this.$daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
             }
 
             try {
                 this.transactionFee = await p;
             } catch (e) {
-                console.log('q');
                 if (e.error && e.error.code === -6) {
-                    console.log('z');
                     this.totalAmountExceedsBalance = true;
                 }
             }
@@ -628,10 +626,10 @@ export default {
 
             try {
                 if (this.privateOrPublic === 'private') {
-                    await this.$daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
+                    await $daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
                         this.subtractFeeFromAmount, coinControl);
                 } else {
-                    let d = await this.$daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
+                    let d = await $daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
                         this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
                 }
             } catch (e) {
@@ -681,7 +679,7 @@ export default {
         async openAddressBook() {
             console.log('Addressbook:', this.addressBook);
             if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
-                const ab = await this.$daemon.readAddressBook();
+                const ab = await $daemon.readAddressBook();
                 this.$store.dispatch('Transactions/setAddressBook', ab);
             }
             this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'send'});

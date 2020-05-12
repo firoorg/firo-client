@@ -9,6 +9,10 @@
             />
         </div>
 
+        <div v-if="showUnsyncedWarning" class="show-unsynced-warning">
+            The blockchain is not yet synced. Payment information may be incomplete or inaccurate.
+        </div>
+
         <animated-table
             :data="filteredTableData"
             :fields="tableFields"
@@ -85,15 +89,21 @@ export default {
             transactions: 'Transactions/transactions',
             addresses: 'Transactions/addresses',
             consolidatedMints: 'Transactions/consolidatedMints',
-            paymentRequests: 'PaymentRequest/paymentRequests'
+            paymentRequests: 'PaymentRequest/paymentRequests',
+            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
+            isReindexing: 'ApiStatus/isReindexing'
         }),
+
+        showUnsyncedWarning() {
+            return !this.isBlockchainSynced || this.isReindexing;
+        },
 
         tableData () {
             const tableData = [];
 
             for (const [id, tx] of Object.entries(this.transactions)) {
-                this.$log.error(`transaction ${id}`);
-                if (tx.isChange && tx.category != 'mined') {
+                // Mined transactions are incorrectly marked as change.
+                if (tx.isChange && tx.category !== 'mined') {
                     continue;
                 }
                 // Mints are handled separately.
@@ -240,9 +250,21 @@ export default {
     }
 }
 
+
 .filter-input {
     position: relative;
     display: inline-block;
+}
+.show-unsynced-warning {
+    text-align: center;
+    color: red;
+    font: {
+        size: 0.9em;
+        style: italic;
+        weight: bold;
+    }
+
+    margin-bottom: 1em;
 }
 
 input {

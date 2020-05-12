@@ -62,6 +62,8 @@
 </template>
 
 <script>
+const {app} = require('electron').remote;
+
 export default {
     name: "DebugPage",
 
@@ -104,9 +106,9 @@ export default {
                     longHelp: 'clear the console'
                 },
 
-                chdatadir: {
-                    shortHelp: 'chdatadir /path/to/datadir',
-                    longHelp: 'Change the datadir to be passed to zcoind on next startup WITHOUT moving any data, creating the directory if it does not exist.'
+                resetclientconfig: {
+                    shortHelp: 'resetclientconfig',
+                    longHelp: 'Reset the configuration of the client, allowing you to go through setup again.'
                 }
             }
         }
@@ -116,7 +118,7 @@ export default {
         this.focusInput();
 
         // Get the list of available commands.
-        this.$daemon.legacyRpcCommands().then(commands => {
+        $daemon.legacyRpcCommands().then(commands => {
             this.availableCommands = commands.concat(Object.keys(this.clientHelp));
         })
     },
@@ -277,19 +279,8 @@ export default {
 
             if (input === 'clear') {
                 this.sessionLog = [];
-            } else if (input.match(/^\s*chdatadir/)) {
-                if ((m = input.match(/^\s*chdatadir (.+)$/))) {
-                    this.sessionLog.push({
-                        input,
-                        output: await this.chdatadir(m[1])
-                    });
-                } else {
-                    const c = this.clientHelp['chdatadir'];
-                    this.sessionLog.push({
-                        input,
-                        output: `${c.shortHelp}\n${c.longHelp}`
-                    });
-                }
+            } else if (input.match(/^\s*resetclientconfig\s*$/)) {
+                this.resetClientConfig();
             } else if (input.match(/^\s*help\s*$/)) { // Add our own commands to help.
                 let output = await this.legacyRpc("help");
                 output += "\n\n== GUI ==\n";
@@ -324,18 +315,8 @@ export default {
             });
         },
 
-        async chdatadir(newDataDirectory) {
-            try {
-                await this.$store.dispatch('App/changeBlockchainLocation', newDataDirectory);
-            } catch(e) {
-                return `Error: ${e}`;
-            }
-
-            return "Success! Changes will take effect on restart. Please note that if you wish to keep your existing data, you must migrate it yourself.";
-        },
-
         async legacyRpc(commandline) {
-            const response = await this.$daemon.legacyRpc(commandline);
+            const response = await $daemon.legacyRpc(commandline);
 
             if (response.result) {
                 return response.result;
@@ -346,6 +327,11 @@ export default {
             } else {
                 return response;
             }
+        },
+
+        resetClientConfig() {
+            this.$store.commit('App/setIsInitialized', false);
+            this.$nextTick($quitApp);
         }
     }
 }

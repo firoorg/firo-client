@@ -174,8 +174,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import types from '~/types'
+import { mapGetters, mapMutations } from 'vuex'
 
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
@@ -198,7 +197,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            isRestarting: 'App/isRestarting',
             apiStatus: 'ApiStatus/apiStatus'
         }),
 
@@ -233,9 +231,21 @@ export default {
     },
 
     methods: {
-        ...mapActions({
-            restartDaemon: types.app.DAEMON_RESTART
+        ...mapMutations({
+            setWaitingReason: 'App/setWaitingReason'
         }),
+
+        async restartDaemon() {
+            this.setWaitingReason("Restarting daemon...");
+            await $daemon.restartDaemon();
+            this.setWaitingReason("Loading our data...");
+            try {
+                await $daemon.awaitInitializersCompleted();
+            } catch(e) {
+                await $quitApp(`Shutting down because initializers didn't complete successfully: ${e}`);
+            }
+            this.setWaitingReason(undefined);
+        },
 
         async changePassphrase() {
             if (!this.canChangePassphrase) {
@@ -243,7 +253,7 @@ export default {
             }
 
             try {
-                await this.$daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
+                await $daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
             } catch (e) {
                 if (e.name === 'IncorrectPassphrase') {
                     this.changePassphraseError = 'Incorrect Passphrase';
@@ -282,7 +292,7 @@ export default {
             this.popoverStep = 'wait';
 
             try {
-                await this.$daemon.backup(backupDirectory);
+                await $daemon.backup(backupDirectory);
                 this.popoverStep = 'success';
             } catch (e) {
                 this.errorMessage = (e.error && e.error.message) ? e.error.message : String(e);
