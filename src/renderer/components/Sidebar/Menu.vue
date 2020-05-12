@@ -31,6 +31,13 @@
                     </span>
                 </router-link>
             </li>
+            <li>
+                <router-link to="/znodes">
+                    <span class="text">
+                        Znodes
+                    </span>
+                </router-link>
+            </li>
             <li
                 v-if="localZnodeCount > 0"
                 class="has-divider"

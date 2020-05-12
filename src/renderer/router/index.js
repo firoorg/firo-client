@@ -62,6 +62,11 @@ export default new Router({
                 },
 
                 {
+                    path: '/znodes',
+                    component: require('@/components/EvoZnodesPage').default
+                },
+
+                {
                     path: '/znodelist',
                     component: require('@/components/ZnodePage').default
                 },
