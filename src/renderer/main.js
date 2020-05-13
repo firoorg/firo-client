@@ -200,29 +200,30 @@ function startVue() {
     }).$mount('#app');
 }
 
-if (process.env.ZCOIN_CLIENT_REPL === 'true') {
-    // Allow shutting down.
-    setWaitingReason(undefined);
-
-    window.Zcoind = require('../daemon/zcoind').Zcoind;
-
-    ourWindow.webContents.openDevTools();
-} else if (store.getters['App/isInitialized'] &&
-           existsSync(store.getters['App/walletLocation']) &&
-           process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
+// Start the daemon, showing progress to the user and resolving when the daemon is fully started.
+window.$startDaemon = () => new Promise(resolve => {
     setWaitingReason("Starting up zcoind...");
-
-    startVue();
-    ourWindow.show();
-
-    // Start up zcoind.
     zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;
 
-            setWaitingReason("Loading our state from zcoind...");
+            setWaitingReason("Awaiting zcoind's API to load...");
+            // This may throw if we try to restart the daemon, but we're not going to do that.
+            await $daemon.awaitApiIsReady();
 
+            if ($daemon.apiStatus().data.reindexing) {
+                setWaitingReason("Waiting for zcoind to reindex. This may take an extremely long time...");
+                await $daemon.awaitBlockchainLoaded();
+            } else if ($daemon.apiStatus().data.rescanning) {
+                setWaitingReason("Waiting for zcoind to rescan the block index. This may take a long time...");
+                await $daemon.awaitBlockchainLoaded();
+            }
+
+            setWaitingReason("Connecting to zcoind...")
+            await $daemon.awaitHasConnected();
+
+            setWaitingReason("Loading our state from zcoind...");
             try {
                 // Make sure our state is updated before proceeding.
                 await $daemon.awaitInitializersCompleted();
@@ -235,10 +236,27 @@ if (process.env.ZCOIN_CLIENT_REPL === 'true') {
             }
 
             setWaitingReason(undefined);
+            resolve();
         })
         .catch(async e => {
             await $quitApp(`An error occured starting zcoind: ${e}`);
         });
+});
+
+if (process.env.ZCOIN_CLIENT_REPL === 'true') {
+    // Allow shutting down.
+    setWaitingReason(undefined);
+
+    window.Zcoind = require('../daemon/zcoind').Zcoind;
+
+    ourWindow.webContents.openDevTools();
+} else if (store.getters['App/isInitialized'] &&
+           existsSync(store.getters['App/walletLocation']) &&
+           process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
+    startVue();
+    ourWindow.show();
+
+    $startDaemon();
 } else {
     setWaitingReason(undefined);
 
