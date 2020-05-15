@@ -235,6 +235,7 @@ window.$startDaemon = () => new Promise(resolve => {
                 await $quitApp("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
             }
 
+            logger.info("zcoind has started.");
             setWaitingReason(undefined);
             resolve();
         })
