@@ -145,6 +145,11 @@ ourWindow.webContents.on('shutdown-requested', async () => {
     await $quitApp();
 });
 
+// Removing old listeners on navigation is ecessary to prevent warnings when we quit while hot reloading is enabled.
+ourWindow.webContents.once("will-navigate", () => {
+    ourWindow.webContents.removeAllListeners('shutdown-requested');
+});
+
 // Handle zcoin:// links on Windows.
 app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
@@ -202,8 +207,12 @@ function startVue() {
 
 // Start the daemon, showing progress to the user and resolving when the daemon is fully started.
 window.$startDaemon = () => new Promise(resolve => {
+    // Checking for zcoindHasStarted allows us to work properly with hot reloading.
+
     setWaitingReason("Starting up zcoind...");
-    zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'], store.getters['App/blockchainLocation'] || null)
+    zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'],
+        store.getters['App/blockchainLocation'] || null, undefined,
+        store.getters['App/zcoindHasStarted'] && process.env.NODE_ENV === "development")
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;
@@ -237,6 +246,7 @@ window.$startDaemon = () => new Promise(resolve => {
 
             logger.info("zcoind has started.");
             setWaitingReason(undefined);
+            store.commit('App/setZcoindHasStarted', true);
             resolve();
         })
         .catch(async e => {

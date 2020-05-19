@@ -2,9 +2,10 @@
 
 import { Zcoind, MnemonicSettings } from './zcoind';
 
-/// Start up zcoind, connect to it, and return a Zcoind instance.
+/// Start up zcoind, connect to it, and return a Zcoind instance. If allowMultipleZcoindInstances is true, instead of
+// giving an error if there is an existing zcoind instance running, we will connect to it without running initializers.
 async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string,
-                      mnemonicSettings?: MnemonicSettings): Promise<Zcoind> {
+                      mnemonicSettings?: MnemonicSettings, allowMultipleZcoindInstances?: boolean): Promise<Zcoind> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
@@ -40,6 +41,7 @@ async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoin
         }
     }
     const zcoind = new Zcoind(network, zcoindLocation, zcoindDataDir, initializers, eventHandlers);
+    zcoind.allowMultipleZcoindInstances = !!allowMultipleZcoindInstances;
     await zcoind.start(mnemonicSettings);
 
     return zcoind;
