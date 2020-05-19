@@ -14,7 +14,8 @@ const state = {
     blockchainLocation: '',
     // This is the value read from our configuration, not what is given to us in APIStatus.
     zcoinClientNetwork: '',
-    waitingReason: 'Loading...'
+    waitingReason: 'Loading...',
+    zcoindHasStarted: false
 }
 
 const mutations = {
@@ -76,6 +77,10 @@ const mutations = {
     // This determines whether WaitingScreen will be shown from MainLayout.
     setWaitingReason(state, value) {
         state.waitingReason = value;
+    },
+
+    setZcoindHasStarted(state, value) {
+        state.zcoindHasStarted = value;
     }
 }
 
@@ -163,6 +168,7 @@ const getters = {
     zcoinClientNetwork: (state) => state.zcoinClientNetwork,
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
+    zcoindHasStarted: (state) => state.zcoindHasStarted,
 
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.

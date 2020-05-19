@@ -247,6 +247,10 @@ export class Zcoind {
     // The directory that zcoind will use to store its data. This must already exist.
     readonly zcoindDataDir: string;
 
+    // If this is set to true, we will connect to an existing zcoind instance (supposing -clientapi is enabled) instead
+    // of resetting everything. In this case, initializers will NOT be run.
+    allowMultipleZcoindInstances: boolean = false;
+
     // zcoindLocation is the location of the zcoind binary.
     //
     // network is the network zcoind should connect to.
@@ -323,32 +327,39 @@ export class Zcoind {
             }
         }
 
-        this.awaitHasConnected().then(async () => {
-            const initializerPromises = this.initializers.map(initializer => initializer(this));
-            const rejections = [];
-
-            for (const promise of initializerPromises) {
-                try {
-                    await promise;
-                } catch(e) {
-                    rejections.push(e);
-                }
-            }
-
-            if (rejections.length > 0) {
-                await this.initializersCompletedEWH.poison(rejections);
-            } else {
-                await this.initializersCompletedEWH.release(undefined);
-            }
-        });
-
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
         // a fairly small  window anyway,
         if (await this.isZcoindListening()) {
-            throw new ZcoindAlreadyRunning();
+            if (!this.allowMultipleZcoindInstances) {
+                throw new ZcoindAlreadyRunning();
+            }
+
+            this.awaitHasConnected().then(async () => {
+                await this.initializersCompletedEWH.release(undefined);
+            });
+        } else {
+            this.awaitHasConnected().then(async () => {
+                const initializerPromises = this.initializers.map(initializer => initializer(this));
+                const rejections = [];
+
+                for (const promise of initializerPromises) {
+                    try {
+                        await promise;
+                    } catch (e) {
+                        rejections.push(e);
+                    }
+                }
+
+                if (rejections.length > 0) {
+                    await this.initializersCompletedEWH.poison(rejections);
+                } else {
+                    await this.initializersCompletedEWH.release(undefined);
+                }
+            });
+
+            await this.launchDaemon(mnemonicSettings);
         }
 
-        await this.launchDaemon(mnemonicSettings);
         await this.connectAndReact();
     }
 
