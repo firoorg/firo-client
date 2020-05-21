@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "target": "es2017",
     "module": "commonjs",
-    "sourceMap": true
+    "sourceMap": true,
+    "esModuleInterop": true
   }
 }

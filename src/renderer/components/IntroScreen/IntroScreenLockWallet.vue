@@ -137,19 +137,7 @@ export default {
             await this.setWaitingReason("Waiting for zcoind to stop listening so we can restart it...");
             await initialDaemon.awaitZcoindNotListening();
 
-            await this.setWaitingReason("Starting zcoind..");
-            try {
-                window.$daemon = await zcoind(this.$store, this.zcoinClientNetwork, this.zcoindLocation, this.blockchainLocation);
-            } catch(e) {
-                await $quitApp(`Failed to start zcoind normally: ${e}`);
-            }
-
-            await this.setWaitingReason("Waiting to update our state with data from zcoind...");
-            try {
-                await $daemon.awaitInitializersCompleted();
-            } catch(e) {
-                await $quitApp(`initializers failed to complete: ${e}`);
-            }
+            await $startDaemon();
 
             await this.setWaitingReason("Sanity checking mnemonic...");
             const mnemonicSanityCheck = await $daemon.showMnemonics(this.passphrase);

@@ -1,3 +1,4 @@
+import {cloneDeep} from 'lodash';
 import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/zcoind';
 
 import { createLogger } from '../../lib/logger'
@@ -19,6 +20,10 @@ const mutations = {
     // isReindexing is state.getters['ApiStatus/isReindexing']. The caller must be responsible for it due to inherent
     // limitations in VueX.
     setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
+        const stateTransactions = cloneDeep(state.transactions);
+        const stateAddresses = cloneDeep(state.addresses);
+        const stateUnspentUTXOs = cloneDeep(state.unspentUTXOs);
+
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
         var unspentAlreadyProcess = false;
         for (const address of Object.keys(initialStateWallet.addresses)) {
@@ -27,7 +32,7 @@ const mutations = {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
-                        state.unspentUTXOs[`${tx.txid}-${tx.txIndex}-${tx.category}`] = true;
+                        stateUnspentUTXOs[`${tx.txid}-${tx.txIndex}-${tx.category}`] = true;
 
                         if (address === 'MINT' && tx.category === 'receive') {
                             // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
@@ -39,35 +44,35 @@ const mutations = {
                         // mined and znode transactions without a blockHeight are orphans.
                         if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
                             // Delete previous records associated with the transaction.
-                            if (state.transactions[tx.uniqId]) {
+                            if (stateTransactions[tx.uniqId]) {
                                 logger.info(`Got orphan ${tx.uniqId}, deleting associated records.`);
-                                delete state.transactions[tx.uniqId];
-                                delete state.unspentUTXOs[tx.uniqId];
-                                state.addresses[tx.address] = state.addresses[tx.address].filter(id => id !== tx.uniqId);
+                                delete stateTransactions[tx.uniqId];
+                                delete stateUnspentUTXOs[tx.uniqId];
+                                stateAddresses[tx.address] = stateAddresses[tx.address].filter(id => id !== tx.uniqId);
                             }
 
                             // We don't want to display orphan transactions in the UI.
                             continue;
                         }
 
-                        state.transactions[tx.uniqId] = tx;
+                        stateTransactions[tx.uniqId] = tx;
 
                         // Mint transactions will have no associated address.
                         if (!tx.address) {
                             continue;
                         }
 
-                        if (!state.addresses[tx.address]) {
-                            state.addresses[tx.address] = [];
+                        if (!stateAddresses[tx.address]) {
+                            stateAddresses[tx.address] = [];
                         }
-                        state.addresses[tx.address].push(tx.uniqId);
+                        stateAddresses[tx.address].push(tx.uniqId);
                     }
                 }
             } else if (['lockedCoins'].includes(address)) {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                            state.transactions[id].locked = true;
+                            stateTransactions[id].locked = true;
                         }
                     }
                 }
@@ -75,7 +80,7 @@ const mutations = {
                 for (const outpoint of Object.values(addressData)) {
                     for (const [id, tx] of Object.entries(state.transactions)) {
                         if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                            state.transactions[id].locked = false;
+                            stateTransactions[id].locked = false;
                         }
                     }
                 }
@@ -88,18 +93,17 @@ const mutations = {
                 for (const [id, tx] of Object.entries(state.transactions)) {
                     //logger.info('spent: %s', id);
                     if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                        state.transactions[id].spendable = false;
-                        state.unspentUTXOs[id] = false;
-                        delete state.unspentUTXOs[id];
+                        stateTransactions[id].spendable = false;
+                        stateUnspentUTXOs[id] = false;
+                        delete stateUnspentUTXOs[id];
                     }
                 }
             }
         }
-        // Tell Vue we've updated our variables.
-        // FIXME: Use Vue.set.
-        state.addresses = {...state.addresses};
-        state.transactions = {...state.transactions};
-        state.unspentUTXOs = {...state.unspentUTXOs};
+
+        state.addresses = stateAddresses;
+        state.transactions = stateTransactions;
+        state.unspentUTXOs = stateUnspentUTXOs;
         state.walletLoaded = true;
     },
 

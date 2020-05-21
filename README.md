@@ -61,12 +61,18 @@ npm run dev
 By default, zcoin-client will log to `userData/combined.log` in the application data directory at debug level. This
 can be changed with the environment variable `ZCOIN_CLIENT_DEBUG_LEVEL`.
 
-## REPL
+### REPL
 
 If the client is started with the `ZCOIN_CLIENT_REPL` environment variable set to `true`, the client will not start
 and instead Chrome Dev Tools will be launched with the global variable Zcoind set to the Zcoind class from
 `src/daemon/zcoind.ts`. It can then be used to interact with the daemon as documented in that file. The daemon will
 NOT be stopped automatically on exit.
+
+### Forcing Reinitialization
+
+If you want to reinitialize the client and don't want to use the `resetclientconfig` command in the debug console, you
+can set the enviornment variable `REINITIALIZE_ZCOIN_CLIENT` to `true`. If this is set, Zcoin Client will show the setup
+screen on startup regardless of whether it has already been initialized.
 
 ## Getting Assistance
 

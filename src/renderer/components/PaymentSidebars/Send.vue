@@ -602,16 +602,12 @@ export default {
         },
 
         async attemptSend () {
-            var coinControl = '';
+            let coinControl;
             if (this.selectedUtxos && this.selectedUtxos.length > 0) {
-                this.selectedUtxos.forEach(element => {
-                    coinControl = `${coinControl}:${element.txid}-${element.txIndex}`;
-                });
+                coinControl = this.selectedUtxos.map(element => [element.txid, element.txIndex]);
                 this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
-                coinControl = coinControl.substring(1);
             }
 
-            console.log('coin control:', coinControl);
             // This will have the effect of preventing the user from sending again without re-entering their passphrase.
             // JavaScript is single threaded, so there should be no race condition possible with an interruption between
             // the value check and the value assignment.
