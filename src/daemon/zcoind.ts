@@ -1165,17 +1165,8 @@ export class Zcoind {
     }
 
     // Has our wallet been locked yet?
-    isWalletLocked(): boolean {
-        if (!this.latestApiStatus || !this.latestApiStatus.data || typeof this.latestApiStatus.data.walletLock !== 'boolean') {
-            throw "apiStatus has not yet been loaded or has invalid data.";
-        }
-
+    async isWalletLocked(): Promise<boolean> {
+        await this.awaitApiIsReady();
         return this.latestApiStatus.data.walletLock;
-    }
-
-    // Have we ever used this wallet? We detect this by determining if we have any receiving addresses.
-    async hasBeenUsed(): Promise<boolean> {
-        const stateWallet = await this.getStateWallet();
-        return !!stateWallet.addresses.length;
     }
 }

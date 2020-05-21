@@ -232,16 +232,16 @@ window.$startDaemon = () => new Promise(resolve => {
             setWaitingReason("Connecting to zcoind...")
             await $daemon.awaitHasConnected();
 
+            if (!await $daemon.isWalletLocked())  {
+                await $quitApp("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
+            }
+
             setWaitingReason("Loading our state from zcoind...");
             try {
                 // Make sure our state is updated before proceeding.
                 await $daemon.awaitInitializersCompleted();
             } catch(e) {
                 await $quitApp(`An error occurred in our initializers: ${e}`);
-            }
-
-            if (!$daemon.isWalletLocked())  {
-                await $quitApp("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
             }
 
             logger.info("zcoind has started.");
