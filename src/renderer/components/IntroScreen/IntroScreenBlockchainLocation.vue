@@ -53,8 +53,6 @@ const remote = require('electron').remote;
 import { mapGetters, mapMutations } from 'vuex'
 import GuideStepMixin from '@/mixins/GuideStepMixin'
 
-import zcoind from "#/daemon/init";
-
 export default {
     name: 'IntroScreenBlockchainLocation',
 
@@ -166,37 +164,9 @@ export default {
 
             // The wallet already exists, so we don't need to go through the mnemonics screen.
             if (fs.existsSync(this.walletLocation)) {
-                this.setWaitingReason("Starting zcoind...");
-                try {
-                    window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.dataDir);
-                } catch(e) {
-                    await $quitApp(`Error starting zcoind: ${e}`);
-                }
-
-                this.setWaitingReason("Loading state from zcoind...");
-                try {
-                    await $daemon.awaitInitializersCompleted();
-                } catch(e) {
-                    await $quitApp(`Error running our initializers: ${e}`);
-                }
-
-                if ($daemon.isWalletLocked()) {
-                    this.setWaitingReason(undefined);
-                    // This wallet is already locked. End the setup procedure.
-                    this.$store.commit("App/setIsInitialized", true);
-                    // We will be destroyed automatically from MainLayout.
-                } else {
-                    // The wallet exists, but isn't yet locked. This is probably the result of some form of error.
-                    if (await $daemon.hasBeenUsed()) {
-                        await $quitApp(`You have an existing, unlocked wallet.dat (located at ${this.walletLocation}) ` +
-                              "with addresses in it. Try locking it and starting the client again.");
-                    } else {
-                        await $quitApp("It looks like you have an existing wallet.dat, but it has no addresses in it. " +
-                              "This is probably the result of a bug or the client exiting before setup could be " +
-                              `completed. Manually backup the existing wallet.dat (located at ${this.walletLocation}) ` +
-                              "and try starting the client again.");
-                    }
-                }
+                await $startDaemon();
+                // If startup fails, we will not be marked as initialized.
+                this.commit('App/setIsInitialized', true);
             } else {
                 // wallet.dat doesn't exist, so we should set it up with a mnemonic.
                 this.actions.goTo("createOrRestore");
