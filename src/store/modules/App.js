@@ -179,7 +179,7 @@ const getters = {
 
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.
-    waitingReason: (state) => state.waitingReason || undefined,
+    waitingReason: (state) => state.waitingReason,
     cachedMnemonic: (state) => state.cachedMnemonic,
     openAddressBook: (state) => state.openAddressBook
 }
