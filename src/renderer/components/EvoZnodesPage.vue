@@ -19,6 +19,9 @@
     <label for="showallznodes">
       Show all Znodes.
     </label>
+    <div style="text-align:right">
+      <p>Node Count: {{ tableData.length }}</p>
+    </div>
     <vuetable
       ref="vuetable"
       :api-mode="false"
@@ -505,7 +508,6 @@ export default {
 
 .round {
   position: relative;
-  margin-bottom: 2%;
 }
 
 .round label {
