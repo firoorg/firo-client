@@ -92,14 +92,15 @@ requireComponent.keys().forEach(fileName => {
     )
 })
 
-// Allow global access to the store.
+// Allow global access to the store and router.
 window.$store = store;
+window.$router = router;
 
 // Show the waiting screen with reason, or, if reason may be undefined, close it.
 //
 // Note that the app starts off with the reason "Loading..." in order to not show the main window for a short time
 // before starting the daemon.
-function setWaitingReason(reason) {
+window.$setWaitingReason = (reason) => {
     if (reason) {
         logger.info("Waiting: " + reason);
     }
@@ -117,7 +118,7 @@ window.$quitApp = async (message=undefined) => {
 
     // $daemon will not be set if we are setting up.
     if (window.$daemon) {
-        setWaitingReason("Shutting down zcoind...");
+        $setWaitingReason("Shutting down zcoind...");
         try {
             await $daemon.stopDaemon();
         } catch(e) {
@@ -148,6 +149,18 @@ ourWindow.webContents.on('shutdown-requested', async () => {
 // Removing old listeners on navigation is ecessary to prevent warnings when we quit while hot reloading is enabled.
 ourWindow.webContents.once("will-navigate", () => {
     ourWindow.webContents.removeAllListeners('shutdown-requested');
+});
+
+// Record our current location in the app so we can go back to it when a restart is required.
+router.afterEach((to) => {
+    logger.info(`Setting current route to ${to.path}`);
+    // Route objects can't be put into the $store directly, so we have to extract just the relevant properties.
+    $store.commit('App/setCurrentRoute', {
+        path: to.path,
+        params: to.params,
+        query: to.query,
+        hash: to.hash
+    });
 });
 
 // Handle zcoin:// links on Windows.
@@ -205,11 +218,12 @@ function startVue() {
     }).$mount('#app');
 }
 
-// Start the daemon, showing progress to the user and resolving when the daemon is fully started.
+// Start the daemon, showing progress to the user and resolving when the daemon is fully started. App/isInitialized is
+// set to true if the daemon is started successfully and the wallet is locked.
 window.$startDaemon = () => new Promise(resolve => {
     // Checking for zcoindHasStarted allows us to work properly with hot reloading.
 
-    setWaitingReason("Starting up zcoind...");
+    $setWaitingReason("Starting up zcoind...");
     zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'],
         store.getters['App/blockchainLocation'] || null, undefined,
         store.getters['App/zcoindHasStarted'] && process.env.NODE_ENV === "development")
@@ -217,64 +231,108 @@ window.$startDaemon = () => new Promise(resolve => {
             // Make $daemon globally accessible.
             window.$daemon = z;
 
-            setWaitingReason("Awaiting zcoind's API to load...");
+            $setWaitingReason("Awaiting zcoind's API to load...");
             // This may throw if we try to restart the daemon, but we're not going to do that.
             await $daemon.awaitApiIsReady();
 
             if ($daemon.apiStatus().data.reindexing) {
-                setWaitingReason("Waiting for zcoind to reindex. This may take an extremely long time...");
+                $setWaitingReason("Waiting for zcoind to reindex. This may take an extremely long time...");
                 await $daemon.awaitBlockchainLoaded();
             } else if ($daemon.apiStatus().data.rescanning) {
-                setWaitingReason("Waiting for zcoind to rescan the block index. This may take a long time...");
+                $setWaitingReason("Waiting for zcoind to rescan the block index. This may take a long time...");
                 await $daemon.awaitBlockchainLoaded();
             }
 
-            setWaitingReason("Connecting to zcoind...")
+            $setWaitingReason("Connecting to zcoind...")
             await $daemon.awaitHasConnected();
 
-            if (!await $daemon.isWalletLocked())  {
-                await $quitApp("Zcoin Client doesn't support the use of unencrypted wallets. Please lock your wallet manually and try again.");
-            }
+            if (await $daemon.isWalletLocked()) {
+                // Start up the daemon.
 
-            setWaitingReason("Loading our state from zcoind...");
-            try {
-                // Make sure our state is updated before proceeding.
-                await $daemon.awaitInitializersCompleted();
-            } catch(e) {
-                await $quitApp(`An error occurred in our initializers: ${e}`);
-            }
+                $setWaitingReason("Loading our state from zcoind...");
+                try {
+                    // Make sure our state is updated before proceeding.
+                    await $daemon.awaitInitializersCompleted();
+                } catch (e) {
+                    await $quitApp(`An error occurred in our initializers: ${e}`);
+                }
 
-            logger.info("zcoind has started.");
-            setWaitingReason(undefined);
-            store.commit('App/setZcoindHasStarted', true);
-            resolve();
+                logger.info("zcoind has started.");
+                $setWaitingReason(undefined);
+                store.commit('App/setZcoindHasStarted', true);
+                store.commit('App/setIsInitialized', true);
+                resolve();
+            } else {
+                // Direct the user to the lock wallet screen. The lock wallet screen will call resolve() when it has
+                // successfully started zcoind.
+
+                router.push({
+                    path: '/setup/lock-wallet',
+                    query: {
+                        isExistingWallet: true,
+                        onStart: resolve
+                    }
+                }).then(() => {
+                    $setWaitingReason(undefined);
+                })
+            }
         })
         .catch(async e => {
             await $quitApp(`An error occured starting zcoind: ${e}`);
         });
 });
 
-if (process.env.ZCOIN_CLIENT_REPL === 'true') {
-    // Allow shutting down.
-    setWaitingReason(undefined);
+// currentRoute will only be set if we're being reloaded.
+const currentRoute = store.getters['App/currentRoute'];
 
-    window.Zcoind = require('../daemon/zcoind').Zcoind;
+if (!currentRoute) {
+    if (process.env.ZCOIN_CLIENT_REPL === 'true') {
+        // Allow shutting down.
+        $setWaitingReason(undefined);
 
-    ourWindow.webContents.openDevTools();
-} else if (store.getters['App/isInitialized'] &&
-           existsSync(store.getters['App/walletLocation']) &&
-           process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
-    startVue();
-    ourWindow.show();
+        window.Zcoind = require('../daemon/zcoind').Zcoind;
 
-    $startDaemon();
+        ourWindow.webContents.openDevTools();
+    } else if (store.getters['App/isInitialized'] &&
+               existsSync(store.getters['App/walletLocation']) &&
+               process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
+        startVue();
+        ourWindow.show();
+        $startDaemon().then(() => {
+            router.push("/main");
+        });
+    } else {
+        logger.info("App is not yet initialized. Let's get 'er ready!");
+
+        $setWaitingReason(undefined);
+        startVue();
+        router.push("/setup/welcome").then(() => {
+            ourWindow.show();
+        });
+    }
 } else {
-    setWaitingReason(undefined);
+    // This branch is taken when we're reloaded.
 
-    logger.info("App is not yet initialized. Let's get 'er ready!");
-
-    store.commit('App/setIsInitialized', false);
+    $setWaitingReason(undefined);
 
     startVue();
     ourWindow.show();
+
+    // fixme: Sometimes, push() is necessary, and other times, it fails and is not. I don't really understand what is
+    //        going on, but since this is only for development I haven't bothered with figuring out what's happening.
+    const pushCurrentRoute = () => {
+        if (router.currentRoute.path !== router.currentRoute.path) {
+            router.push(currentRoute);
+        }
+    }
+
+    if (!currentRoute.path.startsWith("/setup/")) {
+        $startDaemon().then(() => {
+            logger.info(`Navigating to route before reload: ${currentRoute.path}`);
+            pushCurrentRoute();
+        });
+    } else {
+        logger.info(`Navigating to route before reload: ${currentRoute.path}`);
+        pushCurrentRoute();
+    }
 }

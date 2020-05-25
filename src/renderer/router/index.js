@@ -6,8 +6,44 @@ Vue.use(Router)
 export default new Router({
     routes: [
         {
-            path: '',
-            redirect: '/receive'
+            path: '/setup',
+            component: require('@/layouts/SetupLayout').default,
+            children: [
+                {
+                    path: 'welcome',
+                    component: require('@/components/Setup/Welcome').default
+                },
+
+                {
+                    path: 'select-blockchain-location',
+                    component: require('@/components/Setup/SelectBlockchainLocation').default
+                },
+
+                {
+                    path: 'select-create-or-restore',
+                    component: require('@/components/Setup/SelectCreateOrRestore').default
+                },
+
+                {
+                    path: 'write-down-mnemonic',
+                    component: require('@/components/Setup/WriteDownMnemonic').default
+                },
+
+                {
+                    path: 'confirm-mnemonic',
+                    component: require('@/components/Setup/ConfirmMnemonic').default
+                },
+
+                {
+                    path: 'recover-from-mnemonic',
+                    component: require('@/components/Setup/RecoverFromMnemonic').default
+                },
+
+                {
+                    path: 'lock-wallet',
+                    component: require('@/components/Setup/LockWallet').default
+                }
+            ]
         },
 
         {

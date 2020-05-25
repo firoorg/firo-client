@@ -23,19 +23,19 @@ const actions = {
 const getters = {
     apiStatus: (state) => state.apiStatus,
     // 'main', 'test', or 'regtest'
-    network: (state) => state.apiStatus.data ? state.apiStatus.data.network : undefined,
+    network: (state) => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.network : undefined,
     // Do we have an apiStatus?
-    hasApiStatus: (state): boolean => !!state.apiStatus.data,
+    hasApiStatus: (state): boolean => state.apiStatus && !!state.apiStatus.data,
     // Is the wallet locked? Returns undefined if not yet loaded.
-    isLocked: (state): boolean | undefined => state.apiStatus.data ? state.apiStatus.data.walletLock : undefined,
-    isReindexing: (state): boolean => state.apiStatus.data.reindexing,
-    API: (state): boolean => state.apiStatus.data.modules.API,
+    isLocked: (state): boolean | undefined => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.walletLock : undefined,
+    isReindexing: (state): boolean => state.apiStatus && state.apiStatus.data && state.apiStatus.data.reindexing,
+    API: (state): boolean => state.apiStatus && state.apiStatus.data && state.apiStatus.data.modules && state.apiStatus.data.modules.API,
     // We will return 0 if apiStatus hasn't yet loaded.
-    localZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.localCount : 0,
+    localZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.Znode.localCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
-    totalZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.totalCount : 0,
+    totalZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.Znode.totalCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
-    enabledZnodeCount: (state): number => state.apiStatus.data ? state.apiStatus.data.Znode.enabledCount : 0
+    enabledZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.Znode.enabledCount : 0
 };
 
 export default {

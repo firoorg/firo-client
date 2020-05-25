@@ -231,12 +231,8 @@ export default {
     },
 
     methods: {
-        ...mapMutations({
-            setWaitingReason: 'App/setWaitingReason'
-        }),
-
         async restartDaemon() {
-            this.setWaitingReason("Restarting daemon...");
+            $setWaitingReason("Restarting daemon...");
             await $daemon.stopDaemon();
 
             $startDaemon();

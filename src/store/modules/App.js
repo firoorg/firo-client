@@ -9,20 +9,20 @@ const logger = createLogger('zcoin:store:app')
 
 const state = {
     isInitialized: false,
-    mnemonicSetting: '',
+    // This is used so that we will always have the same mnemonic even if we go back and forth through several different
+    // screens. Cached mnemonic is of the type {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean}
+    cachedMnemonic: null,
     openAddressBook: null,
-    blockchainLocation: '',
+    blockchainLocation: null,
     // This is the value read from our configuration, not what is given to us in APIStatus.
-    zcoinClientNetwork: '',
+    zcoinClientNetwork: null,
     waitingReason: 'Loading...',
-    zcoindHasStarted: false
+    zcoindHasStarted: false,
+    // This is used to go back to the page we were looking at when an automatic reload occurs.
+    currentRoute: null
 }
 
 const mutations = {
-    [types.MNEMONIC_SETTING] (state, mnemonic) {
-        state.mnemonicSetting = mnemonic
-    },
-
     [types.OPEN_ADDRESS_BOOK] (state, open_) {
         state.openAddressBook = open_
     },
@@ -81,14 +81,20 @@ const mutations = {
 
     setZcoindHasStarted(state, value) {
         state.zcoindHasStarted = value;
+    },
+
+    // Set from a router.afterEach hook in main.js. We'll be used to figure out where we left off if we're reloading the
+    // app. This MUST NOT be called directly.
+    setCurrentRoute(state, value) {
+        state.currentRoute = value;
+    },
+
+    setCachedMnemonic(state, value) {
+        state.cachedMnemonic = value;
     }
 }
 
 const actions = {
-    async [types.MNEMONIC_SETTING] ({ commit, state }, mnemonic) {
-        commit(types.MNEMONIC_SETTING, mnemonic);
-    },
-
     async [types.OPEN_ADDRESS_BOOK] ({ commit, state }, open_) {
         commit(types.OPEN_ADDRESS_BOOK, open_);
     },
@@ -169,11 +175,12 @@ const getters = {
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
     zcoindHasStarted: (state) => state.zcoindHasStarted,
+    currentRoute: (state) => state.currentRoute,
 
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.
     waitingReason: (state) => state.waitingReason || undefined,
-    mnemonicSetting: (state) => state.mnemonicSetting,
+    cachedMnemonic: (state) => state.cachedMnemonic,
     openAddressBook: (state) => state.openAddressBook
 }
 

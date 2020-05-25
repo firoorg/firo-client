@@ -1,16 +1,33 @@
 <template>
     <div id="app">
-        <router-view />
+        <div :v-show="!!waitingReason">
+            <WaitingScreen v-if="waitingReason" :reason="waitingReason" />
+        </div>
+
+        <div :v-show="waitingReason">
+            <router-view />
+        </div>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import WaitingScreen from "@/components/WaitingScreen";
+
 export default {
-    name: 'ZcoinClient'
+    name: 'ZcoinClient',
+
+    components: {
+        WaitingScreen
+    },
+
+    computed: mapGetters({
+        waitingReason: 'App/waitingReason'
+    })
 }
 </script>
 
 <style>
-    @import '../../node_modules/lato-font/css/lato-font.css';
-    @import '../../node_modules/typeface-overpass-mono/index.css';
+@import '../../node_modules/lato-font/css/lato-font.css';
+@import '../../node_modules/typeface-overpass-mono/index.css';
 </style>

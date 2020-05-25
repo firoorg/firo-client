@@ -17,9 +17,7 @@ const state = {
 };
 
 const mutations = {
-    // isReindexing is state.getters['ApiStatus/isReindexing']. The caller must be responsible for it due to inherent
-    // limitations in VueX.
-    setWalletState(state, {isReindexing, initialStateWallet}: {isReindexing: boolean, initialStateWallet: StateWallet}) {
+    setWalletState(state, initialStateWallet: StateWallet) {
         const stateTransactions = cloneDeep(state.transactions);
         const stateAddresses = cloneDeep(state.addresses);
         const stateUnspentUTXOs = cloneDeep(state.unspentUTXOs);
@@ -146,18 +144,17 @@ const actions = {
     // We're called by stateWallet (in initialize).
     setWalletState({commit, rootGetters}, initialStateWallet: StateWallet) {
         logger.info('setWalletState');
-        const isReindexing = rootGetters['ApiStatus/isReindexing'];
-        commit('setWalletState', {isReindexing, initialStateWallet});
+        commit('setWalletState', initialStateWallet);
     },
 
     handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
         logger.info('handleTransactionEvent');
-        commit('setWalletState', {isReindexing: false, initialStateWallet: {addresses: transactionEvent}});
+        commit('setWalletState', {addresses: transactionEvent});
     },
     
     handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
         logger.info('handleAddressEvent');
-        commit('setWalletState', {isReindexing: false, initialStateWallet: addressEvent})
+        commit('setWalletState', addressEvent)
     },
 
     changeLockStatus({commit, rootGetters}, uniqIds: string[]) {
