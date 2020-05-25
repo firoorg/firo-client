@@ -43,9 +43,13 @@
         {{ props.rowData.nextPaymentBlock }}
       </div>
 
+      <div slot="statusdetails" slot-scope="props">
+        <p>{{ props.rowData.status }}</p>
+      </div>
+
       <div slot="status" slot-scope="props">
-        <ZnodeStatusGreen v-show="props.rowData.status" />
-        <ZnodeStatusRed v-show="!props.rowData.status" />
+        <ZnodeStatusGreen v-show="props.rowData.status=='ENABLED'" />
+        <ZnodeStatusRed v-show="props.rowData.status!='ENABLED'" />
       </div>
 
       <div
@@ -89,7 +93,7 @@ const tableFields = [
     name: "label",
     title: "Label",
     sortField: "amount",
-    width: "33%",
+    width: "25%",
   },
   {
     name: "collateralAddress",
@@ -99,8 +103,13 @@ const tableFields = [
   },
   {
     name: "nextPaymentBlock",
-    title: "Next Payout (Block)",
-    width: "23%",
+    title: "Next Payment (Block)",
+    width: "18%",
+  },
+  {
+    name: "statusdetails",
+    title: "Status",
+    width: "13%",
   },
   {
     name: "status",
@@ -139,15 +148,15 @@ export default {
           sortField: "status",
         },
         {
-          field: "label",
+          field: "nextPaymentBlock",
           direction: "desc",
-          sortField: "label",
+          sortField: "nextPaymentBlock",
         },
       ],
     },
     perPage: {
       type: Number,
-      default: 6,
+      default: 5,
     },
     noDataMessage: {
       type: String,
@@ -210,7 +219,7 @@ export default {
           collateralAddress: znodeObj.collateraladdress,
           lastpaid: znodeObj.lastpaidblock,
           nextPaymentBlock: 1000,
-          status: znodeObj.status == "ENABLED",
+          status: znodeObj.status,
           expand: false,
           service: znodeObj.address,
           ownerAddress: znodeObj.owneraddress,
@@ -442,16 +451,10 @@ export default {
 .evo-znode-page {
   //display: grid;
   box-sizing: border-box;
-
-  & > div {
-    height: 100%;
-    //@include scrollbar-on-hover($color--comet-dark-mixed);
-  }
   position: relative;
   width: 100%;
   top: 10%;
   left: 10px;
-  bottom: 10%;
   left: 5%px;
   right: 10%;
   padding: 5%px;

@@ -6,9 +6,9 @@
       rules=none
     >
       <colgroup>
-        <col style="width: 32%;" />
+        <col style="width: 24%;" />
         <col style="width: 35%;" />
-        <col style="width: 33%;" />
+        <col style="width: 41%;" />
       </colgroup>
       <tr class='znode-tr'>
         <td class='znode-td' style="background-color: #f0f3fc; font-weight:bold">Service</td>
