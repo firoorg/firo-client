@@ -31,7 +31,7 @@
                     </span>
                 </router-link>
             </li>
-            <li>
+            <li class ="has-divider">
                 <router-link to="/znodes">
                     <span class="text">
                         Znodes

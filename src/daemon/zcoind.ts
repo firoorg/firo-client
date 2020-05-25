@@ -995,6 +995,10 @@ export class Zcoind {
         return await this.send('', 'create', 'readAddressBook', {});
     }
 
+    async getZnodeList() : Promise<string> {
+        return await this.send('', 'initial', 'znodeList', {});
+    }
+
     async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<boolean> {
         return await this.send('', 'create', 'editAddressBook', {
             address: address_,
