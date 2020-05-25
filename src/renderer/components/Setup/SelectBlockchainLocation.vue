@@ -1,8 +1,8 @@
 <template>
     <div class="blockchain-location">
-        <h1>
+        <div class="header">
             Configuration
-        </h1>
+        </div>
 
         <div id="config-options">
             <div class="config-option" id="datadir">
@@ -195,8 +195,12 @@ export default {
 .blockchain-location {
     width: max-content;
 
-    h1 {
+    .header {
         text-align: center;
+        font: {
+            weight: bold;
+            size: 2.5em;
+        }
     }
 
     #config-options {
@@ -239,7 +243,7 @@ export default {
         margin: {
             left: auto;
             right: auto;
-            top: 3em;
+            top: 1em;
         }
     }
 }
