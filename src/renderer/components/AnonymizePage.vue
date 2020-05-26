@@ -447,7 +447,7 @@ export default {
                         }
                     });
                 }, 50);
-                this.$router.push('/');
+                this.$router.push('/main');
             }
         }
     }

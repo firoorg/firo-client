@@ -181,7 +181,7 @@ export default {
         async deletePaymentRequest() {
             const pr = this.pr;
 
-            this.$router.push("/");
+            this.$router.push("/main");
 
             try {
                 await $daemon.updatePaymentRequest(pr.address, pr.amount, pr.label, pr.message, 'archived');
