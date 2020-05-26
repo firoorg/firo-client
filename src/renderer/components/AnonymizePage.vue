@@ -238,6 +238,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { getDenominationsToMint, convertToSatoshi, convertToCoin } from "#/lib/convert";
+import { IncorrectPassphrase, ZcoindErrorResponse } from "#/daemon/zcoind";
 
 import CircularTimer from '@/components/Icons/CircularTimer';
 import DenominationSelector from '@/components/DenominationSelector'
@@ -413,13 +414,12 @@ export default {
             try {
                 await $daemon.mintZerocoin(passphrase, this.coinsToMint);
             } catch (e) {
-                // Error code -14 indicates an incorrect passphrase.
-                if (e.error && e.error.code === -14) {
+                if (e instanceof IncorrectPassphrase) {
                     this.beginIncorrectPassphraseStep();
-                } else if (e.error && e.error.message) {
-                    this.beginErrorStep(e.error.message);
+                } else if (e instanceof ZcoindErrorResponse) {
+                    this.beginErrorStep(e.errorMessage);
                 } else {
-                    this.beginErrorStep(JSON.stringify(e));
+                    throw e;
                 }
 
                 return;

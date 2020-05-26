@@ -322,9 +322,9 @@ import SendStepWaitForReply from './SendSteps/WaitForReply';
 import SendStepIncorrectPassphrase from './SendSteps/IncorrectPassphrase';
 import SendStepError from './SendSteps/Error';
 import SendStepComplete from './SendSteps/Complete';
-
 import CircularTimer from "@/components/Icons/CircularTimer";
 
+import {IncorrectPassphrase, ZcoindErrorResponse} from '#/daemon/zcoind';
 import {isValidAddress} from '#/lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from '#/lib/convert';
 import types from "~/types";
@@ -566,8 +566,10 @@ export default {
             try {
                 this.transactionFee = await p;
             } catch (e) {
-                if (e.error && e.error.code === -6) {
+                if (e instanceof ZcoindErrorResponse && e.errorCode === -6) {
                     this.totalAmountExceedsBalance = true;
+                } else {
+                    throw e;
                 }
             }
         },
@@ -629,13 +631,12 @@ export default {
                         this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
                 }
             } catch (e) {
-                // Error code -14 indicates an incorrect passphrase.
-                if (e.error && e.error.code === -14) {
+                if (e instanceof IncorrectPassphrase) {
                     this.beginIncorrectPassphraseStep();
-                } else if (e.error && e.error.message) {
-                    this.beginErrorStep(e.error.message);
+                } else if (e instanceof ZcoindErrorResponse) {
+                    this.beginErrorStep(e.errorMessage);
                 } else {
-                    this.beginErrorStep(JSON.stringify(e));
+                    throw e;
                 }
 
                 return;
