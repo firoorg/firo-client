@@ -328,22 +328,6 @@ export default {
       this.tableData = JSON.parse(JSON.stringify(tableOuts));
     },
 
-    getRowClass(item, index) {
-      const classes = [];
-
-      if (item.isFulfilled) {
-        classes.push("is-fulfilled");
-      }
-      if (item.isIncoming) {
-        classes.push("is-incoming");
-      }
-      if (item.isReused) {
-        classes.push("is-reused");
-      }
-
-      return classes.join(" ");
-    },
-
     onPaginationData(paginationData) {
       this.$refs.pagination.setPaginationData(paginationData);
     },
@@ -380,28 +364,6 @@ export default {
       };
     },
 
-    convertToCoin: convertToCoin,
-    convertToSatoshi: convertToSatoshi,
-    toggleCheckbox(isCheck, dataItem) {
-      if (!isCheck) {
-        this.selectedTx[dataItem.uniqId] = false;
-        if (dataItem.status) {
-          this.totalSelected -= dataItem.amount;
-        }
-        this.unselected[dataItem.uniqId] = true;
-      } else {
-        console.log(
-          "selectd:",
-          dataItem.uniqId,
-          ", address=",
-          dataItem.address
-        );
-        this.selectedTx[dataItem.uniqId] = true;
-        this.totalSelected += dataItem.amount;
-        this.unselected[dataItem.uniqId] = false;
-        dataItem.status = true;
-      }
-    },
     onLoadingCompleted() {
       if (this.selectedUtxos) {
         this.selectedUtxos.forEach((element1) => {
@@ -424,26 +386,6 @@ export default {
         });
       }
     },
-    toggleSlider(dataItem) {
-      this.$refs.vuetable.toggleDetailRow(dataItem.uniqId);
-      console.log("Slider is toggled:", this.selectedTx[dataItem.uniqId]);
-      if (dataItem.status && this.selectedTx[dataItem.uniqId]) {
-        this.$refs.vuetable.unselectId(dataItem.uniqId);
-        this.selectedTx[dataItem.uniqId] = false;
-        this.totalSelected -= dataItem.amount;
-        this.unselected[dataItem.uniqId] = true;
-      }
-      dataItem.status = !dataItem.status;
-    },
-    isLocked(dataItem) {
-      return !dataItem.status;
-    },
-    closePopup() {
-      if (this.totalSelected === 0) {
-        this.$store.dispatch("ZcoinPayment/UPDATE_CUSTOM_INPUTS", []);
-      }
-      this.$store.dispatch("ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP");
-    },
   },
 };
 </script>
@@ -465,17 +407,6 @@ export default {
   right: 10%;
   padding: 5%px;
   overflow: auto;
-  .close {
-    position: absolute;
-    top: 15px;
-    right: 30px;
-    transition: all 200ms;
-    font-size: 30px;
-    font-weight: bold;
-    text-decoration: none;
-    color: #333;
-    cursor: pointer;
-  }
   .vuetable-timestamp {
     font-size: 11px;
   }
