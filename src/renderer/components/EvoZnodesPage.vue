@@ -31,6 +31,7 @@
       @vuetable:loaded="onLoadingCompleted"
       :track-by="trackBy"
       :per-page="perPage"
+      @vuetable:row-clicked="onExpandClicked"
       @vuetable:pagination-data="onPaginationData"
       detail-row-component="evo-znodes-details-page"
     >
@@ -51,14 +52,13 @@
       </div>
 
       <div slot="status" slot-scope="props">
-        <ZnodeStatusGreen v-show="props.rowData.status=='ENABLED'" />
-        <ZnodeStatusRed v-show="props.rowData.status!='ENABLED'" />
+        <ZnodeStatusGreen v-show="props.rowData.status == 'ENABLED'" />
+        <ZnodeStatusRed v-show="props.rowData.status != 'ENABLED'" />
       </div>
 
       <div
         slot="expand"
         slot-scope="props"
-        @click="onCellClicked(props.rowData)"
         :style="{ cursor: 'pointer' }"
       >
         <ZnodeCollapseButton v-show="props.rowData.expand" />
@@ -85,10 +85,8 @@ import ZnodeStatusGreen from "@/components//Icons/ZnodeStatusGreen";
 import ZnodeStatusRed from "@/components//Icons/ZnodeStatusRed";
 import ZnodeCollapseButton from "@/components//Icons/ZnodeCollapseButton";
 import ZnodeExpandButton from "@/components//Icons/ZnodeExpandButton";
-import VueTableCheckbox from "@/components/Overlay/VueTableCheckbox";
 import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
 import { convertToSatoshi, convertToCoin } from "#/lib/convert";
-Vue.component("vuetable-field-checkbox", VueTableCheckbox);
 Vue.component("evo-znodes-details-page", EvoZnodesDetailsPage);
 
 const tableFields = [
@@ -96,13 +94,13 @@ const tableFields = [
     name: "label",
     title: "Label",
     sortField: "amount",
-    width: "25%",
+    width: "22%",
   },
   {
     name: "collateralAddress",
     title: "Collateral Address",
     sortField: "amount",
-    width: "34%",
+    width: "37%",
   },
   {
     name: "nextPaymentBlock",
@@ -170,14 +168,9 @@ export default {
     return {
       tableFields,
       filter: "",
-      totalSelected: 0,
-      selectedTx: {},
-      unselected: {},
       showAllZnodes: false,
       tableData: [],
       oldFilter: "",
-      znodeRet: {},
-      znodeList: {}
     };
   },
   mounted() {
@@ -185,15 +178,9 @@ export default {
     this.$refs.vuetable.refresh();
   },
 
-  async created() {
-    this.znodeRet = await $daemon.getZnodeList();
-    this.znodeList = this.znodeRet.nodes;
-    console.log('loaded znode:', this.znodeList)
-  },
-
   computed: {
     ...mapGetters({
-      transactions: "Transactions/transactions",
+      masternodes: "Masternode/masternodes",
     }),
 
     filterString() {
@@ -214,46 +201,52 @@ export default {
 
     allZnodesTableData() {
       const tableData = [];
-      for (const znodeId of Object.keys(this.znodeList)) {
-        let znodeObj = this.znodeList[znodeId];
+      for (const proTxHash of Object.keys(this.masternodes)) {
+        let znodeObj = this.masternodes[proTxHash];
+        console.log('znodeObj:', znodeObj)
         tableData.push({
-          key: znodeId,
-          label: (znodeObj.label && znodeObj.label.length > 0)? znodeObj.label:"(unlabelled)",
-          collateralAddress: znodeObj.collateraladdress,
-          lastpaid: znodeObj.lastpaidblock,
-          nextPaymentBlock: 1000,
-          status: znodeObj.status,
+          proTxHash: proTxHash,
+          label:
+            znodeObj.label && znodeObj.label.length > 0
+              ? znodeObj.label
+              : "(unlabelled)",
+          collateralAddress: znodeObj.collateralAddress,
+          lastpaid: znodeObj.state.lastPaidHeight,
+          nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "UNKNOWN",
+          status: znodeObj.status? znodeObj.status : "UNKNOWN",
           expand: false,
-          service: znodeObj.address,
-          ownerAddress: znodeObj.owneraddress,
-          PoSScore: znodeObj.posescore,
-          registeredBlock: znodeObj.registeredblock,
-          paymentAddress: znodeObj.payee
-        })
+          service: znodeObj.state.service,
+          ownerAddress: znodeObj.state.ownerAddress,
+          PoSScore: znodeObj.state.PoSePenalty,
+          registeredBlock: znodeObj.state.registeredHeight,
+          paymentAddress: znodeObj.state.payoutAddress,
+        });
       }
       return tableData;
     },
 
     myZnodesTableData() {
       const tableData = [];
-      for (const znodeId of Object.keys(this.znodeList)) {
-        let znodeObj = this.znodeList[znodeId];
+      for (const proTxHash of Object.keys(this.masternodes)) {
+        let znodeObj = this.masternodes[proTxHash];
         if (znodeObj.isMine) {
-          console.log('znodeobject:', znodeObj)
           tableData.push({
-            key: znodeId,
-            label: (znodeObj.label && znodeObj.label.length > 0)? znodeObj.label:"(unlabelled)",
+            proTxHash: proTxHash,
+            label:
+              znodeObj.label && znodeObj.label.length > 0
+                ? znodeObj.label
+                : "(unlabelled)",
             collateralAddress: znodeObj.collateraladdress,
-            lastpaid: znodeObj.lastpaidblock,
-            nextPaymentBlock: 1000,
-            status: znodeObj.status == "ENABLED",
+            lastpaid: znodeObj.state.lastPaidHeight,
+          nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "UNKNOWN",
+            status: znodeObj.status,
             expand: false,
-            service: znodeObj.address,
-            ownerAddress: znodeObj.owneraddress,
-            PoSScore: znodeObj.posescore,
-            registeredBlock: znodeObj.registeredblock,
-            paymentAddress: znodeObj.payee
-          })
+            service: znodeObj.state.service,
+            ownerAddress: znodeObj.state.ownerAddress,
+            PoSScore: znodeObj.state.PoSePenalty,
+            registeredBlock: znodeObj.state.registeredHeight,
+            paymentAddress: znodeObj.state.payoutAddress,
+          });
         }
       }
       return tableData;
@@ -280,6 +273,9 @@ export default {
       data.expand = !data.expand;
       this.$refs.vuetable.toggleDetailRow(data.service);
     },
+    onExpandClicked(d) {
+      this.onCellClicked(d.data);
+    },
 
     async showAllZnodesChange(e) {
       this.oldFilter = "";
@@ -294,7 +290,7 @@ export default {
     },
 
     applyFilter() {
-      console.log('applyFilter:', this.allZnodesTableData)
+      console.log("applyFilter:", this.allZnodesTableData);
       if (this.filter.length == 0) {
         if (this.showAllZnodes) {
           this.tableData = this.allZnodesTableData;
@@ -314,13 +310,20 @@ export default {
       }
       var newFilter = this.filter;
       if (this.oldFilter.length == 0 || !this.filter.includes(this.oldFilter)) {
-        tableOuts = tableRef.filter(e =>
-          (e.label && e.label.includes(newFilter)) || e.service.includes(newFilter) || e.collateralAddress.includes(newFilter)
-        )
+        tableOuts = tableRef.filter(
+          (e) =>
+            (e.label && e.label.includes(newFilter)) ||
+            e.service.includes(newFilter) ||
+            e.collateralAddress.includes(newFilter)
+        );
       } else {
         tableOuts = this.tableData;
-        tableOuts = tableRef.filter(e =>
-          (e.label && e.label.includes(newFilter)) || e.service.includes(newFilter) || e.collateralAddress.includes(newFilter))
+        tableOuts = tableRef.filter(
+          (e) =>
+            (e.label && e.label.includes(newFilter)) ||
+            e.service.includes(newFilter) ||
+            e.collateralAddress.includes(newFilter)
+        );
       }
       this.tableData = JSON.parse(JSON.stringify(tableOuts));
     },

@@ -176,6 +176,29 @@ export interface TransactionEvent {
     }
 }
 
+export interface MasternodeEvent {
+    proTxHash: string;
+    collateralHash: string;
+    collateralIndex: Number;
+    collateralAddress: string;
+    operatorReward: number;
+    state: {
+        service: string;
+        registeredHeight: number;
+        lastPaidHeight: number;
+        nextPaymentHeight: number;
+        PoSePenalty: number;
+        PoSeRevivedHeight: number;
+        PoSeBanHeight: number;
+        revocationReason: number;
+        ownerAddress: string;
+        votingAddress: string;
+        payoutAddress: string;
+        pubKeyOperator: string;
+        operatorPayoutAddress: string;
+    }
+}
+
 export type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
 export interface PaymentRequestData {
     address: string;
