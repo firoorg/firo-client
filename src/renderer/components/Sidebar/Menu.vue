@@ -38,13 +38,10 @@
                     </span>
                 </router-link>
             </li>
-            <li
-                v-if="localZnodeCount > 0"
-                class="has-divider"
-            >
+            <li>
                 <router-link to="/znodelist">
                     <span class="text">
-                        {{ $t('navigation.menu.button__znode') }}
+                        Legacy {{ $t('navigation.menu.button__znode') }}
                     </span>
                 </router-link>
             </li>
