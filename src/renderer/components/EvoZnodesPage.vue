@@ -161,7 +161,7 @@ export default {
     },
     noDataMessage: {
       type: String,
-      default: "No usable Transaction Ouput",
+      default: "No znodes",
     },
   },
   data() {
@@ -213,7 +213,7 @@ export default {
           collateralAddress: znodeObj.collateralAddress,
           lastpaid: znodeObj.state.lastPaidHeight,
           nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "UNKNOWN",
-          status: znodeObj.status? znodeObj.status : "UNKNOWN",
+          status: znodeObj.state.status? znodeObj.state.status : "UNKNOWN",
           expand: false,
           service: znodeObj.state.service,
           ownerAddress: znodeObj.state.ownerAddress,
@@ -407,37 +407,6 @@ export default {
   right: 10%;
   padding: 5%px;
   overflow: auto;
-  .vuetable-timestamp {
-    font-size: 11px;
-  }
-
-  .tx-enable {
-    // background: green;
-    width: 78%;
-    height: 5px;
-    background: #58ca58;
-    display: inline-block;
-    > img {
-      float: right;
-      margin-top: -8px;
-      margin-right: -13px;
-      width: 15px;
-      filter: invert(74%) sepia(13%) saturate(1998%) hue-rotate(85deg)
-        brightness(93%) contrast(85%);
-    }
-  }
-  .tx-disable {
-    width: 78%;
-    height: 5px;
-    background: #ef3650;
-    display: inline-block;
-    margin-left: 12px;
-    > svg {
-      float: left;
-      margin-top: -8px;
-      margin-left: -13px;
-    }
-  }
 }
 
 .round {
