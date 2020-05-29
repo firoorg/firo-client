@@ -170,7 +170,7 @@ export default {
             // Wait for our updates to propagate to the store so it can be used by $startDaemon. sigh.
             await new Promise(async (resolve) => {
                 while (true) {
-                    if (this.$store.getters['App/zcoinClientNetwork'] && this.$store.getters['App/blockchainLocation']) {
+                    if (this.$store.getters['App/zcoinClientNetwork'] === this.network && this.$store.getters['App/blockchainLocation'] === this.dataDir) {
                         return resolve();
                     }
 
