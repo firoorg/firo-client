@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img src="assets/images/znode-status-01.png" height="15px" width="15px"/>
+    <img src="assets/images/znode-status-150ppi-01.png" height="15px" width="15px"/>
   </div>
 </template>
 

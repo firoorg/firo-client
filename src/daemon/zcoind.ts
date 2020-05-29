@@ -196,6 +196,15 @@ export interface MasternodeEvent {
         payoutAddress: string;
         pubKeyOperator: string;
         operatorPayoutAddress: string;
+    },
+    wallet: {
+        hasMasternode: boolean;
+        hasOperatorKey: boolean;
+        hasOwnerKey: boolean;
+        hasVotingKey: boolean;
+        ownsCollateral: boolean;
+        ownsOperatorRewardScript: boolean;
+        ownsPayeeScript: boolean;
     }
 }
 
@@ -1020,6 +1029,10 @@ export class Zcoind {
 
     async getZnodeList() : Promise<string> {
         return await this.send('', 'initial', 'znodeList', {});
+    }
+
+    async getMasternodeList() : Promise<string> {
+        return await this.send('', 'initial', 'masternodeList', {});
     }
 
     async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<boolean> {

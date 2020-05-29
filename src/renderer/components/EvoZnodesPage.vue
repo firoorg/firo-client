@@ -31,6 +31,7 @@
       @vuetable:loaded="onLoadingCompleted"
       :track-by="trackBy"
       :per-page="perPage"
+      :sort-order="sortOrder"
       @vuetable:row-clicked="onExpandClicked"
       @vuetable:pagination-data="onPaginationData"
       detail-row-component="evo-znodes-details-page"
@@ -93,23 +94,23 @@ const tableFields = [
   {
     name: "label",
     title: "Label",
-    sortField: "amount",
     width: "22%",
   },
   {
     name: "collateralAddress",
     title: "Collateral Address",
-    sortField: "amount",
     width: "37%",
   },
   {
     name: "nextPaymentBlock",
     title: "Next Payment (Block)",
+    sortField: "nextPaymentBlock",
     width: "18%",
   },
   {
     name: "statusdetails",
     title: "Status",
+    sortField: "statusdetails",
     width: "13%",
   },
   {
@@ -121,7 +122,7 @@ const tableFields = [
     name: "expand",
     title: "",
     width: "5%",
-  },
+  }
 ];
 
 export default {
@@ -138,20 +139,18 @@ export default {
   props: {
     trackBy: {
       type: String,
-      default: "service",
+      default: "proTxHash",
     },
     sortOrder: {
       type: Array,
-      default: () => [
+      default: [
         {
-          field: "status",
-          direction: "desc",
-          sortField: "status",
+          field: "statusdetails",
+          direction: "asc",
         },
         {
           field: "nextPaymentBlock",
           direction: "desc",
-          sortField: "nextPaymentBlock",
         },
       ],
     },
@@ -212,8 +211,8 @@ export default {
               : "(unlabelled)",
           collateralAddress: znodeObj.collateralAddress,
           lastpaid: znodeObj.state.lastPaidHeight,
-          nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "UNKNOWN",
-          status: znodeObj.state.status? znodeObj.state.status : "UNKNOWN",
+          nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "SYNCING",
+          status: znodeObj.state.status? znodeObj.state.status : "SYNCING",
           expand: false,
           service: znodeObj.state.service,
           ownerAddress: znodeObj.state.ownerAddress,
@@ -229,7 +228,7 @@ export default {
       const tableData = [];
       for (const proTxHash of Object.keys(this.masternodes)) {
         let znodeObj = this.masternodes[proTxHash];
-        if (znodeObj.isMine) {
+        if (znodeObj.wallet.hasMasternode) {
           tableData.push({
             proTxHash: proTxHash,
             label:
@@ -266,12 +265,12 @@ export default {
       //collapse all rows
       for (var d of this.tableData) {
         if (d !== data) {
-          if (d.expand) this.$refs.vuetable.toggleDetailRow(d.service);
+          if (d.expand) this.$refs.vuetable.toggleDetailRow(d.proTxHash);
           d.expand = false;
         }
       }
       data.expand = !data.expand;
-      this.$refs.vuetable.toggleDetailRow(data.service);
+      this.$refs.vuetable.toggleDetailRow(data.proTxHash);
     },
     onExpandClicked(d) {
       this.onCellClicked(d.data);

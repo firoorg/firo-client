@@ -16,11 +16,11 @@
         <td class='znode-td' style="background-color: #f0f3fc; font-weight:bold">Owner Address</td>
       </tr>
       <tr class='znode-tr'>
-        <td style="background-color: white">{{ serviceIP }}</td>
+        <td style="border: none;background-color: white">{{ serviceIP }}</td>
         <td style="background-color: white">{{ PoSScore }}</td>
         <td style="background-color: white">{{ ownerAddress }}</td>
-      <tr>
-        <tr class='znode-tr'>
+      </tr>
+      <tr class='znode-tr'>
         <td class='znode-td' style="background-color: white; font-weight:bold">Registered (Block)</td>
         <td class='znode-td' style="background-color: white; font-weight:bold">Last Paid</td>
         <td class='znode-td' style="background-color: white; font-weight:bold">Payment Address</td>
@@ -31,7 +31,6 @@
         <td style="background-color: white">{{ payoutAddress }}</td>
       </tr>
       <tr>
-        <tr class='znode-tr'>
         <td class='znode-td' style="background-color: white; font-weight:bold">Operator Reward</td>
         <td class='znode-td' style="background-color: white; font-weight:bold"></td>
         <td class='znode-td' style="background-color: white; font-weight:bold"></td>
@@ -104,6 +103,7 @@ export default {
   padding: 0;
   border:0;
   border-collapse: collapse;
+  border: none;
 }
 .znode-td {
   border:none;
