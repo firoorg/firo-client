@@ -363,6 +363,12 @@ export class Zcoind {
         await this.connectAndReact();
     }
 
+    // Wait for the zcoind API to first make a response. This DOES NOT mean that it is safe commands. You must await
+    // awaitApiIsReady() for that.
+    async awaitApiResponse() {
+        await this.gotAPIResponseEWH.block();
+    }
+
     // Resolve when zcoind has loaded the block index.
     async awaitApiIsReady() {
         await this.apiIsReadyEWH.block()
@@ -1154,12 +1160,9 @@ export class Zcoind {
         return await this.send(null, 'initial', 'stateWallet', null);
     }
 
-    // Return the API status, waiting until one is available to return. We will reject() if we haven't been given an
-    // apiStatus yet (ie. before start() has resolved) or if zcoind has subsequently been shut down.
-    apiStatus(): ApiStatus {
-        if (!this.latestApiStatus) {
-            throw "We don't appear to be connected to zcoind."
-        }
+    // Return the API status, waiting until one is available to return.
+    async apiStatus(): Promise<ApiStatus> {
+        await this.awaitApiResponse();
 
         return this.latestApiStatus;
     }
@@ -1168,5 +1171,15 @@ export class Zcoind {
     async isWalletLocked(): Promise<boolean> {
         await this.awaitApiIsReady();
         return this.latestApiStatus.data.walletLock;
+    }
+
+    // Is the daemon rescanning?
+    async isRescanning(): Promise<boolean> {
+        return (await this.apiStatus()).data.rescanning;
+    }
+
+    // Is the daemon reindexing?
+    async isReindexing(): Promise<boolean> {
+        return (await this.apiStatus()).data.reindexing;
     }
 }

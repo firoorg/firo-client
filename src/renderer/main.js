@@ -231,17 +231,19 @@ window.$startDaemon = () => new Promise(resolve => {
             // Make $daemon globally accessible.
             window.$daemon = z;
 
-            $setWaitingReason("Awaiting zcoind's API to load...");
-            // This may throw if we try to restart the daemon, but we're not going to do that.
-            await $daemon.awaitApiIsReady();
+            $setWaitingReason("Waiting for zcoind to start the API...");
+            await $daemon.awaitApiResponse();
 
-            if ($daemon.apiStatus().data.reindexing) {
+            if (await $daemon.isReindexing()) {
                 $setWaitingReason("Waiting for zcoind to reindex. This may take an extremely long time...");
                 await $daemon.awaitBlockchainLoaded();
-            } else if ($daemon.apiStatus().data.rescanning) {
+            } else if (await $daemon.isRescanning()) {
                 $setWaitingReason("Waiting for zcoind to rescan the block index. This may take a long time...");
                 await $daemon.awaitBlockchainLoaded();
             }
+
+            $setWaitingReason("Waiting for the API to indicate it's ready to receive commands...");
+            await $daemon.awaitApiIsReady();
 
             $setWaitingReason("Connecting to zcoind...")
             await $daemon.awaitHasConnected();
