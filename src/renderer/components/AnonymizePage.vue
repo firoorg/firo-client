@@ -64,6 +64,13 @@
                         <span class="xzc">
                             XZC
                         </span>
+
+                        <input
+                            class="automint-button"
+                            type="button"
+                            @click="autoMint"
+                            value="Go!"
+                        />
                     </div>
                 </div>
             </section>
@@ -484,6 +491,23 @@ export default {
         .xzc {
             margin-left: 0.5em;
             font-weight: bold;
+        }
+
+        .automint-button {
+            cursor: pointer;
+            color: $color--green-dark;
+            background-color: inherit;
+            border-radius: 25px;
+            border-width: 0;
+
+            &:focus {
+                outline: none;
+            }
+
+            font: {
+                size: 1.2em;
+                weight: bold;
+            }
         }
     }
 
