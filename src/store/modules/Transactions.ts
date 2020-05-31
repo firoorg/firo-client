@@ -1,4 +1,4 @@
-import {cloneDeep} from 'lodash';
+import {cloneDeep, merge} from 'lodash';
 import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/zcoind';
 
 import { createLogger } from '../../lib/logger'
@@ -140,21 +140,58 @@ const mutations = {
     }
 };
 
+// Used to cache multiple transactions coming in quick succession.
+let cachedInitialStateWallets: StateWallet[] = [];
+let lastStateWalletTime: number;
+let hasStartedCachedStateWalletWatcher = false;
+
 const actions = {
-    // We're called by stateWallet (in initialize).
-    setWalletState({commit, rootGetters}, initialStateWallet: StateWallet) {
-        logger.info('setWalletState');
-        commit('setWalletState', initialStateWallet);
+    // We're called every second and are responsible for consolidation stateWallet events into a single update. Our
+    // interval timer is set the first time a call to addCachedStateWallet is made.
+    maybeDoStateWallet({commit}) {
+        // If there are no items in cachedInitialStateWallet or it's been less than 1 second since the last item was
+        // added, do nothing.
+        if (!cachedInitialStateWallets.length || ((new Date()).getTime() - lastStateWalletTime) < 1e3) {
+            return;
+        }
+
+        logger.info("1s has passed since the last stateWallet update. Beginning batch-processing.");
+
+        // fixme: addCachedStateWallet calls are asynchronous, but mergedInitialStateWallet depends on the order of
+        //        elements in cachedInitialStateWallet for properly detecting orphaned or reorganised transactions. In
+        //        practice this shouldn't be a huge issue because the window for this to happen is very small.
+        const mergedInitialStateWallet: StateWallet = merge(...cachedInitialStateWallets);
+        cachedInitialStateWallets = [];
+        lastStateWalletTime = undefined;
+        commit('setWalletState', mergedInitialStateWallet);
     },
 
-    handleTransactionEvent({commit, rootGetters}, transactionEvent: TransactionEvent) {
+    addCachedStateWallet({commit, dispatch}, initialStateWallet: StateWallet) {
+        // Call maybeDoStateWallet every second.
+        if (!hasStartedCachedStateWalletWatcher) {
+            hasStartedCachedStateWalletWatcher = true;
+            setInterval(() => dispatch('maybeDoStateWallet'), 300);
+        }
+
+        logger.info("Adding more items to the initialStateWallet cache...");
+        cachedInitialStateWallets.push(initialStateWallet);
+        lastStateWalletTime = (new Date()).getTime();
+    },
+
+    // We're called by stateWallet (in initialize).
+    setWalletState({dispatch, rootGetters}, initialStateWallet: StateWallet) {
+        logger.info('setWalletState');
+        dispatch('addCachedStateWallet', initialStateWallet);
+    },
+
+    handleTransactionEvent({dispatch, rootGetters}, transactionEvent: TransactionEvent) {
         logger.info('handleTransactionEvent');
-        commit('setWalletState', {addresses: transactionEvent});
+        dispatch('addCachedStateWallet', {addresses: transactionEvent});
     },
     
-    handleAddressEvent({commit, rootGetters}, addressEvent: AddressEvent) {
+    handleAddressEvent({dispatch, rootGetters}, addressEvent: AddressEvent) {
         logger.info('handleAddressEvent');
-        commit('setWalletState', addressEvent)
+        dispatch('addCachedStateWallet', addressEvent)
     },
 
     changeLockStatus({commit, rootGetters}, uniqIds: string[]) {
