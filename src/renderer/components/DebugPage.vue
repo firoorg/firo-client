@@ -389,7 +389,7 @@ export default {
             }
 
             .output {
-                white-space: pre-line;
+                white-space: pre-wrap;
                 margin-bottom: 1em;
             }
         }
