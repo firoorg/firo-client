@@ -767,6 +767,9 @@ export class Zcoind {
                     // dandelion=0 needs to be set for mining to actually include transactions on regtest.
                     args.push("-dandelion=0");
                     break;
+
+                default:
+                    throw 'unreachable';
             }
 
             logger.info("Starting daemon...");
