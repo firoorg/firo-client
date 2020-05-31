@@ -245,7 +245,7 @@ export default {
             $setWaitingReason("Restarting daemon...");
             await $daemon.stopDaemon();
 
-            $startDaemon();
+            await $startDaemon();
         },
 
         async changePassphrase() {
