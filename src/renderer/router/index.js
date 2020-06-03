@@ -72,7 +72,7 @@ export default new Router({
 
                         {
                             path: '/receive',
-                            component: require('@/components/PaymentSidebars/CreatePaymentRequest').default
+                            component: require('@/components/PaymentSidebars/Receive').default
                         },
 
                         {
