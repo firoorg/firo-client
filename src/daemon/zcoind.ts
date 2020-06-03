@@ -556,6 +556,9 @@ export class Zcoind {
     // If this is set to true, we will type check all zcoind responses. On large wallets, this may cause startup to be
     // very slow.
     typecheckEverything: boolean = false;
+    // This is the account name that will be associated in the zcoind backend with addresses we generate with
+    // getUnusedAddress.
+    addressAccountName: string = 'zcoin-client';
 
     // zcoindLocation is the location of the zcoind binary.
     //
@@ -1372,6 +1375,17 @@ export class Zcoind {
             updatedaddress: updatedaddress_,
             updatedlabel: updatedlabel_
         });
+    }
+
+    // Get an unused address with no associated label.
+    async getUnusedAddress(): Promise<string> {
+        const data = await this.legacyRpc(`getaccountaddress ${this.addressAccountName}`);
+
+        if (typeof data.result === 'string') {
+            return data.result;
+        }
+
+        throw new UnexpectedZcoindResponse('create/rpc:getaccountaddress', data);
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
