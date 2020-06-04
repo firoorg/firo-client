@@ -114,13 +114,17 @@ export default {
         }
     },
 
-    mounted () {
+    async mounted () {
         this.focusInput();
 
+        // This is needed when we're reloading the page.
+        while (!window.$daemon) {
+            await new Promise(r => setTimeout(r, 10));
+        }
+
         // Get the list of available commands.
-        $daemon.legacyRpcCommands().then(commands => {
-            this.availableCommands = commands.concat(Object.keys(this.clientHelp));
-        })
+        const commands = await $daemon.legacyRpcCommands();
+        this.availableCommands = commands.concat(Object.keys(this.clientHelp));
     },
 
     beforeRouteEnter(_to, _from, next) {
