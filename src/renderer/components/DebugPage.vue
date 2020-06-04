@@ -123,6 +123,14 @@ export default {
         })
     },
 
+    beforeRouteEnter(_to, _from, next) {
+        // This is called after the component is loaded. It can't be placed in mounted() because mounted() won't be
+        // called when the user returns to this screen since we use <keep-alive> in MainLayout.vue.
+        next(self => {
+            self.scrollToBottom();
+        });
+    },
+
     methods: {
         // Update the suggestions to show the user. This can't be made as a computed property because this.$refs is not
         // reactive.

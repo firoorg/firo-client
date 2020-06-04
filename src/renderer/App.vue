@@ -5,7 +5,9 @@
         </div>
 
         <div :v-show="waitingReason">
-            <router-view />
+            <keep-alive>
+                <router-view />
+            </keep-alive>
         </div>
     </div>
 </template>

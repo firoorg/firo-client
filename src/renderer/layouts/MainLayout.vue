@@ -3,7 +3,9 @@
         <Sidebar class="aside" />
 
         <main ref="main" class="main default-tooltip-boundary">
-            <router-view class="child" />
+            <keep-alive>
+                <router-view class="child" />
+            </keep-alive>
         </main>
     </div>
 </template>
