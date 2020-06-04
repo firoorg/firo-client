@@ -38,7 +38,7 @@ export default {
 
         this.address = await $daemon.getUnusedAddress();
         new QRCode(this.$refs.qrCode, {
-            text: `zcoin://${this.address}`,
+            text: this.address,
             width: 256,
             height: 256,
             // $color--comet-dark
