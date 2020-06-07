@@ -140,6 +140,7 @@ export default {
         // called when the user returns to this screen since we use <keep-alive> in MainLayout.vue.
         next(self => {
             self.scrollToBottom();
+            self.focusInput();
         });
     },
 
