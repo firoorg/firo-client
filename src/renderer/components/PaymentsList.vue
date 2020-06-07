@@ -13,6 +13,10 @@
             The blockchain is not yet synced. Payment information may be incomplete or inaccurate.
         </div>
 
+        <div v-if="newTableData.length" class="awaiting-updates">
+            New payments have arrived. <a href='#' @click="reloadTable">Click here</a> to load new transactions.
+        </div>
+
         <animated-table
             :data="filteredTableData"
             :fields="tableFields"
@@ -23,6 +27,7 @@
             :sort-order="sortOrder"
             :compare-elements="comparePayments"
             :per-page="13"
+            :on-page-change="(pageNumber) => this.currentPage = pageNumber"
         />
     </section>
 </template>
@@ -80,7 +85,27 @@ export default {
     data () {
         return {
             tableFields,
-            filter: ''
+            filter: '',
+            tableData: [],
+            newTableData: [],
+            currentPage: 1
+        }
+    },
+
+    watch: {
+        currentPage(newPage, oldPage) {
+            console.log(`currentPage: ${oldPage} -> ${newPage}`);
+        },
+
+        latestTableData: {
+            immediate: true,
+
+            handler() {
+                this.newTableData = this.latestTableData;
+                if (this.currentPage === 1) {
+                    this.reloadTable();
+                }
+            }
         }
     },
 
@@ -98,7 +123,7 @@ export default {
             return !this.isBlockchainSynced || this.isReindexing;
         },
 
-        tableData () {
+        latestTableData () {
             const tableData = [];
 
             for (const [id, tx] of Object.entries(this.transactions)) {
@@ -229,6 +254,11 @@ export default {
             );
         },
 
+        reloadTable() {
+            this.tableData = this.newTableData;
+            this.newTableData = [];
+        },
+
         async onTableRowSelect (rowData) {
             // id is always set to the path of the detail route of the payment.
             if (this.$route.path !== rowData.id) {
@@ -255,9 +285,9 @@ export default {
     position: relative;
     display: inline-block;
 }
-.show-unsynced-warning {
+
+.show-unsynced-warning, .awaiting-updates {
     text-align: center;
-    color: red;
     font: {
         size: 0.9em;
         style: italic;
@@ -265,6 +295,10 @@ export default {
     }
 
     margin-bottom: 1em;
+}
+
+.show-unsynced-warning {
+    color: red;
 }
 
 input {
