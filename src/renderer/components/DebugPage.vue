@@ -130,9 +130,11 @@ export default {
             await new Promise(r => setTimeout(r, 10));
         }
 
+        const sort_dedup = array => array.sort().reduce((a, x) => {if (a[a.length-1] !== x) {a.push(x)} return a}, []);
+
         // Get the list of available commands.
         const commands = await $daemon.legacyRpcCommands();
-        this.availableCommands = commands.concat(Object.keys(this.clientCommands));
+        this.availableCommands = sort_dedup(commands.concat(Object.keys(this.clientCommands)));
     },
 
     beforeRouteEnter(_to, _from, next) {
