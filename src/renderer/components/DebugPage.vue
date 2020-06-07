@@ -132,7 +132,7 @@ export default {
 
         // Get the list of available commands.
         const commands = await $daemon.legacyRpcCommands();
-        this.availableCommands = commands.concat(Object.keys(this.clientHelp));
+        this.availableCommands = commands.concat(Object.keys(this.clientCommands));
     },
 
     beforeRouteEnter(_to, _from, next) {
