@@ -1402,15 +1402,34 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('create/mint', data);
     }
 
+    // calcPublicTxFee and calcPrivateTxFee require an address as input despit the fact that the response is the same
+    // regardless of which address is passed. We hardcode them in here so that those functions don't have to take a
+    // superfluous parameter.
+    private defaultAddress() {
+        switch (this.zcoindNetwork) {
+            case "mainnet":
+                // 40 XZC output from block 1.
+                return "aEF2p3jepoWF2yRYZjb6EACCP4CaP41doV";
+
+            case "regtest":
+            case "test":
+                // 40 XZC output from testnet block 1. testnet and regtest use the same addresses
+                return "TAczBFWtiP8mNstdLn1Z383z51rZ1vHk5N";
+
+            default:
+                throw "unreachable";
+        }
+    }
+
     // Calculate a transaction fee for a public transaction.
     // feePerKb is the satoshi fee per kilobyte for the generated transaction.
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the zcoind call fails or received data is invalid.
-    async calcPublicTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+    async calcPublicTxFee(amount: number, subtractFeeFromAmount: boolean, feePerKb: number): Promise<number> {
         let data = await this.send(null, 'get', 'txFee', {
             addresses: {
-                [address]: amount
+                [this.defaultAddress()]: amount
             },
             feePerKb,
             subtractFeeFromAmount
@@ -1429,20 +1448,21 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('get/txFee', data);
     }
 
-    // Calculate a transaction fee for a private transaction.
-    // feePerKb is the satoshi fee per kilobyte for the generated transaction.
+    // Calculate a transaction fee for a private transaction. You may not specify custom transaction fees for private
+    // transactions.
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the zcoind call fails or received data is invalid.
-    async calcPrivateTxFee(label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+    async calcPrivateTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
         let data = await this.send(null, 'none', 'privateTxFee', {
             outputs: [
                 {
-                    address: recipient,
+                    address: this.defaultAddress(),
                     amount
                 }
             ],
-            label,
+            // The response is the same no matter what label we use.
+            label: '',
             subtractFeeFromAmount
         });
 

@@ -470,11 +470,6 @@ export default {
             this.amount = to.query.amount || '';
         },
 
-        address: {
-            handler: 'maybeShowFee',
-            immediate: true
-        },
-
         amount: {
             handler: 'maybeShowFee',
             immediate: true
@@ -507,14 +502,14 @@ export default {
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availableXzc will still be reactively updated.
             getMessage: () => this.coinControlSelectedAmount == 0? ('Amount Is Over Your Available Balance of ' + convertToCoin(this.availableBalance)):'Amount Is Over Your Selected Amount of ' + convertToCoin(this.coinControlSelectedAmount),
-            validate: (value) => (this.coinControlSelectedAmount == 0 && convertToSatoshi(value) <= this.availableBalance) 
-                                || (this.coinControlSelectedAmount > 0 && convertToSatoshi(value) <= this.coinControlSelectedAmount) 
+            validate: (value) => (this.coinControlSelectedAmount == 0 && convertToSatoshi(value) <= this.availableBalance)
+                                || (this.coinControlSelectedAmount > 0 && convertToSatoshi(value) <= this.coinControlSelectedAmount)
         });
 
         this.$validator.extend('publicAmountIsValid', {
             getMessage: () => 'Amount Must Be A Multiple of 0.00000001',
             // We use a regex here so as to not to have to deal with floating point issues.
-            validate: (value) => !!value.match(/^\d+(\.\d{1,8})?$/)
+            validate: (value) => Number(value) !== 0 && !!value.match(/^\d+(\.\d{1,8})?$/)
         });
 
         this.$validator.extend('privateAmountIsValid', {
@@ -546,15 +541,16 @@ export default {
             this.transactionFee = 0;
             this.totalAmountExceedsBalance = false;
 
-            if (!this.isValidated) {
+            // The empty string for an amount won't issue a validation error, but it would be invalid to pass to zcoind.
+             if (!await this.$validator.validate('amount') || this.satoshiAmount === 0) {
                 return;
             }
 
             let p;
             if (this.privateOrPublic === 'private') {
-                p = $daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPrivateTxFee(this.satoshiAmount, this.subtractFeeFromAmount);
             } else {
-                p = $daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPublicTxFee(this.satoshiAmount, this.subtractFeeFromAmount, this.txFeePerKb);
             }
 
             try {
