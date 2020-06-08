@@ -393,16 +393,10 @@ export default {
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
         // send.
         privateOrPublic () {
-            switch (this.$route.path) {
-            case '/send/private':
-                return 'private';
-
-            case '/send/public':
+            if (this.$route.path === '/send/public') {
                 return 'public';
-
-            default:
-                this.$log.error("Route neither public nor private");
-                throw 'Route neither public nor private';
+            } else {
+                return 'private';
             }
         },
 
