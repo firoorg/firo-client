@@ -108,7 +108,7 @@
                                         </u>
                                     </div>
 
-                                    <div class="select-fee">
+                                    <div v-show="privateOrPublic === 'public'" class="select-fee">
                                         <input type="checkbox" v-model="useCustomFee" />
                                         <label>Use a Custom Transaction Fee</label>
                                         <div v-show="useCustomFee">
