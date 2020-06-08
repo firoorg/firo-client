@@ -100,11 +100,27 @@
                                     </div>
                                 </div>
                                 <div class="control">
-                                    <u><a
-                                        :style="{ cursor: 'pointer'}"
-                                        @click="selectCustomInputs()"
-                                    >
-                                        Select Custom Inputs</a></u>
+                                    <div class="select-custom-inputs">
+                                        <u>
+                                            <a :style="{ cursor: 'pointer'}" @click="selectCustomInputs()">
+                                                Select Custom Inputs
+                                            </a>
+                                        </u>
+                                    </div>
+
+                                    <div class="select-fee">
+                                        <input type="checkbox" v-model="useCustomFee" />
+                                        <label>Use a Custom Transaction Fee</label>
+                                        <div v-show="useCustomFee">
+                                            <input
+                                                type="number"
+                                                v-model.number="txFeePerKb"
+                                                name="txFeePerKb"
+                                                v-validate.initial="'integer|between:0,10000'"
+                                            />
+                                            <label>satoshis/kb</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
@@ -367,14 +383,14 @@ export default {
             // complete -> initial
             sendPopoverStep: 'initial',
 
-            // This will be updated in watch() as computed properties can't use async.
+            useCustomFee: false,
+            txFeePerKb: 1,
+
+            // This is the total, computed transaction fee.
             transactionFee: 0,
 
             // This is set if error -6 occurs during fee calculation.
             totalAmountExceedsBalance: false,
-
-            // TODO: Right now we're just hardcoding this. It should be made user configurable.
-            txFeePerKb: 1        
         }
     },
 
@@ -430,7 +446,7 @@ export default {
 
         isValidated () {
             // this.errors was already calculated when amount and address were entered.
-            return !!(this.amount && this.address && !this.validationErrors.items.length);
+            return !!(this.amount && this.address && this.txFeePerKb && !this.validationErrors.items.length);
         },
 
         coinControlSelectedAmount() {
@@ -468,6 +484,17 @@ export default {
             this.address = to.query.address || '';
             this.label = to.query.label || '';
             this.amount = to.query.amount || '';
+        },
+
+        txFeePerKb: {
+            handler: 'maybeShowFee',
+            immediate: true
+        },
+
+        useCustomFee() {
+            if (!this.useCustomFee) {
+                this.txFeePerKb = 1;
+            }
         },
 
         amount: {
@@ -538,11 +565,16 @@ export default {
         convertToCoin,
 
         async maybeShowFee () {
-            this.transactionFee = 0;
             this.totalAmountExceedsBalance = false;
 
             // The empty string for an amount won't issue a validation error, but it would be invalid to pass to zcoind.
-             if (!await this.$validator.validate('amount') || this.satoshiAmount === 0) {
+             if (
+                 !await this.$validator.validate('txFeePerKb') ||
+                 !await this.$validator.validate('amount') ||
+                 typeof this.txFeePerKb !== 'number' ||
+                 this.satoshiAmount === 0
+             ) {
+                this.transactionFee = 0;
                 return;
             }
 
@@ -762,7 +794,7 @@ fieldset {
         font-size: 0.85em;
     }
 
-    .subtract-fee-from-amount-checkbox {
+    .subtract-fee-from-amount-checkbox, .select-fee {
         font-weight: bold;
     }
 
