@@ -82,7 +82,7 @@ function isZcoindErrorResponseMessage(x: any): x is ZcoindErrorResponseMessage {
     return isZcoindResponseMessage(x) && (x.error !== null);
 }
 
-class ZcoindErrorResponse extends ZcoindError {
+export class ZcoindErrorResponse extends ZcoindError {
     call: string;
     error: ZcoindErrorResponseMessage;
     errorMessage: string;
@@ -98,7 +98,7 @@ class ZcoindErrorResponse extends ZcoindError {
     }
 }
 
-class UnexpectedZcoindResponse extends ZcoindError {
+export class UnexpectedZcoindResponse extends ZcoindError {
     response: unknown;
     call: string;
 
@@ -112,7 +112,7 @@ class UnexpectedZcoindResponse extends ZcoindError {
     }
 }
 
-class IncorrectPassphrase extends ZcoindError {
+export class IncorrectPassphrase extends ZcoindError {
     call: string;
 
     constructor(call: string) {
@@ -123,7 +123,7 @@ class IncorrectPassphrase extends ZcoindError {
 }
 
 // This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
-class ZcoindConnectionTimeout extends ZcoindError {
+export class ZcoindConnectionTimeout extends ZcoindError {
     constructor(seconds: number) {
         super(`unable to connect to zcoind within ${seconds}s; a reason this might happen is that you have another instance of zcoind not managed by Zcoin Client running`);
         this.name = 'ZcoindConnectionTimeout';
@@ -131,14 +131,14 @@ class ZcoindConnectionTimeout extends ZcoindError {
 }
 
 // This is thrown when we find a zcoind instance already listening when we haven't yet started one.
-class ZcoindAlreadyRunning extends ZcoindError {
+export class ZcoindAlreadyRunning extends ZcoindError {
     constructor() {
         super('Another zcoind instance running with -clientapi=1 is already running');
         this.name = 'ZcoindAlreadyRunning';
     }
 }
 
-class ZcoindAlreadyShutdown extends ZcoindError {
+export class ZcoindAlreadyShutdown extends ZcoindError {
     constructor() {
         super('zcoind has already been shutdown');
         this.name = 'ZcoindAlreadyShutdown';
@@ -146,7 +146,7 @@ class ZcoindAlreadyShutdown extends ZcoindError {
 }
 
 type Network = 'mainnet' | 'regtest' | 'test';
-class InvalidNetwork extends ZcoindError {
+export class InvalidNetwork extends ZcoindError {
     constructor() {
         super("valid network types are 'mainnet', 'regtest', and 'test'");
         this.name = 'InvalidNetwork';
@@ -367,7 +367,7 @@ export interface PaymentRequestData {
     state: PaymentRequestState;
 }
 
-class InvalidMnemonic extends ZcoindError {
+export class InvalidMnemonic extends ZcoindError {
     constructor(message) {
         super(message);
         this.name = 'InvalidMnemonic';
