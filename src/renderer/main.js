@@ -231,6 +231,10 @@ window.$startDaemon = () => new Promise(resolve => {
             // Make $daemon globally accessible.
             window.$daemon = z;
 
+            $daemon.awaitShutdown().catch(() => {
+                $quitApp("zcoind has shutdown unexpectedly. See zcoind's debug.log for details.");
+            });
+
             $setWaitingReason("Waiting for zcoind to start the API...");
             await $daemon.awaitApiResponse();
 

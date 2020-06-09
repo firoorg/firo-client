@@ -523,6 +523,8 @@ export class Zcoind {
     private blockchainLoadedEWH: EventWaitHandle<undefined>;
     private hasConnectedEWH: EventWaitHandle<undefined>;
     private initializersCompletedEWH: EventWaitHandle<undefined>;
+    // We resolve with true if zcoind has shutdown cleanly or false if it has crashed.
+    private zcoindHasShutdown: EventWaitHandle<boolean>
 
     // This will ensure only one request is sent at a time.
     private requestMutex: Mutex;
@@ -588,6 +590,7 @@ export class Zcoind {
         this.blockchainLoadedEWH = new EventWaitHandle();
         this.hasConnectedEWH = new EventWaitHandle();
         this.initializersCompletedEWH = new EventWaitHandle();
+        this.zcoindHasShutdown = new EventWaitHandle();
     }
 
     // Start the daemon and register handlers.
@@ -716,6 +719,17 @@ export class Zcoind {
 
             await new Promise(r => setTimeout(r, 1000));
         }
+    }
+
+    // Await zcoind shutting down. If the shutdown is clean, we will resolve(); if it is unclean, we will reject().
+    awaitShutdown(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            if (await this.zcoindHasShutdown.block()) {
+                resolve();
+            } else {
+                reject();
+            }
+        });
     }
 
     // Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
@@ -863,6 +877,23 @@ export class Zcoind {
 
                 resolve();
             });
+        });
+
+        this.awaitZcoindNotListening().then(async () => {
+            // This will be set if zcoind shutdown cleanly.
+            if (this.hasShutdown) {
+                logger.debug("zcoind has closed its ports after a clean shutdown");
+                return;
+            }
+
+            this.hasShutdown = true;
+            logger.error("zcoind has died unexpectedly");
+            await this.zcoindHasShutdown.release(false);
+        });
+
+        logger.info("Setting a watcher to see if zcoind unexpectedly dies...");
+        this.awaitZcoindNotListening().then(async () => {
+            // TODO
         })
 
         logger.info("Connecting to zcoind...")
@@ -1054,20 +1085,28 @@ export class Zcoind {
     // If zcoind has been shutdown intentionally (but not crashed) this method will throw.
     async send(auth: string | null, type: string, collection: string, data: unknown): Promise<unknown> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-        return await this.requesterSocketSend({
+
+        return await this.requesterSocketSend(this.formatSend(auth, type, collection, data));
+    }
+
+    private formatSend(auth: string | null, type: string, collection: string, data: unknown): unknown {
+        return {
             auth: {
                 passphrase: auth
             },
             type,
             collection,
             data
-        });
+        };
     }
 
     // Send an object through the requester socket and process the response. Refer to the documentation of send() for
     // what we're actually doing. The reason this method is split off is that the setPassphrase() method is weird and
     // requires a special case.
-    private async requesterSocketSend(message: unknown): Promise<unknown> {
+    //
+    // allowAfterShutdown determines whether we are allowed to send after we're marked as having shutdown. This should
+    // only be set to true from sendToShutdown().
+    private async requesterSocketSend(message: unknown, allowAftersShutdown: boolean = false): Promise<unknown> {
         await this.hasConnectedEWH.block();
 
         let callName = '<unknown>';
@@ -1090,7 +1129,7 @@ export class Zcoind {
         };
 
         return new Promise(async (resolve, reject) => {
-            if (this.hasShutdown) {
+            if (this.hasShutdown && !allowAftersShutdown) {
                 reject(new ZcoindAlreadyShutdown());
                 return;
             }
@@ -1143,17 +1182,19 @@ export class Zcoind {
 
     // Stop the daemon.
     async stopDaemon() {
-        await this.send(null, 'initial', 'stop', null);
-        await this.expectShutdown();
+        await this.sendToShutdown(null, 'initial', 'stop', null);
     }
 
-    // Wait for zcoind to close its ports and then clean up.
-    private async expectShutdown() {
+    // Run a command, knowing that it will result in zcoind to shut down. If zcoind is shut down in any other way, it
+    // will be considered a crash. This takes the same arguments as send.
+    private async sendToShutdown(auth: string | null, type: string, collection: string, data: unknown) {
         if (this.hasShutdown) {
             throw new ZcoindAlreadyShutdown();
         }
 
         this.hasShutdown = true;
+
+        await this.requesterSocketSend(this.formatSend(auth, type, collection, data), true);
 
         logger.info("Waiting for zcoind to close its ports.");
         await this.awaitZcoindNotListening();
@@ -1161,6 +1202,8 @@ export class Zcoind {
         this.statusPublisherSocket.close();
         this.publisherSocket.close();
         this.requesterSocket.close();
+
+        await this.zcoindHasShutdown.release(true);
     }
 
     // This is called when an error sending to zcoind has occurred.
@@ -1579,15 +1622,11 @@ export class Zcoind {
     // If the wallet is unencrypted THE DAEMON WILL STOP; we will wait for it to do so before returning. In this case,
     // any further calls will error.
     async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
-        let r;
-
         if (oldPassphrase === null) {
-            r = await this.send(newPassphrase, 'create', 'setPassphrase', null);
-            await this.expectShutdown();
-            return r;
+            return await this.sendToShutdown(newPassphrase, 'create', 'setPassphrase', null);
         }
 
-        r = await this.requesterSocketSend({
+        const r = await this.requesterSocketSend({
             auth: {
                 passphrase: oldPassphrase || '',
                 newPassphrase
