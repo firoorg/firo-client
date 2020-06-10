@@ -21,29 +21,6 @@ export default {
 
     components: {
         EvoZnodesPage
-    },
-    data() {
-        return {
-            data: ''
-        }
-    },
-    mounted() {
-        this.$on('close-mnemonic-warning', this.closeMnemonicWarning);
-    },
-    computed: {
-        ...mapGetters({
-            isShowingCustomInputs: 'ZcoinPayment/customInputs',
-            hasApiStatus: 'ApiStatus/hasApiStatus',
-            apiStatus: 'ApiStatus/apiStatus',
-            showWarning: 'Settings/showWarning',
-            openAddressBook: 'App/openAddressBook'
-        }),
-    },
-
-    methods: {
-        async closeMnemonicWarning() {
-            this.$store.commit('Settings/MNEMONIC_WARNING_SETTING', false);
-        }
     }
 }
 </script>
