@@ -357,6 +357,38 @@ export interface TransactionEvent {
     }
 }
 
+export interface MasternodeEvent {
+    proTxHash: string;
+    collateralHash: string;
+    collateralIndex: Number;
+    collateralAddress: string;
+    operatorReward: number;
+    state: {
+        service: string;
+        registeredHeight: number;
+        lastPaidHeight: number;
+        nextPaymentHeight: number;
+        PoSePenalty: number;
+        PoSeRevivedHeight: number;
+        PoSeBanHeight: number;
+        revocationReason: number;
+        ownerAddress: string;
+        votingAddress: string;
+        payoutAddress: string;
+        pubKeyOperator: string;
+        operatorPayoutAddress: string;
+    },
+    wallet: {
+        hasMasternode: boolean;
+        hasOperatorKey: boolean;
+        hasOwnerKey: boolean;
+        hasVotingKey: boolean;
+        ownsCollateral: boolean;
+        ownsOperatorRewardScript: boolean;
+        ownsPayeeScript: boolean;
+    }
+}
+
 export type PaymentRequestState = 'active' | 'hidden' | 'deleted' | 'archived';
 export interface PaymentRequestData {
     address: string;
@@ -1407,6 +1439,20 @@ export class Zcoind {
         }
 
         throw new UnexpectedZcoindResponse('create/readAddressBook', data);
+    }
+
+    async getZnodeList() : Promise<string> {
+        const data = await this.send('', 'initial', 'znodeList', {});
+        if (typeof data === 'string') {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('getZnodeList', data);
+    }
+
+    async getMasternodeList() : Promise<Object> {
+        const data = await this.send('', 'initial', 'masternodeList', {});
+        return data;
     }
 
     async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<void> {

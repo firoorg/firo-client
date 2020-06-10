@@ -98,6 +98,11 @@ export default new Router({
                 },
 
                 {
+                    path: '/znodes',
+                    component: require('@/components/EvoZnodesContainer').default
+                },
+
+                {
                     path: '/znodelist',
                     component: require('@/components/ZnodePage').default
                 },
