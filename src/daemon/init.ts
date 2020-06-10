@@ -3,7 +3,8 @@
 import { Zcoind, MnemonicSettings } from './zcoind';
 
 /// Start up zcoind, connect to it, and return a Zcoind instance. If allowMultipleZcoindInstances is true, instead of
-// giving an error if there is an existing zcoind instance running, we will connect to it without running initializers.
+// giving an error if there is an existing zcoind instance running OR the wallet is unlocked, we will connect to it
+// without running initializers.
 async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string,
                       mnemonicSettings?: MnemonicSettings, allowMultipleZcoindInstances?: boolean): Promise<Zcoind> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
@@ -36,7 +37,14 @@ async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoin
             }
 
             initializers.push(
-                async (zcoind) => await component.initialize(store, zcoind)
+                async (zcoind) => {
+                    // Wallet is not locked. Don't run initializers.
+                    if (!await zcoind.isWalletLocked()) {
+                        return;
+                    }
+
+                    await component.initialize(store, zcoind)
+                }
             );
         }
     }

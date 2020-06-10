@@ -100,30 +100,73 @@ export default {
             suggestionTabIndex: -1,
 
             // Extra help to display to the user in addition to RPC help.
-            clientHelp: {
+            clientCommands: {
                 clear: {
                     shortHelp: 'clear',
-                    longHelp: 'clear the console'
+                    longHelp: 'Clear the console.',
+                    cmd: () => this.clear()
                 },
 
                 resetclientconfig: {
                     shortHelp: 'resetclientconfig',
-                    longHelp: 'Reset the configuration of the client, allowing you to go through setup again.'
+                    longHelp: 'Reset the configuration of the client, allowing you to go through setup again.',
+                    cmd: async () => await this.resetclientconfig()
+                },
+
+                help: {
+                    shortHelp: 'help [command]',
+                    longHelp: 'List all commands, or get help for a specified command.',
+                    cmd: async (commandline) => await this.help(commandline)
                 }
             }
         }
     },
 
-    mounted () {
+    async mounted () {
         this.focusInput();
 
+        // This is needed when we're reloading the page.
+        while (!window.$daemon) {
+            await new Promise(r => setTimeout(r, 10));
+        }
+
+        const sort_dedup = array => array.sort().reduce((a, x) => {if (a[a.length-1] !== x) {a.push(x)} return a}, []);
+
         // Get the list of available commands.
-        $daemon.legacyRpcCommands().then(commands => {
-            this.availableCommands = commands.concat(Object.keys(this.clientHelp));
-        })
+        const commands = await $daemon.legacyRpcCommands();
+        this.availableCommands = sort_dedup(commands.concat(Object.keys(this.clientCommands)));
+    },
+
+    beforeRouteEnter(_to, _from, next) {
+        // This is called after the component is loaded. It can't be placed in mounted() because mounted() won't be
+        // called when the user returns to this screen since we use <keep-alive> in MainLayout.vue.
+        next(self => {
+            self.scrollToBottom();
+            self.focusInput();
+        });
     },
 
     methods: {
+        clear() {
+            this.sessionLog = [];
+        },
+
+        async help(commandline) {
+            if (this.clientCommands[commandline]) {
+                return this.clientCommands[commandline].longHelp;
+            } else if (commandline) {
+                return await this.legacyRpc(`help ${commandline}`);
+            } else {
+                let output = await this.legacyRpc("help");
+                output += "\n\n== GUI ==\n";
+                output += Object.values(this.clientCommands)
+                    .map(c => c.shortHelp)
+                    .sort()
+                    .join("\n");
+                return output;
+            }
+        },
+
         // Update the suggestions to show the user. This can't be made as a computed property because this.$refs is not
         // reactive.
         updateSuggestions (event=null) {
@@ -275,34 +318,17 @@ export default {
 
             this.history.push(input);
 
-            let m;
+            const m = input.match(/^\s*(\w+)\s*(.*)$/);
 
-            if (input === 'clear') {
-                this.sessionLog = [];
-            } else if (input.match(/^\s*resetclientconfig\s*$/)) {
-                this.resetClientConfig();
-            } else if (input.match(/^\s*help\s*$/)) { // Add our own commands to help.
-                let output = await this.legacyRpc("help");
-                output += "\n\n== GUI ==\n";
-                output += Object.values(this.clientHelp)
-                    .map(c => c.shortHelp)
-                    .sort()
-                    .join("\n");
-
-                this.sessionLog.push({
-                    input,
-                    output
-                });
-            } else if ((m = input.match(/^\s*help\s*(\w+)\s*$/)) && this.clientHelp[m[1]]) { // Give help about our own commands.
-                this.sessionLog.push({
-                    input,
-                    output: this.clientHelp[m[1]].longHelp,
-                })
+            let output;
+            if (this.clientCommands[m[1]]) {
+                output = await this.clientCommands[m[1]].cmd(m[2]);
             } else {
-                this.sessionLog.push({
-                    input,
-                    output: await this.legacyRpc(input)
-                });
+                output = await this.legacyRpc(input);
+            }
+
+            if (output === '' || output) {
+                this.sessionLog.push({input, output});
             }
 
             this.$refs.currentInput.contentEditable = true;
@@ -329,7 +355,7 @@ export default {
             }
         },
 
-        resetClientConfig() {
+        resetclientconfig() {
             this.$store.commit('App/setIsInitialized', false);
             this.$nextTick($quitApp);
         }
@@ -389,7 +415,7 @@ export default {
             }
 
             .output {
-                white-space: pre-line;
+                white-space: pre-wrap;
                 margin-bottom: 1em;
             }
         }

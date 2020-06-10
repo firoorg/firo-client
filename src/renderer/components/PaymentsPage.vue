@@ -36,7 +36,7 @@ import { mapGetters } from 'vuex';
 import PaymentsList from '@/components/PaymentsList';
 import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
 import AddressBookPopup from '@/components/Overlay/AddressBookPopup';
-import WarningWalletWithoutMnemonics from './Mnemonics/WarningWalletWithoutMnemonics.vue';
+import WarningWalletWithoutMnemonics from './WarningWalletWithoutMnemonics.vue';
 
 export default {
     name: 'PaymentsPage',

@@ -202,13 +202,14 @@
 import { shell } from 'electron'
 import { mapGetters } from 'vuex'
 import { convertToCoin } from '#/lib/convert'
+import { IncorrectPassphrase, ZcoindErrorResponse } from '#/daemon/zcoind'
+
 import Notice from '@/components/Notification/Notice'
 import ZnodeStatus from '@/components/ZnodePage/ZnodeStatus'
 
 import Passphrase from "@/components/PaymentSidebars/SendSteps/Passphrase";
 import Error from "@/components/PaymentSidebars/SendSteps/Error";
 import Complete from "@/components/PaymentSidebars/SendSteps/Complete";
-
 
 
 export default {
@@ -325,13 +326,13 @@ export default {
             try {
                 await $daemon.startZnode(this.passphrase, this.znode.label);
             } catch (e) {
-                if (e.name === 'ZcoindErrorResponse') {
-                    this.removeOutsideClickListener();
-                    this.beginErrorStep(e.message);
-                    return;
-                } else if ((e.error && e.error.code === -14)) {
+                if (e instanceof IncorrectPassphrase) {
                     // Going to the incorrect passphrase step, we do NOT want to removeOutsideClickListener().
                     this.beginIncorrectPassphraseStep();
+                    return;
+                } else if (e instanceof ZcoindErrorResponse) {
+                    this.removeOutsideClickListener();
+                    this.beginErrorStep(e.errorMessage);
                     return;
                 } else {
                     this.removeOutsideClickListener();

@@ -76,6 +76,10 @@ export default {
             type: Function,
             default: null
         },
+        onPageChange: {
+            type: Function,
+            default: (newPage) => null
+        },
         theme: {
             type: String,
             default: ''
@@ -125,6 +129,7 @@ export default {
 
             if (!isEqual) {
                 this.$refs.vuetable.refresh()
+                this.onPageChange(1);
             }
         }
     },
@@ -166,6 +171,7 @@ export default {
             this.rowTransition = ''
             this.$refs.vuetable.changePage(page)
             this.rowTransition = 'fade'
+            this.onPageChange(page);
         },
 
         dataManager (sortOrder, pagination) {

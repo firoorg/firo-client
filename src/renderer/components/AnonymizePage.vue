@@ -64,6 +64,13 @@
                         <span class="xzc">
                             XZC
                         </span>
+
+                        <input
+                            class="automint-button"
+                            type="button"
+                            @click="autoMint"
+                            value="Go!"
+                        />
                     </div>
                 </div>
             </section>
@@ -238,6 +245,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { getDenominationsToMint, convertToSatoshi, convertToCoin } from "#/lib/convert";
+import { IncorrectPassphrase, ZcoindErrorResponse } from "#/daemon/zcoind";
 
 import CircularTimer from '@/components/Icons/CircularTimer';
 import DenominationSelector from '@/components/DenominationSelector'
@@ -413,13 +421,12 @@ export default {
             try {
                 await $daemon.mintZerocoin(passphrase, this.coinsToMint);
             } catch (e) {
-                // Error code -14 indicates an incorrect passphrase.
-                if (e.error && e.error.code === -14) {
+                if (e instanceof IncorrectPassphrase) {
                     this.beginIncorrectPassphraseStep();
-                } else if (e.error && e.error.message) {
-                    this.beginErrorStep(e.error.message);
+                } else if (e instanceof ZcoindErrorResponse) {
+                    this.beginErrorStep(e.errorMessage);
                 } else {
-                    this.beginErrorStep(JSON.stringify(e));
+                    throw e;
                 }
 
                 return;
@@ -447,7 +454,7 @@ export default {
                         }
                     });
                 }, 50);
-                this.$router.push('/');
+                this.$router.push('/main');
             }
         }
     }
@@ -484,6 +491,23 @@ export default {
         .xzc {
             margin-left: 0.5em;
             font-weight: bold;
+        }
+
+        .automint-button {
+            cursor: pointer;
+            color: $color--green-dark;
+            background-color: inherit;
+            border-radius: 25px;
+            border-width: 0;
+
+            &:focus {
+                outline: none;
+            }
+
+            font: {
+                size: 1.2em;
+                weight: bold;
+            }
         }
     }
 

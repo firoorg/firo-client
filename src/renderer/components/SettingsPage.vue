@@ -115,58 +115,68 @@
                     </div>
                     <ShowMnemonicSettings v-if="showMnemonicSetting" @close-mnemonic="closeMnemonicDialog"/>
 
-                    <section class="backup">
-                        <h2>Backup</h2>
-                        <input
-                            ref="backupDirectory"
-                            type="file"
-                            hidden
-                            webkitdirectory
-                            @change="doBackup"
-                        />
+                    <div class="buttons">
+                        <div class="backup button">
+                            <h2>Backup</h2>
+                            <input
+                                ref="backupDirectory"
+                                type="file"
+                                hidden
+                                webkitdirectory
+                                @change="doBackup"
+                            />
 
-                        <v-popover
-                            :open="popoverStep !== 'initial'"
-                            placement="top-end"
-                            popover-class="tooltip popover multi-step-popover"
-                            class="send-button-popover-container"
-                            trigger="manually"
-                            :auto-hide="false"
-                            :handle-resize="true"
-                        >
-                            <base-button
-                                color="green"
-                                @click="openBackupDialog"
+                            <v-popover
+                                :open="popoverStep !== 'initial'"
+                                placement="top-end"
+                                popover-class="tooltip popover multi-step-popover"
+                                class="send-button-popover-container"
+                                trigger="manually"
+                                :auto-hide="false"
+                                :handle-resize="true"
                             >
-                                Backup Zcoin Data
+                                <base-button
+                                    color="green"
+                                    @click="openBackupDialog"
+                                >
+                                    Backup Zcoin Data
+                                </base-button>
+
+                                <template slot="popover">
+                                    <div class="close-dialog-button">
+                                        <a
+                                            @click.prevent="closePopover"
+                                            href="#"
+                                        >
+                                            X
+                                        </a>
+                                    </div>
+
+                                    <div class="content-wrapper">
+                                        <div v-if="popoverStep === 'wait'">
+                                            Please wait...
+                                        </div>
+
+                                        <div v-if="popoverStep === 'success'">
+                                            Backup succeeded!
+                                        </div>
+
+                                        <div v-if="popoverStep === 'error'">
+                                            {{ errorMessage }}
+                                        </div>
+                                    </div>
+                                </template>
+                            </v-popover>
+                        </div>
+
+                        <div class="button reset-config">
+                            <h2>Reset Network and Data Directory</h2>
+
+                            <base-button color="green" @click="showSetupScreenAgain">
+                                Reset Configuration
                             </base-button>
-
-                            <template slot="popover">
-                                <div class="close-dialog-button">
-                                    <a
-                                        @click.prevent="closePopover"
-                                        href="#"
-                                    >
-                                        X
-                                    </a>
-                                </div>
-
-                                <div class="content-wrapper">
-                                    <div v-if="popoverStep === 'wait'">
-                                        Please wait...
-                                    </div>
-
-                                    <div v-if="popoverStep === 'success'">
-                                        Backup succeeded!
-                                    </div>
-
-                                    <div v-if="popoverStep === 'error'">
-                                        {{ errorMessage }}
-                                    </div>
-                                </div>
-                            </template>
-                        </v-popover>
-                    </section>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -174,8 +184,8 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
-
+import {mapGetters} from 'vuex'
+import {remote} from 'electron';
 import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
 import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
 import ConnectViaTorSettings from '@/components/SettingsPage/ConnectViaTorSettings'
@@ -231,15 +241,11 @@ export default {
     },
 
     methods: {
-        ...mapMutations({
-            setWaitingReason: 'App/setWaitingReason'
-        }),
-
         async restartDaemon() {
-            this.setWaitingReason("Restarting daemon...");
+            $setWaitingReason("Restarting daemon...");
             await $daemon.stopDaemon();
 
-            $startDaemon();
+            await $startDaemon();
         },
 
         async changePassphrase() {
@@ -297,90 +303,103 @@ export default {
 
         closePopover() {
             this.popoverStep = 'initial';
+        },
+
+        async showSetupScreenAgain() {
+            if (!confirm("Are you sure you want to reset the configuration?")) {
+                return;
+            }
+
+            this.$store.commit('App/setIsInitialized', false);
+            await $quitApp();
         }
     },
 }
 </script>
 
 <style lang="scss" scoped>
-    .version {
-        font: {
-            style: italic;
-            weight: normal;
-            size: 0.5em;
+.version {
+    font: {
+        style: italic;
+        weight: normal;
+        size: 0.5em;
+    }
+}
+
+.settings-page {
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.settings-page-inner {
+    padding: emRhythm(5) emRhythm(8) emRhythm(5) emRhythm(4);
+}
+
+.interface .form {
+    .language-settings {
+        .control {
+            margin-left: emRhythm(-2);
+        }
+    }
+}
+
+.passphrase {
+    display: table;
+
+    .line {
+        display: table-row;
+
+        .left, .right {
+            display: table-cell;
+            width: max-content;
         }
     }
 
-    .settings-page {
-        box-sizing: border-box;
-        overflow-y: auto;
-    }
+    .form {
+        width: max-content;
 
-    .settings-page-inner {
-        padding: emRhythm(5) emRhythm(8) emRhythm(5) emRhythm(4);
-    }
-
-    .interface .form {
-        .language-settings {
-            .control {
-                margin-left: emRhythm(-2);
-            }
-        }
-    }
-
-    .passphrase {
-        display: table;
-
-        .line {
+        .field {
             display: table-row;
 
-            .left, .right {
+            label, input {
                 display: table-cell;
-                width: max-content;
             }
-        }
 
-        .form {
-            width: max-content;
+            label {
+                padding-right: 2em;
+            }
 
-            .field {
-                display: table-row;
+            input {
+                background-color: $color--comet-medium;
+                border: none;
+                height: 1.5em;
+                width: 30em;
 
-                label, input {
-                    display: table-cell;
-                }
-
-                label {
-                    padding-right: 2em;
-                }
-
-                input {
-                    background-color: $color--comet-medium;
-                    border: none;
-                    height: 1.5em;
-                    width: 30em;
-
-                    &.non-matching {
-                        outline-style: auto;
-                        outline-color: red;
-                    }
+                &.non-matching {
+                    outline-style: auto;
+                    outline-color: red;
                 }
             }
         }
     }
+}
 
-    .close-dialog-button {
-        margin-top: 0.5em;
-        margin-right: 1em;
-        margin-bottom: -2em;
-        text-align: right;
-        a {
-            color: white;
-        }
+.close-dialog-button {
+    margin-top: 0.5em;
+    margin-right: 1em;
+    margin-bottom: -2em;
+    text-align: right;
+    a {
+        color: white;
     }
+}
 
-    .mnemonic-setting {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
+.mnemonic-setting {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.show-setup-screen-again {
+    margin-top: 1em;
+}
 </style>

@@ -1,46 +1,27 @@
 <template>
-    <transition name="fade">
-        <div v-if="waitingReason">
-            <WaitingScreen :reason="waitingReason" />
-        </div>
+    <div class="main-layout wrapper">
+        <Sidebar class="aside" />
 
-        <div
-            v-else-if="isInitialized"
-            class="main-layout wrapper"
-        >
-            <Sidebar class="aside" />
-
-            <main
-                ref="main"
-                class="main default-tooltip-boundary"
-            >
+        <main ref="main" class="main default-tooltip-boundary">
+            <keep-alive>
                 <router-view class="child" />
-            </main>
-        </div>
-
-        <div v-else>
-            <IntroScreen />
-        </div>
-    </transition>
+            </keep-alive>
+        </main>
+    </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Sidebar from '@/components/Sidebar'
-import IntroScreen from "@/components/IntroScreen/IntroScreen";
-import WaitingScreen from "@/components/WaitingScreen";
 
 export default {
     name: 'MainLayout',
 
     components: {
-        IntroScreen,
         Sidebar,
-        WaitingScreen
     },
 
     computed: mapGetters({
-        isInitialized: 'App/isInitialized',
         waitingReason: 'App/waitingReason'
     })
 }

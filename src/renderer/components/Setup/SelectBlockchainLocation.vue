@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <h1>
+    <div class="blockchain-location">
+        <div class="header">
             Configuration
-        </h1>
+        </div>
 
         <div id="config-options">
             <div class="config-option" id="datadir">
@@ -11,13 +11,19 @@
                 </label>
 
                 <div class="value">
-                    <span id="datadir-value">
+                    <div id="datadir-value">
                         {{ dataDir }}
-                    </span>
+                    </div>
 
-                    <a id="change-datadir" href="#" @click="changeDataDir">
-                        Change
-                    </a>
+                    <div id="datadir-actions">
+                        <a href="#" @click="changeDataDir">
+                            Change
+                        </a>
+
+                        <a href="#" @click="resetDataDir">
+                            Reset
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -51,16 +57,9 @@ import path from 'path';
 const remote = require('electron').remote;
 
 import { mapGetters, mapMutations } from 'vuex'
-import GuideStepMixin from '@/mixins/GuideStepMixin'
-
-import zcoind from "#/daemon/init";
 
 export default {
     name: 'IntroScreenBlockchainLocation',
-
-    mixins: [
-        GuideStepMixin
-    ],
 
     data: () => ({
         dataDir: '',
@@ -109,6 +108,10 @@ export default {
         ...mapMutations({
             setWaitingReason: 'App/setWaitingReason'
         }),
+
+        resetDataDir() {
+            this.dataDir = this.defaultZcoinRootDirectory;
+        },
 
         async changeDataDir() {
             this.dataDir = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
@@ -164,42 +167,24 @@ export default {
             this.$log.info(`Setting blockchain location: ${this.dataDir}`);
             this.$store.commit('App/setBlockchainLocation', this.dataDir);
 
-            // The wallet already exists, so we don't need to go through the mnemonics screen.
-            if (fs.existsSync(this.walletLocation)) {
-                this.setWaitingReason("Starting zcoind...");
-                try {
-                    window.$daemon = await zcoind(this.$store, this.network, this.zcoindLocation, this.dataDir);
-                } catch(e) {
-                    await $quitApp(`Error starting zcoind: ${e}`);
-                }
-
-                this.setWaitingReason("Loading state from zcoind...");
-                try {
-                    await $daemon.awaitInitializersCompleted();
-                } catch(e) {
-                    await $quitApp(`Error running our initializers: ${e}`);
-                }
-
-                if ($daemon.isWalletLocked()) {
-                    this.setWaitingReason(undefined);
-                    // This wallet is already locked. End the setup procedure.
-                    this.$store.commit("App/setIsInitialized", true);
-                    // We will be destroyed automatically from MainLayout.
-                } else {
-                    // The wallet exists, but isn't yet locked. This is probably the result of some form of error.
-                    if (await $daemon.hasBeenUsed()) {
-                        await $quitApp(`You have an existing, unlocked wallet.dat (located at ${this.walletLocation}) ` +
-                              "with addresses in it. Try locking it and starting the client again.");
-                    } else {
-                        await $quitApp("It looks like you have an existing wallet.dat, but it has no addresses in it. " +
-                              "This is probably the result of a bug or the client exiting before setup could be " +
-                              `completed. Manually backup the existing wallet.dat (located at ${this.walletLocation}) ` +
-                              "and try starting the client again.");
+            // Wait for our updates to propagate to the store so it can be used by $startDaemon. sigh.
+            await new Promise(async (resolve) => {
+                while (true) {
+                    if (this.$store.getters['App/zcoinClientNetwork'] === this.network && this.$store.getters['App/blockchainLocation'] === this.dataDir) {
+                        return resolve();
                     }
+
+                    await new Promise(r => setTimeout(r, 100));
                 }
+            });
+
+            if (fs.existsSync(this.walletLocation)) {
+                // The wallet already exists, so we don't need to go through the mnemonics screen.
+                await $startDaemon();
+                this.$router.push('/main');
             } else {
                 // wallet.dat doesn't exist, so we should set it up with a mnemonic.
-                this.actions.goTo("createOrRestore");
+                this.$router.push('/setup/select-create-or-restore');
             }
         }
     }
@@ -207,42 +192,59 @@ export default {
 </script>
 
 <style scoped lang="scss">
-#config-options {
-    display: table;
+.blockchain-location {
+    width: max-content;
 
-    label {
-        font-size: 1.2em;
-        padding-right: 0.5em;
+    .header {
+        text-align: center;
+        font: {
+            weight: bold;
+            size: 2.5em;
+        }
     }
 
-    #datadir {
-        #datadir-value {
-            font-weight: bold;
+    #config-options {
+        display: table;
+
+        label {
+            font-size: 1.2em;
+            padding-right: 0.5em;
         }
 
-        #change-datadir {
-            font: {
-                style: italic;
-                size: 0.9em;
+        #datadir {
+            #datadir-value {
+                font-weight: bold;
+                width: fit-content;
+            }
+
+            #datadir-actions {
+                font: {
+                    style: italic;
+                    size: 0.9em;
+                }
+
+                a:not(:first-child) {
+                    margin-left: 0.5em;
+                }
+            }
+        }
+
+        .config-option {
+            display: table-row;
+
+            label, .value {
+                display: table-cell;
             }
         }
     }
 
-    .config-option {
-        display: table-row;
-
-        label, .value {
-            display: table-cell;
+    #setup-button {
+        width: fit-content;
+        margin: {
+            left: auto;
+            right: auto;
+            top: 1em;
         }
-    }
-}
-
-#setup-button {
-    width: fit-content;
-    margin: {
-        left: auto;
-        right: auto;
-        top: 1em;
     }
 }
 </style>

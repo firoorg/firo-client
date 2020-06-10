@@ -9,36 +9,121 @@ import EventWaitHandle from "./eventWaitHandle";
 import * as constants from './constants';
 import { createLogger } from '../lib/logger';
 import * as net from "net";
-import eventWaitHandle from "./eventWaitHandle";
 
 const logger = createLogger('zcoin:daemon');
 
-// FIXME: This is not thrown consistently. See documentation of individual calls for details.
-class ZcoindErrorResponse extends Error {
-    constructor(call, error) {
-        super(`${call} call failed due to ${JSON.stringify(error)}`);
+// The base class for all our errors.
+export class ZcoindError extends Error {
+    constructor(message: string) {
+        super(message);
+    }
+}
+
+export interface StandardZcoindRequest {
+     auth: null | {
+         passphrase: string;
+     };
+     type: string;
+     collection: string;
+     data: unknown;
+}
+
+function isStandardZcoindRequest(x): x is StandardZcoindRequest {
+    return x !== null &&
+        typeof x === 'object' &&
+        x.auth !== null &&
+        typeof x.auth === 'object' &&
+        (x.auth.passphrase === null || typeof x.auth.passphrase === 'string') &&
+        typeof x.type === 'string' &&
+        typeof x.collection === 'string';
+}
+
+export interface ZcoindResponseMessage {
+    data: unknown;
+    meta: {
+        status: number;
+    };
+    error: null | {
+        code: number,
+        message: string;
+    }
+}
+
+function isZcoindResponseMessage(x: any): x is ZcoindResponseMessage {
+    return x !== null &&
+        typeof x === 'object' &&
+        x.meta !== null &&
+        typeof x.meta === 'object' &&
+        typeof x.meta.status === 'number' &&
+        (
+            (x.error === null && x.data !== null) ||
+            (
+                x.data === null &&
+                x.error !== null &&
+                typeof x.error === 'object' &&
+                typeof x.error.code === 'number' &&
+                typeof x.error.message === 'string'
+            )
+        );
+}
+
+export interface ZcoindErrorResponseMessage {
+    data: null;
+    meta: {
+        status: number;
+    };
+    error: {
+        code: number;
+        message: string;
+    }
+}
+
+function isZcoindErrorResponseMessage(x: any): x is ZcoindErrorResponseMessage {
+    return isZcoindResponseMessage(x) && (x.error !== null);
+}
+
+export class ZcoindErrorResponse extends ZcoindError {
+    call: string;
+    error: ZcoindErrorResponseMessage;
+    errorMessage: string;
+    errorCode: number;
+
+    constructor(call: string, error: ZcoindErrorResponseMessage) {
+        super(`${call} call failed (${error.error.code}): ${error.error.message}`);
         this.name = 'ZcoindErrorResponse';
+        this.call = call;
+        this.error = error;
+        this.errorMessage = error.error.message;
+        this.errorCode = error.error.code;
     }
 }
 
-// FIXME: This is not thrown consistently. See documentation of individual calls for details.
-class UnexpectedZcoindResponse extends Error {
-    constructor(call: string, response: any) {
-        super(`unexpected response to ${call} ${JSON.stringify(response)}`);
+export class UnexpectedZcoindResponse extends ZcoindError {
+    response: unknown;
+    call: string;
+
+    constructor(call: string, response: unknown) {
+        super(`unexpected response to call ${call}`);
         this.name = 'UnexpectedZcoindResponse';
+        this.call = call;
+        this.response = response;
+
+        logger.error(`Unexpected response to call ${call}: ${JSON.stringify(response)}`);
     }
 }
 
-// FIXME: This is not thrown consistently. See documentation of individual calls for details.
-class IncorrectPassphrase extends Error {
-    constructor() {
-        super('incorrect passphrase');
+export class IncorrectPassphrase extends ZcoindError {
+    call: string;
+
+    constructor(call: string) {
+        super(`incorrect passphrase for ${call} call`);
         this.name = 'IncorrectPassphrase';
+        this.call = call;
     }
 }
 
 // This is thrown when connecting to zcoind takes too long. It probably indicates that zcoind is already running.
-class ZcoindConnectionTimeout extends Error {
+export class ZcoindConnectionTimeout extends ZcoindError {
     constructor(seconds: number) {
         super(`unable to connect to zcoind within ${seconds}s; a reason this might happen is that you have another instance of zcoind not managed by Zcoin Client running`);
         this.name = 'ZcoindConnectionTimeout';
@@ -46,11 +131,33 @@ class ZcoindConnectionTimeout extends Error {
 }
 
 // This is thrown when we find a zcoind instance already listening when we haven't yet started one.
-class ZcoindAlreadyRunning extends Error {
+export class ZcoindAlreadyRunning extends ZcoindError {
     constructor() {
         super('Another zcoind instance running with -clientapi=1 is already running');
         this.name = 'ZcoindAlreadyRunning';
     }
+}
+
+export class ZcoindAlreadyShutdown extends ZcoindError {
+    constructor() {
+        super('zcoind has already been shutdown');
+        this.name = 'ZcoindAlreadyShutdown';
+    }
+}
+
+type Network = 'mainnet' | 'regtest' | 'test';
+export class InvalidNetwork extends ZcoindError {
+    constructor() {
+        super("valid network types are 'mainnet', 'regtest', and 'test'");
+        this.name = 'InvalidNetwork';
+    }
+}
+function assertValidNetwork(x: any): x is Network {
+    if (!['mainnet', 'regtest', 'test'].includes(x)) {
+        throw new InvalidNetwork();
+    }
+
+    return true;
 }
 
 export interface ApiStatus {
@@ -60,7 +167,8 @@ export interface ApiStatus {
         walletVersion: number;
         walletLock: boolean;
         dataDir: string;
-        network: string;
+        // Note that this is DIFFERENT from the Network type.
+        network: 'main' | 'test' | 'regtest';
         blocks: number;
         connections: number;
         devAuth: boolean;
@@ -95,26 +203,59 @@ export interface TransactionOutput {
     txid: string;
     txIndex: number;
     firstSeenAt: number;
-    label: string;
-    fee: number;
+    label?: string;
+    fee?: number;
     amount: number;
     address?: string;
     blockHeight?: number;
-    blockHash?: number;
+    blockHash?: string;
     blockTime?: number;
     spendable: boolean;
-    locked: boolean;
+    locked?: boolean;
+}
+function isValidTransactionOutput(x: any): x is TransactionOutput {
+    return x !== null &&
+        typeof x === 'object' &&
+        (x.uniqId === undefined || typeof x.uniqId === 'string') &&
+        typeof x.isChange === 'boolean' &&
+        typeof x.category === 'string' &&
+        typeof x.txid === 'string' &&
+        typeof x.txIndex === 'number' &&
+        typeof x.firstSeenAt === 'number' &&
+        (x.label === undefined || typeof x.label === 'string') &&
+        (x.fee === undefined || typeof x.fee === 'number') &&
+        typeof x.amount === 'number' &&
+        (x.address === undefined || typeof x.address === 'string') &&
+        (x.blockHeight === undefined || typeof x.blockHeight === 'number') &&
+        (x.blockHash === undefined || typeof x.blockHash === 'string') &&
+        (x.blockTime === undefined || typeof x.blockTime === 'number') &&
+        typeof x.spendable === 'boolean' &&
+        (x.locked === undefined || typeof x.locked === 'boolean');
 }
 
 export interface TransactionInput {
     txid: string;
     index: number;
 }
+function isValidTransactionInput(x: any): x is TransactionInput {
+    return x !== null &&
+        typeof x === 'object' &&
+        typeof x.txid === 'string' &&
+        typeof x.index === 'number';
+}
 
 export interface AddressBookItem {
     address: string;
     label: string;
     purpose: string;
+}
+
+function isValidAddressBookItem(x: any): x is AddressBookItem {
+    return x !== null &&
+        typeof x === 'object' &&
+        typeof x.address === 'string' &&
+        typeof x.label === 'string' &&
+        typeof x.purpose === 'string';
 }
 
 // This is the data format for initial/stateWallet.
@@ -127,9 +268,11 @@ export interface StateWallet {
                     [maybeTxid: string]: TransactionOutput
                 }
             },
+
             inputs?: {
                 [outpoint: string]: TransactionInput
             },
+
             lockedCoins?: {
                 [outpoint: string]: TransactionInput
             },
@@ -139,6 +282,44 @@ export interface StateWallet {
             },
         }
     }
+}
+function isValidStateWallet(x: any): x is StateWallet {
+    if (x === null || typeof x !== 'object' || x.addresses === null || typeof x.addresses !== 'object') {
+        return false;
+    }
+
+    for (const v of <any[]>Object.values(x.addresses)) {
+        if (v === null ||
+            typeof v !== 'object' ||
+            v.txids === null ||
+            typeof v.txids !== 'object' ||
+            (v.inputs !== undefined && typeof v.inputs !== 'object') ||
+            (v.lockedCoins !== undefined && typeof v.lockedCoins !== 'object') ||
+            (v.unlockedCoins !== undefined && typeof v.unlockedCoins !== 'object')) {
+
+            return false;
+        }
+
+        if (Object.values(v.txids).find(grouping =>
+            grouping === null || typeof grouping !== 'object' || Object.values(grouping).find(e => !isValidTransactionOutput(e))
+        )) {
+            return false;
+        }
+
+        if (v.inputs && !Object.values(v.inputs).find(e => !isValidTransactionInput(e))) {
+            return false;
+        }
+
+        if (v.lockedCoins && !Object.values(v.lockedCoins).find(e => !isValidTransactionInput(e))) {
+            return false;
+        }
+
+        if (v.unlockedCoins && !Object.values(v.unlockedCoins).find(isValidTransactionInput)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 // This is the data format we're given in 'transaction' events.
@@ -218,40 +399,164 @@ export interface PaymentRequestData {
     state: PaymentRequestState;
 }
 
-export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean};
+export class InvalidMnemonic extends ZcoindError {
+    constructor(message) {
+        super(message);
+        this.name = 'InvalidMnemonic';
+    }
+}
+
 export {validateMnemonic, generateMnemonic} from "bip39";
+export type MnemonicSettings = {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean};
+function assertValidMnemonicSettings(x: any): x is MnemonicSettings {
+    if (x !== null &&
+        typeof x === 'object' &&
+        typeof x.mnemonic === 'string' &&
+        (
+            x.mnemonicPassphrase === null ||
+            typeof x.mnemonicPassphrase === 'string'
+        ) &&
+        typeof x.isNewMnemonic === 'boolean') {
+
+        if (validateMnemonic(x.mnemonic)) {
+            return true;
+        } else {
+            throw new InvalidMnemonic('mnemonic is not a valid BIP39 mnemonic');
+        }
+    } else {
+        throw new InvalidMnemonic('mnemonic object is not valid');
+    }
+}
 
 // CoinControl is an array of [txid, txindex] pairs.
 export type CoinControl = [string, number][];
 const coinControlToString = (coinControl: CoinControl) => coinControl.map(e => `${e[0]}-${e[1]}`).join(':');
 
+export type Setting = {
+    data: string;
+    changed: boolean;
+    disabled: boolean;
+};
+export type SettingsData = {
+    [key: string]: Setting | boolean;
+};
+
+// This verifies not just that the x matches the interface, but that for all keys, iff key begins with a "-" it is a
+// Setting, and otherwise it is a boolean.
+function isValidSettingsData(x: any): x is SettingsData {
+    if (x === null || typeof x !== 'object') {
+        return false;
+    }
+
+    for (const [k, v] of <any>Object.entries(x)) {
+        if (v === null ||
+            !(
+                (!k.startsWith("-") && typeof v === 'boolean') ||
+                (
+                    k.startsWith("-") &&
+                    typeof v === 'object' &&
+                    v.hasOwnProperty('data') &&
+                    typeof v.changed === 'boolean' &&
+                    typeof v.disabled === 'boolean'
+                )
+            )
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export class ZcoindDoesNotExist extends ZcoindError {
+    path: string;
+
+    constructor(path: string) {
+        super(`zcoind at path ${path} does not exist`);
+        this.name = 'ZcoindDoesNotExist';
+    }
+}
+
+export class InvalidCertificateFile extends ZcoindError {
+    path: string;
+
+    constructor(path: string) {
+        super(`invalid certificate file: ${path}`);
+        this.name = 'InvalidCertificateFile';
+        this.path = path;
+    }
+}
+
 // Read a certificate pair from path. Returns [pubKey, privKey]. Throws if path does not exist or is not a valid key
 // file.
 function readCert(path: string): [string, string] {
-    const parsed = JSON.parse(fs.readFileSync(path).toString());
-
-    if (
-        parsed.type !== "keys" ||
-        !parsed.data ||
-        typeof parsed.data.public !== 'string' ||
-        typeof parsed.data.private !== 'string'
-    ) {
-        throw "invalid certificate file: " + path;
+    let parsed;
+    try {
+        parsed = JSON.parse(fs.readFileSync(path).toString());
+    } catch(e) {
+        throw new InvalidCertificateFile(path);
     }
 
-    return [parsed.data.public, parsed.data.private];
+    if (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        parsed.type === "keys" &&
+        parsed.data !== null &&
+        typeof parsed.data === 'object' &&
+        typeof parsed.data.public === 'string' &&
+        typeof parsed.data.private === 'string'
+    ) {
+        return [parsed.data.public, parsed.data.private];
+    }
+
+    throw new InvalidCertificateFile(path);
 }
 
-export type ZcoindEventHandler = (daemon: Zcoind, eventData: any) => Promise<void>;
+export type ZcoindEventHandler = (daemon: Zcoind, eventData: unknown) => Promise<void>;
 export type ZcoindInitializationFunction = (daemon: Zcoind) => Promise<void>;
+
+export class ZcoindStartupError extends ZcoindError {
+    error: Error;
+    stderr: string;
+
+    constructor(error: Error, stderr: string) {
+        super(`error starting zcoind (${error}): ${stderr}`);
+        this.name = 'ZcoindStartupError';
+        this.error = error;
+        this.stderr = stderr;
+    }
+}
+
+export class RebroadcastError extends ZcoindError {
+    error: string;
+
+    constructor(error: string) {
+        super(`error rebroadcasting transaction: ${error}`);
+        this.name = 'RebroadcastError';
+        this.error = error;
+    }
+}
+
+export class ZnodeStartupError extends ZcoindError {
+    error: string;
+
+    constructor(error: string) {
+        super(`failed to start znode: ${error}`);
+        this.name = 'ZnodeStartupError';
+        this.error = error;
+    }
+}
 
 // We take care of starting the daemon, sending messages, and calling proper event handlers for subscription events.
 export class Zcoind {
     // These are synchronisation primitives so as to not send data before zcoind is ready.
+    private gotAPIResponseEWH: EventWaitHandle<undefined>;
     private apiIsReadyEWH: EventWaitHandle<undefined>;
     private blockchainLoadedEWH: EventWaitHandle<undefined>;
     private hasConnectedEWH: EventWaitHandle<undefined>;
     private initializersCompletedEWH: EventWaitHandle<undefined>;
+    // We resolve with true if zcoind has shutdown cleanly or false if it has crashed.
+    private zcoindHasShutdown: EventWaitHandle<boolean>
 
     // This will ensure only one request is sent at a time.
     private requestMutex: Mutex;
@@ -282,6 +587,12 @@ export class Zcoind {
     // If this is set to true, we will connect to an existing zcoind instance (supposing -clientapi is enabled) instead
     // of resetting everything. In this case, initializers will NOT be run.
     allowMultipleZcoindInstances: boolean = false;
+    // If this is set to true, we will type check all zcoind responses. On large wallets, this may cause startup to be
+    // very slow.
+    typecheckEverything: boolean = false;
+    // This is the account name that will be associated in the zcoind backend with addresses we generate with
+    // getUnusedAddress.
+    addressAccountName: string = 'zcoin-client';
 
     // zcoindLocation is the location of the zcoind binary.
     //
@@ -297,9 +608,7 @@ export class Zcoind {
     // key that will be called when an apiStatus event is receives.
     constructor(network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string | null,
                 initializers: ZcoindInitializationFunction[], eventHandlers: {[eventName: string]: ZcoindEventHandler}) {
-        if (!['mainnet', 'test', 'regtest'].includes(network)) {
-            throw "network must be one of 'mainnet', 'test', or 'regtest'";
-        }
+        assertValidNetwork(network);
         this.zcoindNetwork = network;
         this.zcoindLocation = zcoindLocation;
         this.zcoindDataDir = zcoindDataDir;
@@ -308,10 +617,12 @@ export class Zcoind {
         this.eventHandlers = eventHandlers;
 
         this.requestMutex = new Mutex();
+        this.gotAPIResponseEWH = new EventWaitHandle();
         this.apiIsReadyEWH = new EventWaitHandle();
         this.blockchainLoadedEWH = new EventWaitHandle();
         this.hasConnectedEWH = new EventWaitHandle();
         this.initializersCompletedEWH = new EventWaitHandle();
+        this.zcoindHasShutdown = new EventWaitHandle();
     }
 
     // Start the daemon and register handlers.
@@ -327,14 +638,12 @@ export class Zcoind {
     // We may be called only once.
     async start(mnemonicSettings?: MnemonicSettings) {
         if (this.hasStarted) {
-            throw "start may not be called multiple times";
+            throw new ZcoindAlreadyRunning();
         }
         this.hasStarted = true;
 
         if (mnemonicSettings) {
-            if (!validateMnemonic((mnemonicSettings.mnemonic))) {
-                throw "invalid mnemonic";
-            }
+            assertValidMnemonicSettings(mnemonicSettings);
 
             let walletLocation;
             switch (this.zcoindNetwork) {
@@ -351,11 +660,11 @@ export class Zcoind {
                     break
 
                 default:
-                    throw "unreachable";
+                    throw new InvalidNetwork();
             }
 
             if (fs.existsSync(walletLocation)) {
-                throw "Zcoind.start() called with mnemonicSettings set, but wallet.dat already exists";
+                throw new InvalidMnemonic("Zcoind.start() called with mnemonicSettings set, but wallet.dat already exists");
             }
         }
 
@@ -393,6 +702,12 @@ export class Zcoind {
         }
 
         await this.connectAndReact();
+    }
+
+    // Wait for the zcoind API to first make a response. This DOES NOT mean that it is safe commands. You must await
+    // awaitApiIsReady() for that.
+    async awaitApiResponse() {
+        await this.gotAPIResponseEWH.block();
     }
 
     // Resolve when zcoind has loaded the block index.
@@ -438,6 +753,17 @@ export class Zcoind {
         }
     }
 
+    // Await zcoind shutting down. If the shutdown is clean, we will resolve(); if it is unclean, we will reject().
+    awaitShutdown(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            if (await this.zcoindHasShutdown.block()) {
+                resolve();
+            } else {
+                reject();
+            }
+        });
+    }
+
     // Launch zcoind at zcoindLocation as a daemon with the specified datadir dataDir. Resolves when zcoind exits with
     // status 0, or rejects it with the error given by execFile if something goes wrong.
     //
@@ -446,23 +772,22 @@ export class Zcoind {
     private async launchDaemon(mnemonicSettings?: MnemonicSettings): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!fs.existsSync(this.zcoindLocation)) {
-                throw "zcoind (${this.zcoindLocation) does not exist.";
+                throw new ZcoindDoesNotExist(this.zcoindLocation);
             }
 
             // These are the arguments that will be passed to zcoind.
             const args = ["-clientapi=1"];
+
             if (process.platform !== "win32") {
                 args.push("-daemon=1");
             }
+
             if (this.zcoindDataDir) {
                 args.push(`-datadir=${this.zcoindDataDir}`);
             }
+
             if (mnemonicSettings) {
-                // This is typed as a boolean, but since we are indirectly called from JS there's really not any type
-                // checking, and we don't want to silently do weird things.
-                if (typeof mnemonicSettings.isNewMnemonic !== 'boolean') {
-                    throw "mnemonicSettings.isNewMnemonic must be a boolean";
-                }
+                assertValidMnemonicSettings(mnemonicSettings);
 
                 if (!mnemonicSettings.isNewMnemonic) {
                     // We need to rescan when recovering from a mnemonic.
@@ -475,6 +800,8 @@ export class Zcoind {
                     args.push(`-mnemonicpassphrase=${mnemonicSettings.mnemonicPassphrase}`);
                 }
             }
+
+            assertValidNetwork(this.zcoindNetwork);
             switch (this.zcoindNetwork) {
                 case 'mainnet':
                     args.push("-mainnet=1");
@@ -491,7 +818,7 @@ export class Zcoind {
                     break;
 
                 default:
-                    throw "unreachable";
+                    throw 'unreachable';
             }
 
             logger.info("Starting daemon...");
@@ -504,7 +831,7 @@ export class Zcoind {
                     if (error) {
                         logger.error(`Error starting daemon (${error}): ${stderr}`);
                         hasResolved = true;
-                        reject(`${error}: ${stderr}`);
+                        reject(new ZcoindStartupError(error, stderr));
                     }
                 });
 
@@ -522,7 +849,7 @@ export class Zcoind {
                     (error, stdout, stderr) => {
                         if (error) {
                             logger.error(`Error starting daemon (${error}): ${stderr}`);
-                            reject(`${error}: ${stderr}`);
+                            reject(new ZcoindStartupError(error, stderr));
                         } else {
                             logger.info(`Successfully started daemon: ${stdout}`);
                             resolve();
@@ -541,11 +868,11 @@ export class Zcoind {
         return new Promise(resolve => {
             const socket = new net.Socket();
             socket.setTimeout(5_000);
-            socket.on("error", (e) => {
+            socket.on("error", () => {
                 socket.destroy();
                 resolve(false);
             });
-            socket.on("timeout", (e) => {
+            socket.on("timeout", () => {
                 socket.destroy();
                 resolve(false);
             });
@@ -582,6 +909,23 @@ export class Zcoind {
 
                 resolve();
             });
+        });
+
+        this.awaitZcoindNotListening().then(async () => {
+            // This will be set if zcoind shutdown cleanly.
+            if (this.hasShutdown) {
+                logger.debug("zcoind has closed its ports after a clean shutdown");
+                return;
+            }
+
+            this.hasShutdown = true;
+            logger.error("zcoind has died unexpectedly");
+            await this.zcoindHasShutdown.release(false);
+        });
+
+        logger.info("Setting a watcher to see if zcoind unexpectedly dies...");
+        this.awaitZcoindNotListening().then(async () => {
+            // TODO
         })
 
         logger.info("Connecting to zcoind...")
@@ -620,7 +964,7 @@ export class Zcoind {
                 return;
             }
 
-            throw e;
+            throw new ZcoindError(`subscribing to apiStatus failed: ${e}`);
         }
 
         setTimeout(() => this.subscribeToApiStatus(), 1500);
@@ -634,20 +978,21 @@ export class Zcoind {
             apiStatus = JSON.parse(apiStatusMessage);
         } catch (e) {
             logger.error("Failed to parse API status %O", apiStatusMessage);
-            throw "Failed to parse API status";
+            throw new ZcoindError(`Failed to parse apiStatus: ${e}`);
         }
 
         if (apiStatus.error) {
             logger.error("Error retrieving API status: %O", apiStatus);
-            throw "Error retrieving API status";
+            throw new UnexpectedZcoindResponse('apiStatus', apiStatus);
         }
 
         if (apiStatus.meta.status < 200 || apiStatus.meta.status >= 400) {
             logger.error("Received API status with bad status %d: %O", apiStatus.meta.status, apiStatus);
-            throw "Bad API status";
+            throw new UnexpectedZcoindResponse('apiStatus', apiStatus);
         }
 
         this.latestApiStatus = apiStatus;
+        await this.gotAPIResponseEWH.release(undefined);
 
         // modules.API will be set once it is valid to connect to the API.
         if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
@@ -662,7 +1007,7 @@ export class Zcoind {
         }
 
         if (this.eventHandlers['apiStatus']) {
-            this.eventHandlers['apiStatus'](this, apiStatus);
+            await this.eventHandlers['apiStatus'](this, apiStatus);
         }
     }
 
@@ -698,7 +1043,7 @@ export class Zcoind {
 
             default:
                 logger.error("Connected to unknown network type %O", apiStatus.data.network);
-                throw 'connected to unknown network type';
+                throw new UnexpectedZcoindResponse('apiStatus', apiStatus);
         }
 
         const [clientPubkey, clientPrivkey] = readCert(path.join(apiStatus.data.dataDir, "certificates", "client", "keys.json"));
@@ -750,6 +1095,7 @@ export class Zcoind {
 
         if (parsedMessage.meta.status !== 200) {
             logger.error("zcoind sent us an event for topic %s with a non-200 status: %O", topic, parsedMessage);
+            return;
         }
 
         if (this.eventHandlers[topic]) {
@@ -769,43 +1115,54 @@ export class Zcoind {
     // return the entire response object we received from zcoind.
     //
     // If zcoind has been shutdown intentionally (but not crashed) this method will throw.
-    async send(auth: string | null, type: string, collection: string, data: any): Promise<any> {
+    async send(auth: string | null, type: string, collection: string, data: unknown): Promise<unknown> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
-        return await this.requesterSocketSend({
+
+        return await this.requesterSocketSend(this.formatSend(auth, type, collection, data));
+    }
+
+    private formatSend(auth: string | null, type: string, collection: string, data: unknown): unknown {
+        return {
             auth: {
                 passphrase: auth
             },
             type,
             collection,
             data
-        });
+        };
     }
 
     // Send an object through the requester socket and process the response. Refer to the documentation of send() for
     // what we're actually doing. The reason this method is split off is that the setPassphrase() method is weird and
     // requires a special case.
-    private async requesterSocketSend(message: any): Promise<any> {
+    //
+    // allowAfterShutdown determines whether we are allowed to send after we're marked as having shutdown. This should
+    // only be set to true from sendToShutdown().
+    private async requesterSocketSend(message: unknown, allowAftersShutdown: boolean = false): Promise<unknown> {
         await this.hasConnectedEWH.block();
 
-        let forCallName = '';
-        if (message.collection) {
-            forCallName = ` for ${message.type}/${message.collection}`;
+        let callName = '<unknown>';
+        if (isStandardZcoindRequest(message)) {
+            callName = `${message.type}/${message.collection}`;
+        } else { // fixme
+            console.log('<unknown>');
+            console.log(message);
         }
 
-        logger.debug(`Trying to acquire requestMutex${forCallName}...`);
+        logger.debug(`Trying to acquire requestMutex for ${callName}...`);
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
         let releaseLock = await this.requestMutex.lock();
-        logger.debug(`Acquired requestMutex${forCallName}`);
+        logger.debug(`Acquired requestMutex for ${callName}`);
 
         const release = () => {
-            logger.debug(`Releasing requestMutex${forCallName}...`)
+            logger.debug(`Releasing requestMutex for ${callName}...`)
             releaseLock();
         };
 
         return new Promise(async (resolve, reject) => {
-            if (this.hasShutdown) {
-                reject("We can't send! We've already shutdown!");
+            if (this.hasShutdown && !allowAftersShutdown) {
+                reject(new ZcoindAlreadyShutdown());
                 return;
             }
 
@@ -830,22 +1187,24 @@ export class Zcoind {
                 } catch (e) {
                     logger.error("zcoind sent us invalid JSON: %O", messageString);
                     release();
-                    reject(e);
+                    reject(new UnexpectedZcoindResponse(callName, e));
                     return;
                 }
 
-                logger.debug(`received reply from zcoind${forCallName}: %O`, message);
+                logger.debug(`received reply from zcoind for ${callName}: %O`, message);
 
-                if (typeof message === 'object' &&
-                    !message.error &&
-                    message.meta &&
-                    message.meta.status === 200 &&
-                    message.data
-                ) {
-                    resolve(message.data);
+                if (isZcoindResponseMessage(message)) {
+                    if (message.meta.status === 200) {
+                        resolve(message.data);
+                    } else if (isZcoindErrorResponseMessage(message)) {
+                        if (message.error.code === -14) {
+                            reject(new IncorrectPassphrase(callName));
+                        } else {
+                            reject(new ZcoindErrorResponse(callName, message));
+                        }
+                    }
                 } else {
-                    logger.error(`zcoind replied with an error${forCallName}: %O`, message);
-                    reject(message);
+                    reject(new UnexpectedZcoindResponse(callName, message));
                 }
 
                 release();
@@ -855,17 +1214,19 @@ export class Zcoind {
 
     // Stop the daemon.
     async stopDaemon() {
-        await this.send(null, 'initial', 'stop', null);
-        await this.expectShutdown();
+        await this.sendToShutdown(null, 'initial', 'stop', null);
     }
 
-    // Wait for zcoind to close its ports and then clean up.
-    private async expectShutdown() {
+    // Run a command, knowing that it will result in zcoind to shut down. If zcoind is shut down in any other way, it
+    // will be considered a crash. This takes the same arguments as send.
+    private async sendToShutdown(auth: string | null, type: string, collection: string, data: unknown) {
         if (this.hasShutdown) {
-            throw 'zcoind has already shutdown';
+            throw new ZcoindAlreadyShutdown();
         }
 
         this.hasShutdown = true;
+
+        await this.requesterSocketSend(this.formatSend(auth, type, collection, data), true);
 
         logger.info("Waiting for zcoind to close its ports.");
         await this.awaitZcoindNotListening();
@@ -873,6 +1234,8 @@ export class Zcoind {
         this.statusPublisherSocket.close();
         this.publisherSocket.close();
         this.requesterSocket.close();
+
+        await this.zcoindHasShutdown.release(true);
     }
 
     // This is called when an error sending to zcoind has occurred.
@@ -886,33 +1249,71 @@ export class Zcoind {
 
     // See restartDaemon() for another available action.
 
-    // Invoke a legacy RPC command. result is whatever the JSON result of the command is, and errored is a boolean that
-    // indicates whether or not an error has occurred.
+    // Invoke a legacy RPC command.
     //
     // NOTE: legacyRpc commands sometimes require auth, but they take it as a special legacyRpc command
     //       (walletpassphrase) which is called prior to invoking the protected command.
-    async legacyRpc(commandline: string): Promise<{result: object, errored: boolean}> {
+    async legacyRpc(commandline: string): Promise<{result: null | unknown, error: null | {code: number, message: string}}> {
         // Yes, it is correct to infer that zcoind can parse the argument list but cannot parse the command name.
         const i = commandline.indexOf(' ');
         const method = (i !== -1) ? commandline.slice(0, i) : commandline;
         const args = (i !== -1) ? commandline.slice(i+1) : '';
 
-        return await this.send(null, 'create', 'rpc', {
+        const data = await this.send(null, 'create', 'rpc', {
             method,
             args
         });
+
+        function isLegacyRpcResponse(x: any): x is {result: null | unknown, error: null | {code: number, message: string}} {
+            return x !== null &&
+                typeof x === 'object' &&
+                (
+                    ((x.result !== null) && (x.error === null)) ||
+                    (
+                        x.result === null &&
+                        typeof x.error === 'object' &&
+                        typeof x.error.code === 'number' &&
+                        typeof x.error.message === 'string'
+                    )
+                );
+        }
+
+        if (isLegacyRpcResponse(data)) {
+            return data;
+        } else {
+            throw new UnexpectedZcoindResponse('create/rpc', data);
+        }
     }
 
     // Returns a list of all available legacy RPC commands.
     async legacyRpcCommands(): Promise<string[]> {
-        // I don't exactly understand why TypeScript infers the incorrect types for stuff here, given that this.send()
-        // returns a Promise of any, but ...
-        const r = await this.send(null, 'initial', 'rpc', {});
-        const categories = Object.values(r.categories);
-        const helpEntries = <string[]>categories.reduce((a: string[], x: string[]) => a.concat(x), []);
-        const commands = helpEntries.map(x => x.split(' ')[0]);
+        const data = await this.send(null, 'initial', 'rpc', {});
 
-        return commands;
+        function isValidResponse(x: any): x is {categories: {[category: string]: string[]}} {
+            if (x === null ||
+                typeof x !== 'object' ||
+                x.categories === null ||
+                typeof x.categories !== 'object') {
+
+                return false;
+            }
+
+            for (const v of Object.values(x.categories)) {
+                if (!(v instanceof Array) || v.find(e => typeof e !== 'string')) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (!isValidResponse(data)) {
+            throw new UnexpectedZcoindResponse('initial/rpc', data);
+        }
+
+        const categories = Object.values(data.categories);
+        const helpEntries = categories.reduce((a: string[], x: string[]) => a.concat(x), []);
+        return helpEntries.map(x => x.split(' ')[0]);
     }
 
     // Create a new payment request (to be stored on the daemon-side).
@@ -922,7 +1323,7 @@ export class Zcoind {
     // NOTE: zcoind doesn't send out a subscription event when a new payment request is created, so the caller is
     //       responsible for any updating of state that might be required.
     async createPaymentRequest(amount: number | undefined, label: string, message: string, address?: string): Promise<PaymentRequestData> {
-        return await this.send(null, 'create', 'paymentRequest', {
+        return <any>await this.send(null, 'create', 'paymentRequest', {
             amount,
             label,
             address,
@@ -930,17 +1331,12 @@ export class Zcoind {
         });
     }
 
-
-    async verifyMnemonicValidity(mnemonic: string): Promise<string> {
-        return await this.send(null, 'create', 'verifyMnemonicValidity', {mnemonic: mnemonic});
-    }
-
     // Update an existing payment request.
     //
     // NOTE: zcoind doesn't send out a subscription event when a payment request is updated, so the caller is
     //       responsible for any updating of state that might be required.
     async updatePaymentRequest(address: string, amount: number | undefined, label: string, message: string, state: PaymentRequestState): Promise<PaymentRequestData> {
-        return await this.send(null, 'update', 'paymentRequest', {
+        return <any>await this.send(null, 'update', 'paymentRequest', {
             id: address,
             amount,
             label,
@@ -956,7 +1352,7 @@ export class Zcoind {
     // this transaction.
     async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
                      subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
-        const data: {txid: string} = await this.send(auth, 'create', 'sendZcoin', {
+        const data = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
                     label,
@@ -970,7 +1366,15 @@ export class Zcoind {
             }
         });
 
-        return data.txid;
+        function isValidResponse(x: any): x is {txid: string} {
+            return x !== null && typeof x === 'object' && typeof x.txid === 'string';
+        }
+
+        if (isValidResponse(data)) {
+            return data.txid;
+        } else {
+            throw new UnexpectedZcoindResponse('create/sendZcoin', data);
+        }
     }
 
     async lockCoins(auth: string, lockedCoins: string, unlockedCoins: string): Promise<string> {
@@ -979,7 +1383,11 @@ export class Zcoind {
             unlockedCoins: unlockedCoins
         });
 
-        return data;
+        if (typeof data === 'string') {
+            return data;
+        } else {
+            throw new UnexpectedZcoindResponse('create/lockCoins', data);
+        }
     }
 
     // Privately send amount satoshi XZC to recipient, subtracting the fee from the amount.
@@ -1003,40 +1411,52 @@ export class Zcoind {
                 selected: coinControl ? coinControlToString(coinControl) : ''
             }
         });
-        return data;
-    }
 
-    async unlockWallet(auth: string): Promise<string> {
-        const data = await this.send(auth, 'create', 'unlockWallet', {});
-        return data;
+        if (typeof data === 'string') {
+            return data;
+        } else {
+            throw new UnexpectedZcoindResponse('create/sendPrivate', data);
+        }
     }
 
     async showMnemonics(auth: string): Promise<string> {
-        return await this.send(auth, 'create', 'showMnemonics', {});
+        const data = await this.send(auth, 'create', 'showMnemonics', {});
+        if (typeof data === 'string') {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('create/showMnemonics', data);
     }
 
-    async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<string> {
-        return await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
-    }
-
-    async readWalletMnemonicWarningState(auth: string) : Promise<string> {
-        return await this.send(auth, 'create', 'readWalletMnemonicWarningState', {});
+    async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<void> {
+        await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
     }
     
-    async readAddressBook() : Promise<string> {
-        return await this.send('', 'create', 'readAddressBook', {});
+    async readAddressBook() : Promise<AddressBookItem[]> {
+        const data = await this.send('', 'create', 'readAddressBook', {});
+        if (data instanceof Array && !data.find(e => !isValidAddressBookItem(e))) {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('create/readAddressBook', data);
     }
 
     async getZnodeList() : Promise<string> {
-        return await this.send('', 'initial', 'znodeList', {});
+        const data = await this.send('', 'initial', 'znodeList', {});
+        if (typeof data === 'string') {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('getZnodeList', data);
     }
 
-    async getMasternodeList() : Promise<string> {
-        return await this.send('', 'initial', 'masternodeList', {});
+    async getMasternodeList() : Promise<Object> {
+        const data = await this.send('', 'initial', 'masternodeList', {});
+        return data;
     }
 
-    async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<boolean> {
-        return await this.send('', 'create', 'editAddressBook', {
+    async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<void> {
+        await this.send('', 'create', 'editAddressBook', {
             address: address_,
             label: label_,
             purpose: purpose_,
@@ -1046,13 +1466,48 @@ export class Zcoind {
         });
     }
 
+    // Get an unused address with no associated label.
+    async getUnusedAddress(): Promise<string> {
+        const data = await this.legacyRpc(`getaccountaddress ${this.addressAccountName}`);
+
+        if (typeof data.result === 'string') {
+            return data.result;
+        }
+
+        throw new UnexpectedZcoindResponse('create/rpc:getaccountaddress', data);
+    }
+
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
     // '25', or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200
     // Zerocoin). We resolve() with the generated txid, or reject() with an error if something went wrong.
     async mintZerocoin(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string> {
-        return await this.send(auth, 'create', 'mint', {
+        const data = await this.send(auth, 'create', 'mint', {
             denominations: mints
         });
+        if (typeof data === 'string') {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('create/mint', data);
+    }
+
+    // calcPublicTxFee and calcPrivateTxFee require an address as input despit the fact that the response is the same
+    // regardless of which address is passed. We hardcode them in here so that those functions don't have to take a
+    // superfluous parameter.
+    private defaultAddress() {
+        switch (this.zcoindNetwork) {
+            case "mainnet":
+                // 40 XZC output from block 1.
+                return "aEF2p3jepoWF2yRYZjb6EACCP4CaP41doV";
+
+            case "regtest":
+            case "test":
+                // 40 XZC output from testnet block 1. testnet and regtest use the same addresses
+                return "TAczBFWtiP8mNstdLn1Z383z51rZ1vHk5N";
+
+            default:
+                throw "unreachable";
+        }
     }
 
     // Calculate a transaction fee for a public transaction.
@@ -1060,46 +1515,57 @@ export class Zcoind {
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the zcoind call fails or received data is invalid.
-    async calcPublicTxFee(feePerKb: number, address: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+    async calcPublicTxFee(amount: number, subtractFeeFromAmount: boolean, feePerKb: number): Promise<number> {
         let data = await this.send(null, 'get', 'txFee', {
             addresses: {
-                [address]: amount
+                [this.defaultAddress()]: amount
             },
             feePerKb,
             subtractFeeFromAmount
         });
 
-        if (typeof data.fee === 'number') {
-            return data.fee;
-        } else {
-            logger.error("got invalid calcTxFee response: %O", data);
-            throw "got invalid calcTxFee response";
+        function isValidResponse(x: any): x is {fee: number} {
+            return x !== null &&
+                typeof x === 'object' &&
+                typeof x.fee === 'number';
         }
+
+        if (isValidResponse(data)) {
+            return data.fee
+        }
+
+        throw new UnexpectedZcoindResponse('get/txFee', data);
     }
 
-    // Calculate a transaction fee for a private transaction.
-    // feePerKb is the satoshi fee per kilobyte for the generated transaction.
+    // Calculate a transaction fee for a private transaction. You may not specify custom transaction fees for private
+    // transactions.
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the zcoind call fails or received data is invalid.
-    async calcPrivateTxFee(label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+    async calcPrivateTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
         let data = await this.send(null, 'none', 'privateTxFee', {
             outputs: [
                 {
-                    address: recipient,
+                    address: this.defaultAddress(),
                     amount
                 }
             ],
-            label,
+            // The response is the same no matter what label we use.
+            label: '',
             subtractFeeFromAmount
         });
 
-        if (typeof data.fee === 'number') {
-            return data.fee;
-        } else {
-            logger.error("got invalid calcTxFee response: %O", data);
-            throw "got invalid calcTxFee response";
+        function isValidResponse(x: any): x is {fee: number} {
+            return x !== null &&
+                typeof x === 'object' &&
+                typeof x.fee === 'number';
         }
+
+        if (isValidResponse(data)) {
+            return data.fee
+        }
+
+        throw new UnexpectedZcoindResponse('get/privateTxFee', data);
     }
 
     // Backup wallet.dat into backupDirectory. We will reject() the problem if the backup fails for some reason;
@@ -1110,31 +1576,69 @@ export class Zcoind {
 
     // Rebroadcast a transaction. If the rebroadcast fails, we reject() the promise with the cause.
     async rebroadcast(txid: string): Promise<void> {
-        const r = await this.send(null, 'create', 'rebroadcast', {
+        const data = await this.send(null, 'create', 'rebroadcast', {
             txHash: txid
         });
 
-        // The call failed.
-        if (!r.result) {
-            throw r.error;
+        function isValidResponse(x: any): x is {result: boolean, error?: string} {
+            return x !== null &&
+                typeof x === 'object' &&
+                typeof x.result === 'boolean' &&
+                (
+                    (x.result && !x.error) ||
+                    !x.result && typeof x.error === 'string'
+                );
+        }
+
+        if (isValidResponse(data)) {
+            if (data.result) {
+                return;
+            }
+
+            throw new RebroadcastError(data.error);
+        } else {
+            throw new UnexpectedZcoindResponse('create/rebroadcast', data);
         }
     }
 
     // Start a Znode by alias. If the call fails, we reject() with the cause.
     async startZnode(auth: string, znodeAlias: string): Promise<void> {
-        const r = await this.send(auth, 'update', 'znodeControl', {
+        const data = await this.send(auth, 'update', 'znodeControl', {
             method: 'start-alias',
             alias: znodeAlias
         });
 
-        if (!r.overall || r.overall.total !== 1 || !r.detail || !r.detail.status
-            || (!r.detail.status.success && !r.detail.status.info)) {
-            throw new UnexpectedZcoindResponse('update/znodeControl', r);
+        function isValidResponse(x: any): x is {
+            overall: {
+                total: 1
+            },
+            detail: {
+                status: {
+                    success: boolean,
+                    info?: string
+                }
+            }
+        } {
+            return x !== null &&
+                typeof x === 'object' &&
+                x.overall !== null &&
+                typeof x.overall === 'object' &&
+                x.overall.total === 1 &&
+                x.detail !== null &&
+                typeof x.detail === 'object' &&
+                x.detail.status !== null &&
+                typeof x.detail.status.success === 'boolean' &&
+                (!x.detail.status.success !== !!x.detail.status.info) &&
+                (!x.detail.status.info || typeof x.detail.status.info === 'string')
+        }
+
+        if (!isValidResponse(data)) {
+            throw new UnexpectedZcoindResponse('update/znodeControl', data);
         }
 
         // If the call failed, r.detail[0].info will be the error message; otherwise, it will be blank.
-        if (!r.detail.status.success) {
-            throw new ZcoindErrorResponse('update/znodeControl', r.detail.status.info);
+        if (!data.detail.status.success) {
+            throw new ZnodeStartupError(data.detail.status.info);
         }
     }
 
@@ -1146,8 +1650,14 @@ export class Zcoind {
     }
 
     // Retrieve the value of all settings.
-    async getSettings(): Promise<{[key: string]: {data: string, changed: boolean, restartRequired: boolean}}> {
-        return await this.send(null, 'initial', 'setting', null);
+    async getSettings(): Promise<SettingsData> {
+        const data = await this.send(null, 'initial', 'setting', null);
+
+        if (isValidSettingsData(data)) {
+            return data;
+        } else {
+            throw new UnexpectedZcoindResponse('initial/setting', data);
+        }
     }
 
     // Set the passphrase to newPassphrase. If there is an existing passphrase, it must be passed as oldPassphrase; or
@@ -1158,31 +1668,19 @@ export class Zcoind {
     // If the wallet is unencrypted THE DAEMON WILL STOP; we will wait for it to do so before returning. In this case,
     // any further calls will error.
     async setPassphrase(oldPassphrase: string | null, newPassphrase: string): Promise<void> {
-        let r;
-
-        try {
-            if (oldPassphrase === null) {
-                r = await this.send(newPassphrase, 'create', 'setPassphrase', null);
-                await this.expectShutdown();
-                return r;
-            }
-
-            r = await this.requesterSocketSend({
-                auth: {
-                    passphrase: oldPassphrase || '',
-                    newPassphrase
-                },
-                type: 'update',
-                collection: 'setPassphrase',
-                data: {}
-            });
-        } catch (e) {
-            if (e.error && e.error.code === -14) {
-                throw new IncorrectPassphrase();
-            }
-
-            throw e;
+        if (oldPassphrase === null) {
+            return await this.sendToShutdown(newPassphrase, 'create', 'setPassphrase', null);
         }
+
+        const r = await this.requesterSocketSend({
+            auth: {
+                passphrase: oldPassphrase || '',
+                newPassphrase
+            },
+            type: 'update',
+            collection: 'setPassphrase',
+            data: {}
+        });
 
         if (!r) {
             throw 'setPassphrase call failed';
@@ -1191,31 +1689,40 @@ export class Zcoind {
 
     // Get the initial state of the wallet, which includes the information in the StateWallet interface.
     async getStateWallet(): Promise<StateWallet> {
-        return await this.send(null, 'initial', 'stateWallet', null);
+        const data = await this.send(null, 'initial', 'stateWallet', null);
+
+        if (!this.typecheckEverything) {
+            // assume zcoind has returned type-correct data.
+            return <StateWallet>data;
+        }
+
+        if (isValidStateWallet(data)) {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('initial/stateWallet', data);
     }
 
-    // Return the API status, waiting until one is available to return. We will reject() if we haven't been given an
-    // apiStatus yet (ie. before start() has resolved) or if zcoind has subsequently been shut down.
-    apiStatus(): ApiStatus {
-        if (!this.latestApiStatus) {
-            throw "We don't appear to be connected to zcoind."
-        }
+    // Return the API status, waiting until one is available to return.
+    async apiStatus(): Promise<ApiStatus> {
+        await this.awaitApiResponse();
 
         return this.latestApiStatus;
     }
 
     // Has our wallet been locked yet?
-    isWalletLocked(): boolean {
-        if (!this.latestApiStatus || !this.latestApiStatus.data || typeof this.latestApiStatus.data.walletLock !== 'boolean') {
-            throw "apiStatus has not yet been loaded or has invalid data.";
-        }
-
+    async isWalletLocked(): Promise<boolean> {
+        await this.awaitApiIsReady();
         return this.latestApiStatus.data.walletLock;
     }
 
-    // Have we ever used this wallet? We detect this by determining if we have any receiving addresses.
-    async hasBeenUsed(): Promise<boolean> {
-        const stateWallet = await this.getStateWallet();
-        return !!stateWallet.addresses.length;
+    // Is the daemon rescanning?
+    async isRescanning(): Promise<boolean> {
+        return (await this.apiStatus()).data.rescanning;
+    }
+
+    // Is the daemon reindexing?
+    async isReindexing(): Promise<boolean> {
+        return (await this.apiStatus()).data.reindexing;
     }
 }

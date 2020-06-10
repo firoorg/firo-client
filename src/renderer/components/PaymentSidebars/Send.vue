@@ -100,11 +100,27 @@
                                     </div>
                                 </div>
                                 <div class="control">
-                                    <u><a
-                                        :style="{ cursor: 'pointer'}"
-                                        @click="selectCustomInputs()"
-                                    >
-                                        Select Custom Inputs</a></u>
+                                    <div class="select-custom-inputs">
+                                        <u>
+                                            <a :style="{ cursor: 'pointer'}" @click="selectCustomInputs()">
+                                                Select Custom Inputs
+                                            </a>
+                                        </u>
+                                    </div>
+
+                                    <div v-show="privateOrPublic === 'public'" class="select-fee">
+                                        <input type="checkbox" v-model="useCustomFee" />
+                                        <label>Use a Custom Transaction Fee</label>
+                                        <div v-show="useCustomFee">
+                                            <input
+                                                type="number"
+                                                v-model.number="txFeePerKb"
+                                                name="txFeePerKb"
+                                                v-validate.initial="'integer|between:0,10000'"
+                                            />
+                                            <label>satoshis/kb</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
@@ -322,9 +338,9 @@ import SendStepWaitForReply from './SendSteps/WaitForReply';
 import SendStepIncorrectPassphrase from './SendSteps/IncorrectPassphrase';
 import SendStepError from './SendSteps/Error';
 import SendStepComplete from './SendSteps/Complete';
-
 import CircularTimer from "@/components/Icons/CircularTimer";
 
+import {IncorrectPassphrase, ZcoindErrorResponse} from '#/daemon/zcoind';
 import {isValidAddress} from '#/lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from '#/lib/convert';
 import types from "~/types";
@@ -367,14 +383,14 @@ export default {
             // complete -> initial
             sendPopoverStep: 'initial',
 
-            // This will be updated in watch() as computed properties can't use async.
+            useCustomFee: false,
+            txFeePerKb: 1,
+
+            // This is the total, computed transaction fee.
             transactionFee: 0,
 
             // This is set if error -6 occurs during fee calculation.
             totalAmountExceedsBalance: false,
-
-            // TODO: Right now we're just hardcoding this. It should be made user configurable.
-            txFeePerKb: 1        
         }
     },
 
@@ -393,16 +409,10 @@ export default {
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
         // send.
         privateOrPublic () {
-            switch (this.$route.path) {
-            case '/send/private':
-                return 'private';
-
-            case '/send/public':
+            if (this.$route.path === '/send/public') {
                 return 'public';
-
-            default:
-                this.$log.error("Route neither public nor private");
-                throw 'Route neither public nor private';
+            } else {
+                return 'private';
             }
         },
 
@@ -436,7 +446,7 @@ export default {
 
         isValidated () {
             // this.errors was already calculated when amount and address were entered.
-            return !!(this.amount && this.address && !this.validationErrors.items.length);
+            return !!(this.amount && this.address && this.txFeePerKb && !this.validationErrors.items.length);
         },
 
         coinControlSelectedAmount() {
@@ -476,9 +486,15 @@ export default {
             this.amount = to.query.amount || '';
         },
 
-        address: {
+        txFeePerKb: {
             handler: 'maybeShowFee',
             immediate: true
+        },
+
+        useCustomFee() {
+            if (!this.useCustomFee) {
+                this.txFeePerKb = 1;
+            }
         },
 
         amount: {
@@ -513,14 +529,14 @@ export default {
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availableXzc will still be reactively updated.
             getMessage: () => this.coinControlSelectedAmount == 0? ('Amount Is Over Your Available Balance of ' + convertToCoin(this.availableBalance)):'Amount Is Over Your Selected Amount of ' + convertToCoin(this.coinControlSelectedAmount),
-            validate: (value) => (this.coinControlSelectedAmount == 0 && convertToSatoshi(value) <= this.availableBalance) 
-                                || (this.coinControlSelectedAmount > 0 && convertToSatoshi(value) <= this.coinControlSelectedAmount) 
+            validate: (value) => (this.coinControlSelectedAmount == 0 && convertToSatoshi(value) <= this.availableBalance)
+                                || (this.coinControlSelectedAmount > 0 && convertToSatoshi(value) <= this.coinControlSelectedAmount)
         });
 
         this.$validator.extend('publicAmountIsValid', {
             getMessage: () => 'Amount Must Be A Multiple of 0.00000001',
             // We use a regex here so as to not to have to deal with floating point issues.
-            validate: (value) => !!value.match(/^\d+(\.\d{1,8})?$/)
+            validate: (value) => Number(value) !== 0 && !!value.match(/^\d+(\.\d{1,8})?$/)
         });
 
         this.$validator.extend('privateAmountIsValid', {
@@ -549,25 +565,33 @@ export default {
         convertToCoin,
 
         async maybeShowFee () {
-            this.transactionFee = 0;
             this.totalAmountExceedsBalance = false;
 
-            if (!this.isValidated) {
+            // The empty string for an amount won't issue a validation error, but it would be invalid to pass to zcoind.
+             if (
+                 !await this.$validator.validate('txFeePerKb') ||
+                 !await this.$validator.validate('amount') ||
+                 typeof this.txFeePerKb !== 'number' ||
+                 this.satoshiAmount === 0
+             ) {
+                this.transactionFee = 0;
                 return;
             }
 
             let p;
             if (this.privateOrPublic === 'private') {
-                p = $daemon.calcPrivateTxFee(this.label, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPrivateTxFee(this.satoshiAmount, this.subtractFeeFromAmount);
             } else {
-                p = $daemon.calcPublicTxFee(this.txFeePerKb, this.address, this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPublicTxFee(this.satoshiAmount, this.subtractFeeFromAmount, this.txFeePerKb);
             }
 
             try {
                 this.transactionFee = await p;
             } catch (e) {
-                if (e.error && e.error.code === -6) {
+                if (e instanceof ZcoindErrorResponse && e.errorCode === -6) {
                     this.totalAmountExceedsBalance = true;
+                } else {
+                    throw e;
                 }
             }
         },
@@ -629,13 +653,12 @@ export default {
                         this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
                 }
             } catch (e) {
-                // Error code -14 indicates an incorrect passphrase.
-                if (e.error && e.error.code === -14) {
+                if (e instanceof IncorrectPassphrase) {
                     this.beginIncorrectPassphraseStep();
-                } else if (e.error && e.error.message) {
-                    this.beginErrorStep(e.error.message);
+                } else if (e instanceof ZcoindErrorResponse) {
+                    this.beginErrorStep(e.errorMessage);
                 } else {
-                    this.beginErrorStep(JSON.stringify(e));
+                    throw e;
                 }
 
                 return;
@@ -771,7 +794,7 @@ fieldset {
         font-size: 0.85em;
     }
 
-    .subtract-fee-from-amount-checkbox {
+    .subtract-fee-from-amount-checkbox, .select-fee {
         font-weight: bold;
     }
 
