@@ -244,11 +244,7 @@ export default {
       return this.tableData;
     },
   },
-  watch: {
-    $route(to, from) {
-      this.$store.dispatch("ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP");
-    },
-  },
+  
   methods: {
     onCellClicked(data) {
       data.expand = !data.expand;
