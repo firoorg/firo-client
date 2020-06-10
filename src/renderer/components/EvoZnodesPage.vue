@@ -1,79 +1,79 @@
 <template>
-  <section class="evo-znode-page animated-table">
-    <input
-      class="control"
-      v-focus
-      @input="onInput"
-      placeholder="Filter by label, ip address or collateral address"
-      v-model="filter"
-      style="font-style:italic"
-    />
-    <input
-      class="round"
-      v-model="showAllZnodes"
-      type="checkbox"
-      name="showallznodes"
-      :checked="false"
-      @change="showAllZnodesChange(showAllZnodes)"
-    />
-    <label for="showallznodes">
-      Show all Znodes.
-    </label>
-    <div style="text-align:right">
-      <p>Node Count: {{ tableData.length }}</p>
-    </div>
-    <vuetable
-      ref="vuetable"
-      :api-mode="false"
-      :fields="tableFields"
-      :data-manager="dataManager"
-      pagination-path="pagination"
-      @vuetable:loaded="onLoadingCompleted"
-      :track-by="trackBy"
-      :per-page="perPage"
-      :sort-order="sortOrder"
-      @vuetable:row-clicked="onExpandClicked"
-      @vuetable:pagination-data="onPaginationData"
-      detail-row-component="evo-znodes-details-page"
-    >
-      <div slot="label" slot-scope="props">
-        {{ props.rowData.label }}
-      </div>
-
-      <div slot="collateralAddress" slot-scope="props">
-        {{ props.rowData.collateralAddress }}
-      </div>
-
-      <div slot="nextPaymentBlock" slot-scope="props">
-        {{ props.rowData.nextPaymentBlock }}
-      </div>
-
-      <div slot="statusdetails" slot-scope="props">
-        <p>{{ props.rowData.status }}</p>
-      </div>
-
-      <div slot="status" slot-scope="props">
-        <ZnodeStatusGreen v-show="props.rowData.status == 'ENABLED'" />
-        <ZnodeStatusRed v-show="props.rowData.status != 'ENABLED'" />
-      </div>
-
-      <div
-        slot="expand"
-        slot-scope="props"
-        :style="{ cursor: 'pointer' }"
-      >
-        <ZnodeCollapseButton v-show="props.rowData.expand" />
-        <ZnodeExpandButton v-show="!props.rowData.expand" />
-      </div>
-    </vuetable>
-
-    <div>
-      <animated-table-pagination
-        ref="pagination"
-        @vuetable-pagination:change-page="onChangePage"
+  <div class="evo-znode-page znode-table-container">
+    <div class="window-height znode-table-container">
+      <input
+        class="control"
+        v-focus
+        @input="onInput"
+        placeholder="Filter by label, ip address or collateral address"
+        v-model="filter"
+        style="font-style:italic"
       />
+      <input
+        class="round"
+        v-model="showAllZnodes"
+        type="checkbox"
+        name="showallznodes"
+        :checked="false"
+        @change="showAllZnodesChange(showAllZnodes)"
+      />
+      <label for="showallznodes">
+        Show all Znodes.
+      </label>
+      <div style="text-align:right">
+        <p>Node Count: {{ tableData.length }}</p>
+      </div>
+      <section v-scrollable class="znode-table-container animated-table">
+        <vuetable
+          ref="vuetable"
+          :api-mode="false"
+          :fields="tableFields"
+          :data-manager="dataManager"
+          pagination-path="pagination"
+          @vuetable:loaded="onLoadingCompleted"
+          :track-by="trackBy"
+          :per-page="perPage"
+          :sort-order="sortOrder"
+          @vuetable:row-clicked="onExpandClicked"
+          @vuetable:pagination-data="onPaginationData"
+          detail-row-component="evo-znodes-details-page"
+        >
+          <div slot="label" slot-scope="props">
+            {{ props.rowData.label }}
+          </div>
+
+          <div slot="collateralAddress" slot-scope="props">
+            {{ props.rowData.collateralAddress }}
+          </div>
+
+          <div slot="nextPaymentBlock" slot-scope="props">
+            {{ props.rowData.nextPaymentBlock }}
+          </div>
+
+          <div slot="statusdetails" slot-scope="props">
+            <p>{{ props.rowData.status }}</p>
+          </div>
+
+          <div slot="status" slot-scope="props">
+            <ZnodeStatusGreen v-show="props.rowData.status == 'ENABLED'" />
+            <ZnodeStatusRed v-show="props.rowData.status != 'ENABLED'" />
+          </div>
+
+          <div slot="expand" slot-scope="props" :style="{ cursor: 'pointer' }">
+            <ZnodeCollapseButton v-show="props.rowData.expand" />
+            <ZnodeExpandButton v-show="!props.rowData.expand" />
+          </div>
+        </vuetable>
+
+        <div class="znode-table-container">
+          <animated-table-pagination
+            ref="pagination"
+            @vuetable-pagination:change-page="onChangePage"
+          />
+        </div>
+      </section>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -122,7 +122,7 @@ const tableFields = [
     name: "expand",
     title: "",
     width: "5%",
-  }
+  },
 ];
 
 export default {
@@ -143,7 +143,7 @@ export default {
     },
     sortOrder: {
       type: Array,
-      default: [
+      default: () => [
         {
           field: "statusdetails",
           direction: "asc",
@@ -156,7 +156,7 @@ export default {
     },
     perPage: {
       type: Number,
-      default: 5,
+      default: 8,
     },
     noDataMessage: {
       type: String,
@@ -202,7 +202,12 @@ export default {
       const tableData = [];
       for (const proTxHash of Object.keys(this.masternodes)) {
         let znodeObj = this.masternodes[proTxHash];
-        console.log('znodeObj:', znodeObj)
+        let nextPay = znodeObj.state.nextPaymentHeight
+          ? znodeObj.state.nextPaymentHeight
+          : "SYNCING";
+        if (znodeObj.state.status == "POSE_BANNED") {
+          nextPay = "UNKNOWN";
+        }
         tableData.push({
           proTxHash: proTxHash,
           label:
@@ -211,14 +216,15 @@ export default {
               : "(unlabelled)",
           collateralAddress: znodeObj.collateralAddress,
           lastpaid: znodeObj.state.lastPaidHeight,
-          nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "SYNCING",
-          status: znodeObj.state.status? znodeObj.state.status : "SYNCING",
+          nextPaymentBlock: nextPay,
+          status: znodeObj.state.status ? znodeObj.state.status : "SYNCING",
           expand: false,
           service: znodeObj.state.service,
           ownerAddress: znodeObj.state.ownerAddress,
           PoSScore: znodeObj.state.PoSePenalty,
           registeredBlock: znodeObj.state.registeredHeight,
           paymentAddress: znodeObj.state.payoutAddress,
+          isMine: znodeObj.wallet && znodeObj.wallet.hasMasternode
         });
       }
       return tableData;
@@ -226,26 +232,9 @@ export default {
 
     myZnodesTableData() {
       const tableData = [];
-      for (const proTxHash of Object.keys(this.masternodes)) {
-        let znodeObj = this.masternodes[proTxHash];
-        if (znodeObj.wallet.hasMasternode) {
-          tableData.push({
-            proTxHash: proTxHash,
-            label:
-              znodeObj.label && znodeObj.label.length > 0
-                ? znodeObj.label
-                : "(unlabelled)",
-            collateralAddress: znodeObj.collateraladdress,
-            lastpaid: znodeObj.state.lastPaidHeight,
-          nextPaymentBlock: znodeObj.state.nextPaymentHeight? znodeObj.state.nextPaymentHeight: "UNKNOWN",
-            status: znodeObj.status,
-            expand: false,
-            service: znodeObj.state.service,
-            ownerAddress: znodeObj.state.ownerAddress,
-            PoSScore: znodeObj.state.PoSePenalty,
-            registeredBlock: znodeObj.state.registeredHeight,
-            paymentAddress: znodeObj.state.payoutAddress,
-          });
+      for (const znode of this.allZnodesTableData) {
+        if (znode.isMine) {
+          tableData.push(znode);
         }
       }
       return tableData;
@@ -262,13 +251,6 @@ export default {
   },
   methods: {
     onCellClicked(data) {
-      //collapse all rows
-      for (var d of this.tableData) {
-        if (d !== data) {
-          if (d.expand) this.$refs.vuetable.toggleDetailRow(d.proTxHash);
-          d.expand = false;
-        }
-      }
       data.expand = !data.expand;
       this.$refs.vuetable.toggleDetailRow(data.proTxHash);
     },
@@ -289,7 +271,6 @@ export default {
     },
 
     applyFilter() {
-      console.log("applyFilter:", this.allZnodesTableData);
       if (this.filter.length == 0) {
         if (this.showAllZnodes) {
           this.tableData = this.allZnodesTableData;
@@ -337,6 +318,22 @@ export default {
       this.rowTransition = "fade";
     },
 
+    collapseExpand() {
+      let len = this.tableData.length;
+      this.tableData.forEach((e) => {
+        if (len <= 2) {
+          if (!e.expand) {
+            this.$refs.vuetable.toggleDetailRow(e.proTxHash);
+            e.expand = true;
+          }
+        } else {
+          if (e.expand) {
+            this.$refs.vuetable.toggleDetailRow(e.proTxHash);
+            e.expand = false;
+          }
+        }
+      });
+    },
     dataManager(sortOrder, pagination) {
       if (this.tableData.length < 1) {
         return {
@@ -356,7 +353,7 @@ export default {
       );
       let from = pagination.from - 1;
       let to = from + this.perPage;
-
+  
       return {
         pagination: pagination,
         data: _.slice(local, from, to),
@@ -364,26 +361,7 @@ export default {
     },
 
     onLoadingCompleted() {
-      if (this.selectedUtxos) {
-        this.selectedUtxos.forEach((element1) => {
-          let found = false;
-          this.tableData.forEach((element2) => {
-            if (element1.uniqId == element2.uniqId) {
-              found = true;
-            }
-          });
-
-          if (found) {
-            if (!this.unselected[element1.uniqId]) {
-              this.$refs.vuetable.selectId(element1.uniqId);
-              if (!this.selectedTx[element1.uniqId]) {
-                this.totalSelected += element1.amount;
-              }
-              this.selectedTx[element1.uniqId] = true;
-            }
-          }
-        });
-      }
+      this.collapseExpand();
     },
   },
 };
@@ -397,15 +375,26 @@ export default {
 }
 .evo-znode-page {
   //display: grid;
-  box-sizing: border-box;
-  position: relative;
-  width: 100%;
-  top: 10%;
+  top: 2%;
   left: 10px;
-  left: 5%px;
-  right: 10%;
+  right: 9%;
   padding: 5%px;
-  overflow: auto;
+  overflow-y: scroll;
+
+  display: grid;
+  box-sizing: border-box;
+
+  .scrollable {
+    position: relative;
+    z-index: 20000;
+    box-sizing: border-box;
+    overflow: scroll;
+    height: 1000vh;
+  }
+  & > div {
+    height: 100%;
+    //@include scrollbar-on-hover($color--comet-dark-mixed);
+  }
 }
 
 .round {
@@ -449,5 +438,9 @@ export default {
 
 .round input[type="checkbox"]:checked + label:after {
   opacity: 1;
+}
+
+.znode-table-container {
+  position: relative;
 }
 </style>
