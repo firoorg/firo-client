@@ -111,7 +111,7 @@ const tableFields = [
     name: "statusdetails",
     title: "Status",
     sortField: "statusdetails",
-    width: "13%",
+    width: "12%",
   },
   {
     name: "status",
@@ -121,7 +121,7 @@ const tableFields = [
   {
     name: "expand",
     title: "",
-    width: "5%",
+    width: "3%",
   },
 ];
 
