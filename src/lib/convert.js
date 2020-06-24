@@ -1,5 +1,4 @@
 import Big from 'big.js'
-import clone from 'lodash/clone'
 
 const coinBase = new Big(1)
 const satoshiBase = new Big(0.00000001)
@@ -47,93 +46,26 @@ export const convertToSatoshi = function (base) {
     }
 }
 
-/**
- * returns denomination with the largest possible value by not exceeding the given amount
- *
- * getLargestDenomination(42, { '10': 7, '25': 2 }) // { denomination: 25, change: 17 }
- */
-export const getLargestDenomination = function (amount, denominations = {}) {
-    const denominationsPairs = Object.entries(denominations).map(([ key, value ]) => [ Number(key), value ])
-    const denoms = denominationsPairs.map(([ key ]) => key).reverse()
-    let denomination = null
+// Get the maximum amount of denominations we can mint from a given amount of satoshis. Our output, but NOT input, is in
+// whole XZC.
+export function getDenominationsToMint(amount) {
+    // We MUST be floats representable in two's complement in descending order, and our smallest value MUST exceed FEE.
+    const DENOMINATIONS = [100, 25, 10, 1, 0.5, 0.1, 0.05];
+    const FEE = 1e5; // 0.001 XZC
 
-    for (let denom of denoms) {
-        if (amount >= denom && denominations[`${denom}`] > 0) {
-            denomination = denom
-            break
+    let remaining = amount;
+    const toMint = {};
+
+    for (const denomination of DENOMINATIONS) {
+        toMint[denomination] = ~~(remaining / denomination / 1e8);
+        remaining = remaining % (denomination * 1e8) - (toMint[denomination] * FEE);
+
+        if (remaining < 0) {
+            // If remaining < 0, toMint[denomination] will be >= 1.
+            toMint[denomination] = toMint[denomination] - 1;
+            remaining += denomination * 1e8;
         }
     }
 
-    return {
-        denomination,
-        change: amount - denomination
-    }
-}
-
-export const getDenominationsToSpend = function ({ amount, denominations = {}, limit = -1 }) {
-    const denomsToSpend = {}
-    const denoms = clone(denominations)
-    let amountToSpend = amount
-    let found = false
-    let counter = 0
-
-    do {
-        counter++
-        const { denomination } = getLargestDenomination(amountToSpend, denoms)
-        const key = `${denomination}`
-
-        found = !!denomination
-
-        if (!found) {
-            break
-        }
-
-        amountToSpend -= denomination
-
-        if (!denomsToSpend[key]) {
-            denomsToSpend[key] = 0
-        }
-
-        denomsToSpend[key]++
-
-        if (denoms[key] > 0) {
-            denoms[key]--
-        }
-    } while (found && (limit === -1 || counter < limit))
-
-    return {
-        toSpend: denomsToSpend,
-        denominations: denoms,
-        change: amountToSpend
-    }
-}
-
-export const getDenominationsToMint = function (amount, denoms = [0.05, 0.1, 0.5, 1, 10, 25, 100]) {
-    const denomsToMint = {}
-    const reversed = denoms.reverse()
-
-    let amountToMint = amount
-    let found = false
-
-    do {
-        found = false
-
-        for (let denom of reversed) {
-            if (denom > amountToMint) {
-                continue
-            }
-
-            if (denomsToMint[`${denom}`] === undefined) {
-                denomsToMint[`${denom}`] = 0
-            }
-            denomsToMint[`${denom}`]++
-            amountToMint -= denom
-            found = true
-            break
-        }
-    } while (found)
-    return {
-        toMint: denomsToMint,
-        change: amountToMint
-    }
+    return toMint;
 }

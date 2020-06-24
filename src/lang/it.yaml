@@ -464,7 +464,7 @@ onboarding:
     title: Stay Private, Stay Flexible # test variables
     description: According to your settings you would like to keep a {percentageToHoldInZerocoin} ratio between your private and public coins. Due to recent transactions, this ratio is now out of balance. 
 
-                 Pertanto, ti consigliamo di coniare {remainingXzcToFulFillPercentageToHoldInZerocoin} il prima possibile. Questo assicurerà che tu possa spendere monete private senza ritardi in futuro.
+                 Pertanto, ti consigliamo di coniare {suggestedMintAmount} il prima possibile. Questo assicurerà che tu possa spendere monete private senza ritardi in futuro.
     button__add-selection--primary: Ripristina rapporto ora
 
   # first-payment-received:
