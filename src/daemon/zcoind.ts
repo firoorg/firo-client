@@ -1458,7 +1458,7 @@ export class Zcoind {
     async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<void> {
         await this.send('', 'create', 'editAddressBook', {
             address: address_,
-            label: label_,
+            label: label_, // FIXME: This field is required, but its value is ignored.
             purpose: purpose_,
             action: action_,
             updatedaddress: updatedaddress_,
