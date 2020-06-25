@@ -1281,7 +1281,7 @@ export class Zcoind {
         if (isLegacyRpcResponse(data)) {
             return data;
         } else {
-            throw new UnexpectedZcoindResponse('create/rpc', data);
+            throw new UnexpectedZcoindResponse('create/legacyRpc', data);
         }
     }
 
@@ -1474,7 +1474,7 @@ export class Zcoind {
             return data.result;
         }
 
-        throw new UnexpectedZcoindResponse('create/rpc:getaccountaddress', data);
+        throw new UnexpectedZcoindResponse('create/legacyRpc:getaccountaddress', data);
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
