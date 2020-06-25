@@ -1491,10 +1491,10 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('create/mint', data);
     }
 
-    // calcPublicTxFee and calcPrivateTxFee require an address as input despit the fact that the response is the same
-    // regardless of which address is passed. We hardcode them in here so that those functions don't have to take a
+    // calcPublicTxFee and calcPrivateTxFee require an address as input despite the fact that the response is the same
+    // regardless of which address is passed. We hardcode them here so that those functions don't have to take a
     // superfluous parameter.
-    private defaultAddress() {
+    private defaultAddress(): string {
         switch (this.zcoindNetwork) {
             case "mainnet":
                 // 40 XZC output from block 1.
