@@ -1268,7 +1268,7 @@ export class Zcoind {
             return x !== null &&
                 typeof x === 'object' &&
                 (
-                    ((x.result !== null) && (x.error === null)) ||
+                    (x.error === null) ||
                     (
                         x.result === null &&
                         typeof x.error === 'object' &&
