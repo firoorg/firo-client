@@ -587,9 +587,6 @@ export class Zcoind {
     // If this is set to true, we will connect to an existing zcoind instance (supposing -clientapi is enabled) instead
     // of resetting everything. In this case, initializers will NOT be run.
     allowMultipleZcoindInstances: boolean = false;
-    // If this is set to true, we will type check all zcoind responses. On large wallets, this may cause startup to be
-    // very slow.
-    typecheckEverything: boolean = false;
     // This is the account name that will be associated in the zcoind backend with addresses we generate with
     // getUnusedAddress.
     addressAccountName: string = 'zcoin-client';
@@ -1687,14 +1684,13 @@ export class Zcoind {
         }
     }
 
-    // Get the initial state of the wallet, which includes the information in the StateWallet interface.
+    // Calling this causes a number of address events containing information about the state of the wallet to be sent in
+    // addition to the return value here. Handlers for address events must be set *in addition* to processing the return
+    // value of this function.
+    //
+    // WARNING: THE RETURN VALUE OF THIS FUNCTION CONTAINS ONLY A SMALL PORTION OF THE REQUESTED DATA.
     async getStateWallet(): Promise<StateWallet> {
         const data = await this.send(null, 'initial', 'stateWallet', null);
-
-        if (!this.typecheckEverything) {
-            // assume zcoind has returned type-correct data.
-            return <StateWallet>data;
-        }
 
         if (isValidStateWallet(data)) {
             return data;
