@@ -1465,13 +1465,13 @@ export class Zcoind {
 
     // Get an unused address with no associated label.
     async getUnusedAddress(): Promise<string> {
-        const data = await this.legacyRpc(`getaccountaddress ${this.addressAccountName}`);
+        const data = await this.send(null, 'none', 'paymentRequestAddress', null);
 
-        if (typeof data.result === 'string') {
-            return data.result;
+        if (typeof data === 'object' && typeof data['address'] === 'string') {
+            return data['address'];
         }
 
-        throw new UnexpectedZcoindResponse('create/legacyRpc:getaccountaddress', data);
+        throw new UnexpectedZcoindResponse('none/paymentRequestAddress', data);
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
