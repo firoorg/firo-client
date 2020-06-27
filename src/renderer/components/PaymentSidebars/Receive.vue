@@ -54,7 +54,22 @@ export default {
 
     computed: mapGetters({
         paymentRequests: 'PaymentRequest/paymentRequests',
+        addresses: 'Transactions/addresses'
     }),
+
+    watch: {
+        paymentRequests() {
+            if (this.paymentRequests[this.address]) {
+                this.displayAddress();
+            }
+        },
+
+        addresses() {
+            if (this.addresses[this.address]) {
+                this.displayAddress();
+            }
+        }
+    },
 
     methods: {
         async displayAddress() {
