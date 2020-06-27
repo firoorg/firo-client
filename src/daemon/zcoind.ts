@@ -210,11 +210,12 @@ export interface TransactionOutput {
     blockHeight?: number;
     blockHash?: string;
     blockTime?: number;
-    spendable: boolean;
+    available?: boolean;
+    spendable?: boolean;
     locked?: boolean;
 }
 function isValidTransactionOutput(x: any): x is TransactionOutput {
-    return x !== null &&
+    const r = x !== null &&
         typeof x === 'object' &&
         (x.uniqId === undefined || typeof x.uniqId === 'string') &&
         typeof x.isChange === 'boolean' &&
@@ -229,8 +230,15 @@ function isValidTransactionOutput(x: any): x is TransactionOutput {
         (x.blockHeight === undefined || typeof x.blockHeight === 'number') &&
         (x.blockHash === undefined || typeof x.blockHash === 'string') &&
         (x.blockTime === undefined || typeof x.blockTime === 'number') &&
-        typeof x.spendable === 'boolean' &&
+        (x.spendable === undefined || typeof x.spendable === 'boolean') &&
+        (x.available === undefined || typeof x.available === 'boolean') &&
         (x.locked === undefined || typeof x.locked === 'boolean');
+
+    if (!r) {
+        logger.error("Invalid transaction output: %O", x);
+    }
+
+    return r;
 }
 
 export interface TransactionInput {
@@ -238,10 +246,16 @@ export interface TransactionInput {
     index: number;
 }
 function isValidTransactionInput(x: any): x is TransactionInput {
-    return x !== null &&
+    const r = x !== null &&
         typeof x === 'object' &&
         typeof x.txid === 'string' &&
         typeof x.index === 'number';
+
+    if (!r) {
+        logger.error("Invalid transaction input: %O", x);
+    }
+
+    return r;
 }
 
 export interface AddressBookItem {
@@ -251,15 +265,33 @@ export interface AddressBookItem {
 }
 
 function isValidAddressBookItem(x: any): x is AddressBookItem {
-    return x !== null &&
+    const r = x !== null &&
         typeof x === 'object' &&
         typeof x.address === 'string' &&
         typeof x.label === 'string' &&
         typeof x.purpose === 'string';
+
+    if (!r) {
+        logger.error("Invalid address book item: %O", x);
+    }
+
+    return r;
 }
 
 // This is the data format for initial/stateWallet.
 export interface StateWallet {
+    inputs?: {
+        [outpoint: string]: TransactionInput
+    },
+
+    lockedCoins?: {
+        [outpoint: string]: TransactionInput
+    },
+
+    unlockedCoins?: {
+        [outpoint: string]: TransactionInput
+    },
+
     addresses: {
         // maybeAddress could also be the string "MINT"
         [maybeAddress: string]: {
@@ -267,19 +299,7 @@ export interface StateWallet {
                 [grouping: string]: {
                     [maybeTxid: string]: TransactionOutput
                 }
-            },
-
-            inputs?: {
-                [outpoint: string]: TransactionInput
-            },
-
-            lockedCoins?: {
-                [outpoint: string]: TransactionInput
-            },
-
-            unlockedCoins?: {
-                [outpoint: string]: TransactionInput
-            },
+            }
         }
     }
 }
@@ -288,7 +308,21 @@ function isValidStateWallet(x: any): x is StateWallet {
         return false;
     }
 
-    for (const v of <any[]>Object.values(x.addresses)) {
+    if (x.inputs && !Object.values(x.inputs).find(e => !isValidTransactionInput(e))) {
+        return false;
+    }
+
+    if (x.lockedCoins && !Object.values(x.lockedCoins).find(e => !isValidTransactionInput(e))) {
+        return false;
+    }
+
+    if (x.unlockedCoins && !Object.values(x.unlockedCoins).find(isValidTransactionInput)) {
+        return false;
+    }
+
+    for (const [k, v] of <any[]>Object.entries(x.addresses)) {
+        if (['inputs', 'lockedCoins', 'unlockedCoins'].includes(k)) continue;
+
         if (v === null ||
             typeof v !== 'object' ||
             v.txids === null ||
@@ -297,24 +331,13 @@ function isValidStateWallet(x: any): x is StateWallet {
             (v.lockedCoins !== undefined && typeof v.lockedCoins !== 'object') ||
             (v.unlockedCoins !== undefined && typeof v.unlockedCoins !== 'object')) {
 
+            logger.error(`Invalid stateWallet address ${k}: ${JSON.stringify(v)}`)
             return false;
         }
 
         if (Object.values(v.txids).find(grouping =>
-            grouping === null || typeof grouping !== 'object' || Object.values(grouping).find(e => !isValidTransactionOutput(e))
+            grouping === null || typeof grouping !== 'object' || Object.values(grouping).find(e => !isValidTransactionOutput(e) && !<any>console.log(e))
         )) {
-            return false;
-        }
-
-        if (v.inputs && !Object.values(v.inputs).find(e => !isValidTransactionInput(e))) {
-            return false;
-        }
-
-        if (v.lockedCoins && !Object.values(v.lockedCoins).find(e => !isValidTransactionInput(e))) {
-            return false;
-        }
-
-        if (v.unlockedCoins && !Object.values(v.unlockedCoins).find(isValidTransactionInput)) {
             return false;
         }
     }
