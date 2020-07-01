@@ -1461,15 +1461,6 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('create/readAddressBook', data);
     }
 
-    async getZnodeList() : Promise<string> {
-        const data = await this.send('', 'initial', 'znodeList', {});
-        if (typeof data === 'string') {
-            return data;
-        }
-
-        throw new UnexpectedZcoindResponse('getZnodeList', data);
-    }
-
     async getMasternodeList() : Promise<Object> {
         const data = await this.send('', 'initial', 'masternodeList', {});
         return data;
