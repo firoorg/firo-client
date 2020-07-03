@@ -106,7 +106,7 @@ export default {
         },
 
         isMnemonicValid() {
-            return this.newWords.length === this.mnemonicLength && validateMnemonic(this.newWords.join(' '));
+            return this.newWords.length === Number(this.mnemonicLength) && validateMnemonic(this.newWords.join(' '));
         },
 
         isProtectivePassphraseValid() {
