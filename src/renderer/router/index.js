@@ -103,6 +103,11 @@ export default new Router({
                 },
 
                 {
+                    path: '/addressbook',
+                    component: require('@/components/AddressBookPage').default
+                },
+
+                {
                     path: '/znodelist',
                     component: require('@/components/ZnodePage').default
                 },
