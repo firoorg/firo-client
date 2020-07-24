@@ -567,13 +567,19 @@ export default {
         async maybeShowFee () {
             this.totalAmountExceedsBalance = false;
 
-            // The empty string for an amount won't issue a validation error, but it would be invalid to pass to zcoind.
-             if (
-                 !await this.$validator.validate('txFeePerKb') ||
-                 !await this.$validator.validate('amount') ||
-                 typeof this.txFeePerKb !== 'number' ||
-                 this.satoshiAmount === 0
-             ) {
+            try {
+                // The empty string for an amount won't issue a validation error, but it would be invalid to pass to zcoind.
+                if (
+                    !await this.$validator.validate('txFeePerKb') ||
+                    !await this.$validator.validate('amount') ||
+                    typeof this.txFeePerKb !== 'number' ||
+                    this.satoshiAmount === 0
+                ) {
+                    this.transactionFee = 0;
+                    return;
+                }
+            } catch {
+                // On startup, $validator.validate() will through an error because we're called before the page is loaded.
                 this.transactionFee = 0;
                 return;
             }

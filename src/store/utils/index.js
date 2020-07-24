@@ -3,7 +3,7 @@ import { camelCase, snakeCase } from 'lodash'
 
 export const getName = (namespace) => {
     const name = camelCase(namespace)
-    const Name = ucFirst(name)
+    const Name = name.charAt(0).toUpperCase() + name.slice(1)
     const NAME = snakeCase(namespace).toUpperCase()
 
     return {

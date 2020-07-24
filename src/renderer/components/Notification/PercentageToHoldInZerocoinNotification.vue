@@ -46,6 +46,7 @@
 <script>
 import types from '~/types'
 import { mapGetters, mapActions } from 'vuex'
+import {convertToCoin} from "#/lib/convert";
 
 import NotificationIndicator from '@/components/Notification/NotificationIndicator'
 
@@ -58,13 +59,9 @@ export default {
 
     computed: {
         ...mapGetters({
-            availableXzc: 'Balance/availableXzc',
-            confirmedXzcZerocoinRatio: 'Balance/confirmedXzcZerocoinRatio',
-            percentageToHoldInZerocoin: 'Settings/percentageToHoldInZerocoin',
             isOutOfPercentageToHoldInZerocoin: 'Settings/isOutOfPercentageToHoldInZerocoin',
             showIsOutOfPercentageToHoldInZerocoinNotification: 'Settings/showIsOutOfPercentageToHoldInZerocoinNotification',
-            remainingXzcToFulFillPercentageToHoldInZerocoin: 'Settings/remainingXzcToFulFillPercentageToHoldInZerocoin',
-            suggestedMintsToFulfillRatio: 'Settings/suggestedMintsToFulfillRatio'
+            suggestedMints: 'Settings/suggestedMints'
         })
     },
 
@@ -73,13 +70,18 @@ export default {
             markAsNotified: types.settings.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED,
         }),
 
+        // Used from a translation.
+        suggestedMintAmount() {
+            return convertToCoin(this.$store.getters['Settings/suggestedMintAmount']);
+        },
+
         fillAndRouteToMint () {
             this.markAsNotified();
 
             this.$router.push({
                 path: '/anonymize',
                 query: {
-                    coinsToMint: this.suggestedMintsToFulfillRatio
+                    coinsToMint: this.suggestedMints
                 }
             });
         }

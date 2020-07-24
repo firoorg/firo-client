@@ -45,13 +45,6 @@
                     </span>
                 </router-link>
             </li>
-            <li>
-                <router-link to="/znodelist">
-                    <span class="text">
-                        Legacy {{ $t('navigation.menu.button__znode') }}
-                    </span>
-                </router-link>
-            </li>
             <li class="has-divider">
                 <router-link to="/settings">
                     <span class="text">

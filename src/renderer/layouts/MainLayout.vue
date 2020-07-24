@@ -3,7 +3,7 @@
         <Sidebar class="aside" />
 
         <main ref="main" class="main default-tooltip-boundary">
-            <keep-alive>
+            <keep-alive exclude="AnonymizePage">
                 <router-view class="child" />
             </keep-alive>
         </main>

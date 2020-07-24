@@ -481,7 +481,7 @@ onboarding:
     title: Stay Private, Stay Flexible # test variables
     description: According to your settings you would like to keep a {percentageToHoldInZerocoin} ratio between your private and public coins. Due to recent transactions, this ratio is now out of balance.
 
-                 Therefore, we suggest to mint {remainingXzcToFulFillPercentageToHoldInZerocoin} as soon as possible. This will make sure you can spend private coins without any delays in the future.
+                 Therefore, we suggest to mint {suggestedMintAmount} as soon as possible. This will make sure you can spend private coins without any delays in the future.
     button__add-selection--primary: Restore ratio now
 
   # first-payment-received:

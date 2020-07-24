@@ -210,11 +210,12 @@ export interface TransactionOutput {
     blockHeight?: number;
     blockHash?: string;
     blockTime?: number;
-    spendable: boolean;
+    available?: boolean;
+    spendable?: boolean;
     locked?: boolean;
 }
 function isValidTransactionOutput(x: any): x is TransactionOutput {
-    return x !== null &&
+    const r = x !== null &&
         typeof x === 'object' &&
         (x.uniqId === undefined || typeof x.uniqId === 'string') &&
         typeof x.isChange === 'boolean' &&
@@ -229,8 +230,15 @@ function isValidTransactionOutput(x: any): x is TransactionOutput {
         (x.blockHeight === undefined || typeof x.blockHeight === 'number') &&
         (x.blockHash === undefined || typeof x.blockHash === 'string') &&
         (x.blockTime === undefined || typeof x.blockTime === 'number') &&
-        typeof x.spendable === 'boolean' &&
+        (x.spendable === undefined || typeof x.spendable === 'boolean') &&
+        (x.available === undefined || typeof x.available === 'boolean') &&
         (x.locked === undefined || typeof x.locked === 'boolean');
+
+    if (!r) {
+        logger.error("Invalid transaction output: %O", x);
+    }
+
+    return r;
 }
 
 export interface TransactionInput {
@@ -238,10 +246,16 @@ export interface TransactionInput {
     index: number;
 }
 function isValidTransactionInput(x: any): x is TransactionInput {
-    return x !== null &&
+    const r = x !== null &&
         typeof x === 'object' &&
         typeof x.txid === 'string' &&
         typeof x.index === 'number';
+
+    if (!r) {
+        logger.error("Invalid transaction input: %O", x);
+    }
+
+    return r;
 }
 
 export interface AddressBookItem {
@@ -251,15 +265,33 @@ export interface AddressBookItem {
 }
 
 function isValidAddressBookItem(x: any): x is AddressBookItem {
-    return x !== null &&
+    const r = x !== null &&
         typeof x === 'object' &&
         typeof x.address === 'string' &&
         typeof x.label === 'string' &&
         typeof x.purpose === 'string';
+
+    if (!r) {
+        logger.error("Invalid address book item: %O", x);
+    }
+
+    return r;
 }
 
 // This is the data format for initial/stateWallet.
 export interface StateWallet {
+    inputs?: {
+        [outpoint: string]: TransactionInput
+    },
+
+    lockedCoins?: {
+        [outpoint: string]: TransactionInput
+    },
+
+    unlockedCoins?: {
+        [outpoint: string]: TransactionInput
+    },
+
     addresses: {
         // maybeAddress could also be the string "MINT"
         [maybeAddress: string]: {
@@ -267,19 +299,7 @@ export interface StateWallet {
                 [grouping: string]: {
                     [maybeTxid: string]: TransactionOutput
                 }
-            },
-
-            inputs?: {
-                [outpoint: string]: TransactionInput
-            },
-
-            lockedCoins?: {
-                [outpoint: string]: TransactionInput
-            },
-
-            unlockedCoins?: {
-                [outpoint: string]: TransactionInput
-            },
+            }
         }
     }
 }
@@ -288,7 +308,21 @@ function isValidStateWallet(x: any): x is StateWallet {
         return false;
     }
 
-    for (const v of <any[]>Object.values(x.addresses)) {
+    if (x.inputs && !Object.values(x.inputs).find(e => !isValidTransactionInput(e))) {
+        return false;
+    }
+
+    if (x.lockedCoins && !Object.values(x.lockedCoins).find(e => !isValidTransactionInput(e))) {
+        return false;
+    }
+
+    if (x.unlockedCoins && !Object.values(x.unlockedCoins).find(isValidTransactionInput)) {
+        return false;
+    }
+
+    for (const [k, v] of <any[]>Object.entries(x.addresses)) {
+        if (['inputs', 'lockedCoins', 'unlockedCoins'].includes(k)) continue;
+
         if (v === null ||
             typeof v !== 'object' ||
             v.txids === null ||
@@ -297,24 +331,13 @@ function isValidStateWallet(x: any): x is StateWallet {
             (v.lockedCoins !== undefined && typeof v.lockedCoins !== 'object') ||
             (v.unlockedCoins !== undefined && typeof v.unlockedCoins !== 'object')) {
 
+            logger.error(`Invalid stateWallet address ${k}: ${JSON.stringify(v)}`)
             return false;
         }
 
         if (Object.values(v.txids).find(grouping =>
-            grouping === null || typeof grouping !== 'object' || Object.values(grouping).find(e => !isValidTransactionOutput(e))
+            grouping === null || typeof grouping !== 'object' || Object.values(grouping).find(e => !isValidTransactionOutput(e) && !<any>console.log(e))
         )) {
-            return false;
-        }
-
-        if (v.inputs && !Object.values(v.inputs).find(e => !isValidTransactionInput(e))) {
-            return false;
-        }
-
-        if (v.lockedCoins && !Object.values(v.lockedCoins).find(e => !isValidTransactionInput(e))) {
-            return false;
-        }
-
-        if (v.unlockedCoins && !Object.values(v.unlockedCoins).find(isValidTransactionInput)) {
             return false;
         }
     }
@@ -587,9 +610,6 @@ export class Zcoind {
     // If this is set to true, we will connect to an existing zcoind instance (supposing -clientapi is enabled) instead
     // of resetting everything. In this case, initializers will NOT be run.
     allowMultipleZcoindInstances: boolean = false;
-    // If this is set to true, we will type check all zcoind responses. On large wallets, this may cause startup to be
-    // very slow.
-    typecheckEverything: boolean = false;
     // This is the account name that will be associated in the zcoind backend with addresses we generate with
     // getUnusedAddress.
     addressAccountName: string = 'zcoin-client';
@@ -1268,7 +1288,7 @@ export class Zcoind {
             return x !== null &&
                 typeof x === 'object' &&
                 (
-                    ((x.result !== null) && (x.error === null)) ||
+                    (x.error === null) ||
                     (
                         x.result === null &&
                         typeof x.error === 'object' &&
@@ -1281,7 +1301,7 @@ export class Zcoind {
         if (isLegacyRpcResponse(data)) {
             return data;
         } else {
-            throw new UnexpectedZcoindResponse('create/rpc', data);
+            throw new UnexpectedZcoindResponse('create/legacyRpc', data);
         }
     }
 
@@ -1441,15 +1461,6 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('create/readAddressBook', data);
     }
 
-    async getZnodeList() : Promise<string> {
-        const data = await this.send('', 'initial', 'znodeList', {});
-        if (typeof data === 'string') {
-            return data;
-        }
-
-        throw new UnexpectedZcoindResponse('getZnodeList', data);
-    }
-
     async getMasternodeList() : Promise<Object> {
         const data = await this.send('', 'initial', 'masternodeList', {});
         return data;
@@ -1458,7 +1469,7 @@ export class Zcoind {
     async editAddressBook(address_: string, label_: string, purpose_: string, action_: string, updatedaddress_:string, updatedlabel_: string) : Promise<void> {
         await this.send('', 'create', 'editAddressBook', {
             address: address_,
-            label: label_,
+            label: label_, // FIXME: This field is required, but its value is ignored.
             purpose: purpose_,
             action: action_,
             updatedaddress: updatedaddress_,
@@ -1468,13 +1479,13 @@ export class Zcoind {
 
     // Get an unused address with no associated label.
     async getUnusedAddress(): Promise<string> {
-        const data = await this.legacyRpc(`getaccountaddress ${this.addressAccountName}`);
+        const data = await this.send(null, 'none', 'paymentRequestAddress', null);
 
-        if (typeof data.result === 'string') {
-            return data.result;
+        if (typeof data === 'object' && typeof data['address'] === 'string') {
+            return data['address'];
         }
 
-        throw new UnexpectedZcoindResponse('create/rpc:getaccountaddress', data);
+        throw new UnexpectedZcoindResponse('none/paymentRequestAddress', data);
     }
 
     // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
@@ -1491,10 +1502,10 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('create/mint', data);
     }
 
-    // calcPublicTxFee and calcPrivateTxFee require an address as input despit the fact that the response is the same
-    // regardless of which address is passed. We hardcode them in here so that those functions don't have to take a
+    // calcPublicTxFee and calcPrivateTxFee require an address as input despite the fact that the response is the same
+    // regardless of which address is passed. We hardcode them here so that those functions don't have to take a
     // superfluous parameter.
-    private defaultAddress() {
+    private defaultAddress(): string {
         switch (this.zcoindNetwork) {
             case "mainnet":
                 // 40 XZC output from block 1.
@@ -1687,14 +1698,13 @@ export class Zcoind {
         }
     }
 
-    // Get the initial state of the wallet, which includes the information in the StateWallet interface.
+    // Calling this causes a number of address events containing information about the state of the wallet to be sent in
+    // addition to the return value here. Handlers for address events must be set *in addition* to processing the return
+    // value of this function.
+    //
+    // WARNING: THE RETURN VALUE OF THIS FUNCTION CONTAINS ONLY A SMALL PORTION OF THE REQUESTED DATA.
     async getStateWallet(): Promise<StateWallet> {
         const data = await this.send(null, 'initial', 'stateWallet', null);
-
-        if (!this.typecheckEverything) {
-            // assume zcoind has returned type-correct data.
-            return <StateWallet>data;
-        }
 
         if (isValidStateWallet(data)) {
             return data;

@@ -73,6 +73,8 @@ const getters = {
     availableZerocoin: (state) => state.zerocoin.confirmed,
     unconfirmedZerocoin: (state) => state.zerocoin.unconfirmed,
     confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total,
+    xzcZerocoinRatio: (state, getters) =>
+        (getters.availableZerocoin + getters.unconfirmedZerocoin) / (getters.availableXzc + getters.unconfirmedXzc),
     unspentMints: (state) => state.unspentMints,
 
     // This is the maximum amount (in satoshi) that we can send privately. Consensus limits prohibit private

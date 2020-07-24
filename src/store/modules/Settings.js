@@ -210,14 +210,12 @@ const getters = {
             rootGetters['Blockchain/isBlockchainSynced']
     },
     showWarning: (state) => state.showWarning,
-    remainingXzcToFulFillPercentageToHoldInZerocoin (state, getters, rootState, rootGetters) {
-        return Math.floor((rootGetters['Balance/availableXzc'] * (state.percentageToHoldInZerocoin - rootGetters['Balance/confirmedXzcZerocoinRatio'])) / 100000000)
+    suggestedMintAmount (state, getters, rootState, rootGetters) {
+        const x = (rootGetters['Balance/availableXzc'] * (state.percentageToHoldInZerocoin - rootGetters['Balance/confirmedXzcZerocoinRatio']));
+        return x - x % 5e6;
     },
-
-    suggestedMintsToFulfillRatio (state, getters) {
-        const { toMint } = getDenominationsToMint(getters.remainingXzcToFulFillPercentageToHoldInZerocoin)
-
-        return toMint
+    suggestedMints (state, getters) {
+        return getDenominationsToMint(getters.suggestedMintAmount)
     },
     b58Prefixes (state, getters, rootState, rootGetters) {
         const network = rootGetters['ApiStatus/network']

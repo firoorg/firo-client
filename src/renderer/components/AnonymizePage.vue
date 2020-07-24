@@ -450,7 +450,7 @@ export default {
                     this.$router.push({
                         path: '/anonymize',
                         query: {
-                            coinsToMint: getDenominationsToMint(this.autoMintAmount).toMint
+                            coinsToMint: getDenominationsToMint(this.autoMintAmount * 1e8)
                         }
                     });
                 }, 50);

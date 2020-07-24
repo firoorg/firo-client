@@ -34,8 +34,26 @@ export const mutations = {
 }
 
 export const getters = {
-    currentBlockHeight: (state) => state.currentBlock.height,
-    currentBlockTimestamp: (state) => state.currentBlock.timestamp,
+    currentBlockHeight: (state) => state.currentBlock ? state.currentBlock.height : 0,
+    currentBlockTimestamp: (state, getters, rootState, rootGetters) => {
+        if (state.currentBlock && state.currentBlock.height) {
+            return state.currentBlock.timestamp;
+        }
+
+        // If the current block hasn't been loaded yet, use a hardcoded value set to the first Zcoin block mined.
+        switch (rootGetters['App/zcoinClientNetwork']) {
+            case 'mainnet':
+                // Sep 28, 2016 7:00:13 AM
+                return 1475046013;
+
+            case 'test':
+                // Oct 10, 2018 3:19:09 PM
+                return 1539159549;
+
+            case 'regtest':
+                return 0;
+        }
+    },
     status: (state) => state.status || {},
     isSynced: (state, getters) => getters.status.isSynced,
     isBlockchainSynced: (state, getters, rootState, rootGetters) => getters.status.isBlockchainSynced || rootGetters['ApiStatus/network'] === 'regtest',

@@ -15,7 +15,5 @@ export async function initialize(store: any, zcoind: Zcoind) {
 
     const data = await zcoind.getMasternodeList();
     console.log("Got initial masternode list data:", data);
-    for(const mn of Object.values(data)) {
-        store.dispatch('Masternode/updateMasternode', mn);
-    }
+    store.dispatch('Masternode/updateMasternodeList', Object.values(data));
 }
