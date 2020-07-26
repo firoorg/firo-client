@@ -1111,7 +1111,7 @@ export class Zcoind {
             return;
         }
 
-        logger.debug("zcoind sent us a subscription event for topic %s: %O", topic, parsedMessage);
+        logger.silly("zcoind sent us a subscription event for topic %s: %O", topic, parsedMessage);
 
         if (parsedMessage.meta.status !== 200) {
             logger.error("zcoind sent us an event for topic %s with a non-200 status: %O", topic, parsedMessage);

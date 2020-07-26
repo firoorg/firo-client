@@ -142,7 +142,7 @@ export default {
                 }
 
                 if (!tx.address) {
-                    this.$log.error(`transaction ${id} with no associated address`);
+                    this.$log.silly(`transaction ${id} with no associated address`);
                     continue;
                 }
 

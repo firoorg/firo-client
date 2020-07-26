@@ -15,7 +15,7 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.Console({
-            level: 'debug',
+            level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'debug',
             handleExceptions: true
         }),
         new winston.transports.File({
