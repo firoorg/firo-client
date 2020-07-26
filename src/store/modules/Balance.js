@@ -1,3 +1,4 @@
+import { fromPairs } from 'lodash'
 import { createLogger } from '#/lib/logger'
 import { convertToSatoshi } from "#/lib/convert";
 
@@ -75,27 +76,26 @@ const getters = {
     confirmedXzcZerocoinRatio: (state, getters) => getters.availableZerocoin / getters.total,
     xzcZerocoinRatio: (state, getters) =>
         (getters.availableZerocoin + getters.unconfirmedZerocoin) / (getters.availableXzc + getters.unconfirmedXzc),
-    unspentMints: (state) => state.unspentMints,
+    unspentMints: (state) => fromPairs(Object.entries(state.unspentMints).map(([k, v]) => [convertToSatoshi(k), v])),
 
     // This is the maximum amount (in satoshi) that we can send privately. Consensus limits prohibit private
     // transactions spending over 500 XZC, and transactions with over 35 private inputs.
-    maxPrivateSend: (state) => {
+    maxPrivateSend: (state, getters) => {
         // Sort denominations from highest to lowest.
-        const denominations = Object.keys(state.unspentMints).sort((a, b) => Number(b) - Number(a));
+        const denominations = Object.keys(getters.unspentMints).sort((a, b) => b - a);
 
         let maxPrivateSend = 0;
         let inputsRemaining = 35;
 
         for (const denomination of denominations) {
-            const value = convertToSatoshi(denomination);
-            const amount = state.unspentMints[denomination].confirmed || 0;
+            const amount = getters.unspentMints[denomination].confirmed || 0;
 
             if (inputsRemaining <= amount) {
-                maxPrivateSend += value * inputsRemaining;
+                maxPrivateSend += denomination * inputsRemaining;
                 break
             }
 
-            maxPrivateSend += value * amount;
+            maxPrivateSend += denomination * amount;
             inputsRemaining -= amount;
 
             if (inputsRemaining <= 0) {

@@ -243,7 +243,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { fromPairs } from 'lodash';
+import { mapGetters } from 'vuex';
 import { getDenominationsToMint, convertToSatoshi, convertToCoin } from "#/lib/convert";
 import { IncorrectPassphrase, ZcoindErrorResponse } from "#/daemon/zcoind";
 
@@ -311,8 +312,9 @@ export default {
             passphrase: '',
             mintAmount: 0,
             mintFees: 0,
-            // {[denomination: string]: number}
-            coinsToMint: this.$route.query.coinsToMint || {},
+
+            // {[denomination: number]: number}
+            coinsToMint: fromPairs(Object.entries(this.$route.query.coinsToMint || {}).map(([k,v]) => [Number(k), v])),
 
             autoMintAmount: 0
         }
@@ -419,7 +421,7 @@ export default {
             this.recalculatePopoverPosition();
 
             try {
-                await $daemon.mintZerocoin(passphrase, this.coinsToMint);
+                await $daemon.mintZerocoin(passphrase, fromPairs(Object.entries(this.coinsToMint).map(([k,v]) => [convertToCoin(k), v])));
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
                     this.beginIncorrectPassphraseStep();
@@ -443,14 +445,14 @@ export default {
 
         autoMint() {
             if (this.autoMintAmount && !this.validationErrors.items.length) {
-                // This is a horrible, evil hack because Vue Router doesn't allow links to the current page, and
-                // changing our whole architecture is too much trouble. I guess this should be FIXME,
-                //  but I don't really see a great solution, so meh.
+                console.log(getDenominationsToMint(convertToSatoshi(this.autoMintAmount)));
+                // FIXME: This is a horrible, evil hack because Vue Router doesn't allow links to the current page, and
+                //        changing our whole architecture is too much trouble.
                 setTimeout(() => {
                     this.$router.push({
                         path: '/anonymize',
                         query: {
-                            coinsToMint: getDenominationsToMint(this.autoMintAmount * 1e8)
+                            coinsToMint: getDenominationsToMint(convertToSatoshi(this.autoMintAmount))
                         }
                     });
                 }, 50);

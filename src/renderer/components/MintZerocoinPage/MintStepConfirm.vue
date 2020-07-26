@@ -44,7 +44,7 @@ export default {
         },
 
         mints: {
-            // {[denomination: string]: number}
+            // {[denomination: number]: number}
             type: Object,
             required: true
         }

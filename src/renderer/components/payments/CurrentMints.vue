@@ -1,7 +1,8 @@
 <template>
     <ul class="mints">
         <li
-            v-for="[denomination, amount] in denominations"
+            v-for="[denomination, amount] of Object.entries(currentMints)"
+            v-if="amount > 0"
             :key="denomination"
         >
             <div class="amount">
@@ -10,10 +11,10 @@
             <div class="label">
                 <div>
                     <span class="name">
-                        Mint {{ denomination }}
+                        Mint {{ convertToCoin(denomination) }}
                     </span>
                     <span class="cost">
-                        {{ Number(denomination) * amount }} <span class="unit">
+                        {{ convertToCoin(denomination * amount) }} <span class="unit">
                             xzc
                         </span>
                     </span>
@@ -24,6 +25,8 @@
 </template>
 
 <script>
+import {convertToCoin} from "#/lib/convert";
+
 export default {
     name: 'CurrentMints',
 
@@ -38,12 +41,8 @@ export default {
         }
     },
 
-    computed: {
-        denominations () {
-            return Object.entries(this.currentMints)
-                .filter(([denomination, amount]) => amount > 0)
-                .sort(([d1, a1], [d2, a2]) => Number(d1) - Number(d2));
-        }
+    methods: {
+        convertToCoin
     }
 }
 </script>

@@ -46,24 +46,24 @@ export const convertToSatoshi = function (base) {
     }
 }
 
-// Get the maximum amount of denominations we can mint from a given amount of satoshis. Our output, but NOT input, is in
-// whole XZC.
+// Get the maximum amount of denominations we can mint from a given amount of satoshis. Both our output and input are in
+// satoshis.
 export function getDenominationsToMint(amount) {
-    // We MUST be floats representable in two's complement in descending order, and our smallest value MUST exceed FEE.
-    const DENOMINATIONS = [100, 25, 10, 1, 0.5, 0.1, 0.05];
-    const FEE = 1e5; // 0.001 XZC
+    // We MUST be listed in descending order.
+    const DENOMINATIONS = [100e8, 25e8, 10e8, 1e8, 0.5e8, 0.1e8, 0.05e8];
+    const FEE = 0.001e8;
 
     let remaining = amount;
     const toMint = {};
 
     for (const denomination of DENOMINATIONS) {
-        toMint[denomination] = ~~(remaining / denomination / 1e8);
-        remaining = remaining % (denomination * 1e8) - (toMint[denomination] * FEE);
+        toMint[denomination] = ~~(remaining / denomination);
+        remaining = remaining % denomination - (toMint[denomination] * FEE);
 
         if (remaining < 0) {
             // If remaining < 0, toMint[denomination] will be >= 1.
             toMint[denomination] = toMint[denomination] - 1;
-            remaining += denomination * 1e8;
+            remaining += denomination;
         }
     }
 
