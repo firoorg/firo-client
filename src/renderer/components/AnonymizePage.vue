@@ -445,7 +445,6 @@ export default {
 
         autoMint() {
             if (this.autoMintAmount && !this.validationErrors.items.length) {
-                console.log(getDenominationsToMint(convertToSatoshi(this.autoMintAmount)));
                 // FIXME: This is a horrible, evil hack because Vue Router doesn't allow links to the current page, and
                 //        changing our whole architecture is too much trouble.
                 setTimeout(() => {
