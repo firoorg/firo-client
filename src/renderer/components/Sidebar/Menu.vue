@@ -38,6 +38,13 @@
                     </span>
                 </router-link>
             </li>
+            <li>
+                <router-link to="/transactions">
+                    <span class="text">
+                        Transactions
+                    </span>
+                </router-link>
+            </li>
             <li class ="has-divider">
                 <router-link to="/znodes">
                     <span class="text">

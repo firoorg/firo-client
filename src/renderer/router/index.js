@@ -108,6 +108,11 @@ export default new Router({
                 },
 
                 {
+                    path: '/transactions',
+                    component: require('@/components/TransactionHistoryPage').default
+                },
+
+                {
                     path: '/znodelist',
                     component: require('@/components/ZnodePage').default
                 },
