@@ -71,7 +71,7 @@ export default {
 
                 if (!list[key]) {
                     list[key] = {
-                        denomination: Number(convertToCoin(amount)),
+                        denomination: convertToCoin(amount),
                         eta: eta,
                         tx: {}
                     }

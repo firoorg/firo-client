@@ -25,7 +25,7 @@
                     {{ existingValue }}
                 </span>
             </div>
-            <label>{{ denomination }}</label>
+            <label>{{ convertToCoin(denomination) }}</label>
         </div>
         <div class="buttons">
             <base-round-button
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { convertToSatoshi } from "#/lib/convert";
+import { convertToCoin } from "#/lib/convert";
 import { mapGetters } from "vuex";
 
 export default {
@@ -53,7 +53,7 @@ export default {
 
     props: {
         denomination: {
-            type: String,
+            type: Number,
             required: true
         },
 
@@ -119,7 +119,7 @@ export default {
 
         canIncrease() {
             // Relevant fees are already calculated by the parent component.
-            return !this.disabled && convertToSatoshi(this.denomination) <= this.availableBalanceRemaining;
+            return !this.disabled && this.denomination <= this.availableBalanceRemaining;
         },
 
         canDecrease() {
@@ -146,6 +146,8 @@ export default {
     },
 
     methods: {
+        convertToCoin,
+
         tryIncrease() {
             if (this.canIncrease) {
                 this.increase();

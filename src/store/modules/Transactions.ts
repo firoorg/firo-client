@@ -43,7 +43,7 @@ const mutations = {
                         if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
                             // Delete previous records associated with the transaction.
                             if (stateTransactions[tx.uniqId]) {
-                                logger.info(`Got orphan ${tx.uniqId}, deleting associated records.`);
+                                logger.silly(`Got orphan ${tx.uniqId}, deleting associated records.`);
                                 delete stateTransactions[tx.uniqId];
                                 delete stateUnspentUTXOs[tx.uniqId];
                                 stateAddresses[tx.address] = stateAddresses[tx.address].filter(id => id !== tx.uniqId);
@@ -155,7 +155,7 @@ const actions = {
             return;
         }
 
-        logger.info("1s has passed since the last stateWallet update. Beginning batch-processing.");
+        logger.debug("1s has passed since the last stateWallet update. Beginning batch-processing.");
 
         // fixme: addCachedStateWallet calls are asynchronous, but mergedInitialStateWallet depends on the order of
         //        elements in cachedInitialStateWallet for properly detecting orphaned or reorganised transactions. In
@@ -173,24 +173,24 @@ const actions = {
             setInterval(() => dispatch('maybeDoStateWallet'), 300);
         }
 
-        logger.info("Adding more items to the initialStateWallet cache...");
+        logger.silly("Adding more items to the initialStateWallet cache...");
         cachedInitialStateWallets.push(initialStateWallet);
         lastStateWalletTime = (new Date()).getTime();
     },
 
     // We're called by stateWallet (in initialize).
     setWalletState({dispatch, rootGetters}, initialStateWallet: StateWallet) {
-        logger.info('setWalletState');
+        logger.silly('setWalletState');
         dispatch('addCachedStateWallet', initialStateWallet);
     },
 
     handleTransactionEvent({dispatch, rootGetters}, transactionEvent: TransactionEvent) {
-        logger.info('handleTransactionEvent');
+        logger.silly('handleTransactionEvent');
         dispatch('addCachedStateWallet', {addresses: transactionEvent});
     },
     
     handleAddressEvent({dispatch, rootGetters}, addressEvent: AddressEvent) {
-        logger.info('handleAddressEvent');
+        logger.silly('handleAddressEvent');
         dispatch('addCachedStateWallet', addressEvent)
     },
 
