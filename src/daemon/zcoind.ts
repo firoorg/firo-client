@@ -1211,7 +1211,12 @@ export class Zcoind {
                     return;
                 }
 
-                logger.debug(`received reply from zcoind for ${callName}: %O`, message);
+                if (messageString.length > 1024) {
+                    logger.debug(`received reply from zcoind for ${callName}: <%d bytes>`, messageString.length);
+                    logger.silly(`content of %d byte reply to ${callName}: %O`, messageString.length, message);
+                } else {
+                    logger.debug(`received reply from zcoind for ${callName}: %O`, message);
+                }
 
                 if (isZcoindResponseMessage(message)) {
                     if (message.meta.status === 200) {
