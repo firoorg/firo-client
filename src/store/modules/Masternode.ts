@@ -23,7 +23,6 @@ const mutations = {
 
 const actions = {
     updateMasternode({commit, rootGetters}, mn: MasternodeEvent) {
-        logger.info('updateMasternode:', mn);
         commit('updateMasternode', mn);
     },
     updateMasternodeList({commit, rootGetters}, mnList: Array<MasternodeEvent>) {
