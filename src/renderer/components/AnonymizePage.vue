@@ -24,22 +24,7 @@
                             v-if="!availableXzc"
                             class="onboarding"
                         >
-                            <template slot="header">
-                                <h3>{{ $t('onboarding.make-request-first.mint.title') }}</h3>
-                            </template>
-                            <template slot="content">
-                                <i18n
-                                    path="onboarding.make-request-first.mint.description"
-                                    tag="p"
-                                >
-                                    <router-link
-                                        to="/receive"
-                                        place="linkToCreatePaymentRequest"
-                                    >
-                                        {{ $t('onboarding.make-request-first.mint.button__linkToCreatePaymentRequest') }}
-                                    </router-link>
-                                </i18n>
-                            </template>
+                            You don't seem to have have any XZC available. :(
                         </onboarding-notice>
                         <mint-stats v-else />
                     </transition>

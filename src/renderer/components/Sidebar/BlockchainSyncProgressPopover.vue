@@ -3,34 +3,14 @@
         <template v-if="!isBlockchainSynced">
             <h3>{{ $t('navigation.flyout-blockchain-sync-progress.title') }}</h3>
             <p>
-                <i18n
-                    path="navigation.flyout-blockchain-sync-progress.label__blocks-processed"
-                    tag="span"
-                >
-                    <span place="blockAmount">
-                        <strong>{{ currentBlockHeight }}</strong>
-                    </span>
-                </i18n>
-                <i18n
-                    path="navigation.flyout-blockchain-sync-progress.label__blocks-timestamp"
-                    tag="span"
-                >
-                    <span place="blockTimeago">
-                        <timeago
-                            :datetime="currentBlockTimestamp * 1000"
-                            :auto-update="10"
-                        />
-                    </span>
-                </i18n>
-                <!--
-                <i18n path="navigation.flyout-blockchain-sync-progress.label__estimated-time-until-synced" tag="span">
-                    <span place="estimatedTimestamp">
-                        <timeago
-                            :datetime="estimatedTimeUntilSynced"
-                            :auto-update="30" />
-                    </span>
-                </i18n>
-                -->
+                <span>
+                    <strong>Proceaaed {{ currentBlockHeight }} blocks of transaction history so far.</strong>
+                </span>
+
+                <span>
+                  The last block received was generated
+                  <timeago :datetime="currentBlockTimestamp * 1000" :auto-update="10" />.
+                </span>
             </p>
             <p>
                 <strong>{{ $t('navigation.flyout-blockchain-sync-progress.label__blocks-not-visible') }}</strong>
