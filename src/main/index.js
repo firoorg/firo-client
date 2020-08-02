@@ -47,7 +47,11 @@ app.once('ready', async () => {
         height: 780,
         width: 1400,
         minWidth: 1200,
-        minHeight: 450
+        minHeight: 450,
+        webPreferences: {
+            nodeIntegration: true,
+            enableRemoteModule: true
+        }
     });
 
     // Fire the shutdown-requested listener in renderer/main.js when the user tries to close us.
