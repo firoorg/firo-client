@@ -70,7 +70,6 @@ export default {
             !this.dontShowMnemonicWarning
           );
         } catch (e) {
-          console.log(e);
         }
       }
       this.$emit("close-mnemonic-warning");

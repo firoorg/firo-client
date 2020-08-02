@@ -152,7 +152,6 @@ export default {
             if (this.currentIndex >= this.stepKeys.length - 1) {
                 return false
             }
-            console.log('NextStep:', this.stepKeys[this.currentIndex + 1]);
             this.$emit('step-change', this.stepKeys[this.currentIndex + 1], this.currentStep)
             return true
         },
@@ -171,7 +170,6 @@ export default {
             if (!this.steps[stepKey]) {
                 return false
             }
-            console.log('currentStep:', this.currentStep);
 
             this.$emit('step-change', stepKey, this.currentStep)
             return true

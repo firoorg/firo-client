@@ -702,7 +702,6 @@ export default {
         },
 
         async openAddressBook() {
-            console.log('Addressbook:', this.addressBook);
             if (!this.addressBook || Object.keys(this.addressBook).length == 0) {
                 const ab = await $daemon.readAddressBook();
                 this.$store.dispatch('Transactions/setAddressBook', ab);

@@ -195,7 +195,6 @@ export default {
   },
   created() {
     for (const [address, item] of Object.entries(this.addressBook)) {
-      console.log("tabledata:", item);
       if (
         this.openAddressBook.purpose == "unknown" ||
         this.openAddressBook.purpose.toLowerCase() == item.purpose.toLowerCase()
@@ -248,7 +247,6 @@ export default {
       this.showDeleteAddressConfirm = false;
       if (!data.updated) return;
       try {
-        console.log("deleting address:", data.address);
         await $daemon.editAddressBook(
           data.address,
           data.label,
@@ -262,14 +260,12 @@ export default {
         this.rows.splice(index, 1);
         this.$refs.vuetable.reload();
       } catch (e) {
-        console.log(e);
       }
     },
 
     //data:{updated: bool, oldaddress, oldlabel, newaddress, newlabel, purpose}
     async closeEditAddressBook(data) {
       this.showEditAddressBook = false;
-      console.log("closeEditAddressBook:", data);
       if (!data.updated) return; //cancel
       if (data.oldaddress === "") {
         //add new address

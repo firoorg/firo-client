@@ -262,7 +262,6 @@ export default {
         },
 
         async closeMnemonicDialog() {
-            console.log('closing');
             this.showMnemonicSetting = false;
         },
 
@@ -297,7 +296,6 @@ export default {
         },
 
         openMnemonicSettings() {
-            console.log('hasMnemonic:', this.hasMnemonic);
             this.showMnemonicSetting = true;
         },
 

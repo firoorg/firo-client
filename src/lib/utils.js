@@ -62,14 +62,12 @@ class AppSettings {
 
                     regKey.values((err, regItems) => {
                         if (err) {
-                            console.log(`Error: ${err}`)
                             reject(err);
                             return;
                         }
 
                         const result = {};
                         for (const regItem of regItems) {
-                            console.log(`found Windows registry entry: ${regItem.key}/${regItem.name}: ${regItem.value}`);
                             try {
                                 result[regItem.name] = JSON.parse(regItem.value);
                             } catch(e) {
@@ -159,7 +157,6 @@ class AppSettings {
                 // Creating the key even if it exists is fine.
                 regKey.create(async (err) => {
                     if (err) {
-                        console.log(`Error creating registry key: ${err}`);
                         reject(err);
                         release();
                     }
@@ -167,11 +164,9 @@ class AppSettings {
                     // Empty string represents the default value.
                     regKey.set(key, 'REG_SZ', JSON.stringify(value), (err) => {
                         if (err) {
-                            console.log(`Error setting setting ${key} to ${value}`);
                             reject(err);
                             release();
                         } else {
-                            console.log(`Set setting setting ${key} to ${value}`);
                             resolve(undefined);
                             release();
                         }
