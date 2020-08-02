@@ -118,13 +118,6 @@
                     <div class="buttons">
                         <div class="backup button">
                             <h2>Backup</h2>
-                            <input
-                                ref="backupDirectory"
-                                type="file"
-                                hidden
-                                webkitdirectory
-                                @change="doBackup"
-                            />
 
                             <v-popover
                                 :open="popoverStep !== 'initial'"
@@ -279,17 +272,19 @@ export default {
             this.openPassphrasePopover = false;
         },
 
-        openBackupDialog() {
-            this.$refs.backupDirectory.click();
-        },
+        async openBackupDialog() {
+            const selected = await remote.dialog.showOpenDialog({
+                title: "Select Backup File Directory",
+                buttonLabel: "Select Backup File Directory",
+                properties: [
+                    'createDirectory',
+                    'openDirectory'
+                ]
+            });
 
-        openMnemonicSettings() {
-            console.log('hasMnemonic:', this.hasMnemonic);
-            this.showMnemonicSetting = true;
-        },
+            const backupDirectory = selected.filePaths[0];
+            if (!backupDirectory) return;
 
-        async doBackup() {
-            let backupDirectory = this.$refs.backupDirectory.files[0].path;
             this.popoverStep = 'wait';
 
             try {
@@ -299,6 +294,11 @@ export default {
                 this.errorMessage = (e.error && e.error.message) ? e.error.message : String(e);
                 this.popoverStep = 'error';
             }
+        },
+
+        openMnemonicSettings() {
+            console.log('hasMnemonic:', this.hasMnemonic);
+            this.showMnemonicSetting = true;
         },
 
         closePopover() {
