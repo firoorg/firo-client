@@ -948,9 +948,11 @@ export class Zcoind {
         logger.info("Connecting to zcoind...")
         this.statusPublisherSocket = new zmq.Subscriber();
 
-        for await (const [msg] of this.statusPublisherSocket) {
-            await this.gotApiStatus(msg.toString());
-        }
+        new Promise(async () => {
+            for await (const [topicBuffer, msgBuffer] of this.statusPublisherSocket) {
+                await this.gotApiStatus(msgBuffer.toString());
+            }
+        });
 
         this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
         this.subscribeToApiStatus();
@@ -1083,10 +1085,11 @@ export class Zcoind {
             this.publisherSocket.subscribe(topic);
         }
 
-
-        for await (const [topicBuffer, messageBuffer] of this.publisherSocket) {
-            this.handleSubscriptionEvent(topicBuffer.toString(), messageBuffer.toString());
-        }
+        new Promise(async () => {
+            for await (const [topicBuffer, messageBuffer] of this.publisherSocket) {
+                this.handleSubscriptionEvent(topicBuffer.toString(), messageBuffer.toString());
+            }
+        });
 
         await this.hasConnectedEWH.release(undefined);
     }
@@ -1189,7 +1192,7 @@ export class Zcoind {
                 return;
             }
 
-            this.requesterSocket.receive().then(messageBuffer => {
+            this.requesterSocket.receive().then(([messageBuffer]) => {
                 const messageString = messageBuffer.toString();
 
                 let message;
