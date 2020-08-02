@@ -70,7 +70,7 @@ Vue.config.productionTip = false
 
 // automatically registering BaseComponents as Component (stripping of Base)
 const requireComponent = require.context('./components', true, /Base[A-Z]\w+\.(vue|js)$/)
-requireComponent.keys().forEach(fileName => {
+for (const fileName of requireComponent.keys()) {
     // Get component config
     const componentConfig = requireComponent(fileName)
 
@@ -90,7 +90,7 @@ requireComponent.keys().forEach(fileName => {
         // otherwise fall back to module's root.
         componentConfig.default || componentConfig
     )
-})
+}
 
 // Allow global access to the store and router.
 window.$store = store;
@@ -132,7 +132,7 @@ window.$quitApp = async (message=undefined) => {
     app.exit();
 
     // Execution may momentarily resume, so wait forever to avoid giving control back to the caller awaiting us.
-    await new Promise(r=>undefined);
+    await new Promise(_=>_);
 }
 
 // This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
@@ -164,7 +164,7 @@ router.afterEach((to) => {
 });
 
 // Handle zcoin:// links on Windows.
-app.on('second-instance', (event, commandLine, workingDirectory) => {
+app.on('second-instance', (event, commandLine) => {
     // Someone tried to run a second instance, we should focus our window.
     if (ourWindow.isMinimized()) {
         ourWindow.restore();
@@ -194,8 +194,8 @@ app.on('open-url', (event, url) => {
     const m = (pattern) => (url.match(pattern) || [])[1];
 
     const address = m(/^zcoin:\/\/(\w+)/);
-    const amount = m(/[\?&]amount=([0-9]+)/);
-    const label = m(/[\?&]message=([^&]+)/);
+    const amount = m(/[?&]amount=([0-9]+)/);
+    const label = m(/[?&]message=([^&]+)/);
 
     router.push({
         path: '/send/private',

@@ -72,11 +72,10 @@ app.once('ready', async () => {
 
     if (process.env.NODE_ENV === 'development') {
         logger.info("Loading development environment at localhost:9080...");
-        ourWindow.loadURL("http://localhost:9080/");
-    }
-    else {
+        await ourWindow.loadURL("http://localhost:9080/");
+    } else {
         const indexDotHtml = join(__dirname, 'index.html');
         logger.info(`Loading production environment at ${indexDotHtml}...`);
-        ourWindow.loadFile(indexDotHtml);
+        await ourWindow.loadFile(indexDotHtml);
     }
 });
