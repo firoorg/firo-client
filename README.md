@@ -74,6 +74,11 @@ If you want to reinitialize the client and don't want to use the `resetclientcon
 can set the enviornment variable `REINITIALIZE_ZCOIN_CLIENT` to `true`. If this is set, Zcoin Client will show the setup
 screen on startup regardless of whether it has already been initialized.
 
+### Connecting to an Existing Zcoind
+
+If you want to allow the client to connect to an existing instance of zcoind, you can set the environment variable
+`ALLOW_EXISTING_ZCOIND` to `true`. Note that the existing zcoind instance will be shut down when the client exits.
+
 ## Getting Assistance
 
 If you need assistance with this project, you can join the official Zcoin Telegram group

@@ -226,7 +226,8 @@ window.$startDaemon = () => new Promise(resolve => {
     $setWaitingReason("Starting up zcoind...");
     zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'],
         store.getters['App/blockchainLocation'] || null, undefined,
-        store.getters['App/zcoindHasStarted'] && process.env.NODE_ENV === "development")
+        (store.getters['App/zcoindHasStarted'] && process.env.NODE_ENV === "development") || process.env.ALLOW_EXISTING_ZCOIND === "true",
+        !store.getters['App/zcoindHasStarted'] && process.env.ALLOW_EXISTING_ZCOIND === "true")
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;

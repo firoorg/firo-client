@@ -608,8 +608,11 @@ export class Zcoind {
     readonly zcoindDataDir: string;
 
     // If this is set to true, we will connect to an existing zcoind instance (supposing -clientapi is enabled) instead
-    // of resetting everything. In this case, initializers will NOT be run.
+    // of resetting everything. In this case, initializers will NOT be run (unless runInitializersIfZcoindIsRunning is
+    // set).
     allowMultipleZcoindInstances: boolean = false;
+    // If this is set to true, when we connect to a running zcoind instance, we WILL run initializers.
+    runInitializersIfZcoindIsRunning: boolean = false;
 
     // zcoindLocation is the location of the zcoind binary.
     //
@@ -687,11 +690,10 @@ export class Zcoind {
 
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
         // a fairly small  window anyway,
-        if (await this.isZcoindListening()) {
-            if (!this.allowMultipleZcoindInstances) {
-                throw new ZcoindAlreadyRunning();
-            }
-
+        const isZcoindListening = await this.isZcoindListening();
+        if (isZcoindListening && !this.allowMultipleZcoindInstances) {
+            throw new ZcoindAlreadyRunning();
+        } else if (isZcoindListening && !this.runInitializersIfZcoindIsRunning) {
             this.awaitHasConnected().then(async () => {
                 await this.initializersCompletedEWH.release(undefined);
             });
