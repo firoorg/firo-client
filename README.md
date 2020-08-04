@@ -79,6 +79,11 @@ screen on startup regardless of whether it has already been initialized.
 If you want to allow the client to connect to an existing instance of zcoind, you can set the environment variable
 `ALLOW_EXISTING_ZCOIND` to `true`. Note that the existing zcoind instance will be shut down when the client exits.
 
+### Zcoind Connection Timeout
+
+By default, if zcoind fails to start within 30 seconds, Zcoin Client will timeout. This value can be changed with by
+setting the environment variable `ZCOIND_CONNECTION_TIMEOUT` to the number of seconds you want to change the timeout to.
+
 ## Getting Assistance
 
 If you need assistance with this project, you can join the official Zcoin Telegram group

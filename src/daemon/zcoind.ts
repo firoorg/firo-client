@@ -613,6 +613,8 @@ export class Zcoind {
     allowMultipleZcoindInstances: boolean = false;
     // If this is set to true, when we connect to a running zcoind instance, we WILL run initializers.
     runInitializersIfZcoindIsRunning: boolean = false;
+    // This is the number of seconds to wait before signalling zcoind as unresponsive.
+    connectionTimeout: number = 30;
 
     // zcoindLocation is the location of the zcoind binary.
     //
@@ -913,12 +915,12 @@ export class Zcoind {
         await new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (!finished) {
-                    logger.error("zcoind has not opened it ports after 30 seconds");
+                    logger.error("zcoind has not opened it ports after %s seconds", this.connectionTimeout);
                     finished = true;
                 }
 
-                reject(new ZcoindConnectionTimeout(30));
-            }, 30_000);
+                reject(new ZcoindConnectionTimeout(this.connectionTimeout));
+            }, this.connectionTimeout * 1000);
 
             this.awaitZcoindListening().then(() => {
                 if (!finished) {
