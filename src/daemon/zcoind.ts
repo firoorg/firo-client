@@ -944,11 +944,6 @@ export class Zcoind {
             await this.zcoindHasShutdown.release(false);
         });
 
-        logger.info("Setting a watcher to see if zcoind unexpectedly dies...");
-        this.awaitZcoindNotListening().then(async () => {
-            // TODO
-        })
-
         logger.info("Connecting to zcoind...")
         this.statusPublisherSocket = new zmq.Subscriber();
 
