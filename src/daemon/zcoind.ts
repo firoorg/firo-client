@@ -693,13 +693,16 @@ export class Zcoind {
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
         // a fairly small  window anyway,
         const isZcoindListening = await this.isZcoindListening();
+
         if (isZcoindListening && !this.allowMultipleZcoindInstances) {
             throw new ZcoindAlreadyRunning();
-        } else if (isZcoindListening && !this.runInitializersIfZcoindIsRunning) {
-            this.awaitHasConnected().then(async () => {
-                await this.initializersCompletedEWH.release(undefined);
-            });
-        } else {
+        }
+
+        if (!isZcoindListening) {
+            await this.launchDaemon(mnemonicSettings);
+        }
+
+        if (!isZcoindListening || this.runInitializersIfZcoindIsRunning) {
             this.awaitHasConnected().then(async () => {
                 const initializerPromises = this.initializers.map(initializer => initializer(this));
                 const rejections = [];
@@ -718,8 +721,10 @@ export class Zcoind {
                     await this.initializersCompletedEWH.release(undefined);
                 }
             });
-
-            await this.launchDaemon(mnemonicSettings);
+        } else {
+            this.awaitHasConnected().then(async () => {
+                await this.initializersCompletedEWH.release(undefined);
+            });
         }
 
         await this.connectAndReact();
