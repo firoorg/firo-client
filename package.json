@@ -12,6 +12,7 @@
   "scripts": {
     "build": "npm install && node electron-vue/build.js && electron-builder build -mlw",
     "dev": "clear; DEBUG=zcoin:* node $NODE_DEBUG_OPTION electron-vue/dev-runner.js",
+    "test": "mocha -r ts-node/register 'tests/**/*.ts'",
     "utils:rebuild-zeromq": "VERSION=$(echo $npm_package_devDependencies_electron | sed 's/\\^//g'); npm rebuild zeromq --runtime=electron --target=${VERSION}",
     "postinstall": "npm run utils:rebuild-zeromq"
   },
@@ -149,6 +150,7 @@
     "@babel/preset-env": "^7.11.0",
     "@babel/register": "^7.10.5",
     "@babel/runtime": "^7.11.0",
+    "@types/mocha": "^8.0.1",
     "babel-loader": "^8.1.0",
     "babel-minify-webpack-plugin": "^0.3.1",
     "babel-plugin-istanbul": "^5.2.0",
@@ -187,6 +189,7 @@
     "spectron": "^11.1.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.2.2",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.7",
     "url-loader": "^1.1.2",
     "vue-devtools": "^5.1.4",
