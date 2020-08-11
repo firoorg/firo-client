@@ -1,24 +1,14 @@
-'use strict'
-
 process.env.BABEL_ENV = 'renderer'
 
 const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
-const MinifyWebpackPlugin = require('babel-minify-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 
-/**
- * List of node_modules to include in webpack bundle
- *
- * Required for specific packages like Vue UI libraries
- * that provide pure *.vue files that need compiling
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
- */
+// This is the list of node_modules that will be included in our webpack bundle
 let whiteListedModules = [
     'vue',
     'vue-lottie',
@@ -27,12 +17,13 @@ let whiteListedModules = [
 
 let rendererConfig = {
     devtool: '#cheap-module-eval-source-map',
+
     entry: {
         renderer: path.join(__dirname, '../src/renderer/main.js')
     },
-    externals: [
-        ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
-    ],
+
+    externals: Object.keys(dependencies).filter(d => !whiteListedModules.includes(d)),
+
     module: {
         rules: [
             {
@@ -177,16 +168,6 @@ let rendererConfig = {
     target: 'electron-renderer'
 }
 
-/**
- * Adjust rendererConfig for development settings
- */
-if (process.env.NODE_ENV !== 'production') {
-    rendererConfig.plugins.push(
-        new webpack.DefinePlugin({
-            '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-        })
-    )
-}
 
 /**
  * Adjust rendererConfig for production settings
@@ -195,14 +176,6 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = ''
 
     rendererConfig.plugins.push(
-        //new MinifyWebpackPlugin(),
-        new CopyWebpackPlugin([
-            {
-                from: path.join(__dirname, '../static'),
-                to: path.join(__dirname, '../dist/electron/static'),
-                ignore: ['.*']
-            }
-        ]),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
         }),

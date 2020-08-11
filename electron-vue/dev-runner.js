@@ -1,9 +1,5 @@
-'use strict'
-
-const chalk = require('chalk')
 const electron = require('electron')
 const path = require('path')
-const { say } = require('cfonts')
 const { spawn } = require('child_process')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
@@ -12,41 +8,12 @@ const webpackHotMiddleware = require('webpack-hot-middleware')
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
 
-let electronProcess = null
-let manualRestart = false
-let hotMiddleware
-
-function logStats (proc, data) {
-  let log = ''
-
-  log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`)
-  log += '\n\n'
-
-  if (typeof data === 'object') {
-    data.toString({
-      colors: true,
-      chunks: false
-    }).split(/\r?\n/).forEach(line => {
-      log += '  ' + line + '\n'
-    })
-  } else {
-    log += `  ${data}\n`
-  }
-
-  log += '\n' + chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`) + '\n'
-
-  console.log(log)
-}
+rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer)
+rendererConfig.mode = 'development'
 
 function startRenderer () {
   return new Promise((resolve, reject) => {
-    rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer)
-    rendererConfig.mode = 'development'
     const compiler = webpack(rendererConfig)
-    hotMiddleware = webpackHotMiddleware(compiler, {
-      log: false,
-      heartbeat: 2500
-    })
 
     compiler.hooks.compilation.tap('compilation', compilation => {
       compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
@@ -57,6 +24,12 @@ function startRenderer () {
 
     compiler.hooks.done.tap('done', stats => {
       logStats('Renderer', stats)
+    })
+
+
+    let hotMiddleware = webpackHotMiddleware(compiler, {
+      log: true,
+      heartbeat: 2500
     })
 
     const server = new WebpackDevServer(

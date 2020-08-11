@@ -8,14 +8,6 @@ import store from '../store/main'
 
 const logger = createLogger('zcoin:main')
 
-/**
- * Set `__static` path to static files in production
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
- */
-if (process.env.NODE_ENV !== 'development') {
-    global.__static = join(__dirname, 'static').replace(/\\/g, '\\\\')
-}
-
 // We don't want multiple copies of our application running.
 if (!app.requestSingleInstanceLock()) {
     // The second-instance handler will be fired automatically.
