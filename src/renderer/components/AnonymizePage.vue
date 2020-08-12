@@ -37,7 +37,7 @@
                         <input
                             id="autoMintAmount"
                             v-model="autoMintAmount"
-                            v-validate.initial="'amountIsWithinAvailableBalance|amountIsValid'"
+                            v-validate.initial="'amountIsWithinAvailableBalance|min_value:0'"
                             v-tooltip="getValidationTooltip('autoMintAmount')"
                             name="autoMintAmount"
                             class="automint-input"
@@ -343,12 +343,6 @@ export default {
             // this.availableXzc will still be reactively updated.
             getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableXzc),
             validate: (value) => convertToSatoshi(value) <= this.availableXzc
-        });
-
-        this.$validator.extend('amountIsValid', {
-            // this.availableXzc will still be reactively updated.
-            getMessage: () => 'Amount Must Be a Positive Multiple of 0.05',
-            validate: (value) => 1 / (convertToSatoshi(value) % 5e6) === Infinity
         });
     },
 
