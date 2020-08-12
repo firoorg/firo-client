@@ -321,7 +321,7 @@ export default {
             const m = input.match(/^\s*(\w+)\s*(.*)$/);
 
             let output;
-            if (this.clientCommands[m[1]]) {
+            if (m && this.clientCommands[m[1]]) {
                 output = await this.clientCommands[m[1]].cmd(m[2]);
             } else {
                 output = await this.legacyRpc(input);
