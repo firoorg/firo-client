@@ -179,13 +179,12 @@ export interface ApiStatus {
         modules: {
             [moduleName: string]: boolean;
         };
-        Znode: {
+        Znode?: {
             localCount: number;
             totalCount: number;
             enabledCount: number;
         };
         hasMnemonic: boolean;
-
     };
     meta: {
         status: number;

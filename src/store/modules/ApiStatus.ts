@@ -31,11 +31,11 @@ const getters = {
     isReindexing: (state): boolean => state.apiStatus && state.apiStatus.data && state.apiStatus.data.reindexing,
     API: (state): boolean => state.apiStatus && state.apiStatus.data && state.apiStatus.data.modules && state.apiStatus.data.modules.API,
     // We will return 0 if apiStatus hasn't yet loaded.
-    localZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.Znode.localCount : 0,
+    localZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.Znode) ? state.apiStatus.data.Znode.localCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
-    totalZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.Znode.totalCount : 0,
+    totalZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.Znode) ? state.apiStatus.data.Znode.totalCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
-    enabledZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.Znode.enabledCount : 0
+    enabledZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.Znode) ? state.apiStatus.data.Znode.enabledCount : 0
 };
 
 export default {
