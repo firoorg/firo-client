@@ -5,7 +5,7 @@
     >
         <div class="sidebar">
             <div class="logo">
-                <router-link to="/">
+                <router-link to="/main">
                     <svg viewBox="0 0 633 200">
                         <linearGradient
                             id="green-gradient"
