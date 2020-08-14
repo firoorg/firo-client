@@ -14,7 +14,6 @@
             :fields="tableFields"
             track-by="id"
             no-data-message="No Transactions made yet."
-            :on-row-select="onTableRowSelect"
             :sort-order="sortOrder"
             :compare-elements="compareTransactions"
             :per-page="13"
@@ -37,7 +36,7 @@ const tableFields = [
     {
         name: RelativeDate,
         title: 'Date',
-        dateField: 'data',
+        dateField: 'date',
         sortField: 'date',
         width: '25%'
     },
@@ -54,7 +53,7 @@ const tableFields = [
         width: '25%'
     },
     {
-        name: "amount",
+        name: Amount,
         title: 'send.table__outgoing-payments.label__amount',
         sortField: 'amount',
         width: '25%'
@@ -95,6 +94,7 @@ export default {
 
             handler() {
                 this.newTableData = this.latestTableData;
+                console.log("Read table")
                 if (this.currentPage === 1) {
                     this.reloadTable();
                 }
@@ -106,6 +106,8 @@ export default {
         ...mapGetters({
             transactions: 'Transactions/transactions',
             addressBook: "Transactions/addressBook",
+            paymentRequests: 'PaymentRequest/paymentRequests',
+            consolidatedMints: 'Transactions/consolidatedMints',
         }),
 
         latestTableData () {
@@ -152,27 +154,30 @@ export default {
                     extraSearchText = 'Znode Payment';
                     break
                 }
-
+                console.log('tx:', tx.blockTime)
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction-info/${id}`,
                     txid: tx.txid,
                     type: tx.category,
+                    category: tx.category,
                     blockHeight: tx.blockHeight,
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
                     label:
                         tx.label ||
-                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
+                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined) || extraSearchText,
                     extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
                 });
+                console.log("added")
             }
 
             for (const [blockHeight, mintInfo] of Object.entries(this.consolidatedMints)) {
                 tableData.push({
                     id: `/mint-info/${blockHeight}`,
                     type: 'mint',
+                    category: 'mint',
                     blockHeight: blockHeight,
                     date: mintInfo.blockTime * 1000 || Infinity,
                     amount: mintInfo.totalMintAmount,
@@ -197,6 +202,7 @@ export default {
                     // id is the path of the detail route for the payment request.
                     id: `/payment-request/${pr.address}`,
                     type: 'payment-request',
+                    category: 'payment-request',
                     blockHeight: null,
                     date: pr.createdAt,
                     amount: pr.amount,

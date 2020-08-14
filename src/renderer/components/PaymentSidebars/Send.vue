@@ -341,7 +341,7 @@ import SendStepComplete from './SendSteps/Complete';
 import CircularTimer from "@/components/Icons/CircularTimer";
 
 import {IncorrectPassphrase, ZcoindErrorResponse} from '#/daemon/zcoind';
-import {isValidAddress} from '#/lib/isValidAddress';
+import {isValidAddress, isValidPaymentCode} from '#/lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from '#/lib/convert';
 import types from "~/types";
 
@@ -523,7 +523,7 @@ export default {
 
         this.$validator.extend('zcoinAddress', {
             getMessage: () => 'Invalid Zcoin Address',
-            validate: (value) => isValidAddress(value, this.network)
+            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value)
         });
 
         this.$validator.extend('amountIsWithinAvailableBalance', {

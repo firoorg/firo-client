@@ -1,11 +1,11 @@
 <template>
-    <section class="tx-history-page">
-        <div class="window-height history-page-window">
+    <section class="addressbook-page">
+        <div class="window-height addressbook-page-window">
             <section
                 v-scrollable
-                class="tx-history-list-container"
+                class="addressbook-container"
             >
-                <transaction-list />
+              <receive-list />
             </section>
         </div>
     </section>
@@ -14,13 +14,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import TransactionList from '@/components/TransactionList';
+import ReceiveList from '@/components/ReceiveList';
 
 export default {
-    name: 'TransactionHistoryPage',
+    name: 'AddressBookPage',
 
     components: {
-        TransactionList,
+        ReceiveList,
     },
     data() {
         return {
@@ -41,7 +41,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .tx-history-page {
+    .addressbook-page {
         display: grid;
         box-sizing: border-box;
 
@@ -54,13 +54,13 @@ export default {
         }
     }
 
-    .tx-history-list-container {
+    .addressbook-container {
         padding: emRhythm(5) emRhythm(4);
         box-sizing: border-box;
         height: 100%;
     }
 
-    .history-page-window{
+    .addressbook-page-window{
         position: relative
     }
 </style>

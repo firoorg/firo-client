@@ -71,11 +71,6 @@ export default new Router({
                         },
 
                         {
-                            path: '/receive',
-                            component: require('@/components/PaymentSidebars/Receive').default
-                        },
-
-                        {
                             path: '/payment-request/:uniqId',
                             component: require('@/components/PaymentSidebars/PaymentRequest').default
                         },
@@ -90,6 +85,11 @@ export default new Router({
                             component: require('@/components/PaymentSidebars/MintInfo').default
                         }
                     ]
+                },
+
+                {
+                    path: '/receive',
+                    component: require('@/components/ReceivePage').default
                 },
 
                 {

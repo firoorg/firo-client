@@ -13,4 +13,12 @@ export async function initialize(store: any, zcoind: Zcoind) {
     while (!store.getters['Transactions/walletLoaded']) {
         await new Promise(r => setTimeout(r, 500));
     }
+
+    //load address book
+    const ab = await zcoind.readAddressBook();
+    await store.dispatch('Transactions/setAddressBook', ab);
+
+    //load payment codes
+    const pcs = await zcoind.getPaymentCodes();
+    await store.dispatch('Transactions/setPaymentCodes', pcs);
 }

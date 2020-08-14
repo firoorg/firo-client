@@ -1,5 +1,5 @@
 import {cloneDeep, merge} from 'lodash';
-import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/zcoind';
+import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem, PaymentCodeItem} from '../../daemon/zcoind';
 
 import { createLogger } from '../../lib/logger'
 const logger = createLogger('zcoin:store:Transactions');
@@ -13,7 +13,8 @@ const state = {
     addresses: <{[address: string]: string[]}>{},
     unspentUTXOs: <{[txidAndIndex:string]:boolean}>{},
     addressBook: <{[address: string]: AddressBookItem}>{},
-    walletLoaded: false
+    walletLoaded: false,
+    paymentCodes: <{[label: string]: string}>{},
 };
 
 const mutations = {
@@ -129,6 +130,13 @@ const mutations = {
         state.addressBook = {...state.addressBook};
     },
 
+    setPaymentCodes(state, pcs: PaymentCodeItem[]) {
+        pcs.forEach(e => {
+            state.paymentCodes[e.label] = e.paymentcode;
+        })
+        state.paymentCodes = {...state.paymentCodes};
+    },
+
     deleteAddressItem(state, address: string) {
         delete state.addressBook[address];
         state.addressBook = {...state.addressBook};
@@ -211,6 +219,10 @@ const actions = {
         commit('setAddressBook', addressBook_);
     },
 
+    setPaymentCodes({commit, rootGetters}, pcs: PaymentCodeItem[]) {
+        commit('setPaymentCodes', pcs);
+    },
+
     deleteAddressItem({commit, rootGetters}, address:string) {
         commit('deleteAddressItem', address);
     },
@@ -226,6 +238,7 @@ const getters = {
     unspentUTXOs: (state) => state.unspentUTXOs,
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
+    paymentCodes: (state) => state.paymentCodes,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,

@@ -264,6 +264,11 @@ export interface AddressBookItem {
     purpose: string;
 }
 
+export interface PaymentCodeItem {
+    label: string;
+    paymentcode: string;
+}
+
 function isValidAddressBookItem(x: any): x is AddressBookItem {
     const r = x !== null &&
         typeof x === 'object' &&
@@ -1459,6 +1464,24 @@ export class Zcoind {
         }
 
         throw new UnexpectedZcoindResponse('create/readAddressBook', data);
+    }
+
+    async getPaymentCodes() : Promise<string[]> {
+        const data = await this.send('', 'create', 'getPaymentCodes', {});
+        if (data instanceof Array) {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('create/getPaymentCodes', data);
+    }
+
+    async createNewAddress(isRegular: boolean) : Promise<string> {
+        const data = await this.send('', 'create', 'createNewAddress', {isregular: isRegular});
+        if (typeof data === 'string') {
+            return data;
+        }
+
+        throw new UnexpectedZcoindResponse('create/createNewAddress', data);
     }
 
     async getMasternodeList() : Promise<Object> {

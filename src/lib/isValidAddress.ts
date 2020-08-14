@@ -1,6 +1,7 @@
 const shajs = require('sha.js');
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 const bs58 = require('base-x')(BASE58);
+const base58Check = require('base58check');
 
 const ADDRESS_PREFIXES = {
     main: {
@@ -50,4 +51,21 @@ export function isValidAddress(address: string, network: 'test' | 'main' | 'regt
         .slice(0, 4);
 
     return [0, 1, 2, 3].every((i) => checksum[i] === calculatedChecksum[i]);
+}
+
+export function isValidPaymentCode(pc: string): boolean {
+    let pcData;
+    try {
+        pcData = base58Check.decode(pcData);
+    } catch(e) {
+        return false;
+    }
+    if (pcData.prefix[0] != 0x47) {
+        return false;
+    }
+    let pubkey = pcData.data.slice(2, 35);
+    if (pubkey[0] != 2 && pubkey[0] != 3) {
+        return false;
+    }
+    return true;
 }
