@@ -235,6 +235,8 @@ export default {
       var ret = "";
       if (this.addressBook[this.selectedAddress]) {
         ret = this.addressBook[this.selectedAddress].label;
+      } else if (this.paymentCodes[this.selectedAddress]) {
+        ret = this.paymentCodes[this.selectedAddress]
       }
       if (ret == "") {
         return "(unlabelled)";
@@ -252,11 +254,11 @@ export default {
 
     paymentCodeTableData() {
       var data = [];
-      for (const label of Object.keys(this.paymentCodes)) {
+      for (const paymentcode of Object.keys(this.paymentCodes)) {
         data.push({
-          label: label,
-          shortAddress: this.shortenAddress(this.paymentCodes[label]),
-          address: this.paymentCodes[label],
+          label: this.paymentCodes[paymentcode],
+          shortAddress: this.shortenAddress(paymentcode),
+          address: paymentcode,
         });
       }
       return data;
@@ -391,8 +393,14 @@ export default {
     onRowClass(dataItem, index) {
       return dataItem.isOverdue ? "color-red" : "color-white";
     },
-    createNewAddress() {
-      console.log("createNewAddress");
+    async createNewAddress() {
+      if (this.isRegularAddressSelected) {
+        //
+      } else {
+        var newPaymentCode = await $daemon.createNewPaymentCode();
+        console.log('newL:', newPaymentCode)
+        await this.$store.dispatch('Transactions/setPaymentCodes', newPaymentCode);
+      }
     },
     onRowClick(row) {
       if (this.selectedAddress != row.address) {

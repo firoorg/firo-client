@@ -1475,13 +1475,9 @@ export class Zcoind {
         throw new UnexpectedZcoindResponse('create/getPaymentCodes', data);
     }
 
-    async createNewAddress(isRegular: boolean) : Promise<string> {
-        const data = await this.send('', 'create', 'createNewAddress', {isregular: isRegular});
-        if (typeof data === 'string') {
-            return data;
-        }
-
-        throw new UnexpectedZcoindResponse('create/createNewAddress', data);
+    async createNewPaymentCode() : Promise<Object> {
+        const data = await this.send('', 'create', 'createNewPaymentCode', {});
+        return data;
     }
 
     async getMasternodeList() : Promise<Object> {

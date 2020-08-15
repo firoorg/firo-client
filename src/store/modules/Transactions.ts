@@ -132,7 +132,7 @@ const mutations = {
 
     setPaymentCodes(state, pcs: PaymentCodeItem[]) {
         pcs.forEach(e => {
-            state.paymentCodes[e.label] = e.paymentcode;
+            state.paymentCodes[e.paymentcode] = e.label;
         })
         state.paymentCodes = {...state.paymentCodes};
     },
