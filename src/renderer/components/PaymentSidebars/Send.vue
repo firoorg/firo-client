@@ -522,7 +522,7 @@ export default {
         // Set up VeeValidator rules.
 
         this.$validator.extend('zcoinAddress', {
-            getMessage: () => 'Invalid Zcoin Address',
+            getMessage: () => 'Invalid Zcoin Regular/RAP Address',
             validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value)
         });
 

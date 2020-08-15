@@ -56,8 +56,9 @@ export function isValidAddress(address: string, network: 'test' | 'main' | 'regt
 export function isValidPaymentCode(pc: string): boolean {
     let pcData;
     try {
-        pcData = base58Check.decode(pcData);
+        pcData = base58Check.decode(pc);
     } catch(e) {
+        console.log("cannot decode")
         return false;
     }
     if (pcData.prefix[0] != 0x47) {
