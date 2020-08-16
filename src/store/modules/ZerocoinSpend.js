@@ -1,12 +1,12 @@
 import Vue from 'vue'
-import * as types from '~/types/ZerocoinSpend'
-import allTypes from '~/types'
-import { formatDenominationPairs } from '~/utils'
+import * as types from 'store/types/ZerocoinSpend'
+import allTypes from 'store/types'
+import { formatDenominationPairs } from 'store/utils'
 
-import IsLoading from '~/mixins/IsLoading'
-import Response from '~/mixins/Response'
+import IsLoading from 'store/mixins/IsLoading'
+import Response from 'store/mixins/Response'
 
-import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+import { convertToCoin, convertToSatoshi } from 'lib/convert'
 
 const isLoading = IsLoading.module('')
 const spendZerocoinResponse = Response.module('spend zerocoin')

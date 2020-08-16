@@ -14,7 +14,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import EvoZnodesPage from '@/components/EvoZnodesPage';
+import EvoZnodesPage from 'renderer/components/EvoZnodesPage';
 
 export default {
     name: 'EvoZnodesContainer',

@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {generateMnemonic} from "#/daemon/zcoind";
+import {generateMnemonic} from "daemon/zcoind";
 
 export default {
     name: 'SelectCreateOrRestore',

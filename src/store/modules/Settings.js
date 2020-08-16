@@ -1,10 +1,10 @@
 import { format } from 'util'
 
 import * as types from '../types/Settings'
-import { getApp, getAppSettings } from '#/lib/utils'
+import { getApp, getAppSettings } from 'lib/utils'
 
-import { convertToSatoshi, getDenominationsToMintSubtractingFee } from '#/lib/convert'
-import { createLogger } from '#/lib/logger'
+import { convertToSatoshi, getDenominationsToMintSubtractingFee } from 'lib/convert'
+import { createLogger } from 'lib/logger'
 
 const logger = createLogger('zcoin:store:settings')
 

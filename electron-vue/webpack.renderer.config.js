@@ -158,11 +158,9 @@ let rendererConfig = {
     },
     resolve: {
         alias: {
-            '@': path.join(__dirname, '../src/renderer'),
-            '~': path.join(__dirname, '../src/store'),
-            '#': path.join(__dirname, '../src'),
             'vue$': 'vue/dist/vue.esm.js'
         },
+        modules: ['src', 'node_modules'].map(x => path.join(__dirname, '..', x)),
         extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts']
     },
     target: 'electron-renderer'

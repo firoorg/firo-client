@@ -28,12 +28,12 @@
 </template>
 
 <script>
-import AutoCloseMixin from '@/mixins/AutoCloseMixin'
-import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
+import AutoCloseMixin from 'renderer/mixins/AutoCloseMixin'
+import TranslationNamespaceMixin from 'renderer/mixins/TranslationNamespaceMixin'
 
-import SendError from '@/components/Icons/SendError'
-import SuccessfullySend from '@/components/Icons/SucessfullySend'
-import MintStarted from '@/components/Icons/MintStarted'
+import SendError from 'renderer/components/Icons/SendError'
+import SuccessfullySend from 'renderer/components/Icons/SucessfullySend'
+import MintStarted from 'renderer/components/Icons/MintStarted'
 
 export default {
     name: 'StepResponseStatus',

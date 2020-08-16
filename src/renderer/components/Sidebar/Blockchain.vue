@@ -103,12 +103,12 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import LoadingBounce from '@/components/Icons/LoadingBounce'
-import TickIcon from '@/components/Icons/TickIcon'
+import LoadingBounce from 'renderer/components/Icons/LoadingBounce'
+import TickIcon from 'renderer/components/Icons/TickIcon'
 
-import BlockchainConnectionPopover from '@/components/Sidebar/BlockchainConnectionPopover'
-import BlockchainSyncProgressPopover from '@/components/Sidebar/BlockchainSyncProgressPopover'
-import CircularBadge from '@/components/Badge/CircularBadge'
+import BlockchainConnectionPopover from 'renderer/components/Sidebar/BlockchainConnectionPopover'
+import BlockchainSyncProgressPopover from 'renderer/components/Sidebar/BlockchainSyncProgressPopover'
+import CircularBadge from 'renderer/components/Badge/CircularBadge'
 
 export default {
     name: 'Blockchain',

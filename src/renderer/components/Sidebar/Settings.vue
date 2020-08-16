@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { addVuexModel } from '@/utils/store'
+import { addVuexModel } from 'renderer/utils/store'
 
 export default {
     name: 'Settings',

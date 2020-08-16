@@ -74,7 +74,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import MyZnode from '@/components/ZnodePage/MyZnode'
+import MyZnode from 'renderer/components/ZnodePage/MyZnode'
 import LoadingBounce from "./Icons/LoadingBounce";
 
 export default {

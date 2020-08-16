@@ -1,6 +1,6 @@
 import { join } from 'path'
 import winston from 'winston'
-import { getApp } from '#/lib/utils'
+import { getApp } from 'lib/utils'
 
 const logger = winston.createLogger({
     level: 'debug',

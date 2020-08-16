@@ -7,58 +7,58 @@ export default new Router({
     routes: [
         {
             path: '/setup',
-            component: require('@/layouts/SetupLayout').default,
+            component: require('renderer/layouts/SetupLayout').default,
             children: [
                 {
                     path: 'welcome',
-                    component: require('@/components/Setup/Welcome').default
+                    component: require('renderer/components/Setup/Welcome').default
                 },
 
                 {
                     path: 'select-blockchain-location',
-                    component: require('@/components/Setup/SelectBlockchainLocation').default
+                    component: require('renderer/components/Setup/SelectBlockchainLocation').default
                 },
 
                 {
                     path: 'select-create-or-restore',
-                    component: require('@/components/Setup/SelectCreateOrRestore').default
+                    component: require('renderer/components/Setup/SelectCreateOrRestore').default
                 },
 
                 {
                     path: 'write-down-mnemonic',
-                    component: require('@/components/Setup/WriteDownMnemonic').default
+                    component: require('renderer/components/Setup/WriteDownMnemonic').default
                 },
 
                 {
                     path: 'confirm-mnemonic',
-                    component: require('@/components/Setup/ConfirmMnemonic').default
+                    component: require('renderer/components/Setup/ConfirmMnemonic').default
                 },
 
                 {
                     path: 'recover-from-mnemonic',
-                    component: require('@/components/Setup/RecoverFromMnemonic').default
+                    component: require('renderer/components/Setup/RecoverFromMnemonic').default
                 },
 
                 {
                     path: 'lock-wallet',
-                    component: require('@/components/Setup/LockWallet').default
+                    component: require('renderer/components/Setup/LockWallet').default
                 }
             ]
         },
 
         {
             path: '/main',
-            component: require('@/layouts/MainLayout').default,
+            component: require('renderer/layouts/MainLayout').default,
             // fixme: It would be cleaner if we started pointing to / instead of /main.
             redirect: '/receive',
             children: [
                 {
                     path: 'transaction-page',
-                    component: require('@/components/PaymentsPage').default,
+                    component: require('renderer/components/PaymentsPage').default,
                     children: [
                         {
                             path: '/send',
-                            component: require('@/components/PaymentSidebars/Send').default,
+                            component: require('renderer/components/PaymentSidebars/Send').default,
                             children: [
                                 {
                                     path: 'private'
@@ -72,49 +72,49 @@ export default new Router({
 
                         {
                             path: '/receive',
-                            component: require('@/components/PaymentSidebars/Receive').default
+                            component: require('renderer/components/PaymentSidebars/Receive').default
                         },
 
                         {
                             path: '/payment-request/:uniqId',
-                            component: require('@/components/PaymentSidebars/PaymentRequest').default
+                            component: require('renderer/components/PaymentSidebars/PaymentRequest').default
                         },
 
                         {
                             path: '/transaction-info/:uniqId',
-                            component: require('@/components/PaymentSidebars/TransactionInfo').default
+                            component: require('renderer/components/PaymentSidebars/TransactionInfo').default
                         },
 
                         {
                             path: '/mint-info/:blockHeight',
-                            component: require('@/components/PaymentSidebars/MintInfo').default
+                            component: require('renderer/components/PaymentSidebars/MintInfo').default
                         }
                     ]
                 },
 
                 {
                     path: '/anonymize',
-                    component: require('@/components/AnonymizePage').default
+                    component: require('renderer/components/AnonymizePage').default
                 },
 
                 {
                     path: '/znodes',
-                    component: require('@/components/EvoZnodesContainer').default
+                    component: require('renderer/components/EvoZnodesContainer').default
                 },
 
                 {
                     path: '/znodelist',
-                    component: require('@/components/ZnodePage').default
+                    component: require('renderer/components/ZnodePage').default
                 },
 
                 {
                     path: '/settings',
-                    component: require('@/components/SettingsPage').default
+                    component: require('renderer/components/SettingsPage').default
                 },
 
                 {
                     path: '/debugconsole',
-                    component: require('@/components/DebugPage').default
+                    component: require('renderer/components/DebugPage').default
                 }
             ]
         }

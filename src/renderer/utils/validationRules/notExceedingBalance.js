@@ -1,5 +1,5 @@
 import { Validator } from 'vee-validate'
-import { convertToSatoshi, convertToCoin } from '#/lib/convert'
+import { convertToSatoshi, convertToCoin } from 'lib/convert'
 
 Validator.extend('not_exceeding_balance', {
     getMessage: (field, { limit }) => {

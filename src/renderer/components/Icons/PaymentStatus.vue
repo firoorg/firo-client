@@ -12,8 +12,8 @@
 
 <script>
 import Lottie from 'vue-lottie'
-// import animationData from '@/assets/animations/pending-to-check-v3.json'
-import animationData from '@/assets/animations/payment-states.json'
+// import animationData from 'renderer/assets/animations/pending-to-check-v3.json'
+import animationData from 'renderer/assets/animations/payment-states.json'
 
 export default {
     name: 'PaymentStatus',

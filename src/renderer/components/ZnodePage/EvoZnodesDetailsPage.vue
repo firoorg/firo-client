@@ -47,8 +47,8 @@
 <script>
 import { mapGetters } from "vuex";
 import Vue from "vue";
-import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
-import { convertToSatoshi, convertToCoin } from "#/lib/convert";
+import AnimatedTablePagination from "renderer/components/AnimatedTable/AnimatedTablePagination";
+import { convertToSatoshi, convertToCoin } from "lib/convert";
 
 export default {
   name: "EvoZnodesDetailsPage",

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import Denomination from '@/components/Denomination'
+import Denomination from 'renderer/components/Denomination'
 
 export default {
     name: 'DenominationSelector',

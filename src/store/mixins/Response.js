@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import { getName, getTypeName } from '~/utils'
-import { createLogger } from '#/lib/logger'
+import { getName, getTypeName } from 'store/utils'
+import { createLogger } from 'lib/logger'
 
 const logger = createLogger('zcoin:store:mixins:response')
 

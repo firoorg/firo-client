@@ -38,12 +38,10 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 
-import types from '~/types'
-
-import TickIcon from '@/components/Icons/TickIcon'
-import LoadingBounce from '@/components/Icons/LoadingBounce'
+import TickIcon from 'renderer/components/Icons/TickIcon'
+import LoadingBounce from 'renderer/components/Icons/LoadingBounce'
 import EditableLabelPopoverContent from './EditableLabelPopoverContent'
-import EditIcon from '@/components/Icons/EditIcon'
+import EditIcon from 'renderer/components/Icons/EditIcon'
 
 export default {
     name: 'EditableLabel',

@@ -6,7 +6,7 @@
 
 <script>
 import Lottie from 'vue-lottie'
-import animationData from '@/assets/animations/outgoing-payment-error.json'
+import animationData from 'renderer/assets/animations/outgoing-payment-error.json'
 
 export default {
     name: 'SendError',

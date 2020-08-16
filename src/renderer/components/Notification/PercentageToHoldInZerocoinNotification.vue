@@ -44,11 +44,10 @@
 </template>
 
 <script>
-import types from '~/types'
 import { mapGetters, mapActions } from 'vuex'
-import {convertToCoin} from "#/lib/convert";
+import {convertToCoin} from "lib/convert";
 
-import NotificationIndicator from '@/components/Notification/NotificationIndicator'
+import NotificationIndicator from 'renderer/components/Notification/NotificationIndicator'
 
 export default {
     name: 'PercentageToHoldInZerocoinNotification',
@@ -67,7 +66,7 @@ export default {
 
     methods: {
         ...mapActions({
-            markAsNotified: types.settings.MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED,
+            markAsNotified: 'Settings/MARK_PERCENTAGE_TO_HOLD_IN_ZEROCOIN_AS_NOTIFIED'
         }),
 
         // Used from a translation.

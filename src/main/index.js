@@ -1,7 +1,7 @@
 import {app, BrowserWindow, Menu} from 'electron'
-import { createLogger } from '#/lib/logger'
+import { createLogger } from 'lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
-import { setupLocales } from '#/lib/i18n'
+import { setupLocales } from 'lib/i18n'
 import {join} from 'path'
 import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'

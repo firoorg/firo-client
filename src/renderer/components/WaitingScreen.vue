@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import LoadingBounce from '@/components/Icons/LoadingBounce';
-import ZcoinLogo from '@/components/Icons/ZcoinLogo';
+import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
+import ZcoinLogo from 'renderer/components/Icons/ZcoinLogo';
 
 export default {
     name: "WaitingScreen",

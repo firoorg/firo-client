@@ -5,7 +5,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import modules from './modules'
 
-import { createLogger } from '#/lib/logger'
+import { createLogger } from 'lib/logger'
 
 const logger = createLogger('zcoin:store:main')
 

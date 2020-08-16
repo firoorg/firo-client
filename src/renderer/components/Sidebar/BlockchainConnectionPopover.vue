@@ -37,9 +37,9 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import CircularBadge from '@/components/Badge/CircularBadge'
-import TickIcon from '@/components/Icons/TickIcon'
-import CrossIcon from '@/components//Icons/CrossIcon'
+import CircularBadge from 'renderer/components/Badge/CircularBadge'
+import TickIcon from 'renderer/components/Icons/TickIcon'
+import CrossIcon from 'renderer/components//Icons/CrossIcon'
 
 export default {
     name: 'BlockchainConnectionPopover',

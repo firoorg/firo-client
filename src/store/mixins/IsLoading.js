@@ -1,4 +1,4 @@
-import { getName, getTypeName } from '~/utils'
+import { getName, getTypeName } from 'store/utils'
 
 const tn = getTypeName
 

@@ -82,12 +82,12 @@ import Vue from "vue";
 import { Vuetable } from "vuetable-2";
 import _ from "lodash";
 import EvoZnodesDetailsPage from "./ZnodePage/EvoZnodesDetailsPage.vue";
-import ZnodeStatusGreen from "@/components//Icons/ZnodeStatusGreen";
-import ZnodeStatusRed from "@/components//Icons/ZnodeStatusRed";
-import ZnodeCollapseButton from "@/components//Icons/ZnodeCollapseButton";
-import ZnodeExpandButton from "@/components//Icons/ZnodeExpandButton";
-import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
-import { convertToSatoshi, convertToCoin } from "#/lib/convert";
+import ZnodeStatusGreen from "renderer/components//Icons/ZnodeStatusGreen";
+import ZnodeStatusRed from "renderer/components//Icons/ZnodeStatusRed";
+import ZnodeCollapseButton from "renderer/components//Icons/ZnodeCollapseButton";
+import ZnodeExpandButton from "renderer/components//Icons/ZnodeExpandButton";
+import AnimatedTablePagination from "renderer/components/AnimatedTable/AnimatedTablePagination";
+import { convertToSatoshi, convertToCoin } from "lib/convert";
 Vue.component("evo-znodes-details-page", EvoZnodesDetailsPage);
 
 const tableFields = [

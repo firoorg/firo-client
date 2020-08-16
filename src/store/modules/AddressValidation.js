@@ -1,4 +1,4 @@
-import * as types from '~/types/AddressValidation'
+import * as types from 'store/types/AddressValidation'
 
 const state = {
     address: '',

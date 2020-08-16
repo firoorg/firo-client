@@ -12,7 +12,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Sidebar from '@/components/Sidebar'
+import Sidebar from 'renderer/components/Sidebar'
 
 export default {
     name: 'MainLayout',

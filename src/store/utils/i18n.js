@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 
-import { convertToSatoshi } from '#/lib/convert'
+import { convertToSatoshi } from 'lib/convert'
 
 const isZnodeAddress = function (transactions) {
     // check if it's a new znode address with collateral

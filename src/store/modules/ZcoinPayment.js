@@ -1,10 +1,10 @@
-import * as types from '~/types/ZcoinPayment'
-import allTypes from '~/types'
-import { convertToCoin, convertToSatoshi } from '#/lib/convert'
+import * as types from 'store/types/ZcoinPayment'
+import allTypes from 'store/types'
+import { convertToCoin, convertToSatoshi } from 'lib/convert'
 
-import IsLoading from '~/mixins/IsLoading'
-import Payments from '~/mixins/Payments'
-import Response from '~/mixins/Response'
+import IsLoading from 'store/mixins/IsLoading'
+import Payments from 'store/mixins/Payments'
+import Response from 'store/mixins/Response'
 
 const isLoading = IsLoading.module('')
 const pendingPayments = Payments.module('zcoin')

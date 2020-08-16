@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import IconColorMixin from "@/mixins/IconColorMixin";
+import IconColorMixin from "renderer/mixins/IconColorMixin";
 
 export default {
   name: "EditAddressIcon",

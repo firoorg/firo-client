@@ -2,22 +2,22 @@ import Vue from 'vue'
 import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
-import Scrollable from '@/directives/scrollable'
-import Focus from '@/directives/focus'
+import Scrollable from 'renderer/directives/scrollable'
+import Focus from 'renderer/directives/focus'
 
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
 import {existsSync} from 'fs';
 
-import i18n from '#/lib/i18n'
+import i18n from 'lib/i18n'
 
 const electron = require('electron');
 const remote = electron.remote;
 const app = electron.remote.app;
 
-import BindScopedSlotsPlugin from '@/plugins/BindScopedSlotsPlugin'
-import Logger from '@/plugins/Logger'
+import BindScopedSlotsPlugin from 'renderer/plugins/BindScopedSlotsPlugin'
+import Logger from 'renderer/plugins/Logger'
 
 import App from './App'
 import router from './router'
@@ -25,9 +25,9 @@ import store from '../store/renderer'
 
 import zcoind from '../daemon/init'
 
-import {convertToCoin} from "#/lib/convert";
+import {convertToCoin} from "lib/convert";
 
-import { createLogger } from '#/lib/logger';
+import { createLogger } from 'lib/logger';
 const logger = createLogger('zcoin:renderer:main.js');
 
 logger.info("Entering renderer/main.js...");

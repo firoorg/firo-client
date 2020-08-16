@@ -40,7 +40,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { convertToCoin } from '#/lib/convert'
+import { convertToCoin } from 'lib/convert'
 
 export default {
     name: 'MintsInProgressList',

@@ -1,4 +1,4 @@
-import { getEventBus } from '@/utils/eventBus'
+import { getEventBus } from 'renderer/utils/eventBus'
 
 export default {
     data () {

@@ -38,7 +38,7 @@
 <script>
 import { shell } from 'electron';
 import { mapGetters } from 'vuex';
-import { convertToCoin } from "#/lib/convert";
+import { convertToCoin } from "lib/convert";
 
 export default {
     name: "TransactionInfo",

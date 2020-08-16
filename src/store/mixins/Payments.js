@@ -1,5 +1,5 @@
-import { convertToCoin } from '#/lib/convert'
-import { getName } from '~/utils'
+import { convertToCoin } from 'lib/convert'
+import { getName } from 'store/utils'
 
 const types = function (namespace) {
     const { NAME: PAYMENTS } = getName(`pending ${namespace} payments`)

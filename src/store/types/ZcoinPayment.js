@@ -1,6 +1,6 @@
-import IsLoading from '~/mixins/IsLoading'
-import Payment from '~/mixins/Payments'
-import Response from '~/mixins/Response'
+import IsLoading from 'store/mixins/IsLoading'
+import Payment from 'store/mixins/Payments'
+import Response from 'store/mixins/Response'
 
 const isLoading = IsLoading.module('')
 const pendingPayment = Payment.types('zcoin')

@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import FeesAndAmount from '@/components/payments/FeesAndAmount'
-import CurrentMints from '@/components/payments/CurrentMints'
+import FeesAndAmount from 'renderer/components/payments/FeesAndAmount'
+import CurrentMints from 'renderer/components/payments/CurrentMints'
 
 export default {
     name: 'MintStepConfirm',

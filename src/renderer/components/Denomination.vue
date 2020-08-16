@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { convertToCoin } from "#/lib/convert";
+import { convertToCoin } from "lib/convert";
 import { mapGetters } from "vuex";
 
 export default {

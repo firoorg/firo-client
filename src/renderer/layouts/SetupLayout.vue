@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import ZcoinLogo from '@/components/Icons/ZcoinLogo';
+import ZcoinLogo from 'renderer/components/Icons/ZcoinLogo';
 
 export default {
     name: "SetupLayout",

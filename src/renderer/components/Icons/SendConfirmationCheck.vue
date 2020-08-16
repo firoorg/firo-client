@@ -6,7 +6,7 @@
 
 <script>
 import Lottie from 'vue-lottie'
-import animationData from '@/assets/animations/confirmation-check.json'
+import animationData from 'renderer/assets/animations/confirmation-check.json'
 
 export default {
     name: 'SendConfirmationCheck',

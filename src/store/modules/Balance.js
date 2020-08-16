@@ -1,6 +1,6 @@
 import { fromPairs, isEqual, cloneDeep } from 'lodash'
-import { createLogger } from '#/lib/logger'
-import { convertToSatoshi } from "#/lib/convert";
+import { createLogger } from 'lib/logger'
+import { convertToSatoshi } from "lib/convert";
 
 const logger = createLogger('zcoin:store:balance')
 

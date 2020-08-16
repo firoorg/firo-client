@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { convertToCoin } from '#/lib/convert'
+import { convertToCoin } from 'lib/convert'
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
 
 export default {

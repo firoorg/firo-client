@@ -1,6 +1,6 @@
-import ValidationMixin from '@/mixins/ValidationMixin'
+import ValidationMixin from 'renderer/mixins/ValidationMixin'
 
-import { addVuexModel } from '@/utils/store'
+import { addVuexModel } from 'renderer/utils/store'
 
 export default {
     mixins: [

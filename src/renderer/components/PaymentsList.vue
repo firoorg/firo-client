@@ -35,13 +35,13 @@
 <script>
 import { mapGetters } from 'vuex';
 
-import AnimatedTable from '@/components/AnimatedTable/AnimatedTable';
-import RelativeDate from '@/components/AnimatedTable/AnimatedTableRelativeDate';
-import Amount from '@/components/AnimatedTable/AnimatedTableAmount';
-import PaymentStatus from '@/components/AnimatedTable/AnimatedTablePaymentStatus';
-import Label from '@/components/AnimatedTable/AnimatedTableLabel';
+import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
+import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate';
+import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
+import PaymentStatus from 'renderer/components/AnimatedTable/AnimatedTablePaymentStatus';
+import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
 
-import { convertToCoin } from "#/lib/convert";
+import { convertToCoin } from "lib/convert";
 
 const tableFields = [
     {

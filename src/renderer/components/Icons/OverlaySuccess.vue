@@ -9,7 +9,7 @@
 
 <script>
 import Lottie from 'vue-lottie'
-import animationData from '@/assets/animations/overlay-success-white.json'
+import animationData from 'renderer/assets/animations/overlay-success-white.json'
 
 export default {
     name: 'OverlaySuccess',

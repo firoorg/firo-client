@@ -41,8 +41,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { convertToCoin } from '#/lib/convert'
-import Notice from '@/components/Notification/Notice'
+import { convertToCoin } from 'lib/convert'
+import Notice from 'renderer/components/Notification/Notice'
 
 export default {
     name: 'MintStats',

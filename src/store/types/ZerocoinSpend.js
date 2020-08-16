@@ -1,5 +1,5 @@
-import IsLoading from '~/mixins/IsLoading'
-import Response from '~/mixins/Response'
+import IsLoading from 'store/mixins/IsLoading'
+import Response from 'store/mixins/Response'
 
 const isLoading = IsLoading.types('')
 const spendZerocoinResponse = Response.types('spend zerocoin')

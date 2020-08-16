@@ -234,24 +234,24 @@
 <script>
 import { fromPairs } from 'lodash';
 import { mapGetters } from 'vuex';
-import { getDenominationsToMintSeparatingFee, convertToSatoshi, convertToCoin } from "#/lib/convert";
-import { IncorrectPassphrase, ZcoindErrorResponse } from "#/daemon/zcoind";
+import { getDenominationsToMintSeparatingFee, convertToSatoshi, convertToCoin } from "lib/convert";
+import { IncorrectPassphrase, ZcoindErrorResponse } from "daemon/zcoind";
 
-import CircularTimer from '@/components/Icons/CircularTimer';
-import DenominationSelector from '@/components/DenominationSelector'
-import OnboardingNotice from '@/components/Notification/OnboardingNotice'
-import CurrentMints from '@/components/payments/CurrentMints'
-import FeesAndAmount from '@/components/payments/FeesAndAmount'
-import MintsInProgressList from '@/components/MintZerocoinPage/MintsInProgressList'
-import Stack from '@/components/Icons/Stack'
-import NotificationIndicator from '@/components/Notification/NotificationIndicator'
-import MintStats from '@/components/MintZerocoinPage/MintStats'
+import CircularTimer from 'renderer/components/Icons/CircularTimer';
+import DenominationSelector from 'renderer/components/DenominationSelector'
+import OnboardingNotice from 'renderer/components/Notification/OnboardingNotice'
+import CurrentMints from 'renderer/components/payments/CurrentMints'
+import FeesAndAmount from 'renderer/components/payments/FeesAndAmount'
+import MintsInProgressList from 'renderer/components/MintZerocoinPage/MintsInProgressList'
+import Stack from 'renderer/components/Icons/Stack'
+import NotificationIndicator from 'renderer/components/Notification/NotificationIndicator'
+import MintStats from 'renderer/components/MintZerocoinPage/MintStats'
 
-import MintStepConfirm from '@/components/MintZerocoinPage/MintStepConfirm';
-import SendStepPassphrase from '@/components/PaymentSidebars/SendSteps/Passphrase';
-import SendStepWaitForReply from '@/components/PaymentSidebars/SendSteps/WaitForReply';
-import SendStepError from '@/components/PaymentSidebars/SendSteps/Error';
-import SendStepIncorrectPassphrase from '@/components/PaymentSidebars/SendSteps/IncorrectPassphrase';
+import MintStepConfirm from 'renderer/components/MintZerocoinPage/MintStepConfirm';
+import SendStepPassphrase from 'renderer/components/PaymentSidebars/SendSteps/Passphrase';
+import SendStepWaitForReply from 'renderer/components/PaymentSidebars/SendSteps/WaitForReply';
+import SendStepError from 'renderer/components/PaymentSidebars/SendSteps/Error';
+import SendStepIncorrectPassphrase from 'renderer/components/PaymentSidebars/SendSteps/IncorrectPassphrase';
 
 
 export default {

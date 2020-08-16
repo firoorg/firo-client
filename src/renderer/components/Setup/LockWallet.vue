@@ -77,7 +77,7 @@
 
 <script>
 import zxcvbn from 'zxcvbn';
-import {Zcoind} from "#/daemon/zcoind";
+import {Zcoind} from "daemon/zcoind";
 import {mapGetters} from "vuex";
 
 export default {

@@ -201,15 +201,15 @@
 <script>
 import { shell } from 'electron'
 import { mapGetters } from 'vuex'
-import { convertToCoin } from '#/lib/convert'
-import { IncorrectPassphrase, ZcoindErrorResponse } from '#/daemon/zcoind'
+import { convertToCoin } from 'lib/convert'
+import { IncorrectPassphrase, ZcoindErrorResponse } from 'daemon/zcoind'
 
-import Notice from '@/components/Notification/Notice'
-import ZnodeStatus from '@/components/ZnodePage/ZnodeStatus'
+import Notice from 'renderer/components/Notification/Notice'
+import ZnodeStatus from 'renderer/components/ZnodePage/ZnodeStatus'
 
-import Passphrase from "@/components/PaymentSidebars/SendSteps/Passphrase";
-import Error from "@/components/PaymentSidebars/SendSteps/Error";
-import Complete from "@/components/PaymentSidebars/SendSteps/Complete";
+import Passphrase from "renderer/components/PaymentSidebars/SendSteps/Passphrase";
+import Error from "renderer/components/PaymentSidebars/SendSteps/Error";
+import Complete from "renderer/components/PaymentSidebars/SendSteps/Complete";
 
 
 export default {

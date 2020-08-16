@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import ZcoinLogo from '@/assets/zcoin-logo.svg'
+import ZcoinLogo from 'renderer/assets/zcoin-logo.svg'
 
 export default {
     name: 'LogoText',

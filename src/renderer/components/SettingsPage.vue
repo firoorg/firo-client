@@ -179,11 +179,11 @@
 <script>
 import {mapGetters} from 'vuex'
 import {remote} from 'electron';
-import BlockchainExplorerSettings from '@/components/SettingsPage/BlockchainExplorerSettings'
-import LanguageSettings from '@/components/SettingsPage/LanguageSettings'
-import ConnectViaTorSettings from '@/components/SettingsPage/ConnectViaTorSettings'
-import AmountToHoldInZerocoinSettings from '@/components/SettingsPage/AmountToHoldInZerocoinSettings'
-import ShowMnemonicSettings from '@/components/SettingsPage/ShowMnemonicSettings'
+import BlockchainExplorerSettings from 'renderer/components/SettingsPage/BlockchainExplorerSettings'
+import LanguageSettings from 'renderer/components/SettingsPage/LanguageSettings'
+import ConnectViaTorSettings from 'renderer/components/SettingsPage/ConnectViaTorSettings'
+import AmountToHoldInZerocoinSettings from 'renderer/components/SettingsPage/AmountToHoldInZerocoinSettings'
+import ShowMnemonicSettings from 'renderer/components/SettingsPage/ShowMnemonicSettings'
 
 const zcoinClientVersion = require('../../../package.json').version;
 

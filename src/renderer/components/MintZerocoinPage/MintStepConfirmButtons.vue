@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import CircularTimer from '@/components/Icons/CircularTimer'
+import CircularTimer from 'renderer/components/Icons/CircularTimer'
 
 export default {
     name: 'MintStepConfirmButtons',

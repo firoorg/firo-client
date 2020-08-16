@@ -14,7 +14,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import WaitingScreen from "@/components/WaitingScreen";
+import WaitingScreen from "renderer/components/WaitingScreen";
 
 export default {
     name: 'ZcoinClient',

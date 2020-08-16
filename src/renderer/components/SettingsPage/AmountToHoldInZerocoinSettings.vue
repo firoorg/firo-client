@@ -36,8 +36,7 @@
 <script>
 import vueSlider from 'vue-slider-component'
 
-import types from '~/types'
-import { addVuexModel } from '@/utils/store'
+import { addVuexModel } from 'renderer/utils/store'
 
 export default {
     name: 'AmountToHoldInZerocoinSettings',
@@ -49,7 +48,7 @@ export default {
         ...addVuexModel({
             name: 'privatePercentage',
             getter: 'Settings/percentageToHoldInZerocoin',
-            action: types.settings.SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN
+            action: 'Settings/SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN'
         })
     }
 }

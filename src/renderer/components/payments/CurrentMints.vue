@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import {convertToCoin} from "#/lib/convert";
+import {convertToCoin} from "lib/convert";
 
 export default {
     name: 'CurrentMints',

@@ -1,7 +1,7 @@
 import shajs from 'sha.js'
 import bs58 from 'bs58'
 
-import { createLogger } from '#/lib/logger'
+import { createLogger } from 'lib/logger'
 
 const logger = createLogger('zcoin:lib:zcoin')
 

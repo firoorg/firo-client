@@ -100,13 +100,12 @@
 import { mapGetters } from "vuex";
 import { Vuetable } from "vuetable-2";
 import _ from "lodash";
-import CopyAddressIcon from "@/components//Icons/CopyAddressIcon";
-import EditAddressIcon from "@/components//Icons/EditAddressIcon";
-import DeleteAddressIcon from "@/components//Icons/DeleteAddressIcon";
-import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
-import EditAddressBookPopup from "@/components/Overlay/EditAddressBookPopup";
-import AddressDeleteConfirm from "@/components/Overlay/AddressDeleteConfirm";
-import types from "~/types";
+import CopyAddressIcon from "renderer/components//Icons/CopyAddressIcon";
+import EditAddressIcon from "renderer/components//Icons/EditAddressIcon";
+import DeleteAddressIcon from "renderer/components//Icons/DeleteAddressIcon";
+import AnimatedTablePagination from "renderer/components/AnimatedTable/AnimatedTablePagination";
+import EditAddressBookPopup from "renderer/components/Overlay/EditAddressBookPopup";
+import AddressDeleteConfirm from "renderer/components/Overlay/AddressDeleteConfirm";
 import Vue from "vue";
 import Toasted from 'vue-toasted';
 Vue.use(Toasted)
@@ -227,12 +226,12 @@ export default {
   },
   watch: {
     $route(to, from) {
-      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, purpose: ''});
+      this.$store.dispatch('App/OPEN_ADDRESS_BOOK', {open: false, purpose: ''});
     }
   },
   methods: {
     selectAddress(item) {
-      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
+      this.$store.dispatch('App/OPEN_ADDRESS_BOOK', {
         open: false,
         address: item.address,
         purpose: item.purpose.toLowerCase()
@@ -393,7 +392,7 @@ export default {
       return !dataItem.status;
     },
     closePopup() {
-      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
+      this.$store.dispatch('App/OPEN_ADDRESS_BOOK', {
         open: false,
         address: ""
       });

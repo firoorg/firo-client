@@ -6,7 +6,7 @@
 
 <script>
 import Lottie from 'vue-lottie'
-import animationData from '@/assets/animations/mint-success.json'
+import animationData from 'renderer/assets/animations/mint-success.json'
 
 export default {
     name: 'MintStarted',

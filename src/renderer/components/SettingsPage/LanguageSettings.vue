@@ -22,7 +22,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { VueSelect } from 'vue-select'
-import types from '~/types'
 
 export default {
     name: 'LanguageSettings',
@@ -45,7 +44,7 @@ export default {
 
     methods: {
         ...mapActions({
-            setLocale: types.settings.SET_LOCALE
+            setLocale: 'Settings/SET_LOCALE'
         }),
 
         onChange (selected) {

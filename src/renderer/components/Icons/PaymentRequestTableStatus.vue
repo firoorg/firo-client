@@ -38,8 +38,8 @@
 </template>
 
 <script>
-import TickIcon from '@/components/Icons/TickIcon'
-import IncomingIcon from '@/components/Icons/IncomingIcon'
+import TickIcon from 'renderer/components/Icons/TickIcon'
+import IncomingIcon from 'renderer/components/Icons/IncomingIcon'
 
 export default {
     name: 'PaymentRequestTableStatus',

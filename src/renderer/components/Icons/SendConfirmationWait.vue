@@ -9,7 +9,7 @@
 
 <script>
 import Lottie from 'vue-lottie'
-import animationData from '@/assets/animations/confirmation-wait-v3.json'
+import animationData from 'renderer/assets/animations/confirmation-wait-v3.json'
 
 export default {
     name: 'SendConfirmationWait',

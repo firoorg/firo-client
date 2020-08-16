@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 
-import types from '~/types'
-import languages from '#/lang'
-import dateTimeFormats from '#/lang/dateTimeFormats'
+import types from 'store/types'
+import languages from 'lang'
+import dateTimeFormats from 'lang/dateTimeFormats'
 
-import { createLogger } from '#/lib/logger'
+import { createLogger } from 'lib/logger'
 
 const logger = createLogger('zcoin:i18n')
 

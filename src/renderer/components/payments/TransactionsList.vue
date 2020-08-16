@@ -45,10 +45,10 @@
 </template>
 
 <script>
-import { convertToCoin } from '#/lib/convert'
-import TickIcon from '@/components/Icons/TickIcon'
-import IncomingIcon from '@/components/Icons/IncomingIcon'
-import OutgoingIcon from '@/components/Icons/OutgoingIcon'
+import { convertToCoin } from 'lib/convert'
+import TickIcon from 'renderer/components/Icons/TickIcon'
+import IncomingIcon from 'renderer/components/Icons/IncomingIcon'
+import OutgoingIcon from 'renderer/components/Icons/OutgoingIcon'
 
 export default {
     name: 'TransactionsList',

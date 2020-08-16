@@ -338,12 +338,11 @@ import SendStepWaitForReply from './SendSteps/WaitForReply';
 import SendStepIncorrectPassphrase from './SendSteps/IncorrectPassphrase';
 import SendStepError from './SendSteps/Error';
 import SendStepComplete from './SendSteps/Complete';
-import CircularTimer from "@/components/Icons/CircularTimer";
+import CircularTimer from "renderer/components/Icons/CircularTimer";
 
-import {IncorrectPassphrase, ZcoindErrorResponse} from '#/daemon/zcoind';
-import {isValidAddress} from '#/lib/isValidAddress';
-import {convertToSatoshi, convertToCoin} from '#/lib/convert';
-import types from "~/types";
+import {IncorrectPassphrase, ZcoindErrorResponse} from 'daemon/zcoind';
+import {isValidAddress} from 'lib/isValidAddress';
+import {convertToSatoshi, convertToCoin} from 'lib/convert';
 
 export default {
     name: 'Send',
@@ -706,7 +705,7 @@ export default {
                 const ab = await $daemon.readAddressBook();
                 this.$store.dispatch('Transactions/setAddressBook', ab);
             }
-            this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: true, address: '', purpose: 'send'});
+            this.$store.dispatch('App/OPEN_ADDRESS_BOOK', {open: true, address: '', purpose: 'send'});
         }
     }
 }

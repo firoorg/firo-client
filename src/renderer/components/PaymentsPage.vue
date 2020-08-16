@@ -33,9 +33,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import PaymentsList from '@/components/PaymentsList';
-import CustomInputPopup from '@/components/Overlay/CustomInputPopup';
-import AddressBookPopup from '@/components/Overlay/AddressBookPopup';
+import PaymentsList from 'renderer/components/PaymentsList';
+import CustomInputPopup from 'renderer/components/Overlay/CustomInputPopup';
+import AddressBookPopup from 'renderer/components/Overlay/AddressBookPopup';
 import WarningWalletWithoutMnemonics from './WarningWalletWithoutMnemonics.vue';
 
 export default {

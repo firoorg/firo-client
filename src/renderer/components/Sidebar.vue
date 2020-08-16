@@ -88,10 +88,10 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import Balance from '@/components/Sidebar/Balance'
-import Menu from '@/components/Sidebar/Menu'
-import Settings from '@/components/Sidebar/Settings'
-import Blockchain from '@/components/Sidebar/Blockchain'
+import Balance from 'renderer/components/Sidebar/Balance'
+import Menu from 'renderer/components/Sidebar/Menu'
+import Settings from 'renderer/components/Sidebar/Settings'
+import Blockchain from 'renderer/components/Sidebar/Blockchain'
 
 export default {
     name: 'Sidebar',

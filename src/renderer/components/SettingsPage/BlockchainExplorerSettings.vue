@@ -19,10 +19,8 @@
 </template>
 
 <script>
-import ValidatedVuexModel from '@/mixins/ValidatedVuexModel'
-
-import { addVuexModel } from '@/utils/store'
-import types from '~/types'
+import ValidatedVuexModel from 'renderer/mixins/ValidatedVuexModel'
+import {addVuexModel} from 'renderer/utils/store'
 
 export default {
     name: 'BlockchainExplorerSettings',
@@ -35,7 +33,7 @@ export default {
         ...addVuexModel({
             name: 'storeValue',
             getter: 'Settings/getExplorerBaseUrl',
-            action: types.settings.SET_BLOCKCHAIN_EXPLORER_BASE_URL
+            action: 'Settings/SET_BLOCKCHAIN_EXPLORER_BASE_URL'
         })
     }
 }

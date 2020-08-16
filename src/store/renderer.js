@@ -2,8 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { ipcRenderer } from 'electron'
 
-import modules from '~/modules'
-import types from '~/types'
+import modules from 'store/modules'
+import types from 'store/types'
 
 Vue.use(Vuex)
 if (process.env.NODE_ENV !== 'production') {

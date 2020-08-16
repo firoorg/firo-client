@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import {validateMnemonic} from "#/daemon/zcoind";
+import {validateMnemonic} from "daemon/zcoind";
 
 export default {
     name: "RecoverFromMnemonic",

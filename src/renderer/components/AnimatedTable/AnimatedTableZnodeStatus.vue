@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import ZnodeStatus from '@/components/ZnodePage/ZnodeStatus'
+import ZnodeStatus from 'renderer/components/ZnodePage/ZnodeStatus'
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
 
 export default {

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import MultiStepPopover from '@/components/Notification/MultiStepPopover'
+import MultiStepPopover from 'renderer/components/Notification/MultiStepPopover'
 
 export default {
     name: 'MultiStepPopoverButtons',

@@ -58,7 +58,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import PercentageToHoldInZerocoinNotification from '@/components/Notification/PercentageToHoldInZerocoinNotification'
+import PercentageToHoldInZerocoinNotification from 'renderer/components/Notification/PercentageToHoldInZerocoinNotification'
 
 export default {
     name: 'Menu',

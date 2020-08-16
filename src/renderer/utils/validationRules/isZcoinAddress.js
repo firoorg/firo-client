@@ -1,5 +1,5 @@
 import { Validator } from 'vee-validate'
-import { isZcoinAddress } from '#/lib/zcoin'
+import { isZcoinAddress } from 'lib/zcoin'
 
 Validator.extend('zcoin_address', {
     getMessage: (field) => {

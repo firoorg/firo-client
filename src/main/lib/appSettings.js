@@ -1,6 +1,6 @@
-import { getAppSettings } from '#/lib/utils'
+import { getAppSettings } from 'lib/utils'
 
-import { createLogger } from '#/lib/logger'
+import { createLogger } from 'lib/logger'
 const logger = createLogger('zcoin:appSettings')
 
 export const populateStoreWithAppSettings = async function ({ store }) {

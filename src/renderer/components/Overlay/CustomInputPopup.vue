@@ -85,11 +85,11 @@ import { mapGetters } from 'vuex';
 import Vue from 'vue'
 import { Vuetable } from 'vuetable-2'
 import _ from 'lodash'
-import VueTableCheckbox from '@/components/Overlay/VueTableCheckbox'
-import LockIcon from '@/components//Icons/LockIcon'
-import UnlockIcon from '@/components//Icons/UnlockIcon'
-import AnimatedTablePagination from '@/components/AnimatedTable/AnimatedTablePagination'
-import { convertToSatoshi, convertToCoin } from "#/lib/convert";
+import VueTableCheckbox from 'renderer/components/Overlay/VueTableCheckbox'
+import LockIcon from 'renderer/components//Icons/LockIcon'
+import UnlockIcon from 'renderer/components//Icons/UnlockIcon'
+import AnimatedTablePagination from 'renderer/components/AnimatedTable/AnimatedTablePagination'
+import { convertToSatoshi, convertToCoin } from "lib/convert";
 Vue.component('vuetable-field-checkbox', VueTableCheckbox)
 
 const tableFields = [

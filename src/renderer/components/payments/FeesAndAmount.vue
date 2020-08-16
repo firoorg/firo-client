@@ -39,8 +39,8 @@
 </template>
 
 <script>
-import { convertToCoin } from '#/lib/convert'
-import TranslationNamespaceMixin from '@/mixins/TranslationNamespaceMixin'
+import { convertToCoin } from 'lib/convert'
+import TranslationNamespaceMixin from 'renderer/mixins/TranslationNamespaceMixin'
 
 export default {
     name: 'FeesAndAmount',

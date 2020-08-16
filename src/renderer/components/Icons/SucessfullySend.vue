@@ -6,7 +6,7 @@
 
 <script>
 import Lottie from 'vue-lottie'
-import animationData from '@/assets/animations/outgoing-payment.json'
+import animationData from 'renderer/assets/animations/outgoing-payment.json'
 
 export default {
     name: 'SuccessfullySend',

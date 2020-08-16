@@ -1,4 +1,4 @@
-import { ucFirst } from '#/lib/utils'
+import { ucFirst } from 'lib/utils'
 import { camelCase, snakeCase } from 'lodash'
 
 export const getName = (namespace) => {
