@@ -1,5 +1,5 @@
 import {cloneDeep, merge} from 'lodash';
-import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem, PaymentCodeItem} from '../../daemon/zcoind';
+import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem, PaymentCodeItem, PaymentChannel} from '../../daemon/zcoind';
 
 import { createLogger } from '../../lib/logger'
 const logger = createLogger('zcoin:store:Transactions');
@@ -15,6 +15,7 @@ const state = {
     addressBook: <{[address: string]: AddressBookItem}>{},
     walletLoaded: false,
     paymentCodes: <{[label: string]: string}>{},
+    paymentChannels: <{[paymentCode: string]: PaymentChannel[]}>{}
 };
 
 const mutations = {
@@ -130,6 +131,13 @@ const mutations = {
         state.addressBook = {...state.addressBook};
     },
 
+    setPaymentChannels(state, paymentChannels_: PaymentChannel[][]) {
+        paymentChannels_.forEach(e => {
+            state.paymentChannels[e[0].paymentCode] = e;
+        })
+        state.paymentChannels = {...state.paymentChannels};
+    },
+
     setPaymentCodes(state, pcs: PaymentCodeItem[]) {
         pcs.forEach(e => {
             state.paymentCodes[e.paymentcode] = e.label;
@@ -223,6 +231,10 @@ const actions = {
         commit('setPaymentCodes', pcs);
     },
 
+    setPaymentChannels({commit, rootGetters}, channels: PaymentChannel[][]) {
+        commit('setPaymentChannels', channels);
+    },
+
     deleteAddressItem({commit, rootGetters}, address:string) {
         commit('deleteAddressItem', address);
     },
@@ -239,6 +251,7 @@ const getters = {
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
     paymentCodes: (state) => state.paymentCodes,
+    paymentChannels: (state) => state.paymentChannels,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,

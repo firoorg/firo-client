@@ -264,6 +264,13 @@ export interface AddressBookItem {
     purpose: string;
 }
 
+export interface PaymentChannel {
+    paymentCode: string;
+    myPaymentCode: string;
+    label: string;
+    status: boolean;
+}
+
 export interface PaymentCodeItem {
     label: string;
     paymentcode: string;
@@ -308,6 +315,7 @@ export interface StateWallet {
         }
     }
 }
+
 function isValidStateWallet(x: any): x is StateWallet {
     if (x === null || typeof x !== 'object' || x.addresses === null || typeof x.addresses !== 'object') {
         return false;
@@ -1482,6 +1490,11 @@ export class Zcoind {
 
     async getMasternodeList() : Promise<Object> {
         const data = await this.send('', 'initial', 'masternodeList', {});
+        return data;
+    }
+
+    async readPaymentChannelsState() : Promise<Object> {
+        const data = await this.send('', 'create', 'readPaymentChannelsState', {});
         return data;
     }
 

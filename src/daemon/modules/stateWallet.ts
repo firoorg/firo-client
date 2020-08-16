@@ -21,4 +21,7 @@ export async function initialize(store: any, zcoind: Zcoind) {
     //load payment codes
     const pcs = await zcoind.getPaymentCodes();
     await store.dispatch('Transactions/setPaymentCodes', pcs);
+
+    const paymentChannelsState = await zcoind.readPaymentChannelsState();
+    store.dispatch('Transactions/setPaymentChannels', Object.values(paymentChannelsState));
 }
