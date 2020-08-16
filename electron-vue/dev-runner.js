@@ -1,6 +1,6 @@
 const electron = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const child_process = require('child_process');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 
@@ -19,4 +19,5 @@ const server = new WebpackDevServer(
 );
 server.listen(9080);
 
-spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
+const electronProcess = child_process.spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
+electronProcess.on('exit', () => process.exit());
