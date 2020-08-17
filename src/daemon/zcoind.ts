@@ -269,11 +269,16 @@ export interface PaymentChannel {
     myPaymentCode: string;
     label: string;
     status: boolean;
+    incomingAddresses: string[];
+    outgoingAddresses: string[];
+    currentOutgoingIndex: number;
+    currentIncomingIndex: number;
 }
 
 export interface PaymentCodeItem {
     label: string;
     paymentcode: string;
+    index: number;
 }
 
 function isValidAddressBookItem(x: any): x is AddressBookItem {
@@ -1405,6 +1410,26 @@ export class Zcoind {
 
         if (isValidResponse(data)) {
             return data.txid;
+        } else {
+            throw new UnexpectedZcoindResponse('create/sendZcoin', data);
+        }
+    }
+
+    async sendToPaymentCode(auth: string, recipient: string, myPaymentCode: string, amount: number, feePerKb: number,
+        subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
+        const data = await this.send(auth, 'create', 'sendToPaymentCode', {
+            paymentCode: recipient,
+            myPaymentCode: myPaymentCode,
+            feePerKb,
+            amount,
+            subtractFeeFromAmount,
+            coinControl: {
+                selected: coinControl ? coinControlToString(coinControl) : ''
+            }
+        });
+
+        if (typeof data === 'string') {
+            return data;
         } else {
             throw new UnexpectedZcoindResponse('create/sendZcoin', data);
         }

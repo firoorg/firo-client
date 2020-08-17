@@ -54,7 +54,22 @@
                                 <label for="address">
                                     {{ $t('send.public.detail-public-send.label__address') }}
                                 </label>
-
+                                <div class="addressbook-action-group" style="float:right">
+                                    <div
+                                        class="addressbook-action-group"
+                                        :style="{ cursor: 'pointer' }"
+                                        @click="openAddressBook()"
+                                    >
+                                        <address-book-icon />
+                                    </div>
+                                    <div
+                                        class="addressbook-action-group"
+                                        @click="openAddressBook()"
+                                        :style="{ cursor: 'pointer' }"
+                                    >
+                                        <paste-icon />
+                                    </div>
+                                </div>
                                 <div class="control">
                                     <input
                                         id="address"
@@ -67,6 +82,9 @@
                                         tabindex="2"
                                         :placeholder="$t('send.public.detail-public-send.placeholder__address')"
                                     />
+                                </div>
+                                <div v-if="notifyNotificationTx" style="color:red; font-size: small">
+                                    <i>No transaction history to this address found, thus a 0.005 XZC connection fee will be inlcuded in your transaction.</i>
                                 </div>
                                 <div class="addressbook">
                                     <u><a
@@ -340,6 +358,13 @@ import SendStepError from './SendSteps/Error';
 import SendStepComplete from './SendSteps/Complete';
 import CircularTimer from "@/components/Icons/CircularTimer";
 
+import AddressBookIcon from "@/components//Icons/AddressBookIcon";
+import PasteIcon from "@/components//Icons/PasteIcon";
+import Vue from "vue";
+import VtTooltip from 'v-tooltip'
+Vue.use(VtTooltip)
+
+
 import {IncorrectPassphrase, ZcoindErrorResponse} from '#/daemon/zcoind';
 import {isValidAddress, isValidPaymentCode} from '#/lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from '#/lib/convert';
@@ -355,7 +380,10 @@ export default {
         SendStepWaitForReply,
         SendStepIncorrectPassphrase,
         SendStepError,
-        SendStepComplete
+        SendStepComplete,
+        AddressBookIcon,
+        PasteIcon,
+        VtTooltip
     },
 
     inject: [
@@ -403,7 +431,9 @@ export default {
             maxPrivateSend: 'Balance/maxPrivateSend',
             selectedUtxos: 'ZcoinPayment/selectedInputs',
             addressBook: 'Transactions/addressBook',
-            addressBookStt: 'App/openAddressBook'
+            addressBookStt: 'App/openAddressBook',
+            paymentChannels: 'Transactions/paymentChannels',
+            paymentCodes: 'Transactions/paymentCodes'
         }),
 
         // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
@@ -414,6 +444,10 @@ export default {
             } else {
                 return 'private';
             }
+        },
+
+        notifyNotificationTx() {
+            return isValidPaymentCode(this.address) && !this.paymentChannels[this.address];
         },
 
         unavailableBalance () {
@@ -655,8 +689,25 @@ export default {
                     await $daemon.privateSend(passphrase, this.label, this.address, this.satoshiAmount,
                         this.subtractFeeFromAmount, coinControl);
                 } else {
-                    let d = await $daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
-                        this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
+                    if (isValidPaymentCode(this.address)) {
+                        var myPaymentCode = "";
+                        if (this.paymentChannels[this.address]) {
+                            this.paymentChannels[this.address][0].myPaymentCode;
+                        } else {
+                            for(const pc of Object.keys(this.paymentCodes)) {
+                                if (this.paymentCodes[pc].index == 0) {
+                                    myPaymentCode = pc;
+                                    break;
+                                }
+                            }
+                        }
+                        console.log('myPaymentCode:', myPaymentCode)
+                        let d = $daemon.sendToPaymentCode(passphrase, this.address, myPaymentCode, this.satoshiAmount,
+                            this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
+                    } else {
+                        let d = await $daemon.publicSend(passphrase, this.label, this.address, this.satoshiAmount,
+                            this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
+                    }
                 }
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
@@ -868,5 +919,9 @@ button {
 
 .popover {
     background-color: $color--comet-dark;
+}
+
+.addressbook-action-group {
+    display: inline;
 }
 </style>
