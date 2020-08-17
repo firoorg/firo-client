@@ -1435,6 +1435,26 @@ export class Zcoind {
         }
     }
 
+    async privateSendToPaymentCode(auth: string, recipient: string, myPaymentCode: string, amount: number, feePerKb: number,
+        subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
+        const data = await this.send(auth, 'create', 'privateSendToPaymentCode', {
+            paymentCode: recipient,
+            myPaymentCode: myPaymentCode,
+            feePerKb,
+            amount,
+            subtractFeeFromAmount,
+            coinControl: {
+                selected: coinControl ? coinControlToString(coinControl) : ''
+            }
+        });
+
+        if (typeof data === 'string') {
+            return data;
+        } else {
+            throw new UnexpectedZcoindResponse('create/privateSendToPaymentCode', data);
+        }
+    } 
+
     async lockCoins(auth: string, lockedCoins: string, unlockedCoins: string): Promise<string> {
         const data = await this.send(auth, 'create', 'lockCoins', {
             lockedCoins: lockedCoins,
