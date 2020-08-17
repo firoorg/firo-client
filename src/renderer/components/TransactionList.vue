@@ -154,7 +154,6 @@ export default {
                     extraSearchText = 'Znode Payment';
                     break
                 }
-                console.log('tx:', tx.blockTime)
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction-info/${id}`,
@@ -168,9 +167,8 @@ export default {
                     label:
                         tx.label ||
                         (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined) || extraSearchText,
-                    extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
+                    extraSearchText: extraSearchText + ' ' + tx.label + ' ' + tx.address + convertToCoin(tx.amount) + ' XZC'
                 });
-                console.log("added")
             }
 
             for (const [blockHeight, mintInfo] of Object.entries(this.consolidatedMints)) {
@@ -183,7 +181,7 @@ export default {
                     amount: mintInfo.totalMintAmount,
                     label: null,
                     // Coordinate this with the default values in AnimatedTableLabel.
-                    extraSearchText: 'Private Mint (' + convertToCoin(mintInfo.totalMintAmount) + ')'
+                    extraSearchText: 'Private Mint (' + convertToCoin(mintInfo.totalMintAmount) + ')' + ' XZC'
                 });
             }
 
@@ -208,7 +206,7 @@ export default {
                     amount: pr.amount,
                     label: pr.label,
                     // Coordinate this with the default values in AnimatedTableLabel.
-                    extraSearchText: 'Payment Request (' + convertToCoin(pr.amount) + ')'
+                    extraSearchText: 'Payment Request (' + convertToCoin(pr.amount) + ')' + ' XZC' + ' ' + pr.label + ' ' + pr.address
                 });
             }
 
