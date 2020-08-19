@@ -104,7 +104,7 @@
       </div>
     </overlay>
     <br />
-    <div id="wrap">
+    <div id="wrap" v-if="!isRegularAddressSelected">
       <div
         class="icon"
         id="plus"
@@ -187,7 +187,8 @@ export default {
       regularAddressesData: [],
       stateAddressesChanged: false,
       addressBookChanged: false,
-      selectedAddress: ""
+      selectedAddress: "",
+      numUnlabelledAddress: 0
     };
   },
 
@@ -205,15 +206,24 @@ export default {
     addressBook: function(newF, oldF) {
       this.addressBookChanged = true;
       this.regularAddressTableData();
+    },
+    numUnlabelledAddress: function(oldV, newV) {
+      if (newV == 0) {
+        this.generateNewRegularAddresses();
+      }
     }
   },
 
-  mounted() {
+  async mounted() {
     this.styleRegularAddress = this.selectedStyle;
     this.stateAddressesChanged = true;
     this.addressBookChanged = true;
     this.regularAddressTableData();
-    this.selectedAddress = this.filteredTableData[0].address;
+    if (this.numUnlabelledAddress == 0) {
+      await this.generateNewRegularAddresses();
+      this.regularAddressTableData();
+    } 
+    this.selectedAddress = this.regularAddressTableData[0].address;
     this.generateQRCode();
   },
 
@@ -234,6 +244,16 @@ export default {
 
     latestTableData() {
       return tableData;
+    },
+
+    computeStateUnusedAddresses() {
+      var ret = [];
+      for (const k of Object.keys(this.addressBook)) {
+        if (!this.stateAddresses[k] && this.addressBook[k].label != "Bip47Receive") {
+          ret.push(k);
+        }
+      }
+      return ret;
     },
 
     selectedLabel() {
@@ -281,49 +301,60 @@ export default {
 
   methods: {
     async showRegularAddress() {
+      if (this.isRegularAddressSelected) {
+        return;
+      }
       this.stateAddressesChanged = true;
       this.addressBookChanged = true;
       this.regularAddressTableData();
+      console.log('numUnlabelledAddress:', this.numUnlabelledAddress)
+      
+      if (this.numUnlabelledAddress == 0) {
+        this.selectedAddress = await this.generateNewRegularAddresses();
+        this.regularAddressTableData();
+      } else {
+        this.selectedAddress = this.regularAddressesData[0].address;
+      }
+      this.isRegularAddressSelected = true; 
       this.styleRegularAddress = this.selectedStyle;
       // if (this.stateUnusedAddresses.length <= 4) {
       //   //await this.generateNewRegularAddresses();
       // }
-      this.isRegularAddressSelected = true;
       this.styleReusableAddress = "";
       this.generateQRCode();
     },
     showReusableAddress() {
-      this.styleReusableAddress = this.selectedStyle;
-      this.isRegularAddressSelected = false;
-      this.styleRegularAddress = "";
-      this.generateQRCode();
-    },
-
-    computeStateUnusedAddresses() {
-      var ret = [];
-      for (const k of Object.keys(this.addressBook)) {
-        if (!this.stateAddresses[k]) {
-          ret.push(k);
-        }
+      if (!this.isRegularAddressSelected) {
+        return;
       }
-      return ret;
+      this.isRegularAddressSelected = false;
+      if (this.filteredTableData.length > 0) {
+        this.selectedAddress = this.filteredTableData[0].address;
+        this.styleReusableAddress = this.selectedStyle;
+        this.styleRegularAddress = "";
+        this.generateQRCode();
+      }
     },
 
     regularAddressTableData() {
       if (!this.addressBookChanged || !this.stateAddressesChanged) return;
       var data = [];
-      var addresses = this.computeStateUnusedAddresses();
+      var addresses = this.computeStateUnusedAddresses;
+      this.numUnlabelledAddress = 0;
       if (addresses.length > 0) {
         for(const k of addresses) {
           data.push({
-          label:
-            !this.addressBook[k] ||
-            this.addressBook[k].label == ""
-              ? "(unlabelled)"
-              : this.addressBook[k].label,
-          address: k,
-          shortAddress: this.shortenAddress(k),
-        });
+            label:
+              !this.addressBook[k] ||
+              this.addressBook[k].label == ""
+                ? "(unlabelled)"
+                : this.addressBook[k].label,
+            address: k,
+            shortAddress: this.shortenAddress(k),
+          });
+          if (!this.addressBook[k].label || this.addressBook[k].label == "") {
+            this.numUnlabelledAddress++;
+          }
         }
       }
       this.regularAddressesData = data;
@@ -356,21 +387,28 @@ export default {
     async submit() {
       try {
         //edit
-        await $daemon.editAddressBook(
-          this.selectedAddress,
-          this.selectedLabel,
-          "receive",
-          "edit",
-          this.selectedAddress,
-          this.labelResult
-        );
-        console.log("label result:", this.labelResult);
-        this.$store.dispatch("Transactions/addAddressItem", {
-          address: this.selectedAddress,
-          label: this.labelResult,
-          purpose: "receive",
-        });
-      } catch (e) {}
+        if (this.isRegularAddressSelected) {
+          await $daemon.editAddressBook(
+            this.selectedAddress,
+            this.selectedLabel,
+            "receive",
+            "edit",
+            this.selectedAddress,
+            this.labelResult
+          );
+          console.log("label result:", this.labelResult);
+          this.$store.dispatch("Transactions/addAddressItem", {
+            address: this.selectedAddress,
+            label: this.labelResult,
+            purpose: "receive",
+          });
+        } else {
+          const data = await $daemon.editPaymentCodeBook(this.selectedAddress, this.labelResult);
+          await this.$store.dispatch('Transactions/setPaymentCodes', data);
+        }
+      } catch (e) {
+        console.log('Error: ', e)
+      }
       this.opened = false;
       this.visible = false;
     },
@@ -414,16 +452,20 @@ export default {
       }
     },
     async generateNewRegularAddresses() {
-      var createds = {};
-      for (var i = 0; i < 3; i++) {
+      var createds = [];
+      try {
         var createdAddress = await $daemon.getUnusedAddress();
-        createds[createdAddress] = {
+        createds.push({
           address: createdAddress,
-          label: "(unlabelled)",
+          label: "",
           purpose: "receive",
-        };
+        });
+        console.log('created address:', createdAddress);
+        await this.$store.dispatch("Transactions/setAddressBook", createds);
+        return createdAddress;
+      } catch(e) {
+        console.log('error:', e)
       }
-      await store.dispatch("Transactions/setAddressBook", createds);
     },
   },
 };

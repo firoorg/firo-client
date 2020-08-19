@@ -64,6 +64,7 @@ export default {
     async submit() {
       try {
           //edit
+          
           await $daemon.editAddressBook(
             this.address,
             this.label,

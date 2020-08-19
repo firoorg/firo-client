@@ -734,7 +734,7 @@ export default {
         console.log("myPaymentCode:", myPaymentCode);
         if (this.privateOrPublic === "private") {
           if (paymentCodeValid) {
-            await $$daemon.privateSendToPaymentCode(
+            await $daemon.privateSendToPaymentCode(
               passphrase,
               this.address,
               myPaymentCode,
