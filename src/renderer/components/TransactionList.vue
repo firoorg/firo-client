@@ -150,6 +150,11 @@ export default {
                 case 'receive':
                 case 'spendIn':
                     extraSearchText = 'Incoming Transaction';
+                    if (tx.paymentChannelID) {
+                        txType = "RAP address";
+                        let receivePcode = tx.paymentChannelID.split("-")[0];
+                        label = this.paymentChannels[receivePcode][0].label;
+                    }
                     break;
 
                 case 'send':
