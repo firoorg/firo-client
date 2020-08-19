@@ -223,7 +223,7 @@ export default {
       await this.generateNewRegularAddresses();
       this.regularAddressTableData();
     } 
-    this.selectedAddress = this.regularAddressTableData[0].address;
+    this.selectedAddress = this.regularAddressesData[0].address;
     this.generateQRCode();
   },
 
