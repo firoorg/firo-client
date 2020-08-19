@@ -19,13 +19,22 @@
         {{ props.rowData.label }}
       </div>
 
-      <div slot="address" slot-scope="props" class="vuetable-address" v-tooltip="purpose=='send'?'Select this address as transaction recipient':'Select this address as payment recipient'">
+      <div
+        slot="address"
+        slot-scope="props"
+        class="vuetable-address"
+        v-tooltip="
+          purpose == 'send'
+            ? 'Select this address as transaction recipient'
+            : 'Select this address as payment recipient'
+        "
+      >
         <u
           ><a
             :style="{ cursor: 'pointer' }"
             @click.prevent="selectAddress(props.rowData)"
           >
-            {{ props.rowData.address }}
+            {{ props.rowData.shortAddress }}
           </a>
         </u>
       </div>
@@ -106,39 +115,40 @@ import DeleteAddressIcon from "@/components//Icons/DeleteAddressIcon";
 import AnimatedTablePagination from "@/components/AnimatedTable/AnimatedTablePagination";
 import EditAddressBookPopup from "@/components/Overlay/EditAddressBookPopup";
 import AddressDeleteConfirm from "@/components/Overlay/AddressDeleteConfirm";
+import { isValidPaymentCode } from "#/lib/isValidAddress";
 import types from "~/types";
 import Vue from "vue";
-import Toasted from 'vue-toasted';
-Vue.use(Toasted)
+import Toasted from "vue-toasted";
+Vue.use(Toasted);
 
 import VueClipboards from "vue-clipboards";
 Vue.use(VueClipboards);
 
-import VTooltip from 'v-tooltip'
-Vue.use(VTooltip)
+import VTooltip from "v-tooltip";
+Vue.use(VTooltip);
 
 const tableFields = [
   {
     name: "label",
     title: "Label",
     sortField: "label",
-    width: "15%"
+    width: "20%",
   },
   {
     name: "address",
     title: "Address",
     sortField: "address",
-    width: "58%"
+    width: "53%",
   },
   {
     name: "purpose",
-    title: 'Type',
-    width: "15%"
+    title: "Type",
+    width: "15%",
   },
   {
     name: "actions",
-    width: "12%"
-  }
+    width: "12%",
+  },
 ];
 
 export default {
@@ -151,30 +161,30 @@ export default {
     AnimatedTablePagination,
     EditAddressBookPopup,
     VueClipboards,
-    AddressDeleteConfirm
+    AddressDeleteConfirm,
   },
   props: {
     trackBy: {
       type: String,
-      default: "address"
+      default: "address",
     },
     sortOrder: {
       default: () => [
         {
           field: "label",
           direction: "asec",
-          sortField: "label"
-        }
-      ]
+          sortField: "label",
+        },
+      ],
     },
     perPage: {
       type: Number,
-      default: 10
+      default: 10,
     },
     noDataMessage: {
       type: String,
-      default: "No usable Transaction Ouput"
-    }
+      default: "No usable Transaction Ouput",
+    },
   },
   data() {
     return {
@@ -190,7 +200,7 @@ export default {
       deletedLabel: "",
       deletedAddress: "",
       needReloadData: false,
-      rows: []
+      rows: [],
     };
   },
   created() {
@@ -203,15 +213,28 @@ export default {
         this.rows.push({
           label: item.label,
           address: address,
-          purpose: this.toFirstUpperCase(item.purpose)
+          purpose: this.toFirstUpperCase(item.purpose),
+          shortAddress: address,
         });
       }
+    }
+
+    for (const [paymentCode, channels] of Object.entries(
+      this.paymentChannels
+    )) {
+      this.rows.push({
+        label: channels[0].label == "" ? "(unlabelled)" : channels[0].label,
+        address: paymentCode,
+        shortAddress: this.shortenAddress(paymentCode),
+        purpose: "RAP",
+      });
     }
   },
   computed: {
     ...mapGetters({
       addressBook: "Transactions/addressBook",
-      openAddressBook: "App/openAddressBook"
+      paymentChannels: "Transactions/paymentChannels",
+      openAddressBook: "App/openAddressBook",
     }),
 
     tableData() {
@@ -224,24 +247,30 @@ export default {
 
     purpose() {
       return this.openAddressBook.purpose.toLowerCase();
-    }
+    },
   },
   watch: {
     $route(to, from) {
-      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {open: false, purpose: ''});
-    }
+      this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
+        open: false,
+        purpose: "",
+      });
+    },
   },
   methods: {
     selectAddress(item) {
       this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
         open: false,
         address: item.address,
-        purpose: item.purpose.toLowerCase()
+        purpose: this.openAddressBook.purpose.toLowerCase(),
       });
     },
 
     showCopied(addr) {
-      this.$toasted.success('Copied ' + addr + ".", {position: 'top-center', duration: 2000});
+      this.$toasted.success("Copied " + addr + ".", {
+        position: "top-center",
+        duration: 2000,
+      });
     },
 
     async closeDeleteAddressBook(data) {
@@ -258,7 +287,7 @@ export default {
           ""
         );
         this.$store.dispatch("Transactions/deleteAddressItem", data.address);
-        const index = this.rows.findIndex(v => v.address == data.address);
+        const index = this.rows.findIndex((v) => v.address == data.address);
         this.rows.splice(index, 1);
         this.$refs.vuetable.reload();
       } catch (e) {
@@ -271,16 +300,19 @@ export default {
       this.showEditAddressBook = false;
       console.log("closeEditAddressBook:", data);
       if (!data.updated) return; //cancel
+      var isPC = isValidPaymentCode(data.newaddress);
+      var short = isPC? this.shortenAddress(data.newaddress):data.newaddress;
+      var purpose_ = isPC? "RAP":this.toFirstUpperCase(data.purpose);
       if (data.oldaddress === "") {
         //add new address
         this.rows.push({
           label: data.newlabel,
           address: data.newaddress,
-          purpose: this.toFirstUpperCase(data.purpose)
+          purpose: this.toFirstUpperCase(data.purpose),
         });
       } else {
         //edit existing address
-        this.rows.forEach(item => {
+        this.rows.forEach((item) => {
           if (item.address === data.oldaddress) {
             item.address = data.newaddress;
             item.label = data.newlabel;
@@ -293,7 +325,7 @@ export default {
     },
     comparePayments(a, b) {
       return !["blockHeight", "timestamp", "amount", "txId"].find(
-        field => a[field] !== b[field]
+        (field) => a[field] !== b[field]
       );
     },
     getRowClass(item, index) {
@@ -325,7 +357,7 @@ export default {
     dataManager(sortOrder, pagination) {
       if (this.tableData.length < 1) {
         return {
-          data: []
+          data: [],
         };
       }
 
@@ -344,19 +376,26 @@ export default {
 
       return {
         pagination: pagination,
-        data: _.slice(local, from, to)
+        data: _.slice(local, from, to),
       };
     },
 
+    shortenAddress(addr) {
+      if (addr.length < 20) {
+        return addr;
+      }
+      return addr.substring(0, 10) + "..." + addr.substring(addr.length - 10);
+    },
+
     toFirstUpperCase(a) {
-      return a.substring(0,1).toUpperCase() + a.substring(1).toLowerCase()
+      return a.substring(0, 1).toUpperCase() + a.substring(1).toLowerCase();
     },
 
     onLoadingCompleted() {
       if (this.selectedUtxos) {
-        this.selectedUtxos.forEach(element1 => {
+        this.selectedUtxos.forEach((element1) => {
           let found = false;
-          this.tableData.forEach(element2 => {
+          this.tableData.forEach((element2) => {
             if (element1.uniqId == element2.uniqId) {
               found = true;
             }
@@ -382,9 +421,11 @@ export default {
     },
 
     async deleteAddress(item) {
-      this.showDeleteAddressConfirm = true;
-      this.deletedLabel = item.label;
-      this.deletedAddress = item.address;
+      if (!isValidPaymentCode(item.address)) {
+        this.showDeleteAddressConfirm = true;
+        this.deletedLabel = item.label;
+        this.deletedAddress = item.address;
+      }
     },
 
     addNewAddress() {
@@ -399,10 +440,10 @@ export default {
     closePopup() {
       this.$store.dispatch(types.app.OPEN_ADDRESS_BOOK, {
         open: false,
-        address: ""
+        address: "",
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

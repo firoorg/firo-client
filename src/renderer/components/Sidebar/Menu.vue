@@ -32,13 +32,6 @@
                 </router-link>
             </li>
             <li>
-                <router-link to="/addressbook">
-                    <span class="text">
-                        Address Book
-                    </span>
-                </router-link>
-            </li>
-            <li>
                 <router-link to="/transactions">
                     <span class="text">
                         Transactions

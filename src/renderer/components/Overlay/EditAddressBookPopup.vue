@@ -40,6 +40,7 @@
                 v-if="!isCreateNew()"
                 @keydown="checkAddressValidity"
                 v-model="addressResult"
+                readonly
               />
               <input
                 type="text"
@@ -73,32 +74,34 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { isValidPaymentCode } from "#/lib/isValidAddress";
 
 export default {
   name: "EditAddressBookPopup",
   props: {
     label: {
       type: String,
-      default: ""
+      default: "",
     },
     address: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   created() {
     this.labelResult = this.label;
     this.addressResult = this.address;
-    window.addEventListener('keypress', this.doCommand);
+    window.addEventListener("keypress", this.doCommand);
   },
   destroyed() {
-    window.removeEventListener('keypress', this.doCommand);
+    window.removeEventListener("keypress", this.doCommand);
   },
   computed: {
     ...mapGetters({
       addressBook: "Transactions/addressBook",
-      openAddressBook: "App/openAddressBook"
-    })
+      paymentChannels: "Transactions/paymentChannels",
+      openAddressBook: "App/openAddressBook",
+    }),
   },
   data() {
     return {
@@ -107,7 +110,7 @@ export default {
       errorMessage: "Invalid address",
       showError: false,
       xStyle: "top: 245px",
-      xStyleDefault: "top: 245px"
+      xStyleDefault: "top: 245px",
     };
   },
   methods: {
@@ -116,63 +119,93 @@ export default {
       if (this.isCreateNew() && this.addressBook[this.addressResult]) {
         this.errorMessage = "Duplicate address!";
         this.showError = true;
-        this.xStyle = "top: 225px"
+        this.xStyle = "top: 225px";
         return;
       }
       try {
         if (this.isCreateNew()) {
-          //add
-          await $daemon.editAddressBook(
-            this.addressResult,
-            this.labelResult,
-            this.openAddressBook.purpose.toLowerCase(),
-            "add",
-            "",
-            ""
-          );
-          this.$store.dispatch("Transactions/addAddressItem", {
-            address: this.addressResult,
-            label: this.labelResult,
-            purpose: this.openAddressBook.purpose.toLowerCase()
-          });
-          this.$emit("close-edit-address-book", {
-            updated: true,
-            oldaddress: "",
-            oldlabel: "",
-            newaddress: this.addressResult,
-            newlabel: this.labelResult,
-            purpose: this.openAddressBook.purpose.toLowerCase()
-          });
+          //adddress
+          if (isValidPaymentCode(this.addressResult)) {
+            const data = await $daemon.editPaymentCodeBook(this.addressResult, this.labelResult);
+            this.$store.dispatch('Transactions/setPaymentChannels', Object.values(data));
+            this.$emit("close-edit-address-book", {
+              updated: true,
+              oldaddress: "",
+              oldlabel: "",
+              newaddress: this.addressResult,
+              newlabel: this.labelResult,
+              purpose: this.openAddressBook.purpose.toLowerCase(),
+            });
+          } else {
+            await $daemon.editAddressBook(
+              this.addressResult,
+              this.labelResult,
+              this.openAddressBook.purpose.toLowerCase(),
+              "add",
+              "",
+              ""
+            );
+            this.$store.dispatch("Transactions/addAddressItem", {
+              address: this.addressResult,
+              label: this.labelResult,
+              purpose: this.openAddressBook.purpose.toLowerCase(),
+            });
+            this.$emit("close-edit-address-book", {
+              updated: true,
+              oldaddress: "",
+              oldlabel: "",
+              newaddress: this.addressResult,
+              newlabel: this.labelResult,
+              purpose: this.openAddressBook.purpose.toLowerCase(),
+            });
+          }
         } else {
           //edit
-          await $daemon.editAddressBook(
-            this.address,
-            this.label,
-            this.openAddressBook.purpose.toLowerCase(),
-            "edit",
-            this.addressResult,
-            this.labelResult
-          );
-          this.$store.dispatch("Transactions/deleteAddressItem", this.address);
-          this.$store.dispatch("Transactions/addAddressItem", {
-            address: this.addressResult,
-            label: this.labelResult,
-            purpose: this.openAddressBook.purpose.toLowerCase()
-          });
-          this.$emit("close-edit-address-book", {
-            updated: true,
-            oldaddress: this.address,
-            oldlabel: this.label,
-            newaddress: this.addressResult,
-            newlabel: this.labelResult,
-            purpose: this.openAddressBook.purpose.toLowerCase()
-          });
+          if (isValidPaymentCode(this.addressResult)) {
+            const data = await $daemon.editPaymentCodeBook(this.addressResult, this.labelResult);
+            console.log('data:', data)
+            this.$store.dispatch('Transactions/setPaymentChannels', Object.values(data));
+            this.$emit("close-edit-address-book", {
+              updated: true,
+              oldaddress: this.address,
+              oldlabel: this.label,
+              newaddress: this.addressResult,
+              newlabel: this.labelResult,
+              purpose: this.openAddressBook.purpose.toLowerCase(),
+            });
+          } else {
+            await $daemon.editAddressBook(
+              this.address,
+              this.label,
+              this.openAddressBook.purpose.toLowerCase(),
+              "edit",
+              this.addressResult,
+              this.labelResult
+            );
+            this.$store.dispatch(
+              "Transactions/deleteAddressItem",
+              this.address
+            );
+            this.$store.dispatch("Transactions/addAddressItem", {
+              address: this.addressResult,
+              label: this.labelResult,
+              purpose: this.openAddressBook.purpose.toLowerCase(),
+            });
+            this.$emit("close-edit-address-book", {
+              updated: true,
+              oldaddress: this.address,
+              oldlabel: this.label,
+              newaddress: this.addressResult,
+              newlabel: this.labelResult,
+              purpose: this.openAddressBook.purpose.toLowerCase(),
+            });
+          }
         }
       } catch (e) {
         console.log("error:", e);
         this.errorMessage = e.error.message;
         this.showError = true;
-        this.xStyle = "top: 225px"
+        this.xStyle = "top: 225px";
       }
     },
     isCreateNew() {
@@ -186,8 +219,8 @@ export default {
     checkAddressValidity() {
       this.showError = false;
       this.xStyle = this.xStyleDefault;
-    }
-  }
+    },
+  },
 };
 </script>
 

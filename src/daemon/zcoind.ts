@@ -1554,6 +1554,12 @@ export class Zcoind {
         });
     }
 
+    async editPaymentCodeBook(paymentCode_: string, label_: string) : Promise<Object> {
+        return await this.send('', 'create', 'editPaymentCodeBook', {
+            paymentCode: paymentCode_,
+            label: label_
+        });
+    }
     // Get an unused address with no associated label.
     async getUnusedAddress(): Promise<string> {
         const data = await this.send(null, 'none', 'paymentRequestAddress', null);

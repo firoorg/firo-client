@@ -108,6 +108,7 @@ export default {
             addressBook: "Transactions/addressBook",
             paymentRequests: 'PaymentRequest/paymentRequests',
             consolidatedMints: 'Transactions/consolidatedMints',
+            paymentChannels:'Transactions/paymentChannels'
         }),
 
         latestTableData () {
@@ -116,6 +117,9 @@ export default {
             for (const [id, tx] of Object.entries(this.transactions)) {
                 // Mined transactions are incorrectly marked as change.
                 if (tx.isChange && tx.category !== 'mined') {
+                    continue;
+                }
+                if (tx.amount <= 0) {
                     continue;
                 }
                 // Mints are handled separately.
@@ -127,6 +131,9 @@ export default {
                     this.$log.error(`unknown category '${tx.category}' on tx ${id}`);
                     continue;
                 }
+                
+                var txType = "Regular address";
+                var label = tx.label;
 
                 if (!tx.address) {
                     this.$log.error(`transaction ${id} with no associated address`);
@@ -148,25 +155,36 @@ export default {
                 case 'send':
                 case 'spendOut':
                     extraSearchText = 'Outgoing Transaction';
+                    if (tx.paymentChannelID) {
+                        txType = "RAP address";
+                        let receivePcode = tx.paymentChannelID.split("-")[0];
+                        label = this.paymentChannels[receivePcode][0].label;
+                    }
                     break;
 
                 case 'znode':
                     extraSearchText = 'Znode Payment';
                     break
                 }
+
+                if (tx.isNotificationTransaction) {
+                    txType = "Connection Fee";
+                    label = this.paymentChannels[tx.paymentCode][0].label;
+                    if (label == "") {
+                        label = "(unlabelled)";
+                    }
+                }
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction-info/${id}`,
                     txid: tx.txid,
-                    type: tx.category,
+                    type: txType,
                     category: tx.category,
                     blockHeight: tx.blockHeight,
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
-                    label:
-                        tx.label ||
-                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined) || extraSearchText,
+                    label: (!label || label == "")? extraSearchText:label,
                     extraSearchText: extraSearchText + ' ' + tx.label + ' ' + tx.address + convertToCoin(tx.amount) + ' XZC'
                 });
             }
@@ -174,7 +192,7 @@ export default {
             for (const [blockHeight, mintInfo] of Object.entries(this.consolidatedMints)) {
                 tableData.push({
                     id: `/mint-info/${blockHeight}`,
-                    type: 'mint',
+                    type: 'Mint Transaction',
                     category: 'mint',
                     blockHeight: blockHeight,
                     date: mintInfo.blockTime * 1000 || Infinity,

@@ -103,11 +103,6 @@ export default new Router({
                 },
 
                 {
-                    path: '/addressbook',
-                    component: require('@/components/AddressBookPage').default
-                },
-
-                {
                     path: '/transactions',
                     component: require('@/components/TransactionHistoryPage').default
                 },

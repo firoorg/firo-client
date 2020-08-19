@@ -87,8 +87,7 @@
                   style="color:red; font-size: small"
                 >
                   <i
-                    >No transaction history to this address found, thus a 0.005
-                    XZC connection fee will be inlcuded in your transaction.</i
+                    >{{notiMessage}}.</i
                   >
                 </div>
               </div>
@@ -381,6 +380,7 @@ export default {
       passphrase: "",
 
       errorMessage: "",
+      notiMessage:"",
 
       // Valid progressions are:
       //
@@ -429,9 +429,20 @@ export default {
     },
 
     notifyNotificationTx() {
-      return (
-        isValidPaymentCode(this.address) && !this.paymentChannels[this.address]
-      );
+      if (this.paymentCodes[this.address]) {
+        this.notiMessage = "You cannot send to your RAP address";
+        return true;
+      }
+      this.notiMessage = "No transaction history to this address found, thus a 0.005 XZC connection fee will be inlcuded in your transaction";
+      if (!isValidPaymentCode(this.address)) return false;
+      if (!this.paymentChannels[this.address]) return true;
+      var i;
+      for(i = 0; i < this.paymentChannels[this.address].length; i++) {
+        if (this.paymentChannels[this.address][i].status) {
+          return false;
+        }
+      }
+      return true;
     },
 
     unavailableBalance() {
@@ -468,7 +479,7 @@ export default {
       return (
         this.isValidated &&
         this.transactionFee > 0 &&
-        !this.totalAmountExceedsBalance
+        !this.totalAmountExceedsBalance 
       );
     },
 
@@ -478,7 +489,8 @@ export default {
         this.amount &&
         this.address &&
         this.txFeePerKb &&
-        !this.validationErrors.items.length
+        !this.validationErrors.items.length &&
+        !this.paymentCodes[this.address]
       );
     },
 

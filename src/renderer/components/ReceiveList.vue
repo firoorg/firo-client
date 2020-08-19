@@ -32,7 +32,7 @@
         :data="filteredTableData"
         :fields="tableFields"
         track-by="address"
-        no-data-message="No Address Found."
+        no-data-message="noDataMessage"
         :sort-order="sortOrder"
         :row-class="onRowClass"
         :per-page="13"
@@ -222,9 +222,14 @@ export default {
       paymentCodes: "Transactions/paymentCodes",
       addressBook: "Transactions/addressBook",
       stateAddresses: "Transactions/addresses",
+      apiStatus: 'ApiStatus/apiStatus',
     }),
     selectedAddressShort() {
       return this.shortenAddress(this.selectedAddress);
+    },
+
+    noDataMessage() {
+      return apiStatus.data.hasMnemonic?"No Address Found.":"Reusable addressses not supported as your wallet does not have mnemonics recovery phrase";
     },
 
     latestTableData() {
