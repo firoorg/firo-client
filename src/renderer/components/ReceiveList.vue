@@ -1,30 +1,33 @@
 <template>
   <section class="receive-list">
     <div class="qr-code">
-      <div ref="qrCode" />
+      <div ref="qrCode" 
+            @click="copyAddress(shortenAddress(selectedAddress))"
+            :style="{ cursor: 'pointer' }"/>
       <div style="text-align:center">
         <p>
           <span style="font-weight: bold;">{{ selectedLabel }}</span>
-          <br /><span>{{ selectedAddressShort }}</span>
+          <br/><u><a
+            :style="{ cursor: 'pointer' }"
+            @click="copyAddress(shortenAddress(selectedAddress))"
+          >{{ shortenAddress(selectedAddress) }}</a></u>
         </p>
       </div>
     </div>
 
     <div class="popup-footer">
       <base-button
-        class="rounded-btn"
-        :style="styleRegularAddress"
+        :class="styleRegularAddress"
         @click.prevent="showRegularAddress"
       >
-        REGULAR ADDRESS
+        REGULAR ADDRESSES
       </base-button>
 
       <base-button
-        class="rounded-btn"
-        :style="styleReusableAddress"
+        :class="styleReusableAddress"
         @click.prevent="showReusableAddress"
       >
-        REUSABLE ADDRESS
+        REUSABLE ADDRESSES
       </base-button>
     </div>
     <div class="animated-table-customized">
@@ -82,6 +85,7 @@
       :opened="opened"
       :visible="visible"
       @closed="opened = visible = false"
+      width="300"
     >
       <div style="text-align:center">
         <div class="close" @click="closeEdit">
@@ -95,6 +99,7 @@
             value=""
             placeholder="Start typing"
             width="200"
+            @keyup.enter="submit"
           />
         </div>
         <br />
@@ -176,9 +181,8 @@ export default {
       tableFields,
       filter: "",
       currentPage: 1,
-      selectedStyle: "background-color: #E2E2E9; color: #F92848;",
-      styleRegularAddress: "",
-      styleReusableAddress: "",
+      styleRegularAddress: "rounded-btn-selected",
+      styleReusableAddress: "rounded-btn",
       qrCode: null,
       isRegularAddressSelected: true,
       opened: false,
@@ -188,7 +192,9 @@ export default {
       stateAddressesChanged: false,
       addressBookChanged: false,
       selectedAddress: "",
-      numUnlabelledAddress: 0
+      numUnlabelledAddress: 0,
+      selectedStyle: "rounded-btn-selected",
+      notSelectedStyle: "rounded-btn"
     };
   },
 
@@ -207,6 +213,9 @@ export default {
       this.addressBookChanged = true;
       this.regularAddressTableData();
     },
+    unusedAddresses: function(newF, oldF) {
+      this.regularAddressTableData();
+    },
     numUnlabelledAddress: function(oldV, newV) {
       if (newV == 0) {
         this.generateNewRegularAddresses();
@@ -214,15 +223,15 @@ export default {
     }
   },
 
-  async mounted() {
+  created() {
     this.styleRegularAddress = this.selectedStyle;
     this.stateAddressesChanged = true;
     this.addressBookChanged = true;
     this.regularAddressTableData();
-    if (this.numUnlabelledAddress == 0) {
+    /*if (this.numUnlabelledAddress == 0) {
       await this.generateNewRegularAddresses();
       this.regularAddressTableData();
-    } 
+    } */
     this.selectedAddress = this.regularAddressesData[0].address;
     this.generateQRCode();
   },
@@ -233,6 +242,7 @@ export default {
       addressBook: "Transactions/addressBook",
       stateAddresses: "Transactions/addresses",
       apiStatus: 'ApiStatus/apiStatus',
+      unusedAddresses: 'Transactions/unusedAddresses'
     }),
     selectedAddressShort() {
       return this.shortenAddress(this.selectedAddress);
@@ -247,13 +257,7 @@ export default {
     },
 
     computeStateUnusedAddresses() {
-      var ret = [];
-      for (const k of Object.keys(this.addressBook)) {
-        if (!this.stateAddresses[k] && this.addressBook[k].label != "Bip47Receive") {
-          ret.push(k);
-        }
-      }
-      return ret;
+      return Object.keys(this.unusedAddresses);
     },
 
     selectedLabel() {
@@ -264,7 +268,7 @@ export default {
         ret = this.paymentCodes[this.selectedAddress]
       }
       if (ret == "") {
-        return "(unlabelled)";
+        return "Unlabelled";
       }
       return ret;
     },
@@ -320,7 +324,7 @@ export default {
       // if (this.stateUnusedAddresses.length <= 4) {
       //   //await this.generateNewRegularAddresses();
       // }
-      this.styleReusableAddress = "";
+      this.styleReusableAddress = this.notSelectedStyle;
       this.generateQRCode();
     },
     showReusableAddress() {
@@ -331,7 +335,7 @@ export default {
       if (this.filteredTableData.length > 0) {
         this.selectedAddress = this.filteredTableData[0].address;
         this.styleReusableAddress = this.selectedStyle;
-        this.styleRegularAddress = "";
+        this.styleRegularAddress = this.notSelectedStyle;
         this.generateQRCode();
       }
     },
@@ -347,7 +351,7 @@ export default {
             label:
               !this.addressBook[k] ||
               this.addressBook[k].label == ""
-                ? "(unlabelled)"
+                ? "Unlabelled"
                 : this.addressBook[k].label,
             address: k,
             shortAddress: this.shortenAddress(k),
@@ -355,6 +359,7 @@ export default {
           if (!this.addressBook[k].label || this.addressBook[k].label == "") {
             this.numUnlabelledAddress++;
           }
+          break;
         }
       }
       this.regularAddressesData = data;
@@ -406,6 +411,12 @@ export default {
           const data = await $daemon.editPaymentCodeBook(this.selectedAddress, this.labelResult);
           await this.$store.dispatch('Transactions/setPaymentCodes', data);
         }
+        for(const d of this.filteredTableData) {
+          if (d.address == this.selectedAddress) {
+            d.label = this.labelResult;
+            break;
+          }
+        }
       } catch (e) {
         console.log('Error: ', e)
       }
@@ -424,17 +435,17 @@ export default {
     },
 
     editLabel(item) {
-      console.log("jahdjhad");
+      this.labelResult = "";
       this.opened = this.visible = true;
     },
     copyAddress(addr) {
       this.$toasted.success("Copied " + addr + ".", {
-        position: "top-right",
+        position: "top-center",
         duration: 1000,
       });
     },
     onRowClass(dataItem, index) {
-      return dataItem.isOverdue ? "color-red" : "color-white";
+      return "color-red";
     },
     async createNewAddress() {
       if (this.isRegularAddressSelected) {
@@ -475,7 +486,7 @@ export default {
 .close {
   position: absolute;
   right: 20px;
-  top: 800;
+  top: 0;
   transition: all 200ms;
   font-size: 30px;
   font-weight: bold;
@@ -508,8 +519,16 @@ export default {
 
 .rounded-btn {
   border-radius: 28px !important;
-  border: none;
-  background-color: $color--polo-light;
+  border:1px solid #828282;
+  background-color: #F0F3FC;
+  color: #828282;
+}
+
+.rounded-btn-selected {
+  border-radius: 28px !important;
+  border:1px solid #3EAD54;
+  background-color: #E6E7FF;
+  color: #3EAD54;
 }
 
 .qr-code {

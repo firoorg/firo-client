@@ -305,11 +305,13 @@ export default {
       var purpose_ = isPC? "RAP":this.toFirstUpperCase(data.purpose);
       if (data.oldaddress === "") {
         //add new address
-        this.rows.push({
+        var newRow = {
           label: data.newlabel,
-          address: data.newaddress,
+          address: short,
           purpose: this.toFirstUpperCase(data.purpose),
-        });
+        };
+        console.log("closeEditAddressBook:", newRow);
+        this.rows.push(newRow);
       } else {
         //edit existing address
         this.rows.forEach((item) => {

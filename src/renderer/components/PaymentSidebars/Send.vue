@@ -4,18 +4,9 @@
       <form class="send">
         <div class="grid">
           <div class="form">
-            <header>
-              <h2>
-                Send Zcoin
-                {{
-                  privateOrPublic[0].toUpperCase() + privateOrPublic.substr(1)
-                }}ly
-              </h2>
-            </header>
-
             <p v-if="privateOrPublic === 'public'" class="description">
               Zcoin you send with Public Send will be visible by everyone. Maybe
-              you want to use Private Send instead?
+              use Private Send instead?
             </p>
 
             <p v-else class="description">
@@ -44,6 +35,16 @@
                   />
                 </div>
               </div>
+              <div class="field" v-show="showDropDown">
+                <div class="addressbook-action-group">
+                  <p class="addressbook-action-group" style="font-weight: bold">Send From:</p>
+                  <div class="addressbook-action-group" style="float:right">
+                      <select v-model="selectedSendFrom" class="selectrap">
+                          <option v-for="addr in Object.keys(mapOfAddresses)" v-bind:key="addr">{{addr}}</option>
+                      </select>
+                  </div>
+                </div>
+              </div>
               <div class="addressbook-action-group" style="float:right">
                 <div
                   class="addressbook-action-group"
@@ -56,7 +57,7 @@
                 <div
                   class="addressbook-action-group"
                   title="Paste"
-                  @click="openAddressBook()"
+                  @click="pasteAddress()"
                   :style="{ cursor: 'pointer' }"
                 >
                   <paste-icon />
@@ -64,7 +65,7 @@
               </div>
               <div class="field">
                 <label for="address">
-                  {{ $t("send.public.detail-public-send.label__address") }}
+                  Send To
                 </label>
 
                 <div class="control">
@@ -86,9 +87,7 @@
                   v-if="notifyNotificationTx"
                   style="color:red; font-size: small"
                 >
-                  <i
-                    >{{notiMessage}}.</i
-                  >
+                  <i>{{ notiMessage }}.</i>
                 </div>
               </div>
 
@@ -344,6 +343,7 @@ import CircularTimer from "@/components/Icons/CircularTimer";
 
 import AddressBookIcon from "@/components//Icons/AddressBookIcon";
 import PasteIcon from "@/components//Icons/PasteIcon";
+
 import Vue from "vue";
 import VtTooltip from "v-tooltip";
 Vue.use(VtTooltip);
@@ -380,7 +380,7 @@ export default {
       passphrase: "",
 
       errorMessage: "",
-      notiMessage:"",
+      notiMessage: "",
 
       // Valid progressions are:
       //
@@ -401,7 +401,14 @@ export default {
 
       // This is set if error -6 occurs during fee calculation.
       totalAmountExceedsBalance: false,
+      selectedSendFrom: null,
     };
+  },
+
+  created() {
+    if (!this.selectSendFrom && Object.values(this.mapOfAddresses).length > 0) {
+      this.selectedSendFrom = Object.keys(this.mapOfAddresses)[0];
+    }
   },
 
   computed: {
@@ -427,17 +434,38 @@ export default {
         return "private";
       }
     },
+    mapOfAddresses() {
+      var data = {};
+      for (const addr of Object.keys(this.paymentCodes)) {
+        data[this.shortenAddress(addr)] = addr;
+      }
+      return data;
+    },
+    selectedSendPaymentCode() {
+      if (this.mapOfAddresses[this.selectedSendFrom]) {
+        return this.mapOfAddresses[this.selectedSendFrom];
+      }
+      return "";
+    },
+
+    showDropDown() {
+      return (
+        isValidPaymentCode(this.address) &&
+        Object.keys(this.paymentCodes).length > 1
+      );
+    },
 
     notifyNotificationTx() {
       if (this.paymentCodes[this.address]) {
-        this.notiMessage = "You cannot send to your RAP address";
+        this.notiMessage = "You cannot send to your own RAP address";
         return true;
       }
-      this.notiMessage = "No transaction history to this address found, thus a 0.005 XZC connection fee will be inlcuded in your transaction";
+      this.notiMessage =
+        "No transaction history to this address found, thus a 0.005 XZC connection fee will be included in your transaction";
       if (!isValidPaymentCode(this.address)) return false;
       if (!this.paymentChannels[this.address]) return true;
       var i;
-      for(i = 0; i < this.paymentChannels[this.address].length; i++) {
+      for (i = 0; i < this.paymentChannels[this.address].length; i++) {
         if (this.paymentChannels[this.address][i].status) {
           return false;
         }
@@ -479,7 +507,7 @@ export default {
       return (
         this.isValidated &&
         this.transactionFee > 0 &&
-        !this.totalAmountExceedsBalance 
+        !this.totalAmountExceedsBalance
       );
     },
 
@@ -539,6 +567,11 @@ export default {
       if (!this.useCustomFee) {
         this.txFeePerKb = 1;
       }
+    },
+
+    mapOfAddresses: {
+      handler: "selectSendFrom",
+      immediate: true
     },
 
     amount: {
@@ -620,6 +653,12 @@ export default {
   methods: {
     convertToCoin,
 
+    selectSendFrom() {
+      if (!this.selectedSendFrom || this.selectedSendFrom.length == 0) {
+        this.selectedSendFrom = Object.keys(this.mapOfAddresses)[0];
+      }
+    },
+
     async maybeShowFee() {
       this.totalAmountExceedsBalance = false;
 
@@ -673,6 +712,10 @@ export default {
       this.closeSendPopover();
     },
 
+    methodToRunOnSelect(payload) {
+      this.selectedSendFrom = payload;
+    },
+
     recalculatePopoverPosition() {
       // v-popover only knows to recalculate position on resize events, so fake that one happened in order to
       // trigger the update.
@@ -720,16 +763,7 @@ export default {
         const paymentCodeValid = isValidPaymentCode(this.address);
         var myPaymentCode = "";
         if (paymentCodeValid) {
-          if (this.paymentChannels[this.address]) {
-            this.paymentChannels[this.address][0].myPaymentCode;
-          } else {
-            for (const pc of Object.keys(this.paymentCodes)) {
-              if (this.paymentCodes[pc].index == 0) {
-                myPaymentCode = pc;
-                break;
-              }
-            }
-          }
+          myPaymentCode = this.selectedSendPaymentCode;
         }
         console.log("myPaymentCode:", myPaymentCode);
         if (this.privateOrPublic === "private") {
@@ -820,6 +854,17 @@ export default {
         this.amount ? this.amount : 0
       );
       this.$store.dispatch("ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP");
+    },
+
+    shortenAddress(addr) {
+      if (addr.length < 20) {
+        return addr;
+      }
+      return addr.substring(0, 10) + "..." + addr.substring(addr.length - 10);
+    },
+
+    async pasteAddress() {
+      console.log('Selected:', this.mapOfAddresses[this.selectedSendFrom])
     },
 
     async openAddressBook() {
@@ -971,6 +1016,11 @@ fieldset {
 
 .debug {
   align-self: end;
+}
+
+.selectrap {
+   border:0px;
+   outline:0px;
 }
 
 button,

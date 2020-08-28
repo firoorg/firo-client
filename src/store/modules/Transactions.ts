@@ -15,7 +15,8 @@ const state = {
     addressBook: <{[address: string]: AddressBookItem}>{},
     walletLoaded: false,
     paymentCodes: <{[label: string]: string}>{},
-    paymentChannels: <{[paymentCode: string]: PaymentChannel[]}>{}
+    paymentChannels: <{[paymentCode: string]: PaymentChannel[]}>{},
+    unusedAddresses: <{[address: string]: boolean}>{}
 };
 
 const mutations = {
@@ -23,6 +24,7 @@ const mutations = {
         const stateTransactions = cloneDeep(state.transactions);
         const stateAddresses = cloneDeep(state.addresses);
         const stateUnspentUTXOs = cloneDeep(state.unspentUTXOs);
+        const stateUnusedAddresses = cloneDeep(state.unusedAddresses);
 
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
         var unspentAlreadyProcess = false;
@@ -66,6 +68,7 @@ const mutations = {
                             stateAddresses[tx.address] = [];
                         }
                         stateAddresses[tx.address].push(tx.uniqId);
+                        delete stateUnusedAddresses[tx.address];
                     }
                 }
             } else if (['lockedCoins'].includes(address)) {
@@ -104,6 +107,7 @@ const mutations = {
         state.addresses = stateAddresses;
         state.transactions = stateTransactions;
         state.unspentUTXOs = stateUnspentUTXOs;
+        state.unusedAddresses = stateUnusedAddresses;
         state.walletLoaded = true;
     },
 
@@ -127,8 +131,16 @@ const mutations = {
     setAddressBook(state, addressBook_: AddressBookItem[]) {
         addressBook_.forEach(e => {
             state.addressBook[e.address] = e;
+            if (e.purpose == "receive") {
+                if (!state.addresses[e.address]) {
+                    state.unusedAddresses[e.address] = true; 
+                } else {
+                    delete state.unusedAddresses[e.address];
+                }
+            }
         })
         state.addressBook = {...state.addressBook};
+        state.unusedAddresses = {...state.unusedAddresses};
     },
 
     setPaymentChannels(state, paymentChannels_: PaymentChannel[][]) {
@@ -152,6 +164,14 @@ const mutations = {
 
     addAddressItem(state, item: AddressBookItem) {
         state.addressBook[item.address] = item;
+        if (item.purpose == "receive") {
+            if (!state.addresses[item.address]) {
+                state.unusedAddresses[item.address] = true; 
+            } else {
+                delete state.unusedAddresses[item.address];
+            }
+            state.unusedAddresses = {...state.unusedAddresses};
+        }
         state.addressBook = {...state.addressBook};
     }
 };
@@ -252,6 +272,7 @@ const getters = {
     walletLoaded: (state) => state.walletLoaded,
     paymentCodes: (state) => state.paymentCodes,
     paymentChannels: (state) => state.paymentChannels,
+    unusedAddresses: (state) => state.unusedAddresses,
 
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,
