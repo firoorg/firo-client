@@ -6,7 +6,7 @@ export async function handleEvent(store, zcoin: Zcoind, eventData: any) {
     const paymentChannelsState = await zcoin.readPaymentChannelsState();
     store.dispatch('Transactions/setPaymentChannels', Object.values(paymentChannelsState));
 
-    if (Object.values(store.state.unusedAddresses).length == 0) {
+    if (Object.values(store.getters['Transactions/unusedAddresses']).length == 0) {
       var createds = [];
       try {
         var createdAddress = await zcoin.getUnusedAddress();

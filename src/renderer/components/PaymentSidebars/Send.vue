@@ -37,11 +37,17 @@
               </div>
               <div class="field" v-show="showDropDown">
                 <div class="addressbook-action-group">
-                  <p class="addressbook-action-group" style="font-weight: bold">Send From:</p>
+                  <p class="addressbook-action-group" style="font-weight: bold">
+                    Send From:
+                  </p>
                   <div class="addressbook-action-group" style="float:right">
-                      <select v-model="selectedSendFrom" class="selectrap">
-                          <option v-for="addr in Object.keys(mapOfAddresses)" v-bind:key="addr">{{addr}}</option>
-                      </select>
+                    <select v-model="selectedSendFrom" class="selectrap">
+                      <option
+                        v-for="addr in Object.keys(mapOfAddresses)"
+                        v-bind:key="addr"
+                        >{{ addr }}</option
+                      >
+                    </select>
                   </div>
                 </div>
               </div>
@@ -445,6 +451,9 @@ export default {
       if (this.mapOfAddresses[this.selectedSendFrom]) {
         return this.mapOfAddresses[this.selectedSendFrom];
       }
+      if (Object.keys(this.paymentCodes).length == 1) {
+        return Object.keys(this.paymentCodes)[0];
+      }
       return "";
     },
 
@@ -466,7 +475,11 @@ export default {
       if (!this.paymentChannels[this.address]) return true;
       var i;
       for (i = 0; i < this.paymentChannels[this.address].length; i++) {
-        if (this.paymentChannels[this.address][i].status) {
+        if (
+          this.paymentChannels[this.address][i].status &&
+          this.paymentChannels[this.address][i].myPaymentCode ==
+            this.selectedSendPaymentCode
+        ) {
           return false;
         }
       }
@@ -571,7 +584,7 @@ export default {
 
     mapOfAddresses: {
       handler: "selectSendFrom",
-      immediate: true
+      immediate: true,
     },
 
     amount: {
@@ -586,6 +599,11 @@ export default {
 
     isValidated: {
       handler: "maybeShowFee",
+    },
+
+    address: {
+      handler: "chooseConnectedRAP",
+      immediate: true,
     },
 
     addressBookStt(val) {
@@ -656,6 +674,31 @@ export default {
     selectSendFrom() {
       if (!this.selectedSendFrom || this.selectedSendFrom.length == 0) {
         this.selectedSendFrom = Object.keys(this.mapOfAddresses)[0];
+      }
+    },
+
+    chooseConnectedRAP() {
+      if (
+        isValidPaymentCode(this.address) &&
+        this.paymentChannels[this.address] &&
+        this.paymentChannels[this.address].length > 0
+      ) {
+        //check if the current selected payment code has connection
+        var selectedAddress = this.selectedSendPaymentCode;
+        var foundConnectedAddress = "";
+        for (var i = 0; i < this.paymentChannels[this.address].length; i++) {
+          if (this.paymentChannels[this.address][i].status) {
+            if (this.paymentChannels[this.address][i].myPaymentCode == selectedAddress) {
+              return;
+            } else {
+              foundConnectedAddress = this.paymentChannels[this.address][i].myPaymentCode;
+            }
+          }
+        }
+        if (foundConnectedAddress != "") {
+          this.selectedSendFrom = this.shortenAddress(foundConnectedAddress);
+          console.log('selectedSendFrom:', this.selectedSendFrom);
+        }
       }
     },
 
@@ -864,7 +907,7 @@ export default {
     },
 
     async pasteAddress() {
-      console.log('Selected:', this.mapOfAddresses[this.selectedSendFrom])
+      console.log("Selected:", this.mapOfAddresses[this.selectedSendFrom]);
     },
 
     async openAddressBook() {
@@ -1019,8 +1062,8 @@ fieldset {
 }
 
 .selectrap {
-   border:0px;
-   outline:0px;
+  border: 0px;
+  outline: 0px;
 }
 
 button,

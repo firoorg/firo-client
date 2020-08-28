@@ -223,7 +223,7 @@ export default {
     }
   },
 
-  created() {
+  mounted() {
     this.styleRegularAddress = this.selectedStyle;
     this.stateAddressesChanged = true;
     this.addressBookChanged = true;
