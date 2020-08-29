@@ -24,22 +24,7 @@
                             v-if="!availableXzc"
                             class="onboarding"
                         >
-                            <template slot="header">
-                                <h3>{{ $t('onboarding.make-request-first.mint.title') }}</h3>
-                            </template>
-                            <template slot="content">
-                                <i18n
-                                    path="onboarding.make-request-first.mint.description"
-                                    tag="p"
-                                >
-                                    <router-link
-                                        to="/receive"
-                                        place="linkToCreatePaymentRequest"
-                                    >
-                                        {{ $t('onboarding.make-request-first.mint.button__linkToCreatePaymentRequest') }}
-                                    </router-link>
-                                </i18n>
-                            </template>
+                            You don't seem to have have any XZC available. :(
                         </onboarding-notice>
                         <mint-stats v-else />
                     </transition>
@@ -52,7 +37,7 @@
                         <input
                             id="autoMintAmount"
                             v-model="autoMintAmount"
-                            v-validate.initial="'amountIsWithinAvailableBalance|amountIsValid'"
+                            v-validate.initial="'amountIsWithinAvailableBalance|min_value:0'"
                             v-tooltip="getValidationTooltip('autoMintAmount')"
                             name="autoMintAmount"
                             class="automint-input"
@@ -71,6 +56,10 @@
                             @click="autoMint"
                             value="Go!"
                         />
+
+                        <div v-if="showInsufficientXzcForAutomintWarning" class="insufficient-xzc-for-automint-warning">
+                            Insufficient Public XZC to Pay Automint Fees
+                        </div>
                     </div>
                 </div>
             </section>
@@ -245,7 +234,7 @@
 <script>
 import { fromPairs } from 'lodash';
 import { mapGetters } from 'vuex';
-import { getDenominationsToMint, convertToSatoshi, convertToCoin } from "#/lib/convert";
+import { getDenominationsToMintSeparatingFee, convertToSatoshi, convertToCoin } from "#/lib/convert";
 import { IncorrectPassphrase, ZcoindErrorResponse } from "#/daemon/zcoind";
 
 import CircularTimer from '@/components/Icons/CircularTimer';
@@ -316,7 +305,8 @@ export default {
             // {[denomination: number]: number}
             coinsToMint: fromPairs(Object.entries(this.$route.query.coinsToMint || {}).map(([k,v]) => [Number(k), v])),
 
-            autoMintAmount: 0
+            autoMintAmount: 0,
+            showInsufficientXzcForAutomintWarning: false
         }
     },
 
@@ -353,12 +343,6 @@ export default {
             // this.availableXzc will still be reactively updated.
             getMessage: () => 'Amount Is Over Your Available Balance of ' + convertToCoin(this.availableXzc),
             validate: (value) => convertToSatoshi(value) <= this.availableXzc
-        });
-
-        this.$validator.extend('amountIsValid', {
-            // this.availableXzc will still be reactively updated.
-            getMessage: () => 'Amount Must Be a Positive Multiple of 0.05',
-            validate: (value) => 1 / (convertToSatoshi(value) % 5e6) === Infinity
         });
     },
 
@@ -445,14 +429,23 @@ export default {
 
         autoMint() {
             if (this.autoMintAmount && !this.validationErrors.items.length) {
-                console.log(getDenominationsToMint(convertToSatoshi(this.autoMintAmount)));
+                const autoMintAmount = convertToSatoshi(this.autoMintAmount);
+                const [toMint, fee] = getDenominationsToMintSeparatingFee(autoMintAmount);
+
+                if (autoMintAmount + fee > this.availableXzc) {
+                    this.showInsufficientXzcForAutomintWarning = true;
+                    return;
+                } else {
+                    this.showInsufficientXzcForAutomintWarning = false;
+                }
+
                 // FIXME: This is a horrible, evil hack because Vue Router doesn't allow links to the current page, and
                 //        changing our whole architecture is too much trouble.
                 setTimeout(() => {
                     this.$router.push({
                         path: '/anonymize',
                         query: {
-                            coinsToMint: getDenominationsToMint(convertToSatoshi(this.autoMintAmount))
+                            coinsToMint: toMint
                         }
                     });
                 }, 50);
@@ -510,6 +503,11 @@ export default {
                 size: 1.2em;
                 weight: bold;
             }
+        }
+
+        .insufficient-xzc-for-automint-warning {
+            font-style: italic;
+            color: red;
         }
     }
 

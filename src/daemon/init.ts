@@ -6,7 +6,8 @@ import { Zcoind, MnemonicSettings } from './zcoind';
 // giving an error if there is an existing zcoind instance running OR the wallet is unlocked, we will connect to it
 // without running initializers.
 async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string,
-                      mnemonicSettings?: MnemonicSettings, allowMultipleZcoindInstances?: boolean): Promise<Zcoind> {
+                      mnemonicSettings?: MnemonicSettings, allowMultipleZcoindInstances?: boolean,
+                      runInitializersIfZcoindIsRunning?: boolean, connectionTimeout?: number): Promise<Zcoind> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
@@ -50,6 +51,8 @@ async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoin
     }
     const zcoind = new Zcoind(network, zcoindLocation, zcoindDataDir, initializers, eventHandlers);
     zcoind.allowMultipleZcoindInstances = !!allowMultipleZcoindInstances;
+    zcoind.runInitializersIfZcoindIsRunning = !!runInitializersIfZcoindIsRunning;
+    if (connectionTimeout) zcoind.connectionTimeout = connectionTimeout;
     await zcoind.start(mnemonicSettings);
 
     return zcoind;

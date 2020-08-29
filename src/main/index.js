@@ -23,6 +23,17 @@ if (!app.requestSingleInstanceLock()) {
     process.exit();
 }
 
+// Chromium sandboxing requires an suid helper binary to be present, but we want users to be able to install Zcoin
+// Client without root. Therefore, we need to disable sandboxing. This shouldn't be a security risk since we don't have
+// any untrusted code anyway.
+app.commandLine.appendSwitch('--no-sandbox');
+// Shared memory can't be used if the client is being run over SSH, and Chromium has a bug where it fails to
+// automatically detect the situation. Therefore, if we detect we're being run over SSH, we will tell it to not use
+// shared memory ourselves.
+if (process.env.SSH_CLIENT) {
+    app.commandLine.appendSwitch('--no-xshm');
+}
+
 // Register us as the handler for zcoin:// links. Actual handling of them is done in main.js.
 if (!app.isDefaultProtocolClient('zcoin')) {
     logger.info("Setting Zcoin Client as the default handler for zcoin:// links...");
@@ -47,7 +58,11 @@ app.once('ready', async () => {
         height: 780,
         width: 1400,
         minWidth: 1200,
-        minHeight: 450
+        minHeight: 450,
+        webPreferences: {
+            nodeIntegration: true,
+            enableRemoteModule: true
+        }
     });
 
     // Fire the shutdown-requested listener in renderer/main.js when the user tries to close us.
@@ -68,11 +83,10 @@ app.once('ready', async () => {
 
     if (process.env.NODE_ENV === 'development') {
         logger.info("Loading development environment at localhost:9080...");
-        ourWindow.loadURL("http://localhost:9080/");
-    }
-    else {
+        await ourWindow.loadURL("http://localhost:9080/");
+    } else {
         const indexDotHtml = join(__dirname, 'index.html');
         logger.info(`Loading production environment at ${indexDotHtml}...`);
-        ourWindow.loadFile(indexDotHtml);
+        await ourWindow.loadFile(indexDotHtml);
     }
 });

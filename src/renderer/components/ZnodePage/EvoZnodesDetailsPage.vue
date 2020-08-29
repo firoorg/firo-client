@@ -93,7 +93,6 @@ export default {
   },
   methods: {
     onClick(event) {
-      console.log("my-detail-row: on-click", event.target);
     },
   },
 };

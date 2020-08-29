@@ -241,7 +241,6 @@ export default {
             );
         },
         async confirmSelect() {
-            console.log('entered amount:', this.enteredAmount);
             /*if (this.totalSelected === 0 ) {
                 return alert("Please select at least one !");
             }*/
@@ -277,15 +276,12 @@ export default {
             var coinUnlocks = '';
             if (statusChanges && statusChanges.length > 0) {
                 try {
-                    console.log('coin changes:', statusChanges);
                     statusChanges.forEach(element => {
-                        console.log('string:', element);
                         var str = `${element.txid}-${element.txIndex}`;
                         if (element.status) {
                             coinUnlocks = `${coinUnlocks}:${str}`;
                         } else {
                             coinLocks = `${coinLocks}:${str}`;
-                            console.log('locking ', element.txid);
                         }
                     });
 
@@ -381,7 +377,6 @@ export default {
                 }
                 this.unselected[dataItem.uniqId] = true;
             } else {
-                console.log('selectd:', dataItem.uniqId, ', address=', dataItem.address);
                 this.selectedTx[dataItem.uniqId] = true;
                 this.totalSelected += dataItem.amount
                 this.unselected[dataItem.uniqId] = false;
@@ -411,7 +406,6 @@ export default {
             }
         },
         toggleSlider(dataItem) {
-            console.log('Slider is toggled:', this.selectedTx[dataItem.uniqId]);
             if (dataItem.status && this.selectedTx[dataItem.uniqId]) {
                 this.$refs.vuetable.unselectId(dataItem.uniqId);
                 this.selectedTx[dataItem.uniqId] = false;

@@ -114,7 +114,7 @@ export default {
         },
 
         async changeDataDir() {
-            this.dataDir = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+            const selection = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
                 title: 'Select Zcoin Data Directory',
                 properties: [
                     'openDirectory',
@@ -123,7 +123,10 @@ export default {
                     'showHiddenFiles'
                 ],
                 buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
-            })[0];
+            });
+            if (!selection.filePaths.length) return;
+
+            this.dataDir = selection.filePaths[0];
         },
 
         async continueSetup() {

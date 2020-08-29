@@ -1,5 +1,5 @@
 <template>
-    <section class="mint-info">
+    <section v-if="!isNaN(blockHeight)" class="mint-info">
         <div class="title">
             Private Mint
         </div>
@@ -54,6 +54,8 @@ export default {
             return this.blockHeight ? this.currentBlockHeight - this.blockHeight + 1 : 0;
         },
 
+        // This MAY be NaN if we're not on the current route. Thefore we must check whether it is NaN before rendering
+        // the component, or errors will be thrown when we navigate away from a mint-info/ path.
         blockHeight () {
             return Number(this.$route.params.blockHeight);
         },

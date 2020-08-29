@@ -94,7 +94,6 @@ export default {
 
     watch: {
         currentPage(newPage, oldPage) {
-            console.log(`currentPage: ${oldPage} -> ${newPage}`);
         },
 
         latestTableData: {

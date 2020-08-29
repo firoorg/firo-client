@@ -3,7 +3,7 @@ import { format } from 'util'
 import * as types from '../types/Settings'
 import { getApp, getAppSettings } from '#/lib/utils'
 
-import { convertToSatoshi, getDenominationsToMint } from '#/lib/convert'
+import { convertToSatoshi, getDenominationsToMintSubtractingFee } from '#/lib/convert'
 import { createLogger } from '#/lib/logger'
 
 const logger = createLogger('zcoin:store:settings')
@@ -211,11 +211,12 @@ const getters = {
     },
     showWarning: (state) => state.showWarning,
     suggestedMintAmount (state, getters, rootState, rootGetters) {
-        const x = (rootGetters['Balance/availableXzc'] * (state.percentageToHoldInZerocoin - rootGetters['Balance/confirmedXzcZerocoinRatio']));
-        return x - x % 5e6;
+        const alreadyHolding = rootGetters['Balance/unconfirmedZerocoin'] + rootGetters['Balance/availableZerocoin'];
+        const shouldHold = (alreadyHolding + rootGetters['Balance/availableXzc']) * state.percentageToHoldInZerocoin;
+        return Math.max(shouldHold - alreadyHolding, 0);
     },
     suggestedMints (state, getters) {
-        return getDenominationsToMint(getters.suggestedMintAmount)
+        return getDenominationsToMintSubtractingFee(getters.suggestedMintAmount)
     },
     b58Prefixes (state, getters, rootState, rootGetters) {
         const network = rootGetters['ApiStatus/network']

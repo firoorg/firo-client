@@ -179,13 +179,12 @@ export interface ApiStatus {
         modules: {
             [moduleName: string]: boolean;
         };
-        Znode: {
+        Znode?: {
             localCount: number;
             totalCount: number;
             enabledCount: number;
         };
         hasMnemonic: boolean;
-
     };
     meta: {
         status: number;
@@ -607,9 +606,9 @@ export class Zcoind {
     private hasShutdown: boolean = false;
 
     // (requester|publisher)Socket will be undefined prior to the apiIsReadyEWH being released.
-    private requesterSocket?: zmq.Socket;
-    private publisherSocket?: zmq.Socket;
-    private statusPublisherSocket: zmq.Socket;
+    private requesterSocket?: zmq.Request;
+    private publisherSocket?: zmq.Subscriber;
+    private statusPublisherSocket: zmq.Subscriber;
 
     // latestApiStatus will be reset every time we get an apiStatus. It will be undefined until we get an apiStatus.
     private latestApiStatus?: ApiStatus;
@@ -626,11 +625,13 @@ export class Zcoind {
     readonly zcoindDataDir: string;
 
     // If this is set to true, we will connect to an existing zcoind instance (supposing -clientapi is enabled) instead
-    // of resetting everything. In this case, initializers will NOT be run.
+    // of resetting everything. In this case, initializers will NOT be run (unless runInitializersIfZcoindIsRunning is
+    // set).
     allowMultipleZcoindInstances: boolean = false;
-    // This is the account name that will be associated in the zcoind backend with addresses we generate with
-    // getUnusedAddress.
-    addressAccountName: string = 'zcoin-client';
+    // If this is set to true, when we connect to a running zcoind instance, we WILL run initializers.
+    runInitializersIfZcoindIsRunning: boolean = false;
+    // This is the number of seconds to wait before signalling zcoind as unresponsive.
+    connectionTimeout: number = 30;
 
     // zcoindLocation is the location of the zcoind binary.
     //
@@ -708,15 +709,17 @@ export class Zcoind {
 
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
         // a fairly small  window anyway,
-        if (await this.isZcoindListening()) {
-            if (!this.allowMultipleZcoindInstances) {
-                throw new ZcoindAlreadyRunning();
-            }
+        const isZcoindListening = await this.isZcoindListening();
 
-            this.awaitHasConnected().then(async () => {
-                await this.initializersCompletedEWH.release(undefined);
-            });
-        } else {
+        if (isZcoindListening && !this.allowMultipleZcoindInstances) {
+            throw new ZcoindAlreadyRunning();
+        }
+
+        if (!isZcoindListening) {
+            await this.launchDaemon(mnemonicSettings);
+        }
+
+        if (!isZcoindListening || this.runInitializersIfZcoindIsRunning) {
             this.awaitHasConnected().then(async () => {
                 const initializerPromises = this.initializers.map(initializer => initializer(this));
                 const rejections = [];
@@ -735,8 +738,10 @@ export class Zcoind {
                     await this.initializersCompletedEWH.release(undefined);
                 }
             });
-
-            await this.launchDaemon(mnemonicSettings);
+        } else {
+            this.awaitHasConnected().then(async () => {
+                await this.initializersCompletedEWH.release(undefined);
+            });
         }
 
         await this.connectAndReact();
@@ -932,12 +937,12 @@ export class Zcoind {
         await new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (!finished) {
-                    logger.error("zcoind has not opened it ports after 30 seconds");
+                    logger.error("zcoind has not opened it ports after %s seconds", this.connectionTimeout);
                     finished = true;
                 }
 
-                reject(new ZcoindConnectionTimeout(30));
-            }, 30_000);
+                reject(new ZcoindConnectionTimeout(this.connectionTimeout));
+            }, this.connectionTimeout * 1000);
 
             this.awaitZcoindListening().then(() => {
                 if (!finished) {
@@ -961,20 +966,13 @@ export class Zcoind {
             await this.zcoindHasShutdown.release(false);
         });
 
-        logger.info("Setting a watcher to see if zcoind unexpectedly dies...");
-        this.awaitZcoindNotListening().then(async () => {
-            // TODO
-        })
-
         logger.info("Connecting to zcoind...")
-        this.statusPublisherSocket = zmq.socket('sub');
+        this.statusPublisherSocket = new zmq.Subscriber();
 
-        // Set timeout for requester socket
-        this.statusPublisherSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
-        this.statusPublisherSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
-
-        this.statusPublisherSocket.on('message', (topic, msg) => {
-            this.gotApiStatus(msg.toString());
+        new Promise(async () => {
+            for await (const [topicBuffer, msgBuffer] of this.statusPublisherSocket) {
+                await this.gotApiStatus(msgBuffer.toString());
+            }
         });
 
         this.statusPublisherSocket.connect(`tcp://${constants.zcoindAddress.host}:${constants.zcoindAddress.statusPort.publisher}`);
@@ -1055,12 +1053,9 @@ export class Zcoind {
     private async initializeWithApiStatus(apiStatus: ApiStatus) {
         logger.info("Initializing with apiStatus: %O", apiStatus);
 
-        this.requesterSocket = zmq.socket('req');
-        this.publisherSocket = zmq.socket('sub');
+        this.requesterSocket = new zmq.Request();
+        this.publisherSocket = new zmq.Subscriber();
 
-        // Set timeout for requester socket
-        this.requesterSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 2000);
-        this.requesterSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 2000);
 
         let reqPort, pubPort;
         switch (apiStatus.data.network) {
@@ -1089,9 +1084,9 @@ export class Zcoind {
 
         // Setup encryption.
         for (const s of [this.requesterSocket, this.publisherSocket]) {
-            s.curve_serverkey = serverPubkey;
-            s.curve_publickey = clientPubkey;
-            s.curve_secretkey = clientPrivkey;
+            s.curveServerKey = serverPubkey;
+            s.curvePublicKey = clientPubkey;
+            s.curveSecretKey = clientPrivkey;
         }
 
         logger.info("Connecting to zcoind controller ports...");
@@ -1111,8 +1106,10 @@ export class Zcoind {
             this.publisherSocket.subscribe(topic);
         }
 
-        this.publisherSocket.on('message', (topicBuffer, messageBuffer) => {
-            this.handleSubscriptionEvent(topicBuffer.toString(), messageBuffer.toString());
+        new Promise(async () => {
+            for await (const [topicBuffer, messageBuffer] of this.publisherSocket) {
+                this.handleSubscriptionEvent(topicBuffer.toString(), messageBuffer.toString());
+            }
         });
 
         await this.hasConnectedEWH.release(undefined);
@@ -1156,10 +1153,10 @@ export class Zcoind {
     async send(auth: string | null, type: string, collection: string, data: unknown): Promise<unknown> {
         logger.debug("Sending request to zcoind: type: %O, collection: %O, data: %O", type, collection, data);
 
-        return await this.requesterSocketSend(this.formatSend(auth, type, collection, data));
+        return await this.requesterSocketSend(Zcoind.formatSend(auth, type, collection, data));
     }
 
-    private formatSend(auth: string | null, type: string, collection: string, data: unknown): unknown {
+    private static formatSend(auth: string | null, type: string, collection: string, data: unknown): unknown {
         return {
             auth: {
                 passphrase: auth
@@ -1205,7 +1202,7 @@ export class Zcoind {
             }
 
             try {
-                this.requesterSocket.send(JSON.stringify(message));
+                await this.requesterSocket.send(JSON.stringify(message));
             } catch (e) {
                 try {
                     await this.sendError(e);
@@ -1216,7 +1213,7 @@ export class Zcoind {
                 return;
             }
 
-            this.requesterSocket.once('message', (messageBuffer) => {
+            this.requesterSocket.receive().then(([messageBuffer]) => {
                 const messageString = messageBuffer.toString();
 
                 let message;
@@ -1229,7 +1226,12 @@ export class Zcoind {
                     return;
                 }
 
-                logger.debug(`received reply from zcoind for ${callName}: %O`, message);
+                if (messageString.length > 1024) {
+                    logger.debug(`received reply from zcoind for ${callName}: <%d bytes>`, messageString.length);
+                    logger.silly(`content of %d byte reply to ${callName}: %O`, messageString.length, message);
+                } else {
+                    logger.debug(`received reply from zcoind for ${callName}: %O`, message);
+                }
 
                 if (isZcoindResponseMessage(message)) {
                     if (message.meta.status === 200) {
@@ -1264,7 +1266,7 @@ export class Zcoind {
 
         this.hasShutdown = true;
 
-        await this.requesterSocketSend(this.formatSend(auth, type, collection, data), true);
+        await this.requesterSocketSend(Zcoind.formatSend(auth, type, collection, data), true);
 
         logger.info("Waiting for zcoind to close its ports.");
         await this.awaitZcoindNotListening();
@@ -1534,8 +1536,7 @@ export class Zcoind {
     }
 
     async getMasternodeList() : Promise<Object> {
-        const data = await this.send('', 'initial', 'masternodeList', {});
-        return data;
+        return await this.send('', 'initial', 'masternodeList', {});
     }
 
     async readPaymentChannelsState() : Promise<Object> {

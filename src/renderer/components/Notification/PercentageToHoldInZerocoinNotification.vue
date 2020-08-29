@@ -75,10 +75,15 @@ export default {
             return convertToCoin(this.$store.getters['Settings/suggestedMintAmount']);
         },
 
-        fillAndRouteToMint () {
+        async fillAndRouteToMint () {
             this.markAsNotified();
 
-            this.$router.push({
+            if (this.$route.path.startsWith('/anonymize')) {
+                await this.$router.push('/main');
+                await new Promise(r => setTimeout(r, 50));
+            }
+
+            await this.$router.push({
                 path: '/anonymize',
                 query: {
                     coinsToMint: this.suggestedMints

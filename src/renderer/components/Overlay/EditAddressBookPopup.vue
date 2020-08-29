@@ -202,7 +202,6 @@ export default {
           }
         }
       } catch (e) {
-        console.log("error:", e);
         this.errorMessage = e.error.message;
         this.showError = true;
         this.xStyle = "top: 225px";

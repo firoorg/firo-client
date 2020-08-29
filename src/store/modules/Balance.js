@@ -1,4 +1,4 @@
-import { fromPairs } from 'lodash'
+import { fromPairs, isEqual, cloneDeep } from 'lodash'
 import { createLogger } from '#/lib/logger'
 import { convertToSatoshi } from "#/lib/convert";
 
@@ -24,36 +24,36 @@ const state = {
 
 const mutations = {
     updateBalance(state, balance) {
-        logger.debug('going to update balance %O', balance)
-
         // FIXME: This just aliases different names used in zcoind (where zcoind's public becomes our xzc, and its
         //        private becomes our zerocoin), which is very confusing. We should change names for us to be consistent
         //        with that throughout the program.
-        const { all, pending, available } = balance.total
-        const { confirmed: confirmedXzc, unconfirmed: unconfirmedXzc, locked } = balance.public
-        const { confirmed: confirmedZerocoin, unconfirmed: unconfirmedZerocoin } = balance.private
+        const data = {
+            total: {
+                all: balance.total.all,
+                pending: balance.total.pending,
+                available: balance.total.available
+            },
+            xzc: {
+                confirmed: balance.public.confirmed,
+                unconfirmed: balance.public.unconfirmed,
+                locked: balance.public.locked
+            },
+            zerocoin: {
+                confirmed: balance.private.confirmed,
+                unconfirmed: balance.private.unconfirmed
+            },
+            unspentMints: balance.unspentMints || {}
+        };
 
-        state.total = {
-            ...state.total,
-            all,
-            pending,
-            available
+        let equal = true;
+        for (const [k, v] of Object.entries(data)) {
+            if (!isEqual(state[k], v)) equal = false;
+            state[k] = v;
         }
 
-        state.xzc = {
-            ...state.xzc,
-            confirmed: confirmedXzc,
-            unconfirmed: unconfirmedXzc,
-            locked
+        if (!equal) {
+            logger.info("Updated balance: %O", cloneDeep(data));
         }
-
-        state.zerocoin = {
-            ...state.zerocoin,
-            confirmed: confirmedZerocoin,
-            unconfirmed: unconfirmedZerocoin
-        }
-
-        state.unspentMints = balance.unspentMints || {};
     }
 }
 
