@@ -4,7 +4,7 @@
             <h3>{{ $t('navigation.flyout-blockchain-sync-progress.title') }}</h3>
             <p>
                 <span>
-                    <strong>Proceaaed {{ currentBlockHeight }} blocks of transaction history so far.</strong>
+                    <strong>Processed {{ currentBlockHeight }} blocks of transaction history so far.</strong>
                 </span>
 
                 <span>
