@@ -44,10 +44,6 @@ To install dependencies for the client itself, run
 npm install
 ```
 
-## Installing Electron
-
-You must also install [Electron](https://electronjs.org/). We're currently developing on Electron version `3.0.8`.
-
 ## Starting zcoin-client
 
 To run the development version of zcoin-client, simply run
