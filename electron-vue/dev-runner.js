@@ -13,7 +13,7 @@ const compiler = webpack(rendererConfig);
 const server = new WebpackDevServer(
     compiler,
     {
-        contentBase: path.join(__dirname, '../'),
+        contentBase: path.join(__dirname, '..'),
         hot: true
     }
 );
