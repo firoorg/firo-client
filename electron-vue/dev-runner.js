@@ -20,4 +20,6 @@ const server = new WebpackDevServer(
 server.listen(9080);
 
 const electronProcess = child_process.spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
+electronProcess.stdout.on('data', (data) => { console.log(data.toString()); });
+electronProcess.stderr.on('data', (data) => { console.error(data.toString()); });
 electronProcess.on('exit', () => process.exit());
