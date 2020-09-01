@@ -16,7 +16,7 @@ let whiteListedModules = [
 ]
 
 let rendererConfig = {
-    devtool: '#cheap-module-eval-source-map',
+    devtool: 'cheap-module-source-map',
 
     entry: {
         renderer: path.join(__dirname, '../src/renderer/renderer.js')
@@ -144,12 +144,9 @@ let rendererConfig = {
                 removeAttributeQuotes: true,
                 removeComments: true
             },
-            nodeModules: process.env.NODE_ENV !== 'production'
-                ? path.resolve(__dirname, '../node_modules')
-                : false
+            nodeModules: process.env.NODE_ENV === 'production' ? false : path.resolve(__dirname, '../node_modules')
         }),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoEmitOnErrorsPlugin()
+        new webpack.HotModuleReplacementPlugin()
     ],
     output: {
         filename: '[name].js',
@@ -164,23 +161,6 @@ let rendererConfig = {
         extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts']
     },
     target: 'electron-renderer'
-}
-
-
-/**
- * Adjust rendererConfig for production settings
- */
-if (process.env.NODE_ENV === 'production') {
-    rendererConfig.devtool = ''
-
-    rendererConfig.plugins.push(
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"production"'
-        }),
-        new webpack.LoaderOptionsPlugin({
-            minimize: true
-        })
-    )
 }
 
 module.exports = rendererConfig

@@ -34,14 +34,8 @@ logger.info("Entering renderer/main.js...");
 
 let ourWindow = remote.getCurrentWindow();
 
-const customValidationRules = [
-    'isZcoinAddress',
-    'notExceedingBalance'
-]
-
-customValidationRules.forEach((rule) => {
-    require('./utils/validationRules/' + rule)
-})
+require('./utils/validationRules/isZcoinAddress');
+require('./utils/validationRules/notExceedingBalance');
 
 Vue.use(VTooltip, {
     defaultBoundariesElement: 'default-tooltip-boundary'
