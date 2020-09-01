@@ -17,6 +17,16 @@ for (const config of [mainConfig, rendererConfig]) {
             console.error(`${config.target} failed to build:`);
             for (const e of errors) {
                 console.error(e);
+                console.error("Error properties:");
+                for (const prop of Object.getOwnPropertyNames(e)) {
+                    console.error(`\t${prop}: ${e[prop]}`);
+
+                    if (typeof e[prop] === 'object') {
+                        for (const p of Object.getOwnPropertyNames(e[prop])) {
+                            console.error(`\t\t${p}: ${e[prop][p]}`);
+                        }
+                    }
+                }
             }
             reject();
         } else {
