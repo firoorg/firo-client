@@ -6,13 +6,7 @@ import {join} from 'path'
 import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
-import {install as installVueDevtools} from 'vue-devtools';
-
 const logger = createLogger('zcoin:main')
-
-app.on('ready', () => {
-    installVueDevtools();
-});
 
 // We don't want multiple copies of our application running.
 if (!app.requestSingleInstanceLock()) {
