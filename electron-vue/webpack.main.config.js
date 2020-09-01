@@ -2,6 +2,8 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 
 let mainConfig = {
+    mode: 'development',
+
     entry: {
         main: path.join(__dirname, '../src/main/main.js')
     },

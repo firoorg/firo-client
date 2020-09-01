@@ -16,6 +16,7 @@ let whiteListedModules = [
 ]
 
 let rendererConfig = {
+    mode: 'development',
     devtool: 'cheap-module-source-map',
 
     entry: {
