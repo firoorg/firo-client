@@ -6,7 +6,7 @@
     "email": "team@zcoin.io",
     "url": "https://zcoin.io/"
   },
-  "description": "Official Zcoin Client",
+  "description": "Zcoin Client",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
