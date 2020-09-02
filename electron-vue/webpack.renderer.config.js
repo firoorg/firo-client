@@ -114,16 +114,11 @@ let rendererConfig = {
             },
             {
                 test: /\.svg$/,
-                loader: 'vue-svg-loader', // `vue-svg` for webpack 1.x
+                loader: 'vue-svg-loader',
                 options: {
-                    // optional [svgo](https://github.com/svg/svgo) options
                     svgo: {
                         plugins: [
-                            {removeDoctype: true},
-                            {removeComments: true},
-                            {removeViewBox: false},
                             {removeDimensions: true},
-                            {removeXMLNS: true}
                         ]
                     }
                 }
@@ -140,11 +135,6 @@ let rendererConfig = {
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(__dirname, '../src/index.ejs'),
-            minify: {
-                collapseWhitespace: true,
-                removeAttributeQuotes: true,
-                removeComments: true
-            },
             nodeModules: process.env.NODE_ENV === 'production' ? false : path.resolve(__dirname, '../node_modules')
         }),
         new webpack.HotModuleReplacementPlugin()

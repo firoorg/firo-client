@@ -78,7 +78,7 @@ app.once('ready', async () => {
         // ?reload=true is required for WebPack hot reloading to work without a manual refresh.
         await ourWindow.loadURL("http://localhost:9080/?reload=true");
     } else {
-        const indexDotHtml = join(__dirname, 'index.html');
+        const indexDotHtml = join(app.getAppPath(), 'index.html');
         logger.info(`Loading production environment at ${indexDotHtml}...`);
         await ourWindow.loadFile(indexDotHtml);
     }

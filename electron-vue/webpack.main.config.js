@@ -99,16 +99,11 @@ let mainConfig = {
             },
             {
                 test: /\.svg$/,
-                loader: 'vue-svg-loader', // `vue-svg` for webpack 1.x
+                loader: 'vue-svg-loader',
                 options: {
-                    // optional [svgo](https://github.com/svg/svgo) options
                     svgo: {
                         plugins: [
-                            {removeDoctype: true},
-                            {removeComments: true},
-                            {removeViewBox: false},
                             {removeDimensions: true},
-                            {removeXMLNS: true}
                         ]
                     }
                 }

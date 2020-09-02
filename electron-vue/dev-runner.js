@@ -16,7 +16,7 @@ const mainConfig = require('./webpack.main.config');
     const server = new WebpackDevServer(
         rendererCompiler,
         {
-            contentBase: path.join(__dirname, '..'),
+            contentBase: path.join(__dirname, '..', 'dist', 'electron'),
             hot: true
         }
     );
