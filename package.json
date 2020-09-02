@@ -34,7 +34,8 @@
       "assets/core/**/*"
     ],
     "asarUnpack": [
-      "**/assets/core/**/*"
+      "dist/electron/**/*",
+      "assets/core/**/*"
     ],
     "dmg": {
       "background": "assets/images/background.png",
