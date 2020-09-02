@@ -24,17 +24,14 @@ must be passed to the `./configure` script when it is invoked during the build p
 files. (If this flag is not passed correctly during the buld process, the client will timeout on bootup with an unhelpful
 error message.)
 
-Once zcoind is built, the relevant binaries will be located in `./zcoin/src/`.
-
-Now you must make copy the zcoind binary into the appropriate assets directory, either `assets/core/win32`,
-`assets/core/linux`, or `assets/core/darwin`. e.g.
-`mkdir -p assets/core/linux && cp ../zcoin/src/zcoind assets/core/linux`. In order to compile Zcoin Client binaries on
-other platforms, you must include zcoind binaries built for that platform in the appropriate directory.
+Once zcoind is built, it will be located at `src/zcoind` relative to the directory you cloned zcoin into. You must then
+copy it into `assets/core/win32`, `assets/core/linux`, or `assets/core/darwin`. e.g. if you followed the command above
+from zcoin-client's root directory and are building for Mac, `cp zcoin/src/zcoind assets/core/darwin`. In order to
+build Zcoin Client binaries on other platforms, you must include zcoind binaries built for that platform in the appropriate directory.
 
 #### Updating zcoind
 
-To update `zcoind`, simply run `git pull` in the `zcoind` directory, and run `./autogen.sh`, `./configure`, and `make`
-with the arguments you previously used following your platform-specific build instructions.
+To update `zcoind`, simply run `git pull` in the `zcoind` directory, and run `make`.
 
 ## Installing npm Packages
 
@@ -42,6 +39,7 @@ To install dependencies for the client itself, run
 
 ```bash
 npm install
+npm run rebuild-zeromq
 ```
 
 ## Starting zcoin-client
