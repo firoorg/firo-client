@@ -2,7 +2,7 @@ const mainConfig = require('./webpack.main.config');
 const rendererConfig = require('./webpack.renderer.config');
 const compileWrapper = require('./compile-wrapper');
 
-Promise.all([mainConfig, rendererConfig].map((c) => {
+module.exports = Promise.all([mainConfig, rendererConfig].map((c) => {
     c.mode = 'production';
     return compileWrapper(c);
 })).catch(() => {
