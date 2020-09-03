@@ -3,7 +3,7 @@ const rendererConfig = require('./webpack.renderer.config');
 const compileWrapper = require('./compile-wrapper');
 
 module.exports = Promise.all([mainConfig, rendererConfig].map((c) => {
-    c.mode = 'production';
+    c.mode = process.env.NODE_ENV || 'production';
     return compileWrapper(c);
 })).catch(() => {
     console.error('compilation failed; aborting...');
