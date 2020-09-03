@@ -107,7 +107,9 @@ window.$setWaitingReason = (reason) => {
 window.$quitApp = async (message=undefined) => {
     if (message) {
         logger.error(message);
-        alert(message);
+        if (process.env.ZCOIN_CLIENT_TEST) {
+            alert(message);
+        }
     }
 
     // $daemon will not be set if we are setting up.
@@ -124,15 +126,12 @@ window.$quitApp = async (message=undefined) => {
 
     logger.info("Exiting app...");
     app.exit();
-
-    // Execution may momentarily resume, so wait forever to avoid giving control back to the caller awaiting us.
-    await new Promise(_=>_);
 }
 
 // This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
 // process now.
 ourWindow.webContents.on('shutdown-requested', async () => {
-    if ($store.getters['App/waitingReason']) {
+    if ($store.getters['App/waitingReason'] && !process.env.ZCOIN_CLIENT_TEST) {
         logger.warn("Ignoring shutdown attempt in a critical period.");
         return;
     }

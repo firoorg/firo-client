@@ -73,13 +73,20 @@ app.once('ready', async () => {
     //        taken.
     ourWindow.webContents.on('new-window', (e) => e.preventDefault());
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.ZCOIN_CLIENT_TEST) {
+        const indexDotHtml = join(app.getAppPath(), 'index.html');
+        logger.info(`Loading test environment at ${indexDotHtml}...`);
+        await ourWindow.loadFile(indexDotHtml);
+    } else if (process.env.NODE_ENV === 'development') {
         logger.info("Loading development environment at localhost:9080...");
         // ?reload=true is required for WebPack hot reloading to work without a manual refresh.
         await ourWindow.loadURL("http://localhost:9080/?reload=true");
-    } else {
+    } else if (process.env.NODE_ENV === 'production') {
         const indexDotHtml = join(app.getAppPath(), '..', 'app.asar.unpacked', 'dist', 'electron', 'index.html');
         logger.info(`Loading production environment at ${indexDotHtml}...`);
         await ourWindow.loadFile(indexDotHtml);
+    } else {
+        logger.error("NODE_ENV must be set for us to determine where to load our content from.");
+        app.exit(1);
     }
 });
