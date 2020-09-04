@@ -42,4 +42,8 @@ describe('Test 1', function (this: Mocha.Suite) {
 
         await this.app.stop();
     });
+
+    it('opens a window', async function (this: This) {
+        expect(await this.app.client.getWindowCount()).to.equal(1);
+    });
 })
