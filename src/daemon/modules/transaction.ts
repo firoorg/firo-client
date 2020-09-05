@@ -1,10 +1,10 @@
 import { Zcoind } from '../zcoind';
 
 export async function handleEvent(store, zcoin: Zcoind, eventData: any) {
-    store.dispatch('Transactions/handleTransactionEvent', eventData);
-    //update payment channel state
-    const paymentChannelsState = await zcoin.readPaymentChannelsState();
-    store.dispatch('Transactions/setPaymentChannels', Object.values(paymentChannelsState));
+  //update payment channel state
+  const paymentChannelsState = await zcoin.readPaymentChannelsState();
+  store.dispatch('Transactions/setPaymentChannels', Object.values(paymentChannelsState));
+  store.dispatch('Transactions/handleTransactionEvent', eventData);
 
     if (Object.values(store.getters['Transactions/unusedAddresses']).length == 0) {
       var createds = [];
@@ -21,4 +21,7 @@ export async function handleEvent(store, zcoin: Zcoind, eventData: any) {
         console.log('error:', e)
       }
     }
+
+  const data = await zcoin.send(null, 'get', 'balance', null);
+  store.commit('Balance/updateBalance', data);
 }

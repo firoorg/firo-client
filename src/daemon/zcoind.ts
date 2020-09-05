@@ -1417,6 +1417,20 @@ export class Zcoind {
         }
     }
 
+    async unlockWallet(auth: string): Promise<boolean> {
+        const data = await this.send(auth, 'create', 'unlockWallet', {});
+        console.log('unlockWallet:', data)
+        if (typeof data === 'boolean') {
+            return data;
+        }
+        throw new UnexpectedZcoindResponse('create/unlockWallet', data);
+    }
+
+    async balance(): Promise<Object> {
+        const data = await this.send(null, 'get', 'balance', null);
+        return data;
+    }
+
     async sendToPaymentCode(auth: string, recipient: string, myPaymentCode: string, amount: number, feePerKb: number,
         subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
         const data = await this.send(auth, 'create', 'sendToPaymentCode', {
@@ -1528,6 +1542,11 @@ export class Zcoind {
         }
 
         throw new UnexpectedZcoindResponse('create/getPaymentCodes', data);
+    }
+
+    async bip47StateWallet(auth: string): Promise<Object> {
+        const data = await this.send(auth, 'create', 'bip47StateWallet', {});
+        return data;
     }
 
     async createNewPaymentCode() : Promise<Object> {

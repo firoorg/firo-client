@@ -132,7 +132,7 @@ const mutations = {
         addressBook_.forEach(e => {
             state.addressBook[e.address] = e;
             if (e.purpose == "receive") {
-                if (!state.addresses[e.address]) {
+                if (!state.addresses[e.address] && !e.label.includes("BIP47PAYMENT")) {
                     state.unusedAddresses[e.address] = true; 
                 } else {
                     delete state.unusedAddresses[e.address];

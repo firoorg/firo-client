@@ -805,8 +805,10 @@ export default {
       try {
         const paymentCodeValid = isValidPaymentCode(this.address);
         var myPaymentCode = "";
+        var sendTwice = false;
         if (paymentCodeValid) {
           myPaymentCode = this.selectedSendPaymentCode;
+          sendTwice = this.notifyNotificationTx;
         }
         console.log("myPaymentCode:", myPaymentCode);
         if (this.privateOrPublic === "private") {
@@ -820,6 +822,18 @@ export default {
               this.subtractFeeFromAmount,
               coinControl
             );
+            if (sendTwice) {
+              //send actual transaction
+              await $daemon.privateSendToPaymentCode(
+                passphrase,
+                this.address,
+                myPaymentCode,
+                this.satoshiAmount,
+                this.txFeePerKb,
+                this.subtractFeeFromAmount,
+                coinControl
+              );
+            }
           } else {
             await $daemon.privateSend(
               passphrase,
@@ -841,6 +855,18 @@ export default {
               this.subtractFeeFromAmount,
               coinControl
             );
+            if (sendTwice) {
+              //send actual transaction
+              let d = $daemon.sendToPaymentCode(
+                passphrase,
+                this.address,
+                myPaymentCode,
+                this.satoshiAmount,
+                this.txFeePerKb,
+                this.subtractFeeFromAmount,
+                coinControl
+              );
+            }
           } else {
             let d = await $daemon.publicSend(
               passphrase,

@@ -153,7 +153,9 @@ export default {
                     if (tx.paymentChannelID) {
                         txType = "RAP address";
                         let receivePcode = tx.paymentChannelID.split("-")[0];
-                        label = this.paymentChannels[receivePcode][0].label;
+                        if (this.paymentChannels[receivePcode]) {
+                            label = this.paymentChannels[receivePcode][0].label;
+                        }
                     }
                     break;
 
@@ -163,7 +165,9 @@ export default {
                     if (tx.paymentChannelID) {
                         txType = "RAP address";
                         let receivePcode = tx.paymentChannelID.split("-")[0];
-                        label = this.paymentChannels[receivePcode][0].label;
+                        if (this.paymentChannels[receivePcode]) {
+                            label = this.paymentChannels[receivePcode][0].label;
+                        }
                     }
                     break;
 
@@ -174,7 +178,11 @@ export default {
 
                 if (tx.isNotificationTransaction) {
                     txType = "Connection Fee";
-                    label = this.paymentChannels[tx.paymentCode][0].label;
+                    console.log('isNotificationTransaction payment code:', tx)
+                    console.log('isNotificationTransaction:', this.paymentChannels)
+                    if (this.paymentChannels[tx.paymentCode]) {
+                        label = this.paymentChannels[tx.paymentCode][0].label;
+                    }
                     if (label == "") {
                         label = "(unlabelled)";
                     }

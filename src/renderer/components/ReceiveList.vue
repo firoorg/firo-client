@@ -108,6 +108,30 @@
         </base-button>
       </div>
     </overlay>
+    <overlay
+      :opened="showPassphrasePopup"
+      :visible="showPassphrasePopup"
+      @closed="!showPassphrasePopup"
+      width="300"
+    >
+      <div style="text-align:center">
+        <b>Enter your passphrase to unlock Reusable Addresses</b>
+        <div>
+          <input
+            type="password"
+            v-model="passphrase"
+            value=""
+            placeholder="Type your passphrase"
+            width="200"
+            @keyup.enter="unlockResuableAddress"
+          />
+        </div>
+        <br />
+        <base-button class="submit-button" @click="unlockResuableAddress">
+          OK
+        </base-button>
+      </div>
+    </overlay>
     <br />
     <div id="wrap" v-if="!isRegularAddressSelected">
       <div
@@ -194,7 +218,8 @@ export default {
       selectedAddress: "",
       numUnlabelledAddress: 0,
       selectedStyle: "rounded-btn-selected",
-      notSelectedStyle: "rounded-btn"
+      notSelectedStyle: "rounded-btn",
+      passphrase: ""
     };
   },
 
@@ -223,15 +248,17 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     this.styleRegularAddress = this.selectedStyle;
     this.stateAddressesChanged = true;
     this.addressBookChanged = true;
     this.regularAddressTableData();
-    /*if (this.numUnlabelledAddress == 0) {
-      await this.generateNewRegularAddresses();
+    if (this.numUnlabelledAddress == 0) {
+      this.selectedAddress = await this.generateNewRegularAddresses();
       this.regularAddressTableData();
-    } */
+    } else {
+      this.selectedAddress = this.regularAddressesData[0].address;
+    }
     this.selectedAddress = this.regularAddressesData[0].address;
     this.generateQRCode();
   },
@@ -242,14 +269,20 @@ export default {
       addressBook: "Transactions/addressBook",
       stateAddresses: "Transactions/addresses",
       apiStatus: 'ApiStatus/apiStatus',
-      unusedAddresses: 'Transactions/unusedAddresses'
+      unusedAddresses: 'Transactions/unusedAddresses',
+      walletLoaded: 'Transactions/walletLoaded',
+      isLocked: 'ApiStatus/isLocked'
     }),
     selectedAddressShort() {
       return this.shortenAddress(this.selectedAddress);
     },
 
+    showPassphrasePopup() {
+      return this.apiStatus.data.hasMnemonic && this.walletLoaded && this.isLocked && Object.values(this.paymentCodes).length == 0;
+    },
+
     noDataMessage() {
-      return apiStatus.data.hasMnemonic?"No Address Found.":"Reusable addressses not supported as your wallet does not have mnemonics recovery phrase";
+      return this.apiStatus.data.hasMnemonic?"Wallet locked. Please unlock it to enable Reusable address":"Reusable addressses not supported as your wallet does not have mnemonics recovery phrase";
     },
 
     latestTableData() {
@@ -304,6 +337,18 @@ export default {
   },
 
   methods: {
+    async unlockResuableAddress() {
+      let passphrase = this.passphrase;
+      try {
+        //load payment codes
+        const pcs = await $daemon.bip47StateWallet(passphrase);
+        await this.$store.dispatch('Transactions/setPaymentCodes', pcs.paymentCodeState);
+        await this.$store.dispatch('Transactions/setWalletState', pcs.transactionState);
+      } catch (e) {
+        console.log('invalid pass phrase:', e);
+      }
+    },
+
     async showRegularAddress() {
       if (this.isRegularAddressSelected) {
         return;
@@ -311,9 +356,10 @@ export default {
       this.stateAddressesChanged = true;
       this.addressBookChanged = true;
       this.regularAddressTableData();
-      console.log('numUnlabelledAddress:', this.numUnlabelledAddress)
+      console.log('numUnlabelledAddress:', this.computeStateUnusedAddresses)
       
       if (this.numUnlabelledAddress == 0) {
+        console.log('generating address')
         this.selectedAddress = await this.generateNewRegularAddresses();
         this.regularAddressTableData();
       } else {
@@ -347,6 +393,7 @@ export default {
       this.numUnlabelledAddress = 0;
       if (addresses.length > 0) {
         for(const k of addresses) {
+          if (this.addressBook[k].label.includes('BIP47PAYMENT')) continue;
           data.push({
             label:
               !this.addressBook[k] ||
@@ -457,6 +504,8 @@ export default {
       }
     },
     onRowClick(row) {
+      let v = this.apiStatus.data.hasMnemonic && this.walletLoaded && this.isLocked && Object.values(this.paymentCodes).length == 0;
+      console.log('value:', v)
       if (this.selectedAddress != row.address) {
         this.selectedAddress = row.address;
         this.generateQRCode();
