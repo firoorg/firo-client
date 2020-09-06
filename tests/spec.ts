@@ -20,6 +20,8 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
     this.slow(500);
 
     this.beforeAll(async function (this: This) {
+        this.timeout(10e3);
+
         this.app = new Application({
             path: <any>electron, // the type annotation for path is incorrect
             args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
@@ -57,6 +59,8 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
     });
 
     it('allows selecting blockchain location and network', async function (this: This) {
+        this.slow(1e3);
+
         const networkValue = await this.app.client.$('#network-value');
         await networkValue.waitForExist();
         await networkValue.selectByAttribute('value', 'regtest');
