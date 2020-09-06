@@ -8,12 +8,13 @@
             <template v-for="(_, n) in 24">
                 <input v-if="hiddenWordPositions.includes(n)"
                     :class="['mnemonic-word', 'hidden', isVerified ? 'verified' : 'unverified']"
+                    :id="`hidden-word-${n}`"
                     type="text"
                     v-model="newWords[n]"
                     placeholder="______"
                     :tabindex="hiddenWordPositions.indexOf(n) + 1"
                 />
-                <span v-else class="mnemonic-word visible">
+                <span v-else class="mnemonic-word visible" :id="`visible-word-${n}`">
                     {{ newWords[n] }}
                 </span>
             </template>
@@ -24,7 +25,7 @@
                 Back
             </BaseButton>
 
-            <BaseButton @click="goToConfirmLockWallet" class="button" color="green" tabindex="-1" :disabled="!isVerified">
+            <BaseButton @click="goToConfirmLockWallet" class="button" id="submit-button" color="green" tabindex="-1" :disabled="!isVerified">
                 Submit
             </BaseButton>
         </div>

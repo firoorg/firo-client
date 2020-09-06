@@ -70,4 +70,42 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('#continue-setup')).click();
     });
+
+    it('correctly displays and confirms mnemonic', async function (this: This) {
+        this.timeout(5e3);
+        this.slow(5e3);
+
+        const createNewWallet = await this.app.client.$('#create-new-wallet');
+        await createNewWallet.waitForExist();
+        await createNewWallet.click();
+
+
+        await (await this.app.client.$('.mnemonic-screen')).waitForExist();
+
+        const words = [];
+        for (let n = 0; n < 24; n++) {
+            const wordElement = await this.app.client.$(`#mnemonic-word-${n}`);
+            words.push(await wordElement.getText());
+        }
+        expect(words.length).to.equal(24);
+
+        await (await this.app.client.$('#confirm-button')).click();
+
+
+        await (await this.app.client.$('.mnemonic-word')).waitForExist();
+
+        const wordElements = await this.app.client.$$('.mnemonic-word');
+        for (const [n, wordElement] of wordElements.entries()) {
+            const classNames = <string>await wordElement.getAttribute('class');
+            if (classNames.includes('hidden')) {
+                await wordElement.setValue(words[n]);
+            } else {
+                expect(await wordElement.getText()).to.equal(words[n]);
+            }
+        }
+
+        const submitButton = await this.app.client.$('#submit-button');
+        await submitButton.waitForClickable();
+        await submitButton.click();
+    });
 })

@@ -5,7 +5,7 @@
         </div>
 
         <div class="mnemonic">
-            <span v-for="(_, n) in 24" class="mnemonic-word visible">
+            <span v-for="(_, n) in 24" class="mnemonic-word visible" :id="`mnemonic-word-${n}`">
                 {{ words[n] }}
             </span>
         </div>
@@ -15,7 +15,7 @@
                 Go Back
             </BaseButton>
 
-            <BaseButton @click="confirmHasWrittenDown" class="button" color="green">
+            <BaseButton @click="confirmHasWrittenDown" class="button" color="green" id="confirm-button">
                 I have written down my seed phrase
             </BaseButton>
         </div>

@@ -15,6 +15,7 @@
 
             <BaseButton
                 @click="writeDownMnemonic"
+                id="create-new-wallet"
                 class="button"
                 color="green"
             >
@@ -23,6 +24,7 @@
 
             <BaseButton
                 @click="recoverFromMnemonic"
+                id="recover-from-mnemonic"
                 class="button"
                 color="green"
             >
