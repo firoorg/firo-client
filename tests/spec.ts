@@ -49,4 +49,10 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
     it('opens a window', async function (this: This) {
         expect(await this.app.client.getWindowCount()).to.equal(1);
     });
+
+    it('starts', async function (this: This) {
+        const startButton = await this.app.client.$('.start-button');
+        await startButton.waitForExist();
+        await startButton.click();
+    });
 })
