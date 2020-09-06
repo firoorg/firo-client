@@ -108,30 +108,6 @@
         </base-button>
       </div>
     </overlay>
-    <overlay
-      :opened="showPassphrasePopup"
-      :visible="showPassphrasePopup"
-      @closed="!showPassphrasePopup"
-      width="300"
-    >
-      <div style="text-align:center">
-        <b>Enter your passphrase to unlock Reusable Addresses</b>
-        <div>
-          <input
-            type="password"
-            v-model="passphrase"
-            value=""
-            placeholder="Type your passphrase"
-            width="200"
-            @keyup.enter="unlockResuableAddress"
-          />
-        </div>
-        <br />
-        <base-button class="submit-button" @click="unlockResuableAddress">
-          OK
-        </base-button>
-      </div>
-    </overlay>
     <br />
     <div id="wrap" v-if="!isRegularAddressSelected">
       <div
@@ -301,7 +277,7 @@ export default {
         ret = this.paymentCodes[this.selectedAddress]
       }
       if (ret == "") {
-        return "Unlabelled";
+        return "Unlabeled";
       }
       return ret;
     },
@@ -337,18 +313,6 @@ export default {
   },
 
   methods: {
-    async unlockResuableAddress() {
-      let passphrase = this.passphrase;
-      try {
-        //load payment codes
-        const pcs = await $daemon.bip47StateWallet(passphrase);
-        await this.$store.dispatch('Transactions/setPaymentCodes', pcs.paymentCodeState);
-        await this.$store.dispatch('Transactions/setWalletState', pcs.transactionState);
-      } catch (e) {
-        console.log('invalid pass phrase:', e);
-      }
-    },
-
     async showRegularAddress() {
       if (this.isRegularAddressSelected) {
         return;
@@ -398,7 +362,7 @@ export default {
             label:
               !this.addressBook[k] ||
               this.addressBook[k].label == ""
-                ? "Unlabelled"
+                ? "Unlabeled"
                 : this.addressBook[k].label,
             address: k,
             shortAddress: this.shortenAddress(k),
