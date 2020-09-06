@@ -43,6 +43,7 @@
         <div id="setup-button">
             <BaseButton
                 color="green"
+                id="continue-setup"
                 @click="continueSetup"
             >
                 Next
@@ -102,6 +103,11 @@ export default {
 
     mounted() {
         this.dataDir = this.defaultZcoinRootDirectory;
+
+        // This is required for testing due to Spectron not being very good at handline file dialogs.
+        document.addEventListener('set-data-dir', (event) => {
+            this.dataDir = event.dataDir;
+        });
     },
 
     methods: {

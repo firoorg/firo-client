@@ -55,4 +55,19 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await startButton.waitForExist();
         await startButton.click();
     });
+
+    it('allows selecting blockchain location and network', async function (this: This) {
+        const networkValue = await this.app.client.$('#network-value');
+        await networkValue.waitForExist();
+        await networkValue.selectByAttribute('value', 'regtest');
+
+        // Set data directory.
+        const dataDirLocation = path.join(os.tmpdir(), `zcoin-client-test-${Math.floor(Math.random() * 1e16)}`);
+        // Creating a new directory is in normal usage taken care of by the file selection dialog.
+        fs.mkdirSync(dataDirLocation);
+        await this.app.webContents.executeJavaScript(`const e = new Event('set-data-dir'); e.dataDir = ${JSON.stringify(dataDirLocation)}; document.dispatchEvent(e)`);
+        await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+
+        await (await this.app.client.$('#continue-setup')).click();
+    });
 })
