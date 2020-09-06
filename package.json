@@ -12,7 +12,7 @@
   "scripts": {
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
-    "build": "npm install && node electron-vue/build.js && electron-builder build -w",
+    "build": "npm install && node electron-vue/build.js && electron-builder build -mlw",
     "build:dir": "node electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node electron-vue/build.js",
