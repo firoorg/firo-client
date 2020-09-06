@@ -1,5 +1,6 @@
 import path from 'path';
-import child_process from 'child_process';
+import os from 'os';
+import fs from 'fs';
 import {expect} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
@@ -15,7 +16,9 @@ if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
     });
 }
 
-describe('Test 1', function (this: Mocha.Suite) {
+describe('Regtest with New Wallet', function (this: Mocha.Suite) {
+    this.slow(500);
+
     this.beforeAll(async function (this: This) {
         this.app = new Application({
             path: <any>electron, // the type annotation for path is incorrect
