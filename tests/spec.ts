@@ -56,14 +56,14 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         const startButton = await this.app.client.$('.start-button');
         await startButton.waitForExist();
         await startButton.click();
+
+        await (await this.app.client.$('#network-value')).waitForExist();
     });
 
     it('allows selecting blockchain location and network', async function (this: This) {
         this.slow(1e3);
 
-        const networkValue = await this.app.client.$('#network-value');
-        await networkValue.waitForExist();
-        await networkValue.selectByAttribute('value', 'regtest');
+        await (await this.app.client.$('#network-value')).selectByAttribute('value', 'regtest');
 
         // Set data directory.
         const dataDirLocation = path.join(os.tmpdir(), `zcoin-client-test-${Math.floor(Math.random() * 1e16)}`);
@@ -73,17 +73,14 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
 
         await (await this.app.client.$('#continue-setup')).click();
+        await (await this.app.client.$('#create-new-wallet')).waitForExist();
     });
 
     it('correctly displays and confirms mnemonic', async function (this: This) {
         this.timeout(5e3);
         this.slow(5e3);
 
-        const createNewWallet = await this.app.client.$('#create-new-wallet');
-        await createNewWallet.waitForExist();
-        await createNewWallet.click();
-
-
+        await (await this.app.client.$('#create-new-wallet')).click();
         await (await this.app.client.$('.mnemonic-screen')).waitForExist();
 
         const words = [];
@@ -111,5 +108,7 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         const submitButton = await this.app.client.$('#submit-button');
         await submitButton.waitForClickable();
         await submitButton.click();
+
+        await (await this.app.client.$('#passphrase')).waitForExist();
     });
 })
