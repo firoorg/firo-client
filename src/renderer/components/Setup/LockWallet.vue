@@ -67,7 +67,7 @@
                     Back
                 </BaseButton>
 
-                <BaseButton @click="lockWallet" class="button" color="green" tabindex="-1" :disabled="!canProceed">
+                <BaseButton @click="lockWallet" id="submit-button" class="button" color="green" tabindex="-1" :disabled="!canProceed">
                     Submit
                 </BaseButton>
             </div>

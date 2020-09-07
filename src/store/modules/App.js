@@ -135,7 +135,7 @@ const getters = {
         const zcoindName = process.platform === 'win32' ? 'zcoind.exe' : 'zcoind';
 
         let appDirectory;
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === "development" || process.env.ZCOIN_CLIENT_TEST) {
             appDirectory = process.cwd();
         } else {
             appDirectory = getApp().getAppPath().replace('app.asar', 'app.asar.unpacked');

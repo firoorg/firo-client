@@ -17,6 +17,8 @@ if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
 }
 
 describe('Regtest with New Wallet', function (this: Mocha.Suite) {
+    const passphrase = 'passphrase';
+
     this.slow(500);
 
     this.beforeAll(async function (this: This) {
@@ -110,5 +112,19 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await submitButton.click();
 
         await (await this.app.client.$('#passphrase')).waitForExist();
+    });
+
+    it('locks the wallet', async function () {
+        this.timeout(60e3);
+        this.slow(20e3);
+
+        await (await this.app.client.$('#passphrase')).setValue(passphrase);
+        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
+
+        const submitButton = await this.app.client.$('#submit-button');
+        await submitButton.waitForClickable();
+        await submitButton.click();
+
+        await (await this.app.client.$('.tx-page')).waitForExist({timeout: 60e3});
     });
 })
