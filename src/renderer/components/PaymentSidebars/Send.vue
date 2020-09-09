@@ -238,6 +238,7 @@
                         >
                             <base-button
                                 v-if="sendPopoverStep === 'initial'"
+                                id="send-button"
                                 color="green"
                                 class="expanded"
                                 :disabled="!canBeginSend"
@@ -253,6 +254,7 @@
 
                             <base-button
                                 v-else-if="sendPopoverStep === 'confirm'"
+                                id="confirm-button"
                                 color="green"
                                 @click.prevent="beginPassphraseStep"
                             >
@@ -261,6 +263,7 @@
 
                             <base-button
                                 v-else-if="sendPopoverStep === 'passphrase'"
+                                id="confirm-passphrase-send-button"
                                 color="green"
                                 @click.prevent="attemptSend"
                             >

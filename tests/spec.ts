@@ -156,6 +156,7 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
 describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
+    let nonce = String(Math.random());
     let receiveAddress: string;
 
     it('loads our existing wallet', async function (this: This) {
@@ -172,4 +173,36 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await receiveAddressElement.waitForExist();
         receiveAddress = await receiveAddressElement.getText();
     })
+
+    it('sends and receives public payment', async function (this: This) {
+        this.timeout(20e3);
+        this.slow(10e3);
+
+        await (await this.app.client.$('a[href="#/send/public')).click();
+        await (await this.app.client.$('#send-zcoin-form')).waitForExist();
+
+        await (await this.app.client.$('#label')).setValue(nonce);
+        await (await this.app.client.$('#address')).setValue(receiveAddress);
+        await (await this.app.client.$('#amount')).setValue('1');
+
+        const sendButton = await this.app.client.$('#send-button');
+        await sendButton.waitForClickable();
+        await sendButton.click();
+
+        const confirmButton = await this.app.client.$('#confirm-button');
+        await confirmButton.waitForClickable();
+        await confirmButton.click();
+
+        const passphraseInput = await this.app.client.$('#passphrase');
+        await passphraseInput.waitForExist();
+        await passphraseInput.setValue(passphrase);
+
+        const realSendButton = await this.app.client.$('#confirm-passphrase-send-button');
+        await realSendButton.click();
+
+        await (await this.app.client.$('a[href="#/receive')).click();
+
+        await this.app.client.waitUntilTextExists('.send-label', nonce);
+        await this.app.client.waitUntilTextExists('.receive-label', nonce);
+    });
 });
