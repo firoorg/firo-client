@@ -16,6 +16,8 @@ if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
     });
 }
 
+const passphrase = 'passphrase';
+
 function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
     this.slow(500);
 
@@ -27,7 +29,7 @@ function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
             args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
             env: {
                 ZCOIN_CLIENT_TEST: 'true',
-                REINITIALIZE_ZCOIN_CLIENT: reinitializeZcoinClient
+                REINITIALIZE_ZCOIN_CLIENT: String(reinitializeZcoinClient)
             }
         });
 
@@ -58,8 +60,6 @@ function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
 
 describe('Regtest with New Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(true);
-
-    const passphrase = 'passphrase';
 
     it('opens a window', async function (this: This) {
         expect(await this.app.client.getWindowCount()).to.equal(1);
