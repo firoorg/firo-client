@@ -19,6 +19,7 @@ if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
 const passphrase = 'passphrase';
 
 function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
+    this.timeout(5e3);
     this.slow(500);
 
     this.beforeAll(async function (this: This) {
