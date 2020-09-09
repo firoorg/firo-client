@@ -121,7 +121,7 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('#passphrase')).waitForExist();
     });
 
-    it('locks the wallet', async function () {
+    it('locks the wallet', async function (this: This) {
         this.timeout(60e3);
         this.slow(20e3);
 
