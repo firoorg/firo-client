@@ -39,14 +39,21 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         console.info('Zcoin Client started.');
     });
 
-    this.afterAll(async function (this: This) {
-        if (this.test.parent.tests.find(t => t.state === 'failed')) {
-            console.error('Main process logs:');
-            console.error(await this.app.client.getMainProcessLogs());
-            console.error('Renderer process logs:');
-            console.error(await this.app.client.getRenderProcessLogs());
-        }
+    this.afterEach(async function (this: This) {
+        // Getting these will clear the logs.
+        const mainLogs = await this.app.client.getMainProcessLogs();
+        const rendererLogs = await this.app.client.getRenderProcessLogs();
 
+        if (this.currentTest.state === 'failed') {
+            console.error('Main process logs:');
+            console.error(mainLogs);
+            console.error('Renderer process logs:');
+            console.error(rendererLogs);
+        }
+    });
+
+    this.afterAll(async function (this: This) {
+        this.timeout(10e3);
         await this.app.stop();
     });
 
