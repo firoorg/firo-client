@@ -138,4 +138,16 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('.tx-page')).waitForExist({timeout: 60e3});
     });
-})
+
+    it('generates XZC', async function (this: This) {
+        this.timeout(500e3);
+        this.slow(100e3);
+
+        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+
+        await this.app.client.keys([..."generate 500".split(''), "Enter"]);
+
+        await this.app.client.waitUntilTextExists('#available-xzc', '16843', <any>{timeout: 500e3});
+        await this.app.client.waitUntilTextExists('#pending-xzc', '4300');
+    });
+});

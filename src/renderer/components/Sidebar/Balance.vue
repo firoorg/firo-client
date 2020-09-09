@@ -5,20 +5,20 @@
 
 <template>
     <section class="balance">
-        <div>
+        <div id="available-xzc">
             <amount :amount="availableXzc" />&nbsp;<span class="ticker">XZC</span>
         </div>
-        <div v-if="lockedXzc > 0">
+        <div v-if="lockedXzc > 0" id="locked-xzc">
             +&nbsp;<amount :amount="lockedXzc" />&nbsp;<span class="ticker">XZC</span>&nbsp;locked
         </div>
-        <div v-if="pendingXzc > 0">
+        <div v-if="pendingXzc > 0" id="pending-xzc">
             +&nbsp;<amount :amount="pendingXzc" />&nbsp;<span class="ticker">XZC</span>&nbsp;pending
         </div>
 
-        <div>
+        <div id="available-private-xzc">
             <amount :amount="availableZerocoin" />&nbsp;<span class="ticker" title="Private XZC">ⓩ</span>
         </div>
-        <div v-if="unconfirmedZerocoin > 0">
+        <div v-if="unconfirmedZerocoin > 0" id="pending-private-xzc">
             +&nbsp;<amount :amount="unconfirmedZerocoin" />&nbsp;<span class="ticker" title="Private XZC">ⓩ</span>&nbsp;pending
         </div>
     </section>
