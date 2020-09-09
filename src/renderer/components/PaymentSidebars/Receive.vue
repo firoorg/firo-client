@@ -8,7 +8,7 @@
             <div ref="qrCode" class="qr-code" />
 
             <div v-if="address" class="address loaded">
-                <a @click.prevent="copyAddress" href="#" title="Click to copy address">
+                <a @click.prevent="copyAddress" id="receive-address" href="#" title="Click to copy address">
                     {{ address }}
                 </a>
 

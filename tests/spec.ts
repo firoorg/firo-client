@@ -156,6 +156,8 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
 describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
+    let receiveAddress: string;
+
     it('loads our existing wallet', async function (this: This) {
         this.timeout(20e3);
         this.slow(20e3);
@@ -164,4 +166,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const paymentStatusElement = await this.app.client.$('.vuetable-td-component-transaction-status');
         await paymentStatusElement.waitForExist({timeout: 20e3});
     });
+
+    it('displays a receiving address', async function (this: This) {
+        const receiveAddressElement = await this.app.client.$('#receive-address');
+        await receiveAddressElement.waitForExist();
+        receiveAddress = await receiveAddressElement.getText();
+    })
 });
