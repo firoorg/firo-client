@@ -152,3 +152,16 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntilTextExists('#pending-xzc', '4300');
     });
 });
+
+describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
+    scaffold.bind(this)(false);
+
+    it('loads our existing wallet', async function (this: This) {
+        this.timeout(20e3);
+        this.slow(20e3);
+
+        // Check that there are existing payments.
+        const paymentStatusElement = await this.app.client.$('.vuetable-td-component-transaction-status');
+        await paymentStatusElement.waitForExist({timeout: 20e3});
+    });
+});
