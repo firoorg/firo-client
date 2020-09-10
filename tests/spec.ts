@@ -271,12 +271,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         receiveAddress = await receiveAddressElement.getText();
     });
 
-    it('sends and receives public payment', async function (this: This) {
+    it('sends and receives a public payment', async function (this: This) {
         this.timeout(20e3);
         this.slow(10e3);
 
         await (await this.app.client.$('a[href="#/send/public')).click();
-        await (await this.app.client.$('#send-zcoin-form')).waitForExist();
+        await (await this.app.client.$('.send-zcoin-form')).waitForExist();
 
         await (await this.app.client.$('#label')).setValue(nonce);
         await (await this.app.client.$('#address')).setValue(receiveAddress);
@@ -297,9 +297,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const realSendButton = await this.app.client.$('#confirm-passphrase-send-button');
         await realSendButton.click();
 
-        await (await this.app.client.$('a[href="#/receive')).click();
-
-        await this.app.client.waitUntilTextExists('.send-label', nonce);
-        await this.app.client.waitUntilTextExists('.receive-label', nonce);
+        // The new transaction MUST be the first element in the list, which is only guaranteed if it is the first
+        // transaction to occur after a block is generated.
+        await this.app.client.waitUntilTextExists('.send-label', nonce, 10e3);
+        await (await this.app.client.$('span.ok.is-incoming')).waitForExist();
     });
 });
