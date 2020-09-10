@@ -39,6 +39,7 @@
 
                 <div
                     ref="currentInput"
+                    id="current-input"
                     class="input"
                     contenteditable="true"
                     @keydown="onInput"

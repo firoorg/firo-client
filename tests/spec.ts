@@ -271,6 +271,16 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         receiveAddress = await receiveAddressElement.getText();
     });
 
+    // This is needed so that checking for payments works properly.
+    it('generates a block', async function (this: This) {
+        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+
+        await this.app.client.keys([..."generate 1".split(''), "Enter"]);
+        await this.app.client.waitUntil(async () =>
+            (await (await this.app.client.$('#current-input')).getText()) === ''
+        );
+    });
+
     it('sends and receives a public payment', async function (this: This) {
         this.timeout(20e3);
         this.slow(10e3);
