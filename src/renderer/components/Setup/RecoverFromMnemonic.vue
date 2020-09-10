@@ -52,13 +52,13 @@
                     Passphrase:
                 </label>
 
-                <input type="passphrase" id="protectivePassphrase" v-model="protectivePassphrase" />
+                <input type="password" id="protectivePassphrase" v-model="protectivePassphrase" />
 
                 <label class="question" for="confirmProtectivePassphrase">
                     Confirm Passphrase:
                 </label>
 
-                <input type="passphrase" id="confirmProtectivePassphrase" v-model="confirmProtectivePassphrase" />
+                <input type="password" id="confirmProtectivePassphrase" v-model="confirmProtectivePassphrase" />
             </div>
         </div>
 
