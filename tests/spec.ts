@@ -79,12 +79,27 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('#network-value')).selectByAttribute('value', 'regtest');
 
-        // Set data directory.
+        const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
         const dataDirLocation = path.join(os.tmpdir(), `zcoin-client-test-${Math.floor(Math.random() * 1e16)}`);
-        // Creating a new directory is in normal usage taken care of by the file selection dialog.
+
         fs.mkdirSync(dataDirLocation);
-        await this.app.webContents.executeJavaScript(`const e = new Event('set-data-dir'); e.dataDir = ${JSON.stringify(dataDirLocation)}; document.dispatchEvent(e)`);
+
+        // Creating a new directory is in normal usage taken care of by the file selection dialog, which can't be automated.
+        const setDataDirJS = `e = new Event('set-data-dir'); e.dataDir = ${JSON.stringify(dataDirLocation)}; document.dispatchEvent(e)`;
+
+        // Set the data dir to the test location.
+        await this.app.webContents.executeJavaScript(setDataDirJS);
         await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+
+        // Test resetting the data dir.
+        await (await this.app.client.$('#reset-data-dir')).click();
+        await this.app.client.waitUntilTextExists('#datadir-value', defaultDataDirLocation);
+
+
+        // Set it back to the real (test) location.
+        await this.app.webContents.executeJavaScript(setDataDirJS);
+        await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+
 
         await (await this.app.client.$('#continue-setup')).click();
         await (await this.app.client.$('#create-new-wallet')).waitForExist();

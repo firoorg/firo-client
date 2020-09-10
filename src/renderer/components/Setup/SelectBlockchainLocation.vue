@@ -20,7 +20,7 @@
                             Change
                         </a>
 
-                        <a href="#" @click="resetDataDir">
+                        <a href="#" id="reset-data-dir" @click="resetDataDir">
                             Reset
                         </a>
                     </div>
