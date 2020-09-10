@@ -120,22 +120,32 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         expect(words.length).to.equal(24);
 
         await (await this.app.client.$('#confirm-button')).click();
-
-
         await (await this.app.client.$('.mnemonic-word')).waitForExist();
 
         const wordElements = await this.app.client.$$('.mnemonic-word');
+        const submitButton = await this.app.client.$('#submit-button');
+        let lastHiddenIndex: number;
+
         for (const [n, wordElement] of wordElements.entries()) {
             const classNames = <string>await wordElement.getAttribute('class');
             if (classNames.includes('hidden')) {
+                lastHiddenIndex = n;
                 await wordElement.setValue(words[n]);
             } else {
                 expect(await wordElement.getText()).to.equal(words[n]);
             }
         }
 
-        const submitButton = await this.app.client.$('#submit-button');
         await submitButton.waitForClickable();
+
+        // Test incorrect words.
+        await wordElements[lastHiddenIndex].setValue('invalid-word');
+        await submitButton.waitForClickable({reverse: true});
+
+        // Set it back to the valid word.
+        await wordElements[lastHiddenIndex].setValue(words[lastHiddenIndex]);
+        await submitButton.waitForClickable();
+
         await submitButton.click();
 
         await (await this.app.client.$('#passphrase')).waitForExist();
