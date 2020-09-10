@@ -12,7 +12,7 @@
   "scripts": {
     "build": "node electron-vue/build.js && electron-builder build",
     "dev": "node electron-vue/dev-runner.js",
-    "test": "mocha -r ts-node/register 'tests/**/*.ts'",
+    "test": "mocha --bail -r ts-node/register 'tests/**/*.ts'",
     "rebuild-zeromq": "VERSION=$(echo $npm_package_devDependencies_electron | sed 's/\\^//g'); npm rebuild zeromq --runtime=electron --target=${VERSION}"
   },
   "build": {
