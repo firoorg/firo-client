@@ -1,5 +1,5 @@
 <template>
-    <div class="mnemonic-screen">
+    <div class="mnemonic-screen recover-from-mnemonic">
         <div class="guidance">
             Enter your recovery phrase below.
         </div>
@@ -26,6 +26,7 @@
             <template v-for="(_, i) in newWords.length">
                 <input
                    ref="newWords"
+                   :id="`mnemonic-word-${i}`"
                    :key="i"
                    :class="['mnemonic-word', 'hidden', isMnemonicValid ? 'verified' : 'unverified']"
                    type="text"
@@ -67,7 +68,7 @@
                 Go Back
             </BaseButton>
 
-            <BaseButton @click="submit" class="button" color="green" :disabled="!isVerified">
+            <BaseButton @click="submit" id="submit-button" class="button" color="green" :disabled="!isVerified">
                 Submit
             </BaseButton>
         </div>

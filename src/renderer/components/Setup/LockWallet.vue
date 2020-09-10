@@ -64,7 +64,7 @@
                     Quit
                 </BaseButton>
 
-                <BaseButton v-else @click="goBack" class="button" color="comet" tabindex="-1">
+                <BaseButton v-else @click="goBack" id="go-back" class="button" color="comet" tabindex="-1">
                     Back
                 </BaseButton>
 

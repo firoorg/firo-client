@@ -1,5 +1,5 @@
 <template>
-    <div class="mnemonic-screen">
+    <div class="mnemonic-screen write-down-mnemonic">
         <div class="guidance">
             Below is your 24-word passphrase. Write it down and keep it safe. You will shortly be asked to re-enter it.
         </div>
@@ -11,7 +11,7 @@
         </div>
 
         <div class="buttons">
-            <BaseButton @click="goBack" class="button" color="comet">
+            <BaseButton @click="goBack" id="go-back" class="button" color="comet">
                 Go Back
             </BaseButton>
 

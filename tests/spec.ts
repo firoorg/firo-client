@@ -17,6 +17,8 @@ if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
 }
 
 const passphrase = 'passphrase';
+let twelveMnemonicWords = ["nation","tip","mean","govern","tide","comic","figure","gift","upper","love","kitchen","dolphin"];
+let mnemonicWords: string[];
 
 function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
     this.timeout(5e3);
@@ -59,7 +61,7 @@ function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
     });
 }
 
-describe('Regtest with New Wallet', function (this: Mocha.Suite) {
+describe('Regtest Setup', function (this: Mocha.Suite) {
     scaffold.bind(this)(true);
 
     it('opens a window', async function (this: This) {
@@ -106,21 +108,17 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
     });
 
     it('correctly displays and confirms mnemonic', async function (this: This) {
-        this.timeout(5e3);
+        this.timeout(5000e3);
         this.slow(5e3);
 
         await (await this.app.client.$('#create-new-wallet')).click();
-        await (await this.app.client.$('.mnemonic-screen')).waitForExist();
+        await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
 
-        const words = [];
-        for (let n = 0; n < 24; n++) {
-            const wordElement = await this.app.client.$(`#mnemonic-word-${n}`);
-            words.push(await wordElement.getText());
-        }
-        expect(words.length).to.equal(24);
+        mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word')).map(e => e.getText()));
+        expect(mnemonicWords.length).to.equal(24);
 
         await (await this.app.client.$('#confirm-button')).click();
-        await (await this.app.client.$('.mnemonic-word')).waitForExist();
+        await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
 
         const wordElements = await this.app.client.$$('.mnemonic-word');
         const submitButton = await this.app.client.$('#submit-button');
@@ -130,9 +128,9 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
             const classNames = <string>await wordElement.getAttribute('class');
             if (classNames.includes('hidden')) {
                 lastHiddenIndex = n;
-                await wordElement.setValue(words[n]);
+                await wordElement.setValue(mnemonicWords[n]);
             } else {
-                expect(await wordElement.getText()).to.equal(words[n]);
+                expect(await wordElement.getText()).to.equal(mnemonicWords[n]);
             }
         }
 
@@ -143,7 +141,7 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await submitButton.waitForClickable({reverse: true});
 
         // Set it back to the valid word.
-        await wordElements[lastHiddenIndex].setValue(words[lastHiddenIndex]);
+        await wordElements[lastHiddenIndex].setValue(mnemonicWords[lastHiddenIndex]);
         await submitButton.waitForClickable();
 
         await submitButton.click();
@@ -151,15 +149,89 @@ describe('Regtest with New Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('#passphrase')).waitForExist();
     });
 
+    it('goes back from the passphrase step', async function (this: This) {
+        await (await this.app.client.$('#go-back')).click();
+        await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
+
+        const wordElementsAgain = await this.app.client.$$('.mnemonic-word');
+        for (const [n, wordElement] of wordElementsAgain.entries()) {
+            const classNames = <string>await wordElement.getAttribute('class');
+            if (!classNames.includes('hidden')) {
+                expect(await wordElement.getText()).to.equal(mnemonicWords[n]);
+            }
+        }
+
+        await (await this.app.client.$('#go-back')).click();
+        await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
+
+        const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word');
+        for (const [n, wordElement] of nonHiddenWordElementsAgain.entries()) {
+            expect(await wordElement.getText()).to.equal(mnemonicWords[n]);
+        }
+
+        await (await this.app.client.$('#go-back')).click();
+        await (await this.app.client.$('#recover-from-mnemonic')).waitForExist();
+    });
+
+    it('can recover from mnemonics', async function (this: This) {
+        this.timeout(1000e3);
+
+        await (await this.app.client.$('#recover-from-mnemonic')).click();
+
+        const submitButton = await this.app.client.$('#submit-button');
+
+        await (await this.app.client.$('input[value="12"]')).click();
+        // FIXME: There is a bug in WebdriverIO.Element.waitForExists({reverse: true}), so we just do a short fixed wait
+        //        to be sure everything is updated.
+        await new Promise(r => setTimeout(r, 20));
+
+        const twelveMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
+        // PROTIP: Using Object.entries() on the result of $$() doesn't work.
+        for (const [n, word] of Object.entries(twelveMnemonicWords)) {
+            await twelveMnemonicWordElements[n].setValue(word);
+        }
+
+        await submitButton.waitForClickable();
+
+        twelveMnemonicWordElements[0].setValue('invalid-word');
+        await submitButton.waitForClickable({reverse: true});
+
+        await (await this.app.client.$('input[value="24"]')).click();
+        await new Promise(r => setTimeout(r, 20)); // FIXME: see above
+
+        const twentyFourMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
+        for (const [n, word] of Object.entries(mnemonicWords)) {
+            await twentyFourMnemonicWordElements[n].setValue(word);
+        }
+
+        await submitButton.waitForClickable();
+
+        twentyFourMnemonicWordElements[0].setValue('invalid-word');
+        await submitButton.waitForClickable({reverse: true});
+
+        twentyFourMnemonicWordElements[0].setValue(mnemonicWords[0]);
+        await submitButton.waitForClickable();
+
+        await submitButton.click();
+        await (await this.app.client.$('#passphrase')).waitForExist();
+    });
+
     it('locks the wallet', async function (this: This) {
         this.timeout(60e3);
         this.slow(20e3);
 
+        const submitButton = await this.app.client.$('#submit-button');
+
         await (await this.app.client.$('#passphrase')).setValue(passphrase);
         await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
-
-        const submitButton = await this.app.client.$('#submit-button');
         await submitButton.waitForClickable();
+
+        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase + 'invalid');
+        await submitButton.waitForClickable({reverse: true})
+
+        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
+        await submitButton.waitForClickable();
+
         await submitButton.click();
 
         await (await this.app.client.$('.tx-page')).waitForExist({timeout: 60e3});

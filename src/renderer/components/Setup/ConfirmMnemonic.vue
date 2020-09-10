@@ -1,5 +1,5 @@
 <template>
-    <div class="mnemonic-screen">
+    <div class="mnemonic-screen confirm-mnemonic">
         <div class="guidance">
             Enter the missing words from your mnemonic recovery phrase below:
         </div>
@@ -21,7 +21,7 @@
         </div>
 
         <div class="buttons">
-            <BaseButton @click="goBack" class="button" color="comet" tabindex="-1">
+            <BaseButton @click="goBack" id="go-back" class="button" color="comet" tabindex="-1">
                 Back
             </BaseButton>
 
