@@ -172,7 +172,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const receiveAddressElement = await this.app.client.$('#receive-address');
         await receiveAddressElement.waitForExist();
         receiveAddress = await receiveAddressElement.getText();
-    })
+    });
 
     it('sends and receives public payment', async function (this: This) {
         this.timeout(20e3);
