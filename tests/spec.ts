@@ -61,6 +61,15 @@ function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
     });
 }
 
+async function generateBlocks(self: This, blocks: number) {
+    await (await self.app.client.$('a[href="#/debugconsole"]')).click();
+
+    await self.app.client.keys([...`generate ${blocks}`.split(''), "Enter"]);
+    await self.app.client.waitUntil(async () =>
+        (await (await self.app.client.$('#current-input')).getText()) === ''
+    , {timeout: Math.max(2000, blocks*500)});
+}
+
 describe('Regtest Setup', function (this: Mocha.Suite) {
     scaffold.bind(this)(true);
 
@@ -241,11 +250,9 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         this.timeout(500e3);
         this.slow(100e3);
 
-        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+        await generateBlocks(this, 500);
 
-        await this.app.client.keys([..."generate 500".split(''), "Enter"]);
-
-        await this.app.client.waitUntilTextExists('#available-xzc', '16843', <any>{timeout: 500e3});
+        await this.app.client.waitUntilTextExists('#available-xzc', '16843');
         await this.app.client.waitUntilTextExists('#pending-xzc', '4300');
     });
 });
@@ -271,28 +278,48 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         receiveAddress = await receiveAddressElement.getText();
     });
 
-    // This is needed so that checking for payments works properly.
-    it('generates a block', async function (this: This) {
-        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
-
-        await this.app.client.keys([..."generate 1".split(''), "Enter"]);
-        await this.app.client.waitUntil(async () =>
-            (await (await this.app.client.$('#current-input')).getText()) === ''
-        );
-    });
-
     it('sends and receives a public payment', async function (this: This) {
-        this.timeout(20e3);
-        this.slow(10e3);
+        this.timeout(60e3);
+        this.slow(30e3);
+
+        // If there are other unmined transactions, ours might not be on the first page.
+        await generateBlocks(this, 1);
 
         await (await this.app.client.$('a[href="#/send/public')).click();
         await (await this.app.client.$('.send-zcoin-form')).waitForExist();
 
-        await (await this.app.client.$('#label')).setValue(nonce);
-        await (await this.app.client.$('#address')).setValue(receiveAddress);
-        await (await this.app.client.$('#amount')).setValue('1');
-
         const sendButton = await this.app.client.$('#send-button');
+        const label = await this.app.client.$('#label')
+        const address = await this.app.client.$('#address');
+        const amount = await this.app.client.$('#amount');
+
+        await address.setValue(receiveAddress);
+        await amount.setValue('1');
+        await sendButton.waitForClickable();
+
+        await label.setValue(nonce);
+
+        await amount.setValue('0.0000000001');
+        await sendButton.waitForClickable({reverse: true});
+        await amount.setValue('1');
+        await sendButton.waitForClickable();
+
+        await amount.setValue('99999999999999');
+        await sendButton.waitForClickable({reverse: true});
+        await amount.setValue('1');
+        await sendButton.waitForClickable();
+
+        await address.setValue('invalid-address');
+        await sendButton.waitForClickable({reverse: true});
+        await address.setValue(receiveAddress);
+        await sendButton.waitForClickable();
+
+        await sendButton.click();
+
+        const cancelButton = await this.app.client.$('#cancel-button');
+        await cancelButton.waitForClickable();
+        await cancelButton.click();
+
         await sendButton.waitForClickable();
         await sendButton.click();
 
@@ -302,10 +329,19 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         const passphraseInput = await this.app.client.$('#passphrase');
         await passphraseInput.waitForExist();
-        await passphraseInput.setValue(passphrase);
+        await passphraseInput.setValue(passphrase + '-invalid');
 
         const realSendButton = await this.app.client.$('#confirm-passphrase-send-button');
         await realSendButton.click();
+
+        const tryAgainButton = await this.app.client.$('#try-again-button');
+        await tryAgainButton.waitForExist();
+        await tryAgainButton.click();
+
+        await passphraseInput.waitForExist();
+        await passphraseInput.setValue(passphrase);
+        await realSendButton.click();
+
 
         // The new transaction MUST be the first element in the list, which is only guaranteed if it is the first
         // transaction to occur after a block is generated.

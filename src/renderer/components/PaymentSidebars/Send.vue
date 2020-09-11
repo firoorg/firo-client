@@ -219,6 +219,7 @@
                     <div class="buttons">
                         <base-button
                             v-if="['confirm', 'passphrase', 'incorrectPassphrase', 'error'].includes(sendPopoverStep)"
+                            id="cancel-button"
                             color="red"
                             :is-dark="true"
                             :is-outline="true"
@@ -279,6 +280,7 @@
 
                             <base-button
                                 v-else-if="sendPopoverStep === 'incorrectPassphrase'"
+                                id="try-again-button"
                                 color="green"
                                 @click.prevent="beginPassphraseStep"
                             >
