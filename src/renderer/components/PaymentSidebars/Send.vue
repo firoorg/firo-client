@@ -59,7 +59,7 @@
                                     <input
                                         id="address"
                                         ref="address"
-                                        v-model.trim="address"
+                                        v-model="address"
                                         v-validate.initial="'zcoinAddress'"
                                         v-tooltip="getValidationTooltip('address')"
                                         type="text"
