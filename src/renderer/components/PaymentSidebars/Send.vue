@@ -586,15 +586,22 @@ export default {
                 return;
             }
 
+            const satoshiAmount = this.satoshiAmount;
+            const subtractFeeFromAmount = this.subtractFeeFromAmount;
+            const txFeePerKb = this.txFeePerKb;
+
             let p;
             if (this.privateOrPublic === 'private') {
-                p = $daemon.calcPrivateTxFee(this.satoshiAmount, this.subtractFeeFromAmount);
+                p = $daemon.calcPrivateTxFee(satoshiAmount, subtractFeeFromAmount);
             } else {
-                p = $daemon.calcPublicTxFee(this.satoshiAmount, this.subtractFeeFromAmount, this.txFeePerKb);
+                p = $daemon.calcPublicTxFee(satoshiAmount, subtractFeeFromAmount, txFeePerKb);
             }
 
             try {
-                this.transactionFee = await p;
+                const txFee = await p;
+                if (this.satoshiAmount === satoshiAmount && this.subtractFeeFromAmount === subtractFeeFromAmount && this.txFeePerKb === txFeePerKb) {
+                    this.transactionFee = txFee
+                }
             } catch (e) {
                 if (e instanceof ZcoindErrorResponse && e.errorCode === -6) {
                     this.totalAmountExceedsBalance = true;
