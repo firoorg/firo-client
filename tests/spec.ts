@@ -272,18 +272,19 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await paymentStatusElement.waitForExist({timeout: 20e3});
     });
 
-    it('displays a receiving address', async function (this: This) {
+    it('displays and updates the receiving address', async function (this: This) {
         const receiveAddressElement = await this.app.client.$('#receive-address');
         await receiveAddressElement.waitForExist();
+
+        receiveAddress = await receiveAddressElement.getText();
+        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generatetoaddress 1 ${receiveAddress}').then(arguments[0])`, []);
+        await this.app.client.waitUntil(async () => (await receiveAddressElement.getText()) !== receiveAddress);
         receiveAddress = await receiveAddressElement.getText();
     });
 
     it('sends and receives a public payment', async function (this: This) {
         this.timeout(60e3);
         this.slow(30e3);
-
-        // If there are other unmined transactions, ours might not be on the first page.
-        await generateBlocks(this, 1);
 
         await (await this.app.client.$('a[href="#/send/public')).click();
         await (await this.app.client.$('.send-zcoin-form')).waitForExist();
@@ -341,7 +342,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await passphraseInput.waitForExist();
         await passphraseInput.setValue(passphrase);
         await realSendButton.click();
-
 
         // The new transaction MUST be the first element in the list, which is only guaranteed if it is the first
         // transaction to occur after a block is generated.
