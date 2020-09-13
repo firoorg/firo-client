@@ -353,4 +353,47 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntilTextExists('.send-label', nonce, 10e3);
         await (await this.app.client.$('span.ok.is-incoming')).waitForExist();
     });
+
+    it('sends with a custom tx fee', async function (this: This) {
+        this.timeout(30e3);
+        this.slow(20e3);
+
+        await this.app.client.executeAsyncScript("$daemon.legacyRpc('generate 1').then(arguments[0])", []);
+
+        const nonce = String(Math.random());
+
+        await (await this.app.client.$('a[href="#/send/public')).click();
+        await (await this.app.client.$('.send-zcoin-form')).waitForExist();
+
+        await (await this.app.client.$('#label')).setValue(nonce);
+        await (await this.app.client.$('#address')).setValue('TAczBFWtiP8mNstdLn1Z383z51rZ1vHk5N');
+        await (await this.app.client.$('#amount')).setValue('1');
+        await (await this.app.client.$('#use-custom-fee-checkbox')).click();
+        // There is a bug in WebdriverIO where the default text will not be erased, so this will end up as a 1111
+        // satoshi fee. The test logic will work whether or not that bug is fixed.
+        await (await this.app.client.$('#custom-fee')).setValue('111');
+
+        const sendButton = await this.app.client.$('#send-button');
+        // There is a WebdriverIO bug where this call takes a couple seconds to complete after the element is enabled.
+        await sendButton.waitForEnabled();
+        sendButton.click();
+
+        const confirmButton = await this.app.client.$('#confirm-button');
+        await confirmButton.waitForEnabled();
+        await confirmButton.click();
+
+        const passphraseInput = await this.app.client.$('#passphrase');
+        await passphraseInput.waitForExist();
+        await passphraseInput.setValue(passphrase);
+
+        await (await this.app.client.$('#confirm-passphrase-send-button')).click();
+
+        await this.app.client.waitUntilTextExists('.send-label', nonce, 10e3);
+
+        const txFee = await this.app.client.executeScript(
+            "Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0]).fee",
+            [nonce]
+        );
+        expect(txFee >= 111);
+    });
 });

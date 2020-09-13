@@ -109,11 +109,12 @@
                                     </div>
 
                                     <div v-show="privateOrPublic === 'public'" class="select-fee">
-                                        <input type="checkbox" v-model="useCustomFee" />
+                                        <input type="checkbox" id="use-custom-fee-checkbox" v-model="useCustomFee" />
                                         <label>Use a Custom Transaction Fee</label>
                                         <div v-show="useCustomFee">
                                             <input
                                                 type="number"
+                                                id="custom-fee"
                                                 v-model.number="txFeePerKb"
                                                 name="txFeePerKb"
                                                 v-validate.initial="'integer|between:0,10000'"
