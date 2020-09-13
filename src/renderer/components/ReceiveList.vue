@@ -3,12 +3,14 @@
     <div class="qr-code">
       <div ref="qrCode" 
             @click="copyAddress(shortenAddress(selectedAddress))"
+            v-clipboard="() => selectedAddress"
             :style="{ cursor: 'pointer' }"/>
       <div style="text-align:center">
         <p>
           <span style="font-weight: bold;">{{ selectedLabel }}</span>
           <br/><u><a
             :style="{ cursor: 'pointer' }"
+            v-clipboard="() => selectedAddress"
             @click="copyAddress(shortenAddress(selectedAddress))"
           >{{ shortenAddress(selectedAddress) }}</a></u>
         </p>
@@ -27,7 +29,7 @@
         :class="styleReusableAddress"
         @click.prevent="showReusableAddress"
       >
-        REUSABLE ADDRESSES
+        REUSABLE ADDRESSES <span class="infolink" style="font-size: 20px"></span>
       </base-button>
     </div>
     <div class="animated-table-customized">
@@ -97,6 +99,7 @@
             type="text"
             v-model="labelResult"
             value=""
+            class="input-label"
             placeholder="Start typing"
             width="200"
             @keyup.enter="submit"
@@ -120,6 +123,16 @@
         <b>&nbsp;&nbsp;Create new</b>
       </div>
     </div>
+    <div v-if="isRegularAddressSelected">
+      <div
+            class="action-group"
+            v-clipboard="() => props.rowData.address"
+            @click.prevent="copyAddress(props.rowData.shortAddress)"
+            :style="{ cursor: 'pointer' }"
+          >
+            <ZnodeExpandButton />
+          </div>
+    </div>
   </section>
 </template>
 
@@ -129,6 +142,7 @@ import CopyIcon from "@/components//Icons/CopyIcon";
 import ModifyIcon from "@/components//Icons/ModifyIcon";
 import PlusIcon from "@/components//Icons/PlusIcon";
 import AnimatedTable from "@/components/AnimatedTable/AnimatedTable";
+import ZnodeExpandButton from "@/components//Icons/ZnodeExpandButton";
 import { Overlay } from "vuejs-overlay";
 import { mapGetters } from "vuex";
 import { add } from "winston";
@@ -172,6 +186,7 @@ export default {
     Toasted,
     VueClipboards,
     Overlay,
+    ZnodeExpandButton
   },
 
   props: {},
@@ -446,7 +461,8 @@ export default {
     },
 
     editLabel(item) {
-      this.labelResult = "";
+      this.selectedAddress = item.address;
+      this.labelResult = this.selectedLabel;
       this.opened = this.visible = true;
     },
     copyAddress(addr) {
@@ -456,7 +472,7 @@ export default {
       });
     },
     onRowClass(dataItem, index) {
-      return "color-red";
+      return "background: blue";
     },
     async createNewAddress() {
       if (this.isRegularAddressSelected) {
@@ -479,9 +495,10 @@ export default {
       var createds = [];
       try {
         var createdAddress = await $daemon.getUnusedAddress();
+        let label = this.addressBook[createdAddress]?this.addressBook[createdAddress].label:"";
         createds.push({
           address: createdAddress,
-          label: "",
+          label: label,
           purpose: "receive",
         });
         console.log('created address:', createdAddress);
@@ -531,17 +548,21 @@ export default {
 }
 
 .rounded-btn {
-  border-radius: 28px !important;
+  border-radius: 10px !important;
   border:1px solid #828282;
   background-color: #F0F3FC;
   color: #828282;
+  width: 26%;
+  height: 45px;
 }
 
 .rounded-btn-selected {
-  border-radius: 28px !important;
+  border-radius: 10px !important;
   border:1px solid #3EAD54;
   background-color: #E6E7FF;
   color: #3EAD54;
+  width: 26%;
+  height: 45px;
 }
 
 .qr-code {
@@ -937,5 +958,30 @@ input {
   display: flex;
   align-items: center;
   margin: 10px;
+}
+
+.infolink:after {
+    content: '?';
+    display: inline-block;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
+    font-size: 50%;
+    line-height: 0.8em;
+    border-radius: 50%;
+    margin-left: 6px;
+    padding: 0.13em 0.2em 0.09em 0.2em;
+    color: inherit;
+    border: 1px solid;
+    text-decoration: none;
+}
+.input-label {
+  background-color: rgba(0,0,0,0.2);
+  border: none;
+  height: 27px;
+  border-radius: 10px !important;
+  margin: {
+    top: 1em;
+  }
 }
 </style>
