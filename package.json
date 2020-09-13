@@ -79,6 +79,7 @@
     }
   },
   "dependencies": {
+    "@types/chai": "^4.2.12",
     "@types/webpack-env": "^1.15.2",
     "@types/zeromq": "^4.6.3",
     "ajv": "^6.12.3",

@@ -1,7 +1,7 @@
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import {expect} from 'chai';
+import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
 
@@ -65,7 +65,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
         scaffold.bind(this)(true);
 
         it('opens a window', async function (this: This) {
-            expect(await this.app.client.getWindowCount()).to.equal(1);
+            assert.equal(await this.app.client.getWindowCount(), 1);
         });
 
         it('starts', async function (this: This) {
@@ -115,7 +115,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
             await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
 
             mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word')).map(e => e.getText()));
-            expect(mnemonicWords.length).to.equal(24);
+            assert.equal(mnemonicWords.length, 24);
 
             await (await this.app.client.$('#confirm-button')).click();
             await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
@@ -130,7 +130,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
                     lastHiddenIndex = n;
                     await wordElement.setValue(mnemonicWords[n]);
                 } else {
-                    expect(await wordElement.getText()).to.equal(mnemonicWords[n]);
+                    assert.equal(await wordElement.getText(), mnemonicWords[n]);
                 }
             }
 
@@ -157,7 +157,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
             for (const [n, wordElement] of wordElementsAgain.entries()) {
                 const classNames = <string>await wordElement.getAttribute('class');
                 if (!classNames.includes('hidden')) {
-                    expect(await wordElement.getText()).to.equal(mnemonicWords[n]);
+                    assert.equal(await wordElement.getText(), mnemonicWords[n]);
                 }
             }
 
@@ -166,7 +166,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
 
             const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word');
             for (const [n, wordElement] of nonHiddenWordElementsAgain.entries()) {
-                expect(await wordElement.getText()).to.equal(mnemonicWords[n]);
+                assert.equal(await wordElement.getText(), mnemonicWords[n]);
             }
 
             await (await this.app.client.$('#go-back')).click();
@@ -394,6 +394,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             "Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0]).fee",
             [nonce]
         );
-        expect(txFee >= 111);
+        assert.isAtLeast(txFee, 111);
     });
 });
