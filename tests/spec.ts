@@ -4,6 +4,7 @@ import fs from 'fs';
 import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
+import {convertToSatoshi} from "../src/lib/convert";
 
 interface This extends Mocha.Context {
     app: Application
@@ -276,6 +277,43 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         let originalReceiveAddress = await receiveAddressElement.getText();
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generatetoaddress 1 ${originalReceiveAddress}').then(arguments[0])`, []);
         await this.app.client.waitUntil(async () => (await receiveAddressElement.getText()) !== originalReceiveAddress);
+    });
+
+    it('suggests anonymization', async function (this: This) {
+        this.timeout(10e3);
+
+        // Coins will just have been generated, and our anonymization slider is set to 100% by default, so the client
+        // should always be suggesting anonymization at this point.
+
+        const reviewMintSuggestionsButton = await this.app.client.$('#review-auto-mint-suggestions');
+        await reviewMintSuggestionsButton.waitForExist();
+        await reviewMintSuggestionsButton.click();
+
+        await (await this.app.client.$('.denomination-selector')).waitForExist();
+        const suggestions = await Promise.all(
+            (await this.app.client.$$('.denomination-value'))
+                .map(async el => {
+                    const denomination = Number((await el.getAttribute('id')).match(/^denomination-(\d+)-value$/)[1]);
+                    const value = Number(await el.getText());
+
+                    return [denomination, value];
+                })
+        );
+
+        let totalSuggested = 0;
+        let totalMints = 0;
+        for (const [denomination, value] of suggestions) {
+            totalMints += value;
+            totalSuggested += denomination * value;
+        }
+
+        const MINT_FEE = 0.001e8;
+        const availableForAnonymization = convertToSatoshi(
+            (await (await this.app.client.$('#available-xzc')).getText())
+            .split(' ')
+            [0]
+        );
+        assert.approximately(totalSuggested + totalMints * MINT_FEE, availableForAnonymization, 0.05e8);
     });
 
     it('sends and receives a public payment', async function (this: This) {

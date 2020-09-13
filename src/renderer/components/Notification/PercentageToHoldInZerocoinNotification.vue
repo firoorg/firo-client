@@ -33,6 +33,7 @@
                     <base-button
                         color="green"
                         :is-dark="true"
+                        id="review-auto-mint-suggestions"
                         @click.prevent="fillAndRouteToMint"
                     >
                         {{ $t('mint.flyout-process-mints.button__review-suggestion--primary') }}

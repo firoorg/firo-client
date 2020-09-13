@@ -12,7 +12,7 @@
                 :class="{ 'has-value': !!value }"
                 :style="{ height: currentHeight }"
             >
-                <span v-if="value">
+                <span v-if="value" class="denomination-value" :id="`denomination-${denomination}-value`">
                     {{ value }}
                 </span>
             </div>
