@@ -293,38 +293,44 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const address = await this.app.client.$('#address');
         const amount = await this.app.client.$('#amount');
 
+        await label.setValue(nonce);
         await address.setValue(receiveAddress);
         await amount.setValue('1');
-        await sendButton.waitForClickable();
-
-        await label.setValue(nonce);
+        // Using waitForClickable() causes a weird bug where the entire page moves out of frame.
+        await sendButton.waitForEnabled();
 
         await amount.setValue('0.0000000001');
-        await sendButton.waitForClickable({reverse: true});
+        await sendButton.waitForEnabled({reverse: true});
+        // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+        await new Promise(r => setTimeout(r, 100));
         await amount.setValue('1');
-        await sendButton.waitForClickable();
+        await sendButton.waitForEnabled();
 
         await amount.setValue('99999999999999');
-        await sendButton.waitForClickable({reverse: true});
+        await sendButton.waitForEnabled({reverse: true});
+        // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+        await new Promise(r => setTimeout(r, 100));
         await amount.setValue('1');
-        await sendButton.waitForClickable();
+        await sendButton.waitForEnabled();
 
         await address.setValue('invalid-address');
-        await sendButton.waitForClickable({reverse: true});
+        await sendButton.waitForEnabled({reverse: true});
+        // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+        await new Promise(r => setTimeout(r, 100));
         await address.setValue(receiveAddress);
-        await sendButton.waitForClickable();
+        await sendButton.waitForEnabled();
 
         await sendButton.click();
 
         const cancelButton = await this.app.client.$('#cancel-button');
-        await cancelButton.waitForClickable();
+        await cancelButton.waitForEnabled();
         await cancelButton.click();
 
-        await sendButton.waitForClickable();
+        await sendButton.waitForEnabled();
         await sendButton.click();
 
         const confirmButton = await this.app.client.$('#confirm-button');
-        await confirmButton.waitForClickable();
+        await confirmButton.waitForEnabled();
         await confirmButton.click();
 
         const passphraseInput = await this.app.client.$('#passphrase');
