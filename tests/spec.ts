@@ -4,7 +4,7 @@ import fs from 'fs';
 import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
-import {convertToSatoshi} from "../src/lib/convert";
+import {convertToCoin, convertToSatoshi} from "../src/lib/convert";
 import {TransactionOutput} from "../src/daemon/zcoind";
 
 interface This extends Mocha.Context {
@@ -444,5 +444,63 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         );
         assert.isAtLeast(tx.fee, 111);
         assert.equal(tx.amount, 1e8);
+    });
+
+    it('anonymizes XZC', async function (this: This) {
+        this.timeout(40e3);
+        this.slow(20e3);
+
+        // Make sure we have enough coins to anonymize.
+        await this.app.client.executeAsyncScript("$daemon.legacyRpc('generate 10').then(arguments[0])", []);
+        // It's easiest, if a bit racy, to just use a setTimeout to make sure the balance is updated, as we don't know
+        // what it should be.
+        await new Promise(r => setTimeout(r, 500));
+
+        await (await this.app.client.$('a[href="#/anonymize')).click();
+        await (await this.app.client.$('.mint-zerocoin')).waitForExist();
+
+        for (const denomination of [100e8, 25e8, 10e8, 1e8, 0.5e8, 0.1e8, 0.05e8]) {
+            await (await this.app.client.$(`#increase-${denomination}-button`)).click();
+            await (await this.app.client.$(`#decrease-${denomination}-button`)).click();
+            await (await this.app.client.$(`#increase-${denomination}-button`)).click();
+        }
+
+        const total = convertToSatoshi(await (await this.app.client.$('.amount > .value')).getText());
+        assert.equal(total, 136.657e8);
+
+        await (await this.app.client.$('#autoMintAmount')).setValue('137');
+        await (await this.app.client.$('.automint-button')).click();
+        // Autominting is implemented in a hackish way so just using a timer is easiest.
+        await new Promise(r => setTimeout(r, 500));
+
+        const total2 = convertToSatoshi(await (await this.app.client.$('.amount > .value')).getText());
+        assert.equal(total2, 137.005e8)
+
+        const anonymizeNowButton = await this.app.client.$('#anonymize-now-button');
+        const confirmButton = await this.app.client.$('#confirm-button');
+        const cancelButton = await this.app.client.$('#cancel-button');
+        const passphraseInput = await this.app.client.$('#passphrase');
+        const mintButton = await this.app.client.$('#mint-button');
+
+        await anonymizeNowButton.click();
+
+        await confirmButton.waitForEnabled();
+        await confirmButton.click();
+
+        await cancelButton.click();
+
+        await anonymizeNowButton.click()
+
+        await confirmButton.waitForEnabled();
+        await confirmButton.click();
+
+        await passphraseInput.setValue(passphrase);
+        await mintButton.click();
+
+        // pendingPrivateXzc will consist solely of what was minted in this function due to the blocks we minted above.
+        const pendingPrivateXzcElement = await this.app.client.$('#pending-private-xzc');
+        await pendingPrivateXzcElement.waitForDisplayed();
+        const pendingPrivateXzc = Number((await pendingPrivateXzcElement.getText()).match(/\d+/)[0]);
+        assert.equal(pendingPrivateXzc, 137);
     });
 });

@@ -135,6 +135,7 @@
                     <div class="buttons">
                         <base-button
                             v-if="!['initial', 'waitToConfirm', 'waitForReply'].includes(popoverStep)"
+                            id="cancel-button"
                             color="red"
                             @click.prevent="closePopover"
                         >
@@ -152,6 +153,7 @@
                         >
                             <base-button
                                 v-if="popoverStep === 'initial'"
+                                id="anonymize-now-button"
                                 color="green"
                                 class="expanded"
                                 :disabled="!mintAmount"
@@ -167,6 +169,7 @@
 
                             <base-button
                                 v-else-if="popoverStep === 'confirm'"
+                                id="confirm-button"
                                 color="green"
                                 @click.prevent="beginPassphraseStep"
                             >
@@ -175,6 +178,7 @@
 
                             <base-button
                                 v-else-if="popoverStep === 'passphrase'"
+                                id="mint-button"
                                 color="green"
                                 @click.prevent="attemptMint"
                             >

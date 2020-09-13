@@ -30,12 +30,14 @@
         <div class="buttons">
             <base-round-button
                 :disabled="!canDecrease"
+                :id="`decrease-${denomination}-button`"
                 @click="tryDecrease"
             >
                 &minus;
             </base-round-button>
             <base-round-button
                 :disabled="!canIncrease"
+                :id="`increase-${denomination}-button`"
                 @click="tryIncrease"
             >
                 &plus;
