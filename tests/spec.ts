@@ -5,6 +5,7 @@ import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
 import {convertToSatoshi} from "../src/lib/convert";
+import {TransactionOutput} from "../src/daemon/zcoind";
 
 interface This extends Mocha.Context {
     app: Application
@@ -386,10 +387,17 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await passphraseInput.setValue(passphrase);
         await realSendButton.click();
 
-        // The new transaction MUST be the first element in the list, which is only guaranteed if it is the first
+        // - The new transaction MUST be the first element in the list, which is only guaranteed if it is the first
         // transaction to occur after a block is generated.
+        // - The type signature of timeout on waitUntilTextExists is incorrect.
         await this.app.client.waitUntilTextExists('.send-label', nonce, <any>{timeout: 10e3});
         await (await this.app.client.$('span.ok.is-incoming')).waitForExist();
+
+        const tx: TransactionOutput = await this.app.client.executeScript(
+            "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0] && tx.category === 'send' && !tx.isChange)",
+            [nonce]
+        );
+        assert.equal(tx.fee + tx.amount, 1e8);
     });
 
     it('sends with a custom tx fee', async function (this: This) {
