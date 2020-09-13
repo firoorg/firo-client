@@ -400,7 +400,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         assert.equal(tx.fee + tx.amount, 1e8);
     });
 
-    it('sends with a custom tx fee', async function (this: This) {
+    it('sends with a custom tx fee not subtracted from amount', async function (this: This) {
         this.timeout(30e3);
         this.slow(20e3);
 
@@ -414,6 +414,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('#label')).setValue(nonce);
         await (await this.app.client.$('#address')).setValue('TAczBFWtiP8mNstdLn1Z383z51rZ1vHk5N');
         await (await this.app.client.$('#amount')).setValue('1');
+        await (await this.app.client.$('#subtract-fee-from-amount-checkbox')).click();
         await (await this.app.client.$('#use-custom-fee-checkbox')).click();
         // There is a bug in WebdriverIO where the default text will not be erased, so this will end up as a 1111
         // satoshi fee. The test logic will work whether or not that bug is fixed.
@@ -434,12 +435,14 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('#confirm-passphrase-send-button')).click();
 
+        // The type signature of waitUntilTextExists is incorrect.
         await this.app.client.waitUntilTextExists('.send-label', nonce, <any>{timeout: 10e3});
 
-        const txFee: number = await this.app.client.executeScript(
-            "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0]).fee",
+        const tx: TransactionOutput = await this.app.client.executeScript(
+            "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0] && !tx.isChange)",
             [nonce]
         );
-        assert.isAtLeast(txFee, 111);
+        assert.isAtLeast(tx.fee, 111);
+        assert.equal(tx.amount, 1e8);
     });
 });

@@ -126,6 +126,7 @@
                                 <div class="subtract-fee-from-amount-checkbox">
                                     <input
                                         v-model="subtractFeeFromAmount"
+                                        id="subtract-fee-from-amount-checkbox"
                                         type="checkbox"
                                         name="subtractFeeFromAmount"
                                         :checked="privateOrPublic === 'private'"
