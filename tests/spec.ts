@@ -388,7 +388,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         // The new transaction MUST be the first element in the list, which is only guaranteed if it is the first
         // transaction to occur after a block is generated.
-        await this.app.client.waitUntilTextExists('.send-label', nonce, 10e3);
+        await this.app.client.waitUntilTextExists('.send-label', nonce, <any>{timeout: 10e3});
         await (await this.app.client.$('span.ok.is-incoming')).waitForExist();
     });
 
@@ -426,10 +426,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('#confirm-passphrase-send-button')).click();
 
-        await this.app.client.waitUntilTextExists('.send-label', nonce, 10e3);
+        await this.app.client.waitUntilTextExists('.send-label', nonce, <any>{timeout: 10e3});
 
-        const txFee = await this.app.client.executeScript(
-            "Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0]).fee",
+        const txFee: number = await this.app.client.executeScript(
+            "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.label === arguments[0]).fee",
             [nonce]
         );
         assert.isAtLeast(txFee, 111);
