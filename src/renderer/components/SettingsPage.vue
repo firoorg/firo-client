@@ -40,6 +40,7 @@
                                 <label>Current Passphrase:</label>
                                 <input
                                     v-model="currentPassphrase"
+                                    id="current-passphrase"
                                     type="password"
                                 />
                             </div>
@@ -48,6 +49,7 @@
                                 <label>New Passphrase:</label>
                                 <input
                                     v-model="newPassphrase"
+                                    id="new-passphrase"
                                     name="newPassphrase"
                                     type="password"
                                     :class="passphraseBoxClass"
@@ -58,6 +60,7 @@
                                 <label>Confirm New Passphrase:</label>
                                 <input
                                     v-model="confirmNewPassphrase"
+                                    id="confirm-new-passphrase"
                                     name="confirmNewPassphrase"
                                     type="password"
                                     :class="passphraseBoxClass"
@@ -77,6 +80,7 @@
                         >
                             <base-button
                                 :disabled="!canChangePassphrase"
+                                id="change-passphrase-button"
                                 color="green"
                                 @click="changePassphrase"
                             >
@@ -87,6 +91,7 @@
                                 <div class="close-dialog-button">
                                     <a
                                         href="#"
+                                        id="close-passphrase-dialog-button"
                                         @click.prevent="closePassphrasePopover"
                                     >
                                         X
@@ -94,11 +99,11 @@
                                 </div>
 
                                 <div class="content-wrapper">
-                                    <div v-if="!changePassphraseError">
+                                    <div v-if="!changePassphraseError" id="passphrase-change-successful">
                                         Passphrase changed successfully.
                                     </div>
 
-                                    <div v-else>
+                                    <div v-else id="passphrase-change-error">
                                         {{ changePassphraseError }}
                                     </div>
                                 </div>

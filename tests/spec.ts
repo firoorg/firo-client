@@ -4,7 +4,7 @@ import fs from 'fs';
 import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
-import {convertToCoin, convertToSatoshi} from "../src/lib/convert";
+import {convertToSatoshi} from "../src/lib/convert";
 import {TransactionOutput} from "../src/daemon/zcoind";
 
 interface This extends Mocha.Context {
@@ -511,5 +511,43 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await pendingPrivateXzcElement.waitForDisplayed();
         const pendingPrivateXzc = Number((await pendingPrivateXzcElement.getText()).match(/\d+/)[0]);
         assert.equal(pendingPrivateXzc, 137);
+    });
+
+    it('changes the passphrase', async function (this: This) {
+        await (await this.app.client.$('a[href="#/settings"]')).click();
+
+        const currentPassphrase = await this.app.client.$('#current-passphrase');
+        const newPassphrase = await this.app.client.$('#new-passphrase');
+        const confirmNewPassphrase = await this.app.client.$('#confirm-new-passphrase');
+        const changePassphraseButton = await this.app.client.$('#change-passphrase-button');
+
+        await currentPassphrase.waitForExist();
+        await currentPassphrase.setValue(passphrase + '-invalid');
+        await newPassphrase.setValue(passphrase + '_');
+        await confirmNewPassphrase.setValue(passphrase + '_');
+        await changePassphraseButton.click();
+
+        const closeButton = await this.app.client.$('.close-dialog-button > a');
+        await closeButton.waitForExist();
+
+        await (await this.app.client.$('#passphrase-change-error')).waitForExist();
+        await closeButton.click();
+
+        await currentPassphrase.setValue(passphrase);
+        await confirmNewPassphrase.setValue(passphrase + '__');
+        await changePassphraseButton.waitForEnabled({reverse: true});
+
+        await confirmNewPassphrase.setValue(passphrase + '_');
+        await changePassphraseButton.waitForEnabled();
+        await changePassphraseButton.click();
+
+        await closeButton.waitForExist();
+        assert(await (await this.app.client.$('#passphrase-change-successful')).isExisting());
+        await closeButton.click();
+
+        await this.app.client.executeAsyncScript(
+            "$daemon.setPassphrase(arguments[0], arguments[1]).then(arguments[2])",
+            [passphrase + "_", passphrase]
+        );
     });
 });
