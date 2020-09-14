@@ -31,11 +31,13 @@
     },
     "files": [
       "dist/electron/**/*",
-      "assets/core/**/*"
+      "assets/core/**/*",
+      "node_modules/**/*"
     ],
     "asarUnpack": [
       "dist/electron/**/*",
-      "assets/core/**/*"
+      "assets/core/**/*",
+      "node_modules/**/*"
     ],
     "dmg": {
       "background": "assets/images/background.png",
