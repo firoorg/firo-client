@@ -459,9 +459,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         // Make sure we have enough coins to anonymize.
         await this.app.client.executeAsyncScript("$daemon.legacyRpc('generate 10').then(arguments[0])", []);
-        // It's easiest, if a bit racy, to just use a setTimeout to make sure the balance is updated, as we don't know
-        // what it should be.
-        await new Promise(r => setTimeout(r, 500));
+        // TODO: It's easiest, if a bit racy, to just use a setTimeout to make sure the balance is updated, as we don't
+        //  know what it should be, and it's a PITA to figure it out. It's also necessary for our balance to stop
+        //  changing before we click on /anonymize, so the timeout here should be suitably long.
+        await new Promise(r => setTimeout(r, 2e3));
 
         await (await this.app.client.$('a[href="#/anonymize')).click();
         await (await this.app.client.$('.mint-zerocoin')).waitForExist();
@@ -489,6 +490,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const passphraseInput = await this.app.client.$('#passphrase');
         const mintButton = await this.app.client.$('#mint-button');
 
+        await anonymizeNowButton.waitForEnabled();
         await anonymizeNowButton.click();
 
         await confirmButton.waitForEnabled();
