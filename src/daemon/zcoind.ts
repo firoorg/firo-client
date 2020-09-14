@@ -803,7 +803,9 @@ export class Zcoind {
             // These are the arguments that will be passed to zcoind.
             const args = ["-clientapi=1"];
 
-            if (process.platform !== "win32") {
+            if (process.platform === "win32") {
+                args.push("-daemon=0");
+            } else {
                 args.push("-daemon=1");
             }
 
