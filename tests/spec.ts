@@ -283,8 +283,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('suggests anonymization', async function (this: This) {
         this.timeout(10e3);
 
-        // Coins will just have been generated, and our anonymization slider is set to 100% by default, so the client
-        // should always be suggesting anonymization at this point.
+        await this.app.client.executeScript("$store.dispatch('Settings/SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN', 100)", []);
 
         const reviewMintSuggestionsButton = await this.app.client.$('#review-auto-mint-suggestions');
         await reviewMintSuggestionsButton.waitForExist();
@@ -315,6 +314,14 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             [0]
         );
         assert.approximately(totalSuggested + totalMints * MINT_FEE, availableForAnonymization, 0.05e8);
+
+        // Turn off mint suggestions.
+        await this.app.client.executeAsyncScript("$daemon.legacyRpc('generate 1').then(arguments[0])", []);
+        await reviewMintSuggestionsButton.waitForExist();
+        await this.app.client.executeScript("$store.dispatch('Settings/SET_PERCENTAGE_TO_HOLD_IN_ZEROCOIN', 0)", []);
+        // There is a bug in WebdriverIO that makes it difficult to check if an element has disappeared.
+        await new Promise(r => setTimeout(r, 1000));
+        assert.isFalse(await reviewMintSuggestionsButton.isDisplayed());
     });
 
     it('sends and receives a public payment', async function (this: This) {

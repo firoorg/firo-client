@@ -24,6 +24,7 @@
 
                 <footer>
                     <base-button
+                        id="ignore-mint-suggestions"
                         :is-outline="true"
                         :is-dark="true"
                         @click.prevent="markAsNotified"
