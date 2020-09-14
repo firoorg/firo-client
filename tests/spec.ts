@@ -550,4 +550,28 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             [passphrase + "_", passphrase]
         );
     });
+
+    it('responds to input properly in the debug console', async function (this: This) {
+        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+
+        const currentInput = await this.app.client.$('#current-input')
+
+        await this.app.client.keys([..."garbage-input-1".split(''), "Enter"]);
+        await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+
+        await this.app.client.keys([..."garbage-input-2".split(''), "Enter"]);
+        await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+
+        await this.app.client.keys(["ArrowUp"]);
+        await this.app.client.waitUntil(async () => (await currentInput.getText()) === 'garbage-input-2');
+
+        await this.app.client.keys(["ArrowUp"]);
+        await this.app.client.waitUntil(async () => (await currentInput.getText()) === 'garbage-input-1');
+
+        await this.app.client.keys(["ArrowDown"]);
+        await this.app.client.waitUntil(async () => (await currentInput.getText()) === 'garbage-input-2');
+
+        await this.app.client.keys(["ArrowDown"]);
+        await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+    });
 });
