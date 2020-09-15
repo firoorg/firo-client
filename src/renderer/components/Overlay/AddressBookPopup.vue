@@ -303,8 +303,9 @@ export default {
         //add new address
         var newRow = {
           label: data.newlabel,
-          address: short,
-          purpose: this.toFirstUpperCase(data.purpose),
+          address: data.newaddress,
+          purpose: purpose_,
+          shortAddress: short,
         };
         console.log("closeEditAddressBook:", newRow);
         this.rows.push(newRow);
@@ -314,7 +315,7 @@ export default {
           if (item.address === data.oldaddress) {
             item.address = data.newaddress;
             item.label = data.newlabel;
-            item.purpose = this.toFirstUpperCase(data.purpose);
+            item.purpose = purpose_;
           }
         });
       }

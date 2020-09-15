@@ -116,7 +116,7 @@ export default {
   methods: {
     async submit() {
       //verify address
-      if (this.isCreateNew() && this.addressBook[this.addressResult]) {
+      if (this.isCreateNew() && (this.addressBook[this.addressResult] || this.paymentChannels[this.addressResult])) {
         this.errorMessage = "Duplicate address!";
         this.showError = true;
         this.xStyle = "top: 225px";

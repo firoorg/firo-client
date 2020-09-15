@@ -43,9 +43,9 @@
                   <div class="addressbook-action-group" style="float:right">
                     <select v-model="selectedSendFrom" class="selectrap">
                       <option
-                        v-for="addr in Object.keys(mapOfAddresses)"
-                        v-bind:key="addr"
-                        >{{ addr }}</option
+                        v-for="label in Object.values(paymentCodes)"
+                        v-bind:key="label"
+                        >{{ label }}</option
                       >
                     </select>
                   </div>
@@ -186,6 +186,15 @@
               </div>
 
               <div v-else class="value"></div>
+            </div>
+
+            <div class="field amount" v-if="notifyNotificationTx">
+              <label>
+                Connection fee (once off):
+              </label>
+              <div class="value">
+                 0.005 XZC
+              </div>
             </div>
 
             <div class="field fee">
@@ -407,13 +416,13 @@ export default {
 
       // This is set if error -6 occurs during fee calculation.
       totalAmountExceedsBalance: false,
-      selectedSendFrom: null,
+      selectedSendFrom: null, //label
     };
   },
 
   created() {
-    if (!this.selectSendFrom && Object.values(this.mapOfAddresses).length > 0) {
-      this.selectedSendFrom = Object.keys(this.mapOfAddresses)[0];
+    if (!this.selectSendFrom && Object.values(this.paymentCodes).length > 0) {
+      this.selectedSendFrom = Object.values(this.paymentCodes)[0];
     }
   },
 
@@ -448,13 +457,9 @@ export default {
       return data;
     },
     selectedSendPaymentCode() {
-      if (this.mapOfAddresses[this.selectedSendFrom]) {
-        return this.mapOfAddresses[this.selectedSendFrom];
-      }
-      if (Object.keys(this.paymentCodes).length == 1) {
-        return Object.keys(this.paymentCodes)[0];
-      }
-      return "";
+      let pcs = this.paymentCodes;
+      let selectedLabelSendFrom = this.selectedSendFrom;
+      return Object.keys(pcs).find(key => pcs[key] === selectedLabelSendFrom);
     },
 
     showDropDown() {
@@ -696,7 +701,7 @@ export default {
           }
         }
         if (foundConnectedAddress != "") {
-          this.selectedSendFrom = this.shortenAddress(foundConnectedAddress);
+          this.selectedSendFrom = this.paymentCodes[foundConnectedAddress];
           console.log('selectedSendFrom:', this.selectedSendFrom);
         }
       }

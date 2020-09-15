@@ -137,9 +137,12 @@ export default {
     methods: {
         getRowClass (item, index) {
             const classes = []
-
+            console.log('row class:', item)
             if (item[this.trackBy] === this.selectedRow) {
                 classes.push('selected')
+            }
+            if (item.isHighlighted) {
+                classes.push('selected-address')
             }
 
             if (item.isFulfilled) {
@@ -485,6 +488,11 @@ export default {
                         }
                     }
                 }
+                &.selected-address {
+                        td {
+                            border-color: red;
+                        }
+                    }
             }
 
             &.fade-enter,

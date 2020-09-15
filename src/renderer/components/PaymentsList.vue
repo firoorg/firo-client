@@ -115,7 +115,8 @@ export default {
             consolidatedMints: 'Transactions/consolidatedMints',
             paymentRequests: 'PaymentRequest/paymentRequests',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            isReindexing: 'ApiStatus/isReindexing'
+            isReindexing: 'ApiStatus/isReindexing',
+            paymentChannels:'Transactions/paymentChannels'
         }),
 
         showUnsyncedWarning() {
@@ -132,6 +133,10 @@ export default {
                 }
                 // Mints are handled separately.
                 if (tx.category === 'mint') {
+                    continue;
+                }
+
+                if (tx.amount == 0) {
                     continue;
                 }
 
@@ -155,11 +160,27 @@ export default {
                 case 'receive':
                 case 'spendIn':
                     extraSearchText = 'Incoming Transaction';
+                    if (tx.paymentChannelID) {
+                        let receivePcode = tx.paymentChannelID.split("-")[0];
+                        if (this.paymentChannels[receivePcode]) {
+                            let label = this.paymentChannels[receivePcode][0].label;
+                            extraSearchText = extraSearchText + ' ' + label; 
+                        }
+                        extraSearchText += ' ' + tx.paymentChannelID + receivePcode;
+                    }
                     break;
 
                 case 'send':
                 case 'spendOut':
                     extraSearchText = 'Outgoing Transaction';
+                    if (tx.paymentChannelID) {
+                        let receivePcode = tx.paymentChannelID.split("-")[0];
+                        if (this.paymentChannels[receivePcode]) {
+                            let label = this.paymentChannels[receivePcode][0].label;
+                            extraSearchText = extraSearchText + ' ' + label; 
+                        }
+                        extraSearchText += ' ' + tx.paymentChannelID + receivePcode;
+                    }
                     break;
 
                 case 'znode':
@@ -181,6 +202,14 @@ export default {
                         (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
                     extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
                 });
+
+                if (tx.isNotificationTransaction) {
+                    if (this.paymentChannels[tx.paymentCode]) {
+                        let label = this.paymentChannels[tx.paymentCode][0].label;
+                        extraSearchText = extraSearchText + ' ' + label; 
+                    }
+                    extraSearchText += ' ' + tx.paymentCode + tx.myPaymentCode;
+                }
             }
 
             for (const [blockHeight, mintInfo] of Object.entries(this.consolidatedMints)) {

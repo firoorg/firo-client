@@ -1,18 +1,23 @@
 <template>
   <section class="receive-list">
     <div class="qr-code">
-      <div ref="qrCode" 
-            @click="copyAddress(shortenAddress(selectedAddress))"
-            v-clipboard="() => selectedAddress"
-            :style="{ cursor: 'pointer' }"/>
+      <div
+        ref="qrCode"
+        @click="copyAddress(shortenAddress(selectedAddress))"
+        v-clipboard="() => selectedAddress"
+        :style="{ cursor: 'pointer' }"
+      />
       <div style="text-align:center">
         <p>
           <span style="font-weight: bold;">{{ selectedLabel }}</span>
-          <br/><u><a
-            :style="{ cursor: 'pointer' }"
-            v-clipboard="() => selectedAddress"
-            @click="copyAddress(shortenAddress(selectedAddress))"
-          >{{ shortenAddress(selectedAddress) }}</a></u>
+          <br /><u
+            ><a
+              :style="{ cursor: 'pointer' }"
+              v-clipboard="() => selectedAddress"
+              @click="copyAddress(shortenAddress(selectedAddress))"
+              >{{ shortenAddress(selectedAddress) }}</a
+            ></u
+          >
         </p>
       </div>
     </div>
@@ -29,7 +34,7 @@
         :class="styleReusableAddress"
         @click.prevent="showReusableAddress"
       >
-        REUSABLE ADDRESSES <span class="infolink" style="font-size: 20px"></span>
+        REUSABLE ADDRESSES
       </base-button>
     </div>
     <div class="animated-table-customized">
@@ -39,7 +44,7 @@
         track-by="address"
         no-data-message="noDataMessage"
         :sort-order="sortOrder"
-        :row-class="onRowClass"
+        :row-class="getRowClass"
         :per-page="13"
         :on-page-change="(pageNumber) => (this.currentPage = pageNumber)"
       >
@@ -124,14 +129,16 @@
       </div>
     </div>
     <div v-if="isRegularAddressSelected">
-      <div
-            class="action-group"
-            v-clipboard="() => props.rowData.address"
-            @click.prevent="copyAddress(props.rowData.shortAddress)"
+      <div style="text-align:right">
+        <u
+          ><a
             :style="{ cursor: 'pointer' }"
-          >
-            <ZnodeExpandButton />
-          </div>
+            v-clipboard="() => selectedAddress"
+            @click="toggleShowPreviouslyUsedAddress"
+            > {{showPreviousAddressText}}</a
+          ></u
+        >
+      </div>
     </div>
   </section>
 </template>
@@ -186,7 +193,7 @@ export default {
     Toasted,
     VueClipboards,
     Overlay,
-    ZnodeExpandButton
+    ZnodeExpandButton,
   },
 
   props: {},
@@ -210,7 +217,9 @@ export default {
       numUnlabelledAddress: 0,
       selectedStyle: "rounded-btn-selected",
       notSelectedStyle: "rounded-btn",
-      passphrase: ""
+      passphrase: "",
+      showPreviouslyUsedAddress: false,
+      showPreviousAddressText: "Show previously used address"
     };
   },
 
@@ -220,6 +229,7 @@ export default {
     },
     selectedAddress: function(newF, oldF) {
       this.generateQRCode();
+      this.highlightSelectedRow();
     },
     stateAddresses: function(newF, oldF) {
       this.stateAddressesChanged = true;
@@ -235,6 +245,13 @@ export default {
     numUnlabelledAddress: function(oldV, newV) {
       if (newV == 0) {
         this.generateNewRegularAddresses();
+      }
+    },
+    showPreviouslyUsedAddress: function(newF, oldF) {
+      if (this.showPreviouslyUsedAddress) {
+        this.showPreviousAddressText = "Hide previously used address";
+      } else {
+        this.showPreviousAddressText = "Show previously used address";
       }
     }
   },
@@ -259,21 +276,28 @@ export default {
       paymentCodes: "Transactions/paymentCodes",
       addressBook: "Transactions/addressBook",
       stateAddresses: "Transactions/addresses",
-      apiStatus: 'ApiStatus/apiStatus',
-      unusedAddresses: 'Transactions/unusedAddresses',
-      walletLoaded: 'Transactions/walletLoaded',
-      isLocked: 'ApiStatus/isLocked'
+      apiStatus: "ApiStatus/apiStatus",
+      unusedAddresses: "Transactions/unusedAddresses",
+      walletLoaded: "Transactions/walletLoaded",
+      isLocked: "ApiStatus/isLocked",
     }),
     selectedAddressShort() {
       return this.shortenAddress(this.selectedAddress);
     },
 
     showPassphrasePopup() {
-      return this.apiStatus.data.hasMnemonic && this.walletLoaded && this.isLocked && Object.values(this.paymentCodes).length == 0;
+      return (
+        this.apiStatus.data.hasMnemonic &&
+        this.walletLoaded &&
+        this.isLocked &&
+        Object.values(this.paymentCodes).length == 0
+      );
     },
 
     noDataMessage() {
-      return this.apiStatus.data.hasMnemonic?"Wallet locked. Please unlock it to enable Reusable address":"Reusable addressses not supported as your wallet does not have mnemonics recovery phrase";
+      return this.apiStatus.data.hasMnemonic
+        ? "Wallet locked. Please unlock it to enable Reusable address"
+        : "Reusable addressses not supported as your wallet does not have mnemonics recovery phrase";
     },
 
     latestTableData() {
@@ -284,12 +308,17 @@ export default {
       return Object.keys(this.unusedAddresses);
     },
 
+    allRegularAddresses() {
+      let addressB = this.addressBook;
+      return Object.keys(this.addressBook).filter(e => addressB[e].purpose == "receive");
+    },
+
     selectedLabel() {
       var ret = "";
       if (this.addressBook[this.selectedAddress]) {
         ret = this.addressBook[this.selectedAddress].label;
       } else if (this.paymentCodes[this.selectedAddress]) {
-        ret = this.paymentCodes[this.selectedAddress]
+        ret = this.paymentCodes[this.selectedAddress];
       }
       if (ret == "") {
         return "Unlabeled";
@@ -335,22 +364,34 @@ export default {
       this.stateAddressesChanged = true;
       this.addressBookChanged = true;
       this.regularAddressTableData();
-      console.log('numUnlabelledAddress:', this.computeStateUnusedAddresses)
-      
+
       if (this.numUnlabelledAddress == 0) {
-        console.log('generating address')
         this.selectedAddress = await this.generateNewRegularAddresses();
         this.regularAddressTableData();
       } else {
         this.selectedAddress = this.regularAddressesData[0].address;
       }
-      this.isRegularAddressSelected = true; 
+      this.isRegularAddressSelected = true;
       this.styleRegularAddress = this.selectedStyle;
-      // if (this.stateUnusedAddresses.length <= 4) {
-      //   //await this.generateNewRegularAddresses();
-      // }
       this.styleReusableAddress = this.notSelectedStyle;
       this.generateQRCode();
+    },
+    toggleShowPreviouslyUsedAddress() {
+      this.showPreviouslyUsedAddress = !this.showPreviouslyUsedAddress;
+      this.stateAddressesChanged = true;
+      this.addressBookChanged = true;
+      this.regularAddressTableData();
+      this.selectedAddress = this.regularAddressesData[0].address;
+      this.generateQRCode();
+    },
+    highlightSelectedRow() {
+      for (const d of this.filteredTableData) {
+        if (d.address == this.selectedAddress) {
+          d.isHighlighted = true;
+        } else {
+          d.isHighlighted = false;
+        }
+      }
     },
     showReusableAddress() {
       if (!this.isRegularAddressSelected) {
@@ -368,15 +409,19 @@ export default {
     regularAddressTableData() {
       if (!this.addressBookChanged || !this.stateAddressesChanged) return;
       var data = [];
-      var addresses = this.computeStateUnusedAddresses;
+      var addresses = [];
+      if (!this.showPreviouslyUsedAddress) {
+        addresses = this.computeStateUnusedAddresses;
+      } else {
+        addresses = this.allRegularAddresses;
+      }
       this.numUnlabelledAddress = 0;
       if (addresses.length > 0) {
-        for(const k of addresses) {
-          if (this.addressBook[k].label.includes('BIP47PAYMENT')) continue;
+        for (const k of addresses) {
+          if (this.addressBook[k].label.includes("BIP47PAYMENT")) continue;
           data.push({
             label:
-              !this.addressBook[k] ||
-              this.addressBook[k].label == ""
+              !this.addressBook[k] || this.addressBook[k].label == ""
                 ? "Unlabeled"
                 : this.addressBook[k].label,
             address: k,
@@ -385,7 +430,8 @@ export default {
           if (!this.addressBook[k].label || this.addressBook[k].label == "") {
             this.numUnlabelledAddress++;
           }
-          break;
+          if (!this.showPreviouslyUsedAddress)
+            break;
         }
       }
       this.regularAddressesData = data;
@@ -434,17 +480,20 @@ export default {
             purpose: "receive",
           });
         } else {
-          const data = await $daemon.editPaymentCodeBook(this.selectedAddress, this.labelResult);
-          await this.$store.dispatch('Transactions/setPaymentCodes', data);
+          const data = await $daemon.editPaymentCodeBook(
+            this.selectedAddress,
+            this.labelResult
+          );
+          await this.$store.dispatch("Transactions/setPaymentCodes", data);
         }
-        for(const d of this.filteredTableData) {
+        for (const d of this.filteredTableData) {
           if (d.address == this.selectedAddress) {
             d.label = this.labelResult;
             break;
           }
         }
       } catch (e) {
-        console.log('Error: ', e)
+        console.log("Error: ", e);
       }
       this.opened = false;
       this.visible = false;
@@ -471,21 +520,29 @@ export default {
         duration: 1000,
       });
     },
-    onRowClass(dataItem, index) {
-      return "background: blue";
+    getRowClass(dataItem, index) {
+      console.log("onRowClass");
+      return "selected-address";
     },
     async createNewAddress() {
       if (this.isRegularAddressSelected) {
         //
       } else {
         var newPaymentCode = await $daemon.createNewPaymentCode();
-        console.log('newL:', newPaymentCode)
-        await this.$store.dispatch('Transactions/setPaymentCodes', newPaymentCode);
+        console.log("newL:", newPaymentCode);
+        await this.$store.dispatch(
+          "Transactions/setPaymentCodes",
+          newPaymentCode
+        );
       }
     },
     onRowClick(row) {
-      let v = this.apiStatus.data.hasMnemonic && this.walletLoaded && this.isLocked && Object.values(this.paymentCodes).length == 0;
-      console.log('value:', v)
+      let v =
+        this.apiStatus.data.hasMnemonic &&
+        this.walletLoaded &&
+        this.isLocked &&
+        Object.values(this.paymentCodes).length == 0;
+      console.log("value:", v);
       if (this.selectedAddress != row.address) {
         this.selectedAddress = row.address;
         this.generateQRCode();
@@ -495,17 +552,19 @@ export default {
       var createds = [];
       try {
         var createdAddress = await $daemon.getUnusedAddress();
-        let label = this.addressBook[createdAddress]?this.addressBook[createdAddress].label:"";
+        let label = this.addressBook[createdAddress]
+          ? this.addressBook[createdAddress].label
+          : "";
         createds.push({
           address: createdAddress,
           label: label,
           purpose: "receive",
         });
-        console.log('created address:', createdAddress);
+        console.log("created address:", createdAddress);
         await this.$store.dispatch("Transactions/setAddressBook", createds);
         return createdAddress;
-      } catch(e) {
-        console.log('error:', e)
+      } catch (e) {
+        console.log("error:", e);
       }
     },
   },
@@ -549,8 +608,8 @@ export default {
 
 .rounded-btn {
   border-radius: 10px !important;
-  border:1px solid #828282;
-  background-color: #F0F3FC;
+  border: 1px solid #828282;
+  background-color: #f0f3fc;
   color: #828282;
   width: 26%;
   height: 45px;
@@ -558,9 +617,9 @@ export default {
 
 .rounded-btn-selected {
   border-radius: 10px !important;
-  border:1px solid #3EAD54;
-  background-color: #E6E7FF;
-  color: #3EAD54;
+  border: 1px solid #3ead54;
+  background-color: #e6e7ff;
+  color: #3ead54;
   width: 26%;
   height: 45px;
 }
@@ -961,27 +1020,35 @@ input {
 }
 
 .infolink:after {
-    content: '?';
-    display: inline-block;
-    font-family: sans-serif;
-    font-weight: bold;
-    text-align: center;
-    font-size: 50%;
-    line-height: 0.8em;
-    border-radius: 50%;
-    margin-left: 6px;
-    padding: 0.13em 0.2em 0.09em 0.2em;
-    color: inherit;
-    border: 1px solid;
-    text-decoration: none;
+  content: "?";
+  display: inline-block;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: center;
+  font-size: 50%;
+  line-height: 0.8em;
+  border-radius: 50%;
+  margin-left: 6px;
+  padding: 0.13em 0.2em 0.09em 0.2em;
+  color: inherit;
+  border: 1px solid;
+  text-decoration: none;
 }
 .input-label {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border: none;
   height: 27px;
   border-radius: 10px !important;
   margin: {
     top: 1em;
   }
+}
+.expand-size {
+  width: 10%;
+  height: 10%;
+}
+
+.selected-address {
+  background-color: red;
 }
 </style>

@@ -142,47 +142,56 @@ export default {
 
                 // Coordinate this with the default values in AnimatedTableLabel.
                 let extraSearchText;
+                let extraSearchTextLabeling;
                 switch (tx.category) {
                 case 'mined':
                     extraSearchText = 'Mined Transaction';
+                    extraSearchTextLabeling = extraSearchText;
                     break;
 
                 case 'receive':
                 case 'spendIn':
                     extraSearchText = 'Incoming Transaction';
+                    extraSearchTextLabeling = extraSearchText;
                     if (tx.paymentChannelID) {
                         txType = "RAP address";
                         let receivePcode = tx.paymentChannelID.split("-")[0];
                         if (this.paymentChannels[receivePcode]) {
                             label = this.paymentChannels[receivePcode][0].label;
+                            extraSearchText = extraSearchText + ' ' + label; 
                         }
+                        extraSearchText += ' ' + tx.paymentChannelID + receivePcode;
                     }
                     break;
 
                 case 'send':
                 case 'spendOut':
                     extraSearchText = 'Outgoing Transaction';
+                    extraSearchTextLabeling = extraSearchText;
                     if (tx.paymentChannelID) {
                         txType = "RAP address";
                         let receivePcode = tx.paymentChannelID.split("-")[0];
                         if (this.paymentChannels[receivePcode]) {
                             label = this.paymentChannels[receivePcode][0].label;
+                            extraSearchText = extraSearchText + ' ' + label; 
                         }
+                        extraSearchText += ' ' + tx.paymentChannelID + receivePcode;
                     }
                     break;
 
                 case 'znode':
                     extraSearchText = 'Znode Payment';
+                    extraSearchTextLabeling = extraSearchText;
                     break
                 }
 
                 if (tx.isNotificationTransaction) {
                     txType = "Connection Fee";
-                    console.log('isNotificationTransaction payment code:', tx)
-                    console.log('isNotificationTransaction:', this.paymentChannels)
                     if (this.paymentChannels[tx.paymentCode]) {
                         label = this.paymentChannels[tx.paymentCode][0].label;
+                        extraSearchText = extraSearchText + ' ' + label; 
                     }
+                    extraSearchText += ' ' + tx.paymentCode + tx.myPaymentCode;
                     if (label == "") {
                         label = "(unlabelled)";
                     }
@@ -197,7 +206,7 @@ export default {
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
                     address: tx.address,
-                    label: (!label || label == "")? extraSearchText:label,
+                    label: (!label || label == "")? extraSearchTextLabeling:label,
                     extraSearchText: extraSearchText + ' ' + tx.label + ' ' + tx.address + convertToCoin(tx.amount) + ' XZC'
                 });
             }
@@ -251,7 +260,7 @@ export default {
 
             let filter = this.filter.toLowerCase();
             return this.tableData.filter(tableRow =>
-                ['label'].find(key =>
+                ['label', 'type', 'extraSearchText'].find(key =>
                     tableRow[key] && tableRow[key].toLowerCase().indexOf(filter) !== -1
                 )
             )
