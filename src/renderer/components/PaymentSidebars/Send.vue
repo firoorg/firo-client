@@ -420,7 +420,7 @@ export default {
     };
   },
 
-  created() {
+  mounted() {
     if (!this.selectSendFrom && Object.values(this.paymentCodes).length > 0) {
       this.selectedSendFrom = Object.values(this.paymentCodes)[0];
     }
@@ -439,6 +439,10 @@ export default {
       paymentChannels: "Transactions/paymentChannels",
       paymentCodes: "Transactions/paymentCodes",
     }),
+
+    paymentCodeHasLabel() {
+      return isValidPaymentCode(this.address) && (this.rapAddressHasLabel(this.address) || this.label != "");
+    },
 
     // Return either 'private' or 'public', depending on whether the user is intending to make a private or a public
     // send.
@@ -459,7 +463,12 @@ export default {
     selectedSendPaymentCode() {
       let pcs = this.paymentCodes;
       let selectedLabelSendFrom = this.selectedSendFrom;
-      return Object.keys(pcs).find(key => pcs[key] === selectedLabelSendFrom);
+      let ret = Object.keys(pcs).find(key => pcs[key] === selectedLabelSendFrom);
+      if (!ret) {
+        ret = Object.keys(this.paymentCodes)[0];
+        this.selectedSendFrom = this.paymentCodes[ret];
+      }
+      return ret;
     },
 
     showDropDown() {
@@ -682,6 +691,14 @@ export default {
       }
     },
 
+    rapAddressHasLabel(addr) {
+      if (this.paymentCodes[addr]) return true;
+      if (!this.paymentChannels[addr]) return false;
+      if (this.paymentChannels[addr].length == 0) return false;
+      if (this.paymentChannels[addr][0].label == null || this.paymentChannels[addr][0].label == "") return false;
+      return true;
+    },
+
     chooseConnectedRAP() {
       if (
         isValidPaymentCode(this.address) &&
@@ -786,6 +803,18 @@ export default {
     },
 
     async attemptSend() {
+      const paymentCodeValid = isValidPaymentCode(this.address);
+      var myPaymentCode = "";
+      var sendTwice = false;
+      if (paymentCodeValid) {
+        myPaymentCode = this.selectedSendPaymentCode;
+        sendTwice = this.notifyNotificationTx;
+      }
+      if (paymentCodeValid && this.label == "" && !this.rapAddressHasLabel(this.address)) {
+        alert("Label is required for this fresh recipient reusable address");
+        return;
+      }
+
       let coinControl;
       if (this.selectedUtxos && this.selectedUtxos.length > 0) {
         coinControl = this.selectedUtxos.map((element) => [
@@ -808,19 +837,12 @@ export default {
       this.recalculatePopoverPosition();
 
       try {
-        const paymentCodeValid = isValidPaymentCode(this.address);
-        var myPaymentCode = "";
-        var sendTwice = false;
-        if (paymentCodeValid) {
-          myPaymentCode = this.selectedSendPaymentCode;
-          sendTwice = this.notifyNotificationTx;
-        }
-        console.log("myPaymentCode:", myPaymentCode);
         if (this.privateOrPublic === "private") {
           if (paymentCodeValid) {
             await $daemon.privateSendToPaymentCode(
               passphrase,
               this.address,
+              this.label,
               myPaymentCode,
               this.satoshiAmount,
               this.txFeePerKb,
@@ -832,6 +854,7 @@ export default {
               await $daemon.privateSendToPaymentCode(
                 passphrase,
                 this.address,
+                this.label,
                 myPaymentCode,
                 this.satoshiAmount,
                 this.txFeePerKb,
@@ -854,6 +877,7 @@ export default {
             let d = $daemon.sendToPaymentCode(
               passphrase,
               this.address,
+              this.label,
               myPaymentCode,
               this.satoshiAmount,
               this.txFeePerKb,
@@ -865,6 +889,7 @@ export default {
               let d = $daemon.sendToPaymentCode(
                 passphrase,
                 this.address,
+                this.label,
                 myPaymentCode,
                 this.satoshiAmount,
                 this.txFeePerKb,

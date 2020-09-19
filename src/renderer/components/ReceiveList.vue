@@ -2,6 +2,7 @@
   <section class="receive-list">
     <div class="qr-code">
       <div
+        class="qr-code-qr"
         ref="qrCode"
         @click="copyAddress(shortenAddress(selectedAddress))"
         v-clipboard="() => selectedAddress"
@@ -29,7 +30,7 @@
       >
         REGULAR ADDRESSES
       </base-button>
-
+      &nbsp;&nbsp;&nbsp;
       <base-button
         :class="styleReusableAddress"
         @click.prevent="showReusableAddress"
@@ -135,7 +136,8 @@
             :style="{ cursor: 'pointer' }"
             v-clipboard="() => selectedAddress"
             @click="toggleShowPreviouslyUsedAddress"
-            > {{showPreviousAddressText}}</a
+          >
+            {{ showPreviousAddressText }}</a
           ></u
         >
       </div>
@@ -219,7 +221,7 @@ export default {
       notSelectedStyle: "rounded-btn",
       passphrase: "",
       showPreviouslyUsedAddress: false,
-      showPreviousAddressText: "Show previously used address"
+      showPreviousAddressText: "Show previously used addresses",
     };
   },
 
@@ -249,11 +251,11 @@ export default {
     },
     showPreviouslyUsedAddress: function(newF, oldF) {
       if (this.showPreviouslyUsedAddress) {
-        this.showPreviousAddressText = "Hide previously used address";
+        this.showPreviousAddressText = "Hide previously used addresses";
       } else {
-        this.showPreviousAddressText = "Show previously used address";
+        this.showPreviousAddressText = "Show previously used addresses";
       }
-    }
+    },
   },
 
   async mounted() {
@@ -310,7 +312,9 @@ export default {
 
     allRegularAddresses() {
       let addressB = this.addressBook;
-      return Object.keys(this.addressBook).filter(e => addressB[e].purpose == "receive");
+      return Object.keys(this.addressBook).filter(
+        (e) => addressB[e].purpose == "receive"
+      );
     },
 
     selectedLabel() {
@@ -393,6 +397,15 @@ export default {
         }
       }
     },
+    highlightSelectedRowWithAddress(addr) {
+      for (const d of this.filteredTableData) {
+        if (d.address == addr) {
+          d.isHighlighted = true;
+        } else {
+          d.isHighlighted = false;
+        }
+      }
+    },
     showReusableAddress() {
       if (!this.isRegularAddressSelected) {
         return;
@@ -430,8 +443,10 @@ export default {
           if (!this.addressBook[k].label || this.addressBook[k].label == "") {
             this.numUnlabelledAddress++;
           }
-          if (!this.showPreviouslyUsedAddress)
+          if (!this.showPreviouslyUsedAddress) {
+            data[0].isHighlighted = true;
             break;
+          }
         }
       }
       this.regularAddressesData = data;
@@ -473,7 +488,6 @@ export default {
             this.selectedAddress,
             this.labelResult
           );
-          console.log("label result:", this.labelResult);
           this.$store.dispatch("Transactions/addAddressItem", {
             address: this.selectedAddress,
             label: this.labelResult,
@@ -537,12 +551,6 @@ export default {
       }
     },
     onRowClick(row) {
-      let v =
-        this.apiStatus.data.hasMnemonic &&
-        this.walletLoaded &&
-        this.isLocked &&
-        Object.values(this.paymentCodes).length == 0;
-      console.log("value:", v);
       if (this.selectedAddress != row.address) {
         this.selectedAddress = row.address;
         this.generateQRCode();
@@ -634,6 +642,9 @@ export default {
   }
 }
 
+.qr-code-qr {
+  border: 2px solid red;
+}
 .plus-btn {
   margin: {
     top: 0em;

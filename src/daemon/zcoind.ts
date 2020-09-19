@@ -1431,10 +1431,11 @@ export class Zcoind {
         return data;
     }
 
-    async sendToPaymentCode(auth: string, recipient: string, myPaymentCode: string, amount: number, feePerKb: number,
+    async sendToPaymentCode(auth: string, recipient: string, label: string, myPaymentCode: string, amount: number, feePerKb: number,
         subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
         const data = await this.send(auth, 'create', 'sendToPaymentCode', {
             paymentCode: recipient,
+            label: label,
             myPaymentCode: myPaymentCode,
             feePerKb,
             amount,
@@ -1451,10 +1452,11 @@ export class Zcoind {
         }
     }
 
-    async privateSendToPaymentCode(auth: string, recipient: string, myPaymentCode: string, amount: number, feePerKb: number,
+    async privateSendToPaymentCode(auth: string, recipient: string, label: string, myPaymentCode: string, amount: number, feePerKb: number,
         subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
         const data = await this.send(auth, 'create', 'privateSendToPaymentCode', {
             paymentCode: recipient,
+            label: label,
             myPaymentCode: myPaymentCode,
             feePerKb,
             amount,
