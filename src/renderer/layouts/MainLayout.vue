@@ -1,7 +1,7 @@
 <template>
   <div v-if="showPassphrasePopup && !isUnlocking">
     <div class="unlock">
-      <div class="logo">
+      <div class="logo-small">
         <svg viewBox="0 0 633 200">
           <linearGradient
             id="green-gradient"
@@ -260,7 +260,7 @@ export default {
   }
 }
 
-.logo {
+.logo-small {
   grid-area: logo;
 
   margin-top: 5%;
