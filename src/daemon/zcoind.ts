@@ -1528,6 +1528,10 @@ export class Zcoind {
         await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
     }
     
+    async writeRemindRAPDescription(auth: string, show: boolean) : Promise<void> {
+        await this.send(auth, 'create', 'writeRemindRAPDescription', {show});
+    }
+    
     async readAddressBook() : Promise<AddressBookItem[]> {
         const data = await this.send('', 'create', 'readAddressBook', {});
         if (data instanceof Array && !data.find(e => !isValidAddressBookItem(e))) {

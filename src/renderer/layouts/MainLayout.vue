@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showPassphrasePopup">
+  <div v-if="showPassphrasePopup && !isUnlocking">
     <div class="unlock">
       <div class="logo">
         <svg viewBox="0 0 633 200">
@@ -73,6 +73,9 @@
       </div>
     </div>
   </div>
+  <div v-else-if="isUnlocking">
+    <WaitingScreen :reason="'Unlocking wallet'" />
+  </div>
   <div class="main-layout wrapper" v-else>
     <Sidebar class="aside" />
 
@@ -87,17 +90,20 @@
 <script>
 import { mapGetters } from "vuex";
 import Sidebar from "@/components/Sidebar";
+import WaitingScreen from "@/components/WaitingScreen";
 
 export default {
   name: "MainLayout",
 
   components: {
     Sidebar,
+    WaitingScreen,
   },
 
   data() {
     return {
       passphrase: "",
+      isUnlocking: false,
     };
   },
 
@@ -125,6 +131,7 @@ export default {
       let passphrase = this.passphrase;
       try {
         //load payment codes
+        this.isUnlocking = true;
         const pcs = await $daemon.bip47StateWallet(passphrase);
         await this.$store.dispatch(
           "Transactions/setPaymentCodes",
@@ -135,10 +142,14 @@ export default {
           pcs.transactionState
         );
         const paymentChannelsState = await $daemon.readPaymentChannelsState();
-        this.$store.dispatch('Transactions/setPaymentChannels', Object.values(paymentChannelsState));
+        this.$store.dispatch(
+          "Transactions/setPaymentChannels",
+          Object.values(paymentChannelsState)
+        );
       } catch (e) {
         console.log("invalid pass phrase:", e);
       }
+      this.isUnlocking = false;
     },
   },
 };
@@ -249,13 +260,11 @@ export default {
   }
 }
 
-
-
 .logo {
   grid-area: logo;
 
   margin-top: 5%;
-  margin-left: -2%; 
+  margin-left: -2%;
   height: emRhythm($sidebar--logo-height);
 
   a {
@@ -275,13 +284,14 @@ export default {
     top: 1em;
   }
   width: 21%;
+  height: 3%;
 }
 .pass-form {
-    margin: {
-        top: 12%;
-    }
+  margin: {
+    top: 12%;
+  }
 }
 .pass-input {
-    width: 20%;
+  width: 20%;
 }
 </style>

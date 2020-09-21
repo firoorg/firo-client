@@ -35,7 +35,7 @@
         :class="styleReusableAddress"
         @click.prevent="showReusableAddress"
       >
-        REUSABLE ADDRESSES
+        REUSABLE ADDRESSES <span class="infolink" />
       </base-button>
     </div>
     <div class="animated-table-customized">
@@ -117,6 +117,7 @@
         </base-button>
       </div>
     </overlay>
+    <RAPDescriptionPopup v-if="shouldShowRAPDescription" @close-rap-description="closeRAPDescription"/>
     <br />
     <div id="wrap" v-if="!isRegularAddressSelected">
       <div
@@ -152,6 +153,7 @@ import ModifyIcon from "@/components//Icons/ModifyIcon";
 import PlusIcon from "@/components//Icons/PlusIcon";
 import AnimatedTable from "@/components/AnimatedTable/AnimatedTable";
 import ZnodeExpandButton from "@/components//Icons/ZnodeExpandButton";
+import RAPDescriptionPopup from "@/components//Overlay/RAPDescriptionPopup";
 import { Overlay } from "vuejs-overlay";
 import { mapGetters } from "vuex";
 import { add } from "winston";
@@ -196,6 +198,7 @@ export default {
     VueClipboards,
     Overlay,
     ZnodeExpandButton,
+    RAPDescriptionPopup
   },
 
   props: {},
@@ -222,6 +225,8 @@ export default {
       passphrase: "",
       showPreviouslyUsedAddress: false,
       showPreviousAddressText: "Show previously used addresses",
+      showRAPDescription: false,
+      showRAPDescriptionAgain: true
     };
   },
 
@@ -271,6 +276,7 @@ export default {
     }
     this.selectedAddress = this.regularAddressesData[0].address;
     this.generateQRCode();
+    this.$on('close-rap-description', this.closeRAPDescription);
   },
 
   computed: {
@@ -279,12 +285,17 @@ export default {
       addressBook: "Transactions/addressBook",
       stateAddresses: "Transactions/addresses",
       apiStatus: "ApiStatus/apiStatus",
+      remindRAPDescription: "ApiStatus/remindRAPDescription",
       unusedAddresses: "Transactions/unusedAddresses",
       walletLoaded: "Transactions/walletLoaded",
       isLocked: "ApiStatus/isLocked",
     }),
     selectedAddressShort() {
       return this.shortenAddress(this.selectedAddress);
+    },
+
+    shouldShowRAPDescription() {
+      return this.showRAPDescription && this.remindRAPDescription && this.showRAPDescriptionAgain;
     },
 
     showPassphrasePopup() {
@@ -380,6 +391,12 @@ export default {
       this.styleReusableAddress = this.notSelectedStyle;
       this.generateQRCode();
     },
+
+    closeRAPDescription() {
+      this.showRAPDescription = false;
+      this.showRAPDescriptionAgain = false;
+      this.showReusableAddressList();
+    },
     toggleShowPreviouslyUsedAddress() {
       this.showPreviouslyUsedAddress = !this.showPreviouslyUsedAddress;
       this.stateAddressesChanged = true;
@@ -410,12 +427,29 @@ export default {
       if (!this.isRegularAddressSelected) {
         return;
       }
+      this.showRAPDescription = true;
+      if (!this.shouldShowRAPDescription) {
+        this.showReusableAddressList();
+      }
+    },
+
+    showReusableAddressList() {
       this.isRegularAddressSelected = false;
       if (this.filteredTableData.length > 0) {
         this.selectedAddress = this.filteredTableData[0].address;
         this.styleReusableAddress = this.selectedStyle;
         this.styleRegularAddress = this.notSelectedStyle;
         this.generateQRCode();
+      }
+    },
+
+    handleCheckboxChange(e) {
+      console.log('value of checkbox : ', e.target.checked);
+      if (e.target.checked != null) {
+        console.log('checked');
+        this.dontRemind = false;
+      } else {
+        console.log('not checked');
       }
     },
 
@@ -621,6 +655,9 @@ export default {
   color: #828282;
   width: 26%;
   height: 45px;
+}
+.inline-group {
+  display: inline-block;
 }
 
 .rounded-btn-selected {
@@ -1034,14 +1071,14 @@ input {
   content: "?";
   display: inline-block;
   font-family: sans-serif;
-  font-weight: bold;
+  background-color: white;
   text-align: center;
-  font-size: 50%;
+  font-size: 1em;
   line-height: 0.8em;
   border-radius: 50%;
   margin-left: 6px;
   padding: 0.13em 0.2em 0.09em 0.2em;
-  color: inherit;
+  color: black;
   border: 1px solid;
   text-decoration: none;
 }
@@ -1061,5 +1098,18 @@ input {
 
 .selected-address {
   background-color: red;
+}
+
+.rap-description {
+  margin-left: 80px;
+  margin-right: 80px;
+}
+.remind-checkbox {
+  background-color: #39f;
+  border-radius: 10px !important;
+  border: 1px solid #39f;
+}
+.checkbox {
+  margin-bottom: 20px;
 }
 </style>
