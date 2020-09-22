@@ -489,8 +489,8 @@ export default {
                 }
                 &.selected-address {
                         td {
-                            border-top: 1px solid red!important;
-                            border-bottom: 1px solid red!important;
+                            border-top: 1px solid #2AC940!important;
+                            border-bottom: 1px solid #2AC940!important;
                         }
                     }
             }

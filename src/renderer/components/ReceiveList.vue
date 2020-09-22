@@ -22,7 +22,7 @@
         </p>
       </div>
     </div>
-
+    <br/>
     <div class="popup-footer">
       <base-button
         :class="styleRegularAddress"
@@ -30,7 +30,7 @@
       >
         REGULAR ADDRESSES
       </base-button>
-      &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <base-button
         :class="styleReusableAddress"
         @click.prevent="showReusableAddress"
@@ -38,6 +38,7 @@
         REUSABLE ADDRESSES <span class="infolink" />
       </base-button>
     </div>
+    <br/>
     <div class="animated-table-customized">
       <animated-table
         :data="filteredTableData"
@@ -236,6 +237,7 @@ export default {
     },
     selectedAddress: function(newF, oldF) {
       this.generateQRCode();
+      this.regularAddressTableData();
       this.highlightSelectedRow();
     },
     stateAddresses: function(newF, oldF) {
@@ -318,13 +320,14 @@ export default {
     },
 
     computeStateUnusedAddresses() {
-      return Object.keys(this.unusedAddresses);
+      return Object.keys(this.unusedAddresses).filter(
+        (e) => !this.addressBook[e].label.includes("BIP47PAYMENT")
+      );
     },
 
     allRegularAddresses() {
-      let addressB = this.addressBook;
       return Object.keys(this.addressBook).filter(
-        (e) => addressB[e].purpose == "receive"
+        (e) => this.addressBook[e].purpose == "receive" && !this.addressBook[e].label.includes("BIP47PAYMENT")
       );
     },
 
@@ -465,7 +468,6 @@ export default {
       this.numUnlabelledAddress = 0;
       if (addresses.length > 0) {
         for (const k of addresses) {
-          if (this.addressBook[k].label.includes("BIP47PAYMENT")) continue;
           data.push({
             label:
               !this.addressBook[k] || this.addressBook[k].label == ""
