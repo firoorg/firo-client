@@ -107,7 +107,7 @@ window.$setWaitingReason = (reason) => {
 window.$quitApp = async (message=undefined) => {
     if (message) {
         logger.error(message);
-        if (process.env.ZCOIN_CLIENT_TEST) {
+        if (!process.env.ZCOIN_CLIENT_TEST) {
             alert(message);
         }
     }
