@@ -114,6 +114,8 @@ export default {
       apiStatus: "ApiStatus/apiStatus",
       walletLoaded: "Transactions/walletLoaded",
       isLocked: "ApiStatus/isLocked",
+      unusedAddresses: "Transactions/unusedAddresses",
+            addressBook: "Transactions/addressBook",
     }),
 
     showPassphrasePopup() {
@@ -123,6 +125,14 @@ export default {
         this.isLocked &&
         Object.values(this.paymentCodes).length == 0
       );
+    },
+  },
+
+  watch: {
+    unusedAddresses: function(newF, oldF) {
+      if (Object.keys(this.unusedAddresses).length == 0) {
+        this.generateNewRegularAddresses();
+      }
     },
   },
 
@@ -150,6 +160,26 @@ export default {
         console.log("invalid pass phrase:", e);
       }
       this.isUnlocking = false;
+    },
+
+    async generateNewRegularAddresses() {
+      var createds = [];
+      try {
+        var createdAddress = await $daemon.getUnusedAddress();
+        let label = this.addressBook[createdAddress]
+          ? this.addressBook[createdAddress].label
+          : "";
+        createds.push({
+          address: createdAddress,
+          label: label,
+          purpose: "receive",
+        });
+        console.log("created address:", createdAddress);
+        await this.$store.dispatch("Transactions/setAddressBook", createds);
+        return createdAddress;
+      } catch (e) {
+        console.log("error:", e);
+      }
     },
   },
 };

@@ -251,6 +251,7 @@ export default {
 
             return tableData;
         },
+        
 
         filteredTableData () {
             if (!this.filter) {

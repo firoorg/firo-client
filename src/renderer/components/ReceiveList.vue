@@ -22,23 +22,27 @@
         </p>
       </div>
     </div>
-    <br/>
-    <div class="popup-footer">
-      <base-button
-        :class="styleRegularAddress"
-        @click.prevent="showRegularAddress"
-      >
-        REGULAR ADDRESSES
-      </base-button>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <base-button
-        :class="styleReusableAddress"
-        @click.prevent="showReusableAddress"
-      >
-        REUSABLE ADDRESSES <span class="infolink" />
-      </base-button>
+    <br />
+    <div class="button-tab">
+      <div class="float-left">
+        <base-button
+          :class="styleRegularAddress"
+          @click.prevent="showRegularAddress"
+        >
+          REGULAR ADDRESSES
+        </base-button>
+      </div>
+      <div style="position:relative;">
+        <div class="rectangle new" style="position:absolute; top:-17px; left:0; cursor: pointer;" @click.prevent="showRAPDescriptionOnly">New</div>
+        <base-button
+          :class="styleReusableAddress"
+          @click.prevent="showReusableAddress"
+        >
+          REUSABLE ADDRESSES <span class="infolink" />
+        </base-button>
+      </div>
     </div>
-    <br/>
+    <br />
     <div class="animated-table-customized">
       <animated-table
         :data="filteredTableData"
@@ -118,12 +122,15 @@
         </base-button>
       </div>
     </overlay>
-    <RAPDescriptionPopup v-if="shouldShowRAPDescription" @close-rap-description="closeRAPDescription"/>
+    <RAPDescriptionPopup
+      v-if="shouldShowRAPDescription"
+      @close-rap-description="closeRAPDescription"
+    />
     <br />
     <div id="wrap" v-if="!isRegularAddressSelected">
       <div
         class="icon"
-        id="plus"
+        id="bigplus"
         :style="{ cursor: 'pointer' }"
         @click.prevent="createNewAddress"
       ></div>
@@ -199,7 +206,7 @@ export default {
     VueClipboards,
     Overlay,
     ZnodeExpandButton,
-    RAPDescriptionPopup
+    RAPDescriptionPopup,
   },
 
   props: {},
@@ -227,7 +234,8 @@ export default {
       showPreviouslyUsedAddress: false,
       showPreviousAddressText: "Show previously used addresses",
       showRAPDescription: false,
-      showRAPDescriptionAgain: true
+      showRAPDescriptionAgain: true,
+      shouldShowRAPDescriptionOnly: false
     };
   },
 
@@ -251,11 +259,6 @@ export default {
     unusedAddresses: function(newF, oldF) {
       this.regularAddressTableData();
     },
-    numUnlabelledAddress: function(oldV, newV) {
-      if (newV == 0) {
-        this.generateNewRegularAddresses();
-      }
-    },
     showPreviouslyUsedAddress: function(newF, oldF) {
       if (this.showPreviouslyUsedAddress) {
         this.showPreviousAddressText = "Hide previously used addresses";
@@ -278,7 +281,7 @@ export default {
     }
     this.selectedAddress = this.regularAddressesData[0].address;
     this.generateQRCode();
-    this.$on('close-rap-description', this.closeRAPDescription);
+    this.$on("close-rap-description", this.closeRAPDescription);
   },
 
   computed: {
@@ -297,7 +300,11 @@ export default {
     },
 
     shouldShowRAPDescription() {
-      return this.showRAPDescription && this.remindRAPDescription && this.showRAPDescriptionAgain;
+      return (
+        this.showRAPDescription &&
+        this.remindRAPDescription &&
+        this.showRAPDescriptionAgain
+      ) || this.shouldShowRAPDescriptionOnly;
     },
 
     showPassphrasePopup() {
@@ -327,7 +334,9 @@ export default {
 
     allRegularAddresses() {
       return Object.keys(this.addressBook).filter(
-        (e) => this.addressBook[e].purpose == "receive" && !this.addressBook[e].label.includes("BIP47PAYMENT")
+        (e) =>
+          this.addressBook[e].purpose == "receive" &&
+          !this.addressBook[e].label.includes("BIP47PAYMENT")
       );
     },
 
@@ -398,7 +407,10 @@ export default {
     closeRAPDescription() {
       this.showRAPDescription = false;
       this.showRAPDescriptionAgain = false;
-      this.showReusableAddressList();
+      if (!this.shouldShowRAPDescriptionOnly) {
+        this.showReusableAddressList();
+      }
+      this.shouldShowRAPDescriptionOnly = false;
     },
     toggleShowPreviouslyUsedAddress() {
       this.showPreviouslyUsedAddress = !this.showPreviouslyUsedAddress;
@@ -436,6 +448,11 @@ export default {
       }
     },
 
+    showRAPDescriptionOnly() {
+      this.showRAPDescription = true;
+      this.shouldShowRAPDescriptionOnly = true;
+    },
+
     showReusableAddressList() {
       this.isRegularAddressSelected = false;
       if (this.filteredTableData.length > 0) {
@@ -447,12 +464,12 @@ export default {
     },
 
     handleCheckboxChange(e) {
-      console.log('value of checkbox : ', e.target.checked);
+      console.log("value of checkbox : ", e.target.checked);
       if (e.target.checked != null) {
-        console.log('checked');
+        console.log("checked");
         this.dontRemind = false;
       } else {
-        console.log('not checked');
+        console.log("not checked");
       }
     },
 
@@ -655,11 +672,22 @@ export default {
   border: 1px solid #828282;
   background-color: #f0f3fc;
   color: #828282;
-  width: 26%;
+  width: 300px;
   height: 45px;
+  float: left;
 }
 .inline-group {
   display: inline-block;
+}
+
+.new {
+  height: 12px;
+  width: 29px;
+  color: #fff;
+  font-family: "Arial Rounded MT Bold";
+  font-size: 10px;
+  line-height: 14px;
+  text-align: center;
 }
 
 .rounded-btn-selected {
@@ -667,8 +695,9 @@ export default {
   border: 1px solid #3ead54;
   background-color: #e6e7ff;
   color: #3ead54;
-  width: 26%;
+  width: 300px;
   height: 45px;
+  float: left;
 }
 
 .qr-code {
@@ -682,7 +711,7 @@ export default {
 }
 
 .qr-code-qr {
-  border: 2px solid red;
+  border: 2px solid #2ac940;
 }
 .plus-btn {
   margin: {
@@ -1050,11 +1079,11 @@ input {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 25px;
-  height: 25px;
+  width: 23px;
+  height: 23px;
   border-radius: 50%;
   border: 1px solid black;
-  font-size: 25px;
+  font-size: 29px;
   color: black;
 }
 #bigplus:before {
@@ -1113,5 +1142,29 @@ input {
 }
 .checkbox {
   margin-bottom: 20px;
+}
+
+.button-tab {
+  margin-top: 10px;
+  h4 {
+    display: inline-block;
+  }
+  float: left;
+  width: 73%;
+  > div {
+    float: left;
+    width: 40%;
+    margin-top: 10px;
+  }
+}
+.float-left {
+  float: left;
+}
+.rectangle {
+  height: 53px;
+  width: 60px;
+  border-radius: 20px 20px 0 0;
+  background-color: #828282;
+  display: inline-block;
 }
 </style>

@@ -63,7 +63,7 @@
                 <div
                   class="addressbook-action-group"
                   title="Paste"
-                  @click="pasteAddress()"
+                  @click="pasteAddress"
                   :style="{ cursor: 'pointer' }"
                 >
                   <paste-icon />
@@ -963,7 +963,10 @@ export default {
     },
 
     async pasteAddress() {
-      console.log("Selected:", this.mapOfAddresses[this.selectedSendFrom]);
+      if (navigator.clipboard) {
+        var text = await navigator.clipboard.readText();
+        this.address = text;
+      }
     },
 
     async openAddressBook() {
