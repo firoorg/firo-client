@@ -325,7 +325,11 @@ export default {
             if (m && this.clientCommands[m[1]]) {
                 output = await this.clientCommands[m[1]].cmd(m[2]);
             } else {
-                output = await this.legacyRpc(input);
+                try {
+                    output = await this.legacyRpc(input);
+                } catch(e) {
+                    output = `${e}`;
+                }
             }
 
             if (output === '' || output) {
