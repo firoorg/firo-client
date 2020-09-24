@@ -605,8 +605,9 @@ export default {
     },
     onRowClick(row) {
       if (this.selectedAddress != row.address) {
+        this.addressBookChanged = true;
+        this.stateAddressesChanged = true;
         this.selectedAddress = row.address;
-        this.generateQRCode();
       }
     },
     async generateNewRegularAddresses() {
