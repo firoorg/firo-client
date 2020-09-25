@@ -17,7 +17,7 @@
             <fieldset>
               <div class="field">
                 <label for="label">
-                  {{ $t("send.public.detail-public-send.label__label") }}
+                  {{ $t("send.public.detail-public-send.label__label") }}<b v-if="isLabelRequired">&#42;</b>
                 </label>
 
                 <div class="control">
@@ -565,6 +565,15 @@ export default {
         : "amountIsWithinAvailableBalance|publicAmountIsValid";
     },
 
+    isLabelRequired() {
+      const paymentCodeValid = isValidPaymentCode(this.address);
+      var myPaymentCode = "";
+      if (paymentCodeValid) {
+        myPaymentCode = this.selectedSendPaymentCode;
+      }
+      return paymentCodeValid && this.label == "" && !this.rapAddressHasLabel(this.address);
+    },
+
     getValidationTooltip() {
       return (fieldName) => ({
         content: this.validationErrors.first(fieldName),
@@ -788,6 +797,10 @@ export default {
     },
 
     beginWaitToConfirmStep() {
+      if (this.isLabelRequired) {
+        alert("Label is required for this fresh recipient reusable address");
+        return;
+      }
       this.sendPopoverStep = "waitToConfirm";
       this.recalculatePopoverPosition();
     },
@@ -809,10 +822,6 @@ export default {
       if (paymentCodeValid) {
         myPaymentCode = this.selectedSendPaymentCode;
         sendTwice = this.notifyNotificationTx;
-      }
-      if (paymentCodeValid && this.label == "" && !this.rapAddressHasLabel(this.address)) {
-        alert("Label is required for this fresh recipient reusable address");
-        return;
       }
 
       let coinControl;
