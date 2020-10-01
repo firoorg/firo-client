@@ -378,6 +378,10 @@ export default {
     background-color: $color--dark;
     color: $color--green;
 
+    &:focus {
+        outline: none;
+    }
+
     .console {
         font: {
             family: monospace;
