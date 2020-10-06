@@ -490,6 +490,9 @@ export default {
             this.address = to.query.address || '';
             this.label = to.query.label || '';
             this.amount = to.query.amount || '';
+
+            // Make sure that selected inputs don't carry over to private send.
+            this.$store.dispatch('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
         },
 
         txFeePerKb: {
