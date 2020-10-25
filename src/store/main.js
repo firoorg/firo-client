@@ -3,7 +3,21 @@ import { ipcMain } from 'electron'
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import modules from './modules'
+
+import AddressValidation from "store/modules/AddressValidation";
+import ApiStatus from "store/modules/ApiStatus";
+import App from "store/modules/App";
+import Balance from "store/modules/Balance";
+import Blockchain from "store/modules/Blockchain";
+import Masternode from "store/modules/Masternode";
+import Notification from "store/modules/Notification";
+import PaymentRequest from "store/modules/PaymentRequest";
+import Settings from "store/modules/Settings";
+import Transactions from "store/modules/Transactions";
+import Window from "store/modules/Window";
+import ZcoinPayment from "store/modules/ZcoinPayment";
+import ZerocoinSpend from "store/modules/ZerocoinSpend";
+import Znode from "store/modules/Znode";
 
 import { createLogger } from 'lib/logger'
 
@@ -14,7 +28,22 @@ Vue.use(Vuex)
 const clients = []
 
 const store = new Vuex.Store({
-    modules
+    modules: {
+        AddressValidation,
+        ApiStatus,
+        App,
+        Balance,
+        Blockchain,
+        Masternode,
+        Notification,
+        PaymentRequest,
+        Settings,
+        Transactions,
+        Window,
+        ZcoinPayment,
+        ZerocoinSpend,
+        Znode
+    }
 })
 
 store.subscribe((mutation, state) => {
