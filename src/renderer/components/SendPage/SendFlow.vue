@@ -29,6 +29,7 @@
 // $emits: success
 
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
+import {mapGetters} from "vuex";
 import Popup from "../Popup";
 import ConfirmStep from "./ConfirmStep";
 import PassphraseStep from "./PassphraseStep";
@@ -102,6 +103,11 @@ export default {
     },
 
     computed: {
+        ...mapGetters({
+            isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
+            addressBook: 'AddressBook/addressBook'
+        }),
+
         totalAmount() {
             return this.subtractFeeFromAmount ? this.amount : this.amount + this.computedTxFee;
         }
@@ -123,12 +129,15 @@ export default {
             this.passphrase = '';
 
             try {
-                if (this.isPrivate) {
-                    await $daemon.privateSend(passphrase, this.label, this.address, this.amount,
+                if (!this.isPrivate) {
+                    await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, this.coinControl);
+                } else if (this.isLelantusAllowed) {
+                    await $daemon.sendLelantus(passphrase, this.address, this.amount, this.subtractFeeFromAmount,
+                        this.coinControl);
                 } else {
-                    let d = await $daemon.publicSend(passphrase, this.label, this.address, this.amount,
-                        this.txFeePerKb, this.subtractFeeFromAmount, this.coinControl);
+                    await $daemon.sendSigma(passphrase, this.label, this.address, this.amount,
+                        this.subtractFeeFromAmount, this.coinControl);
                 }
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
@@ -143,6 +152,30 @@ export default {
                 }
 
                 return;
+            }
+
+            if (this.label) {
+                if (this.addressBook[this.address]) {
+                    if (this.addressBook[this.address].purpose === 'send') {
+                        const item = {
+                            address: this.address,
+                            label: this.addressBook[this.address].label,
+                            purpose: 'send'
+                        };
+
+                        await $daemon.updateAddressBookItem(item, this.label);
+                        $store.commit('AddressBook/updateAddress', {...item, label: this.label});
+                    }
+                } else {
+                    const item = {
+                        address: this.address,
+                        label: this.label,
+                        purpose: 'send'
+                    };
+
+                    await $daemon.addAddressBookItem(item);
+                    $store.commit('AddressBook/updateAddress', item);
+                }
             }
 
             this.error = null;

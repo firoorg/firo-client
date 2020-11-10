@@ -166,6 +166,7 @@ export interface ApiStatus {
         protocolVersion: number;
         walletVersion: number;
         walletLock: boolean;
+        isLelantusAllowed: boolean;
         dataDir: string;
         // Note that this is DIFFERENT from the Network type.
         network: 'main' | 'test' | 'regtest';
@@ -1415,15 +1416,15 @@ export class Firod {
         }
     }
 
-    // Privately send amount satoshi XZC to recipient, subtracting the fee from the amount.
+    // Send amount satoshi XZC to recipient using Sigma, optionally subtracting the fee from the amount.
     //
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
     // this transaction.
     //
     // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async privateSend(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
-                      coinControl?: CoinControl): Promise<string> {
-        const data = await this.send(auth, 'create', 'sendPrivate', {
+    async sendSigma(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
+                    coinControl?: CoinControl): Promise<string> {
+        const data = await this.send(auth, 'create', 'sendSigma', {
             outputs: [
                 {
                     address: recipient,
@@ -1440,7 +1441,31 @@ export class Firod {
         if (typeof data === 'string') {
             return data;
         } else {
-            throw new UnexpectedFirodResponse('create/sendPrivate', data);
+            throw new UnexpectedFirodResponse('create/sendSigma', data);
+        }
+    }
+
+    // Send amount satoshi XZC to recipient using Lelantus, optionally subtracting the fee from the amount.
+    //
+    // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
+    // this transaction.
+    //
+    // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
+    async sendLelantus(auth: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
+                       coinControl?: CoinControl): Promise<string> {
+        const data = await this.send(auth, 'create', 'sendLelantus', {
+            recipient,
+            amount,
+            subtractFeeFromAmount,
+            coinControl: {
+                selected: coinControl ? coinControlToString(coinControl) : ''
+            }
+        });
+
+        if (typeof data === 'string') {
+            return data;
+        } else {
+            throw new UnexpectedFirodResponse('create/sendLelantus', data);
         }
     }
 
@@ -1520,11 +1545,11 @@ export class Firod {
         throw new UnexpectedFirodResponse('none/paymentRequestAddress', data);
     }
 
-    // Mint Zerocoins in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10',
-    // '25', or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200
-    // Zerocoin). We resolve() with the generated txid, or reject() with an error if something went wrong.
-    async mintZerocoin(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string> {
-        const data = await this.send(auth, 'create', 'mint', {
+    // Mint Sigma in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10', '25',
+    // or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200 Sigma). We
+    // resolve() with the generated txid, or reject() with an error if something went wrong.
+    async mintSigma(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string> {
+        const data = await this.send(auth, 'create', 'sigmaMint', {
             denominations: mints
         });
         if (typeof data === 'string') {
@@ -1532,6 +1557,17 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('create/mint', data);
+    }
+
+    // Turn all of our non-Lelantus coins into Lelantus coins. Should be preferred to mintSigma if Lelantus is
+    // available.
+    async mintAllLelantus(auth: string): Promise<string[]> {
+        const data = await this.send(auth, 'create', 'autoMintLelantus', null);
+        if (typeof data !== 'object') throw new UnexpectedFirodResponse('create/mint', data);
+        for (const x in data) {
+            if (typeof x !== 'string') throw new UnexpectedFirodResponse('create/mint', data);
+        }
+        return <string[]>data;
     }
 
     // calcPublicTxFee and calcPrivateTxFee require an address as input despite the fact that the response is the same
@@ -1580,13 +1616,13 @@ export class Firod {
         throw new UnexpectedFirodResponse('get/txFee', data);
     }
 
-    // Calculate a transaction fee for a private transaction. You may not specify custom transaction fees for private
+    // Calculate a transaction fee for a sigma transaction. You may not specify custom transaction fees for sigma
     // transactions.
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the firod call fails or received data is invalid.
-    async calcPrivateTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
-        let data = await this.send(null, 'none', 'privateTxFee', {
+    async calcSigmaTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+        let data = await this.send(null, 'none', 'sigmaTxFee', {
             outputs: [
                 {
                     address: this.defaultAddress(),
@@ -1609,6 +1645,16 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('get/privateTxFee', data);
+    }
+
+    // Calculate a transaction fee for a lelantus transaction. You may not specify custom transaction fees for lelantus
+    // transactions.
+    //
+    // We resolve() with the calculated fee in satoshi.
+    // We reject() the promise if the firod call fails or received data is invalid.
+    async calcLelantusTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
+        // TODO: Actually calculate the transaction fee when the functionality becomes available in the daemon.
+        return 31415;
     }
 
     // Backup wallet.dat into backupDirectory. We will reject() the problem if the backup fails for some reason;
@@ -1766,5 +1812,10 @@ export class Firod {
     // Is the daemon reindexing?
     async isReindexing(): Promise<boolean> {
         return (await this.apiStatus()).data.reindexing;
+    }
+
+    // Are Lelantus mints allowed?
+    async isLelantusAllowed(): Promise<boolean> {
+        return (await this.apiStatus()).data.isLelantusAllowed;
     }
 }
