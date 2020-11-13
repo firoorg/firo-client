@@ -108,19 +108,21 @@ export default {
 </script>
 
 <style lang="scss">
-    .vuetable-td-component-transaction-status {
-        user-select: none;
+@import "src/renderer/styles/colors";
 
-        &.is-confirmed {
-            color: green;
-        }
+.vuetable-td-component-transaction-status {
+    user-select: none;
 
-        &:not(.is-confirmed) {
-            color: orange;
-        }
-
-        .is-outgoing {
-            color: red;
-        }
+    &.is-confirmed {
+        color: $color-amount-positive;
     }
+
+    &:not(.is-confirmed), .is-mint, .is-payment-request {
+        color: $color-amount-neutral;
+    }
+
+    .is-outgoing {
+        color: $color-amount-negative;
+    }
+}
 </style>

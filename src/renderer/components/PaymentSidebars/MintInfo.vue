@@ -10,7 +10,7 @@
             </div>
 
             <div class="amount">
-                {{ convertToCoin(amount) }} XZC
+                {{ convertToCoin(amount) }} FIRO
             </div>
 
             <div class="transactions">

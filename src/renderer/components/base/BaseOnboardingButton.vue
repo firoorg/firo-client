@@ -42,7 +42,6 @@ export default {
 
         @include rhythmBorderTop(1px, $padding-v);
         @include rhythmBorderBottom(1px, $padding-v);
-        @include font-heavy();
 
         transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out;
         outline: none;

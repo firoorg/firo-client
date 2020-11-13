@@ -23,18 +23,18 @@ import App from './App'
 import router from './router'
 import store from '../store/renderer'
 
-import zcoind from '../daemon/init'
+import firod from '../daemon/init'
 
 import {convertToCoin} from "lib/convert";
 
 import { createLogger } from 'lib/logger';
-const logger = createLogger('zcoin:renderer:main.js');
+const logger = createLogger('firo:renderer:main.js');
 
 logger.info("Entering renderer/main.js...");
 
 let ourWindow = remote.getCurrentWindow();
 
-require('./utils/validationRules/isZcoinAddress');
+require('./utils/validationRules/isFiroAddress');
 require('./utils/validationRules/notExceedingBalance');
 
 Vue.use(VTooltip, {
@@ -114,7 +114,7 @@ window.$quitApp = async (message=undefined) => {
 
     // $daemon will not be set if we are setting up.
     if (window.$daemon) {
-        $setWaitingReason("Shutting down zcoind...");
+        $setWaitingReason("Shutting down firod...");
         try {
             await $daemon.stopDaemon();
         } catch(e) {
@@ -156,7 +156,7 @@ router.afterEach((to) => {
     });
 });
 
-// Handle zcoin:// links on Windows.
+// Handle firo:// links on Windows.
 app.on('second-instance', (event, commandLine) => {
     // Someone tried to run a second instance, we should focus our window.
     if (ourWindow.isMinimized()) {
@@ -175,10 +175,10 @@ app.on('second-instance', (event, commandLine) => {
 });
 
 // Actually handle deeplinks. open-url is emitted by our own code on Windows.
-logger.info("Registering protocol handler for zcoin links...");
+logger.info("Registering protocol handler for firo links...");
 app.on('open-url', (event, url) => {
     if (!store.getters['App/isInitialized'] || store.getters['App/waitingReason']) {
-        logger.error(`We're waiting on zcoind or not yet initialized. Ignoring deeplink ${url}...`);
+        logger.error(`We're waiting on firod or not yet initialized. Ignoring deeplink ${url}...`);
         return;
     }
 
@@ -186,12 +186,12 @@ app.on('open-url', (event, url) => {
 
     const m = (pattern) => (url.match(pattern) || [])[1];
 
-    const address = m(/^zcoin:\/\/(\w+)/);
+    const address = m(/^firo:\/\/(\w+)/);
     const amount = m(/[?&]amount=([0-9]+)/);
     const label = m(/[?&]message=([^&]+)/);
 
     router.push({
-        path: '/send/private',
+        path: '/send',
         query: {
             address: address,
             amount: amount && convertToCoin(amount),
@@ -214,43 +214,43 @@ function startVue() {
 // Start the daemon, showing progress to the user and resolving when the daemon is fully started. App/isInitialized is
 // set to true if the daemon is started successfully and the wallet is locked.
 window.$startDaemon = () => new Promise(resolve => {
-    // Checking for zcoindHasStarted allows us to work properly with hot reloading.
+    // Checking for firodHasStarted allows us to work properly with hot reloading.
 
-    $setWaitingReason("Starting up zcoind...");
-    zcoind(store, store.getters['App/zcoinClientNetwork'], store.getters['App/zcoindLocation'],
+    $setWaitingReason("Starting up firod...");
+    firod(store, store.getters['App/firoClientNetwork'], store.getters['App/firodLocation'],
         store.getters['App/blockchainLocation'] || null, undefined,
-        (store.getters['App/zcoindHasStarted'] && process.env.NODE_ENV === "development") || process.env.ALLOW_EXISTING_ZCOIND === "true",
-        !store.getters['App/zcoindHasStarted'] && process.env.ALLOW_EXISTING_ZCOIND === "true",
+        (store.getters['App/firodHasStarted'] && process.env.NODE_ENV === "development") || process.env.ALLOW_EXISTING_ZCOIND === "true",
+        !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_ZCOIND === "true",
         process.env.ZCOIND_CONNECTION_TIMEOUT ? Number(process.env.ZCOIND_CONNECTION_TIMEOUT) : undefined)
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;
 
             $daemon.awaitShutdown().catch(() => {
-                $quitApp("zcoind has shutdown unexpectedly. See zcoind's debug.log for details.");
+                $quitApp("firod has shutdown unexpectedly. See firod's debug.log for details.");
             });
 
-            $setWaitingReason("Waiting for zcoind to start the API...");
+            $setWaitingReason("Waiting for firod to start the API...");
             await $daemon.awaitApiResponse();
 
             if (await $daemon.isReindexing()) {
-                $setWaitingReason("Waiting for zcoind to reindex. This may take an extremely long time...");
+                $setWaitingReason("Waiting for firod to reindex. This may take an extremely long time...");
                 await $daemon.awaitBlockchainLoaded();
             } else if (await $daemon.isRescanning()) {
-                $setWaitingReason("Waiting for zcoind to rescan the block index. This may take a long time...");
+                $setWaitingReason("Waiting for firod to rescan the block index. This may take a long time...");
                 await $daemon.awaitBlockchainLoaded();
             }
 
             $setWaitingReason("Waiting for the API to indicate it's ready to receive commands...");
             await $daemon.awaitApiIsReady();
 
-            $setWaitingReason("Connecting to zcoind...")
+            $setWaitingReason("Connecting to firod...")
             await $daemon.awaitHasConnected();
 
             if (await $daemon.isWalletLocked()) {
                 // Start up the daemon.
 
-                $setWaitingReason("Loading our state from zcoind...");
+                $setWaitingReason("Loading our state from firod...");
                 try {
                     // Make sure our state is updated before proceeding.
                     await $daemon.awaitInitializersCompleted();
@@ -258,28 +258,26 @@ window.$startDaemon = () => new Promise(resolve => {
                     await $quitApp(`An error occurred in our initializers: ${e}`);
                 }
 
-                logger.info("zcoind has started.");
+                logger.info("firod has started.");
                 $setWaitingReason(undefined);
-                store.commit('App/setZcoindHasStarted', true);
+                store.commit('App/setFirodHasStarted', true);
                 store.commit('App/setIsInitialized', true);
                 resolve();
             } else {
-                // Direct the user to the lock wallet screen. The lock wallet screen will call resolve() when it has
-                // successfully started zcoind.
+                // Direct the user to the lock wallet screen. We will never resolve(), but that shouldn't matter.
 
                 router.push({
                     path: '/setup/lock-wallet',
                     query: {
-                        isExistingWallet: true,
-                        onStart: resolve
+                        isExistingWallet: true
                     }
                 }).then(() => {
                     $setWaitingReason(undefined);
-                })
+                });
             }
         })
         .catch(async e => {
-            await $quitApp(`An error occured starting zcoind: ${e}`);
+            await $quitApp(`An error occured starting firod: ${e}`);
         });
 });
 
@@ -291,7 +289,7 @@ if (!currentRoute) {
         // Allow shutting down.
         $setWaitingReason(undefined);
 
-        window.Zcoind = require('../daemon/zcoind').Zcoind;
+        window.Firod = require('../daemon/firod').Firod;
 
         ourWindow.webContents.openDevTools();
     } else if (store.getters['App/isInitialized'] &&

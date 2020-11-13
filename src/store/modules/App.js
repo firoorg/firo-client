@@ -5,28 +5,23 @@ import * as types from '../types/App'
 import { getAppSettings, getApp } from 'lib/utils'
 import { createLogger } from 'lib/logger'
 
-const logger = createLogger('zcoin:store:app')
+const logger = createLogger('firo:store:app')
 
 const state = {
     isInitialized: false,
     // This is used so that we will always have the same mnemonic even if we go back and forth through several different
     // screens. Cached mnemonic is of the type {mnemonic: string, mnemonicPassphrase: string | null, isNewMnemonic: boolean}
     cachedMnemonic: null,
-    openAddressBook: null,
     blockchainLocation: null,
     // This is the value read from our configuration, not what is given to us in APIStatus.
-    zcoinClientNetwork: null,
+    firoClientNetwork: null,
     waitingReason: 'Loading...',
-    zcoindHasStarted: false,
+    firodHasStarted: false,
     // This is used to go back to the page we were looking at when an automatic reload occurs.
     currentRoute: null
 }
 
 const mutations = {
-    [types.OPEN_ADDRESS_BOOK] (state, open_) {
-        state.openAddressBook = open_
-    },
-
     // This is called when app settings are read. It DOES NOT persist information to disk itself. (cf. setIsInitialized)
     // We will cause MainLayout.vue to stop showing IntroScreen.
     SET_IS_INITIALIZED (state, value) {
@@ -38,17 +33,17 @@ const mutations = {
         state.blockchainLocation = location;
     },
 
-    // This is called when app settings are read. It DOES NOT persist information itself. (cf. setZcoinClientNetwork)
+    // This is called when app settings are read. It DOES NOT persist information itself. (cf. setFiroClientNetwork)
     SET_ZCOIN_CLIENT_NETWORK (state, network) {
-        state.zcoinClientNetwork = network;
+        state.firoClientNetwork = network;
     },
 
-    setZcoinClientNetwork(state, network) {
+    setFiroClientNetwork(state, network) {
         if (!["test", "mainnet", "regtest"].includes(network)) {
             throw `unknown network type: ${network}`;
         }
 
-        state.zcoinClientNetwork = network;
+        state.firoClientNetwork = network;
         getAppSettings().set('app.SET_ZCOIN_CLIENT_NETWORK', network);
     },
 
@@ -65,8 +60,8 @@ const mutations = {
                 throw "Trying to mark us as initialized when App.blockchainLocation has not been set.";
             }
 
-            if (!state.zcoinClientNetwork) {
-                throw "Trying to mark us as initialized when App.zcoinClientNetwork has not been set."
+            if (!state.firoClientNetwork) {
+                throw "Trying to mark us as initialized when App.firoClientNetwork has not been set."
             }
         }
 
@@ -79,8 +74,8 @@ const mutations = {
         state.waitingReason = value;
     },
 
-    setZcoindHasStarted(state, value) {
-        state.zcoindHasStarted = value;
+    setFirodHasStarted(state, value) {
+        state.firodHasStarted = value;
     },
 
     // Set from a router.afterEach hook in main.js. We'll be used to figure out where we left off if we're reloading the
@@ -95,10 +90,6 @@ const mutations = {
 }
 
 const actions = {
-    async [types.OPEN_ADDRESS_BOOK] ({ commit, state }, open_) {
-        commit(types.OPEN_ADDRESS_BOOK, open_);
-    },
-
     async SET_IS_INITIALIZED({commit}, value) {
         commit('SET_IS_INITIALIZED', value);
     },
@@ -115,24 +106,24 @@ const actions = {
 }
 
 const getters = {
-    defaultZcoinRootDirectory: () => {
+    defaultFiroRootDirectory: () => {
         switch (process.platform) {
         // This is the ID for *all* Windows versions
         case "win32":
-            return path.join(homedir(), "AppData", "Roaming", "Zcoin");
+            return path.join(homedir(), "AppData", "Roaming", "Firo");
 
         case "darwin":
-            return path.join(homedir(), "Library", "Application Support", "zcoin");
+            return path.join(homedir(), "Library", "Application Support", "firo");
 
         case "linux":
-            return path.join(homedir(), ".zcoin");
+            return path.join(homedir(), ".firo");
 
         default:
             throw "unknown platform";
         }
     },
-    zcoindLocation: () => {
-        const zcoindName = process.platform === 'win32' ? 'zcoind.exe' : 'zcoind';
+    firodLocation: () => {
+        const firodName = process.platform === 'win32' ? 'firod.exe' : 'firod';
 
         let appDirectory;
         if (process.env.NODE_ENV === "development" || process.env.ZCOIN_CLIENT_TEST) {
@@ -141,7 +132,7 @@ const getters = {
             appDirectory = getApp().getAppPath().replace('app.asar', 'app.asar.unpacked');
         }
 
-        return path.resolve(appDirectory, 'assets', 'core', process.platform, zcoindName);
+        return path.resolve(appDirectory, 'assets', 'core', process.platform, firodName);
     },
     // It is invalid to access us prior to the app being initialized.
     //
@@ -152,7 +143,7 @@ const getters = {
         }
 
         let dataDir;
-        switch (getters.zcoinClientNetwork) {
+        switch (getters.firoClientNetwork) {
         case "mainnet":
             dataDir = getters.blockchainLocation;
             break;
@@ -166,22 +157,21 @@ const getters = {
             break;
 
         default:
-            throw `unknown network: ${getters.zcoinClientNetwork}`;
+            throw `unknown network: ${getters.firoClientNetwork}`;
         }
 
         return path.join(dataDir, "wallet.dat");
     },
-    zcoinClientNetwork: (state) => state.zcoinClientNetwork,
+    firoClientNetwork: (state) => state.firoClientNetwork,
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
-    zcoindHasStarted: (state) => state.zcoindHasStarted,
+    firodHasStarted: (state) => state.firodHasStarted,
     currentRoute: (state) => state.currentRoute,
-
+    showPaymentPendingWarning: (state, getters, rootState, rootGetters) => rootGetters['Balance/availablePublic'] > 1e8,
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.
     waitingReason: (state) => state.waitingReason,
     cachedMnemonic: (state) => state.cachedMnemonic,
-    openAddressBook: (state) => state.openAddressBook
 }
 
 export default {

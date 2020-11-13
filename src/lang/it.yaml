@@ -30,7 +30,7 @@ application-menu:
 
 navigation:
   balance:
-    title: Saldo Zcoin
+    title: Saldo Firo
   menu:
     button__receive: Ricevi
     button__send: Invio Pubblico
@@ -43,7 +43,7 @@ navigation:
     label__syncing: Sincronizzazione in corso...
     label__peers: Alla ricerca di peers!
   flyout-connections:
-    title: Network Zcoin
+    title: Network Firo
     label__connections: "{0} connessioni stabilite"
     label__is-connected-via-tor: "Collegato via <strong>Tor</strong> "
     label__not-connected-via-tor: "Connessione via <strong>Tor</strong> disabilitata"
@@ -61,7 +61,7 @@ navigation:
 
 receive:
   overview:
-    title: Ricevi</br>Zcoin
+    title: Ricevi</br>Firo
     # description
     notice__unseen-payments:
       title: Pagamento non visto | Pagamenti non visti
@@ -106,10 +106,10 @@ receive:
 
 mint:
   overview:
-    title: Anonimizza</br> Zcoin
+    title: Anonimizza</br> Firo
     description: Anonimizza monete ora per inviarle privatamente in seguito
     stats:
-      available-zcoin-balance: disponibile per anonimizzazione
+      available-firo-balance: disponibile per anonimizzazione
       balance-in-progress: in corso
       zerocoin-balance: già anonimizzato
 
@@ -179,7 +179,7 @@ send:
       label__label: Etichetta
       placeholder__label: "Puoi usare #tags qui"
       label__address: Indirizzo
-      placeholder__address: Aggiungi un indirizzo Zcoin valido
+      placeholder__address: Aggiungi un indirizzo Firo valido
       label__amount-selection: Quantità
       placeholder__amount-enter: Fare clic per selezionare le operazioni di conio
       placeholder__amount-select: Seleziona le operazioni di conio
@@ -213,14 +213,14 @@ send:
       button__has-error--primary: Riprova
 
     flyout-unused-address:
-      title: Trovato indirizzo Zcoin non ancora utilizzato
-      description: Gli appunti contengono un indirizzo Zcoin.<br>Si desidera usarlo come indirizzo del destinatario<br>per inviare Zcoin pubblicamente?
+      title: Trovato indirizzo Firo non ancora utilizzato
+      description: Gli appunti contengono un indirizzo Firo.<br>Si desidera usarlo come indirizzo del destinatario<br>per inviare Firo pubblicamente?
       label__payment-request-form-label-to-fulfill: 'In esecuzione: "{label}"'
 
 
   public:
     overview:
-      title: Invia<br> Zcoin
+      title: Invia<br> Firo
 
     detail-public-send:
       title: Invio Pubblico
@@ -228,7 +228,7 @@ send:
       label__label: Etichetta
       placeholder__label: "Puoi usare #tags qui"
       label__address: Indirizzo
-      placeholder__address: Aggiungi un indirizzo Zcoin valido
+      placeholder__address: Aggiungi un indirizzo Firo valido
       label__amount: Quantità
       placeholder__amount: Inserisci l'importo da inviare pubblicamente
       button__send--primary: "Invia ora | Invia ora | Invia {count} ora"
@@ -285,8 +285,8 @@ send:
       button__has-error--primary: Riprova
 
     flyout-unused-address:
-      title: Trovato indirizzo Zcoin non ancora utilizzato
-      description: Gli appunti contengono un indirizzo Zcoin.<br>Si desidera usarlo come indirizzo del destinatario<br>per inviare Zcoin pubblicamente?
+      title: Trovato indirizzo Firo non ancora utilizzato
+      description: Gli appunti contengono un indirizzo Firo.<br>Si desidera usarlo come indirizzo del destinatario<br>per inviare Firo pubblicamente?
       label__payment-request-form-label-to-fulfill: 'In esecuzione: "{label}"'
 
 znodes:
@@ -342,8 +342,8 @@ settings:
       label__connect-via-tor: Connetti via Tor
       description__connect-via-tor: Purus Ullamcorper Fermentum.
       label__connect-via-tor--disabled: La connessione Tor come viene definita tramite {value} in {configFile} non può essere modificata qui
-      label__connect-via-tor--checked: Si, le connessioni ad altri nodi nella rete Zcoin sono stabilite tramite Tor
-      label__connect-via-tor--unchecked: No, collegati direttamente ad altri nodi nella rete Zcoin
+      label__connect-via-tor--checked: Si, le connessioni ad altri nodi nella rete Firo sono stabilite tramite Tor
+      label__connect-via-tor--unchecked: No, collegati direttamente ad altri nodi nella rete Firo
       label__hold-in-zerocoin: Rapporto tra saldo privato e saldo pubblico
       description__hold-in-zerocoin: Purus Ullamcorper Fermentum.
       label__hold-in-zerocoin--private: Privato
@@ -353,12 +353,12 @@ settings:
 onboarding:
   intro-screen:
     title: Benvenuto!
-    description: Grazie per aver scaricato il client Zcoin! Hai fatto il primo passo verso la privacy finanziaria. Fai clic sul pulsante qui sotto per iniziare a configurare il tuo client!
+    description: Grazie per aver scaricato il client Firo! Hai fatto il primo passo verso la privacy finanziaria. Fai clic sul pulsante qui sotto per iniziare a configurare il tuo client!
     button__start--primary: Via!
 
   # create-new-wallet:
     # title:
-    # description: Ready to create a new wallet? If you have used Zcoin before, just drop your existing wallet backup in this window.
+    # description: Ready to create a new wallet? If you have used Firo before, just drop your existing wallet backup in this window.
     # button__primary:
     # button__secondary:
 
@@ -392,7 +392,7 @@ onboarding:
     button__generate-passphrase--primary: Genera frase segreta
     button__set-passphrase--primary: Imposta frase segreta
     placeholder__enter-passphrase: Inserisci la frase segreta
-    dictionary__passphrase: "Zcoin"
+    dictionary__passphrase: "Firo"
     # button__secondary: back / cancel?
 
   confirm-passphrase:
@@ -439,7 +439,7 @@ onboarding:
 
   # on-initial-setup:
     # title: High five!
-    # description: Congrats, you are now part of the Zcoin network. Let's go straight to the client!
+    # description: Congrats, you are now part of the Firo network. Let's go straight to the client!
     # button__--primary:
     # button__--secondary:
 
@@ -458,7 +458,7 @@ onboarding:
         # description: No coins to send. Please create a {linkToCreatePaymentRequest} first to receive some coins!
       # private:
         # title: Looks like you do not have any coins.
-        # description: No coins to send privately. Please create a {linkToCreatePaymentRequest} first to receive some coins and then head over to {linkToAnonymizeZcoin}.
+        # description: No coins to send privately. Please create a {linkToCreatePaymentRequest} first to receive some coins and then head over to {linkToAnonymizeFiro}.
 
   process-mints:
     title: Stay Private, Stay Flexible # test variables
@@ -498,7 +498,7 @@ overlay:
 
   error:
     connection-lost:
-      title: Connessione al programma<br> Zcoin persa
-      description: Il client ha perso la connessione al programma Zcoin. Si prega di riavviare il client.
-      button__quit--secondary: Chiudi Zcoin
+      title: Connessione al programma<br> Firo persa
+      description: Il client ha perso la connessione al programma Firo. Si prega di riavviare il client.
+      button__quit--secondary: Chiudi Firo
       button__restart-daemon--primary: Riavvia il programma

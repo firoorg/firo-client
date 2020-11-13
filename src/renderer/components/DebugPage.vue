@@ -1,6 +1,5 @@
 <template>
     <section
-        v-scrollable
         ref="debugPage"
         class="debug-page"
         tabindex="0"
@@ -10,9 +9,8 @@
         <div class="console">
             <div class="output">
                 <div class="info">
-                    Hello, welcome to the Zcoin Client debug console. Here you can interact with zcoind directly. Write
-                    <span class="bold">help</span> and see the list of commands, or <span class="bold">clear</span> to
-                    clear the console.
+                    Hello, welcome to the Firo Client debug console. Here you can interact with firod directly. Write
+                    <b>help</b> and see the list of commands, or <b>clear</b> to clear the console.
                 </div>
 
                 <div
@@ -369,30 +367,26 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.debug-page {
-    // override styles defined globally
-    padding-right: 0;
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/typography";
 
+.debug-page {
+    overflow: scroll;
+    user-select: text;
+    height: 100%;
     word-break: break-all;
 
-    background-color: $color--dark;
-    color: $color--green;
+    background-color: $color-debug-background;
+    color: $color-debug-text;
 
     &:focus {
         outline: none;
     }
 
     .console {
-        font: {
-            family: monospace;
-            size: 1.3em;
-        }
+        @include monospace();
 
-        padding: {
-            top: 4em;
-            left: 2%;
-            right: 2%;
-        }
+        padding: $size-main-margin;
 
         .input-line {
             font-weight: bold;
@@ -402,7 +396,7 @@ export default {
             }
 
             .input {
-                margin-left: 0.5em;
+                margin-left: $size-tiny-space;
                 max-width: border-box;
             }
         }
@@ -410,7 +404,7 @@ export default {
         .output {
             .info {
                 font-style: italic;
-                margin-bottom: 2em;
+                margin-bottom: $size-small-space;
 
                 word-break: normal;
 
@@ -425,7 +419,7 @@ export default {
 
             .output {
                 white-space: pre-wrap;
-                margin-bottom: 1em;
+                margin-bottom: $size-tiny-space;
             }
         }
 
@@ -440,7 +434,7 @@ export default {
         }
 
         .suggestions {
-            margin-top: 0.5em;
+            margin-top: $size-very-tiny-space;
 
             .suggestion {
                 &.selected {

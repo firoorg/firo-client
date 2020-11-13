@@ -37,6 +37,5 @@ export default {
 
 <style lang="scss" scoped>
     td {
-        @include font-heavy();
     }
 </style>

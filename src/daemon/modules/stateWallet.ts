@@ -1,10 +1,10 @@
-import { Zcoind } from '../zcoind';
+import { Firod } from '../firod';
 
 import { createLogger } from '../../lib/logger';
-const logger = createLogger('zcoin:daemon:stateWallet');
+const logger = createLogger('firo:daemon:stateWallet');
 
-export async function initialize(store: any, zcoind: Zcoind) {
-    const data = await zcoind.getStateWallet();
+export async function initialize(store: any, firod: Firod) {
+    const data = await firod.getStateWallet();
     logger.info("Got stateWallet");
     await store.dispatch('Transactions/setWalletState', data);
 

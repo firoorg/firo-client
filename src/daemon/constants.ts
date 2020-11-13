@@ -1,7 +1,7 @@
-// This constant defines the host and ports on which zcoind will be listening in each situation. statusPort will always
-// be open, but mainPort, testPort, and regtestPort will only be open in the event zcoind is set to the corresponding
+// This constant defines the host and ports on which firod will be listening in each situation. statusPort will always
+// be open, but mainPort, testPort, and regtestPort will only be open in the event firod is set to the corresponding
 // network type.
-export const zcoindAddress = {
+export const firodAddress = {
     host: '127.0.0.1',
     statusPort: {
         request: 25558,

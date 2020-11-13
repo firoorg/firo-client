@@ -4,6 +4,7 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
+const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
@@ -35,14 +36,6 @@ let rendererConfig = {
             {
                 test: /\.scss$/,
                 use: ['vue-style-loader', 'css-loader', 'sass-loader?data=@import "./src/renderer/styles";']
-            },
-            {
-                test: /\.sass$/,
-                use: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
-            },
-            {
-                test: /\.less$/,
-                use: ['vue-style-loader', 'css-loader', 'less-loader']
             },
             {
                 test: /\.css$/,
@@ -85,30 +78,11 @@ let rendererConfig = {
                 }
             },
             {
-                test: /\.(png|jpe?g|gif)(\?.*)?$/,
+                test: /\.ttf$/,
                 use: {
                     loader: 'url-loader',
                     query: {
                         limit: 10000,
-                        name: 'imgs/[name]--[folder].[ext]'
-                    }
-                }
-            },
-            {
-                test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: 'media/[name]--[folder].[ext]'
-                }
-            },
-            {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                use: {
-                    loader: 'url-loader',
-                    query: {
-                        limit: 10000,
-                        name: 'fonts/[name]--[folder].[ext]'
                     }
                 }
             },
@@ -119,6 +93,7 @@ let rendererConfig = {
                     svgo: {
                         plugins: [
                             {removeDimensions: true},
+                            {inlineStyles: {onlyMatchedOnce: false}}
                         ]
                     }
                 }
@@ -146,7 +121,8 @@ let rendererConfig = {
     },
     resolve: {
         alias: {
-            'vue$': 'vue/dist/vue.esm.js'
+            'vue$': 'vue/dist/vue.esm.js',
+            'fonts': path.resolve(__dirname, '..', 'assets', 'fonts')
         },
         modules: ['src', 'node_modules'].map(x => path.join(__dirname, '..', x)),
         extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts']

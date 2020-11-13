@@ -21,7 +21,7 @@ class AppSettings {
         case "darwin":
             const plist = require('simple-plist');
 
-            const plistLocation = path.join(homedir(), 'Library', 'Preferences', 'io.Zcoin-Client.plist');
+            const plistLocation = path.join(homedir(), 'Library', 'Preferences', 'io.Firo-Client.plist');
             if (fs.existsSync(plistLocation)) {
                 return plist.readFileSync(plistLocation);
             } else {
@@ -32,7 +32,7 @@ class AppSettings {
         case "openbsd":
         case "freebsd":
             const xdgConfigHome = process.env.XDG_CONFIG_HOME || path.join(homedir(), '.config');
-            const configLocation = path.join(xdgConfigHome, 'zcoin-client', 'zcoin-client.conf');
+            const configLocation = path.join(xdgConfigHome, 'firo-client', 'firo-client.conf');
             if (fs.existsSync(configLocation)) {
                 const raw = fs.readFileSync(configLocation);
                 return JSON.parse(raw);
@@ -40,12 +40,12 @@ class AppSettings {
                 return {};
             }
 
-        // Settings are saved as values in the \Software\Zcoin\Zcoin_Client\Settings registry entry.
+        // Settings are saved as values in the \Software\Firo\Firo_Client\Settings registry entry.
         case "win32":
             const Registry = require('winreg');
             const regKey = new Registry({
                 hive: Registry.HKCU,
-                key: `\\Software\\Zcoin\\Zcoin_Client\\Settings`
+                key: `\\Software\\Firo\\Firo_Client\\Settings`
             });
 
             return new Promise((resolve, reject) => {
@@ -112,7 +112,7 @@ class AppSettings {
         case "darwin":
             const plist = require('simple-plist');
 
-            const plistLocation = path.join(homedir(), 'Library', 'Preferences', 'io.Zcoin-Client.plist');
+            const plistLocation = path.join(homedir(), 'Library', 'Preferences', 'io.Firo-Client.plist');
             let parsed;
             if (fs.existsSync(plistLocation)) {
                 parsed = plist.readFileSync(plistLocation);
@@ -131,10 +131,10 @@ class AppSettings {
         case "openbsd":
         case "freebsd":
             const xdgConfigHome = process.env.XDG_CONFIG_HOME || path.join(homedir(), '.config');
-            const zcoinConfigDir = path.join(xdgConfigHome, 'zcoin-client');
-            const configLocation = path.join(zcoinConfigDir, 'zcoin-client.conf');
+            const firoConfigDir = path.join(xdgConfigHome, 'firo-client');
+            const configLocation = path.join(firoConfigDir, 'firo-client.conf');
 
-            for (const dir of [xdgConfigHome, zcoinConfigDir]) {
+            for (const dir of [xdgConfigHome, firoConfigDir]) {
                 if (!fs.existsSync(dir)) {
                     fs.mkdirSync(dir);
                 }
@@ -148,10 +148,10 @@ class AppSettings {
             release();
             break;
 
-        // Our settings are saved as a JSON-encoded object as the default value of \Software\Zcoin\Zcoin_Client\Settings.
+        // Our settings are saved as a JSON-encoded object as the default value of \Software\Firo\Firo_Client\Settings.
         case "win32":
             const Registry = require('winreg');
-            const regKey = new Registry({ hive: Registry.HKCU, key:  `\\Software\\Zcoin\\Zcoin_Client\\Settings` });
+            const regKey = new Registry({ hive: Registry.HKCU, key:  `\\Software\\Firo\\Firo_Client\\Settings` });
 
             return new Promise((resolve, reject) => {
                 // Creating the key even if it exists is fine.

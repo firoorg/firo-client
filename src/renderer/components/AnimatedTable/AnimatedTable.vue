@@ -1,23 +1,24 @@
 <template>
     <div class="animated-table">
-        <vuetable
-            ref="vuetable"
-            :class="theme"
-            :api-mode="false"
-            :fields="getFieldsWithLocalizedTitle"
-            :per-page="perPage"
-            :track-by="trackBy"
-            :data-manager="dataManager"
-            pagination-path="pagination"
-            :row-transition-name="rowTransition"
-            :row-class="getRowClass"
-            :no-data-template="noDataMessage"
-            v-bind="{ scopedSlots: $scopedSlots }"
-            @vuetable:pagination-data="onPaginationData"
-            @vuetable:row-clicked="onRowClick"
-        />
+        <div class="table-container" ref="table-container">
+            <vuetable
+                ref="vuetable"
+                :api-mode="false"
+                :fields="getFieldsWithLocalizedTitle"
+                :per-page="perPage"
+                :track-by="trackBy"
+                :data-manager="dataManager"
+                pagination-path="pagination"
+                :row-transition-name="rowTransition"
+                :no-data-template="noDataMessage"
+                v-bind="{ scopedSlots: $scopedSlots }"
+                @vuetable:pagination-data="onPaginationData"
+                @vuetable:row-clicked="onRowClick"
+                @vuetable:field-event="(ev) => $emit('field-event', ev)"
+            />
+        </div>
 
-        <div>
+        <div class="table-pagination">
             <animated-table-pagination
                 ref="pagination"
                 :theme="theme"
@@ -60,10 +61,6 @@ export default {
                 }
             ]
         },
-        perPage: {
-            type: Number,
-            default: 10
-        },
         noDataMessage: {
             type: String,
             default: ''
@@ -91,13 +88,23 @@ export default {
         compareElements: {
             type: Function,
             default: (a, b) => a === b
+        },
+
+        // FIXME: For reasons I haven't been able to figure out, flex-grow will cause .table-container to sometimes
+        //        outgrow the available space. This sets our table to be smaller so that won't happen. It seems to only
+        //        be necessary when AnimatedTable is embedded in Popup, which happens in InputSelection.
+        antiOverflowHack: {
+            type: Boolean,
+            default: false
         }
     },
 
     data () {
         return {
             interval: null,
-            rowTransition: 'fade'
+            rowTransition: 'fade',
+            perPage: 0,
+            resizeListener: () => this.setPerPage()
         }
     },
 
@@ -134,25 +141,31 @@ export default {
         }
     },
 
+    mounted() {
+        window.addEventListener("resize", this.resizeListener);
+
+        this.$nextTick(() => {
+            this.setPerPage();
+        });
+    },
+
+    destroyed() {
+        window.removeEventListener("resize", this.resizeListener);
+    },
+
     methods: {
-        getRowClass (item, index) {
-            const classes = []
-
-            if (item[this.trackBy] === this.selectedRow) {
-                classes.push('selected')
-            }
-
-            if (item.isFulfilled) {
-                classes.push('is-fulfilled')
-            }
-            if (item.isIncoming) {
-                classes.push('is-incoming')
-            }
-            if (item.isReused) {
-                classes.push('is-reused')
-            }
-
-            return classes.join(' ')
+        setPerPage() {
+            this.perPage = 0;
+            this.$nextTick(() => {
+                const tableContainer = document.querySelector('.table-container');
+                const tableHeader = document.querySelector('.table-container th');
+                const tableRow = document.querySelector('.table-container td');
+                if (tableContainer && tableHeader && tableRow) {
+                    this.perPage = Math.floor((tableContainer.clientHeight - tableHeader.clientHeight) / tableRow.clientHeight);
+                    if (this.antiOverflowHack) this.perPage -= 1;
+                    this.$refs.vuetable.refresh();
+                }
+            });
         },
 
         onRowClick (rowData) {
@@ -207,294 +220,80 @@ export default {
                 pagination: pagination,
                 data: _.slice(local, from, to)
             }
-        },
-        onActionClicked (action, data) {
-            this.$log.debug('slot actions: on-click', data.name)
         }
     }
 }
 </script>
 
 <style lang="scss">
-    .animated-table {
-        .vuetable-body-wrapper {
-            & > table {
-                width: 100%;
-                border-collapse: collapse;
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/sizes";
+
+.animated-table {
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-end;
+}
+
+.table-container {
+    flex-grow: 1;
+}
+
+.animated-table {
+    .vuetable-body-wrapper {
+        & > table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    }
+
+    tr {
+        text-align: left;
+
+        td, th {
+            &:first-child {
+                padding-left: $size-table-row-horizontal-padding;
+            }
+
+            &:last-child {
+                padding-right: $size-table-row-horizontal-padding;
             }
         }
 
-        thead {
-            text-align: left;
-
-            th {
-                @include font-heavy();
-                color: $color--comet-dark;
-                padding-bottom: emRhythm(2);
-
-                &.sortable {
-                    transition: color 0.15s ease-out;
-                    position: relative;
-
-                    &:hover {
-                        color: $color--dark;
-
-                        .sort-icon {
-                            color: $color--comet-dark;
-                        }
-                    }
-
-                    .sort-icon {
-                        float: none !important;
-                        display: inline-block;
-                        color: $color--comet;
-                        padding-left: 0.5rem;
-                        // border: 1px solid blue;
-                        position: absolute !important;
-
-                        @include setType(1);
-                        font-style: normal;
-                        //transition: transform 0.25s ease-in-out;
-
-                        &:after {
-                            transition: all 0.25s ease-in-out;
-                        }
-
-
-                        &.sort {
-                            top: 0.75rem;
-                            padding-left: 0.35rem;
-
-                            &:after {
-                                // border: 1px solid red;
-
-                                //@include setType(1, $ms-up1);
-                                display: block;
-                                content: '‹›';
-                                transform: rotate(90deg);
-                            }
-                        }
-
-                        &.up,
-                        &.down {
-                            @include setType(1, $ms-up2);
-                            //height: 1.25rem;
-                            top: 0.45rem;
-                            padding-left: 0.75rem;
-                            box-sizing: border-box;
-                            position: relative;
-
-
-                            &:after {
-                                top: 50%;
-                                left: 50%;
-                                display: block;
-                                position: absolute;
-                                //border: 1px solid red;
-                                width: 0.5rem;
-                                height: 0.75rem;
-                                content: '‹';
-                                transform: rotate(270deg);
-                            }
-                        }
-
-                        &.down {
-                            &:after {
-                                transform: rotate(90deg);
-                            }
-                        }
-
-                    }
-
-                }
-            }
+        th {
+            padding-bottom: 1em;
+            font-weight: bold;
+            color: $color-table-heading;
         }
+    }
 
-        .vuetable-body {
-            tr {
-                $padding: 1;
-                $border-size: 1px;
+    .vuetable-body {
+        tr {
+            cursor: pointer;
+            box-sizing: border-box;
 
-                $hover-opacity: .35;
-                $hover-background-color: $color--polo-medium;
+            // alternating colours for different rows
+            &:nth-child(odd) {
+                background: darken($color-table-background, 10%);
+            }
+            &:nth-child(even) {
+                background: $color-table-background;
+            }
 
-                $odd-opacity: .15;
-                $odd-background-color: $color--polo-medium;
-
-                cursor: pointer;
-                position: relative;
-                @include glow-transition-start($color--green);
-
-                transition: box-shadow 0.15s ease-out;
-
-                &.is-reused {
-                    @include glow-transition-start($color--orange);
-                }
-
+            // highlight on hover
+            &:hover {
                 td {
-                    position: relative;
-                    border-color: $color--polo-medium;
-                    // border-color: #fff;
-                    border-top-style: solid;
-                    @include rhythmBorderTop($border-size, $padding);
-                    padding-bottom: emRhythm($padding);
-                    transition: background-color .15s ease-in-out;
-
-                    &:first-child {
-                        margin-left: -1rem;
-                        padding-left: 1rem;
-                    }
-                    /*&:after {
-                        border-bottom: 1px solid #fff;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        z-index: 1;
-
-                        content: '';
-                        width: 100%;
-                    }*/
-                }
-
-                &:last-child td {
-                    border-bottom-style: solid;
-                    @include rhythmBorderBottom($border-size, $padding);
-                }
-
-                &:nth-child(odd) {
-                    background: rgba($odd-background-color, $odd-opacity);
-                }
-
-                &:hover {
-                    &:nth-child(odd) {
-                        td {
-                            background: rgba($hover-background-color, $hover-opacity + $odd-opacity);
-                        }
-                    }
-
-                    td {
-                        background: rgba($hover-background-color, $hover-opacity);
-                    }
-                }
-
-                &.selected {
-                    position: relative;
-                    z-index: 1000;
-
-                    /*&:before {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-
-                        content: '';
-                        width: 100%;
-                        //height: 100%;
-                        background: red;
-                        border: 10px solid blue;
-                    }*/
-                    @include glow-small-box($color--comet-dark-mixed);
-
-                    &.is-fulfilled {
-                        @include glow-small-box($color--green);
-
-                        td {
-                            background: $color--green;
-                        }
-
-                        & .tag {
-                            border-color: mix($color--comet-dark-mixed, $color--comet-dark);
-                        }
-
-                        &:hover td {
-                            background: mix($color--green-bright, $color--green, (100% * $hover-opacity));
-                        }
-
-                        &:nth-child(odd) {
-                            td {
-                                background: mix($color--green-bright, $color--green, (100% * $odd-opacity / 2));
-                            }
-
-                            &:hover td {
-                                background: mix($color--green-bright, $color--green, (100% * ($hover-opacity + $odd-opacity) / 2));
-                            }
-                        }
-                    }
-
-                    &.is-incoming {
-                        .payment-request-table-status path {
-                            fill: $color--white;
-                        }
-                    }
-
-                    &.is-reused {
-                        @include glow-small-box($color--orange);
-
-                        td {
-                            background: $color--orange;
-                        }
-
-                        & .tag {
-                            border-color: mix($color--orange, $color--orange-dark);
-                        }
-
-                        &:hover td {
-                            background: mix($color--orange-bright, $color--orange, (100% * $hover-opacity));
-                        }
-
-                        &:nth-child(odd) {
-                            td {
-                                background: mix($color--orange-bright, $color--orange, (100% * $odd-opacity / 2));
-                            }
-
-                            &:hover td {
-                                background: mix($color--orange-bright, $color--orange, (100% * ($hover-opacity + $odd-opacity) / 2));
-                            }
-                        }
-                    }
-
-                    & .tag {
-                        border-color: mix($color--green, $color--green-dark);
-                    }
-
-                    & .payment-request-table-status {
-                        &.is-fulfilled path {
-                            stroke: $color--white;
-                        }
-
-                        &:not(.is-fulfilled) g {
-                            fill: $color--white;
-                        }
-                    }
-
-                    td {
-                        background: $color--comet-dark-mixed;
-                        color: $color--white;
-                    }
-
-                    &:hover td {
-                        background: mix($color--comet-dark-mixed, $color--polo, (100% * $hover-opacity));
-                    }
-
-                    &:nth-child(odd) {
-                        td {
-                            background: rgba($color--comet-dark-mixed, (100% * $odd-opacity / 2));
-                        }
-
-                        &:hover td {
-                            background: mix($color--comet-dark-mixed, $color--polo, (100% * ($hover-opacity + $odd-opacity) / 2));
-                        }
-                    }
+                    background: lighten($color-table-background, 20%);
                 }
             }
 
-            &.fade-enter,
-            &.fade-enter-active {
-                background: red;
-            }
-
-            &.fade-leave-to {
-                background: blue;
+            td {
+                padding: {
+                    top: $size-table-row-vertical-padding;
+                    bottom: $size-table-row-vertical-padding;
+                }
             }
         }
     }
+}
 </style>

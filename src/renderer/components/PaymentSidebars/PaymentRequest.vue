@@ -53,7 +53,7 @@
 
                 <div class="amount">
                     {{ convertToCoin(pr.amount) }}
-                    XZC
+                    FIRO
                 </div>
             </div>
 
@@ -62,7 +62,7 @@
                     <a @click.prevent="copyLink" href="#">
                         Click here
                     </a>
-                    to copy a link containing payment address and amount, which can be used with a compatible Zcoin
+                    to copy a link containing payment address and amount, which can be used with a compatible Firo
                     client. Alternatively, copy and paste the address below, which will not include information about
                     the requested amount, but should be compatible with all exchanges and wallets.
                 </p>
@@ -163,7 +163,7 @@ export default {
 
             const paramsString = params.length ? `?${params.join('&')}` : '';
 
-            clipboard.writeText(`zcoin://${this.pr.address}${paramsString}`);
+            clipboard.writeText(`firo://${this.pr.address}${paramsString}`);
         },
 
         copyAddress () {

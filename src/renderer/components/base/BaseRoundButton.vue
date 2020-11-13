@@ -41,7 +41,6 @@ export default {
 <style lang="scss" scoped>
     div {
         border: none;
-        @include font-heavy();
         cursor: pointer;
         color: $color--comet-dark;
         outline: none;

@@ -44,7 +44,7 @@
                 slot-scope="props"
                 class="vuetable-amount"
             >
-                {{ convertToCoin(props.rowData.amount) + " XZC" }}
+                {{ convertToCoin(props.rowData.amount) + " FIRO" }}
                 <u
                     v-if="props.rowData.category === 'znode'"
                 >
@@ -69,7 +69,7 @@
         </div>
 
         <div class="popup-footer">
-            <h4> Total Currenly Selected: {{ convertToCoin(totalSelected) }} XZC</h4>
+            <h4> Total Currenly Selected: {{ convertToCoin(totalSelected) }} FIRO</h4>
             <base-button
                 color="white"
                 @click="confirmSelect()"
@@ -104,7 +104,7 @@ const tableFields = [
         title: 'Amount',
         sortField: 'amount',
         width: "15%",
-        formatter: value => convertToCoin(value) + " XZC",
+        formatter: value => convertToCoin(value) + " FIRO",
     },
     {
         name: 'status',
@@ -169,8 +169,8 @@ export default {
     computed: {
         ...mapGetters({
             transactions: 'Transactions/transactions',
-            selectedUtxos: 'ZcoinPayment/selectedInputs',
-            enteredAmount: 'ZcoinPayment/enteredAmount',
+            selectedUtxos: 'FiroPayment/selectedInputs',
+            enteredAmount: 'FiroPayment/enteredAmount',
             currentHeight: 'Blockchain/currentBlockHeight',
             unspentUTXOs: 'Transactions/unspentUTXOs'
         }),
@@ -231,7 +231,7 @@ export default {
     },
     watch:{
         $route (to, from){
-            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+            this.$store.dispatch('FiroPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         }
     },
     methods: {
@@ -253,7 +253,7 @@ export default {
             if (!agree) return
 
             // close dialog and trigger payment event
-            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+            this.$store.dispatch('FiroPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
 
             // get selected utxos
             const utxos = [];
@@ -269,8 +269,8 @@ export default {
                 }
             });
 
-            this.$store.commit('ZcoinPayment/UPDATE_CUSTOM_INPUTS', utxos);
-            //this.$store.commit('ZcoinPayment/UPDATE_COIN_LOCK', statusChanges);
+            this.$store.commit('FiroPayment/UPDATE_CUSTOM_INPUTS', utxos);
+            //this.$store.commit('FiroPayment/UPDATE_COIN_LOCK', statusChanges);
 
             var coinLocks = '';
             var coinUnlocks = '';
@@ -419,9 +419,9 @@ export default {
         },
         closePopup() {
             if (this.totalSelected === 0 ) {
-                this.$store.dispatch('ZcoinPayment/UPDATE_CUSTOM_INPUTS', []);
+                this.$store.dispatch('FiroPayment/UPDATE_CUSTOM_INPUTS', []);
             } 
-            this.$store.dispatch('ZcoinPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
+            this.$store.dispatch('FiroPayment/TOGGLE_CUSTOM_INPUTS_POPUP');
         }
     }
 }

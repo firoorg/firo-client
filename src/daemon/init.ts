@@ -1,25 +1,25 @@
-// Initialization routines for zcoind.
+// Initialization routines for firod.
 
-import { Zcoind, MnemonicSettings } from './zcoind';
+import { Firod, MnemonicSettings } from './firod';
 
-/// Start up zcoind, connect to it, and return a Zcoind instance. If allowMultipleZcoindInstances is true, instead of
-// giving an error if there is an existing zcoind instance running OR the wallet is unlocked, we will connect to it
+/// Start up firod, connect to it, and return a Firod instance. If allowMultipleFirodInstances is true, instead of
+// giving an error if there is an existing firod instance running OR the wallet is unlocked, we will connect to it
 // without running initializers.
-async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoindLocation: string, zcoindDataDir: string,
-                      mnemonicSettings?: MnemonicSettings, allowMultipleZcoindInstances?: boolean,
-                      runInitializersIfZcoindIsRunning?: boolean, connectionTimeout?: number): Promise<Zcoind> {
+async function firod(store: any, network: 'mainnet' | 'test' | 'regtest', firodLocation: string, firodDataDir: string,
+                      mnemonicSettings?: MnemonicSettings, allowMultipleFirodInstances?: boolean,
+                      runInitializersIfFirodIsRunning?: boolean, connectionTimeout?: number): Promise<Firod> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
     // Each module may export a function handler:
     //
-    //     async handleEvent(vuexStore: VuexStore, zcoind: Zcoind, eventData: any)
+    //     async handleEvent(vuexStore: VuexStore, firod: Firod, eventData: any)
     //
     // and also may export an initializer, which will be called after the block index is loaded:
     //
-    //     async initialize(vuexStore: VuexStore, zcoind: Zcoind)
+    //     async initialize(vuexStore: VuexStore, firod: Firod)
     //
-    const eventHandlers: {[topic: string]: (zcoind: Zcoind, eventData: any) => Promise<void>} = {};
+    const eventHandlers: {[topic: string]: (firod: Firod, eventData: any) => Promise<void>} = {};
     const initializers = [];
 
     const daemonComponents = require.context('./modules', true, /[^\/]\.ts$/);
@@ -28,7 +28,7 @@ async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoin
         const topic = fileName.match(/([^\/]+)\.ts$/)[1];
 
         if (component.handleEvent) {
-            eventHandlers[topic] = async (zcoind, eventData) => component.handleEvent(store, zcoind, eventData);
+            eventHandlers[topic] = async (firod, eventData) => component.handleEvent(store, firod, eventData);
         }
 
         if (component.initialize) {
@@ -38,24 +38,24 @@ async function zcoind(store: any, network: 'mainnet' | 'test' | 'regtest', zcoin
             }
 
             initializers.push(
-                async (zcoind) => {
+                async (firod) => {
                     // Wallet is not locked. Don't run initializers.
-                    if (!await zcoind.isWalletLocked()) {
+                    if (!await firod.isWalletLocked()) {
                         return;
                     }
 
-                    await component.initialize(store, zcoind)
+                    await component.initialize(store, firod)
                 }
             );
         }
     }
-    const zcoind = new Zcoind(network, zcoindLocation, zcoindDataDir, initializers, eventHandlers);
-    zcoind.allowMultipleZcoindInstances = !!allowMultipleZcoindInstances;
-    zcoind.runInitializersIfZcoindIsRunning = !!runInitializersIfZcoindIsRunning;
-    if (connectionTimeout) zcoind.connectionTimeout = connectionTimeout;
-    await zcoind.start(mnemonicSettings);
+    const firod = new Firod(network, firodLocation, firodDataDir, initializers, eventHandlers);
+    firod.allowMultipleFirodInstances = !!allowMultipleFirodInstances;
+    firod.runInitializersIfFirodIsRunning = !!runInitializersIfFirodIsRunning;
+    if (connectionTimeout) firod.connectionTimeout = connectionTimeout;
+    await firod.start(mnemonicSettings);
 
-    return zcoind;
+    return firod;
 }
 
-export default zcoind;
+export default firod;

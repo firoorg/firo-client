@@ -19,9 +19,9 @@ navigation:
   balance:
     title: Balance
   menu:
-    button__receive: Receive Zcoin
-    button__send: Send Zcoin
-    button__mint: Mint Zcoin
+    button__receive: Receive Firo
+    button__send: SendPage Firo
+    button__mint: Mint Firo
     button__spend: Spend Privately
     button__settings: Settings
   settings:
@@ -30,7 +30,7 @@ navigation:
 receive:
   # TODO: description, error messages
   overview:
-    title: Receive Zcoin
+    title: Receive Firo
     description:  Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
   # approx. 100 chars // concept of payment request, simple analogy, how should someone know where to send something?
     table__payment-requests:
@@ -63,7 +63,7 @@ receive:
 send:
   # TODO: descriptions, error messages
   overview:
-    title: Send Zcoin
+    title: SendPage Firo
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
     table__send:
       labels:
@@ -72,20 +72,20 @@ send:
         label__amount: Amount
 
   detail-create-send:
-    title__send: Send Zcoin
+    title__send: SendPage Firo
     label__label: Label
     error__label: The label field is required. # note internal labeling
     label__amount: Amount
     error__amount--not-numeric: The amount field must be numeric and may contain 8 decimal points.
     error__amount--below-minimum: The amount field must be 0.001 or more.
     label__address: Address
-    error__address: The address field must cointain a valid Zcoin address. / Ups, it looks like you accidentally mistyped your address!
+    error__address: The address field must cointain a valid Firo address. / Ups, it looks like you accidentally mistyped your address!
 
     single-send:
-      button__send-now--primary: Send Now
-      button__send-later--secondary: Send Later
+      button__send-now--primary: SendPage Now
+      button__send-later--secondary: SendPage Later
     multi-send:
-      button__send-all--primary: Send All
+      button__send-all--primary: SendPage All
       button__add-to-queue--secondary: Add to Queue
 
     pending-payments:
@@ -119,7 +119,7 @@ send:
 mint:
   # TODO: descriptions, detail-process-mint
   overview:
-    title: Mint Zcoin
+    title: Mint Firo
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
 
   detail-create-mint:
@@ -202,11 +202,11 @@ warnings-flyout:
     button__subscription--secondary: Subscription
     button__skip--primary: Ok, I got it!
 
-  zcoin-address-in-clipboard:
+  firo-address-in-clipboard:
     # TODO: spend possible
-    # CASE: Only Send Zcoin possible with available balance / requested amount
-    title__address-found: Zcoin Address found
-    description: Found a Zcoin address in your clipboard. Would you like to use it as the recipient address to send Zcoin?
+    # CASE: Only SendPage Firo possible with available balance / requested amount
+    title__address-found: Firo Address found
+    description: Found a Firo address in your clipboard. Would you like to use it as the recipient address to send Firo?
     button__cancel--secondary: Nope
     button__confirm--primary: Yes, go ahead!
 
@@ -217,12 +217,12 @@ warnings-fullscreen:
     title__connection-lost: Connection Lost
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
     button__restart-demon--primary: Restart Deamon
-    button__close-client--secondary: Close Zcoin Client
+    button__close-client--secondary: Close Firo Client
   could-not-connect:
-    title__connection-apistatus-timeout: Could not get Zcoin Core Status
+    title__connection-apistatus-timeout: Could not get Firo Core Status
     description: Aenean lacinia bibendum nulla sed consectetur. Cras mattis consectetur purus sit amet fermentum.
     button__restart-demon--primary: Restart Deamon
-    button__close-client--secondary: Close Zcoin Client
+    button__close-client--secondary: Close Firo Client
 
   unlock-wallet:
     # TODO: description, error message
@@ -236,14 +236,14 @@ warnings-fullscreen:
 onboarding:
   # TODO: create complete onboarding
   # LENGTH: 30 - 45 words per slide, multiple slides per topic possible!
-  # STRUCTURE: maybe switch order of setup and start-zcoin-experience to handle:
+  # STRUCTURE: maybe switch order of setup and start-firo-experience to handle:
   # first-time-xzc-user (opened app the first time and create new wallet)
   # first-time-client-user (opened app the first time and imported wallet from QT)
   # updated-client-user (opened app the first time after an update)
   # regular-client-user (no functional changes since last usage, only transactional and znode status updates)
-  start-zcoin-experience:
-    zcoin-general-feature-1: # Why Zcoin?
-      title: Title of the Zcoin Feature 1
+  start-firo-experience:
+    firo-general-feature-1: # Why Firo?
+      title: Title of the Firo Feature 1
       paragraph-1:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
           bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
@@ -258,8 +258,8 @@ onboarding:
           ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous paragraph
         button__next--primary: next feature
-    zcoin-general-feature-2: # Why Privacy?
-      title: Title of the Zcoin Feature 2
+    firo-general-feature-2: # Why Privacy?
+      title: Title of the Firo Feature 2
       paragraph-1:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
           bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
@@ -275,8 +275,8 @@ onboarding:
           ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous paragraph
         button__next--primary: next feature
-    zcoin-general-feature-3: # Why Client?
-      title: Title of the Zcoin Feature
+    firo-general-feature-3: # Why Client?
+      title: Title of the Firo Feature
       paragraph-1:
         decription: Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia
           bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Maecenas
@@ -291,8 +291,8 @@ onboarding:
           ligula, eget lacinia odio sem nec elit.
         button__prev--secondary: previous paragraph
         button__next--primary: next feature
-    zcoin-highlight-feature: # Latest Update
-    zcoin-client-update: # Functional Changes / Bug Fixes
+    firo-highlight-feature: # Latest Update
+    firo-client-update: # Functional Changes / Bug Fixes
   setup:
     intro-setup: # What is going to happen in the next steps?
     select-blockchain-directory:
@@ -310,7 +310,7 @@ onboarding:
 tours:
   # TODO: create complete tours
   # CASE: structural dummy
-  create-zcoin-payment:
+  create-firo-payment:
     assistant-mode:
       tooltip__title: Need help creating a Payment? No worries, we got you covered!
     steps:
@@ -325,7 +325,7 @@ tours:
         button__prev--secondary: go back
         button__next--primary: Ok, done!
 
-  send-zcoin:
+  send-firo:
     assistant-mode:
       tooltip__title: Need help sending a Payment? No worries, we got you covered!
     steps:
@@ -340,9 +340,9 @@ tours:
         button__prev--secondary: go back
         button__next--primary: Ok, done!
 
-  mint-zcoin:
+  mint-firo:
     assistant-mode:
-      tooltip__title: Need help minting a Zcoin? No worries, we got you covered!
+      tooltip__title: Need help minting a Firo? No worries, we got you covered!
     steps:
       step-name:
         title: Title of the step
@@ -355,9 +355,9 @@ tours:
         button__prev--secondary: go back
         button__next--primary: Ok, done!
 
-  spend-zcoin:
+  spend-firo:
     assistant-mode:
-      tooltip__title: Need help spending a minted Zcoin? No worries, we got you covered!
+      tooltip__title: Need help spending a minted Firo? No worries, we got you covered!
     steps:
       step-name:
         title: Title of the step

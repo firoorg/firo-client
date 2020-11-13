@@ -1,25 +1,19 @@
-<i18n>
-    en:
-        heading: "Zcoin Balance"
-</i18n>
-
 <template>
     <section class="balance">
-        <div id="available-xzc">
-            <amount :amount="availableXzc" />&nbsp;<span class="ticker">XZC</span>
-        </div>
-        <div v-if="lockedXzc > 0" id="locked-xzc">
-            +&nbsp;<amount :amount="lockedXzc" />&nbsp;<span class="ticker">XZC</span>&nbsp;locked
-        </div>
-        <div v-if="pendingXzc > 0" id="pending-xzc">
-            +&nbsp;<amount :amount="pendingXzc" />&nbsp;<span class="ticker">XZC</span>&nbsp;pending
+        <div>
+            <amount :amount="available" />&nbsp;<span class="ticker">FIRO</span>
         </div>
 
-        <div id="available-private-xzc">
-            <amount :amount="availableZerocoin" />&nbsp;<span class="ticker" title="Private XZC">ⓩ</span>
+        <div v-if="locked > 0" class="locked">
+            +&nbsp;<amount :amount="locked" />&nbsp;locked
         </div>
-        <div v-if="unconfirmedZerocoin > 0" id="pending-private-xzc">
-            +&nbsp;<amount :amount="unconfirmedZerocoin" />&nbsp;<span class="ticker" title="Private XZC">ⓩ</span>&nbsp;pending
+
+        <div v-if="availablePublic > 0" class="public">
+            +&nbsp;<amount :amount="availablePublic" />&nbsp;public
+        </div>
+
+        <div v-if="pending > 0" class="pending">
+            +&nbsp;<amount :amount="pending" />&nbsp;pending
         </div>
     </section>
 </template>
@@ -37,40 +31,32 @@ export default {
 
     computed: {
         ...mapGetters({
-            availableXzc: 'Balance/availableXzc',
-            unconfirmedXzc: 'Balance/unconfirmedXzc',
-            immatureXzc: 'Balance/immatureXzc',
-            lockedXzc: 'Balance/lockedXzc',
-            availableZerocoin: 'Balance/availableZerocoin',
-            unconfirmedZerocoin: 'Balance/unconfirmedZerocoin'
-        }),
-
-        pendingXzc () {
-            return this.immatureXzc + this.unconfirmedXzc
-        }
+            available: 'Balance/available',
+            locked: 'Balance/locked',
+            availablePublic: 'Balance/availablePublic',
+            pending: 'Balance/pending'
+        })
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "src/renderer/styles/typography";
+
 .balance {
-    display: block;
-    @include setType(3);
-
-    margin-top: emRhythm(1);
-    opacity: .8;
-    transition: all .15s ease-in-out;
-    //text-shadow: 0 0 10px $color--green-bright;
-    cursor: default;
-
-    margin: {
-        right: 1em;
-        left: 1em;
-    }
+    opacity: 0.8;
     text-align: right;
+    margin: {
+        top: $size-small-space;
+        right: $size-small-space;
+    }
 
     .ticker {
-        color: #23B852;
+        @include ticker();
+    }
+
+    .locked, .public, .pending {
+        opacity: 0.6;
     }
 }
 </style>

@@ -1,4 +1,4 @@
-import * as types from 'store/types/ZcoinPayment'
+import * as types from 'store/types/FiroPayment'
 import allTypes from 'store/types'
 import { convertToCoin, convertToSatoshi } from 'lib/convert'
 
@@ -7,14 +7,14 @@ import Payments from 'store/mixins/Payments'
 import Response from 'store/mixins/Response'
 
 const isLoading = IsLoading.module('')
-const pendingPayments = Payments.module('zcoin')
+const pendingPayments = Payments.module('firo')
 
-const sendZcoinResponse = Response.module('send zcoin')
+const sendFiroResponse = Response.module('send firo')
 
 const state = {
     ...isLoading.state,
     ...pendingPayments.state,
-    ...sendZcoinResponse.state,
+    ...sendFiroResponse.state,
 
     selectedFee: 'fast',
     availableFees: {
@@ -37,7 +37,7 @@ const state = {
 const mutations = {
     ...isLoading.mutations,
     ...pendingPayments.mutations,
-    ...sendZcoinResponse.mutations,
+    ...sendFiroResponse.mutations,
 
     [types.CALC_TX_FEE] () {},
     [types.SEND_ZCOIN] () {},
@@ -84,7 +84,7 @@ const mutations = {
 
 const actions = {
     ...pendingPayments.actions,
-    ...sendZcoinResponse.actions,
+    ...sendFiroResponse.actions,
 
     [types.SET_AVAILABLE_FEES] ({ dispatch }, availableFees) {
         /*
@@ -202,7 +202,7 @@ const actions = {
 const getters = {
     ...isLoading.getters,
     ...pendingPayments.getters,
-    ...sendZcoinResponse.getters,
+    ...sendFiroResponse.getters,
 
     availableFees: (state) => state.availableFees,
     selectedFee: (state) => ({

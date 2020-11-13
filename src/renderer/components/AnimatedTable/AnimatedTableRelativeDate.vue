@@ -3,8 +3,9 @@
         v-if="isHeader"
         class="vuetable-th-component-relative-date"
         @click="$emit('click', rowField, $event)"
-        v-html="title"
-    />
+    >
+        Date
+    </th>
     <td
         v-else
         class="vuetable-td-component-relative-date"

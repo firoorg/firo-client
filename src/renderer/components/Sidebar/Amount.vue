@@ -23,8 +23,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "src/renderer/styles/typography";
+
 .amount {
-    font-weight: bold;
+    @include amount();
 }
 </style>

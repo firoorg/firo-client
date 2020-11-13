@@ -58,7 +58,6 @@ export default {
 <style lang="scss" scoped>
 
 .checkbox {
-    //@include setType(3);
     white-space: nowrap;
     cursor: pointer;
     outline: none;
@@ -83,10 +82,10 @@ export default {
 .inner {
     display: inline-block;
     position: relative;
-    top: unitlessRhythm(1, $base-em-font-size) * 0.25rem;
+    top: 0.25rem;
     border: none;
     background: $color--polo-medium;
-    border-radius: emRhythm(0.5, $silent: true);
+    border-radius: emRhythm(0.5);
     box-sizing: border-box;
     width: emRhythm(2);
     height: emRhythm(2);
@@ -106,7 +105,7 @@ export default {
     position: absolute;
     top: 1px;
     transform: rotate(45deg) scaleY(0);
-    width: emRhythm(0.5, $silent: true);
+    width: emRhythm(0.5);
     transition: transform .15s cubic-bezier(.71, -.46, .88, .6) .05s;
     transform-origin: center;
 }
@@ -130,16 +129,12 @@ export default {
 }
 
 .label {
-    @include setType(3);
-    @include font-regular();
     white-space: normal;
 
     em, code {
-        @include font-heavy();
     }
 
     code {
-        @include font-monospace();
     }
 }
 
@@ -149,7 +144,7 @@ export default {
     .inner {
         width: emRhythm(3);
         height: emRhythm(3);
-        margin-right: emRhythm(1.5, $silent: true);
+        margin-right: emRhythm(1.5);
 
         &:before {
             height: 8px * 1.5;

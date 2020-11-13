@@ -1,23 +1,15 @@
+@import "styles/reset";
+@import 'styles/typography';
+
 @import 'styles/variables';
-@import './styles/typography';
-@import '~typesettings/typesettings';
-@import 'styles/transitions';
+@import 'styles/legacy';
 @import 'styles/mixins';
-@import '~normalize-scss/sass/normalize/import-now';
-@import 'styles/globals';
 @import 'styles/elements/scrollbar';
 @import 'styles/elements/overlay';
-@import 'styles/elements/button';
 @import 'styles/elements/popover';
 @import 'styles/elements/detail';
 @import 'styles/elements/form';
 
-/*
-
-@import 'styles/element-variables';
-
-
-@import 'styles/element/button';
-@import '~element-ui/packages/theme-chalk/src/index';
-@import 'styles/element-overrides';
- */
+* {
+  box-sizing: border-box;
+}

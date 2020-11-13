@@ -1,7 +1,9 @@
 <template>
     <section class="tx-info">
-        <div class="title">
-            {{ title }}
+        <div class="top-section">
+            <h1>
+                {{ title }}
+            </h1>
         </div>
 
         <div class="details">
@@ -11,7 +13,7 @@
                     {{ convertToCoin(tx.amount) }}
                 </span>
 
-                XZC
+                FIRO
             </div>
 
             <div
@@ -30,7 +32,7 @@
             </div>
 
             <div class="address">
-                <label>Address:</label>
+                <h2>Address:</h2>
 
                 <div class="value">
                     {{ tx.address }}
@@ -38,7 +40,7 @@
             </div>
 
             <div class="txid">
-                <label>Transaction ID:</label>
+                <h2>Transaction ID:</h2>
 
                 <div class="value">
                     {{ tx.txid }}
@@ -56,7 +58,7 @@
             v-if="isPrivate"
             class="privacy-message"
         >
-            This transaction is protected with Zcoin's Sigma technology. No one can see who sent it.
+            This transaction is protected with Firo's Sigma technology. No one can see who sent it.
         </div>
     </section>
 </template>
@@ -133,78 +135,69 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "src/renderer/styles/typography";
+@import "src/renderer/styles/sizes";
+
+
 .tx-info {
-    height: 100%;
-    background: $color--comet-light;
-    color: $color--comet-dark;
+    height: 100vh;
+    background: $color-detail-background;
 
     padding: {
-        top: 2em;
         left: 2em;
         right: 2em;
     }
 
-    font-size: 1.5em;
-
-    .title {
-        font-size: 2em;
-    }
-
-    .confirmations {
-        font-size: 0.6em;
-        font-style: italic;
-        text-align: right;
-    }
-
     .unconfirmed-warning {
-        padding-top: 1em;
-        padding-bottom: 2em;
-        font-size: 0.6em;
+        padding-top: $size-small-space;
+        @include small();
         font-style: italic;
         text-align: center;
     }
 
-    .details {
-        @include detail-header();
+    h2 {
+        margin-bottom: $size-tiny-space;
+    }
 
+    .details {
         .amount {
-            font-size: 1.5em;
+            @include large();
             text-align: right;
+            margin-bottom: $size-tiny-space;
 
             .incoming-amount {
-                color: green;
+                color: $color-amount-positive;
             }
 
             .outgoing-amount {
-                color: red;
+                color: $color-amount-negative;
             }
         }
 
         .address {
-            padding-top: 0.5em;
-            padding-bottom: 0.5em;
+            margin-top: $size-large-space;
+        }
 
-            .value {
-                font-family: monospace;
-                font-style: italic;
-                font-size: 0.9em;
-            }
+        .confirmations {
+            @include small();
+            text-align: right;
+            font-style: italic;
         }
 
         .txid {
-            padding-top: 0.5em;
+            margin: {
+                top: $size-small-space;
+                bottom: $size-tiny-space;
+            }
 
             .value {
-                font-size: 0.5em;
-                font-family: monospace;
-                font-style: italic;
+                @include monospace();
+                @include mini();
             }
         }
 
         .block-explorer {
-            font-size: 0.7em;
-            font-style: italic;
-            text-underline: none;
+            @include small();
         }
     }
 

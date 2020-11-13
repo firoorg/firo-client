@@ -2,7 +2,7 @@ import Vue from 'vue'
 import { getName, getTypeName } from 'store/utils'
 import { createLogger } from 'lib/logger'
 
-const logger = createLogger('zcoin:store:mixins:response')
+const logger = createLogger('firo:store:mixins:response')
 
 const tn = getTypeName
 

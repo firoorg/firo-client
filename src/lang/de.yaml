@@ -59,7 +59,7 @@ mint:
     title: Client entsperren
   overview:
     description: Coins jetzt anonymisieren um sie später schnell versenden zu können
-    title: Zcoin</br>anonymisieren
+    title: Firo</br>anonymisieren
 navigation:
   balance:
     title: Guthaben
@@ -75,7 +75,7 @@ navigation:
     label__dandelion: <strong>Dandelion++</strong> aktiviert
     label__is-connected-via-tor: Über <strong>Tor</strong> verbunden
     label__not-connected-via-tor: Tor deaktiviert
-    title: Zcoin-Netzwerk
+    title: Firo-Netzwerk
   flyout-znode-sync-progress:
     label: >-
       Znode-Liste wird aktualisiert ({alreadySynced} von {allZnodes} Znodes
@@ -89,7 +89,7 @@ navigation:
     button__spend: Privat Ausgeben
     button__znode: Znodes
   network:
-    label__peers: Suche nach anderen Zcoin-Nodes...
+    label__peers: Suche nach anderen Firo-Nodes...
     label__synced: 'Synchronisiert! '
     label__syncing: Synchronisiere...
   settings:
@@ -111,7 +111,7 @@ onboarding:
       Um deine Coins zu schützen, ist es wichtig, eine starke Passphrase zu
       wählen. Bitte stelle sicher, dass sie Klein-und Großbuchstaben, Zahlen und
       Sonderzeichen enthält. Wir empfehlen, einen Passwortmanager zu verwenden.
-    dictionary__passphrase: Zcoin
+    dictionary__passphrase: Firo
     placeholder__enter-passphrase: Passphrase eingeben
     title: Coins absichern!
   final-passphrase-confirmation:
@@ -126,7 +126,7 @@ onboarding:
   intro-screen:
     button__start--primary: Los geht's!
     description: >-
-      Vielen Dank, dass du den Zcoin Client heruntergeladen hast! Damit hast du
+      Vielen Dank, dass du den Firo Client heruntergeladen hast! Damit hast du
       den ersten Schritt in Richtung private Finanzen unternommen. Klick auf den
       Button um mit der Einrichtung zu beginnen.
     title: Willkommen!
@@ -207,12 +207,12 @@ onboarding:
 overlay:
   error:
     connection-lost:
-      button__quit--secondary: Zcoin beenden
+      button__quit--secondary: Firo beenden
       button__restart-daemon--primary: Daemon neu starten
       description: >-
-        Der Client hat seine Verbindung zum Zcoin Daemon verloren. Bitte starte
+        Der Client hat seine Verbindung zum Firo Daemon verloren. Bitte starte
         den Client neu.
-      title: Verbindung zum <br> Zcoin Daemon verloren
+      title: Verbindung zum <br> Firo Daemon verloren
   incoming-payment-request:
     button__cancel--secondary: Abbrechen
     button__make-payment--primary: Jetzt senden
@@ -268,7 +268,7 @@ receive:
       label__label: Label
       label__lastUpdate: Letztes Update
       placeholder__filter: Nach Label filtern
-    title: Zcoin</br>Empfangen
+    title: Firo</br>Empfangen
 send:
   detail-entry-transaction:
     button__open-explorer--primary: Im Block Explorer öffnen
@@ -286,7 +286,7 @@ send:
       label__amount: Gesamt
       label__amount-selection: Menge
       label__label: Label
-      placeholder__address: Füge eine gültige Zcoin-Adresse hinzu
+      placeholder__address: Füge eine gültige Firo-Adresse hinzu
       placeholder__amount-edit: Klick um Mints zu bearbeiten
       placeholder__amount-enter: Klick um Mints auszuwählen
       placeholder__amount-select: Mints Auswählen
@@ -319,10 +319,10 @@ send:
       title: Client enstsperren um Spend zu versenden
     flyout-unused-address:
       description: >-
-        Da ist eine Zcoin-Adresse in deiner Zwischenablage.<br>Möchstest du sie
+        Da ist eine Firo-Adresse in deiner Zwischenablage.<br>Möchstest du sie
         als Empfänger einer neuen öffentlichen<br>Transaktion benutzen?
       label__payment-request-form-label-to-fulfill: 'Bezahle: "{label}"'
-      title: Unbenutzte Zcoin-Adresse gefunden
+      title: Unbenutzte Firo-Adresse gefunden
     overview:
       title: Anonymer Spend
   public:
@@ -337,7 +337,7 @@ send:
       label__address: Adresse
       label__amount: Betrag
       label__label: Label
-      placeholder__address: Gib eine gültige Zcoin-Adresse ein
+      placeholder__address: Gib eine gültige Firo-Adresse ein
       placeholder__amount: 'Betrag, der öffentlich verschickt werden soll'
       placeholder__label: 'Du kannst hier #tags benutzen'
       title: Öffentlich versenden
@@ -398,12 +398,12 @@ send:
       title: Client entsperren um zu versenden
     flyout-unused-address:
       description: >-
-        Da ist eine Zcoin-Adresse in deiner Zwischenablage.<br>Möchstest du sie
+        Da ist eine Firo-Adresse in deiner Zwischenablage.<br>Möchstest du sie
         als Empfänger einer neuen öffentlichen<br>Transaktion benutzen?
       label__payment-request-form-label-to-fulfill: 'Bezahle "{label}"'
-      title: Unbenutzte Zcoin-Adresse gefunden
+      title: Unbenutzte Firo-Adresse gefunden
     overview:
-      title: Zcoin<br>verschicken
+      title: Firo<br>verschicken
   table__outgoing-payments:
     label__amount: Betrag
     label__label: Label

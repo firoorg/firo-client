@@ -5,7 +5,7 @@ import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
 import {convertToSatoshi} from "../src/lib/convert";
-import {TransactionOutput} from "../src/daemon/zcoind";
+import {TransactionOutput} from "../src/daemon/firod";
 
 interface This extends Mocha.Context {
     app: Application
@@ -21,7 +21,7 @@ if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
 const passphrase = 'passphrase';
 let mnemonicWords: string[];
 
-function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
+function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
     this.timeout(5e3);
     this.slow(500);
 
@@ -33,14 +33,14 @@ function scaffold(this: Mocha.Suite, reinitializeZcoinClient: boolean) {
             args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
             env: {
                 ZCOIN_CLIENT_TEST: 'true',
-                REINITIALIZE_ZCOIN_CLIENT: String(reinitializeZcoinClient)
+                REINITIALIZE_ZCOIN_CLIENT: String(reinitializeFiroClient)
             }
         });
 
-        console.info('Starting Zcoin Client...');
+        console.info('Starting Firo Client...');
         await this.app.start();
         await this.app.client.waitUntilWindowLoaded();
-        console.info('Zcoin Client started.');
+        console.info('Firo Client started.');
     });
 
     this.afterEach(async function (this: This) {
@@ -84,7 +84,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
             await (await this.app.client.$('#network-value')).selectByAttribute('value', 'regtest');
 
             const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
-            const dataDirLocation = path.join(os.tmpdir(), `zcoin-client-test-${Math.floor(Math.random() * 1e16)}`);
+            const dataDirLocation = path.join(os.tmpdir(), `firo-client-test-${Math.floor(Math.random() * 1e16)}`);
 
             fs.mkdirSync(dataDirLocation);
 
@@ -332,7 +332,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         let receiveAddress = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
 
         await (await this.app.client.$('a[href="#/send/public')).click();
-        await (await this.app.client.$('.send-zcoin-form')).waitForExist();
+        await (await this.app.client.$('.send-firo-form')).waitForExist();
 
         const sendButton = await this.app.client.$('#send-button');
         const label = await this.app.client.$('#label')
@@ -416,7 +416,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const nonce = String(Math.random());
 
         await (await this.app.client.$('a[href="#/send/public')).click();
-        await (await this.app.client.$('.send-zcoin-form')).waitForExist();
+        await (await this.app.client.$('.send-firo-form')).waitForExist();
 
         await (await this.app.client.$('#label')).setValue(nonce);
         await (await this.app.client.$('#address')).setValue('TAczBFWtiP8mNstdLn1Z383z51rZ1vHk5N');

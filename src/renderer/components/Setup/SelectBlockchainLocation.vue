@@ -1,53 +1,45 @@
 <template>
     <div class="blockchain-location">
-        <div class="header">
+        <div class="title">
             Configuration
         </div>
 
-        <div id="config-options">
-            <div class="config-option" id="datadir">
-                <label for="datadir-value">
-                    Data Directory:
-                </label>
+        <div class="content">
+            <label style="grid-area: datadir-label">
+                Data Directory:
+            </label>
 
-                <div class="value">
-                    <div id="datadir-value">
-                        {{ dataDir }}
-                    </div>
+            <div style="grid-area: datadir-selector">
+                <div id="datadir-value">
+                    {{ dataDir }}
+                </div>
 
-                    <div id="datadir-actions">
-                        <a href="#" @click="changeDataDir">
-                            Change
-                        </a>
+                <div id="datadir-actions">
+                    <a href="#" @click="changeDataDir">
+                        Change
+                    </a>
 
-                        <a href="#" id="reset-data-dir" @click="resetDataDir">
-                            Reset
-                        </a>
-                    </div>
+                    <a href="#" id="reset-data-dir" @click="resetDataDir">
+                        Reset
+                    </a>
                 </div>
             </div>
 
-            <div class="config-option" id="network">
-                 <label for="network-value">
-                     Network:
-                 </label>
+             <label style="grid-area: network-label">
+                 Network:
+             </label>
 
-                <select class="value" id="network-value" v-model="network">
-                    <option value="mainnet">Mainnet (default)</option>
-                    <option value="test">Testnet</option>
-                    <option value="regtest">Regtest</option>
-                </select>
-            </div>
+            <select style="grid-area: network-value" v-model="network">
+                <option value="mainnet">Mainnet (default)</option>
+                <option value="test">Testnet</option>
+                <option value="regtest">Regtest</option>
+            </select>
         </div>
 
-        <div id="setup-button">
-            <BaseButton
-                color="green"
-                id="continue-setup"
-                @click="continueSetup"
-            >
+        <div class="buttons">
+            <button @click="continueSetup">
                 Next
-            </BaseButton>
+            </button>
         </div>
     </div>
 </template>
@@ -69,8 +61,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            zcoindLocation: 'App/zcoindLocation',
-            defaultZcoinRootDirectory: 'App/defaultZcoinRootDirectory'
+            firodLocation: 'App/firodLocation',
+            defaultFiroRootDirectory: 'App/defaultFiroRootDirectory'
         }),
 
         // This code is duplicated from src/module/App.js due to potential race conditions.
@@ -102,7 +94,7 @@ export default {
     },
 
     mounted() {
-        this.dataDir = this.defaultZcoinRootDirectory;
+        this.dataDir = this.defaultFiroRootDirectory;
 
         // This is required for testing due to Spectron not being very good at handline file dialogs.
         document.addEventListener('set-data-dir', (event) => {
@@ -116,12 +108,12 @@ export default {
         }),
 
         resetDataDir() {
-            this.dataDir = this.defaultZcoinRootDirectory;
+            this.dataDir = this.defaultFiroRootDirectory;
         },
 
         async changeDataDir() {
             const selection = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
-                title: 'Select Zcoin Data Directory',
+                title: 'Select Firo Data Directory',
                 properties: [
                     'openDirectory',
                     'createDirectory',
@@ -151,12 +143,12 @@ export default {
             }
 
             // If this.dataDir is the default directory and does not exist, try to create it.
-            if (!fs.existsSync(this.dataDir) && this.dataDir === this.defaultZcoinRootDirectory) {
+            if (!fs.existsSync(this.dataDir) && this.dataDir === this.defaultFiroRootDirectory) {
                 try {
                     fs.mkdirSync(this.dataDir);
-                    this.$log.info(`Created default zcoin dataDir ${this.dataDir}`);
+                    this.$log.info(`Created default firo dataDir ${this.dataDir}`);
                 } catch(e) {
-                    this.$log.warn(`Failed to create default zcoin dataDir ${this.dataDir}`);
+                    this.$log.warn(`Failed to create default firo dataDir ${this.dataDir}`);
                     alert("dataDir didn't exist and we weren't able to create it");
                     return;
                 }
@@ -170,8 +162,8 @@ export default {
                 return;
             }
 
-            this.$log.info(`Setting zcoinClientNetwork: ${this.network}`);
-            this.$store.commit('App/setZcoinClientNetwork', this.network);
+            this.$log.info(`Setting firoClientNetwork: ${this.network}`);
+            this.$store.commit('App/setFiroClientNetwork', this.network);
 
             this.$log.info(`Setting blockchain location: ${this.dataDir}`);
             this.$store.commit('App/setBlockchainLocation', this.dataDir);
@@ -179,7 +171,7 @@ export default {
             // Wait for our updates to propagate to the store so it can be used by $startDaemon. sigh.
             await new Promise(async (resolve) => {
                 while (true) {
-                    if (this.$store.getters['App/zcoinClientNetwork'] === this.network && this.$store.getters['App/blockchainLocation'] === this.dataDir) {
+                    if (this.$store.getters['App/firoClientNetwork'] === this.network && this.$store.getters['App/blockchainLocation'] === this.dataDir) {
                         return resolve();
                     }
 
@@ -201,40 +193,29 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "src/renderer/styles/popup";
+@import "src/renderer/styles/typography";
+@import "src/renderer/styles/sizes";
+
 .blockchain-location {
+    @include popup();
     width: max-content;
 
-    .header {
-        text-align: center;
-        font: {
-            weight: bold;
-            size: 2.5em;
-        }
-    }
-
-    #config-options {
-        display: table;
+    .content {
+        display: grid;
+        grid-gap: $size-small-space;
+        grid-template-areas: "datadir-label datadir-selector"
+                             "network-label network-value";
 
         label {
-            font-size: 1.2em;
-            padding-right: 0.5em;
+            @include label();
         }
 
-        #datadir {
-            #datadir-value {
-                font-weight: bold;
-                width: fit-content;
-            }
+        #datadir-actions {
+            @include optional-action();
 
-            #datadir-actions {
-                font: {
-                    style: italic;
-                    size: 0.9em;
-                }
-
-                a:not(:first-child) {
-                    margin-left: 0.5em;
-                }
+            a:not(:first-child) {
+                margin-left: 0.5em;
             }
         }
 
@@ -244,16 +225,15 @@ export default {
             label, .value {
                 display: table-cell;
             }
+
+            &:not(first-child) {
+                margin-top: $size-between-field-space-big;
+            }
         }
     }
 
-    #setup-button {
-        width: fit-content;
-        margin: {
-            left: auto;
-            right: auto;
-            top: 1em;
-        }
+    .buttons {
+        width: 30%;
     }
 }
 </style>

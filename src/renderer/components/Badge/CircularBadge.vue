@@ -30,10 +30,8 @@ export default {
 
 <style lang="scss" scoped>
 div {
-    @include font-heavy();
-    @include setType(2.5, $ms-down1, $silent: true);
     display: inline-block;
-    min-width: emRhythm(2.5, $ms-down1, $silent: true);
+    min-width: emRhythm(2.5);
     transition: color .25s ease-in-out, background .25s ease-in-out;
     text-align: center;
 

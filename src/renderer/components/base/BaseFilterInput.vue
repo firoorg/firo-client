@@ -65,8 +65,6 @@ export default {
         width: 100%;
         box-sizing: border-box;
 
-        @include lato-font('normal');
-        @include setType(5);
         @include rhythmBorderBottom(1px, 0);
 
         padding: 0 emRhythm($input-bleed);
@@ -94,19 +92,16 @@ export default {
         top: 0;
         right: 0;
         bottom: 0;
-        padding: emRhythm(1) emRhythm(1.5, $silent: true) emRhythm(1) 0;
-
+        padding: emRhythm(1) emRhythm(1.5) 0;
         border: none;
         background: transparent;
         outline: none;
 
         span {
-            @include font-heavy();
-            @include setType(2.5, $silent: true);
             display: block;
             // background: mix($color--polo-medium, $color--polo);
             background: mix($color--comet-light, $color--comet-medium);
-            width: emRhythm(2.5, $silent: true);
+            width: emRhythm(2.5);
             // height: emRhythm(3);
             color: $color--white;
             border-radius: 50%;

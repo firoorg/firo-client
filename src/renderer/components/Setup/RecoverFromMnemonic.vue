@@ -1,82 +1,84 @@
 <template>
-    <div class="mnemonic-screen recover-from-mnemonic">
-        <div class="guidance">
+    <div class="recover-from-mnemonic">
+        <div class="title">
             Enter your recovery phrase below.
         </div>
 
-        <div class="mnemonic-length">
-            <div class="mnemonic-length-question">
-                <span class="question">
-                    Does your mnemonic have 12 or 24 words?
-                </span>
+        <div class="content">
+            <div class="mnemonic-length">
+                <div class="mnemonic-length-question">
+                    <span class="question">
+                        Does your mnemonic have 12 or 24 words?
+                    </span>
 
-                <span class="input">
-                    <input type="radio" name="mnemonicLength" v-model="mnemonicLength" value="12" />
-                    12
-                </span>
+                    <span class="input">
+                        <input type="radio" name="mnemonicLength" v-model="mnemonicLength" value="12" />
+                        12
+                    </span>
 
-                <span class="input">
-                    <input type="radio" name="mnemonicLength" v-model="mnemonicLength" value="24" />
-                    24
-                </span>
+                    <span class="input">
+                        <input type="radio" name="mnemonicLength" v-model="mnemonicLength" value="24" />
+                        24
+                    </span>
+                </div>
             </div>
-        </div>
 
-        <div class="mnemonic">
-            <template v-for="(_, i) in newWords.length">
-                <input
-                   ref="newWords"
-                   :id="`mnemonic-word-${i}`"
-                   :key="i"
-                   :class="['mnemonic-word', 'hidden', isMnemonicValid ? 'verified' : 'unverified']"
-                   type="text"
-                   v-model="newWords[i]"
-                   placeholder="______"
-                   :tabindex="i + 1"
-                   @keydown="preventInvalidCharInput"
-                   @keydown.enter="(ev) => onWhitespace(ev, i)"
-                   @keydown.space="(ev) => onWhitespace(ev, i)"
-                   @keydown.tab="(ev) => onWhitespace(ev, i)"
-                   @beforeinput="(ev) => onWordInput(ev, i)"
-                />
-            </template>
-        </div>
+            <div class="mnemonic">
+                <template v-for="(_, i) in newWords.length">
+                    <input
+                       ref="newWords"
+                       :id="`mnemonic-word-${i}`"
+                       :key="i"
+                       :class="['mnemonic-word', 'hidden', isMnemonicValid ? 'verified' : 'unverified']"
+                       type="text"
+                       v-model="newWords[i]"
+                       placeholder="______"
+                       :tabindex="i + 1"
+                       @keydown="preventInvalidCharInput"
+                       @keydown.enter="(ev) => onWhitespace(ev, i)"
+                       @keydown.space="(ev) => onWhitespace(ev, i)"
+                       @keydown.tab="(ev) => onWhitespace(ev, i)"
+                       @beforeinput="(ev) => onWordInput(ev, i)"
+                    />
+                </template>
+            </div>
 
-        <div class="protective-passphrase">
-            <input type="checkbox" v-model="hasProtectivePassphrase" id="hasProtectivePassphrase" />
-            <label class="question" for="hasProtectivePassphrase">
-                My wallet has a protective passphrase.
-            </label>
-
-            <div v-if="hasProtectivePassphrase" class="protective-passphrase-inputs">
-                <label class="question" for="protectivePassphrase">
-                    Passphrase:
+            <div class="protective-passphrase">
+                <input type="checkbox" v-model="hasProtectivePassphrase" id="hasProtectivePassphrase" />
+                <label class="question" for="hasProtectivePassphrase">
+                    My wallet has a protective passphrase.
                 </label>
 
-                <input type="password" id="protectivePassphrase" v-model="protectivePassphrase" />
+                <div v-if="hasProtectivePassphrase" class="protective-passphrase-inputs">
+                    <label class="question" for="protectivePassphrase">
+                        Passphrase:
+                    </label>
 
-                <label class="question" for="confirmProtectivePassphrase">
-                    Confirm Passphrase:
-                </label>
+                    <input type="password" id="protectivePassphrase" v-model="protectivePassphrase" />
 
-                <input type="password" id="confirmProtectivePassphrase" v-model="confirmProtectivePassphrase" />
+                    <label class="question" for="confirmProtectivePassphrase">
+                        Confirm Passphrase:
+                    </label>
+
+                    <input type="password" id="confirmProtectivePassphrase" v-model="confirmProtectivePassphrase" />
+                </div>
             </div>
         </div>
 
         <div class="buttons">
-            <BaseButton @click="goBack" class="button" color="comet">
+            <button @click="goBack">
                 Go Back
-            </BaseButton>
+            </button>
 
-            <BaseButton @click="submit" id="submit-button" class="button" color="green" :disabled="!isVerified">
+            <button @click="submit" :disabled="!isVerified">
                 Submit
-            </BaseButton>
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-import {validateMnemonic} from "daemon/zcoind";
+import {validateMnemonic} from "daemon/firod";
 
 export default {
     name: "RecoverFromMnemonic",
@@ -217,33 +219,54 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/_mnemonic.scss';
+@import 'src/renderer/styles/mnemonic';
+@import 'src/renderer/styles/popup';
+@import 'src/renderer/styles/sizes';
+@import 'src/renderer/styles/typography';
 
-.question {
-    font-weight: bold;
+@include popup()
+
+.recover-from-mnemonic {
+    user-select: none;
 }
 
-.mnemonic-length-question {
-    margin-top: 1em;
-
-    input {
-        margin-left: 1em;
-    }
-}
-
-.protective-passphrase {
-    .protective-passphrase-inputs {
-        width: fit-content;
-        display: grid;
-        grid-template-columns: auto 1fr;
-
-        label {
-            margin-right: 2em;
-        }
+.content {
+    .mnemonic-length-question {
+        @include label();
 
         input {
-            width: 15em;
+            margin-left: 1em;
         }
     }
+
+    .protective-passphrase {
+        @include label();
+
+        .protective-passphrase-inputs {
+            width: fit-content;
+            display: grid;
+            grid-template-columns: auto 1fr;
+
+            label {
+                margin-right: 2em;
+            }
+
+            input {
+                width: 15em;
+            }
+        }
+    }
+
+    .mnemonic {
+        @include mnemonic();
+        margin: {
+            top: $size-medium-space;
+            bottom: $size-medium-space;
+        }
+    }
+}
+
+.buttons {
+    width: fit-content;
 }
 </style>

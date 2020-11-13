@@ -1,8 +1,8 @@
 import {cloneDeep, merge} from 'lodash';
-import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/zcoind';
+import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/firod';
 
 import { createLogger } from '../../lib/logger'
-const logger = createLogger('zcoin:store:Transactions');
+const logger = createLogger('firo:store:Transactions');
 
 // This is the data format we're given in 'address' events.
 type AddressEvent = StateWallet;
@@ -30,15 +30,21 @@ const mutations = {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
-                        stateUnspentUTXOs[`${tx.txid}-${tx.txIndex}-${tx.category}`] = true;
-
                         if (address === 'MINT' && tx.category === 'receive') {
                             // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
                             // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
                             // category one.
                             continue;
                         }
+
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
+
+                        if (tx.spendable) {
+                            stateUnspentUTXOs[tx.uniqId] = true;
+                        } else {
+                            delete stateUnspentUTXOs[tx.uniqId];
+                        }
+
                         // mined and znode transactions without a blockHeight are orphans.
                         if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
                             // Delete previous records associated with the transaction.
@@ -92,7 +98,6 @@ const mutations = {
                     //logger.info('spent: %s', id);
                     if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
                         stateTransactions[id].spendable = false;
-                        stateUnspentUTXOs[id] = false;
                         delete stateUnspentUTXOs[id];
                     }
                 }
@@ -120,23 +125,6 @@ const mutations = {
     setShouldShowWarning(state, warning: boolean) {
         state.shouldShowWarning = warning;
         state.shouldShowWarning = {...state.shouldShowWarning};
-    },
-
-    setAddressBook(state, addressBook_: AddressBookItem[]) {
-        addressBook_.forEach(e => {
-            state.addressBook[e.address] = e;
-        })
-        state.addressBook = {...state.addressBook};
-    },
-
-    deleteAddressItem(state, address: string) {
-        delete state.addressBook[address];
-        state.addressBook = {...state.addressBook};
-    },
-
-    addAddressItem(state, item: AddressBookItem) {
-        state.addressBook[item.address] = item;
-        state.addressBook = {...state.addressBook};
     }
 };
 
@@ -205,25 +193,13 @@ const actions = {
 
     changeShouldShowWarning({commit, rootGetters}, warning: boolean) {
         commit('setShouldShowWarning', warning);
-    },
-
-    setAddressBook({commit, rootGetters}, addressBook_: AddressBookItem[]) {
-        commit('setAddressBook', addressBook_);
-    },
-
-    deleteAddressItem({commit, rootGetters}, address:string) {
-        commit('deleteAddressItem', address);
-    },
-
-    addAddressItem({commit, rootGetters}, item:AddressBookItem) {
-        commit('addAddressItem', item);
     }
 };
 
 const getters = {
-    // a map of `${txid}-${txIndex}` to the full transaction object returned from zcoind
+    // a map of `${txid}-${txIndex}` to the full transaction object returned from firod
     transactions: (state) => state.transactions,
-    unspentUTXOs: (state) => state.unspentUTXOs,
+    unspentUTXOs: (state) => Object.keys(state.unspentUTXOs).map(uniqId => state.transactions[uniqId]),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
 

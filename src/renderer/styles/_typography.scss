@@ -1,117 +1,106 @@
-@import '~lato-font/scss/public-api';
+@import "./fonts";
+@import "./colors";
+@import "./sizes";
 
-$lato-font-path: ''; // font-faces are loaded directly via App.vue -> styles.
-
-// Your settings for Typesettings :)
-$font-sans: Lato, Helvetica, Arial, sans-serif;
-$font-serif: Georgia, 'Times New Roman', serif;
-$font-mono: 'Lucida Console', Monaco, monospace;
-$text-color: #000;
-$base-vertical-unit: 8px;
-$base-line-multi: 3;
-$base-font-size: 15px;
-//$base-vertical-unit: 6px;
-//$base-line-multi: 4;
-//$base-font-size: 15px;
-//$ms-ratio: 1.5;
-$ms-ratio: 1.25;
-$paragraph-indent: true;
-$paragraph-justify: true;
-$load-typesetted: false;
-$global-init: true; // By default set to false, loaded with typesetted
-
-// Lato font weights overview
-// @see https://github.com/betsol/lato-font/blob/master/scss/internal/_variables.scss
-$weight--headline: 'black';
-$weight--label: 'heavy';
-$weight--button: 'heavy'; //$weight--label;
-
-@mixin typo-headline() {
-    @include lato-font($weight--headline);
-    //line-height: emRhythm(3);
-}
-
-@mixin typo-label() {
-    @include lato-font($weight--label, italic);
-}
-
-@mixin typo-button() {
-    @include lato-font($weight--btton);
-}
-
-@mixin popover-inline-button() {
-    color: $color--white-light;
-    font-style: normal;
-    text-decoration: none;
-    background-color: rgba($color--dark, 0.3);
-    @include setType(2, $ms-down2);
-    text-transform: uppercase;
-    letter-spacing: 0.025rem;
-    display: inline-block;
-    padding: emRhythm(0.75, $silent: true) emRhythm(1);
-    margin: -1 * emRhythm(0.75, $silent: true) 0;
-    border-radius: emRhythm(0.25, $silent: true);
-
-    transition: color 0.15s ease-out, background 0.15s ease-out;
-
-    //position: absolute;
-    //right: 0;
-    //margin-right: -50%;
-    //top: 0;
-
-    &:hover,
-    &:focus {
-        color: $color--white;
-        background: rgba($color--dark, 0.85);
+h1 {
+    font: {
+        family: "Saira Semi Condensed";
+        weight: bold;
+        size: $font-size-normal * 2.5;
     }
 }
 
-h1, h2, h3, h4, h5, h6 {
-    // @include typo-headline()
+h2 {
+    font: {
+        family: "Saira Semi Condensed";
+        weight: 300;
+        size: $font-size-normal * 1.5;
+    }
 }
 
-/*
-$rootsizes: (
-                rootsize-0: 7,     // 24px line-height body text
-                rootsize-1: 7,     // 28px line-height body text
-                rootsize-2: 8,     // 30px line-height body text
-                rootsize-3: 9,     // 34px line-height body text
-                rootsize-4: 10        // 38px line-height body text
-);
+h3 {
+    font: {
+        family: "Source Sans Pro";
+        weight: bold;
+        size: $font-size-normal * 1.125;
+    }
+}
 
-$bodytype: (
-                font-family: 'Lato',
-                regular: 300,
-                bold: 700,
-                italic: italic,
-                cap-height: 0.76
-) !default;
+body {
+    color: $color-text;
+    font: {
+        family: "Source Sans Pro";
+        size: $font-size-normal;
+    }
+}
 
-*/
-/*
-$breakpoints: (
-    small: 640px,
-    large: 1200px
-);
+a {
+    color: darken($color-text, 15%);
+}
 
-$typefaces: (
-    primary: (
-        font-size-ratio: 1,
-        stack: (Lato, Helvetica, Arial, sans-serif),
-        weights: (
-            light: 300,
-            normal: 400,
-            bold: 700
-        ),
-    )
-);
+@mixin large {
+    font-size: $font-size-normal * 1.5;
+}
 
-$typi: (
-    base: (
-        null: (12px, 1.6),
-        small: (14px, 1.4),
-        large: (16px, 1.2)
-        )
-    // Other font maps here
-);
-*/
+@mixin largeish {
+    font-size: $font-size-normal * 1.1;
+}
+
+@mixin small {
+    font-size: $font-size-normal * 0.8;
+}
+
+@mixin mini {
+    font-size: $font-size-normal * 0.7;
+}
+
+@mixin monospace {
+    font-family: "Robot Mono";
+}
+
+@mixin ticker {
+    color: $color-ticker;
+}
+
+@mixin amount {
+    user-select: text;
+    font-weight: bold;
+}
+
+@mixin address {
+    user-select: text;
+    @include monospace();
+}
+
+@mixin txid {
+    user-select: text;
+    @include monospace();
+    @include mini();
+}
+
+@mixin label {
+    user-select: text;
+    font-weight: bold;
+    margin-bottom: $size-tiny-space;
+}
+
+@mixin guidance {
+    user-select: text;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+@mixin optional-action {
+    font-style: italic;
+}
+
+@mixin error {
+    @include monospace();
+    @include mini();
+    user-select: text;
+    color: $color-error;
+    font: {
+        weight: bold;
+        style: italic;
+    }
+}

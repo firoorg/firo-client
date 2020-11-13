@@ -6,7 +6,7 @@ import {join} from 'path'
 import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
-const logger = createLogger('zcoin:main')
+const logger = createLogger('firo:main')
 
 // We don't want multiple copies of our application running.
 if (!app.requestSingleInstanceLock()) {
@@ -15,7 +15,7 @@ if (!app.requestSingleInstanceLock()) {
     process.exit();
 }
 
-// Chromium sandboxing requires an suid helper binary to be present, but we want users to be able to install Zcoin
+// Chromium sandboxing requires an suid helper binary to be present, but we want users to be able to install Firo
 // Client without root. Therefore, we need to disable sandboxing. This shouldn't be a security risk since we don't have
 // any untrusted code anyway.
 app.commandLine.appendSwitch('--no-sandbox');
@@ -26,11 +26,11 @@ if (process.env.SSH_CLIENT) {
     app.commandLine.appendSwitch('--no-xshm');
 }
 
-// Register us as the handler for zcoin:// links. Actual handling of them is done in main.js.
-if (!app.isDefaultProtocolClient('zcoin')) {
-    logger.info("Setting Zcoin Client as the default handler for zcoin:// links...");
+// Register us as the handler for firo:// links. Actual handling of them is done in main.js.
+if (!app.isDefaultProtocolClient('firo')) {
+    logger.info("Setting Firo Client as the default handler for firo:// links...");
     // This can sometimes fail, in which case it will not throw but will print an error to stderr.
-    app.setAsDefaultProtocolClient('zcoin');
+    app.setAsDefaultProtocolClient('firo');
 }
 
 app.once('ready', async () => {
@@ -41,7 +41,7 @@ app.once('ready', async () => {
     const appMenu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(appMenu);
 
-    // The window will be shown by the renderer process when zcoind is connected.
+    // The window will be shown by the renderer process when firod is connected.
     const ourWindow = new BrowserWindow({
         show: false,
         frame: process.platform !== 'darwin',
@@ -50,7 +50,7 @@ app.once('ready', async () => {
         height: 780,
         width: 1400,
         minWidth: 1200,
-        minHeight: 450,
+        minHeight: 650,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true

@@ -1,10 +1,12 @@
+@import "src/renderer/styles/z";
+
 .tooltip {
     $tooltip--padding: emRhythm(2) emRhythm(2);
-    $tooltip--arrow-size: emRhythm(1) / 3 * 2;
+    $tooltip--arrow-size: 0.66em;
     $tooltip--background-transition-duration: .5s;
 
     display: block !important;
-    z-index: 10000;
+    z-index: $z-tooltip;
     @include box-shadow-large();
 
     &:not(.popover) {
@@ -41,7 +43,7 @@
         position: absolute;
         margin: emRhythm(1);
         border-color: $color--comet-dark-mixed;
-        z-index: 1;
+        z-index: $z-tooltip;
     }
 
     &[x-placement^="top"] {
@@ -158,7 +160,7 @@
             transition: background-color $tooltip--background-transition-duration ease-in-out;
 
             h1 {
-                margin-bottom: emRhythm(3, $ms-up5);
+                margin-bottom: emRhythm(3);
             }
 
             h2 {
@@ -179,7 +181,6 @@
 
                 p {
                     max-width: emRhythm(35);
-                    @include font-medium();
                     font-style: italic;
                     // color: $color--green-dark;
                 }
@@ -207,7 +208,7 @@
                 text-align: right;
 
                 button + button {
-                    margin-left: emRhythm(2)
+                    margin-left: emRhythm(2);
                 }
             }
 
@@ -219,14 +220,14 @@
 
             nav.menu {
                 ul {
-                    margin: emRhythm(-1.5, $silent: true) 0;
+                    margin: emRhythm(-1.5);
                     padding: 0;
                     list-style-type: none;
 
                     li a {
                         border: none;
-                        padding: emRhythm(1) emRhythm(1.5, $silent: true);
-                        margin: 0 emRhythm(-1.5, $silent: true);
+                        padding: emRhythm(1) emRhythm(1.5);
+                        margin: 0 emRhythm(-1.5);
                     }
                     li + li a {
                         border-width: 0;
@@ -327,7 +328,7 @@
         &.notice {
             .popover-inner {
                 .content-wrapper > * {
-                    padding: emRhythm(2)
+                    padding: emRhythm(2);
                 }
             }
 

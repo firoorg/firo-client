@@ -40,8 +40,8 @@ export const getters = {
             return state.currentBlock.timestamp;
         }
 
-        // If the current block hasn't been loaded yet, use a hardcoded value set to the first Zcoin block mined.
-        switch (rootGetters['App/zcoinClientNetwork']) {
+        // If the current block hasn't been loaded yet, use a hardcoded value set to the first Firo block mined.
+        switch (rootGetters['App/firoClientNetwork']) {
             case 'mainnet':
                 // Sep 28, 2016 7:00:13 AM
                 return 1475046013;

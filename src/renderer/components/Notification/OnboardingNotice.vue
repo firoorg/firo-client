@@ -46,7 +46,6 @@ export default {
 
             a,
             strong {
-                @include font-medium();
                 font-weight: normal;
                 font-style: inherit;
                 color: mix($color--comet-dark, $color--comet);
@@ -69,7 +68,6 @@ export default {
             @include glow-huge-box($color--polo-medium);
 
             main {
-                @include lato-font('regular');
                 font-style: italic;
             }
         }

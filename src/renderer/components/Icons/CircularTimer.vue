@@ -81,11 +81,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .circular-timer {
-        position: relative;
-    }
+.circular-timer {
+    position: relative;
+}
 
-    .wrap {
-        position: absolute;
-    }
+.wrap {
+    position: absolute;
+}
 </style>

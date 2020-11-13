@@ -48,63 +48,27 @@ export default new Router({
 
         {
             path: '/main',
+            redirect: '/transactions',
             component: require('renderer/layouts/MainLayout').default,
-            // fixme: It would be cleaner if we started pointing to / instead of /main.
-            redirect: '/receive',
             children: [
                 {
-                    path: 'transaction-page',
-                    component: require('renderer/components/PaymentsPage').default,
-                    children: [
-                        {
-                            path: '/send',
-                            component: require('renderer/components/PaymentSidebars/Send').default,
-                            children: [
-                                {
-                                    path: 'private'
-                                },
-
-                                {
-                                    path: 'public'
-                                }
-                            ]
-                        },
-
-                        {
-                            path: '/receive',
-                            component: require('renderer/components/PaymentSidebars/Receive').default
-                        },
-
-                        {
-                            path: '/payment-request/:uniqId',
-                            component: require('renderer/components/PaymentSidebars/PaymentRequest').default
-                        },
-
-                        {
-                            path: '/transaction-info/:uniqId',
-                            component: require('renderer/components/PaymentSidebars/TransactionInfo').default
-                        },
-
-                        {
-                            path: '/mint-info/:blockHeight',
-                            component: require('renderer/components/PaymentSidebars/MintInfo').default
-                        }
-                    ]
+                    path: '/transactions',
+                    component: require('renderer/components/PaymentsPage').default
                 },
 
                 {
-                    path: '/anonymize',
-                    component: require('renderer/components/AnonymizePage').default
+                    path: '/send',
+                    component: require('renderer/components/SendPage.vue').default
+                },
+
+                {
+                    path: '/receive',
+                    component: require('renderer/components/ReceivePage').default
                 },
 
                 {
                     path: '/znodes',
-                    component: require('renderer/components/EvoZnodesContainer').default
-                },
-
-                {
-                    path: '/znodelist',
-                    component: require('renderer/components/ZnodePage').default
+                    component: require('renderer/components/EvoZnodesPage').default
                 },
 
                 {

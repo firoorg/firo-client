@@ -77,15 +77,14 @@ export default {
 
         button.options-handle {
             margin-left: 0;
-            padding: 0 emRhythm(1.5, $silent: true);
+            padding: 0 emRhythm(1.5);
             border-left: none;
 
             span {
                 display: inline-block;
                 transform: rotate(-90deg);
-                padding-bottom: emRhythm(0.5, $silent: true);
-                @include setType(1, $ms-up1);
-                //font-size: emRhythm($ms-up1);
+                padding-bottom: emRhythm(0.5);
+                //font-size: emRhythm(inherit);
             }
         }
     }

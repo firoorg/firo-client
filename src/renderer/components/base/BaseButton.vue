@@ -73,7 +73,6 @@ export default {
         @include rhythmBorderTop(1px, $padding-v);
         @include rhythmBorderBottom(1px, $padding-v);
 
-        @include font-heavy();
 
         transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out;
 
@@ -115,7 +114,7 @@ export default {
         }
 
         &.small {
-            padding: emRhythm($padding-small-v, $silent: true) emRhythm($padding-small-h, $silent: true);
+            padding: emRhythm($padding-small-v) emRhythm($padding-small-h);
             @include rhythmBorderTop(1px, $padding-small-v);
             @include rhythmBorderBottom(1px, $padding-small-v);
         }

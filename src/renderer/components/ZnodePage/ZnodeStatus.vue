@@ -23,13 +23,11 @@ export default {
 <style lang="scss" scoped>
     .status-badge {
         display: inline-block;
-        border-radius: emRhythm(0.5, $silent: true);
+        border-radius: emRhythm(0.5);
         padding: 0.125rem 0.25rem;
         margin: -0.125rem 0;
         background: $color--green;
         color: $color--polo-light;
-        @include font-medium();
-        @include setType(2, $ms-down1);
 
         &.ENABLED {
         }

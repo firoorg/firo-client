@@ -4,9 +4,9 @@ import { getApp } from 'lib/utils'
 
 let logPath;
 if (process.env.ZCOIN_CLIENT_TEST) {
-    logPath = join(process.cwd(), 'zcoin-client-test.log');
+    logPath = join(process.cwd(), 'firo-client-test.log');
 } else {
-    logPath = join(getApp().getPath('userData'), 'zcoin-client.log')
+    logPath = join(getApp().getPath('userData'), 'firo-client.log')
 }
 
 console.info(`Logs will be written to ${logPath}`);
@@ -35,6 +35,6 @@ const logger = winston.createLogger({
     ]
 })
 
-export const createLogger = function (label = 'zcoin:no-module') {
+export const createLogger = function (label = 'firo:no-module') {
     return logger.child({ label })
 }

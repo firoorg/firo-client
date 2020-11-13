@@ -1,15 +1,16 @@
 <template>
     <div class="welcome">
-        <h1>Welcome!</h1>
+        <div class="title">Welcome!</div>
 
-        <p>
-            Thank you for downloading the Zcoin Client! You have taken the first step towards financial privacy. Click
-            the button below to begin setting up your client!
-        </p>
+        <div class="content">
+            Thank you for downloading <span class="firo">Firo</span>. Click below to embark on your path to financial privacy.
+        </div>
 
-        <BaseButton class="start-button" color="green" @click="next">
-            {{ $t('onboarding.intro-screen.button__start--primary') }}
-        </BaseButton>
+        <div class="buttons">
+            <button @click="next">
+                Let's Go
+            </button>
+        </div>
     </div>
 </template>
 
@@ -27,18 +28,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "src/renderer/styles/popup";
+@import "src/renderer/styles/colors";
+
 .welcome {
-    width: 50%;
-
+    @include popup();
+    max-width: 30% !important;
     text-align: center;
-    font-size: 1.2em;
 
-    h1 {
-        margin-bottom: emRhythm(1);
+    .content {
+        .firo {
+            color: $color-text-accent;
+        }
     }
 
-    p {
-        margin-bottom: emRhythm(2);
+    .buttons {
+        width: 30%;
     }
 }
 </style>

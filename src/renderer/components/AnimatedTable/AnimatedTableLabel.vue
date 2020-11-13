@@ -17,14 +17,7 @@
             Payment Request:
         </span>
 
-        <span
-            v-if="['spendIn', 'spendOut'].includes(category)"
-            class="private-icon"
-        >
-            ⓩ
-        </span>
-
-        <span v-if="label">
+        <span v-if="label" class="label-text">
             {{ label }}
         </span>
 
@@ -87,23 +80,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "src/renderer/styles/colors";
+
 .payment-request-label {
-    color: gray;
-
-    .payment-request-warning {
-        font-style: italic;
-    }
+    color: $color-text-disabled;
 }
 
-.private-icon {
-    color: green;
-}
-
-.mint-label {
-    font-style: italic;
-}
-
-.mined-label {
+td > span:not(.label-text) {
     font-style: italic;
 }
 </style>

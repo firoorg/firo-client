@@ -17,7 +17,7 @@ module.exports = {
         settings: false // gui
     },
 
-    ZcoinPayment: {
+    FiroPayment: {
         pendingPayments: [],
         selectedFee: 'fast',
         availableFees: {
@@ -44,7 +44,7 @@ module.exports = {
             totalTxFee: 100000
         },
         isLoading: false,
-        sendZcoinResponse: {
+        sendFiroResponse: {
             _meta: null,
             data: null,
             error: null
@@ -132,7 +132,7 @@ module.exports = {
     },
 
     Settings: { // daemon: isSubscription
-        // blockchainLocation: '~/Library/Application Support/zcoin', // daemon // has, set
+        // blockchainLocation: '~/Library/Application Support/firo', // daemon // has, set
         percentageToHoldInZerocoin: 1.0,
         xzcZerocoinRatioNotified: -1,
 
@@ -173,8 +173,8 @@ module.exports = {
             }
         },
         explorer: {
-            test: 'https://testexplorer.zcoin.io/%s/%s',
-            main: 'https://explorer.zcoin.io/%s/%s',
+            test: 'https://testexplorer.firo.io/%s/%s',
+            main: 'https://explorer.firo.io/%s/%s',
             regtest: 'https://regtestexplorer.invalid/%s/%s'
         }
     },

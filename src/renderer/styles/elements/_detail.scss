@@ -1,7 +1,6 @@
 @mixin detail-wrap() {
     background: $color--white;
     padding: emRhythm(10) emRhythm(5) emRhythm(5);
-    // text-align: center;
     color: $color--dark;
 
     display: grid;
@@ -17,7 +16,6 @@
 
     .inner {
         position: relative;
-        // text-align: left;
         z-index: 2;
         padding-top: emRhythm(4);
         padding-bottom: emRhythm(1);
@@ -26,22 +24,17 @@
         mix-blend-mode: multiply;
 
         /deep/ h2 {
-            @include typo-headline();
-            margin: emRhythm(1, $ms-up2) 0;
+            margin: emRhythm(1);
             mix-blend-mode: multiply;
-            // color: $heading-color;
         }
 
         & > span {
-            @include font-medium();
             font-style: italic;
             color: $color--comet-dark;
         }
     }
 
     .status {
-        //max-width: emRhythm(25);
-        //margin: 0 auto;
         opacity: 1;
         display: flex;
         position: absolute;
@@ -49,26 +42,21 @@
         left: 0;
         bottom: 0;
         z-index: 1;
-        //max-height: 4rem;
 
         & > div {
-            //max-height: 7rem;
             margin-top: emRhythm(-3);
-            //border: 1px solid rgba(red, 0.2);
-            //margin: auto 0;
         }
     }
 
     .status {
-        //border: 1px solid green;
         width: emRhythm(15);
-        margin-left: emRhythm(-1.25, $silent: true);
+        margin-left: emRhythm(-1.25);
         margin-bottom: emRhythm(-1);
 
         &.outgoing-icon {
             &> div {
-                margin-top: emRhythm(-4, $silent: true);
-                margin-bottom: emRhythm(4, $silent: true);
+                margin-top: emRhythm(-4);
+                margin-bottom: emRhythm(4);
             }
         }
     }

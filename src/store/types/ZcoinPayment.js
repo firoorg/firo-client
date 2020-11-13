@@ -3,8 +3,8 @@ import Payment from 'store/mixins/Payments'
 import Response from 'store/mixins/Response'
 
 const isLoading = IsLoading.module('')
-const pendingPayment = Payment.types('zcoin')
-const sendZcoinResponse = Response.types('send zcoin')
+const pendingPayment = Payment.types('firo')
+const sendFiroResponse = Response.types('send firo')
 
 // export const SET_INITIAL_STATE = 'SET_INITIAL_STATE'
 export const IS_LOADING = 'IS_LOADING'
@@ -41,5 +41,5 @@ export const ON_SEND_ZCOIN_ERROR = 'ON_SEND_ZCOIN_ERROR'
 export default {
     ...isLoading,
     ...pendingPayment,
-    ...sendZcoinResponse
+    ...sendFiroResponse
 }

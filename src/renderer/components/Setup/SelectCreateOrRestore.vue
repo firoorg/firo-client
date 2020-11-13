@@ -1,41 +1,27 @@
 <template>
     <div class="select-create-or-restore">
-        <h2>
+        <div class="title">
             Do you want to create a new wallet or restore with a mnemonic?
-        </h2>
+        </div>
 
         <div class="buttons">
-            <BaseButton
-                @click="goBack"
-                class="button"
-                color="comet"
-            >
+            <button @click="goBack">
                 Go Back
-            </BaseButton>
+            </button>
 
-            <BaseButton
-                @click="writeDownMnemonic"
-                id="create-new-wallet"
-                class="button"
-                color="green"
-            >
+            <button @click="writeDownMnemonic">
                 Create New Wallet
-            </BaseButton>
+            </button>
 
-            <BaseButton
-                @click="recoverFromMnemonic"
-                id="recover-from-mnemonic"
-                class="button"
-                color="green"
-            >
+            <button @click="recoverFromMnemonic">
                 Recover from a Mnemonic
-            </BaseButton>
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-import {generateMnemonic} from "daemon/zcoind";
+import {generateMnemonic} from "daemon/firod";
 
 export default {
     name: 'SelectCreateOrRestore',
@@ -71,23 +57,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.select-create-or-restore {
-    width: fit-content;
+@import "src/renderer/styles/popup";
+@import "src/renderer/styles/sizes";
+
+@include popup();
+.title {
+    margin-bottom: $size-medium-space;
 
     .buttons {
-        width: fit-content;
-
-        margin: {
-            top: 20px;
-            left: auto;
-            right: auto;
-        }
-
-        .button {
-            &:not(:first-child) {
-                margin-left: 1em;
-            }
-        }
+        justify-content: space-between;
     }
 }
 </style>

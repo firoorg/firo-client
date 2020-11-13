@@ -17,7 +17,7 @@ const ADDRESS_PREFIXES = {
     }
 };
 
-// Is address a valid address on the Zcoin {network} network?
+// Is address a valid address on the Firo {network} network?
 export function isValidAddress(address: string, network: 'test' | 'main' | 'regtest'): boolean {
     let addressData;
 

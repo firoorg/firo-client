@@ -2,20 +2,12 @@
     .field {
         margin-bottom: emRhythm(3);
 
-        &.has-error {
-            input[type="text"] {
-                // border-bottom-color: $color--red-bright;
-            }
-        }
-
         & > label {
             display: block;
-            @include font-heavy();
             padding-bottom: emRhythm(1);
         }
 
         & > .description {
-            //@include font-medium();
             display: block;
             @include description(100%);
             color: $color--comet;
@@ -45,7 +37,6 @@
 
         input[type="text"],
         input[type="password"] {
-            @include setType(5);
         }
 
         input[type="text"],
@@ -57,16 +48,14 @@
         .prefix {
             position: absolute;
             top: 0;
-            right: emRhythm($input-bleed) * -1;
-            padding-right: emRhythm($input-bleed);
+            right: -#{emRhythm($input-bleed)};
+            padding-right: -#{emRhythm($input-bleed)};
             height: 100%;
-            @include setType(5);
             pointer-events: none;
         }
 
         .message {
             padding: emRhythm(2);
-            @include setType(3);
         }
     }
 }

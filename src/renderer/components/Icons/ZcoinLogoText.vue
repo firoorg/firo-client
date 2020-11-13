@@ -1,20 +1,20 @@
 <template>
-    <zcoin-logo class="zcoin-logo-text" />
+    <firo-logo class="firo-logo-text" />
 </template>
 
 <script>
-import ZcoinLogo from 'renderer/assets/zcoin-logo-text.svg'
+import FiroLogo from 'renderer/assets/firo-logo-text.svg'
 
 export default {
     name: 'LogoText',
     components: {
-        ZcoinLogo
+        FiroLogo
     }
 }
 </script>
 
 <style scoped>
-    .zcoin-logo-text {
+    .firo-logo-text {
         @include drop-shadow();
     }
 </style>

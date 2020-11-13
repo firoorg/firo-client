@@ -83,106 +83,54 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: emRhythm(5);
-        text-align: center;
-        user-select: none;
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/sizes";
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: $size-tiny-space;
+    text-align: center;
+    user-select: none;
+
+}
+
+a {
+    display: inline-block;
+    color: $color-text;
+    cursor: pointer;
+}
+
+.icon {
+    padding: $size-tiny-space;
+
+    &.disabled {
+        cursor: default;
+        color: $color-text-disabled;
     }
+}
 
+.numbers {
+    background: lighten($color-main-background, 20%);
+    border-radius: $size-tiny-space;
+    overflow: hidden;
+    padding: {
+        left: $size-tiny-space;
+        right: $size-tiny-space;
+    }
     a {
-        display: inline-block;
-        color: $color--comet;
-        @include font-heavy();
-        cursor: pointer;
-    }
+        padding: $size-tiny-space;
+        color: $color-text;
 
-    .icon {
-        @include setType(1, $ms-up1);
-        padding: emRhythm(0.5, $silent: true) emRhythm(0.5, $silent: true);
-
-        &:not(.disabled) {
-            color: $color--comet;
-
-            &:hover,
-            &:focus {
-                color: $color--dark;
-            }
+        &:hover,
+        &:focus {
+            background: $color-input-background;
         }
 
-        &.disabled {
-            color: $color--comet-medium;
-            cursor: default;
+        &.active {
+            background: darken($color-main-background, 5%);
         }
     }
-
-    .numbers {
-        background: $color--white-light;
-        border-radius: emRhythm(1);
-        overflow: hidden;
-        margin-left: emRhythm(1.5, $silent: true);
-        margin-right: emRhythm(1.5, $silent: true);
-
-        a {
-            padding: emRhythm(0.5, $silent: true) emRhythm(1.5, $silent: true);
-            color: $color--polo;
-
-            &:hover,
-            &:focus {
-                background: $color--white;
-                color: $color--polo-dark;
-            }
-
-            &.active {
-                background: $color--polo;
-                color: $color--white;
-            }
-        }
-    }
-
-    .pagination.dark {
-        a {
-            color: $color--comet-medium;
-            color: blue;
-        }
-
-        .icon {
-            &:not(.disabled) {
-                color: $color--dark;
-                //color: $color--comet;
-
-                &:hover,
-                &:focus {
-                    color: $color--white;
-                    //color: $color--dark;
-                }
-            }
-
-            &.disabled {
-                color: $color--comet-dark-mixed;
-            }
-        }
-
-        .numbers {
-            background: $color--comet-dark-mixed;
-
-            a {
-                color: mix($color--comet-dark, $color--comet);
-
-                &:hover,
-                &:focus {
-                    background: $color--comet-medium;
-                    color: $color--dark;
-                }
-
-                &.active {
-                    background: $color--comet-light;
-                    color: $color--dark;
-                }
-            }
-        }
-    }
+}
 </style>

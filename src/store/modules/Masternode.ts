@@ -1,8 +1,8 @@
 import {cloneDeep} from 'lodash';
-import {MasternodeEvent} from '../../daemon/zcoind';
+import {MasternodeEvent} from '../../daemon/firod';
 
 import { createLogger } from '../../lib/logger'
-const logger = createLogger('zcoin:store:Masternode');
+const logger = createLogger('firo:store:Masternode');
 
 const state = {
     masternodes: <{[proTxHash: string]: MasternodeEvent}>{},
@@ -31,7 +31,7 @@ const actions = {
 };
 
 const getters = {
-    // a map of `${txid}-${txIndex}` to the full transaction object returned from zcoind
+    // a map of `${txid}-${txIndex}` to the full transaction object returned from firod
     masternodes: (state) => state.masternodes,
 };
 

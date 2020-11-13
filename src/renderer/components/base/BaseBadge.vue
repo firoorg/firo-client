@@ -33,13 +33,11 @@ export default {
     }
 
     .badge {
-        @include setType(2, $ms-down1);
         background: $gradient--comet-dark-horizontal;
-        padding: emRhythm(0.25, $silent: true) emRhythm(0.75, $silent: true) emRhythm(0.35, $silent: true);
+        padding: emRhythm(0.25) emRhythm(0.35);
         display: inline-block;
         color: $color--white;
-        @include font-heavy();
-        border-radius: emRhythm(0.5, $silent: true);
+        border-radius: emRhythm(0.5);
         text-align: center;
 
         position: absolute;

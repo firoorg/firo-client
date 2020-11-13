@@ -1,279 +1,196 @@
 <template>
-    <section class="settings-page">
-        <div class="window-height">
-            <div>
-                <div class="settings-page-inner">
-                    <h1>
-                        <span>{{ $t('settings.overview.title') }}</span>
+    <div class="settings-page">
+        <Popup v-if="errorMessage">
+            <ErrorStep :error="errorMessage" @ok="() => errorMessage = null" />
+        </Popup>
 
-                        <div class="version">
-                            Zcoin Client v{{ zcoinClientVersion }}
-                        </div>
-                    </h1>
+        <Popup v-if="successMessage">
+            <SuccessMessage :message="successMessage" @ok="() => successMessage = null" />
+        </Popup>
 
-                    <section class="interface">
-                        <h2>{{ $t('settings.form.interface.title') }}</h2>
-                        <div class="form">
-                            <language-settings class="language-settings" />
+        <Popup v-if="showMnemonicPassphrasePopup">
+            <SendStepPassphrase
+                v-model="mnemonicPassphrase"
+                :error="mnemonicPassphraseError"
+                @cancel="clearMnemonicPassphrasePopup"
+                @confirm="tryShowMnemonicRecoveryPhrase"
+            />
+        </Popup>
 
-                            <blockchain-explorer-settings class="blockchain-explorer-settings" />
-                        </div>
-                    </section>
+        <h1 class="header">
+            firo client v2.0.0
+        </h1>
 
-                    <section class="privacy">
-                        <h2>{{ $t('settings.form.privacy.title') }}</h2>
-                        <div class="form">
-                            <connect-via-tor-settings
-                                class="connection-settings"
-                                @toggle-tor="restartDaemon"
-                            />
+        <hr class="hr1" />
 
-                            <amount-to-hold-in-zerocoin-settings />
-                        </div>
-                    </section>
+        <div class="pure-buttons">
+            <button @click="openBackupDialog">
+                Backup Wallet
+            </button>
 
-                    <section class="passphrase">
-                        <h2>Passphrase</h2>
+            <button @click="redoSetup">
+                Redo Setup
+            </button>
+        </div>
 
-                        <form class="form">
-                            <div class="field">
-                                <label>Current Passphrase:</label>
-                                <input
-                                    v-model="currentPassphrase"
-                                    id="current-passphrase"
-                                    type="password"
-                                />
-                            </div>
+        <div class="tor-settings">
+            <div class="guidance">
+                Enabling Tor will increase your anonymity by hiding the IP address you connect to the Firo network with.
+            </div>
 
-                            <div class="field">
-                                <label>New Passphrase:</label>
-                                <input
-                                    v-model="newPassphrase"
-                                    id="new-passphrase"
-                                    name="newPassphrase"
-                                    type="password"
-                                    :class="passphraseBoxClass"
-                                />
-                            </div>
-
-                            <div class="field">
-                                <label>Confirm New Passphrase:</label>
-                                <input
-                                    v-model="confirmNewPassphrase"
-                                    id="confirm-new-passphrase"
-                                    name="confirmNewPassphrase"
-                                    type="password"
-                                    :class="passphraseBoxClass"
-                                />
-                            </div>
-                        </form>
-
-                        <v-popover
-                            placement="top-end"
-                            popover-class="tooltip popover multi-step-popover"
-                            class="change-passphrase-button-popover-container"
-                            trigger="manually"
-                            :open="openPassphrasePopover"
-                            :auto-hide="true"
-                            :handle-resize="true"
-                            @hide="closePassphrasePopover"
-                        >
-                            <base-button
-                                :disabled="!canChangePassphrase"
-                                id="change-passphrase-button"
-                                color="green"
-                                @click="changePassphrase"
-                            >
-                                Change Passphrase
-                            </base-button>
-
-                            <template slot="popover">
-                                <div class="close-dialog-button">
-                                    <a
-                                        href="#"
-                                        id="close-passphrase-dialog-button"
-                                        @click.prevent="closePassphrasePopover"
-                                    >
-                                        X
-                                    </a>
-                                </div>
-
-                                <div class="content-wrapper">
-                                    <div v-if="!changePassphraseError" id="passphrase-change-successful">
-                                        Passphrase changed successfully.
-                                    </div>
-
-                                    <div v-else id="passphrase-change-error">
-                                        {{ changePassphraseError }}
-                                    </div>
-                                </div>
-                            </template>
-                        </v-popover>
-                    </section>
-                    <div v-if="apiStatus.data.hasMnemonic" class="mnemonic-setting">
-                        <u><a
-                                :style="{ cursor: 'pointer'}"
-                                @click.prevent="openMnemonicSettings()"                            >
-                            <b>Show my mnemonic recovery phrase</b>
-                            </a>
-                        </u>
-                    </div>
-                    <ShowMnemonicSettings v-if="showMnemonicSetting" @close-mnemonic="closeMnemonicDialog"/>
-
-                    <div class="buttons">
-                        <div class="backup button">
-                            <h2>Backup</h2>
-
-                            <v-popover
-                                :open="popoverStep !== 'initial'"
-                                placement="top-end"
-                                popover-class="tooltip popover multi-step-popover"
-                                class="send-button-popover-container"
-                                trigger="manually"
-                                :auto-hide="false"
-                                :handle-resize="true"
-                            >
-                                <base-button
-                                    color="green"
-                                    @click="openBackupDialog"
-                                >
-                                    Backup Zcoin Data
-                                </base-button>
-
-                                <template slot="popover">
-                                    <div class="close-dialog-button">
-                                        <a
-                                            @click.prevent="closePopover"
-                                            href="#"
-                                        >
-                                            X
-                                        </a>
-                                    </div>
-
-                                    <div class="content-wrapper">
-                                        <div v-if="popoverStep === 'wait'">
-                                            Please wait...
-                                        </div>
-
-                                        <div v-if="popoverStep === 'success'">
-                                            Backup succeeded!
-                                        </div>
-
-                                        <div v-if="popoverStep === 'error'">
-                                            {{ errorMessage }}
-                                        </div>
-                                    </div>
-                                </template>
-                            </v-popover>
-                        </div>
-
-                        <div class="button reset-config">
-                            <h2>Reset Network and Data Directory</h2>
-
-                            <base-button color="green" @click="showSetupScreenAgain">
-                                Reset Configuration
-                            </base-button>
-                        </div>
-                    </div>
-                </div>
+            <div class="tor-checkbox-line">
+                <input type="checkbox" v-model="useTor" />
+                <label>
+                    Connect to Other Nodes via Tor
+                </label>
             </div>
         </div>
-    </section>
+
+        <hr class="hr2" />
+
+        <div class="detail-buttons">
+            <button :class="{active: showDetail === 'passphrase'}" @click="showPassphrase">
+                Change Passphrase
+            </button>
+
+            <button v-if="hasMnemonic" :class="{active: showDetail === 'mnemonic'}" @click="() => showMnemonicPassphrasePopup = true">
+                Show Mnemonic Recovery Phrase
+            </button>
+        </div>
+
+        <div class="detail">
+            <div v-if="showDetail === 'passphrase'" class="change-passphrase">
+                <div class="passphrase-inputs">
+                    <label>Current Passphrase:</label>
+                    <input type="password" v-model="currentPassphrase" />
+
+                    <label>New Passphrase:</label>
+                    <input type="password" v-model="newPassphrase" :class="{matching: passphrasesMatch}" />
+
+                    <label>Confirm Passphrase:</label>
+                    <input type="password" v-model="confirmNewPassphrase" :class="{matching: passphrasesMatch}" />
+                </div>
+
+                <div class="buttons">
+                    <button :disabled="!canChangePassphrase" :class="{active: canChangePassphrase}" @click="changePassphrase">
+                        Change Passphrase
+                    </button>
+                </div>
+            </div>
+
+            <SmallMnemonic v-if="showDetail === 'mnemonic'" :words="mnemonicWords" />
+        </div>
+    </div>
 </template>
 
 <script>
 import {mapGetters} from 'vuex'
 import {remote} from 'electron';
-import BlockchainExplorerSettings from 'renderer/components/SettingsPage/BlockchainExplorerSettings'
-import LanguageSettings from 'renderer/components/SettingsPage/LanguageSettings'
-import ConnectViaTorSettings from 'renderer/components/SettingsPage/ConnectViaTorSettings'
-import AmountToHoldInZerocoinSettings from 'renderer/components/SettingsPage/AmountToHoldInZerocoinSettings'
-import ShowMnemonicSettings from 'renderer/components/SettingsPage/ShowMnemonicSettings'
-
-const zcoinClientVersion = require('../../../package.json').version;
+import Popup from './Popup';
+import ErrorStep from "./SendPage/ErrorStep";
+import SmallMnemonic from "./SettingsPage/SmallMnemonic";
+import {IncorrectPassphrase} from "daemon/firod";
+import SendStepPassphrase from "renderer/components/SendPage/PassphraseStep";
+import SuccessMessage from "renderer/components/SuccessMessage";
 
 export default {
     name: 'SettingsPage',
 
     components: {
-        AmountToHoldInZerocoinSettings,
-        ConnectViaTorSettings,
-        LanguageSettings,
-        BlockchainExplorerSettings,
-        ShowMnemonicSettings
+        SendStepPassphrase,
+        Popup,
+        ErrorStep,
+        SmallMnemonic,
+        SuccessMessage
     },
 
     computed: {
         ...mapGetters({
-            apiStatus: 'ApiStatus/apiStatus'
+            apiStatus: 'ApiStatus/apiStatus',
+            hasMnemonic: 'ApiStatus/hasMnemonic'
         }),
 
-        passphraseBoxClass () {
-            return this.confirmNewPassphrase && (this.newPassphrase !== this.confirmNewPassphrase) ?
-                'non-matching'
-                :
-                'matching';
+        passphrasesMatch () {
+            return !this.confirmNewPassphrase || this.newPassphrase === this.confirmNewPassphrase;
         },
 
         canChangePassphrase () {
-            return this.currentPassphrase && this.newPassphrase && (this.newPassphrase === this.confirmNewPassphrase) && !this.openPassphrasePopover;
+            return this.currentPassphrase && this.newPassphrase && (this.newPassphrase === this.confirmNewPassphrase);
         }
     },
 
     data () {
         return {
-            popoverStep: 'initial',
-            errorMessage: '',
-            changePassphraseError: '',
+            useTor: $store.getters['Settings/isConnectedViaTor'],
+            showDetail: 'passphrase', // 'passphrase' | 'mnemonic'
             currentPassphrase: '',
             newPassphrase: '',
             confirmNewPassphrase: '',
-            openPassphrasePopover: false,
-            zcoinClientVersion,
-            showMnemonicSetting: false
+            changePassphraseError: null,
+            showMnemonicPassphrasePopup: false,
+            mnemonicPassphrase: '',
+            mnemonicPassphraseError: null,
+            mnemonicWords: [],
+            successMessage: null,
+            errorMessage: null
+        };
+    },
+
+    watch: {
+        async useTor() {
+            $setWaitingReason("Restarting daemon...");
+            await $daemon.updateSettings({torsetup: this.useTor ? '1' : '0'});
+            await $daemon.stopDaemon();
+            await $startDaemon();
         }
     },
 
-    mounted() {
-        this.$on('close-mnemonic', this.closeMnemonicDialog);
-    },
-
     methods: {
-        async restartDaemon() {
-            $setWaitingReason("Restarting daemon...");
-            await $daemon.stopDaemon();
+        showPassphrase() {
+            this.showDetail = 'passphrase';
+            this.mnemonicWords = [];
+        },
 
-            await $startDaemon();
+        clearMnemonicPassphrasePopup() {
+            this.mnemonicPassphrase = '';
+            this.mnemonicPassphraseError = null;
+            this.showMnemonicPassphrasePopup = false;
+        },
+
+        async tryShowMnemonicRecoveryPhrase() {
+            if (this.showDetail === 'mnemonic') return;
+
+            try {
+                this.mnemonicWords = await $daemon.showMnemonics(this.mnemonicPassphrase);
+                this.clearMnemonicPassphrasePopup();
+                this.showDetail = 'mnemonic';
+            } catch (e) {
+                this.mnemonicPassphrase = '';
+                if (e instanceof IncorrectPassphrase) {
+                    this.mnemonicPassphraseError = 'Incorrect Passphrase';
+                } else {
+                    this.mnemonicPassphraseError = `${e}`;
+                }
+            }
         },
 
         async changePassphrase() {
-            if (!this.canChangePassphrase) {
-                return;
-            }
+            if (!this.canChangePassphrase) return;
 
             try {
                 await $daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
+                this.newPassphrase = '';
+                this.confirmNewPassphrase = '';
+                this.successMessage = 'Passphrase Changed!'
             } catch (e) {
-                if (e.name === 'IncorrectPassphrase') {
-                    this.changePassphraseError = 'Incorrect Passphrase';
-                } else if (e.error && e.error.message) {
-                    this.changePassphraseError = e.error.message;
+                if (e instanceof IncorrectPassphrase) {
+                    this.errorMessage = 'Incorrect Passphrase';
                 } else {
-                    this.changePassphraseError = JSON.stringify(e);
+                    this.errorMessage = `${e}`;
                 }
             }
 
-            this.openPassphrasePopover = true;
-        },
-
-        async closeMnemonicDialog() {
-            this.showMnemonicSetting = false;
-        },
-
-        // This also needs to be called on popover auto-close to cleanup data.
-        closePassphrasePopover() {
-            this.changePassphraseError = '';
-            this.openPassphrasePopover = false;
+            this.currentPassphrase = '';
         },
 
         async openBackupDialog() {
@@ -293,22 +210,13 @@ export default {
 
             try {
                 await $daemon.backup(backupDirectory);
-                this.popoverStep = 'success';
+                this.successMessage = 'Your wallet.dat has been backed up.';
             } catch (e) {
                 this.errorMessage = (e.error && e.error.message) ? e.error.message : String(e);
-                this.popoverStep = 'error';
             }
         },
 
-        openMnemonicSettings() {
-            this.showMnemonicSetting = true;
-        },
-
-        closePopover() {
-            this.popoverStep = 'initial';
-        },
-
-        async showSetupScreenAgain() {
+        async redoSetup() {
             if (!confirm("Are you sure you want to reset the configuration?")) {
                 return;
             }
@@ -321,88 +229,106 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.version {
-    font: {
-        style: italic;
-        weight: normal;
-        size: 0.5em;
-    }
-}
+@import "src/renderer/styles/sizes";
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/typography";
+@import "src/renderer/styles/inputs";
 
 .settings-page {
-    box-sizing: border-box;
-    overflow-y: auto;
-}
+    padding: $size-main-margin;
+    display: grid;
+    grid-template-columns: 2fr 4fr 1fr;
+    grid-template-areas: "header         header"
+                         "hr1            hr1"
+                         "pure-buttons   tor-settings"
+                         "hr2            hr2"
+                         "detail-buttons detail";
 
-.settings-page-inner {
-    padding: emRhythm(5) emRhythm(8) emRhythm(5) emRhythm(4);
-}
-
-.interface .form {
-    .language-settings {
-        .control {
-            margin-left: emRhythm(-2);
-        }
-    }
-}
-
-.passphrase {
-    display: table;
-
-    .line {
-        display: table-row;
-
-        .left, .right {
-            display: table-cell;
-            width: max-content;
-        }
+    .pure-buttons, .detail-buttons {
+        padding-right: $size-main-margin;
     }
 
-    .form {
-        width: max-content;
+    .tor-settings, .detail {
+        padding-left: $size-main-margin;
+    }
 
-        .field {
-            display: table-row;
+    button {
+        width: $size-medium-button-width;
+    }
 
-            label, input {
-                display: table-cell;
+    label {
+        @include label();
+    }
+
+    hr {
+        width: 100%;
+        margin: {
+            top: $size-medium-space;
+            bottom: $size-medium-space
+        }
+
+        &.hr1 {
+            grid-area: hr1;
+        }
+
+        &.hr2 {
+            grid-area: hr2;
+        }
+    }
+
+    .header {
+        grid-area: header;
+    }
+
+    .pure-buttons {
+        grid-area: pure-buttons;
+        @include buttons-vertical-container();
+    }
+
+    .tor-settings {
+        grid-area: tor-settings;
+
+        .guidance {
+            @include guidance();
+            margin-bottom: $size-between-field-space-medium;
+        }
+    }
+
+    .detail-buttons {
+        grid-area: detail-buttons;
+        @include buttons-vertical-container();
+    }
+
+    .detail {
+        grid-area: detail;
+
+        .change-passphrase {
+            .passphrase-inputs {
+                display: grid;
+                grid-row-gap: $size-between-field-space-medium;
+                grid-template-columns: 1fr 2fr;
             }
 
-            label {
-                padding-right: 2em;
+            input[type="password"] {
+                @include rounded-input();
             }
 
-            input {
-                background-color: $color--comet-medium;
-                border: none;
-                height: 1.5em;
-                width: 30em;
+            .change-passphrase-error {
+                text-align: center;
+                margin-top: $size-between-field-space-medium;
+                @include error();
+            }
 
-                &.non-matching {
-                    outline-style: auto;
-                    outline-color: red;
+            .buttons {
+                margin-top: $size-between-field-space-medium;
+                @include buttons-vertical-container;
+
+                button {
+                    width: fit-content;
+                    margin: auto;
                 }
             }
         }
     }
-}
-
-.close-dialog-button {
-    margin-top: 0.5em;
-    margin-right: 1em;
-    margin-bottom: -2em;
-    text-align: right;
-    a {
-        color: white;
-    }
-}
-
-.mnemonic-setting {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-.show-setup-screen-again {
-    margin-top: 1em;
 }
 </style>

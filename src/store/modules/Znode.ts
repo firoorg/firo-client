@@ -1,7 +1,7 @@
 import { createLogger } from '../../lib/logger';
-const logger = createLogger('zcoin:store:Znode');
+const logger = createLogger('firo:store:Znode');
 
-// zcoind will return information about Znodes in a slightly different format before we sync, but we don't need to show
+// firod will return information about Znodes in a slightly different format before we sync, but we don't need to show
 // that in the UI, so we don't keep any state for it.
 interface Znode {
     payeeAddress: string;
@@ -35,7 +35,7 @@ type ZnodeList = {[txid: string]: Znode};
 
 const state = {
     znodes: <ZnodeList>{},
-    // This is its own entry and not a getter for the lenth of znodes because it's supplied to us by zcoind before
+    // This is its own entry and not a getter for the lenth of znodes because it's supplied to us by firod before
     // the list of znodes is synced.
     znodeCount: 0
 };

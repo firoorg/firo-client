@@ -1,0 +1,111 @@
+@import "./colors";
+@import "./sizes";
+@import "./typography";
+
+@mixin rounded-input() {
+    background-color: $color-input-background;
+    font-family: "Source Sans Pro";
+    opacity: 0.7;
+
+    box-shadow: $size-shadow-radius $size-shadow-radius $size-shadow-radius 0 $color-shadow;
+
+    border: {
+        width: 0;
+        radius: $size-shadow-radius;
+    }
+
+    padding: {
+        top: $size-rounded-input-vertical-padding;
+        bottom: $size-rounded-input-vertical-padding;
+        left: $size-rounded-input-horizontal-padding;
+        right: $size-rounded-input-horizontal-padding;
+    }
+
+    &, &::placeholder {
+        outline: none;
+    }
+
+    &:active {
+        border: none;
+    }
+}
+
+@mixin wide-rounded-input() {
+    @include rounded-input();
+    width: $size-large-field-width;
+}
+
+@mixin undecorated-button() {
+    cursor: pointer;
+    background-color: inherit;
+    border-radius: 25px;
+    border-width: 0;
+
+    &:focus {
+        outline: none;
+    }
+
+    font-weight: bold;
+}
+
+@mixin button {
+    background-color: $color-big-button;
+    color: $color-big-button-text;
+    font-weight: bold;
+
+    &:focus {
+        outline: none;
+    }
+
+    &:not([disabled]) {
+        cursor: pointer;
+    }
+
+    &[disabled] {
+        opacity: 0.4;
+    }
+
+    &.disrecommended {
+        opacity: 0.6;
+    }
+
+    &.active {
+        color: white;
+        background-color: $firo-brick-red;
+        border: none;
+        font-weight: bold;
+    }
+}
+
+@mixin buttons-container {
+    height: 30px;
+    margin: auto;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+
+    button {
+        flex-grow: 1;
+        @include button();
+
+        &:not(:first-child) {
+            margin-left: $size-small-space;
+        }
+    }
+}
+
+@mixin buttons-vertical-container {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+
+    button {
+        height: 30px;
+        flex-grow: 1;
+        @include button();
+
+        &:not(:first-child) {
+            margin-top: $size-small-space;
+        }
+    }
+}

@@ -1,10 +1,10 @@
 <template>
-    <div class="mnemonic-screen confirm-mnemonic">
-        <div class="guidance">
+    <div class="confirm-mnemonic">
+        <div class="title">
             Enter the missing words from your mnemonic recovery phrase below:
         </div>
 
-        <div class="mnemonic">
+        <div class="content">
             <template v-for="(_, n) in 24">
                 <input v-if="hiddenWordPositions.includes(n)"
                     :class="['mnemonic-word', 'hidden', isVerified ? 'verified' : 'unverified']"
@@ -21,13 +21,13 @@
         </div>
 
         <div class="buttons">
-            <BaseButton @click="goBack" id="go-back" class="button" color="comet" tabindex="-1">
+            <button @click="goBack" tabindex="-1">
                 Back
-            </BaseButton>
+            </button>
 
-            <BaseButton @click="goToConfirmLockWallet" class="button" id="submit-button" color="green" tabindex="-1" :disabled="!isVerified">
+            <button @click="goToConfirmLockWallet" tabindex="-1" :disabled="!isVerified">
                 Submit
-            </BaseButton>
+            </button>
         </div>
     </div>
 </template>
@@ -92,5 +92,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/_mnemonic.scss';
+@import 'src/renderer/styles/mnemonic';
+@import 'src/renderer/styles/popup';
+
+@include popup()
+
+.confirm-mnemonic * {
+    user-select: none;
+}
+
+.content {
+    @include mnemonic();
+}
+
+.buttons {
+    width: fit-content;
+}
 </style>

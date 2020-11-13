@@ -1,54 +1,58 @@
 <template>
-    <div id="setup-layout">
-        <div id="logo">
-            <ZcoinLogo />
+    <div class="setup-layout">
+        <div class="logo">
+            <FiroLogoDark />
         </div>
 
-        <router-view id="setup-child" />
+        <router-view class="setup-child" />
     </div>
 </template>
 
 <script>
-import ZcoinLogo from 'renderer/components/Icons/ZcoinLogo';
+import FiroLogoDark from "renderer/assets/FiroLogoDark.svg";
 
 export default {
     name: "SetupLayout",
 
     components: {
-        ZcoinLogo
+        FiroLogoDark
     }
 }
 </script>
 
 <style scoped lang="scss">
-#setup-layout {
-    background-color: $color--comet-dark;
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    left: 0;
-    top: 0;
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/sizes";
 
-    #logo {
-        height: emRhythm(13);
-        width: emRhythm(13);
+.setup-layout {
+    position: fixed;
+    background-color: $color-setup-background;
+    height: 100vh;
+    width: 100vw;
+
+    .logo {
+        width: fit-content;
         margin: {
             left: auto;
             right: auto;
-            top: emRhythm(5);
+            top: $size-large-space;
         };
+
+        svg {
+            height: $size-setup-logo-height;
+        }
     }
 
-    #setup-child {
-        background-color: $color--comet-light;
-        padding: 2em;
-        border-radius: 2em;
+    .setup-child {
+        background-color: $color-setup-foreground;
+        padding: $size-small-space;
+        border-radius: $size-small-space;
         max-width: 90%;
-        height: fit-content;
+        width: fit-content;
         margin: {
+            top: $size-large-space;
             left: auto;
             right: auto;
-            top: emRhythm(5);
         };
     }
 }

@@ -1,13 +1,13 @@
 export default [
     ...(process.platform === 'darwin' ? [{
-        label: 'Zcoin Client',
+        label: 'Firo Client',
         submenu: [
-            {role: 'about', label: 'About Zcoin Client'},
-            {role: 'hide', label: 'Hide Zcoin Client'},
+            {role: 'about', label: 'About Firo Client'},
+            {role: 'hide', label: 'Hide Firo Client'},
             {role: 'hideothers'},
             {role: 'unhide'},
             {type: 'separator'},
-            {role: 'quit', label: 'Quit Zcoin Client'}
+            {role: 'quit', label: 'Quit Firo Client'}
         ]
     }] : []),
 

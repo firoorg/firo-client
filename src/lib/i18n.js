@@ -7,7 +7,7 @@ import dateTimeFormats from 'lang/dateTimeFormats'
 
 import { createLogger } from 'lib/logger'
 
-const logger = createLogger('zcoin:i18n')
+const logger = createLogger('firo:i18n')
 
 let i18nInstance = null
 

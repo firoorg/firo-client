@@ -1,5 +1,5 @@
-import { Zcoind } from '../zcoind';
+import { Firod } from '../firod';
 
-export function handleEvent(store, zcoind: Zcoind, eventData: any) {
+export function handleEvent(store, firod: Firod, eventData: any) {
     store.dispatch('ApiStatus/setApiStatus', eventData);
 }

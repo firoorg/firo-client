@@ -18,7 +18,6 @@ export default {
         //@include box-shadow-large($color--polo-medium);
         @include glow-huge-box($color--polo-medium);
 
-        @include lato-font('regular');
         font-style: italic;
         color: $color--comet;
         -webkit-font-smoothing: subpixel-antialiased;

@@ -20,7 +20,7 @@
             <div style="text-align:center">
               <h4>
                 <i
-                  >You can do this by going to Settings > Backup > Backup Zcoin
+                  >You can do this by going to Settings > Backup > Backup Firo
                   Data and Saving it in a secure location.</i
                 >
               </h4>

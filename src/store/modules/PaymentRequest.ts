@@ -1,5 +1,5 @@
 import { createLogger } from '../../lib/logger';
-const logger = createLogger('zcoin:store:PaymentRequest');
+const logger = createLogger('firo:store:PaymentRequest');
 
 interface PaymentRequest {
     amount: number | undefined;

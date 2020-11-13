@@ -1,19 +1,11 @@
 <template>
-    <div class="waitingScreen">
+    <div class="waiting-screen">
         <div class="inner">
-            <div class="logo">
-                <ZcoinLogo />
-            </div>
+            <h2 class="header-text">
+                Just a Moment...
+            </h2>
 
-            <div class="waiting">
-                <span class="bounce">
-                    <LoadingBounce color="green" />
-                </span>
-
-                <span class="header-text">
-                    Just a Moment...
-                </span>
-            </div>
+            <FiroSymbolWhite />
 
             <div class="reason">
                 {{ reason }}
@@ -23,15 +15,13 @@
 </template>
 
 <script>
-import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
-import ZcoinLogo from 'renderer/components/Icons/ZcoinLogo';
+import FiroSymbolWhite from "renderer/assets/FiroSymbolWhite.svg";
 
 export default {
     name: "WaitingScreen",
 
     components: {
-        LoadingBounce,
-        ZcoinLogo
+        FiroSymbolWhite
     },
 
     props: {
@@ -44,17 +34,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.waitingScreen {
-    // Make the component full-screen.
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    z-index: 40075000;
-    left: 0;
-    top: 0;
-    overflow-x: hidden; /* Disable horizontal scroll */
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/sizes";
+@import "src/renderer/styles/z";
 
-    background-color: $color--comet-dark;
+.waiting-screen {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    z-index: $z-waiting-screen;
+    text-align: center;
+    background-color: $color-loading-background;
 
     .inner {
         // Center .inner horizontally and vertically.
@@ -63,33 +53,19 @@ export default {
         left: 50%;
         transform: translate(-50%, -50%);
 
-        .logo {
-            margin: auto;
-            height: emRhythm(20);
-            width: emRhythm(20);
-        }
-
-        .waiting {
-            color: $color--green;
-            height: min-content;
-            width: fit-content;
-            margin: auto;
-
-            .bounce, .header-text {
-                display: inline-block;
-            }
-
-            .header-text {
-                margin-left: emRhythm(1);
-                font-size: emRhythm(7);
+        svg {
+            width: 20vw;
+            margin: {
+                top: $size-medium-space;
+                bottom: $size-medium-space;
+                left: auto;
+                right: auto;
             }
         }
 
         .reason {
-            text-align: center;
+            color: $color-text-accent;
             font-style: italic;
-            color: $color--comet-light;
-            font-size: emRhythm(3);
         }
     }
 }

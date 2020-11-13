@@ -61,6 +61,7 @@ export default {
         }
 
         &.mini {
+            margin-bottom: -.16em;
             width: emRhythm(2);
             height: emRhythm(2);
         }

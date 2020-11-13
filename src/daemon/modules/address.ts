@@ -1,5 +1,5 @@
-import { Zcoind } from '../zcoind';
+import { Firod } from '../firod';
 
-export function handleEvent(store: any, zcoind: Zcoind, eventData: any) {
+export function handleEvent(store: any, firod: Firod, eventData: any) {
     store.dispatch('Transactions/handleAddressEvent', eventData);
 }

@@ -1,7 +1,7 @@
 import { getAppSettings } from 'lib/utils'
 
 import { createLogger } from 'lib/logger'
-const logger = createLogger('zcoin:appSettings')
+const logger = createLogger('firo:appSettings')
 
 export const populateStoreWithAppSettings = async function ({ store }) {
     for (const [categoryKey, value] of Object.entries(await getAppSettings().getAll())) {

@@ -30,10 +30,10 @@ application-menu:
 
 navigation:
   balance:
-    title: Zcoin Balance
+    title: Firo Balance
   menu:
     button__receive: Receive
-    button__send: Public Send
+    button__send: Public SendPage
     button__mint: Anonymize
     button__spend: Private Spend
     button__znode: Znodes
@@ -43,7 +43,7 @@ navigation:
     label__syncing: Syncing...
     label__peers: Looking for Peers!
   flyout-connections:
-    title: Zcoin Network
+    title: Firo Network
     label__connections: "{0} Connections established"
     label__is-connected-via-tor: "Connected via <strong>Tor</strong>"
     label__not-connected-via-tor: "Connection via <strong>Tor</strong> disabled"
@@ -69,7 +69,7 @@ transaction-list:
 
 receive:
   overview:
-    title: Receive</br>Zcoin
+    title: Receive</br>Firo
     # description
     notice__unseen-payments:
       title: Unseen Payment | Unseen Payments
@@ -119,10 +119,10 @@ receive:
 
 mint:
   overview:
-    title: Anonymize</br>Zcoin
+    title: Anonymize</br>Firo
     description: Anonymize coins now to privately send them later
     stats:
-      available-zcoin-balance: available to anonymize
+      available-firo-balance: available to anonymize
       balance-in-progress: in progress
       zerocoin-balance: already anonymized
 
@@ -192,7 +192,7 @@ send:
       label__label: Label
       placeholder__label: Enter a label for your transaction
       label__address: Address
-      placeholder__address: Add a valid Zcoin address
+      placeholder__address: Add a valid Firo address
       label__amount-selection: Amount
       placeholder__amount-enter: Click to select Mints
       placeholder__amount-select: Select Mints
@@ -226,31 +226,31 @@ send:
       button__has-error--primary: Try Again
 
     flyout-unused-address:
-      title: Unused Zcoin Address found
-      description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
+      title: Unused Firo Address found
+      description: Found a Firo address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Firo publicly?
       label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
 
 
   public:
     overview:
-      title: Send<br>Zcoin
+      title: SendPage<br>Firo
 
     detail-public-send:
-      title: Public Send
+      title: Public SendPage
       description: You can send one or more payments in one transaction.<br />All transactions send via this screen will be visible on the blockchain.
       label__label: Label
       placeholder__label: Enter a label for your transaction
       label__address: Address
-      placeholder__address: Add a valid Zcoin address
+      placeholder__address: Add a valid Firo address
       label__amount: Amount
       placeholder__amount: Enter amount to send publicly
-      button__send--primary: "Send now | Send now | Send {count} now"
+      button__send--primary: "SendPage now | SendPage now | SendPage {count} now"
       button__send-later--secondary: Add to queue
       button__add-to-queue--secondary: Add to queue
 
     flyout-pending-payment-queue:
       title: Pending Payments
-      description: These payments are currently queued up. Once you have finished adding payments, you can send them via "Send now"
+      description: These payments are currently queued up. Once you have finished adding payments, you can send them via "SendPage now"
 
     flyout-suggest-private-spend:
       title: Private Spend
@@ -298,8 +298,8 @@ send:
       button__has-error--primary: Try Again
 
     flyout-unused-address:
-      title: Unused Zcoin Address found
-      description: Found a Zcoin address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Zcoin publicly?
+      title: Unused Firo Address found
+      description: Found a Firo address in your clipboard.<br>Would you like to use it as the recipient address<br>to send Firo publicly?
       label__payment-request-form-label-to-fulfill: 'Fulfilling: "{label}"'
 
     flyout-used-address:
@@ -358,8 +358,8 @@ settings:
       label__connect-via-tor: Connect to other nodes via Tor
       description__connect-via-tor: Connecting via Tor can increase your anonymity.
       label__connect-via-tor--disabled: Tor connection can not be changed here as is defined via {value} in {configFile}
-      label__connect-via-tor--checked: Yes, connections to other Nodes in the Zcoin Network are established via Tor
-      label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Zcoin Network
+      label__connect-via-tor--checked: Yes, connections to other Nodes in the Firo Network are established via Tor
+      label__connect-via-tor--unchecked: No, connecting directly to other nodes in the Firo Network
       label__hold-in-zerocoin: Ratio between private and public funds
       description__hold-in-zerocoin: You might want to hold more of your funds as private coins to make spending easier.
       label__hold-in-zerocoin--private: Private
@@ -369,12 +369,12 @@ settings:
 onboarding:
   intro-screen:
     title: Welcome!
-    description: Thank you for downloading the Zcoin Client! You have taken the first step towards financial privacy. Click the button below to begin setting up your client!
+    description: Thank you for downloading the Firo Client! You have taken the first step towards financial privacy. Click the button below to begin setting up your client!
     button__start--primary: Let's go!
 
   # create-new-wallet:
     # title:
-    # description: Ready to create a new wallet? If you have used Zcoin before, just drop your existing wallet backup in this window.
+    # description: Ready to create a new wallet? If you have used Firo before, just drop your existing wallet backup in this window.
     # button__primary:
     # button__secondary:
 
@@ -408,7 +408,7 @@ onboarding:
     button__generate-passphrase--primary: Generate passphrase
     button__set-passphrase--primary: Set passphrase
     placeholder__enter-passphrase: Enter passphrase
-    dictionary__passphrase: "Zcoin"
+    dictionary__passphrase: "Firo"
     # button__secondary: back / cancel?
 
   confirm-passphrase:
@@ -455,7 +455,7 @@ onboarding:
 
   # on-initial-setup:
     # title: High five!
-    # description: Congrats, you are now part of the Zcoin network. Let's go straight to the client!
+    # description: Congrats, you are now part of the Firo network. Let's go straight to the client!
     # button__--primary:
     # button__--secondary:
 
@@ -475,7 +475,7 @@ onboarding:
         # description: No coins to send. Please create a {linkToCreatePaymentRequest} first to receive some coins!
       # private:
         # title: Looks like you do not have any coins.
-        # description: No coins to send privately. Please create a {linkToCreatePaymentRequest} first to receive some coins and then head over to {linkToAnonymizeZcoin}.
+        # description: No coins to send privately. Please create a {linkToCreatePaymentRequest} first to receive some coins and then head over to {linkToAnonymizeFiro}.
 
   process-mints:
     title: Stay Private, Stay Flexible # test variables
@@ -515,7 +515,7 @@ overlay:
 
   error:
     connection-lost:
-      title: Connection to the<br>Zcoin Deamon lost
-      description: The client has lost its connection to the Zcoin Daemon. Please restart the client.
-      button__quit--secondary: Quit Zcoin
+      title: Connection to the<br>Firo Deamon lost
+      description: The client has lost its connection to the Firo Daemon. Please restart the client.
+      button__quit--secondary: Quit Firo
       button__restart-daemon--primary: Restart

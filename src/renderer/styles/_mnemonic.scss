@@ -1,60 +1,28 @@
-.mnemonic-screen {
-  margin: auto;
-  min-width: fit-content;
-  width: emRhythm(90);
+@import "src/renderer/styles/colors";
 
-  .guidance {
-    margin: auto;
-    width: fit-content;
-    user-select: none;
-
-    font: {
-      style: italic;
-      weight: bold;
-    }
-  }
-
-  .mnemonic {
-    padding: 1em;
+@mixin mnemonic {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 
-    * {
-      background-color: $color--comet-medium;
-    }
-
     .mnemonic-word {
-      -webkit-appearance: none;
-      border: none !important;
-      padding: 0 !important;
-      font: {
-        family: sans-serif;
-        weight: bold;
-      }
-
-      display: inline-flex;
-      outline: none;
-      font-weight: bold;
-
-      &.hidden {
-        &.verified {
-          color: $color--green-dark;
+        -webkit-appearance: none;
+        border: none !important;
+        padding: 0 !important;
+        font: {
+            family: sans-serif;
+            weight: bold;
         }
 
-        &.unverified {
-          color: $color--red-dark;
-        }
-      }
-    }
-  }
+        display: inline-flex;
+        outline: none;
+        font-weight: bold;
 
-  .buttons {
-    user-select: none;
-    width: fit-content;
-    margin: {
-      top: 1em;
-      left: auto;
-      right: auto;
+        background-color: inherit;
+
+        &.hidden {
+            &.unverified {
+                color: $color-error;
+            }
+        }
     }
-  }
 }

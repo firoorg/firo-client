@@ -3,8 +3,10 @@
         v-if="isHeader"
         class="vuetable-th-component-amount"
         @click="$emit('click', rowField, $event)"
-        v-html="title"
-    />
+    >
+        Amount
+    </th>
+
     <td
         v-else
         class="vuetable-td-component-amount"
@@ -13,25 +15,25 @@
             v-if="['spendOut', 'send'].includes(category)"
             class="outgoing"
         >
-            -{{ amount }}
+            -{{ amount }} FIRO
         </span>
         <span
             v-else-if="['spendIn', 'receive', 'mined', 'znode'].includes(category)"
             class="incoming"
         >
-            +{{ amount }}
+            +{{ amount }} FIRO
         </span>
         <span
             v-else-if="category === 'mint'"
             class="mint"
         >
-            ({{ amount }})
+            ({{ amount }} FIRO)
         </span>
         <span
             v-else-if="category === 'payment-request'"
             class="payment-request"
         >
-            ({{ amount }})
+            ({{ amount }} FIRO)
         </span>
         <span v-else>
             This is a bug.
@@ -63,19 +65,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.vuetable-td-component-amount {
-    font-family: monospace;
+@import "src/renderer/styles/colors";
+@import "src/renderer/styles/typography";
 
+.vuetable-td-component-amount {
     .outgoing {
-        color: red;
+        color: $color-amount-negative;
     }
 
     .incoming {
-        color: green;
+        color: $color-amount-positive;
     }
 
     .mint, .payment-request {
-        color: grey;
+        color: $color-amount-neutral;
     }
 }
 </style>

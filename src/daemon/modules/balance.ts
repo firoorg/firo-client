@@ -1,14 +1,14 @@
-import { Zcoind } from '../zcoind';
+import { Firod } from '../firod';
 
 import { createLogger } from '../../lib/logger';
-const logger = createLogger('zcoin:daemon:balance');
+const logger = createLogger('firo:daemon:balance');
 
-export async function handleEvent(store: any, zcoind: Zcoind, data: any) {
+export async function handleEvent(store: any, firod: Firod, data: any) {
     store.commit('Balance/updateBalance', data);
 }
 
-export async function initialize(store: any, zcoind: Zcoind) {
-    const data = await zcoind.send(null, 'get', 'balance', null);
+export async function initialize(store: any, firod: Firod) {
+    const data = await firod.send(null, 'get', 'balance', null);
     logger.info("Got initial balance data");
     store.commit('Balance/updateBalance', data);
 }
