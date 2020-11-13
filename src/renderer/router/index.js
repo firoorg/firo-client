@@ -67,6 +67,11 @@ export default new Router({
                 },
 
                 {
+                    path: '/coinswap',
+                    component: require('renderer/components/CoinSwapPage.vue').default,
+                },
+                
+                {
                     path: '/znodes',
                     component: require('renderer/components/EvoZnodesPage').default
                 },

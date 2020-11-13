@@ -502,3 +502,21 @@ overlay:
       description: Il client ha perso la connessione al programma Firo. Si prega di riavviare il client.
       button__quit--secondary: Chiudi Firo
       button__restart-daemon--primary: Riavvia il programma
+
+currencies:
+  XZC: ZCoin
+  BTC: Bitcoin
+  ETH: Ethereum
+  ZEC: ZCash
+  LTC: Litecoin
+  XRP: Ripple
+  XLM: Stellar
+  BCHABC: Bitcoin Cash
+  BNB: Binance Coin
+  USDT: Tether
+  USDC: USD Coin
+  DAI: Dai
+  DASH: Dash
+  DCR: Decred
+  PAX: Paxos Standard
+  TUSD: True USD 

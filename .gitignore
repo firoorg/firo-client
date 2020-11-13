@@ -4,3 +4,5 @@ node_modules/
 .DS_Store
 .idea/
 zcoin-client-test.log
+.env
+coin-swap-pairs.json

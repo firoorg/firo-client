@@ -18,6 +18,12 @@
             </div>
         </router-link>
 
+        <router-link to="/coinswap">
+            <div class="inner">
+                Coin Swap
+            </div>
+        </router-link>
+
         <router-link to="/znodes">
             <div class="inner">
                 Masternodes

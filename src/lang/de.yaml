@@ -471,3 +471,21 @@ znodes:
       label__status: Status
       placeholder__filter: Znodes filtern
     title: Znodes
+
+currencies:
+  XZC: ZCoin
+  BTC: Bitcoin
+  ETH: Ethereum
+  ZEC: ZCash
+  LTC: Litecoin
+  XRP: Ripple
+  XLM: Stellar
+  BCHABC: Bitcoin Cash
+  BNB: Binance Coin
+  USDT: Tether
+  USDC: USD Coin
+  DAI: Dai
+  DASH: Dash
+  DCR: Decred
+  PAX: Paxos Standard
+  TUSD: True USD 
