@@ -55,8 +55,8 @@
                             placeholder="Address"
                         />
 
-                        <div v-if="showAddToAddressBook" id="add-to-address-book">
-                            <a href="#" @click="addToAddressBook">
+                        <div id="add-to-address-book">
+                            <a href="#" :class="{disabled: !showAddToAddressBook}" @click="addToAddressBook">
                                 Add to Address Book
                             </a>
                         </div>
@@ -459,6 +459,7 @@ export default {
         convertToCoin,
 
         async addToAddressBook() {
+            if (!this.showAddToAddressBook) return;
             if (this.addressBook[this.address]) return;
 
             const item = {
@@ -621,9 +622,15 @@ export default {
 
                         #add-to-address-book {
                             text-align: right;
+
                             a {
                                 @include small();
                                 @include optional-action;
+
+                                &.disabled {
+                                    cursor: default;
+                                    opacity: 0.3;
+                                }
                             }
                         }
                     }
