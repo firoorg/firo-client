@@ -247,7 +247,7 @@ export default {
             label: this.$route.query.label || '',
             amount: this.$route.query.amount || '',
             address: this.$route.query.address || '',
-            subtractFeeFromAmount: true,
+            subtractFeeFromAmount: !$store.getters['ApiStatus/isLelantusAllowed'],
             useCustomFee: false,
             txFeePerKb: 1,
             isPrivate: true,
