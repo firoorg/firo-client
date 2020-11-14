@@ -74,6 +74,7 @@ td {
 
 input {
     @include input-field;
+    height: calc(#{$size-table-row-height} - #{$size-table-row-vertical-padding} * 2);
     width: calc(100% - #{$size-table-row-horizontal-padding});
 }
 </style>
