@@ -252,7 +252,7 @@ export default {
         }
 
         input {
-            @include wide-rounded-input();
+            @include wide-input-field();
         }
 
         .passphrase-input-and-meter {

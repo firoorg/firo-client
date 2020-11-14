@@ -186,7 +186,7 @@ export default {
             }
 
             input[type="text"] {
-                @include rounded-input();
+                @include input-field();
             }
 
             input[type="button"] {

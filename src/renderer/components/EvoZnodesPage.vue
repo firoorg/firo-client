@@ -362,7 +362,7 @@ export default {
     padding-bottom: $size-small-space;
 
     .filter-input {
-        @include wide-rounded-input();
+        @include search-input();
         position: relative;
         float: left;
     }

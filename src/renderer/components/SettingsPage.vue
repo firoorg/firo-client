@@ -310,7 +310,7 @@ export default {
             }
 
             input[type="password"] {
-                @include rounded-input();
+                @include input-field();
             }
 
             .change-passphrase-error {

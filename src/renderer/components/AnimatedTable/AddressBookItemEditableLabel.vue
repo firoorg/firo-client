@@ -73,7 +73,7 @@ td {
 }
 
 input {
-    @include rounded-input;
+    @include input-field;
     width: calc(100% - #{$size-table-row-horizontal-padding});
 }
 </style>

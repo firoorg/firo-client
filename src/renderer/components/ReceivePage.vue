@@ -241,7 +241,7 @@ $top-height: 40%;
                 }
 
                 .label-input {
-                    @include wide-rounded-input();
+                    @include wide-input-field();
                     margin-bottom: $size-tiny-space;
                 }
 

@@ -264,7 +264,7 @@ export default {
                     bottom: $size-medium-space;
                 }
 
-                @include wide-rounded-input();
+                @include search-input();
                 max-width: 100%;
             }
 

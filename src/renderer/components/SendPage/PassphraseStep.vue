@@ -58,7 +58,7 @@ export default {
 @include popup();
 
 input[type="password"] {
-    @include wide-rounded-input();
+    @include wide-input-field();
 }
 
 .error {

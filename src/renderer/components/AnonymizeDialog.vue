@@ -120,7 +120,7 @@ export default {
     color: $color-text;
 
     input[type="password"] {
-        @include wide-rounded-input();
+        @include wide-input-field();
     }
 
     .error {

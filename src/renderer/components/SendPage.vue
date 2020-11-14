@@ -555,7 +555,7 @@ export default {
         padding: $size-main-margin;
 
         input[type="text"] {
-            @include wide-rounded-input();
+            @include search-input();
             margin-bottom: $size-medium-space;
         }
 
@@ -582,8 +582,8 @@ export default {
 
             .tip {
                 position: absolute;
-                bottom: $size-rounded-input-vertical-padding;
-                right: $size-rounded-input-horizontal-padding;
+                bottom: $size-input-vertical-padding;
+                right: $size-input-horizontal-padding;
             }
         }
 
@@ -611,7 +611,7 @@ export default {
                     }
 
                     input[type="text"] {
-                        @include wide-rounded-input();
+                        @include wide-input-field();
                     }
 
                     &#address-field {
