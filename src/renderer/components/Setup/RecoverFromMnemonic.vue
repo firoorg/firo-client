@@ -226,8 +226,8 @@ export default {
 
 @include popup()
 
-.recover-from-mnemonic {
-    user-select: none;
+* {
+    user-select: none !important;
 }
 
 .content {

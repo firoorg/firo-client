@@ -61,6 +61,11 @@ export default {
 @import "src/renderer/styles/sizes";
 
 @include popup();
+
+* {
+    user-select: none !important;
+}
+
 .title {
     margin-bottom: $size-medium-space;
 

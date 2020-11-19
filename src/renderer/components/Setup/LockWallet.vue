@@ -224,12 +224,17 @@ export default {
 
 @include popup();
 
+* {
+    user-select: none !important;
+}
+
 .lock-wallet {
     width: $size-large-field-width * 2 !important;
 }
 
 .guidance {
     font-style: italic;
+    text-align: center;
 
     .emphasis {
         font-weight: bold;
