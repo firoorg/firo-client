@@ -2,12 +2,11 @@
     <div>
         <AnimatedTable
             ref="vuetable"
-            :selected-to="selectedRows"
             :data="ourUnspentUTXOs"
             :fields="fields"
             :anti-overflow-hack="false"
+            :global-data="selectionData"
             track-by="uniqId"
-            @field-event="handleSelectionEvent($event)"
         />
     </div>
 </template>
@@ -45,19 +44,12 @@ export default {
 
     data() {
         return {
-            selectedRows: [],
+            selectionData: {},
             fields: [
                 {name: UTXOSelector},
                 {name: TxIdIndex},
                 {name: TxAmount}
             ]
-        }
-    },
-
-    methods: {
-        handleSelectionEvent([uniqId, value]) {
-            this.selectedRows = this.selectedRows.filter(x => x !== uniqId);
-            if (value) this.selectedRows.push(uniqId);
         }
     },
 
@@ -68,7 +60,9 @@ export default {
         }),
 
         selectedCoins() {
-            return this.selectedRows.map(uniqId => this.transactions[uniqId]);
+            return Object.entries(this.selectionData)
+                .filter(([k, v]) => !!v)
+                .map(([uniqId, v]) => this.transactions[uniqId]);
         },
 
         ourUnspentUTXOs() {

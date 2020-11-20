@@ -38,7 +38,9 @@ const getters = {
     // We will return 0 if apiStatus hasn't yet loaded.
     totalZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.Znode) ? state.apiStatus.data.Znode.totalCount : 0,
     // We will return 0 if apiStatus hasn't yet loaded.
-    enabledZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.Znode) ? state.apiStatus.data.Znode.enabledCount : 0
+    enabledZnodeCount: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.Znode) ? state.apiStatus.data.Znode.enabledCount : 0,
+    // This is the recommended fee per kb, or 0 if no such fee can be calculated.
+    smartFeePerKb: (state): number => (state.apiStatus && state.apiStatus.data && state.apiStatus.data.smartFeePerKb) ? state.apiStatus.data.smartFeePerKb : 0
 };
 
 export default {

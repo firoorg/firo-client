@@ -89,7 +89,10 @@ export default {
             type: Function,
             default: (a, b) => a === b
         },
-
+        globalData: {
+            type: Object,
+            required: false
+        },
         // FIXME: For reasons I haven't been able to figure out, flex-grow will cause .table-container to sometimes
         //        outgrow the available space. This sets our table to be smaller so that won't happen. It seems to only
         //        be necessary when AnimatedTable is embedded in Popup, which happens in InputSelection.
@@ -145,6 +148,7 @@ export default {
         window.addEventListener("resize", this.resizeListener);
 
         this.$nextTick(() => {
+            this.$refs.vuetable.globalData = this.globalData;
             this.setPerPage();
         });
     },

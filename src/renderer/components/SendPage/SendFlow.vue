@@ -133,8 +133,8 @@ export default {
                     await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, this.coinControl);
                 } else if (this.isLelantusAllowed) {
-                    await $daemon.sendLelantus(passphrase, this.address, this.amount, this.subtractFeeFromAmount,
-                        this.coinControl);
+                    await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
+                        this.subtractFeeFromAmount, this.coinControl);
                 } else {
                     await $daemon.sendSigma(passphrase, this.label, this.address, this.amount,
                         this.subtractFeeFromAmount, this.coinControl);

@@ -1,7 +1,7 @@
 <template>
     <th v-if="isHeader"></th>
     <td v-else>
-        <input type="checkbox" v-model="isSelected" />
+        <input ref="checkbox" type="checkbox" @input="toggle" />
     </td>
 </template>
 
@@ -16,15 +16,15 @@ export default {
         VuetableFieldMixin
     ],
 
-    data() {
-        return {
-            isSelected: false
-        };
+    watch: {
+        rowData() {
+            this.$refs.checkbox.checked = !!this.vuetable.globalData[this.rowData.uniqId];
+        }
     },
 
-    watch: {
-        isSelected(val) {
-            this.$emit('vuetable:field-event', [this.rowData.uniqId, val]);
+    methods: {
+        toggle(ev) {
+            Vue.set(this.vuetable.globalData, this.rowData.uniqId, ev.target.checked);
         }
     }
 }

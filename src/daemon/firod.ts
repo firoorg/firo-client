@@ -186,6 +186,7 @@ export interface ApiStatus {
             enabledCount: number;
         };
         hasMnemonic: boolean;
+        smartFeePerKb: number;
     };
     meta: {
         status: number;
@@ -453,7 +454,7 @@ function assertValidMnemonicSettings(x: any): x is MnemonicSettings {
 
 // CoinControl is an array of [txid, txindex] pairs.
 export type CoinControl = [string, number][];
-const coinControlToString = (coinControl: CoinControl) => coinControl.map(e => `${e[0]}-${e[1]}`).join(':');
+const coinControlToString = (coinControl?: CoinControl) => (coinControl || []).map(e => `${e[0]}-${e[1]}`).join(':');
 
 export type Setting = {
     data: string;
@@ -895,7 +896,7 @@ export class Firod {
     isFirodListening(): Promise<boolean> {
         return new Promise(resolve => {
             const socket = new net.Socket();
-            socket.setTimeout(5_000);
+            socket.setTimeout(this.connectionTimeout * 1000);
             socket.on("error", () => {
                 socket.destroy();
                 resolve(false);
@@ -1387,7 +1388,7 @@ export class Firod {
             feePerKb,
             subtractFeeFromAmount,
             coinControl: {
-                selected: coinControl ? coinControlToString(coinControl) : ''
+                selected: coinControlToString(coinControl)
             }
         });
 
@@ -1434,7 +1435,7 @@ export class Firod {
             label,
             subtractFeeFromAmount,
             coinControl: {
-                selected: coinControl ? coinControlToString(coinControl) : ''
+                selected: coinControlToString(coinControl)
             }
         });
 
@@ -1451,12 +1452,13 @@ export class Firod {
     // this transaction.
     //
     // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async sendLelantus(auth: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
-                       coinControl?: CoinControl): Promise<string> {
+    async sendLelantus(auth: string, recipient: string, amount: number, feePerKb: number,
+                       subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
         const data = await this.send(auth, 'create', 'sendLelantus', {
             recipient,
             amount,
             subtractFeeFromAmount,
+            feePerKb,
             coinControl: {
                 selected: coinControl ? coinControlToString(coinControl) : ''
             }
@@ -1652,10 +1654,21 @@ export class Firod {
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the firod call fails or received data is invalid.
-    async calcLelantusTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
-        // TODO: Actually calculate the transaction fee when the functionality becomes available in the daemon.
-        return 31415;
+    async calcLelantusTxFee(amount: number, feePerKb: number, subtractFeeFromAmount: boolean,
+                            coinControl?: CoinControl): Promise<number> {
+        const fee = await this.send(null, 'none', 'lelantusTxFee', {
+            amount,
+            feePerKb,
+            subtractFeeFromAmount,
+            coinControl: {
+                selected: coinControlToString(coinControl)
+            }
+        });
+
+        if (typeof fee === 'number') return fee;
+        throw new UnexpectedFirodResponse('none/lelantusTxFee', fee);
     }
+
 
     // Backup wallet.dat into backupDirectory. We will reject() the problem if the backup fails for some reason;
     // otherwise we return void.

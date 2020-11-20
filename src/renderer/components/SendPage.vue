@@ -109,7 +109,7 @@
                         </Popup>
                     </div>
 
-                    <div class="field">
+                    <div v-show="!isPrivate || isLelantusAllowed" class="field">
                         <label>
                             <input type="checkbox" v-model="useCustomFee" />
                             Custom Transaction Fee
@@ -249,7 +249,7 @@ export default {
             address: this.$route.query.address || '',
             subtractFeeFromAmount: !$store.getters['ApiStatus/isLelantusAllowed'],
             useCustomFee: false,
-            txFeePerKb: 1,
+            txFeePerKb: $store.getters['ApiStatus/smartFeePerKb'],
             isPrivate: true,
             showCustomInputSelector: false,
             useCustomInputs: false,
@@ -277,9 +277,9 @@ export default {
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
             maxPrivateSend: 'Balance/maxPrivateSend',
-            selectedUtxos: 'FiroPayment/selectedInputs',
             sendAddresses: 'AddressBook/sendAddresses',
-            addressBook: 'AddressBook/addressBook'
+            addressBook: 'AddressBook/addressBook',
+            smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
 
         filteredSendAddresses () {
@@ -362,9 +362,9 @@ export default {
 
         useCustomFee() {
             if (!this.useCustomFee) {
-                this.txFeePerKb = 1;
+                this.txFeePerKb = this.smartFeePerKb;
                 // Make sure the validation warning goes away.
-                this.$refs.txFeePerKb.value = 1;
+                this.$refs.txFeePerKb.value = this.smartFeePerKb;
             }
         },
 
@@ -455,8 +455,8 @@ export default {
         });
 
         this.$validator.extend('txFeeIsValid', {
-            getMessage: () => 'Transaction fee must be an integer between 1 and 10,000',
-            validate: (value) => value > 0 && value <= 10_000 && (value % 1 === 0)
+            getMessage: () => 'Transaction fee must be an integer between 1 and 1,000,000',
+            validate: (value) => value > 0 && value <= 1_000_000 && (value % 1 === 0)
         })
     },
 
@@ -509,12 +509,12 @@ export default {
 
             const satoshiAmount = this.satoshiAmount;
             const subtractFeeFromAmount = this.subtractFeeFromAmount;
-            const txFeePerKb = this.useCustomFee ? this.txFeePerKb : 1;
+            const txFeePerKb = this.useCustomFee ? this.txFeePerKb : this.smartFeePerKb;
 
             let p;
             if (this.isPrivate) {
                 if (this.isLelantusAllowed) {
-                    p = $daemon.calcLelantusTxFee(satoshiAmount, subtractFeeFromAmount);
+                    p = $daemon.calcLelantusTxFee(satoshiAmount, txFeePerKb, subtractFeeFromAmount, this.coinControl);
                 } else {
                     p = $daemon.calcSigmaTxFee(satoshiAmount, subtractFeeFromAmount);
                 }
