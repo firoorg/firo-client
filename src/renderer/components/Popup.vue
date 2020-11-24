@@ -26,6 +26,14 @@ export default {
         CloseIcon
     },
 
+    created() {
+        document.getElementsByTagName('body')[0].classList.add('vue-tooltip-z-index-hack');
+    },
+
+    destroyed() {
+        document.getElementsByTagName('body')[0].classList.remove('vue-tooltip-z-index-hack');
+    },
+
     props: {
         margin: {
             type: Boolean,

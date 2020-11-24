@@ -1,11 +1,23 @@
 @import "src/renderer/styles/z";
 
+@at-root {
+    // So this is a fix for a really icky issue with vue-tooltip's use of transform: translate3d directives, which make
+    // it impossible to properly use z-indexes. Popup and WaitingScreen will add this to the root element when they are
+    // created and then remove it when they are destroyed, and we will become invisible accordingly.
+    .vue-tooltip-z-index-hack {
+        .tooltip {
+            display: none !important;
+        }
+    }
+}
+
 .tooltip {
     $tooltip--padding: emRhythm(2) emRhythm(2);
     $tooltip--arrow-size: 0.66em;
     $tooltip--background-transition-duration: .5s;
 
-    display: block !important;
+    display: block;
+
     z-index: $z-tooltip;
     @include box-shadow-large();
 

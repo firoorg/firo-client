@@ -104,7 +104,7 @@
                             </div>
                         </div>
 
-                        <Popup v-if="useCustomInputs" v-show="showCustomInputSelector" :close="() => showCustomInputSelector = false">
+                        <Popup v-if="showCustomInputSelector" :close="() => showCustomInputSelector = false">
                             <InputSelection v-model="customInputs" :is-private="isPrivate" />
                         </Popup>
                     </div>
