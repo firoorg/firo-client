@@ -10,6 +10,7 @@ const state = {
     availablePrivate: 0,
     unconfirmedPrivate: 0,
     locked: 0,
+    immature: 0,
     unspentMints: {}
 }
 
