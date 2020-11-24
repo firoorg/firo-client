@@ -12,8 +12,8 @@
             +&nbsp;<amount :amount="availablePublic" />&nbsp;public
         </div>
 
-        <div v-if="pending > 0" class="pending">
-            +&nbsp;<amount :amount="pending" />&nbsp;pending
+        <div v-if="(pending + immature) > 0" class="pending">
+            +&nbsp;<amount :amount="pending + immature" />&nbsp;pending
         </div>
     </section>
 </template>
@@ -34,7 +34,8 @@ export default {
             available: 'Balance/available',
             locked: 'Balance/locked',
             availablePublic: 'Balance/availablePublic',
-            pending: 'Balance/pending'
+            pending: 'Balance/pending',
+            immature: 'Balance/immature'
         })
     }
 }
