@@ -249,7 +249,8 @@ export default {
             address: this.$route.query.address || '',
             subtractFeeFromAmount: !$store.getters['ApiStatus/isLelantusAllowed'],
             useCustomFee: false,
-            txFeePerKb: $store.getters['ApiStatus/smartFeePerKb'],
+            // In certain cases, firod might suggest very low fees. Practically, we probably never want this.
+            txFeePerKb: Math.max($store.getters['ApiStatus/smartFeePerKb'], 10),
             isPrivate: true,
             showCustomInputSelector: false,
             useCustomInputs: false,
@@ -362,9 +363,9 @@ export default {
 
         useCustomFee() {
             if (!this.useCustomFee) {
-                this.txFeePerKb = this.smartFeePerKb;
+                this.txFeePerKb = Math.max(this.smartFeePerKb, 10);
                 // Make sure the validation warning goes away.
-                this.$refs.txFeePerKb.value = this.smartFeePerKb;
+                this.$refs.txFeePerKb.value = this.txFeePerKb;
             }
         },
 
