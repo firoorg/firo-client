@@ -65,7 +65,7 @@
       ]
     },
     "win": {
-      "icon": "assets/icons/icon.ico",
+      "icon": "assets/icons/icon.png",
       "files": [
         "!assets/core/linux",
         "!assets/core/darwin"
