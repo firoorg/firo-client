@@ -280,8 +280,12 @@ export default {
             maxPrivateSend: 'Balance/maxPrivateSend',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
-            smartFeePerKb: 'ApiStatus/smartFeePerKb'
+            _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
+
+        smartFeePerKb() {
+            return Math.max(this._smartFeePerKb, 10);
+        },
 
         filteredSendAddresses () {
             // filter must be outside the closure for reactivity to work.
@@ -363,7 +367,7 @@ export default {
 
         useCustomFee() {
             if (!this.useCustomFee) {
-                this.txFeePerKb = Math.max(this.smartFeePerKb, 10);
+                this.txFeePerKb = this.smartFeePerKb;
                 // Make sure the validation warning goes away.
                 this.$refs.txFeePerKb.value = this.txFeePerKb;
             }
