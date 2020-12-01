@@ -1112,7 +1112,9 @@ export class Firod {
             return;
         }
 
-        logger.silly("firod sent us a subscription event for topic %s: %O", topic, parsedMessage);
+        if (logger.isSillyEnabled()) {
+            logger.silly("firod sent us a subscription event for topic %s: %O", topic, JSON.stringify(parsedMessage, null, 2));
+        }
 
         if (parsedMessage.meta.status !== 200) {
             logger.error("firod sent us an event for topic %s with a non-200 status: %O", topic, parsedMessage);
