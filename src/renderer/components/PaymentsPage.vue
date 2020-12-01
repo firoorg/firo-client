@@ -89,7 +89,6 @@ export default {
         ...mapGetters({
             transactions: 'Transactions/transactions',
             addresses: 'Transactions/addresses',
-            consolidatedMints: 'Transactions/consolidatedMints',
             paymentRequests: 'PaymentRequest/paymentRequests',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             isReindexing: 'ApiStatus/isReindexing'
@@ -157,43 +156,6 @@ export default {
                         tx.label ||
                         (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
                     extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
-                });
-            }
-
-            for (const [blockHeight, mintInfo] of Object.entries(this.consolidatedMints)) {
-                tableData.push({
-                    id: `/mint-info/${blockHeight}`,
-                    category: 'mint',
-                    blockHeight: blockHeight,
-                    date: mintInfo.blockTime * 1000 || Infinity,
-                    amount: mintInfo.totalMintAmount,
-                    label: null,
-                    // Coordinate this with the default values in AnimatedTableLabel.
-                    extraSearchText: 'Private Mint (' + convertToCoin(mintInfo.totalMintAmount) + ')'
-                });
-            }
-
-            for (const pr of Object.values(this.paymentRequests)) {
-                if (this.addresses[pr.address] && this.addresses[pr.address].length) {
-                    // There are actual transactions associated with the request now, so we don't need to show it.
-                    continue;
-                }
-
-                if (pr.state !== 'active') {
-                    // Don't show deleted or archived payment requests.
-                    continue;
-                }
-
-                tableData.push({
-                    // id is the path of the detail route for the payment request.
-                    id: `/payment-request/${pr.address}`,
-                    category: 'payment-request',
-                    blockHeight: null,
-                    date: pr.createdAt,
-                    amount: pr.amount,
-                    label: pr.label,
-                    // Coordinate this with the default values in AnimatedTableLabel.
-                    extraSearchText: 'Payment Request (' + convertToCoin(pr.amount) + ')'
                 });
             }
 
