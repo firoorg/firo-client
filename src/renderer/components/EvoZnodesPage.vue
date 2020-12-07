@@ -45,7 +45,7 @@
                 </div>
 
                 <div slot="nextPaymentBlock" slot-scope="props">
-                    {{ props.rowData.nextPaymentBlock }}
+                    {{ props.rowData.nextPaymentBlock === Infinity ? '' : props.rowData.nextPaymentBlock }}
                 </div>
 
                 <div slot="statusdetails" slot-scope="props">
@@ -132,12 +132,12 @@ export default {
             type: Array,
             default: () => [
                 {
-                    field: "statusdetails",
+                    field: "nextPaymentBlock",
                     direction: "asc",
                 },
                 {
-                    field: "nextPaymentBlock",
-                    direction: "desc",
+                    field: "statusdetails",
+                    direction: "asc",
                 },
             ],
         },
@@ -186,15 +186,8 @@ export default {
         },
 
         allZnodesTableData() {
-            const tableData = [];
-            for (const proTxHash of Object.keys(this.masternodes)) {
-                let znodeObj = this.masternodes[proTxHash];
-                let nextPay = znodeObj.state.nextPaymentHeight
-                    ? znodeObj.state.nextPaymentHeight
-                    : "SYNCING";
-                if (znodeObj.state.status == "POSE_BANNED") {
-                    nextPay = "UNKNOWN";
-                }
+            let tableData = [];
+            for (const [proTxHash, znodeObj] of Object.entries(this.masternodes)) {
                 tableData.push({
                     proTxHash: proTxHash,
                     label:
@@ -203,7 +196,7 @@ export default {
                             : "(unlabelled)",
                     collateralAddress: znodeObj.collateralAddress,
                     lastpaid: znodeObj.state.lastPaidHeight,
-                    nextPaymentBlock: nextPay,
+                    nextPaymentBlock: znodeObj.state.nextPaymentHeight || Infinity,
                     status: znodeObj.state.status ? znodeObj.state.status : "SYNCING",
                     expand: false,
                     service: znodeObj.state.service,
@@ -214,6 +207,7 @@ export default {
                     isMine: znodeObj.wallet && znodeObj.wallet.hasMasternode
                 });
             }
+
             return tableData;
         },
 
@@ -324,11 +318,7 @@ export default {
                 };
             }
 
-            let local = this.tableData;
-            const orderBy = sortOrder.length ? sortOrder : this.sortOrder;
-            if (orderBy.length > 0) {
-                local = _.orderBy(local, orderBy[0].sortField, orderBy[0].direction);
-            }
+            let local = _.sortBy(this.tableData, 'nextPaymentBlock');
 
             pagination = this.$refs.vuetable.makePagination(
                 local.length,
