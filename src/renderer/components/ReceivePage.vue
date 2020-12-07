@@ -19,9 +19,9 @@
                         <input v-else type="button" value="Edit" @click="isEditing = true" />
                     </div>
 
-                    <div class="address">
+                    <a class="address" title="Click to copy address." @click="copyAddress()">
                         {{ address }}
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -171,8 +171,9 @@ export default {
                 newAddress = {purpose: 'receive', label: this.label, address: this.address};
                 await $daemon.addAddressBookItem(newAddress);
             }
+
             await this.$store.commit('AddressBook/updateAddress', newAddress);
-         }
+        }
     }
 }
 </script>
@@ -250,14 +251,16 @@ $top-height: 40%;
                 }
             }
 
-            .address {
+            a {
+                @include address();
+                cursor: pointer;
+                display: block;
                 width: fit-content;
                 margin: {
                     left: auto;
                     right: auto;
                     bottom: $size-tiny-space;
                 }
-                @include address();
             }
         }
     }
