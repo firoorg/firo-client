@@ -186,6 +186,7 @@
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7",
     "url-loader": "^1.1.2",
+    "vue-devtools": "^5.1.4",
     "vue-loader": "^15.9.3",
     "vue-style-loader": "^4.1.2",
     "vue-svg-loader": "^0.16.0",
