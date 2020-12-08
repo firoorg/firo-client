@@ -91,6 +91,9 @@ export default {
                     return;
                 }
             } else {
+                // FIXME: Remove this once we figure out what's going on here.
+                logger.info("Calculating denominations to mint for amount %d", this.availablePublic);
+
                 let remainingMint = this.availablePublic;
                 let mintAmount = 0;
                 while (mintAmount = Math.min(remainingMint, 500e8)) {
@@ -101,6 +104,9 @@ export default {
                         Object.entries(getDenominationsToMintSubtractingFee(mintAmount))
                             .map(([k, v]) => [convertToCoin(k), v])
                     );
+
+                    // FIXME: Remove this once we figure out what's going on here.
+                    logger.info("Calculated that we should mint: %s", JSON.stringify(toMint));
 
                     try {
                         await $daemon.mintSigma(passphrase, toMint);
