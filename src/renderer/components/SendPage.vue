@@ -227,6 +227,9 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 
+let monotonicTicker = 0;
+const monotonic = () => monotonicTicker++;
+
 export default {
     name: 'SendPage',
 
@@ -268,6 +271,9 @@ export default {
 
             // This is used if an error occurs computing the fee
             error: null,
+
+            // This is used to stop us from making lots of transaction fee calls, which are expensive.
+            latestRequestId: 0
         }
     },
 
@@ -493,6 +499,13 @@ export default {
         },
 
         async maybeShowFee () {
+            // Delay the request for the transaction fee to make sure we don't make a bunch while the user is typing.
+            const ourRequestId = monotonic();
+            this.latestRequestId = ourRequestId;
+            await new Promise(r => setTimeout(r, 1e3));
+            // latestRequestId is only set above, and therefore will increase monotonically in all cases.
+            if (this.latestRequestId > ourRequestId) return;
+
             this.transactionFee = 0;
             this.error = null;
             this.totalAmountExceedsBalance = false;
@@ -529,9 +542,9 @@ export default {
 
             try {
                 const txFee = await p;
-                if (this.satoshiAmount === satoshiAmount && this.subtractFeeFromAmount === subtractFeeFromAmount && this.txFeePerKb === txFeePerKb) {
-                    this.transactionFee = txFee
-                }
+                // Make sure we don't update with old data.
+                if (this.latestRequestId > ourRequestId) return;
+                this.transactionFee = txFee
             } catch (e) {
                 if (e instanceof FirodErrorResponse && e.errorCode === -6) {
                     this.error = e;
