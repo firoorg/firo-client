@@ -144,18 +144,6 @@ ourWindow.webContents.once("will-navigate", () => {
     ourWindow.webContents.removeAllListeners('shutdown-requested');
 });
 
-// Record our current location in the app so we can go back to it when a restart is required.
-router.afterEach((to) => {
-    logger.info(`Setting current route to ${to.path}`);
-    // Route objects can't be put into the $store directly, so we have to extract just the relevant properties.
-    $store.commit('App/setCurrentRoute', {
-        path: to.path,
-        params: to.params,
-        query: to.query,
-        hash: to.hash
-    });
-});
-
 // Handle firo:// links on Windows.
 app.on('second-instance', (event, commandLine) => {
     // Someone tried to run a second instance, we should focus our window.
@@ -281,57 +269,27 @@ window.$startDaemon = () => new Promise(resolve => {
         });
 });
 
-// currentRoute will only be set if we're being reloaded.
-const currentRoute = store.getters['App/currentRoute'];
-
-if (!currentRoute) {
-    if (process.env.ZCOIN_CLIENT_REPL === 'true') {
-        // Allow shutting down.
-        $setWaitingReason(undefined);
-
-        window.Firod = require('../daemon/firod').Firod;
-
-        ourWindow.webContents.openDevTools();
-    } else if (store.getters['App/isInitialized'] &&
-               existsSync(store.getters['App/walletLocation']) &&
-               process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
-        startVue();
-        ourWindow.show();
-        $startDaemon().then(() => {
-            router.push("/main");
-        });
-    } else {
-        logger.info("App is not yet initialized. Let's get 'er ready!");
-
-        $setWaitingReason(undefined);
-        startVue();
-        router.push("/setup/welcome").then(() => {
-            ourWindow.show();
-        });
-    }
-} else {
-    // This branch is taken when we're reloaded.
-
+if (process.env.ZCOIN_CLIENT_REPL === 'true') {
+    // Allow shutting down.
     $setWaitingReason(undefined);
 
+    window.Firod = require('../daemon/firod').Firod;
+
+    ourWindow.webContents.openDevTools();
+} else if (store.getters['App/isInitialized'] &&
+           existsSync(store.getters['App/walletLocation']) &&
+           process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
     startVue();
     ourWindow.show();
+    $startDaemon().then(() => {
+        router.push("/main");
+    });
+} else {
+    logger.info("App is not yet initialized. Let's get 'er ready!");
 
-    // fixme: Sometimes, push() is necessary, and other times, it fails and is not. I don't really understand what is
-    //        going on, but since this is only for development I haven't bothered with figuring out what's happening.
-    const pushCurrentRoute = () => {
-        if (router.currentRoute.path !== router.currentRoute.path) {
-            router.push(currentRoute);
-        }
-    }
-
-    if (!currentRoute.path.startsWith("/setup/")) {
-        $startDaemon().then(() => {
-            logger.info(`Navigating to route before reload: ${currentRoute.path}`);
-            pushCurrentRoute();
-        });
-    } else {
-        logger.info(`Navigating to route before reload: ${currentRoute.path}`);
-        pushCurrentRoute();
-    }
+    $setWaitingReason(undefined);
+    startVue();
+    router.push("/setup/welcome").then(() => {
+        ourWindow.show();
+    });
 }

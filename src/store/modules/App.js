@@ -16,9 +16,7 @@ const state = {
     // This is the value read from our configuration, not what is given to us in APIStatus.
     firoClientNetwork: null,
     waitingReason: 'Loading...',
-    firodHasStarted: false,
-    // This is used to go back to the page we were looking at when an automatic reload occurs.
-    currentRoute: null
+    firodHasStarted: false
 }
 
 const mutations = {
@@ -76,12 +74,6 @@ const mutations = {
 
     setFirodHasStarted(state, value) {
         state.firodHasStarted = value;
-    },
-
-    // Set from a router.afterEach hook in main.js. We'll be used to figure out where we left off if we're reloading the
-    // app. This MUST NOT be called directly.
-    setCurrentRoute(state, value) {
-        state.currentRoute = value;
     },
 
     setCachedMnemonic(state, value) {
@@ -166,7 +158,6 @@ const getters = {
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
     firodHasStarted: (state) => state.firodHasStarted,
-    currentRoute: (state) => state.currentRoute,
     showPaymentPendingWarning: (state, getters, rootState, rootGetters) => rootGetters['Balance/availablePublic'] > 1e8,
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.
