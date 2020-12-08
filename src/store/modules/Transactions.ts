@@ -39,10 +39,10 @@ const mutations = {
 
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
 
-                        if (tx.spendable) {
-                            stateUnspentUTXOs[tx.uniqId] = true;
-                        } else {
+                        if (tx.spendableAt === undefined || tx.spendableAt === -1 || tx.amount === 0) {
                             delete stateUnspentUTXOs[tx.uniqId];
+                        } else {
+                            stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
                         }
 
                         // mined and znode transactions without a blockHeight are orphans.
@@ -199,7 +199,10 @@ const actions = {
 const getters = {
     // a map of `${txid}-${txIndex}` to the full transaction object returned from firod
     transactions: (state) => state.transactions,
-    unspentUTXOs: (state) => Object.keys(state.unspentUTXOs).map(uniqId => state.transactions[uniqId]),
+    availableUTXOs: (state, getters, rootState, rootGetters) =>
+        Object.keys(state.unspentUTXOs)
+        .map(uniqId => state.transactions[uniqId])
+        .filter(tx => tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight']),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
 

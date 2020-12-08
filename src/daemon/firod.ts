@@ -212,7 +212,10 @@ export interface TransactionOutput {
     blockHash?: string;
     blockTime?: number;
     available?: boolean;
-    spendable?: boolean;
+    // This may be undefined or -1, in which case the transaction is not spendable; 0, in which case the transaction
+    // should be spendable now (e.g. non-coinbase transactions), or another positive value, in which case the
+    // transaction is spendable after that block number.
+    spendableAt?: number;
     locked?: boolean;
 }
 function isValidTransactionOutput(x: any): x is TransactionOutput {

@@ -56,7 +56,7 @@ export default {
     computed: {
         ...mapGetters({
             transactions: 'Transactions/transactions',
-            unspentUTXOs: 'Transactions/unspentUTXOs',
+            availableUTXOs: 'Transactions/availableUTXOs'
         }),
 
         selectedCoins() {
@@ -66,10 +66,9 @@ export default {
         },
 
         ourUnspentUTXOs() {
-            return this.unspentUTXOs.filter(tx => {
-                if (this.isPrivate) return tx.category === 'mint';
-                else return tx.category !== 'mint';
-            })
+            return this.availableUTXOs
+                .filter(tx => (tx.category === 'mint') === this.isPrivate)
+                .sort((a, b) => (b.amount - a.amount) || a.txid.localeCompare(b.txid));
         }
     },
 
