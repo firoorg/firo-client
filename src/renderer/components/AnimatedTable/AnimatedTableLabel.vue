@@ -34,11 +34,11 @@
         </span>
 
         <span v-else-if="['send', 'spendOut'].includes(category)">
-            Outgoing Transaction
+            Outgoing Transaction ({{ address }})
         </span>
 
         <span v-else-if="['receive', 'spendIn'].includes(category)">
-            Incoming Transaction
+            Incoming Transaction ({{ address }})
         </span>
 
         <span v-else-if="category === 'payment-request'">
@@ -55,6 +55,7 @@
 // The default values here should be coordinated with the assignment of extraSearchText in PaymentsList.
 
 import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue';
+import {mapGetters} from "vuex";
 
 export default {
     name: "AnimatedTableLabel",
@@ -64,12 +65,21 @@ export default {
     ],
 
     computed: {
+        ...mapGetters({
+            addressBook: 'AddressBook/addressBook'
+        }),
+
         category () {
             return this.rowData.category;
         },
 
+        address () {
+            return this.rowData.address;
+        },
+
         label () {
-            return this.rowData.label;
+            if (this.rowData.label) return this.rowData.label;
+            if (this.addressBook[this.address]) return this.addressBook[this.address].label;
         },
 
         paymentRequestAddress () {
