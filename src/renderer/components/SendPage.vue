@@ -344,7 +344,7 @@ export default {
             if (!this.isPrivate) {
                 return 'amountIsWithinAvailableBalance|publicAmountIsValid';
             } else if (this.isLelantusAllowed) {
-                return 'amountIsWithinAvailableBalance|publicAmountIsValid';
+                return 'amountIsWithinAvailableBalance|publicAmountIsValid|privateAmountDoesntViolateSpendLimit';
             } else {
                 return 'amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits'
             }
@@ -455,6 +455,13 @@ export default {
         this.$validator.extend('privateAmountIsWithinBounds', {
             getMessage: () => 'Amount for private send may not exceed 500 FIRO',
             validate: (value) => Number(value) <= 500
+        });
+
+        this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
+            getMessage: () =>
+                `Due to private transaction spend limits, you may not spend more than 1001 FIRO (including fees) in one transaction`,
+
+            validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 1001e8 : convertToSatoshi(value) <= 1000.99e8
         });
 
         this.$validator.extend('privateAmountDoesntViolateInputLimits', {
