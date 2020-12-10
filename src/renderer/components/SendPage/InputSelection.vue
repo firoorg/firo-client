@@ -4,7 +4,7 @@
             ref="vuetable"
             :data="ourUnspentUTXOs"
             :fields="fields"
-            :anti-overflow-hack="false"
+            :anti-overflow-hack="true"
             :global-data="selectionData"
             track-by="uniqId"
         />

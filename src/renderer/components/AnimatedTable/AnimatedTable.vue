@@ -166,7 +166,7 @@ export default {
                 const tableRow = document.querySelector('.table-container td');
                 if (tableContainer && tableHeader && tableRow) {
                     this.perPage = Math.floor((tableContainer.clientHeight - tableHeader.clientHeight) / tableRow.clientHeight);
-                    if (this.antiOverflowHack) this.perPage -= 1;
+                    if (this.antiOverflowHack) this.perPage -= 2;
                     this.$refs.vuetable.refresh();
                 }
             });
