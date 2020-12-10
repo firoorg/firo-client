@@ -39,7 +39,7 @@ const mutations = {
 
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
 
-                        if (tx.spendableAt === undefined || tx.spendableAt === -1 || tx.amount === 0) {
+                        if (tx.spendableAt === undefined || tx.spendableAt === -1) {
                             delete stateUnspentUTXOs[tx.uniqId];
                         } else {
                             stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
