@@ -2,6 +2,7 @@
 
 @mixin mnemonic {
     display: grid;
+    user-select: text;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 
     .mnemonic-word {
