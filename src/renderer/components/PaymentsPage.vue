@@ -116,11 +116,6 @@ export default {
                     continue;
                 }
 
-                if (!tx.address) {
-                    this.$log.silly(`transaction ${id} with no associated address`);
-                    continue;
-                }
-
                 // Coordinate this with the default values in AnimatedTableLabel.
                 let extraSearchText;
                 switch (tx.category) {

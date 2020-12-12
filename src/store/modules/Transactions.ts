@@ -30,7 +30,7 @@ const mutations = {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
-                        if (address === 'MINT' && tx.category === 'receive') {
+                        if ((!tx.address || address === 'MINT') && (tx.category === 'receive' || tx.category === 'spendIn')) {
                             // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
                             // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
                             // category one.
