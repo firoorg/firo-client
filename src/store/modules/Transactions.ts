@@ -39,7 +39,11 @@ const mutations = {
 
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
 
-                        if (tx.spendableAt === undefined || tx.spendableAt === -1) {
+                        if (!tx.amount) {
+                            logger.warn(`Got 0 amount transaction ${tx.uniqId}`);
+                        }
+
+                        if (tx.spendableAt === undefined || tx.spendableAt === -1 || tx.locked) {
                             delete stateUnspentUTXOs[tx.uniqId];
                         } else {
                             stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
