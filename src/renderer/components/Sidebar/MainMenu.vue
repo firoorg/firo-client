@@ -18,7 +18,7 @@
             </div>
         </router-link>
 
-        <router-link to="/coinswap">
+        <router-link v-if="network === 'main'" to="/coinswap">
             <div class="inner">
                 Coin Swap
             </div>
@@ -45,10 +45,15 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 import PercentageToHoldInZerocoinNotification from 'renderer/components/Notification/PercentageToHoldInZerocoinNotification'
 
 export default {
     name: 'MainMenu',
+
+    computed: mapGetters({
+        network: 'ApiStatus/network'
+    }),
 
     components: {
         PercentageToHoldInZerocoinNotification
