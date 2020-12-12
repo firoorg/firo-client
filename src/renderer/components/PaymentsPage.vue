@@ -82,6 +82,14 @@ export default {
                     this.reloadTable();
                 }
             }
+        },
+
+        newTableData() {
+            this.$emit('resize');
+        },
+
+        showUnsyncedWarning() {
+            this.$emit('resize');
         }
     },
 
