@@ -120,7 +120,7 @@
                         <div v-else class="value" />
                     </div>
 
-                    <div class="total-field" id="receive-amount">
+                    <div class="total-field" id="expected-rate">
                         <label>
                             Expected rate:
                         </label>
