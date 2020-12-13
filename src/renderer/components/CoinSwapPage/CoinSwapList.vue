@@ -314,7 +314,6 @@ export default {
     .inner {
         box-sizing: border-box;
         height: 100%;
-        padding: $size-main-margin;
 
         display: flex;
         flex-flow: column;
