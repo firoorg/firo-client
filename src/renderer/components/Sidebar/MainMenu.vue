@@ -71,7 +71,6 @@ nav {
 
         .inner {
             padding: $size-sidebar-link-inner-padding;
-            border-radius: $size-sidebar-border-radius;
 
             &:hover {
                 color: $color-menu-link-text-highlighted;
