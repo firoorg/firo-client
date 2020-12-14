@@ -61,7 +61,6 @@
                     <label>
                         Amount
                     </label>
-
                     <div class="input-with-tip-container">
                         <input
                             id="amount"
@@ -75,7 +74,6 @@
                             :placeholder="swapType === 'from' ? `From ${isPrivate ? 'private' : 'public'} balance` : 'Amount'"
                             @keyup="changeAmont($event)"
                         />
-
                         <span class="tip ticker">
                             {{ getCurrency }}
                         </span>
@@ -86,18 +84,19 @@
                     <label>
                         Your {{ selectedCoin }} {{ swapType === 'from' ? "destination" : "refund"}} address
                     </label>
-
-                    <input
-                        id="address"
-                        ref="address"
-                        v-model="address"
-                        v-tooltip="getValidationTooltip('address')"
-                        type="text"
-                        name="address"
-                        tabindex="2"
-                        :placeholder="swapType === 'from' ? 'Destination address' : 'Refund address'"
-                        @keyup="changeRecipientWallet($event)"
-                    />
+                    <div class="input-with-tip-container">
+                        <input
+                            id="address"
+                            ref="address"
+                            v-model="address"
+                            v-tooltip="getValidationTooltip('address')"
+                            type="text"
+                            name="address"
+                            tabindex="2"
+                            :placeholder="swapType === 'from' ? 'Destination address' : 'Refund address'"
+                            @keyup="changeWallet($event)"
+                        />
+                    </div>
                 </div>
 
                 <div class="field" id="subtract-fee-from-amount">
@@ -383,10 +382,10 @@ export default {
             return this.totalAmount * price;
         },
         canBeginSend() {
-            if (this.selectedCoin && this.amount && this.address) {
+            if (this.selectedCoin && this.address && !isNaN(parseFloat(this.amount)) && !isNaN(this.amount - 0)) {
                 const isValid = Utils.validateAddress(this.address, this.selectedCoin);
 
-                return isValid && !this.error && !this.amountError;
+                return isValid && !this.error && !this.amountError && convertToSatoshi(this.amount) <= this.available;
             }
 
             return false;
@@ -453,11 +452,12 @@ export default {
 
             this.recountTo(prop);
         },
-        changeRecipientWallet(event) {
-            this.recipientWallet = event.target.value;
-        },
-        changeRefundWallet(event) {
-            this.refundWallet = event.target.value;
+        changeWallet(event) {
+            if (this.swapType === 'from') {
+                this.recipientWallet = event.target.value;
+            } else {
+                this.refundWallet = event.target.value;
+            }
         },
         getCurrentPair() {
             return this.swapType === 'from' ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
