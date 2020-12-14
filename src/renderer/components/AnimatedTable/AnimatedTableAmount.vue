@@ -18,7 +18,7 @@
             -{{ amount }} FIRO
         </span>
         <span
-            v-else-if="['spendIn', 'receive', 'mined', 'znode'].includes(category)"
+            v-else-if="['spendIn', 'receive', 'mined', 'znode', 'mintIn'].includes(category)"
             class="incoming"
         >
             +{{ amount }} FIRO

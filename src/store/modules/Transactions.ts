@@ -30,13 +30,6 @@ const mutations = {
                 unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
-                        if ((!tx.address || address === 'MINT') && (tx.category === 'receive' || tx.category === 'spendIn')) {
-                            // Every mint transaction appears both as a 'receive' and a 'mint'. Since we're already
-                            // processing them as a 'mint' category transaction, we don't need to process it as a 'receive'
-                            // category one.
-                            continue;
-                        }
-
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
 
                         if (!tx.amount) {
@@ -104,6 +97,34 @@ const mutations = {
                         stateTransactions[id].spendable = false;
                         delete stateUnspentUTXOs[id];
                     }
+                }
+            }
+        }
+
+        // Mints to ourselves are listed twice. Filter them out here.
+        for (const uniqId of Object.keys(stateTransactions)) {
+            if (uniqId.includes('-mintIn')) {
+                const mintId = uniqId.replace('-mintIn', '-mint');
+                if (stateTransactions[mintId]) {
+                    delete stateTransactions[uniqId];
+                    delete stateUnspentUTXOs[uniqId];
+
+                    stateTransactions[mintId].isChange = true;
+                }
+            }
+
+            if (uniqId.includes('-mint')) {
+                const receiveId = uniqId.replace('-mint', '-receive');
+                if (stateTransactions[receiveId]) {
+                    delete stateTransactions[receiveId];
+                    delete stateUnspentUTXOs[receiveId];
+                }
+
+
+                const spendInId = uniqId.replace('-mint', '-receive');
+                if (stateTransactions[spendInId]) {
+                    delete stateTransactions[spendInId];
+                    delete stateUnspentUTXOs[spendInId];
                 }
             }
         }

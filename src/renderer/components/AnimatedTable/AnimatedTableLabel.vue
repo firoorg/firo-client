@@ -37,7 +37,7 @@
             Outgoing Transaction ({{ address }})
         </span>
 
-        <span v-else-if="['receive', 'spendIn'].includes(category)">
+        <span v-else-if="['receive', 'spendIn', 'mintIn'].includes(category)">
             Incoming Transaction ({{ address }})
         </span>
 

@@ -67,7 +67,7 @@ export default {
 
         ourUnspentUTXOs() {
             return this.availableUTXOs
-                .filter(tx => (tx.category === 'mint') === this.isPrivate)
+                .filter(tx => ['mint', 'mintIn'].includes(tx.category) === this.isPrivate)
                 .sort((a, b) => (b.amount - a.amount) || a.txid.localeCompare(b.txid));
         }
     },

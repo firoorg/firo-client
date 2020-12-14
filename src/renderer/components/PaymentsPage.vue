@@ -115,7 +115,7 @@ export default {
                     continue;
                 }
                 // Mints are handled separately.
-                if (tx.category === 'mint') {
+                if (['mint', 'mintIn'].includes(tx.category)) {
                     continue;
                 }
 
@@ -131,6 +131,7 @@ export default {
                     extraSearchText = 'Mined Transaction';
                     break;
 
+                case 'mintIn':
                 case 'receive':
                 case 'spendIn':
                     extraSearchText = 'Incoming Transaction';
