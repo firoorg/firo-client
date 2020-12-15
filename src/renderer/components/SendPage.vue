@@ -53,6 +53,7 @@
                             name="address"
                             tabindex="2"
                             placeholder="Address"
+                            spellcheck="false"
                         />
 
                         <div id="add-to-address-book">
