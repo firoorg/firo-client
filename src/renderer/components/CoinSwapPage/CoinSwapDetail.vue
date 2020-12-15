@@ -94,6 +94,7 @@
                             name="address"
                             tabindex="2"
                             :placeholder="swapType === 'from' ? 'Destination address' : 'Refund address'"
+                            spellcheck="false"
                             @keyup="changeWallet($event)"
                         />
                     </div>
