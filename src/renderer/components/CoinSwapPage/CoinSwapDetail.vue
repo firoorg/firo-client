@@ -93,7 +93,6 @@
                             tabindex="2"
                             :placeholder="isSwapFrom ? 'Destination address' : 'Refund address'"
                             spellcheck="false"
-                            @keyup="changeWallet($event)"
                         />
                     </div>
                 </div>
@@ -196,8 +195,6 @@ const initialState = {
     selectedCoin: '',
     selectedCoinInfo: {},
     selectedBalance: { label: 'Public', value: 'public' },
-    recipientWallet: '',
-    refundWallet: '',
     sequence: '',
     passphrase: '',
     transactionFee: 0,
@@ -312,9 +309,6 @@ export default {
         isSwapFrom() {
             return this.swapType === 'from';
         },
-        wallet() {
-            return this.isSwapFrom ? this.recipientWallet : this.refundWallet;
-        },
         getValidationTooltip() {
             const getContent = fieldName => {
                 if (fieldName === 'amount') {
@@ -352,7 +346,7 @@ export default {
 
                     return false;
                 } else {
-                    return this.wallet ? !Utils.validateAddress(this.wallet, this.selectedCoin) : false;
+                    return this.address ? !Utils.validateAddress(this.address, this.selectedCoin) : false;
                 }
             };
 
@@ -448,20 +442,13 @@ export default {
         setBalance(value) {
             this.selectedBalance = value;
         },
-        changeWallet(event) {
-            if (this.isSwapFrom) {
-                this.recipientWallet = event.target.value;
-            } else {
-                this.refundWallet = event.target.value;
-            }
-        },
         getMarketInfo() {
             const marketInfo = this.marketInfo.find(({ pair }) => pair === this.xzcPair);
 
             return marketInfo || {};
         },
         stepIsDisabled() {
-            return this.amount && this.refundWallet;
+            return this.amount && (!this.isSwapFrom && this.address);
         },
         cleanupForm() {
             for (let key in initialState) {
