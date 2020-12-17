@@ -11,12 +11,12 @@
 
                 <div class="radio-buttons-wrapper">
                     <label class="radio-button-wrapper">Swap from FIRO
-                        <input type="radio" v-model="swapType" value="from" :checked="swapType === 'from'" name="radio">
-                        <span class="checkmark"></span>
+                        <input type="radio" v-model="swapType" value="from">
+                        <span class="checkmark" />
                     </label>
                     <label class="radio-button-wrapper">Swap to FIRO
-                        <input type="radio" v-model="swapType" value="to" :checked="swapType === 'to'" name="radio">
-                        <span class="checkmark"></span>
+                        <input type="radio" v-model="swapType" value="to">
+                        <span class="checkmark" />
                     </label>
                 </div>
 
