@@ -71,7 +71,6 @@
                             class="amount"
                             tabindex="3"
                             :placeholder="isSwapFrom ? `From ${isPrivate ? 'private' : 'public'} balance` : 'Amount'"
-                            @keyup="changeAmont($event)"
                         />
                         <span class="tip ticker">
                             {{ getCurrency }}
@@ -292,6 +291,10 @@ export default {
     watch: {
         $route(to, from) {
             this.cleanupForm();
+        },
+
+        amount() {
+            this.recountTo('amount');
         }
     },
 
@@ -446,11 +449,6 @@ export default {
         },
         setBalance(value) {
             this.selectedBalance = value;
-        },
-        changeAmont(event, prop = 'amount') {
-            this[prop] = event.target.value;
-
-            this.recountTo(prop);
         },
         changeWallet(event) {
             if (this.isSwapFrom) {
