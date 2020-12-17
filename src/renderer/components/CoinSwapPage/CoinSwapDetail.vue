@@ -207,7 +207,6 @@ const initialState = {
     amountMinError: false,
     amountMaxError: false,
     amountError: false,
-    exchangeCreated: false,
     isPrivate: true,
     subtractFeeFromAmount: true
 };
@@ -235,10 +234,6 @@ export default {
             currenciesFromFIRO: [],
             currenciesToFIRO: [],
             marketInfo: [],
-            balances: [
-                { label: 'Public', value: 'public' },
-                { label: 'Private', value: 'private' }
-            ],
             ...initialState
         };
     },
