@@ -179,9 +179,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import SendFlow from 'renderer/components/CoinSwapPage/SendFlow';
-import { isValidAddress } from 'lib/isValidAddress';
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
-import { ZcoindErrorResponse } from 'daemon/firod';
 import { VueSelect } from 'vue-select';
 import APIWorker from 'renderer/api/switchain-api';
 import Utils from 'renderer/utils';
