@@ -34,6 +34,18 @@ class APIWorker {
         return;
     }
 
+    // async getMarketInfo() -> Promise<{
+    //   error?: string, // the error response, if any; error XOR response will be set.
+    //   response?: {
+    //     pair: string,     // CUR1-CUR2 eg. USDT-FIRO
+    //     quote: string,    // the string-encoded rational number of currency CUR1 equal to CUR2, eg. "3.1415"
+    //     expiryTs: number, // the UNIX timestamp until which the information is valid
+    //     minerFee: number, // the satoshi amount miner fee
+    //     minLimit: number, // the minimum amount of CUR1 that must be sent
+    //     maxLimit: number, // the maximum amount of CUR1 that must be sent
+    //     signature: string // a UUID representing the pair/quote
+    //   }[],
+    // }>
     async getMarketInfo() {
         const url = `${this.API_URI}marketinfo/`;
 
