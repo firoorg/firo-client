@@ -7,7 +7,6 @@
                         <h2 class="total-field">Coin Swap</h2>
                         <div class="logo-wrapper">Powered by <SwitchainIcon /></div>
                     </div>
-                    <p class="total-field">Page description and explanation what to do</p>
                 </header>
 
                 <div class="radio-buttons-wrapper">
