@@ -22,14 +22,14 @@
 
                 <div class="field" id="label-field">
                     <label>
-                        {{ swapType === 'from' ? 'Receive' : 'Send' }}
+                        {{ isSwapFrom ? 'Receive' : 'Send' }}
                     </label>
 
                     <vue-select
                         class="select"
                         label="coin"
                         :loading="spinner.currencies"
-                        :options="swapType === 'from' ? currenciesFromFIRO : currenciesToFIRO"
+                        :options="isSwapFrom ? currenciesFromFIRO : currenciesToFIRO"
                         :value="selectedCoinInfo"
                         :placeholder="spinner.currencies ? 'Loading coins...' : 'Select coin'"
                         :clearable="!spinner.currencies && !!selectedCoinInfo.coin"
@@ -70,7 +70,7 @@
                             name="amount"
                             class="amount"
                             tabindex="3"
-                            :placeholder="swapType === 'from' ? `From ${isPrivate ? 'private' : 'public'} balance` : 'Amount'"
+                            :placeholder="isSwapFrom ? `From ${isPrivate ? 'private' : 'public'} balance` : 'Amount'"
                             @keyup="changeAmont($event)"
                         />
                         <span class="tip ticker">
@@ -81,7 +81,7 @@
 
                 <div class="field" id="address-field">
                     <label>
-                        Your {{ selectedCoin }} {{ swapType === 'from' ? "destination" : "refund"}} address
+                        Your {{ selectedCoin }} {{ isSwapFrom ? "destination" : "refund"}} address
                     </label>
                     <div class="input-with-tip-container">
                         <input
@@ -92,7 +92,7 @@
                             type="text"
                             name="address"
                             tabindex="2"
-                            :placeholder="swapType === 'from' ? 'Destination address' : 'Refund address'"
+                            :placeholder="isSwapFrom ? 'Destination address' : 'Refund address'"
                             spellcheck="false"
                             @keyup="changeWallet($event)"
                         />
@@ -302,8 +302,11 @@ export default {
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
         }),
+        isSwapFrom() {
+            return this.swapType === 'from';
+        },
         wallet() {
-            return this.swapType === 'from' ? this.recipientWallet : this.refundWallet;
+            return this.isSwapFrom ? this.recipientWallet : this.refundWallet;
         },
         getValidationTooltip() {
             const getContent = fieldName => {
@@ -314,7 +317,7 @@ export default {
                         return 'Invalid amount';
                     }
 
-                    if (this.swapType === 'from' && convertToSatoshi(amount) > this.available) {
+                    if (this.isSwapFrom && convertToSatoshi(amount) > this.available) {
                         return `Amount Is Over Your Available ${this.isPrivate ? 'Private' : ''} Balance of ${convertToCoin(this.available)}`;
                     }
 
@@ -333,7 +336,7 @@ export default {
                     }
 
                     if (amount) {
-                        if (this.swapType === 'from' && convertToSatoshi(amount) > this.available) {
+                        if (this.isSwapFrom && convertToSatoshi(amount) > this.available) {
                             return true;
                         }
 
@@ -389,10 +392,10 @@ export default {
             return this.subtractFeeFromAmount ? this.amount : +this.amount + +this.transactionFee;
         },
         getCurrency() {
-            return this.swapType === 'from' ? 'FIRO' : this.selectedCoin;
+            return this.isSwapFrom ? 'FIRO' : this.selectedCoin;
         },
         getCurrency_() {
-            return this.swapType === 'from' ? this.selectedCoin : 'FIRO';
+            return this.isSwapFrom ? this.selectedCoin : 'FIRO';
         }
     },
 
@@ -444,17 +447,17 @@ export default {
             this.recountTo(prop);
         },
         changeWallet(event) {
-            if (this.swapType === 'from') {
+            if (this.isSwapFrom) {
                 this.recipientWallet = event.target.value;
             } else {
                 this.refundWallet = event.target.value;
             }
         },
         getCurrentPair() {
-            return this.swapType === 'from' ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
+            return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
         },
         _getCurrentPair() {
-            return this.swapType === 'from' ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
+            return this.isSwapFrom ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
         },
         getMarketInfo() {
             const currentPair = this._getCurrentPair();
@@ -481,7 +484,7 @@ export default {
             }
         },
         renderFromLabel(fieldName = 'amount') {
-            const from = this.swapType === 'from' ? 'FIRO' : this.selectedCoin;
+            const from = this.isSwapFrom ? 'FIRO' : this.selectedCoin;
             const hasError = this.amountMaxError || this.amountMinError;
             let error = this.amountMaxError ? `Maximum amount ${this.maxAmount} ${from}` : `Minimum amount ${this.minAmount} ${from}`;
 
@@ -540,7 +543,7 @@ export default {
         countSequence() {
             const price = this.countPrice();
 
-            if (this.swapType === 'from') {
+            if (this.isSwapFrom) {
                 this.sequence = `1 FIRO ≈ ${price || ''} ${this.selectedCoin}`;
             } else {
                 this.sequence = `1 ${this.selectedCoin} ≈ ${price || ''} FIRO`;
