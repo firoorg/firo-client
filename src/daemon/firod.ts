@@ -273,7 +273,7 @@ function isValidAddressBookItem(x: any): x is AddressBookItem {
         typeof x === 'object' &&
         typeof x.address === 'string' &&
         typeof x.label === 'string' &&
-        ['send', 'receive'].includes(x.purpose);
+        typeof x.purpose === 'string';
 
     if (!r) {
         logger.error("Invalid address book item: %O", x);
