@@ -401,29 +401,6 @@ export default {
             this.cleanupForm();
             this.isPrivate = isPrivate;
         },
-        beginWaitToConfirmStep() {
-            this.swapPopoverStep = 'waitToConfirm';
-        },
-        beginConfirmStep() {
-            this.swapPopoverStep = 'confirm';
-        },
-        beginPassphraseStep() {
-            this.swapPopoverStep = 'passphrase';
-        },
-        closeSendPopover() {
-            this.passphrase = '';
-            this.swapPopoverStep = 'initial';
-        },
-        beginIncorrectPassphraseStep() {
-            this.swapPopoverStep = 'incorrectPassphrase';
-        },
-        beginErrorStep(errorMessage) {
-            this.errorMessage = errorMessage;
-            this.swapPopoverStep = 'error';
-        },
-        beginCompleteStep() {
-            this.swapPopoverStep = 'complete';
-        },
         setSelected(value) {
             this.selectedCoinInfo = value;
             this.selectedCoin = value.coin;
