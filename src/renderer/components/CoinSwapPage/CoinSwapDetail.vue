@@ -156,8 +156,8 @@
                     :disabled="!canBeginSend"
                     :swap-type="swapType"
                     :is-private="isPrivate"
-                    :label="firoPair()"
-                    :current-pair="xzcPair()"
+                    :label="firoPair"
+                    :current-pair="xzcPair"
                     :selectedCoin="selectedCoin"
                     :address="address"
                     :amount="+amount"
@@ -302,6 +302,12 @@ export default {
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
         }),
+        firoPair() {
+            return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
+        },
+        xzcPair() {
+            return this.isSwapFrom ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
+        },
         isSwapFrom() {
             return this.swapType === 'from';
         },
@@ -453,14 +459,8 @@ export default {
                 this.refundWallet = event.target.value;
             }
         },
-        firoPair() {
-            return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
-        },
-        xzcPair() {
-            return this.isSwapFrom ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
-        },
         getMarketInfo() {
-            const marketInfo = this.marketInfo.find(({ pair }) => pair === this.xzcPair());
+            const marketInfo = this.marketInfo.find(({ pair }) => pair === this.xzcPair);
 
             return marketInfo || {};
         },
