@@ -196,17 +196,7 @@
                     />
 
                     <div class="footer">
-                        <label id="private-balance-label">PRIVATE BALANCE:</label>
-                        <div id="private-balance">{{ convertToCoin(availablePrivate) }} <span class="ticker">FIRO</span></div>
-                        <label id="public-balance-label">PUBLIC BALANCE:</label>
-                        <div id="public-balance">{{ convertToCoin(availablePublic) }} <span class="ticker">FIRO</span></div>
-                        <div id="toggle" :class="isPrivate ? 'private' : 'public'">
-                            <label id="toggle-label-private">PRIVATE</label>
-                            <div class="toggle-switch" @click="togglePrivatePublic()">
-                                <div class="inner" />
-                            </div>
-                            <label id="toggle-label-public">PUBLIC</label>
-                        </div>
+                        <PrivatePublicBalance @toggle="togglePrivatePublic" />
                     </div>
                 </div>
             </div>
@@ -226,6 +216,7 @@ import Popup from "renderer/components/Popup";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
+import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
 
 let monotonicTicker = 0;
 const monotonic = () => monotonicTicker++;
@@ -234,6 +225,7 @@ export default {
     name: 'SendPage',
 
     components: {
+        PrivatePublicBalance,
         AnimatedTable,
         SendFlow,
         Amount,
@@ -499,10 +491,9 @@ export default {
             this.label = addressBookItem.label;
         },
 
-        togglePrivatePublic() {
-            const p = this.isPrivate;
+        togglePrivatePublic(isPrivate) {
             this.cleanupForm();
-            this.isPrivate = !p;
+            this.isPrivate = isPrivate;
         },
 
         async maybeShowFee () {
@@ -717,82 +708,6 @@ export default {
                 .error {
                     @include error();
                     margin-bottom: $size-small-space;
-                }
-
-                .footer {
-                    @include small();
-                    margin-top: $size-small-space;
-
-                    display: grid;
-                    grid-gap: $size-tiny-space;
-
-                    #private-balance-label {
-                        grid-row: 1;
-                        grid-column: 1;
-                    }
-
-                    #private-balance {
-                        text-align: right;
-                        grid-row: 1;
-                        grid-column: 2;
-                    }
-
-                    #public-balance-label {
-                        grid-row: 2;
-                        grid-column: 1;
-                    }
-
-                    #public-balance {
-                        text-align: right;
-                        grid-row: 2;
-                        grid-column: 2;
-                    }
-
-                    #toggle {
-                        @include label();
-                        user-select: none;
-                        grid-row: 2;
-                        grid-column: 4;
-                        justify-self: end;
-
-                        .toggle-switch {
-                            height: 0.7em;
-                            width: $size-medium-space;
-                            padding: 1px;
-                            display: inline-block;
-                            background-color: black;
-                            border-radius: 5px;
-
-                            .inner {
-                                height: 0.7em;
-                                display: inline-block;
-                                position: relative;
-                                width: $size-medium-space / 2;
-                                background-color: red;
-                                border-radius: 5px;
-
-                                @at-root #toggle.private {
-                                    #toggle-label-public {
-                                        opacity: 0.4;
-                                    }
-
-                                    .inner {
-                                        float: left;
-                                    }
-                                }
-
-                                @at-root #toggle.public {
-                                    #toggle-label-private {
-                                        opacity: 0.4;
-                                    }
-
-                                    .inner {
-                                        float: right;
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
