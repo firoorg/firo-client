@@ -294,15 +294,19 @@ export default {
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
         }),
+
         firoPair() {
             return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
         },
+
         xzcPair() {
             return this.isSwapFrom ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
         },
+
         isSwapFrom() {
             return this.swapType === 'from';
         },
+
         getValidationTooltip() {
             const getContent = fieldName => {
                 if (fieldName === 'amount') {
@@ -354,14 +358,17 @@ export default {
                 show: visible(fieldName)
             });
         },
+
         satoshiAmount () {
             return convertToSatoshi(this.amount);
         },
+
         amountToReceive() {
             const price = this.countPrice();
 
             return this.totalAmount * price;
         },
+
         canBeginSend() {
             if (this.selectedCoin && this.address && !isNaN(parseFloat(this.amount)) && !isNaN(this.amount - 0)) {
                 const isValid = Utils.validateAddress(this.address, this.selectedCoin);
@@ -371,15 +378,19 @@ export default {
 
             return false;
         },
+
         available () {
             return this.isPrivate ? this.availablePrivate : this.availablePublic;
         },
+
         totalAmount () {
             return this.subtractFeeFromAmount ? this.amount : +this.amount + +this.transactionFee;
         },
+
         getCurrency() {
             return this.isSwapFrom ? 'FIRO' : this.selectedCoin;
         },
+
         getCurrency_() {
             return this.isSwapFrom ? this.selectedCoin : 'FIRO';
         }
@@ -387,10 +398,12 @@ export default {
 
     methods: {
         convertToCoin,
+
         togglePrivatePublic(isPrivate) {
             this.cleanupForm();
             this.isPrivate = isPrivate;
         },
+
         setSelected(value) {
             this.selectedCoinInfo = value;
             this.selectedCoin = value.coin;
@@ -401,25 +414,31 @@ export default {
 
             this.recountTo();
         },
+
         setBalance(value) {
             this.selectedBalance = value;
         },
+
         getMarketInfo() {
             const marketInfo = this.marketInfo.find(({ pair }) => pair === this.xzcPair);
 
             return marketInfo || {};
         },
+
         stepIsDisabled() {
             return this.amount && (!this.isSwapFrom && this.address);
         },
+
         cleanupForm() {
             for (let key in initialState) {
                 this[key] = initialState[key];
             }
         },
+
         availableBalance(type) {
             return type === 'public' ? convertToCoin(this.availablePublic) : convertToCoin(this.availablePrivate);
         },
+
         maxSelect(type) {
             if (type === 'public') {
                 this.amount = convertToCoin(this.availablePublic);
@@ -427,6 +446,7 @@ export default {
                 this.amount = convertToCoin(this.availablePrivate);
             }
         },
+
         renderFromLabel(fieldName = 'amount') {
             const from = this.isSwapFrom ? 'FIRO' : this.selectedCoin;
             const hasError = this.amountMaxError || this.amountMinError;
@@ -434,6 +454,7 @@ export default {
 
             return hasError ? error : '';
         },
+
         async recountTo(prop) {
             this[`${prop}Error`] = '';
 
@@ -481,9 +502,11 @@ export default {
                 }
             }
         },
+
         countPrice() {
             return this.amountTo && this.amountTo !== '-' && this.totalAmount ? Number(this.amountTo / this.totalAmount) : 0;
         },
+
         countSequence() {
             const price = this.countPrice();
 
