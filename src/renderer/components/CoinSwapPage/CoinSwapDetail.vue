@@ -163,7 +163,6 @@
                     :tx-fee-per-kb="1"
                     :transactionFee="transactionFee"
                     :subtract-fee-from-amount="subtractFeeFromAmount"
-                    :coin-control="coinControl"
                     @success="cleanupForm"
                 />
 
@@ -357,15 +356,6 @@ export default {
         },
         satoshiAmount () {
             return convertToSatoshi(this.amount);
-        },
-        coinControl () {
-            let coinControl;
-
-            if (this.selectedUtxos && this.selectedUtxos.length > 0) {
-                coinControl = this.selectedUtxos.map(element => [element.txid, element.txIndex]);
-            }
-
-            return coinControl;
         },
         amountToReceive() {
             const price = this.countPrice();
