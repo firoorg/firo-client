@@ -178,8 +178,8 @@
                             <div v-else class="value" />
                         </div>
 
-                        <div v-if="error" class="error">
-                            {{ error }}
+                        <div v-if="transactionFeeError" class="error">
+                            {{ transactionFeeError }}
                         </div>
                     </div>
 
@@ -190,7 +190,7 @@
                         :address="address"
                         :amount="satoshiAmount"
                         :tx-fee-per-kb="txFeePerKb || 1"
-                        :computed-tx-fee="transactionFee"
+                        :computed-tx-fee="transactionFee || 0"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
                         @success="cleanupForm"
@@ -216,6 +216,7 @@
 </template>
 
 <script>
+import lodash from 'lodash';
 import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress} from 'lib/isValidAddress';
@@ -227,9 +228,6 @@ import Popup from "renderer/components/Popup";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
-
-let monotonicTicker = 0;
-const monotonic = () => monotonicTicker++;
 
 export default {
     name: 'SendPage',
@@ -266,15 +264,46 @@ export default {
 
             // This is the search term to filter addresses by.
             filter: '',
+        }
+    },
 
-            // This is the total, computed transaction fee.
-            transactionFee: 0,
+    asyncComputed: {
+        // Returns [number (txfee in satoshi), error (string)], one of which will be null.
+        async transactionFeeAndError() {
+            // The whole point of this dance is to prevent repeated calls to the daemon, which are unfortunately slow.
+            const satoshiAmount = this.satoshiAmount;
+            const txFeePerKb = this.useCustomFee ? this.txFeePerKb : this.smartFeePerKb;
+            const coinControl = this.coinControl;
+            const subtractFeeFromAmount = this.subtractFeeFromAmount;
+            const isPrivate = this.isPrivate;
 
-            // This is used if an error occurs computing the fee
-            error: null,
+            if (this.validationErrors.items.length) return;
+            if (!this.satoshiAmount) return;
+            console.log(this.satoshiAmount);
 
-            // This is used to stop us from making lots of transaction fee calls, which are expensive.
-            latestRequestId: 0
+            await new Promise(r => setTimeout(r, 1e3));
+            if (!lodash.isEqual(
+                [satoshiAmount, txFeePerKb, coinControl, subtractFeeFromAmount, isPrivate],
+                [this.satoshiAmount, this.useCustomFee ? this.txFeePerKb : this.smartFeePerKb, this.coinControl, this.subtractFeeFromAmount, this.isPrivate]
+            )) return;
+
+            try {
+                if (this.isPrivate) {
+                    if (this.isLelantusAllowed) {
+                        return [await $daemon.calcLelantusTxFee(satoshiAmount, txFeePerKb, subtractFeeFromAmount, this.coinControl), null];
+                    } else {
+                        return [await $daemon.calcSigmaTxFee(satoshiAmount, subtractFeeFromAmount), null];
+                    }
+                } else {
+                    return [await $daemon.calcPublicTxFee(satoshiAmount, subtractFeeFromAmount, txFeePerKb), null];
+                }
+            } catch (e) {
+                if (e instanceof FirodErrorResponse) {
+                    return [null, e.errorMessage];
+                } else {
+                    return [null, `${e}`];
+                }
+            }
         }
     },
 
@@ -289,6 +318,14 @@ export default {
             addressBook: 'AddressBook/addressBook',
             _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
+
+        transactionFee() {
+            return this.transactionFeeAndError && this.transactionFeeAndError[0];
+        },
+
+        transactionFeeError() {
+            return this.transactionFeeAndError && this.transactionFeeAndError[1];
+        },
 
         smartFeePerKb() {
             return Math.max(this._smartFeePerKb, 10);
@@ -393,29 +430,6 @@ export default {
         coinControlSelectedAmount() {
             this.$validator.validateAll();
         },
-
-        txFeePerKb: {
-            handler: 'maybeShowFee',
-            immediate: true
-        },
-
-        amount: {
-            handler: 'maybeShowFee',
-            immediate: true
-        },
-
-        subtractFeeFromAmount: {
-            handler: 'maybeShowFee',
-            immediate: true
-        },
-
-        isValidated: {
-            handler: 'maybeShowFee'
-        },
-
-        isPrivate: {
-            handler: 'maybeShowFee'
-        }
     },
 
     beforeMount () {
@@ -504,62 +518,6 @@ export default {
             const p = this.isPrivate;
             this.cleanupForm();
             this.isPrivate = !p;
-        },
-
-        async maybeShowFee () {
-            // Delay the request for the transaction fee to make sure we don't make a bunch while the user is typing.
-            const ourRequestId = monotonic();
-            this.latestRequestId = ourRequestId;
-            await new Promise(r => setTimeout(r, 1e3));
-            // latestRequestId is only set above, and therefore will increase monotonically in all cases.
-            if (this.latestRequestId > ourRequestId) return;
-
-            this.transactionFee = 0;
-            this.error = null;
-            this.totalAmountExceedsBalance = false;
-
-            try {
-                // The empty string for an amount won't issue a validation error, but it would be invalid to pass to firod.
-                if (
-                    (this.useCustomFee && !await this.$validator.validate('txFeePerKb')) ||
-                    !(Number(this.txFeePerKb) > 0) ||
-                    !await this.$validator.validate('amount') ||
-                    this.satoshiAmount === 0
-                ) {
-                    return;
-                }
-            } catch {
-                // On startup, $validator.validate() will throw an error because we're called before the page is loaded.
-                return;
-            }
-
-            const satoshiAmount = this.satoshiAmount;
-            const subtractFeeFromAmount = this.subtractFeeFromAmount;
-            const txFeePerKb = this.useCustomFee ? this.txFeePerKb : this.smartFeePerKb;
-
-            let p;
-            if (this.isPrivate) {
-                if (this.isLelantusAllowed) {
-                    p = $daemon.calcLelantusTxFee(satoshiAmount, txFeePerKb, subtractFeeFromAmount, this.coinControl);
-                } else {
-                    p = $daemon.calcSigmaTxFee(satoshiAmount, subtractFeeFromAmount);
-                }
-            } else {
-                p = $daemon.calcPublicTxFee(satoshiAmount, subtractFeeFromAmount, txFeePerKb);
-            }
-
-            try {
-                const txFee = await p;
-                // Make sure we don't update with old data.
-                if (this.latestRequestId > ourRequestId) return;
-                this.transactionFee = txFee
-            } catch (e) {
-                if (e instanceof FirodErrorResponse && e.errorCode === -6) {
-                    this.error = e;
-                } else {
-                    this.error = `${e}`;
-                }
-            }
         },
 
         cleanupForm () {
