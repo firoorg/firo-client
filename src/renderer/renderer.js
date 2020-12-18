@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
+import AsyncComputed from "vue-async-computed";
 import Scrollable from 'renderer/directives/scrollable'
 import Focus from 'renderer/directives/focus'
 
@@ -40,7 +41,7 @@ require('./utils/validationRules/notExceedingBalance');
 Vue.use(VTooltip, {
     defaultBoundariesElement: 'default-tooltip-boundary'
 })
-
+Vue.use(AsyncComputed);
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
     locale: i18n.getLocale({ app, store }), // Default locale
