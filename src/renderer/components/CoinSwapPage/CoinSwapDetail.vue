@@ -289,7 +289,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            selectedUtxos: 'ZcoinPayment/selectedInputs',
             totalBalance: 'Balance/total',
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
