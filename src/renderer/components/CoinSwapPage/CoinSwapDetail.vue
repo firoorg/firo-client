@@ -183,11 +183,46 @@ import APIWorker from 'renderer/api/switchain-api';
 import Utils from 'renderer/utils';
 import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
 import CircularTimer from 'renderer/components/Icons/CircularTimer';
-import CoinSwapHelper from 'lib/coinSwapHelper';
 import CoinIcon from './CoinIcon';
 import SwitchainIcon from 'renderer/components/Icons/SwitchainIcon';
 import BackButtonIcon from 'renderer/components/Icons/BackButtonIcon';
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
+
+// This is the list of currency pairs that we want to be available in the app. It is not necessarily symmetrical, and it
+// is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
+// one of them.
+const AllowedPairs = [
+    "XZC-BTC",
+    "XZC-ETH",
+    "XZC-ZEC",
+    "XZC-LTC",
+    "XZC-XRP",
+    "XZC-XLM",
+    "XZC-BCHABC",
+    "XZC-BNB",
+    "XZC-USDT",
+    "XZC-USDC",
+    "XZC-DAI",
+    "XZC-DASH",
+    "XZC-DCR",
+    "XZC-PAX",
+    "XZC-TUSD",
+    "BTC-XZC",
+    "ETH-XZC",
+    "ZEC-XZC",
+    "LTC-XZC",
+    "XRP-XZC",
+    "XLM-XZC",
+    "BCHABC-XZC",
+    "BNB-XZC",
+    "USDT-XZC",
+    "USDC-XZC",
+    "DAI-XZC",
+    "DASH-XZC",
+    "DCR-XZC",
+    "PAX-XZC",
+    "TUSD-XZC"
+];
 
 const initialState = {
     swapType: 'from',
@@ -246,10 +281,9 @@ export default {
 
         const marketInfo = error ? [] : response;
 
-        const allowedPairs = CoinSwapHelper.getAllowedCoinSwapPairs();
         const allowedPairsMap = {};
 
-        allowedPairs.forEach(pair => {
+        AllowedPairs.forEach(pair => {
             allowedPairsMap[pair.from + '-' + pair.to] = null;
         });
 
