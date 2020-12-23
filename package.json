@@ -81,6 +81,7 @@
     }
   },
   "dependencies": {
+    "@swyftx/api-crypto-address-validator": "^1.13.1",
     "@types/chai": "^4.2.12",
     "@types/webpack-env": "^1.15.3",
     "@types/zeromq": "^4.6.3",

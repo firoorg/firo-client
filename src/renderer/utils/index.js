@@ -1,13 +1,5 @@
 import { clipboard } from 'electron';
 
-const currenciesRules = require('./currencies-regex.json');
-
-const validateAddress = (address, currency) => {
-    const currencyRule = currenciesRules[currency.toLowerCase()];
-
-    return currencyRule ? address.match(currencyRule.regEx) : true;
-};
-
 const pairToObject = ({ pair }) => {
     const [from, to] = pair.split('-');
 
@@ -46,7 +38,6 @@ const isNumber = n => !isNaN(parseFloat(n)) && !isNaN(n - 0);
 
 export default {
     to,
-    validateAddress,
     pairToObject,
     copyToClipboard,
     dateFormat,

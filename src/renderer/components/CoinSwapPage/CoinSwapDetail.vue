@@ -187,6 +187,7 @@
 </template>
 
 <script>
+import CryptoAddressValidator from '@swyftx/api-crypto-address-validator';
 import Big from 'big.js';
 import lodash from 'lodash';
 import { mapGetters } from 'vuex';
@@ -194,7 +195,6 @@ import SendFlow from 'renderer/components/CoinSwapPage/SendFlow';
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
 import { VueSelect } from 'vue-select';
 import APIWorker from 'renderer/api/switchain-api';
-import Utils from 'renderer/utils';
 import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
 import CircularTimer from 'renderer/components/Icons/CircularTimer';
 import CoinIcon from './CoinIcon';
@@ -257,6 +257,21 @@ const CoinNames = {
     PAX: "Paxos Standard",
     TUSD: "True USD"
 };
+
+const AddressValidations = {};
+for (const coin of ['BTC', 'BCH', 'ETH', 'ZEC', 'LTC', 'XLM', 'BNB', 'USDT', 'USDC', 'DASH', 'DCR', 'PAX', 'TUSD']) {
+    AddressValidations[coin] = (address) => {
+        try {
+            return CryptoAddressValidator.validate(address, coin);
+        } catch {
+            // This case should never occur unless the library is updated to remove functionality or such, but it's
+            // extremely important to catch errors so we'll check for it anyway.
+            console.error(`No validator exists for ${coin}`);
+            return false;
+        }
+    }
+}
+AddressValidations['BCHABC'] = AddressValidations['BCH'];
 
 export default {
     name: 'CoinSwapDetail',
@@ -331,7 +346,8 @@ export default {
         for (const [currency, name] of Object.entries(CoinNames)) {
             this.$validator.extend(`${currency}AddressIsValid`, {
                 getMessage: () => `Invalid ${name} Address`,
-                validate: (value) => !!Utils.validateAddress(value, currency)
+                // We make sure to check if we have a validation for the currency to make sure we fail closed.
+                validate: (value) => !!(AddressValidations[currency] && AddressValidations[currency](value))
             });
         }
 
