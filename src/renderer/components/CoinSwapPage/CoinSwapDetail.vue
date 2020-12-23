@@ -11,11 +11,11 @@
 
                 <div class="radio-buttons-wrapper">
                     <label class="radio-button-wrapper">Swap from FIRO
-                        <input type="radio" v-model="swapType" value="from">
+                        <input type="radio" v-model="isSwapFrom" :value="true">
                         <span class="checkmark" />
                     </label>
                     <label class="radio-button-wrapper">Swap to FIRO
-                        <input type="radio" v-model="swapType" value="to">
+                        <input type="radio" v-model="isSwapFrom" :value="false">
                         <span class="checkmark" />
                     </label>
                 </div>
@@ -25,32 +25,35 @@
                         {{ isSwapFrom ? 'Receive' : 'Send' }}
                     </label>
 
+                    <!-- The use of option.coin below is a function of vue-select, wherein option[label] is set to the
+                         selected value rather than option itself. -->
                     <vue-select
                         class="select"
                         label="coin"
-                        :loading="spinner.currencies"
-                        :options="isSwapFrom ? currenciesFromFIRO : currenciesToFIRO"
-                        :value="selectedCoinInfo"
-                        :placeholder="spinner.currencies ? 'Loading coins...' : 'Select coin'"
-                        :clearable="!spinner.currencies && !!selectedCoinInfo.coin"
-                        :disabled="spinner.currencies"
-                        @input="setSelected"
+                        v-model="selectedCoin"
+                        :loading="!isMarketInfoLoaded"
+                        :disabled="!isMarketInfoLoaded"
+                        :options="remoteCoins"
+                        :placeholder="isMarketInfoLoaded ? 'Select coin' : 'Loading coins...'"
+                        :clearable="!!selectedCoin"
                     >
                         <template v-slot:spinner="loading">
                             <div class="spinner" v-if="loading">Loading...</div>
                         </template>
+
                         <template v-slot:option="option">
                             <div class="coin-option">
                                 <CoinIcon :coin="option.coin" :width="25" :height="25" />
                                 <div class="coin-short-name">{{ option.coin }}</div>
-                                <div class="coin-name">{{ option.name }}</div>
+                                <div class="coin-name">{{ CoinNames[option.coin] }}</div>
                             </div>
                         </template>
+
                         <template v-slot:selected-option="option">
-                            <div class="coin-option" v-if="option.coin">
+                            <div class="coin-option" v-if="option">
                                 <CoinIcon :coin="option.coin" :width="25" :height="25" />
                                 <div class="coin-short-name">{{ option.coin }}</div>
-                                <div class="coin-name">{{ option.name }}</div>
+                                <div class="coin-name">{{ CoinNames[option.coin] }}</div>
                             </div>
                         </template>
                     </vue-select>
@@ -65,15 +68,17 @@
                             id="amount"
                             ref="amount"
                             v-model="amount"
+                            v-validate="amountValidations"
                             v-tooltip="getValidationTooltip('amount')"
                             type="text"
+                            :disabled="!selectedCoin"
                             name="amount"
                             class="amount"
                             tabindex="3"
                             :placeholder="isSwapFrom ? `From ${isPrivate ? 'private' : 'public'} balance` : 'Amount'"
                         />
                         <span class="tip ticker">
-                            {{ getCurrency }}
+                            {{ isSwapFrom ? "FIRO" : selectedCoin }}
                         </span>
                     </div>
                 </div>
@@ -87,82 +92,89 @@
                             id="address"
                             ref="address"
                             v-model="address"
+                            v-validate="`${selectedCoin}AddressIsValid`"
                             v-tooltip="getValidationTooltip('address')"
                             type="text"
                             name="address"
                             tabindex="2"
+                            :disabled="!selectedCoin"
                             :placeholder="isSwapFrom ? 'Destination address' : 'Refund address'"
                             spellcheck="false"
                         />
                     </div>
                 </div>
-
-                <div class="field" id="subtract-fee-from-amount">
-                    <input v-model="subtractFeeFromAmount" type="checkbox" checked />
-                    <label>
-                        Take Transaction Fee From Amount
-                    </label>
-                </div>
             </div>
 
             <div id="bottom">
                 <div id="totals">
-           
-                    <div class="total-field" id="receive-amount">
-                        <label>
-                            Recipient will receive:
-                        </label>
-
-                        <div v-if="transactionFee" class="value"><span>{{ amountToReceive }}</span> <span class="ticker">{{ getCurrency_ }}</span></div>
-                        <div v-else class="value" />
-                    </div>
-
                     <div class="total-field" id="expected-rate">
                         <label>
-                            Expected rate:
+                            Rate:
                         </label>
 
-                        <div v-if="transactionFee" class="value"><span class="ticker">{{ sequence }}</span></div>
-                        <div v-else class="value" />
+                        <div v-if="isMarketInfoLoaded && !!selectedCoin" class="value">
+                            <span class="amount">1</span>
+                            <span class="ticker">{{ isSwapFrom ? "FIRO" : selectedCoin }}</span>
+                            =
+                            <span class="amount">{{ conversionRate }}</span>
+                            <span class="ticker">{{ isSwapFrom ? selectedCoin : "FIRO" }}</span>
+                        </div>
                     </div>
 
-                    <div class="total-field" id="transaction-fee">
+                    <div v-if="isSwapFrom" class="total-field" id="firo-transaction-fee">
                         <label>
-                            Transaction fee:
+                            Firo Transaction fee:
                         </label>
 
-                        <div v-if="transactionFee" class="value"><span>{{transactionFee}}</span> <span class="ticker">{{ getCurrency }}</span></div>
-                        <div v-else class="value" />
+                        <div class="value">
+                            <div v-if="firoTransactionFee">
+                                <span class="amount">{{ convertToCoin(firoTransactionFee) }}</span>
+                                <span class="ticker">FIRO</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedCoin" class="total-field" id="remote-transaction-fee">
+                        <label>
+                            {{ CoinNames[selectedCoin] }} Transaction Fee:
+                        </label>
+
+                        <div class="value">
+                            <span class="amount">{{ remoteTransactionFee }}</span>
+                            <span class="ticker">{{ selectedCoin }}</span>
+                        </div>
                     </div>
 
                     <div class="total-field" id="total-amount">
                         <label>
-                            Total:
+                            You will receive:
                         </label>
 
-                        <div v-if="transactionFee" class="value"><span>{{ totalAmount }}</span> <span class="ticker">{{ getCurrency }}</span></div>
-
-                        <div v-else class="value" />
+                        <div  v-if="amountToReceive" class="value">
+                            ~
+                            <span class="amount">{{ amountToReceive }}</span>
+                            <span class="ticker">{{ isSwapFrom ? selectedCoin : 'FIRO' }}</span>
+                        </div>
                     </div>
 
-                    <div v-if="error" class="error">
-                        {{ error }}
+                    <div v-if="firoTransactionFeeError" class="error">
+                        {{ firoTransactionFeeError }}
                     </div>
                 </div>
 
                 <SendFlow
                     :disabled="!canBeginSend"
-                    :swap-type="swapType"
+                    :swap-type="isSwapFrom ? 'from' : 'to'"
                     :is-private="isPrivate"
                     :label="firoPair"
                     :current-pair="xzcPair"
-                    :selectedCoin="selectedCoin"
+                    :selected-coin="selectedCoin"
                     :address="address"
                     :amount="+amount"
                     :satoshiAmount="satoshiAmount"
                     :tx-fee-per-kb="1"
-                    :transactionFee="transactionFee"
-                    :subtract-fee-from-amount="subtractFeeFromAmount"
+                    :transaction-fee="0"
+                    :subtract-fee-from-amount="true"
                     @success="cleanupForm"
                 />
 
@@ -175,6 +187,8 @@
 </template>
 
 <script>
+import Big from 'big.js';
+import lodash from 'lodash';
 import { mapGetters } from 'vuex';
 import SendFlow from 'renderer/components/CoinSwapPage/SendFlow';
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
@@ -187,6 +201,7 @@ import CoinIcon from './CoinIcon';
 import SwitchainIcon from 'renderer/components/Icons/SwitchainIcon';
 import BackButtonIcon from 'renderer/components/Icons/BackButtonIcon';
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
+import {FirodErrorResponse} from "daemon/firod";
 
 // This is the list of currency pairs that we want to be available in the app. It is not necessarily symmetrical, and it
 // is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
@@ -224,25 +239,23 @@ const AllowedPairs = [
     "TUSD-XZC"
 ];
 
-const initialState = {
-    swapType: 'from',
-    selectedCoin: '',
-    selectedCoinInfo: {},
-    selectedBalance: { label: 'Public', value: 'public' },
-    sequence: '',
-    passphrase: '',
-    transactionFee: 0,
-    error: null,
-    address: '',
-    amount: null,
-    amountTo: 0,
-    step: 1,
-    swapPopoverStep: 'initial',
-    amountMinError: false,
-    amountMaxError: false,
-    amountError: false,
-    isPrivate: true,
-    subtractFeeFromAmount: true
+const CoinNames = {
+    XZC: "Firo",
+    BTC: "Bitcoin",
+    ETH: "Ethereum",
+    ZEC: "ZCash",
+    LTC: "Litecoin",
+    XRP: "Ripple",
+    XLM: "Stellar",
+    BCHABC: "Bitcoin Cash",
+    BNB: "Binance Coin",
+    USDT: "Tether",
+    USDC: "USD Coin",
+    DAI: "Dai",
+    DASH: "Dash",
+    DCR: "Decred",
+    PAX: "Paxos Standard",
+    TUSD: "True USD"
 };
 
 export default {
@@ -259,65 +272,147 @@ export default {
         PrivatePublicBalance
     },
 
+    inject: [
+        '$validator'
+    ],
+
     data() {
         return {
-            api: null,
-            spinner: {
-                currencies: true
-            },
-            currenciesFromFIRO: [],
-            currenciesToFIRO: [],
-            marketInfo: [],
-            ...initialState
+            CoinNames,
+            isPrivate: true,
+            isSwapFrom: true,
+            // This prevents the display of inaccurate transaction fees.
+            calculatingFiroTransactionFee: false,
+
+            selectedCoin: null,
+            amount: '',
+            address: ''
         };
     },
 
-    created() {
-        this.api = new APIWorker();
-    },
+    beforeMount () {
+        // Set up VeeValidator rules.
 
-    async mounted() {
-        const { error, response } = await this.api.getMarketInfo();
+        this.$validator.extend('amountIsWithinAvailableBalance', {
+            // this.availableXzc will still be reactively updated.
+            getMessage: () => `Amount is over your available balance of ${convertToCoin(this.available)} FIRO`,
 
-        const marketInfo = error ? [] : response;
-
-        const allowedPairsMap = {};
-
-        AllowedPairs.forEach(pair => {
-            allowedPairsMap[pair.from + '-' + pair.to] = null;
+            validate: (value) => convertToSatoshi(value) <= this.available
         });
 
-        marketInfo.forEach(({ pair }) => {
-            const { from, to } = Utils.pairToObject({ pair });
-
-            if (pair in allowedPairsMap && (from == 'XZC' || to == 'XZC')) {
-                if (from == 'XZC') {
-                    this.currenciesFromFIRO.push({ coin: to, name: this.$t('currencies.' + to) });
-                } else {
-                    this.currenciesToFIRO.push({ coin: from, name: this.$t('currencies.' + from) });
-                }
+        this.$validator.extend('privateAmountIsValid', {
+            getMessage: () => 'Amount for private send must be a multiple of 0.05',
+            validate: (value) => {
+                const v = convertToSatoshi(value);
+                return (v % 5e6 === 0) && (v > 0);
             }
         });
 
-        this.currenciesFromFIRO.sort((from1, from2) => {
-            return from1.coin.localeCompare(from2.coin);
+        this.$validator.extend('privateAmountIsWithinBounds', {
+            getMessage: () => 'Amount for private send may not exceed 500 FIRO',
+            validate: (value) => Number(value) <= 500
         });
 
-        this.currenciesToFIRO.sort((to1, to2) => {
-            return to1.coin.localeCompare(to2.coin);
+        this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
+            getMessage: () =>
+                `Due to private transaction spend limits, you may not spend more than 1001 FIRO (including fees) in one transaction`,
+
+            validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 1001e8 : convertToSatoshi(value) <= 1000.99e8
         });
 
-        this.marketInfo = marketInfo;
-        this.spinner.currencies = false;
+        this.$validator.extend('privateAmountDoesntViolateInputLimits', {
+            getMessage: () =>
+                `Due to private transaction input limits, you can currently spend no more than ` +
+                `${convertToCoin(this.maxPrivateSend)} FIRO in one transaction. Try minting a larger denomination.`,
+
+            validate: (value) => convertToSatoshi(value) <= this.maxPrivateSend
+        });
+
+        for (const [currency, name] of Object.entries(CoinNames)) {
+            this.$validator.extend(`${currency}AddressIsValid`, {
+                getMessage: () => `Invalid ${name} Address`,
+                validate: (value) => !!Utils.validateAddress(value, currency)
+            });
+        }
+
+        // Additional validations are created in the watcher for marketInfo
     },
 
     watch: {
-        $route(to, from) {
-            this.cleanupForm();
+        marketInfo() {
+            if (!this.marketInfo) return;
+
+            for (const [pair, info] of Object.entries(this.marketInfo)) {
+                this.$validator.extend(`${pair}AmountDoesntViolateAPILimits`, {
+                    getMessage: () => `Amount must be between ${info.minLimit} and ${info.maxLimit}`,
+                    validate: (value) => {
+                        let v;
+                        try {
+                            v = new Big(value);
+                        } catch {
+                            return false;
+                        }
+
+                        return v.gt(info.minLimit) && v.lt(info.maxLimit);
+                    }
+                })
+            }
+        }
+    },
+
+    asyncComputed: {
+        marketInfo: {
+            default: {},
+            async get() {
+                const api = new APIWorker();
+                const {error, response} = await api.getMarketInfo();
+                if (error) return {}
+
+                return lodash.fromPairs(
+                    response
+                        .filter(market => AllowedPairs.includes(market.pair))
+                        .map(market => [market.pair, market])
+                );
+            }
         },
 
-        amount() {
-            this.recountTo('amount');
+        // Returns [number (txfee in satoshi), error (string)], one of which will be null; or undefined if the amount
+        // field is invalid.
+        async firoTransactionFeeAndError() {
+            this.calculatingFiroTransactionFee = true;
+
+            // The whole point of this dance is to prevent repeated calls to the daemon, which are unfortunately slow.
+            const satoshiAmount = this.satoshiAmount;
+            const isPrivate = this.isPrivate;
+
+            if (!!this.getValidationTooltip('amount').content) return;
+            if (!this.satoshiAmount) return;
+
+            await new Promise(r => setTimeout(r, 1e3));
+            if (!lodash.isEqual(
+                [satoshiAmount, isPrivate],
+                [this.satoshiAmount, this.isPrivate]
+            )) return;
+
+            try {
+                if (this.isPrivate) {
+                    if (this.isLelantusAllowed) {
+                        return [await $daemon.calcLelantusTxFee(satoshiAmount, this.smartFeePerKb, false), null];
+                    } else {
+                        return [await $daemon.calcSigmaTxFee(satoshiAmount, false), null];
+                    }
+                } else {
+                    return [await $daemon.calcPublicTxFee(satoshiAmount, false, this.smartFeePerKb), null];
+                }
+            } catch (e) {
+                if (e instanceof FirodErrorResponse) {
+                    return [null, e.errorMessage];
+                } else {
+                    return [null, `${e}`];
+                }
+            } finally {
+                this.calculatingFiroTransactionFee = false;
+            }
         }
     },
 
@@ -326,7 +421,82 @@ export default {
             totalBalance: 'Balance/total',
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
+            maxPrivateSend: 'Balance/maxPrivateSend',
+            _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
+
+        amountValidations () {
+            if (!this.selectedCoin) {
+                return '';
+            } else if (this.isSwapFrom) {
+                if (!this.isPrivate) {
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|publicAmountIsValid`;
+                } else if (this.isLelantusAllowed) {
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|publicAmountIsValid|privateAmountDoesntViolateSpendLimit`;
+                } else {
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits`
+                }
+            } else {
+                return `${this.xzcPair}AmountDoesntViolateAPILimits`;
+            }
+        },
+
+        firoTransactionFee() {
+            if (this.calculatingFiroTransactionFee) return;
+            if (!this.selectedCoin) return;
+            return this.firoTransactionFeeAndError && this.firoTransactionFeeAndError[0];
+        },
+
+        firoTransactionFeeError() {
+            if (this.calculatingFiroTransactionFee) return;
+            if (!this.selectedCoin) return;
+            return this.firoTransactionFeeAndError && this.firoTransactionFeeAndError[1];
+        },
+
+        smartFeePerKb() {
+            return Math.max(this._smartFeePerKb, 10);
+        },
+
+        // The information about the currently selected market, or undefined if marketInfo isn't loaded or no coin is
+        // selected.
+        // Returns:
+        // {
+        //     pair: string,     // CUR1-CUR2 eg. USDT-FIRO
+        //     quote: string,    // the string-encoded rational number of currency CUR1 equal to CUR2, eg. "3.1415"
+        //     expiryTs: number, // the UNIX timestamp until which the information is valid
+        //     minerFee: number, // the satoshi amount miner fee
+        //     minLimit: number, // the minimum amount of CUR1 that must be sent
+        //     maxLimit: number, // the maximum amount of CUR1 that must be sent
+        //     signature: string // a UUID representing the pair/quote
+        // }
+        currentMarketInfo() {
+            return this.marketInfo[this.xzcPair];
+        },
+
+        // This is a string representation of the whole-coin amount of the remote currency taken as a transaction fee.
+        remoteTransactionFee() {
+            return this.currentMarketInfo && this.currentMarketInfo.minerFee;
+        },
+
+        isMarketInfoLoaded() {
+            return Object.keys(this.marketInfo).length !== 0;
+        },
+
+        coinsFromFiro() {
+            return Object.keys(this.marketInfo)
+                .filter(pair => pair.match(/^XZC-/))
+                .map(pair => pair.split('-')[1]);
+        },
+
+        coinsToFiro() {
+            return Object.keys(this.marketInfo)
+                .filter(pair => pair.match(/-XZC$/))
+                .map(pair => pair.split('-')[0]);
+        },
+
+        remoteCoins() {
+            return this.isSwapFrom ? this.coinsFromFiro : this.coinsToFiro;
+        },
 
         firoPair() {
             return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
@@ -336,97 +506,66 @@ export default {
             return this.isSwapFrom ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
         },
 
-        isSwapFrom() {
-            return this.swapType === 'from';
+        // We return a decimal-formatted string (or undefined).
+        conversionRate() {
+            return this.currentMarketInfo && this.currentMarketInfo.quote;
+        },
+
+        // This is a number in satoshi units of the remote currency.
+        remoteCurrencyTransactionFee() {
+            return this.currentMarketInfo && this.currentMarketInfo.minerFee;
         },
 
         getValidationTooltip() {
-            const getContent = fieldName => {
-                if (fieldName === 'amount') {
-                    const amount = Number(this.amount);
-
-                    if (!(typeof amount === 'number' && !isNaN(amount))) {
-                        return 'Invalid amount';
-                    }
-
-                    if (this.isSwapFrom && convertToSatoshi(amount) > this.available) {
-                        return `Amount Is Over Your Available ${this.isPrivate ? 'Private' : ''} Balance of ${convertToCoin(this.available)}`;
-                    }
-
-                    return this.renderFromLabel(fieldName);
-                } else {
-                    return `Invalid ${this.selectedCoin} Address`;
-                }
-            };
-
-            const visible = fieldName => {
-                if (fieldName === 'amount') {
-                    const amount = Number(this.amount);
-
-                    if (!(typeof amount === 'number' && !isNaN(amount))) {
-                        return 'Invalid amount';
-                    }
-
-                    if (amount) {
-                        if (this.isSwapFrom && convertToSatoshi(amount) > this.available) {
-                            return true;
-                        }
-
-                        return this.renderFromLabel(fieldName);
-                    }
-
-                    return false;
-                } else {
-                    return this.address ? !Utils.validateAddress(this.address, this.selectedCoin) : false;
-                }
-            };
-
-            return fieldName => ({
-                content: getContent(fieldName),
+            return (fieldName) => ({
+                content: this.validationErrors.first(fieldName),
                 trigger: 'manual',
                 boundariesElement: 'body',
                 offset: 8,
                 placement: 'left',
                 classes: 'error',
-                show: visible(fieldName)
-            });
+                show: true
+            })
         },
 
         satoshiAmount () {
             return convertToSatoshi(this.amount);
         },
 
+        // We return a string equal to whatever whole-coin amount we expect to receive (either in FIRO or in selectedCoin).
         amountToReceive() {
-            const price = this.countPrice();
+            if (!this.currentMarketInfo) return;
+            if (!this.satoshiAmount) return;
 
-            return this.totalAmount * price;
+            if (this.isSwapFrom) {
+                if (!this.firoTransactionFee) return;
+
+                const conversionRate = new Big(this.conversionRate);
+                const firoAmount = new Big(this.satoshiAmount) / 1e8;
+                const firoTxFee = new Big(this.firoTransactionFee) / 1e8;
+                const remoteTransactionFee = new Big(this.remoteTransactionFee);
+
+                const amountToReceive = (firoAmount - firoTxFee) * conversionRate - remoteTransactionFee;
+                return amountToReceive.toPrecision(8);
+            } else {
+                const conversionRate = new Big(this.conversionRate);
+                // We use amount directly instead of satoshiAmount because the remote currency may have >8 decimal
+                // places of precision.
+                const remoteAmount = new Big(this.amount);
+                const remoteTxFee = new Big(this.remoteTransactionFee);
+
+                const amountToReceive = remoteAmount * conversionRate - remoteTxFee;
+                return amountToReceive.toPrecision(8);
+            }
         },
 
         canBeginSend() {
-            if (this.selectedCoin && this.address && !isNaN(parseFloat(this.amount)) && !isNaN(this.amount - 0)) {
-                const isValid = Utils.validateAddress(this.address, this.selectedCoin);
-
-                return isValid && !this.error && !this.amountError && convertToSatoshi(this.amount) <= this.available;
-            }
-
-            return false;
+            return !this.calculatingFiroTransactionFee && this.firoTransactionFee && this.selectedCoin && this.amount && this.address && !this.validationErrors.items.length;
         },
 
         available () {
             return this.isPrivate ? this.availablePrivate : this.availablePublic;
         },
-
-        totalAmount () {
-            return this.subtractFeeFromAmount ? this.amount : +this.amount + +this.transactionFee;
-        },
-
-        getCurrency() {
-            return this.isSwapFrom ? 'FIRO' : this.selectedCoin;
-        },
-
-        getCurrency_() {
-            return this.isSwapFrom ? this.selectedCoin : 'FIRO';
-        }
     },
 
     methods: {
@@ -437,117 +576,11 @@ export default {
             this.isPrivate = isPrivate;
         },
 
-        setSelected(value) {
-            this.selectedCoinInfo = value;
-            this.selectedCoin = value.coin;
-
-            const { minerFee = 0 } = this.getMarketInfo();
-
-            this.transactionFee = Number(minerFee);
-
-            this.recountTo();
-        },
-
-        setBalance(value) {
-            this.selectedBalance = value;
-        },
-
-        getMarketInfo() {
-            const marketInfo = this.marketInfo.find(({ pair }) => pair === this.xzcPair);
-
-            return marketInfo || {};
-        },
-
-        stepIsDisabled() {
-            return this.amount && (!this.isSwapFrom && this.address);
-        },
-
         cleanupForm() {
-            for (let key in initialState) {
-                this[key] = initialState[key];
-            }
-        },
-
-        availableBalance(type) {
-            return type === 'public' ? convertToCoin(this.availablePublic) : convertToCoin(this.availablePrivate);
-        },
-
-        maxSelect(type) {
-            if (type === 'public') {
-                this.amount = convertToCoin(this.availablePublic);
-            } else {
-                this.amount = convertToCoin(this.availablePrivate);
-            }
-        },
-
-        renderFromLabel(fieldName = 'amount') {
-            const from = this.isSwapFrom ? 'FIRO' : this.selectedCoin;
-            const hasError = this.amountMaxError || this.amountMinError;
-            let error = this.amountMaxError ? `Maximum amount ${this.maxAmount} ${from}` : `Minimum amount ${this.minAmount} ${from}`;
-
-            return hasError ? error : '';
-        },
-
-        async recountTo(prop) {
-            this[`${prop}Error`] = '';
-
-            if (this.marketInfo.length) {
-                let amount = Number(this[prop]);
-
-                try {
-                    if (typeof amount === 'number' && !isNaN(amount)) {
-                        const { quote, minerFee, minLimit, maxLimit } = this.getMarketInfo();
-
-                        this.minAmount = minLimit;
-                        this.maxAmount = maxLimit;
-
-                        if (minLimit > amount) {
-                            this[`${prop}MinError`] = true;
-                            this[`${prop}Error`] = true;
-                            this.sequence = '';
-                            return;
-                        }
-
-                        if (maxLimit < amount) {
-                            this[`${prop}Error`] = true;
-                            this[`${prop}MaxError`] = true;
-                            this.sequence = '';
-                            return;
-                        }
-
-                        this[`${prop}MinError`] = false;
-                        this[`${prop}MaxError`] = false;
-                        this[`${prop}Error`] = false;
-                        
-                        this.amountTo = this.totalAmount * quote - minerFee;
-                    } else {
-                        this[`${prop}Error`] = true;
-                    }
-                } catch (error) {
-                    this.amountTo = '-';
-                } finally {
-                    if (this.amountError || !this.selectedCoin) {
-                        this.sequence = '';
-                        return;
-                    }
-
-                    this.countSequence();
-                }
-            }
-        },
-
-        countPrice() {
-            return this.amountTo && this.amountTo !== '-' && this.totalAmount ? Number(this.amountTo / this.totalAmount) : 0;
-        },
-
-        countSequence() {
-            const price = this.countPrice();
-
-            if (this.isSwapFrom) {
-                this.sequence = `1 FIRO ≈ ${price || ''} ${this.selectedCoin}`;
-            } else {
-                this.sequence = `1 ${this.selectedCoin} ≈ ${price || ''} FIRO`;
-            }
+            this.isPrivate = true;
+            this.selectedCoin = null;
+            this.amount = '';
+            this.address = ''
         }
     }
 };
@@ -560,6 +593,10 @@ export default {
 
 label {
     @include label();
+}
+
+.amount {
+    @include amount();
 }
 
 .input-with-tip-container {

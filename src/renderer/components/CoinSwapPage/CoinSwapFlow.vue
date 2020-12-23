@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="disabled" @click="show = 'confirm'">
+            <button :disabled="!selectedCoin || disabled" @click="show = 'confirm'">
                 Exchange
             </button>
         </div>
@@ -88,7 +88,7 @@ export default {
         },
 
         selectedCoin: {
-            required: true,
+            required: false,
             type: String
         },
 
