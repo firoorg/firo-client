@@ -2,7 +2,7 @@ import {app, session, BrowserWindow, Menu} from 'electron'
 import { createLogger } from 'lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from 'lib/i18n'
-import {join} from 'path'
+import {join, resolve} from 'path'
 import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
@@ -38,7 +38,7 @@ app.once('ready', async () => {
     await populateStoreWithAppSettings({ store })
 
     if (process.env.NODE_ENV !== 'production') {
-        session.defaultSession.loadExtension('node_modules/vue-devtools/vender');
+        session.defaultSession.loadExtension(resolve('node_modules/vue-devtools/vender'));
     }
 
     // Set the application menu. This is required for keyboard shortcuts (including copy+paste) to work correctly.
