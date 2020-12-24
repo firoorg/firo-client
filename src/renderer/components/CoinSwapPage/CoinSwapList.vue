@@ -195,6 +195,7 @@ export default {
             
             let historyData = this.TIR.readFile();
             let tableData = Object.values(historyData);
+            console.log(tableData);
 
             tableData.forEach(element => {
                 if (!finishedStatuses.includes(element.status)) {

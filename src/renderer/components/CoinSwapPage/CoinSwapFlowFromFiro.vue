@@ -1,21 +1,21 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="!selectedCoin || disabled" @click="show = 'confirm'">
+            <button :disabled="disabled" @click="show = 'confirm'">
                 Exchange
             </button>
         </div>
 
         <Popup v-if="show !== 'button'" :margin="show !== 'wait'">
-            <QRCodeStep v-if="show === 'info'" :orderID="orderID" :address="exchangeAddress" :amount="amount" :selectedCoin="selectedCoin" @cancel="cancel(true)" />
             <ConfirmStep
                 v-if="show === 'confirm'"
-                :label="label"
-                :address="address"
-                :amount="amount"
-                :fee="transactionFee"
-                :total="totalAmount"
-                :is-private="isPrivate"
+                from-currency="FIRO"
+                :to-currency="remoteCurrency"
+                :address="receiveAddress"
+                :amount-from="convertToCoin(firoAmount)"
+                :amount-to="remoteAmount"
+                :fee-from="convertToCoin(firoTransactionFee)"
+                :fee-to="remoteTransactionFee"
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
@@ -31,7 +31,6 @@
 
 import {FirodErrorResponse, IncorrectPassphrase} from 'daemon/firod';
 import Popup from '../Popup';
-import QRCodeStep from './QRCodeStep';
 import ConfirmStep from './ConfirmStep';
 import PassphraseStep from './PassphraseStep';
 import ErrorStep from './ErrorStep';
@@ -39,15 +38,16 @@ import WaitOverlay from 'renderer/components/WaitOverlay';
 import APIWorker from 'renderer/api/switchain-api';
 import TIR from 'lib/tir';
 import { getEventBus } from 'renderer/utils/eventBus';
+import {convertToCoin} from "lib/convert";
+import {isValidAddress} from "lib/isValidAddress";
 
 const EventBus = getEventBus('coin-swap');
 
 export default {
-    name: 'SendFlow',
+    name: 'CoinSwapFlowFromFiro',
 
     components: {
         Popup,
-        QRCodeStep,
         ConfirmStep,
         PassphraseStep,
         ErrorStep,
@@ -62,7 +62,7 @@ export default {
             exchangeAddress: '',
             error: null,
             show: 'button',
-            passphrase: ''
+            passphrase: '',
         };
     },
 
@@ -72,64 +72,42 @@ export default {
             type: Boolean
         },
 
-        swapType: {
-            required: true,
-            type: String
-        },
-
-        label: {
-            required: true,
-            type: String
-        },
-
-        currentPair: {
-            required: true,
-            type: String
-        },
-
-        selectedCoin: {
-            required: false,
-            type: String
-        },
-
-        address: {
-            required: true,
-            type: String
-        },
-
-        amount: {
-            required: true,
-            type: Number
-        },
-
-        satoshiAmount: {
-            required: true,
-            type: Number
+        isPrivate: {
+            type: Boolean
         },
 
         txFeePerKb: {
-            required: true,
             type: Number
         },
 
-        transactionFee: {
-            required: true,
-            type: Number
+        // e.g. "USDT"
+        remoteCurrency: {
+            type: String,
         },
 
-        subtractFeeFromAmount: {
-            required: true,
-            type: Boolean
+        // This is a normal satoshi amount of FIRO.
+        firoAmount: {
+            type: Number,
         },
 
-        isPrivate: {
-            required: true,
-            type: Boolean
+        // This is a decimal STRING representing a whole coin amount (NOT satoshi) AFTER all fees are calculated.
+        remoteAmount: {
+            type: String,
         },
 
-        coinControl: {
-            required: false,
-            type: Array // CoinControl[]
+        // This is a normal satoshi amount of FIRO.
+        firoTransactionFee: {
+            type: Number,
+        },
+
+        // This is a decimal STRING representing a whole coin amount, NOT satoshi
+        remoteTransactionFee: {
+            type: String,
+        },
+
+        // The address that funds will be received at.
+        receiveAddress: {
+            type: String,
         }
     },
 
@@ -137,13 +115,9 @@ export default {
         this.api = new APIWorker();
     },
 
-    computed: {
-        totalAmount() {
-            return this.subtractFeeFromAmount ? this.amount : this.amount + this.transactionFee;
-        }
-    },
-
     methods: {
+        convertToCoin,
+
         goToPassphraseStep() {
             this.show = 'passphrase';
         },
@@ -164,48 +138,52 @@ export default {
 
             const walletAddress = await $daemon.getUnusedAddress();
 
-            const params = {
-                pair: this.currentPair,
-                toAddress: this.swapType === 'from' ? this.address : walletAddress,
-                refundAddress: this.swapType === 'from' ? walletAddress : this.address,
-                fromAmount: String(this.totalAmount)
-            };
-
             try {
-                const { error, response } = await this.api.postOrder(params);
+                // The API accepts a signature to commit to a specific offer, but it's only valid for 60s and is
+                // therefore unusable practically.
+                const { error, response } = await this.api.postOrder({
+                    pair: `XZC-${this.remoteCurrency}`,
+                    toAddress: this.receiveAddress,
+                    refundAddress: walletAddress,
+                    fromAmount: convertToCoin(this.firoAmount),
+                });
+                if (error || !response) throw error;
 
-                if (this.swapType === 'from') {
-                    if (this.isPrivate) {
-                        await $daemon.privateSend(passphrase, 'Coin swap: ' + this.label, response.exchangeAddress, this.satoshiAmount, this.subtractFeeFromAmount, this.coinControl);
-                    } else {
-                        await $daemon.publicSend(
-                            passphrase,
-                            'Coin swap: ' + this.label,
-                            response.exchangeAddress,
-                            this.satoshiAmount,
-                            this.txFeePerKb,
-                            this.subtractFeeFromAmount,
-                            this.coinControl
-                        );
-                    }
-                } else {
-                    this.orderID = response.orderId;
-                    this.exchangeAddress = response.exchangeAddress;
+                // Sanity check response
+                if (
+                    response.fromAmount !== convertToCoin(this.firoAmount) ||
+                    response.refundAddress !== walletAddress ||
+                    !isValidAddress(response.exchangeAddress, 'main')
+                ) {
+                    this.$log.error("Invalid Response: %O", response);
+                    throw 'invalid response from SwitchChain';
                 }
+
+                /*
+                if (!this.isPrivate) {
+                    await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
+                        response.exchangeAddress, this.firoAmount, this.txFeePerKb,false);
+                } else if (this.isLelantusAllowed) {
+                    await $daemon.sendLelantus(passphrase, response.exchangeAddress, this.firoAmount, this.txFeePerKb,
+                        false);
+                } else {
+                    await $daemon.sendSigma(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
+                        response.exchangeAddress, this.firoAmount, false);
+                }*/
 
                 let historyData = this.TIR.readFile();
 
                 const newItem = {
                     id: response.orderId,
-                    fromCoin: this.swapType === 'from' ? 'FIRO' : this.selectedCoin,
-                    toCoin: this.swapType === 'from' ? this.selectedCoin : 'FIRO',
+                    fromCoin: 'FIRO',
+                    toCoin: this.remoteCurrency,
                     sentAmount: response.fromAmount,
                     receivedAmount: response.rate ? response.fromAmount * response.rate + this.transactionFee : '-',
-                    fee: this.transactionFee,
+                    localFee: this.firoTransactionFee,
+                    remoteFee: this.remoteTransactionFee,
                     status: 'waiting',
-                    pair: this.label,
                     date: Date.now(),
-                    ...response
+                    response
                 };
 
                 historyData = {
@@ -231,14 +209,9 @@ export default {
                 return;
             }
 
-            if (this.swapType === 'to') {
-                this.show = 'info';
-            } else {
-                this.show = 'button';
-                this.$emit('success');
-            }
-
+            this.show = 'button';
             this.error = null;
+            this.$emit('success');
         }
     }
 };

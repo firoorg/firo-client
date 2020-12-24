@@ -162,19 +162,17 @@
                     </div>
                 </div>
 
-                <SendFlow
+                <CoinSwapFlowFromFiro
+                    v-if="isSwapFrom"
                     :disabled="!canBeginSend"
-                    :swap-type="isSwapFrom ? 'from' : 'to'"
                     :is-private="isPrivate"
-                    :label="firoPair"
-                    :current-pair="xzcPair"
-                    :selected-coin="selectedCoin"
-                    :address="address"
-                    :amount="+amount"
-                    :satoshiAmount="satoshiAmount"
-                    :tx-fee-per-kb="1"
-                    :transaction-fee="0"
-                    :subtract-fee-from-amount="true"
+                    :remote-currency="selectedCoin"
+                    :firo-transaction-fee="firoTransactionFee"
+                    :tx-fee-per-kb="smartFeePerKb"
+                    :remote-transaction-fee="remoteTransactionFee"
+                    :firo-amount="satoshiAmount"
+                    :remote-amount="amountToReceive"
+                    :receive-address="address"
                     @success="cleanupForm"
                 />
 
@@ -191,7 +189,7 @@ import CryptoAddressValidator from '@swyftx/api-crypto-address-validator';
 import Big from 'big.js';
 import lodash from 'lodash';
 import { mapGetters } from 'vuex';
-import SendFlow from 'renderer/components/CoinSwapPage/SendFlow';
+import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro';
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
 import { VueSelect } from 'vue-select';
 import APIWorker from 'renderer/api/switchain-api';
@@ -277,7 +275,7 @@ export default {
     name: 'CoinSwapDetail',
 
     components: {
-        SendFlow,
+        CoinSwapFlowFromFiro,
         VueSelect,
         LoadingBounce,
         CircularTimer,
@@ -298,6 +296,10 @@ export default {
             isSwapFrom: true,
             // This prevents the display of inaccurate transaction fees.
             calculatingFiroTransactionFee: false,
+            // This is used to update market info when necessary.
+            marketInfoRefreshNonce: 0,
+            // This is used so we can clear an interval created on startup to refresh market info.
+            refreshOffersIntervalId: null,
 
             selectedCoin: null,
             amount: '',
@@ -354,6 +356,17 @@ export default {
         // Additional validations are created in the watcher for marketInfo
     },
 
+    created() {
+        // Refresh market information every 30 seconds.
+        this.refreshOffersIntervalId = setInterval(() => {
+            this.marketInfoRefreshNonce++;
+        }, 30e3);
+    },
+
+    destroyed() {
+        clearInterval(this.refreshOffersIntervalId);
+    },
+
     watch: {
         marketInfo() {
             if (!this.marketInfo) return;
@@ -380,6 +393,12 @@ export default {
         marketInfo: {
             default: {},
             async get() {
+                // The function associated with refreshOffersIntervalId will increment this every time we get close to
+                // needing new market information.
+                this.marketInfoRefreshNonce;
+
+                this.$log.debug("Fetching market information...");
+
                 const api = new APIWorker();
                 const {error, response} = await api.getMarketInfo();
                 if (error) return {}
@@ -393,9 +412,11 @@ export default {
         },
 
         // Returns [number (txfee in satoshi), error (string)], one of which will be null; or undefined if the amount
-        // field is invalid.
+        // field is invalid or if it's not a swap from Firo.
         async firoTransactionFeeAndError() {
             this.calculatingFiroTransactionFee = true;
+
+            if (!this.isSwapFrom) return;
 
             // The whole point of this dance is to prevent repeated calls to the daemon, which are unfortunately slow.
             const satoshiAmount = this.satoshiAmount;

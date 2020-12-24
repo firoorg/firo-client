@@ -1,57 +1,57 @@
 <template>
     <div>
         <div class="title">
-            Confirm {{ isPrivate ? '' : 'Public '}}Send
+            Confirm Swap
         </div>
 
         <div class="content">
-            <div v-if="label" class="field">
+            <div class="field">
                 <label>
-                    Label
+                    Amount to Send
                 </label>
 
                 <div class="value">
-                    Coin swap: {{ label }}
+                    <span class="amount">{{ amountFrom }}</span> <span class="ticker">{{ fromCurrency }}</span>
+                </div>
+            </div>
+
+            <div v-if="fromCurrency === 'FIRO'" class="field">
+                <label>
+                    FIRO Fee
+                </label>
+
+                <div class="value">
+                    <span class="amount">{{ feeFrom }}</span> <span class="ticker">FIRO</span>
                 </div>
             </div>
 
             <div class="field">
                 <label>
-                    Address
+                    {{ toCurrency }} Fee
                 </label>
 
-                <div class="address value">
-                    {{ address }}
+                <div class="value">
+                   <span class="amount">{{ feeTo }}</span> <span class="ticker">{{ toCurrency }}</span>
                 </div>
             </div>
 
             <div class="field">
                 <label>
-                    Amount
+                    Estimated Total to Receive
                 </label>
 
                 <div class="value">
-                    <span>{{ amount }}</span> <span class="ticker">FIRO</span>
+                    <span class="amount">{{ amountTo }}</span> <span class="ticker">{{ toCurrency }}</span>
                 </div>
             </div>
 
             <div class="field">
                 <label>
-                    Fee
+                    {{ fromCurrency === 'FIRO' ? toCurrency : fromCurrency }} Address
                 </label>
 
-                <div class="value">
-                    <span>{{ fee }}</span> <span class="ticker">FIRO</span>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>
-                    Total
-                </label>
-
-                <div class="value">
-                   <span>{{ total }}</span> <span class="ticker">FIRO</span>
+                <div class="value address">
+                    <span>{{ address }}</span>
                 </div>
             </div>
         </div>
@@ -81,35 +81,40 @@ export default {
     },
 
     props: {
-        isPrivate: {
-            required: true,
-            type: Boolean
+        fromCurrency: {
+           type: String,
+           required: true
         },
 
-        label: {
-            required: true,
-            type: String
+        toCurrency: {
+            type: String,
+            required: true
+        },
+
+        amountFrom: {
+            type: String,
+            required: true
+        },
+
+        amountTo: {
+            type: String,
+            required: true
+        },
+
+        feeFrom: {
+            type: String,
+            required: true
+        },
+
+        feeTo: {
+            type: String,
+            required: true
         },
 
         address: {
-            required: true,
-            type: String
+            type: String,
+            required: true
         },
-
-        amount: {
-            required: true,
-            type: Number
-        },
-
-        fee: {
-            required: true,
-            type: Number
-        },
-
-        total: {
-            required: true,
-            type: Number
-        }
     },
 
     methods: {
@@ -131,9 +136,17 @@ export default {
 
 .address {
     @include address();
+    font-size: 80%;
+}
+
+.amount {
+    @include amount();
 }
 
 .content {
+    // We do NOT want the size to be adaptive to the screen.
+    width: 400pt;
+
     .field {
         margin-bottom: $size-between-field-space-small;
 
