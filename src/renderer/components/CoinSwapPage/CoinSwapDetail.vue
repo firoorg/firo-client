@@ -164,7 +164,7 @@
 
                 <CoinSwapFlowFromFiro
                     v-if="isSwapFrom"
-                    :disabled="!canBeginSend"
+                    :disabled="!canBeginSwapFromFiro"
                     :is-private="isPrivate"
                     :remote-currency="selectedCoin"
                     :firo-transaction-fee="firoTransactionFee"
@@ -173,6 +173,19 @@
                     :firo-amount="satoshiAmount"
                     :remote-amount="amountToReceive"
                     :receive-address="address"
+                    :expected-rate="conversionRate"
+                    @success="cleanupForm"
+                />
+
+                <CoinSwapFlowToFiro
+                    v-else
+                    :disabled="!canBeginSwapToFiro"
+                    :remote-currency="selectedCoin"
+                    :remote-amount="amount"
+                    :firo-amount="amountToReceive"
+                    :firo-transaction-fee="remoteTransactionFee"
+                    :refund-address="address"
+                    :expected-rate="conversionRate"
                     @success="cleanupForm"
                 />
 
@@ -190,9 +203,10 @@ import Big from 'big.js';
 import lodash from 'lodash';
 import { mapGetters } from 'vuex';
 import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro';
+import CoinSwapFlowToFiro from "renderer/components/CoinSwapPage/CoinSwapFlowToFiro";
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
 import { VueSelect } from 'vue-select';
-import APIWorker from 'renderer/api/switchain-api';
+import APIWorker from 'lib/switchain-api';
 import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
 import CircularTimer from 'renderer/components/Icons/CircularTimer';
 import CoinIcon from './CoinIcon';
@@ -275,6 +289,7 @@ export default {
     name: 'CoinSwapDetail',
 
     components: {
+        CoinSwapFlowToFiro,
         CoinSwapFlowFromFiro,
         VueSelect,
         LoadingBounce,
@@ -382,7 +397,7 @@ export default {
                             return false;
                         }
 
-                        return v.gt(info.minLimit) && v.lt(info.maxLimit);
+                        return v.gte(info.minLimit) && v.lte(info.maxLimit);
                     }
                 })
             }
@@ -467,9 +482,9 @@ export default {
                 return '';
             } else if (this.isSwapFrom) {
                 if (!this.isPrivate) {
-                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|publicAmountIsValid`;
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance`;
                 } else if (this.isLelantusAllowed) {
-                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|publicAmountIsValid|privateAmountDoesntViolateSpendLimit`;
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountDoesntViolateSpendLimit`;
                 } else {
                     return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits`
                 }
@@ -522,13 +537,15 @@ export default {
         coinsFromFiro() {
             return Object.keys(this.marketInfo)
                 .filter(pair => pair.match(/^XZC-/))
-                .map(pair => pair.split('-')[1]);
+                .map(pair => pair.split('-')[1])
+                .sort();
         },
 
         coinsToFiro() {
             return Object.keys(this.marketInfo)
                 .filter(pair => pair.match(/-XZC$/))
-                .map(pair => pair.split('-')[0]);
+                .map(pair => pair.split('-')[0])
+                .sort();
         },
 
         remoteCoins() {
@@ -596,8 +613,12 @@ export default {
             }
         },
 
-        canBeginSend() {
+        canBeginSwapFromFiro() {
             return !this.calculatingFiroTransactionFee && this.firoTransactionFee && this.selectedCoin && this.amount && this.address && !this.validationErrors.items.length;
+        },
+
+        canBeginSwapToFiro() {
+            return this.selectedCoin && this.amount && this.address && !this.validationErrors.items.length;
         },
 
         available () {
@@ -755,15 +776,11 @@ label {
 
     .radio-buttons-wrapper {
         display: flex;
-        margin: 20px 0;
-
-        .radio-button-wrapper {
-            flex: 0 0 35%;
-        }
+        justify-content: space-between;
     }
 
     .v-select {
-        width: 335px;
+        width: $size-large-field-width;
     }
 
     .coin-option {

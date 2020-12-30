@@ -1,26 +1,21 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="disabled" @click="show = 'confirm'">
+            <button :disabled="disabled" @click="show = 'info'">
                 Exchange
             </button>
         </div>
 
         <Popup v-if="show !== 'button'" :margin="show !== 'wait'">
-            <ConfirmStep
-                v-if="show === 'confirm'"
-                from-currency="FIRO"
-                :to-currency="remoteCurrency"
-                :address="receiveAddress"
-                :amount-from="convertToCoin(firoAmount)"
-                :amount-to="remoteAmount"
-                :fee-from="convertToCoin(firoTransactionFee)"
-                :fee-to="remoteTransactionFee"
+            <CoinSwapInfo
+                v-if="show === 'info' && coinSwapRecord"
+                :coin-swap-data="coinSwapRecord"
+                :show-cancel="true"
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
             <PassphraseStep v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
-            <WaitOverlay v-if="show === 'wait'" />
+            <WaitOverlay v-if="show === 'wait' || show === 'info' && !coinSwapRecord" />
             <ErrorStep v-if="show === 'error'" :error="error" @ok="cancel()" />
         </Popup>
     </div>
@@ -31,24 +26,21 @@
 
 import {FirodErrorResponse, IncorrectPassphrase} from 'daemon/firod';
 import Popup from '../Popup';
-import ConfirmStep from './ConfirmStep';
+import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
 import PassphraseStep from './PassphraseStep';
 import ErrorStep from './ErrorStep';
 import WaitOverlay from 'renderer/components/WaitOverlay';
-import APIWorker from 'renderer/api/switchain-api';
-import TIR from 'lib/tir';
-import { getEventBus } from 'renderer/utils/eventBus';
+import APIWorker from 'lib/switchain-api';
 import {convertToCoin} from "lib/convert";
 import {isValidAddress} from "lib/isValidAddress";
-
-const EventBus = getEventBus('coin-swap');
+import {mapActions} from "vuex";
 
 export default {
     name: 'CoinSwapFlowFromFiro',
 
     components: {
         Popup,
-        ConfirmStep,
+        CoinSwapInfo,
         PassphraseStep,
         ErrorStep,
         WaitOverlay
@@ -57,12 +49,11 @@ export default {
     data() {
         return {
             api: null,
-            TIR: new TIR('coin-swap'),
             orderID: '',
             exchangeAddress: '',
             error: null,
             show: 'button',
-            passphrase: '',
+            passphrase: ''
         };
     },
 
@@ -108,6 +99,10 @@ export default {
         // The address that funds will be received at.
         receiveAddress: {
             type: String,
+        },
+
+        expectedRate: {
+            type: String,
         }
     },
 
@@ -115,7 +110,86 @@ export default {
         this.api = new APIWorker();
     },
 
+    asyncComputed: {
+        async coinSwapRecord() {
+            const isPrivate = this.isPrivate;
+            const txFeePerKb = this.txFeePerKb;
+            const remoteCurrency = this.remoteCurrency;
+            const firoAmount = this.firoAmount;
+            const remoteAmount = this.remoteAmount;
+            const firoTransactionFee = this.firoTransactionFee;
+            const remoteTransactionFee = this.remoteTransactionFee;
+            const receiveAddress = this.receiveAddress;
+            const expectedRate = this.expectedRate;
+            const show = this.show;
+
+            const walletAddress = await $daemon.getUnusedAddress();
+
+            if (!(
+                isPrivate !== undefined && txFeePerKb && remoteCurrency && firoAmount && remoteAmount &&
+                firoTransactionFee && remoteTransactionFee && receiveAddress && expectedRate &&
+                // We don't want to fetch records too eagerly, so we check that we're not in the button state before
+                // fetching.
+                show !== 'button'
+            )) return;
+
+            let response;
+            try {
+                const order = {
+                    pair: `XZC-${remoteCurrency}`,
+                    toAddress: receiveAddress,
+                    refundAddress: walletAddress,
+                    fromAmount: convertToCoin(firoAmount)
+                };
+
+                this.$log.info("Posting order: %O", order);
+
+                // The API accepts a signature to commit to a specific offer, but it's only valid for 60s and is
+                // therefore unusable practically.
+                const r = await this.api.postOrder(order);
+                if (r.error || !r.response) throw r.error;
+                response = r.response;
+
+                // Sanity check response
+                if (
+                    response.fromAmount !== convertToCoin(firoAmount) ||
+                    response.refundAddress !== walletAddress ||
+                    response.toAddress !== receiveAddress ||
+                    !isValidAddress(response.exchangeAddress, 'main')
+                ) {
+                    this.$log.error("Invalid Response: %O", response);
+                    throw 'invalid response from SwitchChain';
+                }
+            } catch(e) {
+                this.error = `${e}`;
+                this.show = 'error';
+                return
+            }
+
+            return {
+                orderId: response.orderId,
+                fromCoin: 'FIRO',
+                toCoin: remoteCurrency,
+                sendAmount: response.fromAmount,
+                expectedAmountToReceive: remoteAmount,
+                expectedRate: expectedRate,
+                fromFee: convertToCoin(firoTransactionFee),
+                expectedToFee: remoteTransactionFee,
+                status: 'waiting',
+                date: Date.now(),
+                exchangeAddress: response.exchangeAddress,
+                refundAddress: response.refundAddress,
+                receiveAddress: response.toAddress,
+                _response: response
+            };
+        }
+    },
+
     methods: {
+        ...mapActions({
+            addCoinSwapRecords: 'CoinSwap/addOrUpdateRecords'
+        }),
+
         convertToCoin,
 
         goToPassphraseStep() {
@@ -136,64 +210,19 @@ export default {
             const passphrase = this.passphrase;
             this.passphrase = '';
 
-            const walletAddress = await $daemon.getUnusedAddress();
-
             try {
-                // The API accepts a signature to commit to a specific offer, but it's only valid for 60s and is
-                // therefore unusable practically.
-                const { error, response } = await this.api.postOrder({
-                    pair: `XZC-${this.remoteCurrency}`,
-                    toAddress: this.receiveAddress,
-                    refundAddress: walletAddress,
-                    fromAmount: convertToCoin(this.firoAmount),
-                });
-                if (error || !response) throw error;
-
-                // Sanity check response
-                if (
-                    response.fromAmount !== convertToCoin(this.firoAmount) ||
-                    response.refundAddress !== walletAddress ||
-                    !isValidAddress(response.exchangeAddress, 'main')
-                ) {
-                    this.$log.error("Invalid Response: %O", response);
-                    throw 'invalid response from SwitchChain';
-                }
-
-                /*
                 if (!this.isPrivate) {
                     await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
-                        response.exchangeAddress, this.firoAmount, this.txFeePerKb,false);
+                        this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb,false);
                 } else if (this.isLelantusAllowed) {
-                    await $daemon.sendLelantus(passphrase, response.exchangeAddress, this.firoAmount, this.txFeePerKb,
+                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb,
                         false);
                 } else {
                     await $daemon.sendSigma(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
-                        response.exchangeAddress, this.firoAmount, false);
-                }*/
+                        this.coinSwapRecord.exchangeAddress, this.firoAmount, false);
+                }
 
-                let historyData = this.TIR.readFile();
-
-                const newItem = {
-                    id: response.orderId,
-                    fromCoin: 'FIRO',
-                    toCoin: this.remoteCurrency,
-                    sentAmount: response.fromAmount,
-                    receivedAmount: response.rate ? response.fromAmount * response.rate + this.transactionFee : '-',
-                    localFee: this.firoTransactionFee,
-                    remoteFee: this.remoteTransactionFee,
-                    status: 'waiting',
-                    date: Date.now(),
-                    response
-                };
-
-                historyData = {
-                    ...historyData,
-                    [response.orderId]: newItem
-                };
-
-                this.TIR.writeFile(historyData);
-
-                EventBus.$emit('refresh-table');
+                await this.addCoinSwapRecords([this.coinSwapRecord]);
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
                     this.error = 'Incorrect Passphrase';

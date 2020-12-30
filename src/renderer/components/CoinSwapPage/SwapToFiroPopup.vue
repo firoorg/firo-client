@@ -1,23 +1,25 @@
 <template>
     <div>
         <div class="title">
-            Confirm Swap
+            Swap to Firo
         </div>
 
         <div class="content">
+            <div id="swapToFiroQrCode" />
+
             <div class="field">
                 <label>
                     Amount to Send
                 </label>
 
                 <div class="value">
-                    <span class="amount">{{ amountFrom }}</span> <span class="ticker">{{ fromCurrency }}</span>
+                    <span class="amount">{{ fromAmount }}</span> <span class="ticker">{{ fromCurrency }}</span>
                 </div>
             </div>
 
-            <div v-if="fromCurrency === 'FIRO'" class="field">
+            <div v-if="feeFrom" class="field">
                 <label>
-                    FIRO Fee
+                    {{ fromCurrency }} Fee
                 </label>
 
                 <div class="value">
@@ -31,7 +33,7 @@
                 </label>
 
                 <div class="value">
-                   <span class="amount">{{ feeTo }}</span> <span class="ticker">{{ toCurrency }}</span>
+                    <span class="amount">{{ feeTo }}</span> <span class="ticker">{{ toCurrency }}</span>
                 </div>
             </div>
 
@@ -71,7 +73,8 @@
 <script>
 // $emits: cancel, confirm
 import { convertToCoin } from 'lib/convert'
-import Amount from "renderer/components/Sidebar/Amount";
+import Amount from "renderer/components/Amount";
+import QRCode from "easyqrcodejs";
 
 export default {
     name: 'SendStepConfirm',
@@ -81,44 +84,59 @@ export default {
     },
 
     props: {
-        fromCurrency: {
-           type: String,
-           required: true
-        },
-
-        toCurrency: {
+        rate: {
             type: String,
             required: true
         },
 
-        amountFrom: {
+        exchangeAddress: {
             type: String,
             required: true
         },
 
-        amountTo: {
+        remoteAmount: {
             type: String,
             required: true
         },
 
-        feeFrom: {
+        remoteCurrency: {
             type: String,
             required: true
         },
 
-        feeTo: {
+        firoAmount: {
             type: String,
             required: true
         },
 
-        address: {
+        firoTransactionFee: {
             type: String,
             required: true
-        },
+        }
+    },
+
+    data() {
+        return {
+            qrCode: null
+        }
     },
 
     methods: {
-        convertToCoin
+        convertToCoin,
+
+        makeQrCode() {
+            if (this.qrCode) {
+                this.qrCode.makeCode(this.exchangeAddress);
+            } else {
+                this.qrCode = new QRCode(this.$refs.qrCode, {
+                    text: this.address,
+                    height: 256,
+                    width: 256,
+                    colorDark: 'black',
+                    colorLight: 'white'
+                });
+            }
+        }
     }
 }
 </script>

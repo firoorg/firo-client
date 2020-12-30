@@ -10,6 +10,7 @@ import ApiStatus from "store/modules/ApiStatus";
 import App from "store/modules/App";
 import Balance from "store/modules/Balance";
 import Blockchain from "store/modules/Blockchain";
+import CoinSwap from "store/modules/CoinSwap";
 import Masternode from "store/modules/Masternode";
 import Notification from "store/modules/Notification";
 import PaymentRequest from "store/modules/PaymentRequest";
@@ -32,6 +33,7 @@ const store = new Vuex.Store({
         App,
         Balance,
         Blockchain,
+        CoinSwap,
         Masternode,
         Notification,
         PaymentRequest,

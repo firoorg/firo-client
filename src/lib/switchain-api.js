@@ -1,9 +1,8 @@
-import Http from 'renderer/utils/Http';
-import Utils from 'renderer/utils';
-import configs from 'config/api';
+import Http from './http-utils';
+import Utils from './coinswap-utils';
 
 class APIWorker {
-    API_URI = configs.SWITCHAIN_API_URI;
+    API_URI = 'http://198.13.49.119:12345/switchain/';
 
     buildUrl({ url, params }) {
         const query = [];

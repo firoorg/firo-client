@@ -91,6 +91,14 @@ for (const fileName of requireComponent.keys()) {
 window.$store = store;
 window.$router = router;
 
+// Load CoinSwap records from disk.
+store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
+    // Update outdated CoinSwap records every 60 seconds.
+    setInterval(() => {
+        store.dispatch('CoinSwap/updateOutdatedRecords');
+    }, 60e3);
+});
+
 // Show the waiting screen with reason, or, if reason may be undefined, close it.
 //
 // Note that the app starts off with the reason "Loading..." in order to not show the main window for a short time

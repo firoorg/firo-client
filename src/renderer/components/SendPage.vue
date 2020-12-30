@@ -211,7 +211,7 @@ import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress} from 'lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from 'lib/convert';
-import Amount from "renderer/components/Sidebar/Amount";
+import Amount from "renderer/components/Amount";
 import {FirodErrorResponse} from "daemon/firod";
 import InputSelection from "renderer/components/SendPage/InputSelection";
 import Popup from "renderer/components/Popup";

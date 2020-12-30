@@ -14,94 +14,54 @@
                 :data="filteredTableData"
                 :fields="tableFields"
                 track-by="id"
-                no-data-message="No coin swaps made yet."
+                no-data-message="No Swaps Made Yet"
                 :sort-order="sortOrder"
                 :compare-elements="comparePayments"
                 :per-page="17"
-                :on-page-change="pageNumber => (this.currentPage = pageNumber)"
-                :on-row-select="onRowSelect"
+                :on-page-change="pageNumber => currentPage = pageNumber"
+                :on-row-select="(rowData) => selectedRow = rowData"
             />
         </div>
-        <Popup v-if="show">
-            <QRCodeStep v-if="show" :orderID="orderID" :address="exchangeAddress" :amount="amount" :selectedCoin="selectedCoin" @cancel="cancel()" />
+
+        <Popup v-if="selectedRow">
+            <CoinSwapInfo
+                :coin-swap-data="selectedRow"
+                :show-cancel="false"
+                @confirm="selectedRow = null"
+            />
         </Popup>
     </section>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
-import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate';
-import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
-import PaymentStatus from 'renderer/components/AnimatedTable/AnimatedTablePaymentStatus';
-import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
-import QRCodeStep from 'renderer/components/CoinSwapPage/QRCodeStep';
 import Popup from '../Popup';
-
-import { convertToCoin } from 'lib/convert';
-import TIR from 'lib/tir';
-import APIWorker from 'renderer/api/switchain-api';
-import { statuses, finishedStatuses } from 'renderer/utils/constants';
-import Utils from 'renderer/utils';
-import { getEventBus } from 'renderer/utils/eventBus';
-
-const EventBus = getEventBus("coin-swap");
+import AnimatedTableRelativeDate from "renderer/components/AnimatedTable/AnimatedTableRelativeDate";
+import CoinSwapSendAmount from "renderer/components/AnimatedTable/CoinSwapSendAmount";
+import CoinSwapReceivedAmount from "renderer/components/CoinSwapPage/CoinSwapReceivedAmount";
+import CoinSwapStatus from "renderer/components/CoinSwapPage/CoinSwapStatus";
+import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo";
 
 const tableFields = [
     {
-        name: 'orderId',
-        sortField: 'orderId',
-        title: 'Order ID',
-        width: '30%',
-        formatter: (value, { tableData }) => {
-            let obj = tableData.find(val => val.id === value);
+        name: CoinSwapStatus,
+        width: '10%'
+    },
 
-            if (obj?.toCoin === "FIRO" && obj?.status === "waiting") {
-                return `<div style="color: #207ebc">
-                    ${value}
-                </div>`;
-            }
+    {
+        name: AnimatedTableRelativeDate,
+        width: '30%'
+    },
 
-            return value;
-        }
-    },
     {
-        name: 'pair',
-        sortField: 'pair',
-        title: 'Pair',
-        width: '10%'
+        name: CoinSwapSendAmount,
+        width: '30%'
     },
+
     {
-        name: 'sentAmount',
-        sortField: 'sentAmount',
-        title: 'Sent',
-        width: '10%'
-    },
-    {
-        name: 'receivedAmount',
-        sortField: 'receivedAmount',
-        title: 'Received',
-        width: '12%'
-    },
-    {
-        name: 'fee',
-        sortField: 'fee',
-        title: 'Fee',
-        width: '8%'
-    },
-    {
-        name: 'status',
-        sortField: 'status',
-        title: 'Status',
-        width: '10%'
-    },
-    {
-        name: 'date',
-        sortField: 'date',
-        title: 'Date',
-        width: '20%',
-        formatter: value => `${Utils.dateFormat(value)}`
+        name: CoinSwapReceivedAmount,
+        width: '30%'
     }
 ];
 
@@ -109,49 +69,18 @@ export default {
     name: 'CoinSwapList',
 
     components: {
+        CoinSwapInfo,
         AnimatedTable,
-        Popup,
-        QRCodeStep
+        Popup
     },
 
     data() {
         return {
-            TIR: new TIR('coin-swap'),
             tableFields,
             filter: '',
-            tableData: [],
             currentPage: 1,
-            statusWatcher: {},
-            show: false,
-            orderID: '',
-            exchangeAddress: '',
-            amount: 0,
-            selectedCoin: '',
+            selectedRow: null
         };
-    },
-
-    watch: {
-        $route(to, from) {
-            if (to.path === '/coin-swap') {
-                this.initialize();
-            } else {
-                this.resetTimers();
-            }
-        }
-    },
-
-    created() {
-        this.api = new APIWorker();
-    },
-
-    mounted() {
-        this.initialize();
-        EventBus.$on('refresh-table', this.refreshTable);
-    },
-
-    beforeDestroy() {
-        EventBus.$off('refresh-table', this.refreshTable);
-        this.resetTimers();
     },
 
     computed: {
@@ -161,8 +90,14 @@ export default {
             consolidatedMints: 'Transactions/consolidatedMints',
             paymentRequests: 'PaymentRequest/paymentRequests',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            isReindexing: 'ApiStatus/isReindexing'
+            isReindexing: 'ApiStatus/isReindexing',
+            coinSwapRecords: 'CoinSwap/records'
         }),
+
+        tableData() {
+            return Object.values(this.coinSwapRecords);
+        },
+
         filteredTableData() {
             if (!this.filter) {
                 return this.tableData;
@@ -175,6 +110,7 @@ export default {
                 )
             );
         },
+
         sortOrder() {
             return [
                 {
@@ -186,115 +122,8 @@ export default {
     },
 
     methods: {
-        initialize() {
-            this.refreshTable();
-        },
-        
-        refreshTable() {
-            this.resetTimers();
-            
-            let historyData = this.TIR.readFile();
-            let tableData = Object.values(historyData);
-            console.log(tableData);
-
-            tableData.forEach(element => {
-                if (!finishedStatuses.includes(element.status)) {
-                    this.statusWatcher[element.id] = element;
-                }
-            });
-
-            for (let key in this.statusWatcher) {
-                const transaction = this.statusWatcher[key];
-
-                this.checkTransactionStatus(transaction);
-
-                this.statusWatcher[key].timer = setInterval(() => {
-                    this.checkTransactionStatus(transaction);
-                }, 5000);
-            }
-
-            this.tableData = tableData;
-        },
-
-        resetTimers() {
-            for (let key in this.statusWatcher) {
-                clearInterval(this.statusWatcher[key].timer);
-            }
-
-            this.statusWatcher = {};
-        },
-
-        async checkTransactionStatus(transaction) {
-            if (!transaction) return;
-
-            const { orderId } = transaction;
-
-            const { error, response: transactionData } = await this.api.getOrderStatus({ orderId });
-
-            if (error) {
-                console.log(`Fail to fetch transaction data.`);
-                return;
-            }
-
-            let statusChanged = false;
-
-            if (finishedStatuses.includes(transactionData.status)) {
-                this.tableData = this.tableData.map(element => {
-                    if (element.orderId === orderId) {
-                        element.status = transactionData.status;
-                    }
-
-                    return element;
-                });
-
-                let historyData = this.TIR.readFile();
-
-                statusChanged = transactionData.status !== historyData[orderId].status;
-
-                historyData[orderId] = {
-                    ...historyData[orderId],
-                    rate: transactionData.rate,
-                    receivedAmount: transactionData.rate,
-                    status: transactionData.status
-                };
-
-                this.TIR.writeFile(historyData);
-
-                if (this.statusWatcher[orderId] && this.statusWatcher[orderId].timer) {
-                    clearInterval(this.statusWatcher[orderId].timer);
-                }
-
-                delete this.statusWatcher[orderId];
-            } else {
-                let historyData = this.TIR.readFile();
-
-                statusChanged = transactionData.status !== historyData[orderId].status;
-
-                historyData[orderId] = {
-                    ...historyData[orderId],
-                    status: transactionData.status
-                };
-
-                this.TIR.writeFile(historyData);
-            }
-
-            if (statusChanged) {
-                EventBus.$emit('refresh-table');
-            }
-        },
-
         comparePayments(a, b) {
             return !['id', 'fromCoin', 'toCoin', 'sentAmount', 'receiveAmount', 'fee', 'status'].find(field => a[field] !== b[field]);
-        },
-
-        onRowSelect(data) {
-            if (data?.toCoin === "FIRO" && data?.status === "waiting") {
-                this.show = true;
-                this.orderID = data.id;
-                this.exchangeAddress = data.exchangeAddress;
-                this.amount = +data.sentAmount;
-                this.selectedCoin = data.fromCoin;
-            }
         },
 
         cancel() {
