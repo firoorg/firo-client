@@ -37,10 +37,6 @@ app.once('ready', async () => {
     setupLocales({ store })
     await populateStoreWithAppSettings({ store })
 
-    if (process.env.NODE_ENV !== 'production') {
-        session.defaultSession.loadExtension(resolve('node_modules/vue-devtools/vender'));
-    }
-
     // Set the application menu. This is required for keyboard shortcuts (including copy+paste) to work correctly.
     const appMenu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(appMenu);
