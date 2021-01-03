@@ -290,8 +290,14 @@ if (process.env.ZCOIN_CLIENT_REPL === 'true') {
            process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
     startVue();
     ourWindow.show();
-    $startDaemon().then(() => {
-        router.push("/main");
+    $startDaemon().then(async () => {
+        try {
+            await router.push("/main");
+        } catch (e) {
+            // We want to ignore NavigationDuplicated errors because they'll happen whenever we reload from the main
+            // page.
+            if (e.name !== 'NavigationDuplicated') throw e;
+        }
     });
 } else {
     logger.info("App is not yet initialized. Let's get 'er ready!");
