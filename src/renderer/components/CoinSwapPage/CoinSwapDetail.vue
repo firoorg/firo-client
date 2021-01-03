@@ -416,7 +416,7 @@ export default {
                 // needing new market information.
                 this.marketInfoRefreshNonce;
 
-                this.$log.debug("Fetching market information...");
+                this.$log.silly("Fetching market information...");
 
                 const api = new APIWorker();
                 const {error, response} = await api.getMarketInfo();

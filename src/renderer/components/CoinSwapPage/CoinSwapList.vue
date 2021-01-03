@@ -13,7 +13,7 @@
             <animated-table
                 :data="filteredTableData"
                 :fields="tableFields"
-                track-by="id"
+                track-by="orderId"
                 no-data-message="No Swaps Made Yet"
                 :sort-order="sortOrder"
                 :compare-elements="comparePayments"
