@@ -73,8 +73,8 @@ interface CoinSwapRecord {
 
     // Data in this section will be populated from an API reply when status changes to 'confirming'
     //
-    // The actual rate the conversion will be performed at.
-    actualRate?: Amount,
+    // The actual amount that will be received.
+    actualAmountToReceive?: Amount,
 
     // Data in this section will be populated from an API reply when status changes to 'confirmed'
     //
@@ -196,7 +196,9 @@ const actions = {
                     if (response.depositTxId)
                         newRecord.depositTxId = response.depositTxId;
                     if (response.rate)
-                        newRecord.actualRate = response.rate;
+                        // So response.rate is mislabelled, and does not contain the actual rate, but the amount that
+                        // was sent out. Therefore we need to calculate the actual rate ourselves.
+                        newRecord.actualAmountToReceive = response.rate;
                     if (response.toTx)
                         newRecord.outputTxId = response.toTx;
 

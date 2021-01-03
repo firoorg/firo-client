@@ -48,16 +48,6 @@
                     </div>
                 </div>
 
-                <div v-if="coinSwapData.actualRate" class="field">
-                    <label>Actual Rate</label>
-
-                    <div class="value">
-                        <Amount amount="1" :ticker="coinSwapData.fromCoin" />
-                        =
-                        <Amount :amount="coinSwapData.actualRate" :ticker="coinSwapData.toCoin" />
-                    </div>
-                </div>
-
                 <div class="field">
                     <label>
                         Amount to Send
@@ -95,6 +85,14 @@
 
                     <div class="value">
                         <Amount :amount="coinSwapData.expectedAmountToReceive" :ticker="coinSwapData.toCoin" />
+                    </div>
+                </div>
+
+                <div v-if="coinSwapData.actualAmountToReceive" class="field">
+                    <label>Actual Amount To Receive</label>
+
+                    <div class="value">
+                        <Amount :amount="coinSwapData.actualAmountToReceive" :ticker="coinSwapData.toCoin" />
                     </div>
                 </div>
 
