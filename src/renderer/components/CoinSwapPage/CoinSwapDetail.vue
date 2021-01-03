@@ -375,7 +375,7 @@ export default {
         // Refresh market information every 30 seconds.
         this.refreshOffersIntervalId = setInterval(() => {
             this.marketInfoRefreshNonce++;
-        }, 30e3);
+        }, 60e3);
     },
 
     destroyed() {
@@ -421,6 +421,8 @@ export default {
                 const api = new APIWorker();
                 const {error, response} = await api.getMarketInfo();
                 if (error) return {}
+
+                this.$log.silly("Got market information.");
 
                 return lodash.fromPairs(
                     response
