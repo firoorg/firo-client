@@ -1,8 +1,21 @@
+import {join, resolve} from 'path'
+import {getApp} from "lib/utils";
+import fs from "fs";
+
+// Remove the old log on startup so as to not create too much clutter.
+const logPath = join(getApp().getPath('userData'), 'firo-client.log')
+try {
+    fs.unlinkSync(logPath);
+} catch (e) {
+    if (e.code !== 'ENOENT') {
+        console.error(`Failed to remove old logfile ${logPath}: ${e.message}`);
+    }
+}
+
 import {app, session, BrowserWindow, Menu} from 'electron'
 import { createLogger } from 'lib/logger'
 import { populateStoreWithAppSettings } from './lib/appSettings'
 import { setupLocales } from 'lib/i18n'
-import {join, resolve} from 'path'
 import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
