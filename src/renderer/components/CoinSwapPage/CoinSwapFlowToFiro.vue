@@ -151,7 +151,7 @@ export default {
                     status: 'waiting',
                     date: Date.now(),
                     exchangeAddress: response.exchangeAddress,
-                    refundAddress: walletAddress,
+                    refundAddress: this.refundAddress,
                     receiveAddress: walletAddress,
                     expectedRate: this.expectedRate,
                     _response: response
