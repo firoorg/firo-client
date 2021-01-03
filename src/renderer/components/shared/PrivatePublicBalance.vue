@@ -22,6 +22,13 @@ import {convertToCoin} from "lib/convert";
 export default {
     name: "PrivatePublicBalance",
 
+    props: {
+        value: {
+            type: Boolean,
+            required: true
+        }
+    },
+
     data() {
         return {
             isPrivate: true
@@ -33,12 +40,22 @@ export default {
         availablePublic: "Balance/availablePublic"
     }),
 
+    watch: {
+        value: {
+            immediate: true,
+            handler(v) {
+                if (this.isPrivate === v) return;
+                this.isPrivate = v;
+            }
+        }
+    },
+
     methods: {
         convertToCoin,
 
         toggle() {
             this.isPrivate = !this.isPrivate;
-            this.$emit('toggle', this.isPrivate);
+            this.$emit('input', this.isPrivate);
         }
     }
 }

@@ -190,7 +190,7 @@
                 />
 
                 <div class="footer">
-                    <PrivatePublicBalance @toggle="togglePrivatePublic" />
+                    <PrivatePublicBalance v-model="isPrivate" />
                 </div>
             </div>
         </div>
@@ -401,6 +401,10 @@ export default {
                     }
                 })
             }
+        },
+
+        isPrivate() {
+            this.cleanupForm(false);
         }
     },
 
@@ -629,13 +633,8 @@ export default {
     methods: {
         convertToCoin,
 
-        togglePrivatePublic(isPrivate) {
-            this.cleanupForm();
-            this.isPrivate = isPrivate;
-        },
-
-        cleanupForm() {
-            this.isPrivate = true;
+        cleanupForm(enablePrivate=true) {
+            if (enablePrivate) this.isPrivate = true;
             this.selectedCoin = null;
             this.amount = '';
             this.address = ''

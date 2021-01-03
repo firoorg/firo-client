@@ -197,7 +197,7 @@
                     />
 
                     <div class="footer">
-                        <PrivatePublicBalance @toggle="togglePrivatePublic" />
+                        <PrivatePublicBalance v-model="isPrivate" />
                     </div>
                 </div>
             </div>
@@ -422,6 +422,10 @@ export default {
         coinControlSelectedAmount() {
             this.$validator.validateAll();
         },
+
+        isPrivate() {
+            this.cleanupForm(false);
+        }
     },
 
     beforeMount () {
@@ -506,16 +510,11 @@ export default {
             this.label = addressBookItem.label;
         },
 
-        togglePrivatePublic(isPrivate) {
-            this.cleanupForm();
-            this.isPrivate = isPrivate;
-        },
-
-        cleanupForm () {
+        cleanupForm(enablePrivate=true) {
+            if (enablePrivate) this.isPrivate = true;
             this.label = '';
             this.amount = '';
             this.address = '';
-            this.isPrivate = true;
         }
     }
 }
