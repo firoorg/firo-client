@@ -6,7 +6,7 @@
                     v-model="filter"
                     type="text"
                     class="table-filter-input"
-                    :placeholder="$t('send.table__outgoing-payments.placeholder__filter')"
+                    placeholder="Filter by label or address"
                 />
 
                 <div v-if="showUnsyncedWarning" class="show-unsynced-warning">
