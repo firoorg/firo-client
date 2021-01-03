@@ -24,10 +24,10 @@ const mainConfig = require('./webpack.main.config');
 
     const electronProcess = child_process.spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
     electronProcess.stdout.on('data', (data) => {
-        console.log(data.toString());
+        console.log(data.toString().replace(/\n$/, ''));
     });
     electronProcess.stderr.on('data', (data) => {
-        console.error(data.toString());
+        console.log(data.toString().replace(/\n$/, ''));
     });
     electronProcess.on('exit', () => process.exit());
 })();
