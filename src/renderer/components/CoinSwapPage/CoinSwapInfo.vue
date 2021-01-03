@@ -39,6 +39,16 @@
                 </div>
 
                 <div class="field">
+                    <label>
+                        {{ coinSwapData.fromCoin }} Refund Address
+                    </label>
+
+                    <div class="value address">
+                        {{ coinSwapData.refundAddress }}
+                    </div>
+                </div>
+
+                <div class="field">
                     <label>Expected Rate</label>
 
                     <div class="value">
