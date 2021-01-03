@@ -7,6 +7,10 @@
             &#xef1b;
         </div>
 
+        <div v-else-if="rowData.status === 'failed'">
+            &#xef1b;
+        </div>
+
         <div v-else-if="rowData.status === 'waiting'">
             <div class="spin">&#xeffa;</div>
         </div>
