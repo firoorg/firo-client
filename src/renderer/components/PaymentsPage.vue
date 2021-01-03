@@ -27,19 +27,27 @@
                 :compare-elements="comparePayments"
                 :per-page="17"
                 :on-page-change="(pageNumber) => this.currentPage = pageNumber"
+                :on-row-select="(rowData) => selectedTx = rowData.tx"
             />
         </div>
+
+        <Popup v-if="selectedTx">
+            <TransactionInfo
+                :tx="selectedTx"
+                @ok="selectedTx = null"
+            />
+        </Popup>
     </section>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-
+import TransactionInfo from "renderer/components/PaymentsPage/TransactionInfo";
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
 import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate';
 import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
 import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
-
+import Popup from "renderer/components/Popup";
 import { convertToCoin } from "lib/convert";
 
 const tableFields = [
@@ -53,13 +61,8 @@ export default {
 
     components: {
         AnimatedTable,
-    },
-
-    props: {
-        selectedPayment: {
-            type: String,
-            default: null
-        }
+        Popup,
+        TransactionInfo
     },
 
     data () {
@@ -68,7 +71,8 @@ export default {
             filter: '',
             tableData: [],
             newTableData: [],
-            currentPage: 1
+            currentPage: 1,
+            selectedTx: null
         }
     },
 
@@ -159,7 +163,8 @@ export default {
                     label:
                         tx.label ||
                         (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
-                    extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount)
+                    extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount),
+                    tx
                 });
             }
 

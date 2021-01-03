@@ -1,45 +1,7 @@
 <template>
-    <section class="pr-info">
+    <div>
         <div class="title">
-            {{ title }}
-        </div>
-
-        <div class="delete">
-            <v-popover
-                :open="deletePopoverIsOpen"
-                placement="bottom-end"
-                popover-class="tooltip popover multi-step-popover"
-                trigger="manually"
-                :auto-hide="false"
-                :handle-resize="true"
-            >
-                <a
-                    href="#"
-                    @click.prevent="openDeletePopover"
-                >
-                    Delete Payment Request
-                </a>
-
-                <template slot="popover">
-                    <div>
-                        <div class="popover-content">
-                            <base-button
-                                @click.prevent="cancelDelete"
-                                color="red"
-                            >
-                                Cancel
-                            </base-button>
-
-                            <base-button
-                                @click.prevent="deletePaymentRequest"
-                                color="green"
-                            >
-                                Confirm
-                            </base-button>
-                        </div>
-                    </div>
-                </template>
-            </v-popover>
+            Transaction Info
         </div>
 
         <div class="details">
@@ -93,7 +55,7 @@
                 </a>
             </div>
         </div>
-    </section>
+    </div>
 </template>
 
 <script>

@@ -76,10 +76,18 @@ a {
     @include monospace();
 }
 
-@mixin txid {
+@mixin small-mono {
     user-select: text;
     @include monospace();
     @include mini();
+}
+
+@mixin txid {
+    @include small-mono();
+}
+
+@mixin blockid {
+    @include small-mono();
 }
 
 @mixin label {

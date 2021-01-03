@@ -1,0 +1,37 @@
+@import "src/renderer/styles/typography";
+@import "src/renderer/styles/inputs";
+@import "src/renderer/styles/popup";
+@import "src/renderer/styles/colors";
+
+@mixin info-popup() {
+    @include popup();
+
+    .value {
+        @include small-mono();
+    }
+
+    .content {
+        // We do NOT want the size to be adaptive to the screen.
+        width: 450pt;
+
+        .status {
+            font-weight: bold;
+        }
+
+        .field {
+            margin-bottom: $size-between-field-space-small;
+
+            label {
+                margin-right: $size-medium-space;
+                width: fit-content;
+                @include label();
+            }
+
+            .value {
+                width: available;
+                display: inline;
+                float: right;
+            }
+        }
+    }
+}

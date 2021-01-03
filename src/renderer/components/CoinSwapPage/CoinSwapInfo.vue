@@ -178,62 +178,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/popup";
+@import "src/renderer/styles/info-popup";
+@import "src/renderer/styles/sizes";
 @import "src/renderer/styles/colors";
 
+@include info-popup();
 
-@include popup();
-
-.ticker {
-    @include ticker();
+.qr-code {
+    width: fit-content;
+    margin: {
+        left: auto;
+        right: auto;
+        bottom: $size-popup-margin;
+    }
 }
 
-.address {
-    @include address();
-    font-size: 80%;
-}
-
-.amount {
-    @include amount();
-}
-
-.content {
-    // We do NOT want the size to be adaptive to the screen.
-    width: 400pt;
-
-    .status {
-        font-weight: bold;
-
-        &.status-expired {
-            color: $color-error;
-        }
-    }
-
-    .qr-code {
-        width: fit-content;
-        margin: {
-            left: auto;
-            right: auto;
-            bottom: $size-popup-margin;
-        }
-    }
-
-    .field {
-        margin-bottom: $size-between-field-space-small;
-
-        label {
-            margin-right: $size-medium-space;
-            width: fit-content;
-            @include label();
-        }
-
-        .value {
-            width: available;
-            display: inline;
-            float: right;
-        }
-    }
+.status-expired {
+    color: $color-error;
 }
 </style>
