@@ -5,97 +5,99 @@
         </div>
 
         <div class="content">
-            <template v-if="tx.blockHeight">
+            <div class="fields">
+                <template v-if="tx.blockHeight">
+                    <div class="field">
+                        <label>
+                            Block Height
+                        </label>
+
+                        <div class="value">
+                            {{ tx.blockHeight }}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>
+                            Block Hash
+                        </label>
+
+                        <div class="value">
+                            {{ tx.blockHash }}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>
+                            Block Time
+                        </label>
+
+                        <div class="value">
+                            {{ formattedBlockTime }}
+                        </div>
+                    </div>
+                </template>
+
+                <template v-else>
+                    <div class="field">
+                        <label>
+                            Status
+                        </label>
+
+                        <div class="value status">
+                            UNCONFIRMED
+                        </div>
+                    </div>
+                </template>
+
                 <div class="field">
                     <label>
-                        Block Height
+                        Transaction ID
                     </label>
 
                     <div class="value">
-                        {{ tx.blockHeight }}
+                        {{ tx.txid }}
                     </div>
                 </div>
 
                 <div class="field">
                     <label>
-                        Block Hash
+                        Transaction Index
                     </label>
 
                     <div class="value">
-                        {{ tx.blockHash }}
+                        {{ tx.txIndex }}
                     </div>
                 </div>
 
                 <div class="field">
                     <label>
-                        Block Time
+                        Recipient Address
                     </label>
 
                     <div class="value">
-                        {{ formattedBlockTime }}
+                        {{ tx.address }}
                     </div>
                 </div>
-            </template>
 
-            <template v-else>
-                <div class="field">
+                <div v-if="tx.fee" class="field">
                     <label>
-                        Status
+                        Fee
                     </label>
 
-                    <div class="value status">
-                        UNCONFIRMED
+                    <div class="value">
+                        <Amount :amount="tx.fee" ticker="FIRO" />
                     </div>
                 </div>
-            </template>
 
-            <div class="field">
-                <label>
-                    Transaction ID
-                </label>
+                <div class="field">
+                    <label>
+                        Received Amount
+                    </label>
 
-                <div class="value">
-                    {{ tx.txid }}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>
-                    Transaction Index
-                </label>
-
-                <div class="value">
-                    {{ tx.txIndex }}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>
-                    Recipient Address
-                </label>
-
-                <div class="value">
-                    {{ tx.address }}
-                </div>
-            </div>
-
-            <div v-if="tx.fee" class="field">
-                <label>
-                    Fee
-                </label>
-
-                <div class="value">
-                    <Amount :amount="tx.fee" ticker="FIRO" />
-                </div>
-            </div>
-
-            <div class="field">
-                <label>
-                    Received Amount
-                </label>
-
-                <div class="value">
-                    <Amount :amount="tx.amount" ticker="FIRO" />
+                    <div class="value">
+                        <Amount :amount="tx.amount" ticker="FIRO" />
+                    </div>
                 </div>
             </div>
         </div>

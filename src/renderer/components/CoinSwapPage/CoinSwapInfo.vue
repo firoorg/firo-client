@@ -7,113 +7,115 @@
         <div class="content">
             <div v-if="showQrCode" ref="qrCode" class="qr-code" />
 
-            <div class="field">
-                <label>
-                    Status
-                </label>
+            <div class="fields">
+                <div class="field">
+                    <label>
+                        Status
+                    </label>
 
-                <div :class="`value status status-${coinSwapData.status}`">
-                    {{ coinSwapData.status.toUpperCase() }}
+                    <div :class="`value status status-${coinSwapData.status}`">
+                        {{ coinSwapData.status.toUpperCase() }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label>
-                    {{ coinSwapData.fromCoin }} Address
-                </label>
+                <div class="field">
+                    <label>
+                        {{ coinSwapData.fromCoin }} Address
+                    </label>
 
-                <div class="value address">
-                    {{ coinSwapData.exchangeAddress }}
+                    <div class="value address">
+                        {{ coinSwapData.exchangeAddress }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label>
-                    {{ coinSwapData.toCoin }} Address
-                </label>
+                <div class="field">
+                    <label>
+                        {{ coinSwapData.toCoin }} Address
+                    </label>
 
-                <div class="value address">
-                    {{ coinSwapData.receiveAddress }}
+                    <div class="value address">
+                        {{ coinSwapData.receiveAddress }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label>Expected Rate</label>
+                <div class="field">
+                    <label>Expected Rate</label>
 
-                <div class="value">
-                    <Amount amount="1" :ticker="coinSwapData.fromCoin" />
-                    =
-                    <Amount :amount="coinSwapData.expectedRate" :ticker="coinSwapData.toCoin" />
+                    <div class="value">
+                        <Amount amount="1" :ticker="coinSwapData.fromCoin" />
+                        =
+                        <Amount :amount="coinSwapData.expectedRate" :ticker="coinSwapData.toCoin" />
+                    </div>
                 </div>
-            </div>
 
-            <div v-if="coinSwapData.actualRate" class="field">
-                <label>Actual Rate</label>
+                <div v-if="coinSwapData.actualRate" class="field">
+                    <label>Actual Rate</label>
 
-                <div class="value">
-                    <Amount amount="1" :ticker="coinSwapData.fromCoin" />
-                    =
-                    <Amount :amount="coinSwapData.actualRate" :ticker="coinSwapData.toCoin" />
+                    <div class="value">
+                        <Amount amount="1" :ticker="coinSwapData.fromCoin" />
+                        =
+                        <Amount :amount="coinSwapData.actualRate" :ticker="coinSwapData.toCoin" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label>
-                    Amount to Send
-                </label>
+                <div class="field">
+                    <label>
+                        Amount to Send
+                    </label>
 
-                <div class="value">
-                    <Amount :amount="coinSwapData.sendAmount" :ticker="coinSwapData.fromCoin" />
+                    <div class="value">
+                        <Amount :amount="coinSwapData.sendAmount" :ticker="coinSwapData.fromCoin" />
+                    </div>
                 </div>
-            </div>
 
-            <div v-if="coinSwapData.fromFee" class="field">
-                <label>
-                    {{ coinSwapData.fromCoin }} Fee
-                </label>
+                <div v-if="coinSwapData.fromFee" class="field">
+                    <label>
+                        {{ coinSwapData.fromCoin }} Fee
+                    </label>
 
-                <div class="value">
-                    <Amount :amount="coinSwapData.fromFee" :ticker="coinSwapData.fromCoin" />
+                    <div class="value">
+                        <Amount :amount="coinSwapData.fromFee" :ticker="coinSwapData.fromCoin" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label>
-                    Expected {{ coinSwapData.toCoin }} Fee
-                </label>
+                <div class="field">
+                    <label>
+                        Expected {{ coinSwapData.toCoin }} Fee
+                    </label>
 
-                <div class="value">
-                    <Amount :amount="coinSwapData.expectedToFee" :ticker="coinSwapData.toCoin" />
+                    <div class="value">
+                        <Amount :amount="coinSwapData.expectedToFee" :ticker="coinSwapData.toCoin" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label>
-                    Estimated Total to Receive
-                </label>
+                <div class="field">
+                    <label>
+                        Estimated Total to Receive
+                    </label>
 
-                <div class="value">
-                    <Amount :amount="coinSwapData.expectedAmountToReceive" :ticker="coinSwapData.toCoin" />
+                    <div class="value">
+                        <Amount :amount="coinSwapData.expectedAmountToReceive" :ticker="coinSwapData.toCoin" />
+                    </div>
                 </div>
-            </div>
 
-            <div v-if="coinSwapData.depositTxId" class="field">
-                <label>
-                    {{ coinSwapData.fromCoin }} Transaction
-                </label>
+                <div v-if="coinSwapData.depositTxId" class="field">
+                    <label>
+                        {{ coinSwapData.fromCoin }} Transaction
+                    </label>
 
-                <div class="value">
-                    {{ coinSwapData.depositTxId }}
+                    <div class="value">
+                        {{ coinSwapData.depositTxId }}
+                    </div>
                 </div>
-            </div>
 
-            <div v-if="coinSwapData.outputTxId" class="field">
-                <label>
-                    {{ coinSwapData.toCoin }} Transaction
-                </label>
+                <div v-if="coinSwapData.outputTxId" class="field">
+                    <label>
+                        {{ coinSwapData.toCoin }} Transaction
+                    </label>
 
-                <div class="value">
-                    {{ coinSwapData.outputTxId }}
+                    <div class="value">
+                        {{ coinSwapData.outputTxId }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -205,6 +207,7 @@ export default {
 @include info-popup();
 
 .qr-code {
+    display: block;
     width: fit-content;
     margin: {
         left: auto;

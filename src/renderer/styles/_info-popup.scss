@@ -13,26 +13,30 @@
     .content {
         // We do NOT want the size to be adaptive to the screen.
         min-width: 450pt;
-        display: table;
 
-        .status {
-            font-weight: bold;
-        }
+        .fields {
+            width: 100%;
+            display: table;
 
-        .field {
-            display: table-row;
-
-            label, .value {
-                display: table-cell;
-                padding-bottom: $size-between-field-space-small;
+            .status {
+                font-weight: bold;
             }
 
-            label {
-                @include label();
-            }
+            .field {
+                display: table-row;
 
-            .value {
-                text-align: right;
+                label, .value {
+                    display: table-cell;
+                    padding-bottom: $size-between-field-space-small;
+                }
+
+                label {
+                    @include label();
+                }
+
+                .value {
+                    text-align: right;
+                }
             }
         }
     }
