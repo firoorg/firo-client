@@ -96,6 +96,26 @@
                     <Amount :amount="coinSwapData.expectedAmountToReceive" :ticker="coinSwapData.toCoin" />
                 </div>
             </div>
+
+            <div v-if="coinSwapData.depositTxId" class="field">
+                <label>
+                    {{ coinSwapData.fromCoin }} Transaction
+                </label>
+
+                <div class="value">
+                    {{ coinSwapData.depositTxId }}
+                </div>
+            </div>
+
+            <div v-if="coinSwapData.outputTxId" class="field">
+                <label>
+                    {{ coinSwapData.toCoin }} Transaction
+                </label>
+
+                <div class="value">
+                    {{ coinSwapData.outputTxId }}
+                </div>
+            </div>
         </div>
 
         <div class="buttons">
