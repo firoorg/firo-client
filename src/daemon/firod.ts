@@ -1142,7 +1142,9 @@ export class Firod {
     //
     // If firod has been shutdown intentionally (but not crashed) this method will throw.
     async send(auth: string | null, type: string, collection: string, data: unknown): Promise<unknown> {
-        logger.debug("Sending request to firod: type: %O, collection: %O, data: %O", type, collection, data);
+        if (collection !== 'rpc') {
+            logger.debug("Sending request to firod: type: %O, collection: %O, data: %O", type, collection, data);
+        }
 
         return await this.requesterSocketSend(Firod.formatSend(auth, type, collection, data));
     }
@@ -1217,7 +1219,9 @@ export class Firod {
                     return;
                 }
 
-                if (messageString.length > 1024) {
+                if (callName === 'create/rpc') {
+                    // Don't log anything about rpc requests.
+                } else if (messageString.length > 1024) {
                     logger.debug(`received reply from firod for ${callName}: <%d bytes>`, messageString.length);
                     logger.silly(`content of %d byte reply to ${callName}: %O`, messageString.length, message);
                 } else {
