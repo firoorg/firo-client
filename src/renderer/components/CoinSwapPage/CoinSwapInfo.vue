@@ -20,6 +20,16 @@
 
                 <div class="field">
                     <label>
+                        Switchain Swap ID
+                    </label>
+
+                    <div class="value">
+                        {{ coinSwapData.orderId }}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>
                         {{ coinSwapData.fromCoin }} Address
                     </label>
 
