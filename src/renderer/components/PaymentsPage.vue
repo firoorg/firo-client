@@ -88,12 +88,12 @@ export default {
             }
         },
 
-        newTableData() {
-            this.$emit('resize');
+        filteredTableData() {
+            window.dispatchEvent(new Event('resize'));
         },
 
         showUnsyncedWarning() {
-            this.$emit('resize');
+            window.dispatchEvent(new Event('resize'));
         }
     },
 
