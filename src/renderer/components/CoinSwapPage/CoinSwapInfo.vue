@@ -136,6 +136,16 @@
                     </div>
                 </div>
             </div>
+
+            <div v-if="showQrCode" class="footer guidance">
+                Please send the exact amount shown. If you send a different amount, you will need to contact Switchain
+                support at <a href="mailto:help@switchain.com">help@switchain.com</a> to recover your funds.
+            </div>
+
+            <div v-else class="footer guidance">
+                If you need assistance or funds fail to arrive in a timely fashion, you can contact Switchain at
+                <a href="mailto:help@switchain.com">help@switchain.com</a>.
+            </div>
         </div>
 
         <div class="buttons">
@@ -220,7 +230,7 @@ export default {
 <style scoped lang="scss">
 @import "src/renderer/styles/info-popup";
 @import "src/renderer/styles/sizes";
-@import "src/renderer/styles/colors";
+@import "src/renderer/styles/typography";
 
 @include info-popup();
 
@@ -230,11 +240,18 @@ export default {
     margin: {
         left: auto;
         right: auto;
-        bottom: $size-popup-margin;
     }
 }
 
-.status-expired {
-    color: $color-error;
+.footer {
+    margin: {
+        top: $size-popup-margin;
+        left: auto;
+        right: auto;
+    }
+}
+
+.status-expired, .status-failed {
+    @include error();
 }
 </style>

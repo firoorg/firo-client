@@ -6,13 +6,23 @@
 @mixin info-popup() {
     @include popup();
 
+    .warning {
+        text-align: center;
+        @include warning();
+    }
+
+    .guidance {
+        text-align: center;
+        @include guidance();
+    }
+
     .value {
         @include small-mono();
     }
 
     .content {
         // We do NOT want the size to be adaptive to the screen.
-        min-width: 450pt;
+        width: 450pt;
 
         .fields {
             width: 100%;
