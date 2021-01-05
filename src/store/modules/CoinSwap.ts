@@ -81,6 +81,11 @@ interface CoinSwapRecord {
     // The ID of the transaction to receiveAddress that leaves the exchange.
     outputTxId?: TransactionId,
 
+    // Data in this section will be populated from an API reprly when status changes to 'refunded'
+    //
+    // The ID of the refund transaction on ${fromCoin}'s blockchain, if the transaction failed.
+    refundTx?: TransactionId,
+
     // This is the latest response from the API. We only keep the latest one because previous ones will be logged
     // anyway.
     _response: object
@@ -200,6 +205,8 @@ const actions = {
                         newRecord.receivedAt = Math.floor(+new Date(response.createdAt) / 1000);
                     if (response.depositTxId)
                         newRecord.depositTxId = response.depositTxId;
+                    if (response.refundTx)
+                        newRecord.refundTx = response.refundTx;
                     if (response.rate)
                         // So response.rate is mislabelled, and does not contain the actual rate, but the amount that
                         // was sent out. Therefore we need to calculate the actual rate ourselves.

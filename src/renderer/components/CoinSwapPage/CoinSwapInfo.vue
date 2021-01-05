@@ -135,6 +135,16 @@
                         {{ coinSwapData.outputTxId }}
                     </div>
                 </div>
+
+                <div v-if="coinSwapData.refundTx" class="field">
+                    <label>
+                        {{ coinSwapData.fromCoin }} Refund Transaction
+                    </label>
+
+                    <div class="value">
+                        {{ coinSwapData.refundTx }}
+                    </div>
+                </div>
             </div>
 
             <div v-if="showQrCode" class="footer guidance">
