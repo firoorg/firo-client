@@ -20,7 +20,7 @@ type CurrencyCode = string;
 // a whole coin amount of a given coin, e.g. "1.08" FIRO = 1.08e8 FIRO satoshi
 type Amount = string;
 // the status of the request; this will be updated from 'waiting' to some other value, and then not again.
-type CoinSwapStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed';
+type CoinSwapStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'refunded' | 'failed';
 // a UNIX timestamp
 type Timestamp = number;
 // a coin address, of any type of coin
@@ -171,7 +171,12 @@ const actions = {
     // This is called every minute by renderer.js.
     async updateOutdatedRecords({getters, dispatch}): Promise<void> {
         const potentiallyOutdatedRecords = (<CoinSwapRecord[]>Object.values(getters.records))
-            .filter(record => !['expired', 'confirmed'].includes(record.status));
+            .filter(record =>
+                !['expired', 'confirmed', 'refunded', 'failed'].includes(record.status) ||
+                // Despite failed and expired being documented as permanent states in the Switchain API docs, they can
+                // in fact be updated. Therefore we check for updates for 24 hours after they're made.
+                (['failed', 'expired'].includes(record.status) && record.date > Date.now() - 60e3 * 60 * 24)
+            );
 
         const updatePromises = potentiallyOutdatedRecords.map(async (record): Promise<CoinSwapRecord | undefined> => {
             logger.debug(`Fetching status for CoinSwap record ${record.orderId}...`);
