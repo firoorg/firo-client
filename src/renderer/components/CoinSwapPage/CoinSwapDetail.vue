@@ -432,11 +432,19 @@ export default {
 
                 this.$log.silly("Got market information.");
 
-                return lodash.fromPairs(
+                const marketInfo = lodash.fromPairs(
                     response
                         .filter(market => AllowedPairs.includes(market.pair))
                         .map(market => [market.pair, market])
                 );
+
+                for (const pair of AllowedPairs) {
+                    if (!marketInfo[pair]) {
+                        console.warn(`No CoinSwap market for ${pair}.`);
+                    }
+                }
+
+                return marketInfo
             }
         },
 
