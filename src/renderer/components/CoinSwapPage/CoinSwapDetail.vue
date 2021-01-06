@@ -418,9 +418,17 @@ export default {
 
                 this.$log.silly("Fetching market information...");
 
-                const api = new APIWorker();
-                const {error, response} = await api.getMarketInfo();
-                if (error) return {}
+                let response;
+                try {
+                    const api = new APIWorker();
+                    const mi = await api.getMarketInfo();
+                    if (mi.error) throw mi.error;
+                    response = mi.response;
+                } catch (error) {
+                    console.warn(`Error fetching CoinSwap market info: ${error}`);
+                    setTimeout(() => this.marketInfoRefreshNonce++, 10e3);
+                    return {};
+                }
 
                 this.$log.silly("Got market information.");
 
