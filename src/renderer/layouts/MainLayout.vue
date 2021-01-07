@@ -6,7 +6,9 @@
             <Sidebar id="sidebar" />
 
             <main ref="main" id="primary">
-                <router-view />
+                <keep-alive include="DebugPage">
+                    <router-view />
+                </keep-alive>
             </main>
         </div>
     </div>

@@ -2,14 +2,12 @@
     <div id="app">
         <div id="app-drag-area" />
 
-        <div :v-show="!!waitingReason">
+        <div :v-show="waitingReason">
             <WaitingScreen v-if="waitingReason" :reason="waitingReason" />
         </div>
 
-        <div :v-show="waitingReason">
-            <keep-alive>
-                <router-view />
-            </keep-alive>
+        <div :v-show="!waitingReason">
+            <router-view />
         </div>
     </div>
 </template>
