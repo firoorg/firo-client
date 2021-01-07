@@ -226,8 +226,12 @@ const getters = {
     transactions: (state) => state.transactions,
     availableUTXOs: (state, getters, rootState, rootGetters) =>
         Object.keys(state.unspentUTXOs)
-        .map(uniqId => state.transactions[uniqId])
-        .filter(tx => tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight']),
+        .map(uniqId => {
+            const tx = state.transactions[uniqId];
+            if (!tx) console.warn(`Unknown transaction ${uniqId} in unspentUTXOs`);
+            return tx;
+        })
+        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight']),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
 
