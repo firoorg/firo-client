@@ -6,6 +6,16 @@
 
         <div class="content">
             <div class="fields">
+                <div class="field">
+                    <label>
+                        Confirmations
+                    </label>
+
+                    <div class="value">
+                        {{ confirmations }}
+                    </div>
+                </div>
+
                 <template v-if="tx.blockHeight">
                     <div class="field">
                         <label>
@@ -112,6 +122,7 @@
 
 <script>
 // $emits: ok
+import {mapGetters} from "vuex";
 import Amount from "renderer/components/Amount";
 import { format } from 'date-fns'
 
@@ -131,6 +142,15 @@ export default {
     },
 
     computed: {
+        ...mapGetters({
+            currentBlockHeight: 'Blockchain/currentBlockHeight'
+        }),
+
+        confirmations() {
+            if (!this.tx.blockHeight) return 0;
+            return this.currentBlockHeight - this.tx.blockHeight + 1;
+        },
+
         formattedBlockTime() {
             return format(new Date(this.tx.blockTime * 1000), "HH:MM, D MMM YYYY");
         }
