@@ -26,6 +26,7 @@
                 ref="vuetable"
                 :api-mode="false"
                 :fields="tableFields"
+                no-data-template="You don't have any masternodes yet."
                 :data-manager="dataManager"
                 pagination-path="pagination"
                 @vuetable:loaded="onLoadingCompleted"
