@@ -371,14 +371,14 @@ export default {
         // Additional validations are created in the watcher for marketInfo
     },
 
-    afterMount() {
+    created() {
         // Refresh market information every 30 seconds.
         this.refreshOffersIntervalId = setInterval(() => {
             this.marketInfoRefreshNonce++;
         }, 60e3);
     },
 
-    beforeUnmount() {
+    destroyed() {
         clearInterval(this.refreshOffersIntervalId);
     },
 

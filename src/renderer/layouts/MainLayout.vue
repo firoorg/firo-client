@@ -6,9 +6,7 @@
             <Sidebar id="sidebar" />
 
             <main ref="main" id="primary">
-                <keep-alive>
-                  <router-view />
-                </keep-alive>
+                <router-view />
             </main>
         </div>
     </div>
