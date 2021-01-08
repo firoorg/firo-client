@@ -62,6 +62,16 @@
 
                 <div class="field">
                     <label>
+                        Category
+                    </label>
+
+                    <div class="value">
+                        {{ tx.category }}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>
                         Transaction ID
                     </label>
 
