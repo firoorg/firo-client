@@ -6,16 +6,6 @@
 
         <div class="content">
             <div class="fields">
-                <div class="field">
-                    <label>
-                        Confirmations
-                    </label>
-
-                    <div class="value">
-                        {{ confirmations }}
-                    </div>
-                </div>
-
                 <template v-if="tx.blockHeight">
                     <div class="field">
                         <label>
@@ -59,6 +49,16 @@
                         </div>
                     </div>
                 </template>
+
+                <div class="field">
+                    <label>
+                        Confirmations
+                    </label>
+
+                    <div class="value">
+                        {{ confirmations }}
+                    </div>
+                </div>
 
                 <div class="field">
                     <label>
