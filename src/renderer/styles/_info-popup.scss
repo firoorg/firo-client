@@ -22,7 +22,7 @@
 
     .content {
         // We do NOT want the size to be adaptive to the screen.
-        width: 450pt;
+        min-width: 450pt;
 
         .fields {
             width: 100%;

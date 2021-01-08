@@ -25,7 +25,6 @@
                 :no-data-message="tableData.length ? 'No transactions matched your search criterion' : 'No Payments made yet.'"
                 :sort-order="sortOrder"
                 :compare-elements="comparePayments"
-                :per-page="17"
                 :on-page-change="(pageNumber) => this.currentPage = pageNumber"
                 :on-row-select="(rowData) => selectedTx = rowData.tx"
             />
