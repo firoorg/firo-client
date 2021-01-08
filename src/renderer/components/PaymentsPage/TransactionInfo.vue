@@ -162,7 +162,7 @@ export default {
         },
 
         formattedBlockTime() {
-            return format(new Date(this.tx.blockTime * 1000), "HH:MM, D MMM YYYY");
+            return format(this.tx.blockTime * 1000, "hh:mm:ss, D MMM YYYY");
         }
     },
 
