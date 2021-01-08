@@ -27,11 +27,11 @@
 
             <div class="field">
                 <label>
-                    Amount
+                    Total to Send
                 </label>
 
                 <div class="value">
-                    <Amount :amount="amount" /> <span class="ticker">FIRO</span>
+                    <Amount :amount="total" /> <span class="ticker">FIRO</span>
                 </div>
             </div>
 
@@ -47,11 +47,11 @@
 
             <div class="field">
                 <label>
-                    Total
+                    Amount to Receive
                 </label>
 
                 <div class="value">
-                    <Amount :amount="total" /> <span class="ticker">FIRO</span>
+                    <Amount :amount="amount" /> <span class="ticker">FIRO</span>
                 </div>
             </div>
         </div>
