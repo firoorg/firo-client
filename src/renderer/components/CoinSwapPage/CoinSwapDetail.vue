@@ -438,6 +438,11 @@ export default {
                         .map(market => [market.pair, market])
                 );
 
+                if (!Object.keys(marketInfo).length) {
+                    this.$log.error("Switchain doesn't seem to support FIRO now. :(");
+                    return {};
+                }
+
                 for (const pair of AllowedPairs) {
                     if (!marketInfo[pair]) {
                         console.warn(`No CoinSwap market for ${pair}.`);
