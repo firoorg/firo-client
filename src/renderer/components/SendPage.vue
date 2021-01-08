@@ -123,6 +123,7 @@
                                 v-model.number="txFeePerKb"
                                 v-validate.initial="'txFeeIsValid'"
                                 v-tooltip="getValidationTooltip('txFeePerKb')"
+                                :placeholder="smartFeePerKb"
                                 type="text"
                                 name="txFeePerKb"
                                 tabindex="4"
@@ -189,7 +190,7 @@
                         :label="label"
                         :address="address"
                         :amount="satoshiAmount"
-                        :tx-fee-per-kb="txFeePerKb || 1"
+                        :tx-fee-per-kb="Number(txFeePerKb)"
                         :computed-tx-fee="transactionFee || 0"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
@@ -244,7 +245,7 @@ export default {
             subtractFeeFromAmount: !$store.getters['ApiStatus/isLelantusAllowed'],
             useCustomFee: false,
             // In certain cases, firod might suggest very low fees. Practically, we probably never want this.
-            txFeePerKb: Math.max($store.getters['ApiStatus/smartFeePerKb'], 10),
+            txFeePerKb: '',
             isPrivate: true,
             showCustomInputSelector: false,
             useCustomInputs: false,
@@ -271,7 +272,7 @@ export default {
 
             if (this.validationErrors.items.length) return;
             if (!this.satoshiAmount) return;
-            console.log(this.satoshiAmount);
+            if (this.useCustomFee && !this.txFeePerKb) return;
 
             await new Promise(r => setTimeout(r, 1e3));
             if (!lodash.isEqual(
@@ -367,7 +368,7 @@ export default {
 
         isValidated () {
             // this.errors was already calculated when amount and address were entered.
-            return !!(this.amount && this.address && this.txFeePerKb && !this.validationErrors.items.length);
+            return !!(this.amount && this.address && this.transactionFee && !this.validationErrors.items.length);
         },
 
         amountValidations () {
@@ -403,9 +404,9 @@ export default {
 
         useCustomFee() {
             if (!this.useCustomFee) {
-                this.txFeePerKb = this.smartFeePerKb;
+                this.txFeePerKb = '';
                 // Make sure the validation warning goes away.
-                this.$refs.txFeePerKb.value = this.txFeePerKb;
+                this.$refs.txFeePerKb.value = '';
             }
         },
 
