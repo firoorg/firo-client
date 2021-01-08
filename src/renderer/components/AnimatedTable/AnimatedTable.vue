@@ -140,6 +140,8 @@ export default {
             if (!isEqual) {
                 this.$refs.vuetable.refresh()
                 this.onPageChange(1);
+
+                this.$nextTick(() => this.resizeListener());
             }
         }
     },
