@@ -164,12 +164,6 @@ export default {
         formattedBlockTime() {
             return format(this.tx.blockTime * 1000, "hh:mm:ss, D MMM YYYY");
         }
-    },
-
-    methods: {
-        viewInBlockExplorer() {
-            alert('hi');
-        }
     }
 }
 </script>
