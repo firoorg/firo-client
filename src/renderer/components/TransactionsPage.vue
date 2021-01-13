@@ -41,7 +41,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import TransactionInfo from "renderer/components/PaymentsPage/TransactionInfo";
+import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo";
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
 import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate';
 import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
@@ -56,7 +56,7 @@ const tableFields = [
 ];
 
 export default {
-    name: 'PaymentsList',
+    name: 'TransactionsPage',
 
     components: {
         AnimatedTable,

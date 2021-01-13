@@ -53,7 +53,7 @@ export default new Router({
             children: [
                 {
                     path: '/transactions',
-                    component: require('renderer/components/PaymentsPage').default
+                    component: require('renderer/components/TransactionsPage').default
                 },
 
                 {
