@@ -71,7 +71,7 @@
 <script>
 // $emits: cancel, confirm
 import { convertToCoin } from 'lib/convert'
-import Amount from "renderer/components/Amount";
+import Amount from "renderer/components/shared/Amount";
 
 export default {
     name: 'SendStepConfirm',

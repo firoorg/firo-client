@@ -20,7 +20,7 @@
 
 <script>
 import { mapGetters } from 'vuex' /* , mapActions */
-import Amount from 'renderer/components/Amount'
+import Amount from 'renderer/components/shared/Amount'
 
 export default {
     name: 'Balance',

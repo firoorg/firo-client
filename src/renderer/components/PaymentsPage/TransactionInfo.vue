@@ -133,7 +133,7 @@
 <script>
 // $emits: ok
 import {mapGetters} from "vuex";
-import Amount from "renderer/components/Amount";
+import Amount from "renderer/components/shared/Amount";
 import { format } from 'date-fns'
 
 export default {
