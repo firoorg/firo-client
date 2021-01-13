@@ -8,7 +8,7 @@
     </td>
 
     <td v-else class="banned">
-        BANNED
+        POSE_BANNED
     </td>
 </template>
 
