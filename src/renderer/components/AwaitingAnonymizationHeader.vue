@@ -21,7 +21,7 @@ import Popup from "renderer/components/shared/Popup";
 import AnonymizeDialog from "renderer/components/AnonymizeDialog";
 
 export default {
-    name: "PaymentPendingWarning",
+    name: "AwaitingAnonymizationHeader",
 
     components: {
         Popup,

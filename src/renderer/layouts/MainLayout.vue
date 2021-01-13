@@ -1,6 +1,6 @@
 <template>
     <div id="main-layout">
-        <PaymentPendingWarning v-if="showPaymentPendingWarning" />
+        <AwaitingAnonymizationHeader v-if="showPaymentPendingWarning" />
 
         <div id="main-content" :class="{'has-payment-pending-warning': showPaymentPendingWarning}">
             <Sidebar id="sidebar" />
@@ -17,14 +17,14 @@
 <script>
 import {mapGetters} from "vuex";
 import Sidebar from 'renderer/components/Sidebar'
-import PaymentPendingWarning from "renderer/components/PaymentPendingWarning";
+import AwaitingAnonymizationHeader from "renderer/components/AwaitingAnonymizationHeader";
 
 export default {
     name: 'MainLayout',
 
     components: {
         Sidebar,
-        PaymentPendingWarning
+        AwaitingAnonymizationHeader
     },
 
     computed: mapGetters({
