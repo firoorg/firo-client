@@ -8,6 +8,16 @@
             <div class="fields">
                 <div class="field">
                     <label>
+                        Status
+                    </label>
+
+                    <div class="value">
+                        {{ masternode.state.status || 'SYNCING' }}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>
                         Pro Tx Hash
                     </label>
 

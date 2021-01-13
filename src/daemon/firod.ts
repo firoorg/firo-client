@@ -391,6 +391,7 @@ export interface MasternodeEvent {
     collateralAddress: string;
     operatorReward: number;
     state: {
+        status: string;
         service: string;
         registeredHeight: number;
         lastPaidHeight: number;
