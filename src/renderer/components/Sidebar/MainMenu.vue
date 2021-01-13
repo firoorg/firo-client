@@ -46,18 +46,13 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import PercentageToHoldInZerocoinNotification from 'renderer/components/Notification/PercentageToHoldInZerocoinNotification'
 
 export default {
     name: 'MainMenu',
 
     computed: mapGetters({
         network: 'ApiStatus/network'
-    }),
-
-    components: {
-        PercentageToHoldInZerocoinNotification
-    }
+    })
 }
 </script>
 
