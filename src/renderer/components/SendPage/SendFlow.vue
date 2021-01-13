@@ -34,7 +34,7 @@ import Popup from "renderer/components/shared/Popup";
 import ConfirmStep from "./ConfirmStep";
 import PassphraseStep from "./PassphraseStep";
 import ErrorStep from "./ErrorStep";
-import WaitOverlay from "renderer/components/WaitOverlay";
+import WaitOverlay from "renderer/components/shared/WaitOverlay";
 
 export default {
     name: "SendFlow",
