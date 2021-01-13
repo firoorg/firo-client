@@ -115,8 +115,8 @@ export default {
                 const b = mnB.state.nextPaymentHeight;
 
                 if (!a && !b) return 0;
-                if (!a) return 1;
-                if (!b) return -1;
+                if (!a) return this.showAllZnodes ? 1 : -1;
+                if (!b) return this.showAllZnodes ? -1 : 1;
                 return a - b;
             })
         }
