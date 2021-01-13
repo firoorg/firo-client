@@ -3,8 +3,12 @@
         Next Payment Block
     </th>
 
-    <td v-else>
+    <td v-else-if="rowData.state.nextPaymentHeight">
         {{ rowData.state.nextPaymentHeight }}
+    </td>
+
+    <td v-else class="banned">
+        BANNED
     </td>
 </template>
 
@@ -21,4 +25,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.banned {
+    font-weight: bold;
+}
 </style>
