@@ -63,30 +63,6 @@ Vue.use(Logger)
 Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
-// automatically registering BaseComponents as Component (stripping of Base)
-const requireComponent = require.context('./components', true, /Base[A-Z]\w+\.(vue|js)$/)
-for (const fileName of requireComponent.keys()) {
-    // Get component config
-    const componentConfig = requireComponent(fileName)
-
-    // Get PascalCase name of component
-    const componentName = upperFirst(
-        camelCase(
-            // Strip the path, "Base" and extension from the filename
-            fileName.substr(fileName.lastIndexOf('/')).replace(/^(.*)\.\w+$/, '$1')
-        )
-    )
-
-    // Register component globally
-    Vue.component(
-        componentName,
-        // Look for the component options on `.default`, which will
-        // exist if the component was exported with `export default`,
-        // otherwise fall back to module's root.
-        componentConfig.default || componentConfig
-    )
-}
-
 // Allow global access to the store and router.
 window.$store = store;
 window.$router = router;
