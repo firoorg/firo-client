@@ -91,7 +91,7 @@ import ErrorStep from "./SendPage/ErrorStep";
 import SmallMnemonic from "./SettingsPage/SmallMnemonic";
 import {IncorrectPassphrase} from "daemon/firod";
 import SendStepPassphrase from "renderer/components/SendPage/PassphraseStep";
-import SuccessMessage from "renderer/components/SuccessMessage";
+import SuccessMessage from "renderer/components/SettingsPage/SuccessMessage";
 
 export default {
     name: 'SettingsPage',
