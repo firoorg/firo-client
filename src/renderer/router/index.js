@@ -83,7 +83,7 @@ export default new Router({
 
                 {
                     path: '/debugconsole',
-                    component: require('renderer/components/DebugPage').default
+                    component: require('renderer/components/DebugConsolePage.vue').default
                 }
             ]
         }
