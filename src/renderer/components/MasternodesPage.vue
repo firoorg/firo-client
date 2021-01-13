@@ -106,7 +106,9 @@ export default {
                     masternode.state.votingAddress,
                     masternode.state.payoutAddress,
                     masternode.state.pubKeyOperator,
-                    masternode.state.operatorPayoutAddress
+                    masternode.state.operatorPayoutAddress,
+                    String(masternode.state.nextPaymentHeight),
+                    masternode.state.status
                 ].find(f => f && f.toLowerCase().includes(this.filter.toLowerCase()));
             }).sort((mnA, mnB) => {
                 const a = mnA.state.nextPaymentHeight;
