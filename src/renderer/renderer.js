@@ -3,7 +3,6 @@ import VTooltip from 'v-tooltip'
 import VueTimeago from 'vue-timeago'
 import VeeValidate from 'vee-validate'
 import AsyncComputed from "vue-async-computed";
-import Scrollable from 'renderer/directives/scrollable'
 import Focus from 'renderer/directives/focus'
 
 import upperFirst from 'lodash/upperFirst'
@@ -55,7 +54,6 @@ Vue.use(VeeValidate, {
     fieldsBagName: 'validationFields',
     inject: false
 })
-Vue.directive('scrollable', Scrollable)
 Vue.directive('focus', Focus)
 Vue.use(BindScopedSlotsPlugin)
 Vue.use(Logger)
