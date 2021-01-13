@@ -107,7 +107,7 @@ export default {
                     masternode.state.payoutAddress,
                     masternode.state.pubKeyOperator,
                     masternode.state.operatorPayoutAddress
-                ].find(f => f && f.includes(this.filter));
+                ].find(f => f && f.toLowerCase().includes(this.filter.toLowerCase()));
             }).sort((mnA, mnB) => {
                 const a = mnA.state.nextPaymentHeight;
                 const b = mnB.state.nextPaymentHeight;
