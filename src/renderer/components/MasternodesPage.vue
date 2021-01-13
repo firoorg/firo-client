@@ -43,7 +43,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import Popup from "renderer/components/Popup";
+import Popup from "renderer/components/shared/Popup";
 import MasternodeInfo from "renderer/components/MasternodesPage/MasternodeInfo";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import MasternodeCollateralAddress from "renderer/components/AnimatedTable/MasternodeCollateralAddress";

@@ -215,7 +215,7 @@ import {convertToSatoshi, convertToCoin} from 'lib/convert';
 import Amount from "renderer/components/shared/Amount";
 import {FirodErrorResponse} from "daemon/firod";
 import InputSelection from "renderer/components/SendPage/InputSelection";
-import Popup from "renderer/components/Popup";
+import Popup from "renderer/components/shared/Popup";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";

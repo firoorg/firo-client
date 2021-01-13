@@ -30,7 +30,7 @@
 
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import {mapGetters} from "vuex";
-import Popup from "../Popup";
+import Popup from "renderer/components/shared/Popup";
 import ConfirmStep from "./ConfirmStep";
 import PassphraseStep from "./PassphraseStep";
 import ErrorStep from "./ErrorStep";

@@ -46,7 +46,7 @@ import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
 import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate';
 import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
 import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
-import Popup from "renderer/components/Popup";
+import Popup from "renderer/components/shared/Popup";
 import { convertToCoin } from "lib/convert";
 
 const tableFields = [

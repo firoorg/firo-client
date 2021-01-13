@@ -36,7 +36,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
-import Popup from '../Popup';
+import Popup from 'renderer/components/shared/Popup';
 import AnimatedTableRelativeDate from "renderer/components/AnimatedTable/AnimatedTableRelativeDate";
 import CoinSwapSendAmount from "renderer/components/AnimatedTable/CoinSwapSendAmount";
 import CoinSwapReceivedAmount from "renderer/components/CoinSwapPage/CoinSwapReceivedAmount";

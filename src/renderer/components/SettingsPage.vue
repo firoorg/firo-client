@@ -86,7 +86,7 @@
 <script>
 import {mapGetters} from 'vuex'
 import {remote} from 'electron';
-import Popup from './Popup';
+import Popup from 'renderer/components/shared/Popup';
 import ErrorStep from "./SendPage/ErrorStep";
 import SmallMnemonic from "./SettingsPage/SmallMnemonic";
 import {IncorrectPassphrase} from "daemon/firod";

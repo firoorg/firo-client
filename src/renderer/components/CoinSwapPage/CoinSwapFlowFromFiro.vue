@@ -25,7 +25,7 @@
 // $emits: success
 
 import {FirodErrorResponse, IncorrectPassphrase} from 'daemon/firod';
-import Popup from '../Popup';
+import Popup from 'renderer/components/shared/Popup';
 import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
 import PassphraseStep from './PassphraseStep';
 import ErrorStep from './ErrorStep';
