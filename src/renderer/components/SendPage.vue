@@ -251,12 +251,12 @@ export default {
             useCustomInputs: false,
             customInputs: [],
             tableFields: [
-                {name: AddressBookItemEditableLabel},
+                {name: AddressBookItemEditableLabel, width: "160pt"},
                 {name: AddressBookItemAddress}
             ],
 
             // This is the search term to filter addresses by.
-            filter: '',
+            filter: ''
         }
     },
 

@@ -51,21 +51,9 @@ import MasternodeNextPaymentBlock from "renderer/components/AnimatedTable/Master
 import MasternodeIP from "renderer/components/AnimatedTable/MasternodeIP";
 
 const tableFields = [
-    {
-        name: MasternodeIP,
-        width: "25%",
-    },
-    {
-        name: MasternodeCollateralAddress,
-        title: "Collateral Address",
-        width: "50%",
-    },
-    {
-        name: MasternodeNextPaymentBlock,
-        title: "Next Payment Block",
-        sortField: "nextPaymentBlock",
-        width: "25%",
-    },
+    {name: MasternodeIP, width: "160pt"},
+    {name: MasternodeCollateralAddress},
+    {name: MasternodeNextPaymentBlock, width: "160pt"}
 ];
 
 export default {

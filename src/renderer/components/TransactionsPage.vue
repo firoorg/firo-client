@@ -50,9 +50,9 @@ import Popup from "renderer/components/shared/Popup";
 import { convertToCoin } from "lib/convert";
 
 const tableFields = [
-    {name: RelativeDate},
+    {name: RelativeDate, width: '160pt'},
     {name: Label},
-    {name: Amount}
+    {name: Amount, width: '160pt'}
 ];
 
 export default {

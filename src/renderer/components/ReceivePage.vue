@@ -65,7 +65,7 @@ export default {
             resizeListener: () => this.resizeQrCode(),
 
             tableFields: [
-                {name: AddressBookItemEditableLabel},
+                {name: AddressBookItemEditableLabel, width: "160pt"},
                 {name: AddressBookItemAddress}
             ]
         };

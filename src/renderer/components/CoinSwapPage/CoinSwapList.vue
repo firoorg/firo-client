@@ -44,25 +44,10 @@ import CoinSwapStatus from "renderer/components/CoinSwapPage/CoinSwapStatus";
 import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo";
 
 const tableFields = [
-    {
-        name: CoinSwapStatus,
-        width: '10%'
-    },
-
-    {
-        name: AnimatedTableRelativeDate,
-        width: '30%'
-    },
-
-    {
-        name: CoinSwapSendAmount,
-        width: '30%'
-    },
-
-    {
-        name: CoinSwapReceivedAmount,
-        width: '30%'
-    }
+    {name: CoinSwapStatus, width: '40pt'},
+    {name: AnimatedTableRelativeDate, width: '120pt'},
+    {name: CoinSwapSendAmount},
+    {name: CoinSwapReceivedAmount, width: '150pt'}
 ];
 
 export default {
