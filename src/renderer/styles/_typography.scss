@@ -58,6 +58,10 @@ a {
     font-size: $font-size-normal * 0.7;
 }
 
+@mixin supermini {
+    font-size: $font-size-normal * 0.5;
+}
+
 @mixin monospace {
     font-family: "Robot Mono";
 }

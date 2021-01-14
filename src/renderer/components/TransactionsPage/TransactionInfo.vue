@@ -1,5 +1,41 @@
 <template>
-    <div>
+    <div v-if="rebroadcastingStep === 'wait'">
+        <WaitOverlay />
+    </div>
+
+    <div v-else-if="rebroadcastingStep === 'error'" class="rebroadcast-status">
+        <div class="title">
+            Rebroadcast Failed
+        </div>
+
+        <div class="content">
+            {{ rebroadcastingError }}
+        </div>
+
+        <div class="buttons">
+            <button @click="rebroadcastingError = rebroadcastingStep = null">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <div v-else-if="rebroadcastingStep === 'success'" class="rebroadcast-status">
+        <div class="title">
+            Success!
+        </div>
+
+        <div class="content">
+            Your transaction has been rebroadcast to the network.
+        </div>
+
+        <div class="buttons">
+            <button @click="rebroadcastingStep = null">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <div v-else class="info-popup">
         <div class="title">
             Transaction Information
         </div>
@@ -44,8 +80,12 @@
                             Status
                         </label>
 
-                        <div class="value status">
-                            UNCONFIRMED
+                        <div class="value status unconfirmed">
+                            <div class="text">UNCONFIRMED</div>
+
+                            <a href="#" class="rebroadcast" @click="rebroadcast">
+                                Rebroadcast
+                            </a>
                         </div>
                     </div>
                 </template>
@@ -133,13 +173,17 @@
 <script>
 // $emits: ok
 import {mapGetters} from "vuex";
-import Amount from "renderer/components/shared/Amount";
 import { format } from 'date-fns'
+import Popup from "renderer/components/shared/Popup";
+import Amount from "renderer/components/shared/Amount";
+import WaitOverlay from "renderer/components/shared/WaitOverlay";
 
 export default {
     name: "TransactionInfo",
 
     components: {
+        WaitOverlay,
+        Popup,
         Amount
     },
 
@@ -148,6 +192,13 @@ export default {
         tx: {
             type: Object,
             required: true
+        }
+    },
+
+    data() {
+        return {
+            rebroadcastingStep: null,
+            rebroadcastingError: null
         }
     },
 
@@ -164,12 +215,47 @@ export default {
         formattedBlockTime() {
             return format(this.tx.blockTime * 1000, "hh:mm:ss, D MMM YYYY");
         }
+    },
+
+    methods: {
+        async rebroadcast() {
+            this.rebroadcastingStep = 'wait';
+            try {
+                await $daemon.rebroadcast(this.tx.txid);
+            } catch (e) {
+                this.rebroadcastingStep = 'error';
+                this.rebroadcastingError = `${e}`;
+                return;
+            }
+            this.rebroadcastingStep = 'success';
+        }
     }
 }
 </script>
 
 <style scoped lang="scss">
+@import "src/renderer/styles/popup";
 @import "src/renderer/styles/info-popup";
+@import "src/renderer/styles/typography";
 
-@include info-popup();
+.rebroadcast-status {
+    @include popup();
+
+    .content {
+        @include guidance();
+    }
+}
+
+.info-popup {
+    @include info-popup();
+
+    .unconfirmed {
+        a {
+            display: block;
+            margin-top: $size-between-field-space-small / 2;
+            @include supermini();
+            @include optional-action();
+        }
+    }
+}
 </style>
