@@ -27,16 +27,12 @@ const getters = {
     sendAddresses: (state) =>
         (<AddressBookItem[]>Object.values(state.addressBook))
             .filter(a => a.purpose === 'send')
-            .sort((a, b) =>
-                (a.label || '\xff' ).localeCompare(b.label || '\xff') || a.address.localeCompare(b.address)
-            ),
+            .sort((a, b) => b.createdAt - a.createdAt),
 
     receiveAddresses: (state) =>
         (<AddressBookItem[]>Object.values(state.addressBook))
             .filter(a => a.purpose === 'receive')
-            .sort((a, b) =>
-                (a.label || '\xff' ).localeCompare(b.label || '\xff') || a.address.localeCompare(b.address)
-            )
+            .sort((a, b) => b.createdAt - a.createdAt)
 };
 
 export default {

@@ -170,6 +170,7 @@ export default {
             } else {
                 newAddress = {purpose: 'receive', label: this.label, address: this.address};
                 await $daemon.addAddressBookItem(newAddress);
+                newAddress.createdAt = Math.floor(Date.now() / 1000);
             }
 
             await this.$store.commit('AddressBook/updateAddress', newAddress);

@@ -265,6 +265,7 @@ function isValidTransactionInput(x: any): x is TransactionInput {
 export interface AddressBookItem {
     address: string;
     label: string;
+    createdAt: number; // UNIX timestamp
     purpose: 'send' | 'receive';
 }
 
@@ -1529,6 +1530,7 @@ export class Firod {
         });
 
         return {
+            createdAt: item.createdAt,
             address: item.address,
             purpose: item.purpose,
             label: newLabel
