@@ -62,8 +62,8 @@ app.once('ready', async () => {
         titleBarStyle: 'hiddenInset',
         height: 780,
         width: 1400,
-        minWidth: 1200,
-        minHeight: 650,
+        minWidth: 1250,
+        minHeight: 660,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true
