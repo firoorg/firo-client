@@ -513,6 +513,7 @@ export default {
 
         cleanupForm(enablePrivate=true) {
             if (enablePrivate) this.isPrivate = true;
+            this.useCustomInputs = false;
             this.label = '';
             this.amount = '';
             this.address = '';
