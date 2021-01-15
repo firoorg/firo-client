@@ -1,7 +1,6 @@
 <template>
     <span>
-        <span class="amount">{{ formattedAmount }}</span>
-        <span v-if="ticker" class="ticker">{{ ticker }}</span>
+        <span class="amount">{{ formattedAmount }}</span><span v-if="ticker" class="ticker">&nbsp;{{ ticker }}</span>
     </span>
 </template>
 

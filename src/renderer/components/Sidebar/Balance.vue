@@ -1,19 +1,19 @@
 <template>
     <section class="balance">
         <div>
-            <amount :amount="available" />&nbsp;<span class="ticker">FIRO</span>
+            <amount :amount="available" ticker="FIRO" />
         </div>
 
         <div v-if="locked > 0" class="locked">
-            +&nbsp;<amount :amount="locked" />&nbsp;locked
+            +&nbsp;<amount :amount="locked" ticker="locked" />
         </div>
 
         <div v-if="availablePublic > 0" class="public">
-            +&nbsp;<amount :amount="availablePublic" />&nbsp;public
+            +&nbsp;<amount :amount="availablePublic" ticker="public" />
         </div>
 
         <div v-if="(pending + immature) > 0" class="pending">
-            +&nbsp;<amount :amount="pending + immature" />&nbsp;pending
+            +&nbsp;<amount :amount="pending + immature" ticker="pending" />
         </div>
     </section>
 </template>
@@ -42,7 +42,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/typography";
+@import "src/renderer/styles/sizes";
 
 .balance {
     opacity: 0.8;
@@ -50,10 +50,6 @@ export default {
     margin: {
         top: $size-small-space;
         right: $size-small-space;
-    }
-
-    .ticker {
-        @include ticker();
     }
 
     .locked, .public, .pending {
