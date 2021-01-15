@@ -158,6 +158,14 @@ export default {
                 };
 
                 await this.addCoinSwapRecords([this.coinSwapRecord]);
+
+                const refundAddressBookData = {
+                    address: walletAddress,
+                    label: `${this.remoteCurrency}-FIRO Swap (Order ${response.orderId})`,
+                    purpose: 'coinswapReceive'
+                };
+                $store.commit('AddressBook/updateAddress', refundAddressBookData);
+                await $daemon.addAddressBookItem(refundAddressBookData);
             } catch (e) {
                 this.coinSwapRecord = null;
                 this.error = `${e}`;

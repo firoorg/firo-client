@@ -1,5 +1,5 @@
 import {cloneDeep, merge} from 'lodash';
-import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem} from '../../daemon/firod';
+import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem, CoinControl} from '../../daemon/firod';
 
 import { createLogger } from '../../lib/logger'
 const logger = createLogger('firo:store:Transactions');
@@ -8,10 +8,10 @@ const logger = createLogger('firo:store:Transactions');
 type AddressEvent = StateWallet;
 
 const state = {
-    transactions: <{[txidAndIndex: string]: TransactionOutput}>{},
+    transactions: <{[uniqId: string]: TransactionOutput}>{},
     // values are keys of transactions in state.transactions associated with the address
     addresses: <{[address: string]: string[]}>{},
-    unspentUTXOs: <{[txidAndIndex:string]:boolean}>{},
+    unspentUTXOs: <{[uniqId: string]: number}>{},
     addressBook: <{[address: string]: AddressBookItem}>{},
     walletLoaded: false
 };
@@ -150,6 +150,13 @@ const mutations = {
     setShouldShowWarning(state, warning: boolean) {
         state.shouldShowWarning = warning;
         state.shouldShowWarning = {...state.shouldShowWarning};
+    },
+
+    markSpentTransaction(state, inputs: CoinControl) {
+        for (const uniqId of Object.keys(state.transactions).filter(k => inputs.find(i => k.includes(`${i[0]}-${i[1]}`)))) {
+            logger.debug(`Marking txout ${uniqId} as used.`);
+            delete state.unspentUTXOs[uniqId];
+        }
     }
 };
 

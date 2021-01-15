@@ -160,6 +160,25 @@ export default {
                     this.$log.error("Invalid Response: %O", response);
                     throw 'invalid response from SwitchChain';
                 }
+
+                // We do this here instead of attemptSend so that the user won't receive to this address again, even if
+                // they don't swap.
+                const refundAddressBookData = {
+                    address: walletAddress,
+                    label: `FIRO-${remoteCurrency} Swap Refund (Order ${response.orderId})`,
+                    purpose: 'coinswapRefund'
+                };
+
+                const sendAddressBookData = {
+                    address: response.exchangeAddress,
+                    label: `FIRO-${remoteCurrency} Swap (Order ${response.orderId})`,
+                    purpose: 'coinswapSend'
+                };
+
+                for (const data of [refundAddressBookData, sendAddressBookData]) {
+                    $store.commit('AddressBook/updateAddress', data);
+                    await $daemon.addAddressBookItem(data);
+                }
             } catch(e) {
                 this.error = `${e}`;
                 this.show = 'error';
@@ -219,8 +238,10 @@ export default {
                     await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
                         this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb,false);
                 } else if (this.isLelantusAllowed) {
-                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb,
-                        false);
+                    const r = await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount,
+                        this.txFeePerKb,false);
+
+                    $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
                     await $daemon.sendSigma(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
                         this.coinSwapRecord.exchangeAddress, this.firoAmount, false);

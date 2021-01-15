@@ -460,6 +460,16 @@ function assertValidMnemonicSettings(x: any): x is MnemonicSettings {
 // CoinControl is an array of [txid, txindex] pairs.
 export type CoinControl = [string, number][];
 const coinControlToString = (coinControl?: CoinControl) => (coinControl || []).map(e => `${e[0]}-${e[1]}`).join(':');
+function isValidCoinControl(x: any): x is CoinControl {
+    if (typeof x !== 'object') return false;
+    for (const ix in x) {
+        if (typeof x[ix] !== 'object' ||
+            typeof x[ix][0] !== 'string' ||
+            typeof x[ix][1] !== 'number'
+        ) return false;
+    }
+    return true;
+}
 
 export type Setting = {
     data: string;
@@ -1462,9 +1472,9 @@ export class Firod {
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
     // this transaction.
     //
-    // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
+    // resolve()s with the txid and list of , or reject()s if we have insufficient funds or the call fails for some other reason.
     async sendLelantus(auth: string, recipient: string, amount: number, feePerKb: number,
-                       subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
+                       subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string, inputs: CoinControl}> {
         const data = await this.send(auth, 'create', 'sendLelantus', {
             recipient,
             amount,
@@ -1475,8 +1485,8 @@ export class Firod {
             }
         });
 
-        if (typeof data === 'string') {
-            return data;
+        if (typeof data === 'object' && typeof data['txid'] === 'string' && isValidCoinControl(data['inputs'])) {
+            return <{txid: string, inputs: CoinControl}>data;
         } else {
             throw new UnexpectedFirodResponse('create/sendLelantus', data);
         }

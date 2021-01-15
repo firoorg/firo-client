@@ -133,8 +133,10 @@ export default {
                     await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, this.coinControl);
                 } else if (this.isLelantusAllowed) {
-                    await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, this.coinControl);
+                    const r = await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
+                                                         this.subtractFeeFromAmount, this.coinControl);
+
+                    $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
                     await $daemon.sendSigma(passphrase, this.label, this.address, this.amount,
                         this.subtractFeeFromAmount, this.coinControl);
