@@ -225,7 +225,6 @@ const AllowedPairs = [
     "XZC-LTC",
     "XZC-XRP",
     "XZC-XLM",
-    "XZC-BCHABC",
     "XZC-BNB",
     "XZC-USDT",
     "XZC-USDC",
@@ -233,14 +232,12 @@ const AllowedPairs = [
     "XZC-DASH",
     "XZC-DCR",
     "XZC-PAX",
-    "XZC-TUSD",
     "BTC-XZC",
     "ETH-XZC",
     "ZEC-XZC",
     "LTC-XZC",
     "XRP-XZC",
     "XLM-XZC",
-    "BCHABC-XZC",
     "BNB-XZC",
     "USDT-XZC",
     "USDC-XZC",
@@ -248,7 +245,6 @@ const AllowedPairs = [
     "DASH-XZC",
     "DCR-XZC",
     "PAX-XZC",
-    "TUSD-XZC"
 ];
 
 const CoinNames = {
@@ -259,7 +255,6 @@ const CoinNames = {
     LTC: "Litecoin",
     XRP: "Ripple",
     XLM: "Stellar",
-    BCHABC: "Bitcoin Cash",
     BNB: "Binance Coin",
     USDT: "Tether",
     USDC: "USD Coin",
@@ -267,11 +262,10 @@ const CoinNames = {
     DASH: "Dash",
     DCR: "Decred",
     PAX: "Paxos Standard",
-    TUSD: "True USD"
 };
 
 const AddressValidations = {};
-for (const coin of ['BTC', 'BCH', 'ETH', 'ZEC', 'LTC', 'XLM', 'BNB', 'USDT', 'USDC', 'DASH', 'DCR', 'PAX', 'TUSD']) {
+for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XLM', 'BNB', 'USDT', 'USDC', 'DASH', 'DCR', 'PAX']) {
     AddressValidations[coin] = (address) => {
         try {
             return CryptoAddressValidator.validate(address, coin);
@@ -283,7 +277,6 @@ for (const coin of ['BTC', 'BCH', 'ETH', 'ZEC', 'LTC', 'XLM', 'BNB', 'USDT', 'US
         }
     }
 }
-AddressValidations['BCHABC'] = AddressValidations['BCH'];
 
 export default {
     name: 'CoinSwapDetail',
