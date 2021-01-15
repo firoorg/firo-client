@@ -33,7 +33,7 @@ import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import APIWorker from 'lib/switchain-api';
 import {convertToCoin} from "lib/convert";
 import {isValidAddress} from "lib/isValidAddress";
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
     name: 'CoinSwapFlowFromFiro',
@@ -184,6 +184,10 @@ export default {
             };
         }
     },
+
+    computed: mapGetters({
+        isLelantusAllowed: 'ApiStatus/isLelantusAllowed'
+    }),
 
     methods: {
         ...mapActions({

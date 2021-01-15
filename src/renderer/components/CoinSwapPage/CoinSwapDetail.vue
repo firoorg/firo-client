@@ -494,6 +494,7 @@ export default {
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
             maxPrivateSend: 'Balance/maxPrivateSend',
+            isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
 
