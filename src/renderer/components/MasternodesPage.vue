@@ -87,6 +87,7 @@ export default {
                 if (!this.filter) return true;
 
                 return !![
+                    masternode.state.service,
                     masternode.proTxHash,
                     masternode.collateralHash,
                     masternode.collateralAddress,
