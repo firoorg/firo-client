@@ -459,7 +459,6 @@ export default {
             const satoshiAmount = this.satoshiAmount;
             const isPrivate = this.isPrivate;
 
-            if (!!this.getValidationTooltip('amount').content) return;
             if (!this.satoshiAmount) return;
 
             await new Promise(r => setTimeout(r, 1e3));
@@ -467,6 +466,8 @@ export default {
                 [satoshiAmount, isPrivate],
                 [this.satoshiAmount, this.isPrivate]
             )) return;
+
+            if (this.getValidationTooltip('amount').content) return;
 
             try {
                 if (this.isPrivate) {

@@ -270,7 +270,6 @@ export default {
             const subtractFeeFromAmount = this.subtractFeeFromAmount;
             const isPrivate = this.isPrivate;
 
-            if (this.validationErrors.items.length) return;
             if (!this.satoshiAmount) return;
             if (this.useCustomFee && !this.txFeePerKb) return;
 
@@ -279,6 +278,8 @@ export default {
                 [satoshiAmount, txFeePerKb, coinControl, subtractFeeFromAmount, isPrivate],
                 [this.satoshiAmount, this.useCustomFee ? this.txFeePerKb : this.smartFeePerKb, this.coinControl, this.subtractFeeFromAmount, this.isPrivate]
             )) return;
+
+            if (this.getValidationTooltip('amount').content) return;
 
             try {
                 if (this.isPrivate) {
