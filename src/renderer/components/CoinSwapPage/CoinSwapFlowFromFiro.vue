@@ -103,6 +103,11 @@ export default {
 
         expectedRate: {
             type: String,
+        },
+
+        // an identifier for a specific offer in order to lock-in rates
+        signature: {
+            type: String
         }
     },
 
@@ -122,6 +127,7 @@ export default {
             const receiveAddress = this.receiveAddress;
             const expectedRate = this.expectedRate;
             const show = this.show;
+            const signature = this.signature;
 
             const walletAddress = await $daemon.getUnusedAddress();
 
@@ -139,7 +145,8 @@ export default {
                     pair: `XZC-${remoteCurrency}`,
                     toAddress: receiveAddress,
                     refundAddress: walletAddress,
-                    fromAmount: convertToCoin(firoAmount)
+                    fromAmount: convertToCoin(firoAmount),
+                    signature
                 };
 
                 this.$log.info("Posting order: %O", order);

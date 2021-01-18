@@ -90,6 +90,11 @@ export default {
         // The expected amount of FIRO we will receive for each remoteCurrency, as a string whole-coin amount.
         expectedRate: {
             type: String
+        },
+
+        // an identifier for a specific offer in order to lock-in rates
+        signature: {
+            type: String
         }
     },
 
@@ -119,14 +124,13 @@ export default {
             const walletAddress = await $daemon.getUnusedAddress();
 
             try {
-                // The API accepts a signature to commit to a specific offer, but it's only valid for 60s and is
-                // therefore unusable practically.
                 const { error, response } = await this.api.postOrder({
                     pair: `${this.remoteCurrency}-XZC`,
                     fromAmount: this.remoteAmount,
                     toAddress: walletAddress,
                     toAmount: this.firoAmount,
                     refundAddress: this.refundAddress,
+                    signature: this.signature
                 });
                 if (error || !response) throw error;
 

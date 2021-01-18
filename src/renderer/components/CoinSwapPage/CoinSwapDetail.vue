@@ -174,6 +174,7 @@
                     :remote-amount="amountToReceive"
                     :receive-address="address"
                     :expected-rate="conversionRate"
+                    :signature="signature"
                     @success="cleanupForm"
                 />
 
@@ -186,6 +187,7 @@
                     :firo-transaction-fee="remoteTransactionFee"
                     :refund-address="address"
                     :expected-rate="conversionRate"
+                    :signature="signature"
                     @success="cleanupForm"
                 />
 
@@ -589,6 +591,11 @@ export default {
         // This is a number in satoshi units of the remote currency.
         remoteCurrencyTransactionFee() {
             return this.currentMarketInfo && this.currentMarketInfo.minerFee;
+        },
+
+        // This is a unique identifier for the offer.
+        signature() {
+            return this.currentMarketInfo && this.currentMarketInfo.signature;
         },
 
         getValidationTooltip() {
