@@ -273,7 +273,7 @@ export default {
             if (!this.satoshiAmount) return;
             if (this.useCustomFee && !this.txFeePerKb) return;
 
-            await new Promise(r => setTimeout(r, 1e3));
+            await new Promise(r => setTimeout(r, 500));
             if (!lodash.isEqual(
                 [satoshiAmount, txFeePerKb, coinControl, subtractFeeFromAmount, isPrivate],
                 [this.satoshiAmount, this.useCustomFee ? this.txFeePerKb : this.smartFeePerKb, this.coinControl, this.subtractFeeFromAmount, this.isPrivate]

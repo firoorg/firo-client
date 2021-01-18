@@ -461,7 +461,7 @@ export default {
 
             if (!this.satoshiAmount) return;
 
-            await new Promise(r => setTimeout(r, 1e3));
+            await new Promise(r => setTimeout(r, 500));
             if (!lodash.isEqual(
                 [satoshiAmount, isPrivate],
                 [this.satoshiAmount, this.isPrivate]
