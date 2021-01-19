@@ -31,10 +31,10 @@
                         class="select"
                         label="coin"
                         v-model="selectedCoin"
-                        :loading="!isMarketInfoLoaded"
-                        :disabled="!isMarketInfoLoaded"
+                        :loading="!isSwitchainUnavailable && !doesSwitchainNotSupportFiro && !isMarketInfoLoaded"
+                        :disabled="isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
                         :options="remoteCoins"
-                        :placeholder="isMarketInfoLoaded ? 'Select coin' : 'Loading coins...'"
+                        :placeholder="(isSwitchainUnavailable && 'Switchain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
                         :clearable="!!selectedCoin"
                     >
                         <template v-slot:spinner="loading">
@@ -405,7 +405,7 @@ export default {
 
     asyncComputed: {
         marketInfo: {
-            default: {},
+            default: {_isLoading: true},
             async get() {
                 // The function associated with refreshOffersIntervalId will increment this every time we get close to
                 // needing new market information.
@@ -422,7 +422,7 @@ export default {
                 } catch (error) {
                     console.warn(`Error fetching CoinSwap market info: ${error}`);
                     setTimeout(() => this.marketInfoRefreshNonce++, 10e3);
-                    return {};
+                    return {_switchainIsUnavailable: true};
                 }
 
                 this.$log.silly("Got market information.");
@@ -435,7 +435,7 @@ export default {
 
                 if (!Object.keys(marketInfo).length) {
                     this.$log.error("Switchain doesn't seem to support FIRO now. :(");
-                    return {};
+                    return {_switchainDoesntSupportFiro: true};
                 }
 
                 for (const pair of AllowedPairs) {
@@ -555,7 +555,15 @@ export default {
         },
 
         isMarketInfoLoaded() {
-            return Object.keys(this.marketInfo).length !== 0;
+            return !this.marketInfo._isLoading;
+        },
+
+        isSwitchainUnavailable() {
+            return this.marketInfo._switchainIsUnavailable;
+        },
+
+        doesSwitchainNotSupportFiro() {
+            return this.marketInfo._switchainDoesntSupportFiro;
         },
 
         coinsFromFiro() {
