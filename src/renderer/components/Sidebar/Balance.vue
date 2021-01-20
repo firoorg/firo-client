@@ -1,6 +1,6 @@
 <template>
     <section class="balance">
-        <div>
+        <div class="private">
             <amount :amount="available" ticker="FIRO" />
         </div>
 

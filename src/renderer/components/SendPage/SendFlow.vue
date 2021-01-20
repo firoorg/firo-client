@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="disabled" @click="show = 'confirm'">
+            <button id="send-button" :disabled="disabled" @click="show = 'confirm'">
                 Send
             </button>
         </div>
