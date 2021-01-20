@@ -21,12 +21,12 @@
         </div>
 
         <div class="buttons">
-            <button @click="goBack" tabindex="-1">
+            <button id="back-button" @click="goBack" tabindex="-1">
                 Back
             </button>
 
-            <button @click="goToConfirmLockWallet" tabindex="-1" :disabled="!isVerified">
-                Submit
+            <button id="ok-button" @click="goToConfirmLockWallet" tabindex="-1" :disabled="!isVerified">
+                OK
             </button>
         </div>
     </div>

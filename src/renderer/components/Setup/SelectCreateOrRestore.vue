@@ -5,15 +5,15 @@
         </div>
 
         <div class="buttons">
-            <button @click="goBack">
+            <button id="back-button" @click="goBack">
                 Go Back
             </button>
 
-            <button @click="writeDownMnemonic">
+            <button id="create-new-wallet" @click="writeDownMnemonic">
                 Create New Wallet
             </button>
 
-            <button @click="recoverFromMnemonic">
+            <button id="recover-from-mnemonic" @click="recoverFromMnemonic">
                 Recover from a Mnemonic
             </button>
         </div>

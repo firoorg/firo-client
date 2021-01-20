@@ -1,5 +1,5 @@
 <template>
-    <section class="payments-page">
+    <section class="transactions-page">
         <div class="inner">
             <div class="top-section">
                 <input
@@ -213,7 +213,7 @@ export default {
 @import "src/renderer/styles/sizes";
 @import "src/renderer/styles/colors";
 
-.payments-page {
+.transactions-page {
     height: 100%;
 
     .inner {

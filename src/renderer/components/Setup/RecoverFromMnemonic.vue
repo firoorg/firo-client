@@ -66,12 +66,12 @@
         </div>
 
         <div class="buttons">
-            <button @click="goBack">
+            <button id="back-button" @click="goBack">
                 Go Back
             </button>
 
-            <button @click="submit" :disabled="!isVerified">
-                Submit
+            <button id="ok-button" @click="submit" :disabled="!isVerified">
+                OK
             </button>
         </div>
     </div>

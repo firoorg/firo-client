@@ -11,11 +11,11 @@
         </div>
 
         <div class="buttons">
-            <button @click="goBack">
+            <button id="back-button" @click="goBack">
                 Go Back
             </button>
 
-            <button @click="confirmHasWrittenDown">
+            <button id="confirm-button" @click="confirmHasWrittenDown">
                 I have written down my seed phrase
             </button>
         </div>

@@ -61,12 +61,12 @@
                 Quit
             </button>
 
-            <button v-else @click="goBack" tabindex="-1">
+            <button v-else id="back-button" @click="goBack" tabindex="-1">
                 Back
             </button>
 
-            <button @click="lockWallet" tabindex="-1" :disabled="!canProceed">
-                Submit
+            <button id="ok-button" @click="lockWallet" tabindex="-1" :disabled="!canProceed">
+                OK
             </button>
         </div>
     </div>
