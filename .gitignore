@@ -3,6 +3,6 @@ build/
 node_modules/
 .DS_Store
 .idea/
-zcoin-client-test.log
+firo-client-test.log
 .env
 coin-swap-pairs.json
