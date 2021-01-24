@@ -265,7 +265,7 @@ function isValidTransactionInput(x: any): x is TransactionInput {
 export interface AddressBookItem {
     address: string;
     label: string;
-    createdAt: number; // UNIX timestamp
+    createdAt: number; // UNIX timestamp in milliseconds
     purpose: 'send' | 'receive';
 }
 
