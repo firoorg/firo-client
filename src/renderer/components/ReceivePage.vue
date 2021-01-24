@@ -12,11 +12,11 @@
             <div class="address">
                 <div v-if="address" class="loading">
                     <div class="label">
-                        <input v-if="isEditing" class="label-input" type="text" v-model="label" />
+                        <input v-if="isEditing" class="label-input" type="text" v-model.lazy="label" />
                         <div v-else class="label-text">{{ label }}</div>
 
-                        <input v-if="isEditing" type="button" value="Ok!" @click="changeLabel()" />
-                        <input v-else type="button" value="Edit" @click="isEditing = true" />
+                        <input v-if="isEditing" type="button" value="Ok!" />
+                        <input v-else type="button" value="Edit" @click="isEditing ^= true" />
                     </div>
 
                     <a class="address" title="Click to copy address." @click="copyAddress()">
@@ -41,7 +41,7 @@
 
 <script>
 import {clipboard} from "electron";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import QRCode from "easyqrcodejs";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
@@ -59,10 +59,10 @@ export default {
     data() {
         return {
             address: null,
-            label: '',
             isEditing: false,
             qrCode: null,
             resizeListener: () => this.resizeQrCode(),
+            isDefaultAddress: true,
 
             tableFields: [
                 {name: AddressBookItemEditableLabel, width: "160pt"},
@@ -75,8 +75,24 @@ export default {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
-            addresses: 'Transactions/addresses'
-        })
+            addresses: 'Transactions/addresses',
+            transactions: 'Transactions/transactions'
+        }),
+
+        label: {
+            get() {
+                return (this.addressBook[this.address] && this.addressBook[this.address].label) || 'Unlabelled';
+            },
+
+            async set(newLabel) {
+                if (!this.address) return;
+
+                const newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], newLabel);
+                this.isDefaultAddress = false;
+                await this.$store.commit('AddressBook/updateAddress', newAddress);
+                this.isEditing = false;
+            }
+        }
     },
 
     async created() {
@@ -96,35 +112,41 @@ export default {
 
     // Make sure we always display a fresh address.
     watch: {
-        receiveAddresses() {
-            if (this.addressBook[this.address]) {
-                this.displayAddress();
+        async addresses() {
+            if (this.isDefaultAddress && this.addresses[this.address]) {
+                this.address = await $daemon.getUnusedAddress();
+                await this.displayAddress();
             }
         },
 
-        addresses() {
-            if (this.addresses[this.address]) {
-                this.displayAddress();
+        // When we receive transactions to the default address, we need to add it to the list of old addresses and show
+        // a new default address.
+        //
+        // This is a stopgap measure until we can add functionality in firod to send us the address book in proper
+        // events. This is the only page on which the list of receive addresses can be viewed, so the effect is the
+        // same.
+        transactions: {
+            immediate: true,
+            async handler() {
+                this.setAddressBook(await $daemon.readAddressBook());
+                // The displayed address and QR code will be updated in the addresses watcher.
             }
         }
     },
 
     methods: {
+        ...mapMutations({
+            setAddressBook: 'AddressBook/setAddressBook'
+        }),
+
         navigateToAddressBookItem(item) {
+            this.isDefaultAddress = false;
             this.address = item.address;
             this.displayAddress();
         },
 
         async displayAddress() {
-            if (!this.address) {
-                this.address = await $daemon.getUnusedAddress();
-            }
-
-            if (this.addressBook[this.address] && this.addressBook[this.address].label) {
-                this.label = this.addressBook[this.address].label;
-            } else {
-                this.label = 'Unlabelled';
-            }
+            this.address ||= await $daemon.getUnusedAddress();
 
             if (this.qrCode) {
                 this.qrCode.makeCode(this.address)
@@ -158,22 +180,6 @@ export default {
 
         copyAddress() {
             clipboard.writeText(this.address);
-        },
-
-        async changeLabel() {
-            if (!this.address) return;
-            this.isEditing = false;
-
-            let newAddress;
-            if (this.addressBook[this.address]) {
-                newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], this.label);
-            } else {
-                newAddress = {purpose: 'receive', label: this.label, address: this.address};
-                await $daemon.addAddressBookItem(newAddress);
-                newAddress.createdAt = Math.floor(Date.now() / 1000);
-            }
-
-            await this.$store.commit('AddressBook/updateAddress', newAddress);
         }
     }
 }
