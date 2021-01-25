@@ -166,7 +166,7 @@ export interface ApiStatus {
         protocolVersion: number;
         walletVersion: number;
         walletLock: boolean;
-        isLelantusAllowed: boolean;
+        disabledSporks: string[],
         dataDir: string;
         // Note that this is DIFFERENT from the Network type.
         network: 'main' | 'test' | 'regtest';
@@ -1851,6 +1851,7 @@ export class Firod {
 
     // Are Lelantus mints allowed?
     async isLelantusAllowed(): Promise<boolean> {
-        return (await this.apiStatus()).data.isLelantusAllowed;
+        const d = (await this.apiStatus()).data;
+        return d.disabledSporks && !d.disabledSporks.includes("lelantus");
     }
 }

@@ -19,8 +19,8 @@
         </div>
 
         <section class="send-detail">
-            <div class="inner">
-                <div id="top">
+            <div class="inner" :class="{disabled: formDisabled}">
+                <div id="top" class="not-footer">
                     <div class="field" id="label-field">
                         <label>
                             Label
@@ -35,6 +35,7 @@
                             name="label"
                             tabindex="1"
                             placeholder="Label (optional)"
+                            :disabled="formDisabled"
                         />
                     </div>
 
@@ -54,10 +55,11 @@
                             tabindex="2"
                             placeholder="Address"
                             spellcheck="false"
+                            :disabled="formDisabled"
                         />
 
                         <div id="add-to-address-book">
-                            <a href="#" :class="{disabled: !showAddToAddressBook}" @click="addToAddressBook">
+                            <a href="#" :class="{disabled: formDisabled || !showAddToAddressBook}" @click="addToAddressBook">
                                 Add to Address Book
                             </a>
                         </div>
@@ -80,6 +82,7 @@
                                 class="amount"
                                 tabindex="3"
                                 placeholder="Amount"
+                                :disabled="formDisabled"
                             />
 
                             <span class="tip ticker">
@@ -90,9 +93,9 @@
 
                     <div class="field">
                         <div class="custom-input-checkbox-container">
-                            <input type="checkbox" v-model="useCustomInputs" />
+                            <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled" />
                             <label>
-                                <a href="#" @click="useCustomInputs = true; showCustomInputSelector = true">
+                                <a href="#" :class="{disabled: formDisabled}" @click="useCustomInputs = showCustomInputSelector = !formDisabled">
                                     Custom Inputs (Coin Control)
                                 </a>
                             </label>
@@ -112,7 +115,7 @@
 
                     <div class="field">
                         <label>
-                            <input type="checkbox" v-model="useCustomFee" />
+                            <input type="checkbox" v-model="useCustomFee" :disabled="formDisabled" />
                             Custom Transaction Fee
                         </label>
 
@@ -136,7 +139,7 @@
                     </div>
 
                     <div class="field" id="subtract-fee-from-amount">
-                        <input v-model="subtractFeeFromAmount" type="checkbox" checked />
+                        <input v-model="subtractFeeFromAmount" type="checkbox" checked :disabled="formDisabled" />
                         <label>
                             Take Transaction Fee From Amount
                         </label>
@@ -144,7 +147,7 @@
                 </div>
 
                 <div id="bottom">
-                    <div id="totals">
+                    <div id="totals" class="not-footer">
                         <div class="total-field" id="receive-amount">
                             <label>
                                 Recipient will receive:
@@ -194,6 +197,7 @@
                         :computed-tx-fee="transactionFee || 0"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
+                        class="not-footer"
                         @success="cleanupForm"
                     />
 
@@ -307,6 +311,10 @@ export default {
             addressBook: 'AddressBook/addressBook',
             _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
+
+        formDisabled() {
+            return this.isPrivate && !this.isLelantusAllowed;
+        },
 
         transactionFee() {
             return this.transactionFeeAndError && this.transactionFeeAndError[0];
@@ -467,6 +475,7 @@ export default {
 
         async addToAddressBook() {
             if (!this.showAddToAddressBook) return;
+            if (this.formDisabled) return;
             if (this.addressBook[this.address]) return;
 
             const item = {
@@ -554,6 +563,10 @@ export default {
             display: flex;
             flex-flow: column;
 
+            @at-root .disabled .not-footer {
+                opacity: 0.3;
+            }
+
             #top {
                 flex-grow: 1;
 
@@ -607,6 +620,10 @@ export default {
                     .custom-input-checkbox-container {
                         * {
                             display: inline-block;
+                        }
+
+                        a.disabled {
+                            cursor: default;
                         }
                     }
 

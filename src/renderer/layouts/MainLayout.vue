@@ -1,8 +1,9 @@
 <template>
     <div id="main-layout">
         <AwaitingAnonymizationHeader v-if="showPaymentPendingWarning" />
+        <LelantusDisabledHeader v-else-if="!isLelantusAllowed" />
 
-        <div id="main-content" :class="{'has-payment-pending-warning': showPaymentPendingWarning}">
+        <div id="main-content" :class="{'has-header': hasHeader}">
             <Sidebar id="sidebar" />
 
             <main ref="main" id="primary">
@@ -18,18 +19,27 @@
 import {mapGetters} from "vuex";
 import Sidebar from 'renderer/components/Sidebar'
 import AwaitingAnonymizationHeader from "renderer/components/AwaitingAnonymizationHeader";
+import LelantusDisabledHeader from "renderer/components/LelantusDisabledHeader";
 
 export default {
     name: 'MainLayout',
 
     components: {
-        Sidebar,
-        AwaitingAnonymizationHeader
+        AwaitingAnonymizationHeader,
+        LelantusDisabledHeader,
+        Sidebar
     },
 
-    computed: mapGetters({
-        showPaymentPendingWarning: 'App/showPaymentPendingWarning'
-    })
+    computed: {
+        ...mapGetters({
+            showPaymentPendingWarning: 'App/showPaymentPendingWarning',
+            isLelantusAllowed: 'ApiStatus/isLelantusAllowed'
+        }),
+
+        hasHeader() {
+            return this.showPaymentPendingWarning || !this.isLelantusAllowed;
+        }
+    }
 }
 </script>
 
@@ -40,16 +50,16 @@ export default {
 #main-layout {
     height: 100vh;
 
-    #payment-pending-warning {
+    .warning-header {
         height: $size-warning-banner;
     }
 
     #main-content {
-        &:not(.has-payment-pending-warning) {
+        &:not(.has-header) {
             height: 100vh;
         }
 
-        &.has-payment-pending-warning {
+        &.has-header {
             height: calc(100vh - #{$size-warning-banner});
         }
 

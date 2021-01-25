@@ -1,5 +1,5 @@
 <template>
-    <div id="payment-pending-warning">
+    <div class="warning-header">
         <h3>
             {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
             <a href="#" @click="showAnonymizeDialog = true">Click here</a> to secure them.
@@ -53,18 +53,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/popup";
-
-#payment-pending-warning {
-    user-select: none;
-    height: 100%;
-    background: $color-warning-background;
-    color: $color-warning-text;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+@import "src/renderer/styles/warning-header";
 </style>
