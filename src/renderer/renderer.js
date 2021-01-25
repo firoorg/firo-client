@@ -90,7 +90,7 @@ window.$setWaitingReason = (reason) => {
 window.$quitApp = async (message=undefined) => {
     if (message) {
         logger.error(message);
-        if (!process.env.ZCOIN_CLIENT_TEST) {
+        if (!process.env.FIRO_CLIENT_TEST) {
             alert(message);
         }
     }
@@ -114,7 +114,7 @@ window.$quitApp = async (message=undefined) => {
 // This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
 // process now.
 ourWindow.webContents.on('shutdown-requested', async () => {
-    if ($store.getters['App/waitingReason'] && !process.env.ZCOIN_CLIENT_TEST) {
+    if ($store.getters['App/waitingReason'] && !process.env.FIRO_CLIENT_TEST) {
         logger.warn("Ignoring shutdown attempt in a critical period.");
         return;
     }
@@ -190,9 +190,9 @@ window.$startDaemon = () => new Promise(resolve => {
     $setWaitingReason("Starting up firod...");
     firod(store, store.getters['App/firoClientNetwork'], store.getters['App/firodLocation'],
         store.getters['App/blockchainLocation'] || null, undefined,
-        store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_ZCOIND === "true",
-        !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_ZCOIND === "true",
-        process.env.ZCOIND_CONNECTION_TIMEOUT ? Number(process.env.ZCOIND_CONNECTION_TIMEOUT) : undefined)
+        store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD === "true",
+        !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_FIROD === "true",
+        process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined)
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;
@@ -252,7 +252,7 @@ window.$startDaemon = () => new Promise(resolve => {
         });
 });
 
-if (process.env.ZCOIN_CLIENT_REPL === 'true') {
+if (process.env.FIRO_CLIENT_REPL === 'true') {
     // Allow shutting down.
     $setWaitingReason(undefined);
 
@@ -261,7 +261,7 @@ if (process.env.ZCOIN_CLIENT_REPL === 'true') {
     ourWindow.webContents.openDevTools();
 } else if (store.getters['App/isInitialized'] &&
            existsSync(store.getters['App/walletLocation']) &&
-           process.env.REINITIALIZE_ZCOIN_CLIENT !== 'true') {
+           process.env.REINITIALIZE_FIRO_CLIENT !== 'true') {
     startVue();
     ourWindow.show();
     $startDaemon().then(async () => {

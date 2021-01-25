@@ -230,7 +230,7 @@ const actions = {
 };
 
 const getters = {
-    coinSwapFileLocation: () => process.env.ZCOIN_CLIENT_TEST ?
+    coinSwapFileLocation: () => process.env.FIRO_CLIENT_TEST ?
         path.join(process.cwd(), 'coin-swap-test.jsonl')
         :
         path.join(getApp().getPath('userData'), 'coin-swap.jsonl'),

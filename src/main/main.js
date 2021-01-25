@@ -91,7 +91,7 @@ app.once('ready', async () => {
     //        taken.
     ourWindow.webContents.on('new-window', (e) => e.preventDefault());
 
-    if (process.env.ZCOIN_CLIENT_TEST) {
+    if (process.env.FIRO_CLIENT_TEST) {
         const indexDotHtml = join(app.getAppPath(), 'index.html');
         logger.info(`Loading test environment at ${indexDotHtml}...`);
         await ourWindow.loadFile(indexDotHtml);

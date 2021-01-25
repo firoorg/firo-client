@@ -11,7 +11,7 @@ interface This extends Mocha.Context {
     app: Application
 }
 
-if (process.env.BUILD_ZCOIN_CLIENT !== 'false') {
+if (process.env.BUILD_FIRO_CLIENT !== 'false') {
     before(async function () {
         this.timeout(1000e3); // Make sure we have enough time to build our app.
         await require('../electron-vue/build');
@@ -32,8 +32,8 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
             path: <any>electron, // the type annotation for path is incorrect
             args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
             env: {
-                ZCOIN_CLIENT_TEST: 'true',
-                REINITIALIZE_ZCOIN_CLIENT: String(reinitializeFiroClient)
+                FIRO_CLIENT_TEST: 'true',
+                REINITIALIZE_FIRO_CLIENT: String(reinitializeFiroClient)
             }
         });
 

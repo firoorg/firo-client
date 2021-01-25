@@ -53,11 +53,11 @@ npm run dev
 ### Debug Levels
 
 By default, firo-client will log to `userData/combined.log` in the application data directory at debug level. This
-can be changed with the environment variable `ZCOIN_CLIENT_DEBUG_LEVEL`.
+can be changed with the environment variable `FIRO_CLIENT_DEBUG_LEVEL`.
 
 ### REPL
 
-If the client is started with the `ZCOIN_CLIENT_REPL` environment variable set to `true`, the client will not start
+If the client is started with the `FIRO_CLIENT_REPL` environment variable set to `true`, the client will not start
 and instead Chrome Dev Tools will be launched with the global variable Firod set to the Firod class from
 `src/daemon/firod.ts`. It can then be used to interact with the daemon as documented in that file. The daemon will
 NOT be stopped automatically on exit.
@@ -65,18 +65,18 @@ NOT be stopped automatically on exit.
 ### Forcing Reinitialization
 
 If you want to reinitialize the client and don't want to use the `resetclientconfig` command in the debug console, you
-can set the enviornment variable `REINITIALIZE_ZCOIN_CLIENT` to `true`. If this is set, Firo Client will show the setup
+can set the enviornment variable `REINITIALIZE_FIRO_CLIENT` to `true`. If this is set, Firo Client will show the setup
 screen on startup regardless of whether it has already been initialized.
 
 ### Connecting to an Existing Firod
 
 If you want to allow the client to connect to an existing instance of firod, you can set the environment variable
-`ALLOW_EXISTING_ZCOIND` to `true`. Note that the existing firod instance will be shut down when the client exits.
+`ALLOW_EXISTING_FIROD` to `true`. Note that the existing firod instance will be shut down when the client exits.
 
 ### Firod Connection Timeout
 
 By default, if firod fails to start within 30 seconds, Firo Client will timeout. This value can be changed with by
-setting the environment variable `ZCOIND_CONNECTION_TIMEOUT` to the number of seconds you want to change the timeout to.
+setting the environment variable `FIROD_CONNECTION_TIMEOUT` to the number of seconds you want to change the timeout to.
 
 ## Getting Assistance
 

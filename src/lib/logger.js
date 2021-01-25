@@ -3,7 +3,7 @@ import winston from 'winston'
 import { getApp } from 'lib/utils'
 
 let logPath;
-if (process.env.ZCOIN_CLIENT_TEST) {
+if (process.env.FIRO_CLIENT_TEST) {
     logPath = join(process.cwd(), 'firo-client-test.log');
 } else {
     logPath = join(getApp().getPath('userData'), 'firo-client.log')
@@ -24,13 +24,13 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.Console({
-            level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'debug',
+            level: process.env.FIRO_CLIENT_DEBUG_LEVEL || 'debug',
             handleExceptions: true
         }),
         new winston.transports.File({
             filename: logPath,
             handleExceptions: true,
-	        level: process.env.ZCOIN_CLIENT_DEBUG_LEVEL || 'info',
+	        level: process.env.FIRO_CLIENT_DEBUG_LEVEL || 'info',
         })
     ]
 })

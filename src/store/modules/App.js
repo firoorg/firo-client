@@ -118,7 +118,7 @@ const getters = {
         const firodName = process.platform === 'win32' ? 'firod.exe' : 'firod';
 
         let appDirectory;
-        if (process.env.NODE_ENV === "development" || process.env.ZCOIN_CLIENT_TEST) {
+        if (process.env.NODE_ENV === "development" || process.env.FIRO_CLIENT_TEST) {
             appDirectory = process.cwd();
         } else {
             appDirectory = getApp().getAppPath().replace('app.asar', 'app.asar.unpacked');
