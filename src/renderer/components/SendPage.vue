@@ -110,7 +110,7 @@
                         </Popup>
                     </div>
 
-                    <div v-show="!isPrivate || isLelantusAllowed" class="field">
+                    <div class="field">
                         <label>
                             <input type="checkbox" v-model="useCustomFee" />
                             Custom Transaction Fee
@@ -242,7 +242,7 @@ export default {
             label: this.$route.query.label || '',
             amount: this.$route.query.amount || '',
             address: this.$route.query.address || '',
-            subtractFeeFromAmount: !$store.getters['ApiStatus/isLelantusAllowed'],
+            subtractFeeFromAmount: false,
             useCustomFee: false,
             // In certain cases, firod might suggest very low fees. Practically, we probably never want this.
             txFeePerKb: '',
@@ -283,11 +283,7 @@ export default {
 
             try {
                 if (this.isPrivate) {
-                    if (this.isLelantusAllowed) {
-                        return [await $daemon.calcLelantusTxFee(satoshiAmount, txFeePerKb, subtractFeeFromAmount, this.coinControl), null];
-                    } else {
-                        return [await $daemon.calcSigmaTxFee(satoshiAmount, subtractFeeFromAmount), null];
-                    }
+                    return [await $daemon.calcLelantusTxFee(satoshiAmount, txFeePerKb, subtractFeeFromAmount, this.coinControl), null];
                 } else {
                     return [await $daemon.calcPublicTxFee(satoshiAmount, subtractFeeFromAmount, txFeePerKb), null];
                 }
@@ -307,7 +303,6 @@ export default {
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
-            maxPrivateSend: 'Balance/maxPrivateSend',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
             _smartFeePerKb: 'ApiStatus/smartFeePerKb'
@@ -373,14 +368,11 @@ export default {
         },
 
         amountValidations () {
-            if (!this.isPrivate) {
-                return 'amountIsWithinAvailableBalance|publicAmountIsValid';
-            } else if (this.isLelantusAllowed) {
-                return 'amountIsWithinAvailableBalance|publicAmountIsValid|privateAmountDoesntViolateSpendLimit';
+            if (this.isPrivate) {
+                return 'amountIsWithinAvailableBalance|amountIsValid|privateAmountDoesntViolateSpendLimit';
             } else {
-                return 'amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits'
+                return 'amountIsWithinAvailableBalance|amountIsValid';
             }
-
         },
 
         getValidationTooltip () {
@@ -451,23 +443,10 @@ export default {
                 convertToSatoshi(value) <= this.available
         });
 
-        this.$validator.extend('publicAmountIsValid', {
+        this.$validator.extend('amountIsValid', {
             getMessage: () => 'Amount must be a multiple of 0.00000001',
             // We use a regex here so as to not to have to deal with floating point issues.
             validate: (value) => Number(value) !== 0 && !!value.match(/^\d+(\.\d{1,8})?$/)
-        });
-
-        this.$validator.extend('privateAmountIsValid', {
-            getMessage: () => 'Amount for private send must be a multiple of 0.05',
-            validate: (value) => {
-                const v = convertToSatoshi(value);
-                return (v % 5e6 === 0) && (v > 0);
-            }
-        });
-
-        this.$validator.extend('privateAmountIsWithinBounds', {
-            getMessage: () => 'Amount for private send may not exceed 500 FIRO',
-            validate: (value) => Number(value) <= 500
         });
 
         this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
@@ -475,14 +454,6 @@ export default {
                 `Due to private transaction spend limits, you may not spend more than 1001 FIRO (including fees) in one transaction`,
 
             validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 1001e8 : convertToSatoshi(value) <= 1000.99e8
-        });
-
-        this.$validator.extend('privateAmountDoesntViolateInputLimits', {
-            getMessage: () =>
-                `Due to private transaction input limits, you can currently spend no more than ` +
-                `${convertToCoin(this.maxPrivateSend)} FIRO in one transaction. Try minting a larger denomination.`,
-
-            validate: (value) => convertToSatoshi(value) <= this.maxPrivateSend
         });
 
         this.$validator.extend('txFeeIsValid', {

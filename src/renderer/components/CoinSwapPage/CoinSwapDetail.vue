@@ -471,11 +471,7 @@ export default {
 
             try {
                 if (this.isPrivate) {
-                    if (this.isLelantusAllowed) {
-                        return [await $daemon.calcLelantusTxFee(satoshiAmount, this.smartFeePerKb, false), null];
-                    } else {
-                        return [await $daemon.calcSigmaTxFee(satoshiAmount, false), null];
-                    }
+                    return [await $daemon.calcLelantusTxFee(satoshiAmount, this.smartFeePerKb, false), null];
                 } else {
                     return [await $daemon.calcPublicTxFee(satoshiAmount, false, this.smartFeePerKb), null];
                 }
@@ -505,12 +501,10 @@ export default {
             if (!this.selectedCoin) {
                 return '';
             } else if (this.isSwapFrom) {
-                if (!this.isPrivate) {
-                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance`;
-                } else if (this.isLelantusAllowed) {
+                if (this.isPrivate) {
                     return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountDoesntViolateSpendLimit`;
                 } else {
-                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountIsValid|privateAmountIsWithinBounds|privateAmountDoesntViolateInputLimits`
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance`;
                 }
             } else {
                 return `${this.xzcPair}AmountDoesntViolateAPILimits`;

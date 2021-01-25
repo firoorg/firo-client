@@ -104,7 +104,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             addressBook: 'AddressBook/addressBook'
         }),
 
@@ -129,16 +128,13 @@ export default {
             this.passphrase = '';
 
             try {
-                if (!this.isPrivate) {
-                    await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, this.coinControl);
-                } else if (this.isLelantusAllowed) {
+                if (this.isPrivate) {
                     const r = await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
-                                                         this.subtractFeeFromAmount, this.coinControl);
+                        this.subtractFeeFromAmount, this.coinControl);
 
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
-                    await $daemon.sendSigma(passphrase, this.label, this.address, this.amount,
+                    await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, this.coinControl);
                 }
             } catch (e) {

@@ -211,10 +211,6 @@ export default {
         }
     },
 
-    computed: mapGetters({
-        isLelantusAllowed: 'ApiStatus/isLelantusAllowed'
-    }),
-
     methods: {
         ...mapActions({
             addCoinSwapRecords: 'CoinSwap/addOrUpdateRecords'
@@ -241,17 +237,14 @@ export default {
             this.passphrase = '';
 
             try {
-                if (!this.isPrivate) {
-                    await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
-                        this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb,false);
-                } else if (this.isLelantusAllowed) {
-                    const r = await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount,
-                        this.txFeePerKb,false);
+                if (this.isPrivate) {
+                    const r = await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress,
+                        this.firoAmount, this.txFeePerKb, false);
 
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
-                    await $daemon.sendSigma(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
-                        this.coinSwapRecord.exchangeAddress, this.firoAmount, false);
+                    await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
+                        this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb, false);
                 }
 
                 await this.addCoinSwapRecords([this.coinSwapRecord]);
