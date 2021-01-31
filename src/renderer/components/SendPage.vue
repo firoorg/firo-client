@@ -193,7 +193,7 @@
                         :label="label"
                         :address="address"
                         :amount="satoshiAmount"
-                        :tx-fee-per-kb="Number(txFeePerKb)"
+                        :tx-fee-per-kb="useCustomFee ? Number(txFeePerKb) : smartFeePerKb"
                         :computed-tx-fee="transactionFee || 0"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
