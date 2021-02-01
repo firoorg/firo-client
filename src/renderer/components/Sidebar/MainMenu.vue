@@ -60,6 +60,11 @@ export default {
 @import "src/renderer/styles/colors";
 @import "src/renderer/styles/sizes";
 
+@mixin highlight-styles() {
+    color: $color-menu-link-text-highlighted;
+    background-color: $color-menu-highlighted-element;
+    font-weight: bold;
+}
 
 nav {
     a {
@@ -79,10 +84,14 @@ nav {
             padding: $size-sidebar-link-inner-padding;
 
             &:hover {
-                color: $color-menu-link-text-highlighted;
-                background-color: $color-menu-highlighted-element;
-                font-weight: bold;
+                @include highlight-styles();
             }
+        }
+    }
+
+    a.router-link-active {
+        .inner {
+            @include highlight-styles();
         }
     }
 }
