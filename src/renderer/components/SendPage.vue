@@ -426,7 +426,7 @@ export default {
             if (this.useCustomInputs) {
                 this.showCustomInputSelector = true;
             } else {
-                this.customInputs.length = 0;
+                this.customInputs = [];
             }
 
             this.$validator.validateAll();
