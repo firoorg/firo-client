@@ -238,7 +238,9 @@ const getters = {
             if (!tx) console.warn(`Unknown transaction ${uniqId} in unspentUTXOs`);
             return tx;
         })
-        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight']),
+        // We can make transactions that are spendableAt our current block number + 1 because by the time they'll be
+        // included in a block it will be their spendableAt height.
+        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight'] - 1),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
 
