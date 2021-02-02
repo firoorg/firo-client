@@ -4,13 +4,13 @@
         :class="[css.wrapperClass, theme]"
     >
         <a
-            :class="[css.linkClass, isOnFirstPage ? css.disabledClass : '']"
+            :class="['first-page-link', css.linkClass, isOnFirstPage ? css.disabledClass : '']"
             @click="loadPage(1)"
         >
             &laquo;
         </a>
         <a
-            :class="[css.linkClass, isOnFirstPage ? css.disabledClass : '']"
+            :class="['prev-page-link', css.linkClass, isOnFirstPage ? css.disabledClass : '']"
             @click="loadPage('prev')"
         >
             &nbsp;&lsaquo;
@@ -38,13 +38,13 @@
             </template>
         </div>
         <a
-            :class="[css.linkClass, isOnLastPage ? css.disabledClass : '']"
+            :class="['next-page-link', css.linkClass, isOnLastPage ? css.disabledClass : '']"
             @click="loadPage('next')"
         >
             &rsaquo;&nbsp;
         </a>
         <a
-            :class="[css.linkClass, isOnLastPage ? css.disabledClass : '']"
+            :class="['last-page-link', css.linkClass, isOnLastPage ? css.disabledClass : '']"
             @click="loadPage(totalPage)"
         >
             &raquo;

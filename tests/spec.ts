@@ -1,10 +1,11 @@
+import Big from 'big.js';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
-import {convertToCoin} from "../src/lib/convert";
+import {convertToCoin, convertToSatoshi} from "../src/lib/convert";
 import {TransactionOutput} from "../src/daemon/firod";
 
 interface This extends Mocha.Context {
@@ -393,6 +394,63 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         // The type signature of timeout on waitUntilTextExists is incorrect.
         await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToSend, <any>{timeout: 10e3});
         await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToSend, <any>{timeout: 10e3});
+    });
+
+    it('has private coin control entries that sum to the correct amount', async function (this: This) {
+        this.timeout(20e3);
+        this.slow(20e3);
+
+        const balance = Big(convertToSatoshi(await (await this.app.client.$('.balance .private .amount')).getText()));
+
+        await (await this.app.client.$('a[href="#/send"]')).click();
+
+        await (await this.app.client.$('#custom-inputs-button')).click();
+        let sumOfInputs = Big(0);
+        while (true) {
+            sumOfInputs = (await Promise.all(
+                (await this.app.client.$$('#popup .amount')).map(async e =>
+                    Big(convertToSatoshi(await e.getText()))
+                )
+            )).reduce((a, x) => a.add(x), sumOfInputs);
+
+            const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
+            if (!await nextPageLink.isExisting()) break;
+            await nextPageLink.click();
+        }
+        assert(sumOfInputs.eq(balance), `${sumOfInputs} != ${balance}`);
+
+        await (await this.app.client.$('#close-popup-button')).click();
+    });
+
+    it('has public coin control entries that sum to the correct amount', async function (this: This) {
+        this.timeout(20e3);
+        this.slow(20e3);
+
+        const balanceElement = await this.app.client.$('.balance .public .amount');
+        let balance = 0;
+        if (await balanceElement.isExisting()) {
+            balance = Big(convertToSatoshi(await balanceElement.getText()));
+        }
+
+        await (await this.app.client.$('a[href="#/send"]')).click();
+        await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+
+        await (await this.app.client.$('#custom-inputs-button')).click();
+        let sumOfInputs = Big(0);
+        while (true) {
+            sumOfInputs = (await Promise.all(
+                (await this.app.client.$$('#popup .amount')).map(async e =>
+                    Big(convertToSatoshi(await e.getText()))
+                )
+            )).reduce((a, x) => a.add(x), sumOfInputs);
+
+            const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
+            if (!await nextPageLink.isExisting()) break;
+            await nextPageLink.click();
+        }
+        assert(sumOfInputs.eq(balance), `${sumOfInputs} != ${balance}`);
+
+        await (await this.app.client.$('#close-popup-button')).click();
     });
 
     it('responds to input properly in the debug console', async function (this: This) {

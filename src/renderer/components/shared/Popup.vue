@@ -3,7 +3,7 @@
         <div class="outer">
             <div class="inner">
                 <div v-if="close" class="close-button-container">
-                    <a href="#" @click="close()">
+                    <a id="close-popup-button" href="#" @click="close()">
                         <CloseIcon />
                     </a>
                 </div>

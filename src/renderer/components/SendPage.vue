@@ -95,7 +95,7 @@
                         <div class="custom-input-checkbox-container">
                             <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled" />
                             <label>
-                                <a href="#" :class="{disabled: formDisabled}" @click="useCustomInputs = showCustomInputSelector = !formDisabled">
+                                <a href="#" id="custom-inputs-button" :class="{disabled: formDisabled}" @click="useCustomInputs = showCustomInputSelector = !formDisabled">
                                     Custom Inputs (Coin Control)
                                 </a>
                             </label>
