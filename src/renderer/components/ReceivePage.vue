@@ -128,6 +128,11 @@ export default {
         transactions: {
             immediate: true,
             async handler() {
+                // Don't throw errors during reload.
+                while (!window.$daemon) {
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
                 this.setAddressBook(await $daemon.readAddressBook());
                 // The displayed address and QR code will be updated in the addresses watcher.
             }
@@ -148,6 +153,11 @@ export default {
         async displayAddress() {
             this.address ||= await $daemon.getUnusedAddress();
 
+            // Don't throw errors during reload.
+            while (!this.$refs.qrCode) {
+                await new Promise(r => setTimeout(r, 100));
+            }
+
             if (this.qrCode) {
                 this.qrCode.makeCode(this.address)
             } else {
@@ -165,6 +175,9 @@ export default {
         },
 
         resizeQrCode() {
+            // Don't throw errors during reload.
+            if (!this.$refs.outerQrCode) return;
+
             this.$refs.outerQrCode.classList.remove('shadow');
             this.$refs.qrContainerInner.style.display = 'none';
 
