@@ -4,7 +4,13 @@
             <loading-bounce size="mini" />
             Connecting...
         </div>
-        <div v-else-if="!isBlockchainSynced">
+        <div v-else-if="isBlockchainSynced">
+            <div class="details">
+                {{currentBlockHeight}} blocks, {{connections}} connections
+            </div>
+        </div>
+
+        <div v-else>
             <div class="syncing-text">
                 <loading-bounce size="mini" />
                 Syncing...
