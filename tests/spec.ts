@@ -417,7 +417,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             if (!await nextPageLink.isExisting()) break;
             await nextPageLink.click();
         }
-        assert(sumOfInputs.eq(balance), `${sumOfInputs} != ${balance}`);
+        assert(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
 
         await (await this.app.client.$('#close-popup-button')).click();
     });
@@ -448,7 +448,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             if (!await nextPageLink.isExisting()) break;
             await nextPageLink.click();
         }
-        assert(sumOfInputs.eq(balance), `${sumOfInputs} != ${balance}`);
+        assert(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
 
         await (await this.app.client.$('#close-popup-button')).click();
     });
