@@ -19,7 +19,7 @@
         </div>
 
         <section class="send-detail">
-            <div class="inner" :class="{disabled: formDisabled}">
+            <div class="inner" :class="{disabled: formDisabled, unsynced: !isBlockchainSynced}">
                 <div id="top" class="not-footer">
                     <div class="field" id="label-field">
                         <label>
@@ -202,7 +202,7 @@
                     />
 
                     <div class="footer">
-                        <PrivatePublicBalance v-model="isPrivate" />
+                        <PrivatePublicBalance :disabled="!isBlockchainSynced" v-model="isPrivate" />
                     </div>
                 </div>
             </div>
@@ -268,6 +268,7 @@ export default {
         ...mapGetters({
             network: 'ApiStatus/network',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
+            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',
@@ -296,7 +297,7 @@ export default {
         },
 
         formDisabled() {
-            return this.isPrivate && !this.isLelantusAllowed;
+            return !this.isBlockchainSynced || (this.isPrivate && !this.isLelantusAllowed);
         },
 
         transactionFee() {
@@ -575,6 +576,10 @@ export default {
             flex-flow: column;
 
             @at-root .disabled .not-footer {
+                opacity: 0.3;
+            }
+
+            @at-root .unsynced .footer {
                 opacity: 0.3;
             }
 

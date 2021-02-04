@@ -26,6 +26,11 @@ export default {
         value: {
             type: Boolean,
             required: true
+        },
+
+        disabled: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -54,6 +59,7 @@ export default {
         convertToCoin,
 
         toggle() {
+            if (this.disabled) return;
             this.isPrivate = !this.isPrivate;
             this.$emit('input', this.isPrivate);
         }
