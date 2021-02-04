@@ -110,9 +110,12 @@
     justify-content: space-between;
 
     button {
+        @include button();
+    }
+
+    * {
         height: 30px;
         flex-grow: 1;
-        @include button();
 
         &:not(:first-child) {
             margin-top: $size-small-space;

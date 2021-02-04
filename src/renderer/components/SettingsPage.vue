@@ -56,6 +56,9 @@
             <button v-if="hasMnemonic" :class="{active: showDetail === 'mnemonic'}" @click="() => showMnemonicPassphrasePopup = true">
                 Show Mnemonic Recovery Phrase
             </button>
+
+            <div v-else>
+            </div>
         </div>
 
         <div class="detail">
