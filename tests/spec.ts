@@ -42,6 +42,9 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
         await this.app.start();
         await this.app.client.waitUntilWindowLoaded();
         console.info('Firo Client started.');
+
+        // This is required due to a Spectron bug: https://github.com/electron-userland/spectron/issues/763
+        this.app.client.setTimeout({implicit: 0});
     });
 
     this.afterEach(async function (this: This) {
@@ -187,9 +190,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
             const submitButton = await this.app.client.$('#ok-button');
 
             await (await this.app.client.$('input[value="12"]')).click();
-            // FIXME: There is a bug in WebdriverIO.Element.waitForExists({reverse: true}), so we just do a short fixed wait
-            //        to be sure everything is updated.
-            await new Promise(r => setTimeout(r, 20));
+            await (await this.app.client.$('#mnemonic-word-13')).waitForExist({reverse: true});
 
             const twelveMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
             for (const [n, word] of Object.entries(twelveMnemonicWords)) {
@@ -202,7 +203,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
             await submitButton.waitForClickable({reverse: true});
 
             await (await this.app.client.$('input[value="24"]')).click();
-            await new Promise(r => setTimeout(r, 20)); // FIXME: see above
+            await (await this.app.client.$('#mnemonic-word-13')).waitForExist();
 
             const twentyFourMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
             for (const [n, word] of Object.entries(mnemonicWords)) {
@@ -298,8 +299,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('sends and receives a private payment', async function (this: This) {
-        this.timeout(60e3);
-        this.slow(30e3);
+        this.timeout(20e3);
 
         const sendAddress = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
         const satoshiAmountToSend = Math.floor(1e8 * Math.random());
@@ -379,6 +379,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('a[href="#/transactions')).click();
 
+        // Give some time to make sure we've updated the store.
+        await new Promise(r => setTimeout(r, 1000));
+
         const txOut: TransactionOutput = await this.app.client.executeScript(
             "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.amount === arguments[0] && tx.category === 'spendOut' && !tx.isChange)",
             [satoshiAmountToSend]
@@ -397,9 +400,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('has private coin control entries that sum to the correct amount', async function (this: This) {
-        this.timeout(20e3);
-        this.slow(20e3);
-
         const balance = Big(convertToSatoshi(await (await this.app.client.$('.balance .private .amount')).getText()));
 
         await (await this.app.client.$('a[href="#/send"]')).click();
@@ -423,9 +423,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('has public coin control entries that sum to the correct amount', async function (this: This) {
-        this.timeout(20e3);
-        this.slow(20e3);
-
         const balanceElement = await this.app.client.$('.balance .public .amount');
         let balance = 0;
         if (await balanceElement.isExisting()) {
