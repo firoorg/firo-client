@@ -40,7 +40,7 @@
                     Fee
                 </label>
 
-                <div class="value">
+                <div class="value tx-fee-value">
                     <Amount :amount="fee" /> <span class="ticker">FIRO</span>
                 </div>
             </div>

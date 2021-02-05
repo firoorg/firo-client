@@ -390,6 +390,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             const confirmButton = await this.app.client.$('button.confirm');
             await confirmButton.waitForExist();
+            const satoshiExpectedFee = convertToSatoshi(await (await this.app.client.$('.tx-fee-value .amount')).getText());
             await confirmButton.click();
 
             const passphraseInput = await this.app.client.$('input[type="password"]');
@@ -431,6 +432,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 [satoshiAmountToSend, paymentType === 'private' ? 'spendOut' : 'send', subtractTransactionFee]
             );
             assert.exists(txOut);
+
+            assert.equal(txOut.fee, satoshiExpectedFee, `tx ${txOut.txid}: got fee ${txOut.fee}, expected ${satoshiExpectedFee}`);
 
             const satoshiAmountToReceive = subtractTransactionFee ? txOut.amount : satoshiAmountToSend;
             const txIn: TransactionOutput = await this.app.client.executeScript(
