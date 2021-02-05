@@ -423,6 +423,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('has private coin control entries that sum to the correct amount', async function (this: This) {
+        this.timeout(100e3);
+
         const balance = Big(convertToSatoshi(await (await this.app.client.$('.balance .private .amount')).getText()));
 
         await (await this.app.client.$('a[href="#/send"]')).click();
@@ -449,6 +451,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('has public coin control entries that sum to the correct amount', async function (this: This) {
+        this.timeout(100e3);
+
         const balanceElement = await this.app.client.$('.balance .public .amount');
         let balance = 0;
         if (await balanceElement.isExisting()) {
