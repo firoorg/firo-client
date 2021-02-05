@@ -55,8 +55,11 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
         if (this.currentTest.state === 'failed') {
             console.error('Main process logs:');
             console.error(mainLogs.join("\n"));
-            console.error('Renderer process logs:');
-            console.error(rendererLogs.join("\n"));
+
+            console.error('\n\nRenderer process logs:');
+            console.error(rendererLogs.map((msg: any) =>
+                `${(new Date(msg.timestamp)).toISOString()} [${msg.source}] ${msg.level}: ${msg.message}`
+            ).join("\n"));
         }
     });
 
