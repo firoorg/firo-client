@@ -113,7 +113,7 @@
                         </Popup>
                     </div>
 
-                    <div class="field">
+                    <div class="field use-custom-fee">
                         <label>
                             <input type="checkbox" v-model="useCustomFee" :disabled="formDisabled" />
                             Custom Transaction Fee

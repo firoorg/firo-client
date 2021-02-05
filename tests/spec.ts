@@ -324,7 +324,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
     function sendsAndReceivesPayment(
         paymentType: 'public' | 'private',
-        subtractTransactionFee: boolean
+        subtractTransactionFee: boolean,
+        customTransactionFee: boolean
     ): (this: This) => Promise<void> {
         return async function (this: This) {
             this.timeout(20e3);
@@ -333,7 +334,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', ['generate 1']);
 
             const sendAddress = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
-            const satoshiAmountToSend = Math.floor(1e8 * Math.random());
+            const satoshiAmountToSend = 1e8 + Math.floor(1e8 * Math.random());
             const amountToSend = convertToCoin(satoshiAmountToSend);
 
             await (await this.app.client.$('a[href="#/send')).click();
@@ -378,6 +379,19 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await address.clearValue();
             await address.setValue(sendAddress);
             await sendButton.waitForEnabled();
+
+            if (customTransactionFee) {
+                const txFeeElement = await this.app.client.$('#transaction-fee .value .amount');
+                const defaultTransactionFee = Number(await txFeeElement.getText());
+
+                await (await this.app.client.$('.use-custom-fee input[type="checkbox"]')).click();
+                await (await this.app.client.$('.use-custom-fee input[type="text"]')).setValue("9999");
+                await sendButton.waitForEnabled({reverse: true});
+                await sendButton.waitForEnabled();
+
+                const newTransactionFee = Number(await txFeeElement.getText());
+                assert.isAbove(newTransactionFee, defaultTransactionFee, "setting a fee of 9999 doesn't increase computed fee");
+            }
 
             await sendButton.click();
 
@@ -455,10 +469,13 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         };
     }
 
-    it('sends and receives a private payment', sendsAndReceivesPayment('private', false));
-    it('sends and receives a public payment', sendsAndReceivesPayment('public', false));
-    it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true));
-    it('sends and receives a public payment subtracting tx fee', sendsAndReceivesPayment('public', true));
+    it('sends and receives a private payment', sendsAndReceivesPayment('private', false, false));
+    it('sends and receives a public payment', sendsAndReceivesPayment('public', false, false));
+    it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true, false));
+    it('sends and receives a public payment subtracting tx fee', sendsAndReceivesPayment('public', true, false));
+    it('sends and receives a private payment with custom fee', sendsAndReceivesPayment('private', false, true));
+    it('sends and receives a public payment with custom fee', sendsAndReceivesPayment('public', false, true));
+    it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true));
 
     it('has private coin control entries that sum to the correct amount', async function (this: This) {
         this.timeout(100e3);
