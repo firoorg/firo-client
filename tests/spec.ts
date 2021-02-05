@@ -266,7 +266,7 @@ if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
 describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
-    it('loads our existing wallet', async function (this: This) {
+    this.beforeAll('waits to load our wallet', async function (this: This) {
         this.timeout(20e3);
         this.slow(20e3);
 
@@ -275,14 +275,37 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await paymentStatusElement.waitForExist({timeout: 20e3});
     });
 
-    it('has a non-zero balance', async function (this: This) {
+    this.beforeAll('generates Firo if not enough is available', async function (this: This) {
+        this.timeout(100e3);
+        this.slow(100e3);
+
         // This value doesn't actually _have_ to be above 1 if we're testing with an existing firod, but in a test
         // environment we've probably made some error and it's best to check for that now.
-        const balanceElements = await this.app.client.$$('.balance .amount');
-        const balance = (await Promise.all(balanceElements.map(async e =>
-            Number(await e.getText())
-        ))).reduce((a, x) => a + x, 0);
-        assert.isAbove(balance, 1);
+        const privateBalanceElement = await this.app.client.$('.balance .private .amount');
+        const publicBalanceElement = await this.app.client.$('.balance .public .amount');
+
+        if (!await publicBalanceElement.isExisting() || Number(await publicBalanceElement.getText()) < 40) {
+            // Probably we're mining all the blocks ourselves, and generating just one block will create a balance.
+            await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 2').then(arguments[0])`, []);
+
+            try {
+                await publicBalanceElement.waitForExist({timeout: 1e3});
+                await this.app.client.waitUntil(async () => Number(await publicBalanceElement.getText()) >= 40, {timeout: 1e3});
+            } catch {
+                // If generating 2 blocks failed to create a balance, generate 100 more so that we'll definitely have
+                // received a block reward.
+                await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 100').then(arguments[0])`, []);
+                await publicBalanceElement.waitForExist({timeout: 1e3});
+                await this.app.client.waitUntil(async () => Number(await publicBalanceElement.getText()) >= 40, {timeout: 1e3});
+            }
+        }
+
+        if (Number(await privateBalanceElement.getText()) < 20) {
+            for (const cmd of [`walletpassphrase ${passphrase} 5`, 'mintlelantus 20', 'generate 6']) {
+                await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', [cmd]);
+            }
+            await this.app.client.waitUntil(async () => Number(await privateBalanceElement.getText()) >= 20, {timeout: 1e3});
+        }
     });
 
     it('displays and updates the receiving address', async function (this: This) {
@@ -417,9 +440,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             if (!await nextPageLink.isExisting()) break;
             await nextPageLink.click();
         }
-        assert(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
 
-        await (await this.app.client.$('#close-popup-button')).click();
+        try {
+            assert.isTrue(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
+        } finally {
+            await (await this.app.client.$('#close-popup-button')).click();
+        }
     });
 
     it('has public coin control entries that sum to the correct amount', async function (this: This) {
@@ -445,9 +471,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             if (!await nextPageLink.isExisting()) break;
             await nextPageLink.click();
         }
-        assert(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
 
-        await (await this.app.client.$('#close-popup-button')).click();
+        try {
+            assert.isTrue(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
+        } finally {
+            await (await this.app.client.$('#close-popup-button')).click();
+        }
     });
 
     it('responds to input properly in the debug console', async function (this: This) {
