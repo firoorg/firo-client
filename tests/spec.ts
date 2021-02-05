@@ -322,7 +322,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntil(async () => (await receiveAddressElement.getText()) !== originalReceiveAddress);
     });
 
-    function sendsAndReceivesPayment(paymentType: 'public' | 'private'): (this: This) => Promise<void> {
+    function sendsAndReceivesPayment(
+        paymentType: 'public' | 'private',
+        subtractTransactionFee: boolean
+    ): (this: This) => Promise<void> {
         return async function (this: This) {
             this.timeout(20e3);
 
@@ -338,6 +341,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             if (paymentType === 'public') {
                 await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+            }
+
+            if (subtractTransactionFee) {
+                await (await this.app.client.$('#subtract-fee-from-amount input')).click();
             }
 
             const sendButton = await this.app.client.$('#send-button');
@@ -415,26 +422,40 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await new Promise(r => setTimeout(r, 1000));
 
             const txOut: TransactionOutput = await this.app.client.executeScript(
-                "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.amount === arguments[0] && tx.category === arguments[1] && !tx.isChange)",
-                [satoshiAmountToSend, paymentType === 'private' ? 'spendOut' : 'send']
+                "return Object.values($store.getters['Transactions/transactions'])" +
+                    ".find(tx => " +
+                        "(arguments[2] ? tx.amount + tx.fee : tx.amount) === arguments[0] && " +
+                        "tx.category === arguments[1] && " +
+                        "!tx.isChange" +
+                    ")",
+                [satoshiAmountToSend, paymentType === 'private' ? 'spendOut' : 'send', subtractTransactionFee]
             );
             assert.exists(txOut);
 
+            const satoshiAmountToReceive = subtractTransactionFee ? txOut.amount : satoshiAmountToSend;
             const txIn: TransactionOutput = await this.app.client.executeScript(
-                "return Object.values($store.getters['Transactions/transactions']).find(tx => tx.amount === arguments[0] && tx.category === arguments[1] && !tx.isChange)",
-                [satoshiAmountToSend, paymentType === 'private' ? 'spendIn' : 'receive']
+                "return Object.values($store.getters['Transactions/transactions'])" +
+                    ".find(tx => " +
+                        "tx.amount === arguments[0] && " +
+                        "tx.category === arguments[1] && " +
+                        "!tx.isChange" +
+                    ")",
+                [satoshiAmountToReceive, paymentType === 'private' ? 'spendIn' : 'receive']
             );
             assert.exists(txIn);
 
+            const amountToReceive = convertToCoin(satoshiAmountToReceive);
+
             // The type signature of timeout on waitUntilTextExists is incorrect.
-            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToSend, <any>{timeout: 10e3});
-            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToSend, <any>{timeout: 10e3});
+            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToReceive, <any>{timeout: 10e3});
+            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToReceive, <any>{timeout: 10e3});
         };
     }
 
-    it('sends and receives a private payment', sendsAndReceivesPayment('private'));
-    it('sends and receives a public payment', sendsAndReceivesPayment('public'));
-    it('sends and receives a second private payment', sendsAndReceivesPayment('private'));
+    it('sends and receives a private payment', sendsAndReceivesPayment('private', false));
+    it('sends and receives a public payment', sendsAndReceivesPayment('public', false));
+    it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true));
+    it('sends and receives a public payment subtracting tx fee', sendsAndReceivesPayment('public', true));
 
     it('has private coin control entries that sum to the correct amount', async function (this: This) {
         this.timeout(100e3);
