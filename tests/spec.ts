@@ -281,6 +281,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await new Promise(r => setTimeout(() => r(), 2e3));
     });
 
+    this.beforeAll('is using regtest', async function (this: This) {
+        const badge = await this.app.client.$('.network-badge');
+        assert.isTrue(await badge.isExisting());
+        assert.equal(await badge.getText(), 'Regtest');
+    });
+
     this.beforeAll('generates Firo if not enough is available', async function (this: This) {
         this.timeout(100e3);
         this.slow(100e3);
