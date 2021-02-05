@@ -23,11 +23,11 @@
             </div>
 
             <div class="buttons">
-                <button @click="cancel()">
+                <button class="cancel" @click="cancel()">
                     Cancel
                 </button>
 
-                <button :disabled="!passphrase" @click="tryAnonymize()">
+                <button class="confirm" :disabled="!passphrase" @click="tryAnonymize()">
                     Confirm
                 </button>
             </div>

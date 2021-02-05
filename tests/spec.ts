@@ -287,7 +287,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         assert.equal(await badge.getText(), 'Regtest');
     });
 
-    this.beforeAll('generates Firo if not enough is available', async function (this: This) {
+    async function generateSufficientFiro(this: This) {
         this.timeout(100e3);
         this.slow(100e3);
 
@@ -319,6 +319,40 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
             await this.app.client.waitUntil(async () => Number(await privateBalanceElement.getText()) >= 20, {timeout: 1e3});
         }
+    }
+    this.beforeAll('generates Firo if not enough is available', generateSufficientFiro);
+
+    it('anonymizes Firo', async function (this: This) {
+        const publicBalanceElement = await this.app.client.$('.balance .public .amount');
+        assert.isTrue(await publicBalanceElement.isExisting());
+        const originalPublicBalance = Big(await publicBalanceElement.getText());
+
+        const pendingBalanceElement = await this.app.client.$('.balance .pending .amount');
+        let originalPendingBalance = Big(0);
+        if (pendingBalanceElement.isExisting()) originalPendingBalance = Big(await pendingBalanceElement.getText());
+
+        await (await this.app.client.$('#anonymize-firo-link')).click();
+        await (await this.app.client.$('.anonymize-dialog')).waitForExist();
+        await (await this.app.client.$('.anonymize-dialog button.cancel')).click();
+        await (await this.app.client.$('.anonymize-dialog')).waitForExist({reverse: true});
+
+        await (await this.app.client.$('#anonymize-firo-link')).click();
+        await (await this.app.client.$('.anonymize-dialog')).waitForExist();
+        await (await this.app.client.$('.anonymize-dialog input[type="password"]')).setValue(passphrase + "-invalid");
+        await (await this.app.client.$('.anonymize-dialog button.confirm')).click();
+        await (await this.app.client.$('.anonymize-dialog .error')).waitForExist();
+
+        await (await this.app.client.$('.anonymize-dialog input[type="password"]')).setValue(passphrase);
+        await (await this.app.client.$('.anonymize-dialog button.confirm')).click();
+        await (await this.app.client.$('#popup')).waitForExist({reverse: true});
+
+        await publicBalanceElement.waitForExist({reverse: true});
+        await this.app.client.waitUntil(async () =>
+            Big(await pendingBalanceElement.getText()).gt(originalPublicBalance.add(originalPendingBalance).sub(1)),
+            {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds"}
+        );
+
+        await generateSufficientFiro.bind(this)();
     });
 
     it('displays and updates the receiving address', async function (this: This) {

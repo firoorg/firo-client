@@ -2,7 +2,7 @@
     <div class="warning-header">
         <h3>
             {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
-            <a href="#" @click="showAnonymizeDialog = true">Click here</a> to secure them.
+            <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure them.
         </h3>
 
         <Popup v-if="showAnonymizeDialog">
