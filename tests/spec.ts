@@ -301,7 +301,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
 
         if (Number(await privateBalanceElement.getText()) < 20) {
-            for (const cmd of [`walletpassphrase ${passphrase} 5`, 'mintlelantus 20', 'generate 6']) {
+            // At least 2 coins are required in the anonymity set before we can spend.
+            for (const cmd of [`walletpassphrase ${passphrase} 5`, 'mintlelantus 10', 'mintlelantus 10', 'generate 6']) {
                 await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', [cmd]);
             }
             await this.app.client.waitUntil(async () => Number(await privateBalanceElement.getText()) >= 20, {timeout: 1e3});
