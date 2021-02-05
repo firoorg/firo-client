@@ -480,66 +480,48 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('sends and receives a public payment with custom fee', sendsAndReceivesPayment('public', false, true));
     it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true));
 
-    it('has private coin control entries that sum to the correct amount', async function (this: This) {
-        this.timeout(100e3);
+    function hasCorrectBalance(balanceType: 'public' | 'private'): (this: This) => Promise<void> {
+        return async function (this: This) {
+            this.timeout(100e3);
 
-        const balance = Big(convertToSatoshi(await (await this.app.client.$('.balance .private .amount')).getText()));
+            await (await this.app.client.$('a[href="#/send"]')).click();
 
-        await (await this.app.client.$('a[href="#/send"]')).click();
+            const balanceElement = await this.app.client.$(`.balance .${balanceType} .amount`);
+            let balance = 0;
+            if (await balanceElement.isExisting()) {
+                balance = Big(convertToSatoshi(await balanceElement.getText()));
+            }
 
-        await (await this.app.client.$('#custom-inputs-button')).click();
-        let sumOfInputs = Big(0);
-        while (true) {
-            sumOfInputs = (await Promise.all(
-                (await this.app.client.$$('#popup .amount')).map(async e =>
-                    Big(convertToSatoshi(await e.getText()))
-                )
-            )).reduce((a, x) => a.add(x), sumOfInputs);
+            if (balanceType === 'public') {
+                await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+            }
 
-            const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
-            if (!await nextPageLink.isExisting()) break;
-            await nextPageLink.click();
-        }
+            await (await this.app.client.$('a[href="#/send"]')).click();
 
-        try {
-            assert.isTrue(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
-        } finally {
-            await (await this.app.client.$('#close-popup-button')).click();
-        }
-    });
+            await (await this.app.client.$('#custom-inputs-button')).click();
+            let sumOfInputs = Big(0);
+            while (true) {
+                sumOfInputs = (await Promise.all(
+                    (await this.app.client.$$('#popup .amount')).map(async e =>
+                        Big(convertToSatoshi(await e.getText()))
+                    )
+                )).reduce((a, x) => a.add(x), sumOfInputs);
 
-    it('has public coin control entries that sum to the correct amount', async function (this: This) {
-        this.timeout(100e3);
+                const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
+                if (!await nextPageLink.isExisting()) break;
+                await nextPageLink.click();
+            }
 
-        const balanceElement = await this.app.client.$('.balance .public .amount');
-        let balance = 0;
-        if (await balanceElement.isExisting()) {
-            balance = Big(convertToSatoshi(await balanceElement.getText()));
-        }
+            try {
+                assert.isTrue(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
+            } finally {
+                await (await this.app.client.$('#close-popup-button')).click();
+            }
+        };
+    }
 
-        await (await this.app.client.$('a[href="#/send"]')).click();
-        await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-
-        await (await this.app.client.$('#custom-inputs-button')).click();
-        let sumOfInputs = Big(0);
-        while (true) {
-            sumOfInputs = (await Promise.all(
-                (await this.app.client.$$('#popup .amount')).map(async e =>
-                    Big(convertToSatoshi(await e.getText()))
-                )
-            )).reduce((a, x) => a.add(x), sumOfInputs);
-
-            const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
-            if (!await nextPageLink.isExisting()) break;
-            await nextPageLink.click();
-        }
-
-        try {
-            assert.isTrue(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
-        } finally {
-            await (await this.app.client.$('#close-popup-button')).click();
-        }
-    });
+    it('has private coin control entries that sum to the correct amount', hasCorrectBalance('private'));
+    it('has public coin control entries that sum to the correct amount', hasCorrectBalance('public'));
 
     it('navigates in the debug console', async function (this: This) {
         await (await this.app.client.$('a[href="#/debugconsole"]')).click();
