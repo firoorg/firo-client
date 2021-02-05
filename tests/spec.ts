@@ -479,7 +479,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
     });
 
-    it('responds to input properly in the debug console', async function (this: This) {
+    it('navigates in the debug console', async function (this: This) {
         await (await this.app.client.$('a[href="#/debugconsole"]')).click();
 
         const currentInput = await this.app.client.$('#current-input')
@@ -501,5 +501,25 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await this.app.client.keys(["ArrowDown"]);
         await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+    });
+
+    it('properly sends debug commands', async function (this: This) {
+        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+
+        const currentInput = await this.app.client.$('#current-input');
+
+        for (const [cmd, expectedOutput] of [['getinfo', '"relayfee"'], ['help move', 'Move 0.01 FIRO from the default account']]) {
+            await this.app.client.keys([...cmd.split(''), "Enter"]);
+            await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+
+            let hasResponse = false;
+            for (const e of await this.app.client.$$('.output')) {
+                if ((await e.getText()).includes(expectedOutput)) {
+                    hasResponse = true;
+                    break;
+                }
+            }
+            assert.isTrue(hasResponse, `expected output of ${cmd} has not appeared in the debug console`);
+        }
     });
 });
