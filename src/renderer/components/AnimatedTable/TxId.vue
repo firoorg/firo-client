@@ -1,6 +1,6 @@
 <template>
     <th v-if="isHeader">Transaction ID/Index</th>
-    <td class="txid" v-else>
+    <td v-else class="txid-index">
         {{ rowData.txid }}-{{ rowData.txIndex }}
     </td>
 </template>
@@ -20,7 +20,7 @@ export default {
 <style scoped lang="scss">
 @import "src/renderer/styles/typography";
 
-.txid {
+.txid-index {
     @include txid();
 }
 </style>

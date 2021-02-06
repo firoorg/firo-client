@@ -1,3 +1,4 @@
+import lodash from 'lodash';
 import Big from 'big.js';
 import path from 'path';
 import os from 'os';
@@ -371,7 +372,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     function sendsAndReceivesPayment(
         paymentType: 'public' | 'private',
         subtractTransactionFee: boolean,
-        customTransactionFee: boolean
+        customTransactionFee: boolean,
+        coinControl: boolean
     ): (this: This) => Promise<void> {
         return async function (this: This) {
             this.timeout(20e3);
@@ -439,6 +441,44 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 assert.isAbove(newTransactionFee, defaultTransactionFee, "setting a fee of 9999 doesn't increase computed fee");
             }
 
+            const availableUTXOs = lodash.shuffle(
+                <TransactionOutput[]>await this.app.client.execute((isPrivate) => {
+                    return (<any>window).$store.getters['Transactions/availableUTXOs']
+                        .filter(tx => ['mint', 'mintIn'].includes(tx.category) === isPrivate);
+                }, paymentType === 'private')
+            );
+            const selectedUTXOs = [];
+            let selectedUTXOsAmount = 0;
+            for (const utxo of availableUTXOs) {
+                if (selectedUTXOsAmount >= satoshiAmountToSend) break;
+                selectedUTXOsAmount += utxo.amount;
+                selectedUTXOs.push(`${utxo.txid}-${utxo.txIndex}`);
+            }
+            if (selectedUTXOsAmount < satoshiAmountToSend) assert.fail('insufficient utxos to cover send amount');
+
+            if (coinControl) {
+                await (await this.app.client.$('#custom-inputs-button')).click();
+
+                let selectorsClicked = 0;
+                while (true) {
+                    for (const selectedUTXO of selectedUTXOs) {
+                        const selector = await this.app.client.$(`#utxo-selector-${selectedUTXO}`);
+                        if (await selector.isExisting()) {
+                            await selector.click();
+                            selectorsClicked += 1;
+                        }
+                    }
+
+                    const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
+                    if (!await nextPageLink.isExisting()) break;
+                    await nextPageLink.click();
+                }
+                assert.equal(selectorsClicked, selectedUTXOs.length, "we clicked an incorrect number of selectors");
+
+                await (await this.app.client.$('#close-popup-button')).click();
+            }
+
+            await sendButton.waitForEnabled();
             await sendButton.click();
 
             const cancelButton = await this.app.client.$('button.cancel');
@@ -512,16 +552,41 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             // The type signature of timeout on waitUntilTextExists is incorrect.
             await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToReceive, <any>{timeout: 10e3});
             await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToReceive, <any>{timeout: 10e3});
+
+            if (coinControl) {
+                await (await this.app.client.$('a[href="#/send"]')).click();
+
+                if (paymentType === 'public') {
+                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                }
+
+                await (await this.app.client.$('#custom-inputs-button')).click();
+                while (true) {
+                    for (const selectedUTXO of selectedUTXOs) {
+                        const selector = await this.app.client.$(`#utxo-selector-${selectedUTXO}`);
+                        if (await selector.isExisting()) {
+                            assert.fail(`utxo ${selectedUTXO} is still in our list despite an attempt to use it`);
+                        }
+                    }
+
+                    const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
+                    if (!await nextPageLink.isExisting()) break;
+                    await nextPageLink.click();
+                }
+            }
         };
     }
 
-    it('sends and receives a private payment', sendsAndReceivesPayment('private', false, false));
-    it('sends and receives a public payment', sendsAndReceivesPayment('public', false, false));
-    it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true, false));
-    it('sends and receives a public payment subtracting tx fee', sendsAndReceivesPayment('public', true, false));
-    it('sends and receives a private payment with custom fee', sendsAndReceivesPayment('private', false, true));
-    it('sends and receives a public payment with custom fee', sendsAndReceivesPayment('public', false, true));
-    it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true));
+    it('sends and receives a private payment', sendsAndReceivesPayment('private', false, false, false));
+    it('sends and receives a public payment', sendsAndReceivesPayment('public', false, false, false));
+    it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true, false, false));
+    it('sends and receives a public payment subtracting tx fee', sendsAndReceivesPayment('public', true, false, false));
+    it('sends and receives a private payment with custom fee', sendsAndReceivesPayment('private', false, true, false));
+    it('sends and receives a public payment with custom fee', sendsAndReceivesPayment('public', false, true, false));
+    it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true, false));
+    it('sends and receives a private payment with coin control', sendsAndReceivesPayment('private', true, false, true));
+    it('sends and receives a public payment with coin control', sendsAndReceivesPayment('private', true, false, true));
+
 
     function hasCorrectBalance(balanceType: 'public' | 'private'): (this: This) => Promise<void> {
         return async function (this: This) {

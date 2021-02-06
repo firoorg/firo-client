@@ -1,7 +1,7 @@
 <template>
     <th v-if="isHeader"></th>
     <td v-else>
-        <input ref="checkbox" type="checkbox" @input="toggle" />
+        <input :id="`utxo-selector-${this.rowData.txid}-${this.rowData.txIndex}`" class="utxo-selector" ref="checkbox" type="checkbox" @input="toggle" />
     </td>
 </template>
 
