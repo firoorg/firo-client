@@ -180,7 +180,7 @@ const actions = {
         // fixme: addCachedStateWallet calls are asynchronous, but mergedInitialStateWallet depends on the order of
         //        elements in cachedInitialStateWallet for properly detecting orphaned or reorganised transactions. In
         //        practice this shouldn't be a huge issue because the window for this to happen is very small.
-        const mergedInitialStateWallet: StateWallet = merge(...cachedInitialStateWallets);
+        const mergedInitialStateWallet: StateWallet = merge([], ...cachedInitialStateWallets);
         cachedInitialStateWallets = [];
         lastStateWalletTime = undefined;
         commit('setWalletState', mergedInitialStateWallet);
