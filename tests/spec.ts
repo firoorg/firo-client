@@ -24,8 +24,8 @@ const passphrase = 'sloth';
 let mnemonicWords: string[];
 
 function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
-    this.timeout(5e3);
-    this.slow(500);
+    this.timeout(20e3);
+    this.slow(5e3);
 
     this.beforeAll(async function (this: This) {
         this.timeout(10e3);
@@ -66,6 +66,8 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
 
     this.afterAll(async function (this: This) {
         this.timeout(10e3);
+        // Wait for a small bit to make sure we won't trigger a race condition in the daemon.
+        await new Promise(r => setTimeout(r, 1e3));
         await this.app.stop();
     });
 }
@@ -369,6 +371,59 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntil(async () => (await receiveAddressElement.getText()) !== originalReceiveAddress);
     });
 
+    it('adds, edits, and properly orders receive addresses', async function (this: This) {
+        this.timeout(30e3);
+
+        const addressLabels: [string, string][] = [];
+
+        for (let x = 0; x < 5; x++) {
+            await (await this.app.client.$('a[href="#/send"]')).click();
+            await (await this.app.client.$('a[href="#/receive"]')).click();
+            await (await this.app.client.$('.address .loaded')).waitForExist();
+
+            const label = String(Math.random());
+            const address = await (await this.app.client.$('a.address')).getText();
+            addressLabels.unshift([label, address]);
+
+            await (await this.app.client.$('.label input[type="button"]')).click();
+            const labelInput = await this.app.client.$('.label-input');
+            await labelInput.waitForExist();
+            await labelInput.setValue(label);
+            await (await this.app.client.$('.label input[type="button"]')).click();
+            await this.app.client.waitUntilTextExists('.address .label-text', label);
+        }
+
+        // [0..num_of_table_entries]
+        const indexes = Array.from({length: (await this.app.client.$$('.address-book-item-editable-label')).length},(a, i) => i)
+
+        // We don't want to shuffle because it may equal indexes, and we don't want to reverse because there might be a
+        // bug that causes things to appear in reverse order.
+        const rearrage = x => [...x.splice(x.length/2), ...x.splice(0, x.length/2+1)].splice(addressLabels.length);
+        for (const i of rearrage(indexes)) {
+            const newLabel = String(Math.random());
+            addressLabels[i][1] = newLabel;
+
+            await (await this.app.client.$$('.address-book-item-editable-label a'))[i].click();
+            const inputElement = await this.app.client.$('.address-book-item-editable-label input');
+            await inputElement.waitForExist();
+            await inputElement.setValue(newLabel);
+            await inputElement.keys('Enter');
+            await inputElement.waitForExist({reverse: true});
+        }
+
+        await (await this.app.client.$('a[href="#/send"]')).click();
+        await (await this.app.client.$('a[href="#/receive"]')).click();
+
+        const actualLabels = (await this.app.client.$$('.animated-table .address-book-item-editable-label a'));
+        const actualAddresses = (await this.app.client.$$('.address-book-item-address'));
+        assert.isAtLeast(actualLabels.length, addressLabels.length);
+        assert.isAtLeast(actualAddresses.length, addressLabels.length);
+        for (const [i, [label, address]] of Object.entries(addressLabels)) {
+            assert.equal(await actualAddresses[i].getText(), address);
+            assert.equal(await actualLabels[i].getText(), label);
+        }
+    });
+
     function sendsAndReceivesPayment(
         paymentType: 'public' | 'private',
         subtractTransactionFee: boolean,
@@ -586,7 +641,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true, false));
     it('sends and receives a private payment with coin control', sendsAndReceivesPayment('private', true, false, true));
     it('sends and receives a public payment with coin control', sendsAndReceivesPayment('private', true, false, true));
-
 
     function hasCorrectBalance(balanceType: 'public' | 'private'): (this: This) => Promise<void> {
         return async function (this: This) {

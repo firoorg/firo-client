@@ -3,8 +3,8 @@
         Address
     </th>
 
-    <td v-else class="label">
-        {{ rowData.address || 'Untitled' }}
+    <td v-else class="address-book-item-address">
+        {{ rowData.address }}
     </td>
 </template>
 

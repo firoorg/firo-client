@@ -5,7 +5,7 @@
 
     <td v-else class="address-book-item-editable-label">
         <div v-if="isEditing">
-            <input ref="editLabelInput" v-model="label" @keyup.enter="changeLabel" @focusout="changeLabel" />
+            <input ref="editLabelInput" v-model="label" @keyup.enter="changeLabel" @blur="onBlur" />
         </div>
 
         <div v-else>
@@ -47,6 +47,12 @@ export default {
         beginEditing() {
             this.isEditing = true;
             this.$nextTick(() => this.$refs.editLabelInput.focus());
+        },
+
+        onBlur() {
+            // Acting onBlur here messes with Spectron.
+            if (process.env.FIRO_CLIENT_TEST) return;
+            this.changeLabel();
         },
 
         async changeLabel() {

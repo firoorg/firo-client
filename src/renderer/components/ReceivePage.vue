@@ -10,7 +10,7 @@
             </div>
 
             <div class="address">
-                <div v-if="address" class="loading">
+                <div v-if="address" class="loaded">
                     <div class="label">
                         <input v-if="isEditing" ref="editableLabel" class="label-input" type="text" :placeholder="label" v-model.lazy="label" @blur="isEditing = false" />
                         <div v-else class="label-text">{{ label }}</div>
