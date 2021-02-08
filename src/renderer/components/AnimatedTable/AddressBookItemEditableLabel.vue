@@ -3,13 +3,13 @@
         Label
     </th>
 
-    <td v-else class="label">
+    <td v-else class="address-book-item-editable-label">
         <div v-if="isEditing">
-            <input v-model="label" @keyup.enter="changeLabel" @focusout="changeLabel" />
+            <input ref="editLabelInput" v-model="label" @keyup.enter="changeLabel" @focusout="changeLabel" />
         </div>
 
         <div v-else>
-            <a href="#" @click="isEditing=true">
+            <a href="#" @click="beginEditing">
                 {{ label || 'Unlabelled' }}
             </a>
         </div>
@@ -44,6 +44,11 @@ export default {
     },
 
     methods: {
+        beginEditing() {
+            this.isEditing = true;
+            this.$nextTick(() => this.$refs.editLabelInput.focus());
+        },
+
         async changeLabel() {
             const rowData = this.rowData;
 

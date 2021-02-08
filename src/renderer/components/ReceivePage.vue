@@ -12,11 +12,13 @@
             <div class="address">
                 <div v-if="address" class="loading">
                     <div class="label">
-                        <input v-if="isEditing" class="label-input" type="text" v-model.lazy="label" />
+                        <input v-if="isEditing" ref="editableLabel" class="label-input" type="text" :placeholder="label" v-model.lazy="label" @blur="isEditing = false" />
                         <div v-else class="label-text">{{ label }}</div>
 
+                        <!-- The Ok! button doesn't need an action because clicking anywhere outside label-input will
+                             trigger the rename. -->
                         <input v-if="isEditing" type="button" value="Ok!" />
-                        <input v-else type="button" value="Edit" @click="isEditing ^= true" />
+                        <input v-else type="button" value="Edit" @click="editLabel" />
                     </div>
 
                     <a class="address" title="Click to copy address." @click="copyAddress()">
@@ -86,10 +88,11 @@ export default {
 
             async set(newLabel) {
                 if (!this.address) return;
-
-                const newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], newLabel);
-                this.isDefaultAddress = false;
-                await this.$store.commit('AddressBook/updateAddress', newAddress);
+                if (newLabel) {
+                    const newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], newLabel);
+                    this.isDefaultAddress = false;
+                    await this.$store.commit('AddressBook/updateAddress', newAddress);
+                }
                 this.isEditing = false;
             }
         }
@@ -143,6 +146,14 @@ export default {
         ...mapMutations({
             setAddressBook: 'AddressBook/setAddressBook'
         }),
+
+        editLabel() {
+            this.isEditing = true;
+            this.$nextTick(() => {
+                this.$refs.editableLabel.focus();
+                this.$refs.editableLabel.value = '';
+            });
+        },
 
         navigateToAddressBookItem(item) {
             this.isDefaultAddress = false;
