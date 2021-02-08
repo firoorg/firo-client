@@ -150,6 +150,7 @@ export default {
         window.addEventListener("resize", this.resizeListener);
 
         this.$nextTick(() => {
+            if (!this.$refs.vuetable) return;
             this.$refs.vuetable.globalData = this.globalData;
             this.setPerPage();
         });
