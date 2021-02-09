@@ -238,7 +238,7 @@ const getters = {
             if (!tx) console.warn(`Unknown transaction ${uniqId} in unspentUTXOs`);
             return tx;
         })
-        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight']),
+        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight'] - 1),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
 
