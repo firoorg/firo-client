@@ -373,6 +373,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('anonymizes Firo', async function (this: This) {
+        this.timeout(20e3);
+
         const publicBalanceElement = await this.app.client.$('.balance .public .amount');
         assert.isTrue(await publicBalanceElement.isExisting());
         const originalPublicBalance = Big(await publicBalanceElement.getText());
@@ -394,7 +396,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('.anonymize-dialog input[type="password"]')).setValue(passphrase);
         await (await this.app.client.$('.anonymize-dialog button.confirm')).click();
-        await (await this.app.client.$('#popup')).waitForExist({reverse: true});
+        await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 10e3});
 
         await publicBalanceElement.waitForExist({reverse: true});
         await this.app.client.waitUntil(async () =>
@@ -478,7 +480,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         coinControl: boolean
     ): (this: This) => Promise<void> {
         return async function (this: This) {
-            this.timeout(20e3);
+            this.timeout(40e3);
 
             // This is required so that the new transactions will be the first elements on the transactions list.
             await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', ['generate 1']);
@@ -492,6 +494,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             if (paymentType === 'public') {
                 await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                await (await this.app.client.$('.private-public-balance .toggle.is-public')).waitForExist();
             }
 
             if (subtractTransactionFee) {
@@ -615,9 +618,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await waiting.waitForExist({reverse: true, timeout: 10e3});
 
             // Make sure fields are cleared.
-            assert.isEmpty(await label.getValue());
-            assert.isEmpty(await address.getValue());
-            assert.isEmpty(await amount.getValue());
+            await this.app.client.waitUntil(async () => await label.getValue() === '')
+            await this.app.client.waitUntil(async () => await address.getValue() === '')
+            await this.app.client.waitUntil(async () => await amount.getValue() === '')
 
             await (await this.app.client.$('a[href="#/transactions')).click();
 
@@ -660,22 +663,33 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
                 if (paymentType === 'public') {
                     await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                    await (await this.app.client.$('.private-public-balance .toggle.is-public')).waitForExist();
                 }
 
                 await (await this.app.client.$('#custom-inputs-button')).click();
-                while (true) {
-                    for (const selectedUTXO of selectedUTXOs) {
-                        const selector = await this.app.client.$(`#utxo-selector-${selectedUTXO}`);
-                        if (await selector.isExisting()) {
-                            assert.fail(`utxo ${selectedUTXO} is still in our list despite an attempt to use it`);
-                        }
-                    }
 
-                    const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
-                    if (!await nextPageLink.isExisting()) break;
-                    await nextPageLink.click();
+                try {
+                    while (true) {
+                        for (const selectedUTXO of selectedUTXOs) {
+                            const selector = await this.app.client.$(`#utxo-selector-${selectedUTXO}`);
+                            if (await selector.isExisting()) {
+                                assert.fail(`utxo ${selectedUTXO} is still in our list despite an attempt to use it`);
+                            }
+                        }
+
+                        const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
+                        if (!await nextPageLink.isExisting()) break;
+                        await nextPageLink.click();
+                    }
+                } finally {
+                    const closePopupButton = await this.app.client.$('#close-popup-button');
+                    await closePopupButton.click();
+                    await closePopupButton.waitForExist({reverse: true});
                 }
             }
+
+            // Sleep for 1500ms to make sure there's time for the client to update its data.
+            await new Promise(r => setTimeout(r, 1500));
         };
     }
 
@@ -687,7 +701,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('sends and receives a public payment with custom fee', sendsAndReceivesPayment('public', false, true, false));
     it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true, false));
     it('sends and receives a private payment with coin control', sendsAndReceivesPayment('private', true, false, true));
-    it('sends and receives a public payment with coin control', sendsAndReceivesPayment('private', true, false, true));
+    it('sends and receives a public payment with coin control', sendsAndReceivesPayment('public', true, false, true));
 
     function hasCorrectBalance(balanceType: 'public' | 'private'): (this: This) => Promise<void> {
         return async function (this: This) {
@@ -703,6 +717,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             if (balanceType === 'public') {
                 await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                await (await this.app.client.$('.private-public-balance .toggle.is-public')).waitForExist();
             }
 
             await (await this.app.client.$('a[href="#/send"]')).click();
@@ -724,7 +739,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             try {
                 assert.isTrue(sumOfInputs.eq(balance), `got ${sumOfInputs}, expected ${balance}`);
             } finally {
-                await (await this.app.client.$('#close-popup-button')).click();
+                const closePopupButton = await this.app.client.$('#close-popup-button');
+                await closePopupButton.click();
+                await closePopupButton.waitForExist({reverse: true});
             }
         };
     }
