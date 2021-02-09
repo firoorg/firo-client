@@ -7,7 +7,7 @@
         </div>
 
         <div class="buttons">
-            <button @click="$emit('ok')">
+            <button class="ok-button" @click="$emit('ok')">
                 Ok
             </button>
         </div>

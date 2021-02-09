@@ -325,6 +325,53 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     }
     this.beforeAll('generates Firo if not enough is available', generateSufficientFiro);
 
+    it('can change the passphrase', async function (this: This) {
+        await (await this.app.client.$('a[href="#/settings"]')).click();
+
+        const currentPassphraseElement = await this.app.client.$('#current-passphrase-input');
+        const newPassphraseElement = await this.app.client.$('#new-passphrase-input');
+        const confirmNewPassphaseElement = await this.app.client.$('#confirm-new-passphrase-input');
+        const changePassphraseButton = await this.app.client.$('#change-passphrase-button');
+
+        await currentPassphraseElement.setValue('invalid-passphrase');
+        await newPassphraseElement.setValue('wont-be-our-passphrase');
+        await confirmNewPassphaseElement.setValue('wont-be-our-passphrase');
+        await changePassphraseButton.waitForEnabled();
+        await changePassphraseButton.click();
+
+        const okButton = await this.app.client.$('.error-step .ok-button');
+        await okButton.waitForExist();
+        await okButton.click();
+        await okButton.waitForExist({reverse: true});
+
+        await currentPassphraseElement.setValue(passphrase);
+        await newPassphraseElement.setValue('temporary-passphrase');
+        await confirmNewPassphaseElement.setValue('temporary-passphrase');
+        await changePassphraseButton.waitForEnabled();
+        await confirmNewPassphaseElement.setValue('doesnt-match');
+        await changePassphraseButton.waitForEnabled({reverse: true});
+
+        await confirmNewPassphaseElement.setValue('temporary-passphrase');
+        await changePassphraseButton.waitForEnabled();
+        await changePassphraseButton.click();
+
+        const okButton2 = await this.app.client.$('.success-step .ok-button');
+        await okButton2.waitForExist();
+        await okButton2.click();
+        await okButton2.waitForExist({reverse: true});
+
+        await currentPassphraseElement.setValue('temporary-passphrase');
+        await newPassphraseElement.setValue(passphrase);
+        await confirmNewPassphaseElement.setValue(passphrase);
+        await changePassphraseButton.waitForEnabled();
+        await changePassphraseButton.click();
+
+        const okButton3 = await this.app.client.$('.success-step .ok-button');
+        await okButton3.waitForExist();
+        await okButton3.click();
+        await okButton3.waitForExist({reverse: true});
+    });
+
     it('anonymizes Firo', async function (this: This) {
         const publicBalanceElement = await this.app.client.$('.balance .public .amount');
         assert.isTrue(await publicBalanceElement.isExisting());

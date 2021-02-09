@@ -1,5 +1,5 @@
 <template>
-    <div class="error-step">
+    <div class="success-step">
         <div class="title">Success!</div>
 
         <div class="content">
@@ -7,7 +7,7 @@
         </div>
 
         <div class="buttons">
-            <button @click="$emit('ok')">
+            <button class="ok-button" @click="$emit('ok')">
                 Ok
             </button>
         </div>

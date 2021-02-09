@@ -65,17 +65,17 @@
             <div v-if="showDetail === 'passphrase'" class="change-passphrase">
                 <div class="passphrase-inputs">
                     <label>Current Passphrase:</label>
-                    <input type="password" v-model="currentPassphrase" />
+                    <input id="current-passphrase-input" type="password" v-model="currentPassphrase" />
 
                     <label>New Passphrase:</label>
-                    <input type="password" v-model="newPassphrase" :class="{matching: passphrasesMatch}" />
+                    <input id="new-passphrase-input" type="password" v-model="newPassphrase" :class="{matching: passphrasesMatch}" />
 
                     <label>Confirm Passphrase:</label>
-                    <input type="password" v-model="confirmNewPassphrase" :class="{matching: passphrasesMatch}" />
+                    <input id="confirm-new-passphrase-input" type="password" v-model="confirmNewPassphrase" :class="{matching: passphrasesMatch}" />
                 </div>
 
                 <div class="buttons">
-                    <button :disabled="!canChangePassphrase" :class="{active: canChangePassphrase}" @click="changePassphrase">
+                    <button id="change-passphrase-button" :disabled="!canChangePassphrase" :class="{active: canChangePassphrase}" @click="changePassphrase">
                         Change Passphrase
                     </button>
                 </div>
