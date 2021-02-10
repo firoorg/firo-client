@@ -72,202 +72,206 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
     });
 }
 
-if (!process.env.USE_EXISTING_WALLET_FOR_TEST) {
-    describe('Regtest Setup', function (this: Mocha.Suite) {
-        scaffold.bind(this)(true);
+describe('Regtest Setup', function (this: Mocha.Suite) {
+    scaffold.bind(this)(true);
 
-        it('opens a window', async function (this: This) {
-            assert.equal(await this.app.client.getWindowCount(), 1);
+    if (!process.env.TEST_WALLET_CREATION) {
+        this.beforeAll(function (this: This) {
+            this.skip();
         });
+    }
 
-        it('starts', async function (this: This) {
-            const startButton = await this.app.client.$('button');
-            await startButton.waitForExist();
-            await startButton.click();
+    it('opens a window', async function (this: This) {
+        assert.equal(await this.app.client.getWindowCount(), 1);
+    });
 
-            await (await this.app.client.$('select')).waitForExist();
-        });
+    it('starts', async function (this: This) {
+        const startButton = await this.app.client.$('button');
+        await startButton.waitForExist();
+        await startButton.click();
 
-        it('allows selecting blockchain location and network', async function (this: This) {
-            this.slow(1e3);
+        await (await this.app.client.$('select')).waitForExist();
+    });
 
-            await (await this.app.client.$('select')).selectByAttribute('value', 'regtest');
+    it('allows selecting blockchain location and network', async function (this: This) {
+        this.slow(1e3);
 
-            const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
-            // os.tmpdir() isn't actually unique. :-/
-            const dataDirLocation = path.join(os.tmpdir(), `firo-client-test-${Math.floor(Math.random() * 1e16)}`);
+        await (await this.app.client.$('select')).selectByAttribute('value', 'regtest');
 
-            fs.mkdirSync(dataDirLocation);
+        const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
+        // os.tmpdir() isn't actually unique. :-/
+        const dataDirLocation = path.join(os.tmpdir(), `firo-client-test-${Math.floor(Math.random() * 1e16)}`);
 
-            // Creating a new directory is in normal usage taken care of by the file selection dialog, which can't be automated.
-            const setDataDirJS = `e = new Event('set-data-dir'); e.dataDir = ${JSON.stringify(dataDirLocation)}; document.dispatchEvent(e)`;
+        fs.mkdirSync(dataDirLocation);
 
-            // Set the data dir to the test location.
-            await this.app.webContents.executeJavaScript(setDataDirJS);
-            await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+        // Creating a new directory is in normal usage taken care of by the file selection dialog, which can't be automated.
+        const setDataDirJS = `e = new Event('set-data-dir'); e.dataDir = ${JSON.stringify(dataDirLocation)}; document.dispatchEvent(e)`;
 
-            // Test resetting the data dir.
-            await (await this.app.client.$('#reset-data-dir')).click();
-            await this.app.client.waitUntilTextExists('#datadir-value', defaultDataDirLocation);
+        // Set the data dir to the test location.
+        await this.app.webContents.executeJavaScript(setDataDirJS);
+        await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
 
-
-            // Set it back to the real (test) location.
-            await this.app.webContents.executeJavaScript(setDataDirJS);
-            await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+        // Test resetting the data dir.
+        await (await this.app.client.$('#reset-data-dir')).click();
+        await this.app.client.waitUntilTextExists('#datadir-value', defaultDataDirLocation);
 
 
-            await (await this.app.client.$('button')).click();
-            await (await this.app.client.$('.select-create-or-restore')).waitForExist();
-        });
+        // Set it back to the real (test) location.
+        await this.app.webContents.executeJavaScript(setDataDirJS);
+        await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
 
-        it('correctly displays and confirms mnemonic', async function (this: This) {
-            this.timeout(5000e3);
-            this.slow(5e3);
 
-            await (await this.app.client.$('#create-new-wallet')).click();
-            await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
+        await (await this.app.client.$('button')).click();
+        await (await this.app.client.$('.select-create-or-restore')).waitForExist();
+    });
 
-            mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word')).map(e => e.getText()));
-            assert.equal(mnemonicWords.length, 24);
+    it('correctly displays and confirms mnemonic', async function (this: This) {
+        this.timeout(5000e3);
+        this.slow(5e3);
 
-            await (await this.app.client.$('#confirm-button')).click();
-            await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
+        await (await this.app.client.$('#create-new-wallet')).click();
+        await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
 
-            const wordElements = await this.app.client.$$('.mnemonic-word');
-            const okButton = await this.app.client.$('#ok-button');
-            let lastHiddenIndex: number;
+        mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word')).map(e => e.getText()));
+        assert.equal(mnemonicWords.length, 24);
 
-            for (const [n, wordElement] of wordElements.entries()) {
-                const classNames = <string>await wordElement.getAttribute('class');
-                if (classNames.includes('hidden')) {
-                    lastHiddenIndex = n;
-                    await wordElement.setValue(mnemonicWords[n]);
-                } else {
-                    assert.equal(await wordElement.getText(), mnemonicWords[n]);
-                }
-            }
+        await (await this.app.client.$('#confirm-button')).click();
+        await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
 
-            await okButton.waitForClickable();
+        const wordElements = await this.app.client.$$('.mnemonic-word');
+        const okButton = await this.app.client.$('#ok-button');
+        let lastHiddenIndex: number;
 
-            // Test incorrect words.
-            await wordElements[lastHiddenIndex].setValue('invalid-word');
-            await okButton.waitForClickable({reverse: true});
-
-            // Set it back to the valid word.
-            await wordElements[lastHiddenIndex].setValue(mnemonicWords[lastHiddenIndex]);
-            await okButton.waitForClickable();
-
-            await okButton.click();
-
-            await (await this.app.client.$('#passphrase')).waitForExist();
-        });
-
-        it('goes back from the passphrase step', async function (this: This) {
-            await (await this.app.client.$('#back-button')).click();
-            await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
-
-            const wordElementsAgain = await this.app.client.$$('.mnemonic-word');
-            for (const [n, wordElement] of wordElementsAgain.entries()) {
-                const classNames = <string>await wordElement.getAttribute('class');
-                if (!classNames.includes('hidden')) {
-                    assert.equal(await wordElement.getText(), mnemonicWords[n]);
-                }
-            }
-
-            await (await this.app.client.$('#back-button')).click();
-            await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
-
-            const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word');
-            for (const [n, wordElement] of nonHiddenWordElementsAgain.entries()) {
+        for (const [n, wordElement] of wordElements.entries()) {
+            const classNames = <string>await wordElement.getAttribute('class');
+            if (classNames.includes('hidden')) {
+                lastHiddenIndex = n;
+                await wordElement.setValue(mnemonicWords[n]);
+            } else {
                 assert.equal(await wordElement.getText(), mnemonicWords[n]);
             }
+        }
 
-            await (await this.app.client.$('#back-button')).click();
-            await (await this.app.client.$('#recover-from-mnemonic')).waitForExist();
-        });
+        await okButton.waitForClickable();
 
-        it('can recover from mnemonics', async function (this: This) {
-            this.timeout(1000e3);
+        // Test incorrect words.
+        await wordElements[lastHiddenIndex].setValue('invalid-word');
+        await okButton.waitForClickable({reverse: true});
 
-            let twelveMnemonicWords = ["nation","tip","mean","govern","tide","comic","figure","gift","upper","love","kitchen","dolphin"];
+        // Set it back to the valid word.
+        await wordElements[lastHiddenIndex].setValue(mnemonicWords[lastHiddenIndex]);
+        await okButton.waitForClickable();
 
-            await (await this.app.client.$('#recover-from-mnemonic')).click();
+        await okButton.click();
 
-            const submitButton = await this.app.client.$('#ok-button');
-
-            await (await this.app.client.$('input[value="12"]')).click();
-            await (await this.app.client.$('#mnemonic-word-13')).waitForExist({reverse: true});
-
-            const twelveMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
-            for (const [n, word] of Object.entries(twelveMnemonicWords)) {
-                await twelveMnemonicWordElements[n].setValue(word);
-            }
-
-            await submitButton.waitForClickable();
-
-            twelveMnemonicWordElements[0].setValue('invalid-word');
-            await submitButton.waitForClickable({reverse: true});
-
-            await (await this.app.client.$('input[value="24"]')).click();
-            await (await this.app.client.$('#mnemonic-word-13')).waitForExist();
-
-            const twentyFourMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
-            for (const [n, word] of Object.entries(mnemonicWords)) {
-                await twentyFourMnemonicWordElements[n].setValue(word);
-            }
-
-            await submitButton.waitForClickable();
-
-            twentyFourMnemonicWordElements[0].setValue('invalid-word');
-            await submitButton.waitForClickable({reverse: true});
-
-            twentyFourMnemonicWordElements[0].setValue(mnemonicWords[0]);
-            await submitButton.waitForClickable();
-
-            await submitButton.click();
-            await (await this.app.client.$('#passphrase')).waitForExist();
-        });
-
-        it('locks the wallet', async function (this: This) {
-            this.timeout(60e3);
-            this.slow(20e3);
-
-            const submitButton = await this.app.client.$('#ok-button');
-
-            await (await this.app.client.$('#passphrase')).setValue(passphrase);
-            await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
-            await submitButton.waitForClickable();
-
-            await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase + 'invalid');
-            await submitButton.waitForClickable({reverse: true})
-
-            await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
-            await submitButton.waitForClickable();
-
-            await submitButton.click();
-
-            await (await this.app.client.$('.transactions-page')).waitForExist({timeout: 60e3});
-        });
-
-        it('generates FIRO from the debug console', async function (this: This) {
-            this.timeout(500e3);
-            this.slow(100e3);
-
-            await (await this.app.client.$('a[href="#/debugconsole"]')).click();
-
-            await this.app.client.keys([..."generate 1000".split(''), "Enter"]);
-            await this.app.client.waitUntil(
-                async () => (await (await this.app.client.$('#current-input')).getText()) === '',
-                {timeout: 500e3}
-            );
-        });
-
-        it('has the correct balance after generating FIRO from the debug console', async function (this: This) {
-            await this.app.client.waitUntilTextExists('.public .amount', '38343');
-            await this.app.client.waitUntilTextExists('.pending .amount', '4300');
-        });
+        await (await this.app.client.$('#passphrase')).waitForExist();
     });
-}
+
+    it('goes back from the passphrase step', async function (this: This) {
+        await (await this.app.client.$('#back-button')).click();
+        await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
+
+        const wordElementsAgain = await this.app.client.$$('.mnemonic-word');
+        for (const [n, wordElement] of wordElementsAgain.entries()) {
+            const classNames = <string>await wordElement.getAttribute('class');
+            if (!classNames.includes('hidden')) {
+                assert.equal(await wordElement.getText(), mnemonicWords[n]);
+            }
+        }
+
+        await (await this.app.client.$('#back-button')).click();
+        await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
+
+        const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word');
+        for (const [n, wordElement] of nonHiddenWordElementsAgain.entries()) {
+            assert.equal(await wordElement.getText(), mnemonicWords[n]);
+        }
+
+        await (await this.app.client.$('#back-button')).click();
+        await (await this.app.client.$('#recover-from-mnemonic')).waitForExist();
+    });
+
+    it('can recover from mnemonics', async function (this: This) {
+        this.timeout(1000e3);
+
+        let twelveMnemonicWords = ["nation","tip","mean","govern","tide","comic","figure","gift","upper","love","kitchen","dolphin"];
+
+        await (await this.app.client.$('#recover-from-mnemonic')).click();
+
+        const submitButton = await this.app.client.$('#ok-button');
+
+        await (await this.app.client.$('input[value="12"]')).click();
+        await (await this.app.client.$('#mnemonic-word-13')).waitForExist({reverse: true});
+
+        const twelveMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
+        for (const [n, word] of Object.entries(twelveMnemonicWords)) {
+            await twelveMnemonicWordElements[n].setValue(word);
+        }
+
+        await submitButton.waitForClickable();
+
+        twelveMnemonicWordElements[0].setValue('invalid-word');
+        await submitButton.waitForClickable({reverse: true});
+
+        await (await this.app.client.$('input[value="24"]')).click();
+        await (await this.app.client.$('#mnemonic-word-13')).waitForExist();
+
+        const twentyFourMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
+        for (const [n, word] of Object.entries(mnemonicWords)) {
+            await twentyFourMnemonicWordElements[n].setValue(word);
+        }
+
+        await submitButton.waitForClickable();
+
+        twentyFourMnemonicWordElements[0].setValue('invalid-word');
+        await submitButton.waitForClickable({reverse: true});
+
+        twentyFourMnemonicWordElements[0].setValue(mnemonicWords[0]);
+        await submitButton.waitForClickable();
+
+        await submitButton.click();
+        await (await this.app.client.$('#passphrase')).waitForExist();
+    });
+
+    it('locks the wallet', async function (this: This) {
+        this.timeout(60e3);
+        this.slow(20e3);
+
+        const submitButton = await this.app.client.$('#ok-button');
+
+        await (await this.app.client.$('#passphrase')).setValue(passphrase);
+        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
+        await submitButton.waitForClickable();
+
+        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase + 'invalid');
+        await submitButton.waitForClickable({reverse: true})
+
+        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
+        await submitButton.waitForClickable();
+
+        await submitButton.click();
+
+        await (await this.app.client.$('.transactions-page')).waitForExist({timeout: 60e3});
+    });
+
+    it('generates FIRO from the debug console', async function (this: This) {
+        this.timeout(500e3);
+        this.slow(100e3);
+
+        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+
+        await this.app.client.keys([..."generate 1000".split(''), "Enter"]);
+        await this.app.client.waitUntil(
+            async () => (await (await this.app.client.$('#current-input')).getText()) === '',
+            {timeout: 500e3}
+        );
+    });
+
+    it('has the correct balance after generating FIRO from the debug console', async function (this: This) {
+        await this.app.client.waitUntilTextExists('.public .amount', '38343');
+        await this.app.client.waitUntilTextExists('.pending .amount', '4300');
+    });
+});
 
 describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
