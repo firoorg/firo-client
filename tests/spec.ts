@@ -350,7 +350,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await changePassphraseButton.click();
 
         const okButton2 = await this.app.client.$('.success-step .ok-button');
-        await okButton2.waitForExist();
+        await okButton2.waitForExist({timeout: 20e3});
         await okButton2.click();
         await okButton2.waitForExist({reverse: true});
 
@@ -361,7 +361,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await changePassphraseButton.click();
 
         const okButton3 = await this.app.client.$('.success-step .ok-button');
-        await okButton3.waitForExist();
+        await okButton2.waitForExist({timeout: 20e3});
         await okButton3.click();
         await okButton3.waitForExist({reverse: true});
 
@@ -403,7 +403,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('displays and updates the receiving address', async function (this: This) {
-        this.timeout(10e3);
+        this.timeout(30e3);
 
         await (await this.app.client.$('a[href="#/receive"]')).click();
 
