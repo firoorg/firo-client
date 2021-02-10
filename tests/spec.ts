@@ -810,23 +810,23 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('properly sends debug commands', async function (this: This) {
-        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
-
+        // Due to bugs in WebdriverIO, we can't actually focus #current-input without this.
         const currentInput = await this.app.client.$('#current-input');
+        await (await this.app.client.$('a[href="#/settings"]')).click();
+        await currentInput.waitForExist({reverse: true});
+        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
         await currentInput.waitForExist();
 
         for (const [cmd, expectedOutput] of [['getinfo', '"relayfee"'], ['help move', 'Move 0.01 FIRO from the default account']]) {
             await this.app.client.keys([...cmd.split(''), "Enter"]);
-            await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
-
-            let hasResponse = false;
-            for (const e of await this.app.client.$$('.output')) {
-                if ((await e.getText()).includes(expectedOutput)) {
-                    hasResponse = true;
-                    break;
+            await this.app.client.waitUntil(async () => {
+                let hasResponse = false;
+                for (const e of await this.app.client.$$('.output')) {
+                    if ((await e.getText()).includes(expectedOutput)) {
+                        return true;
+                    }
                 }
-            }
-            assert.isTrue(hasResponse, `expected output of ${cmd} has not appeared in the debug console`);
+            }, {timeout: 10e3, timeoutMsg: `expected output of ${cmd} has not appeared in the debug console`, interval: 500});
         }
     });
 });
