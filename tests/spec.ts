@@ -630,6 +630,17 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await waiting.waitForExist();
             await waiting.waitForExist({reverse: true, timeout: 100e3});
 
+            const errorElement = await this.app.client.$('.error-step .content');
+            if (await errorElement.isExisting()) {
+                const error = await errorElement.getText();
+
+                const closeErrorStep = await this.app.client.$('.error-step .ok-button');
+                await closeErrorStep.click();
+                await closeErrorStep.waitForExist({reverse: true});
+
+                assert.fail(`sending transaction failed: ${error}`);
+            }
+
             // Make sure fields are cleared.
             await this.app.client.waitUntil(async () => await label.getValue() === '')
             await this.app.client.waitUntil(async () => await address.getValue() === '')
