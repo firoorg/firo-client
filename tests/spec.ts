@@ -300,20 +300,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const privateBalanceElement = await this.app.client.$('.balance .private .amount');
         const publicBalanceElement = await this.app.client.$('.balance .public .amount');
 
-        if (!await publicBalanceElement.isExisting() || Number(await publicBalanceElement.getText()) < 40) {
-            // Probably we're mining all the blocks ourselves, and generating just one block will create a balance.
-            await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 2').then(arguments[0])`, []);
-
-            try {
-                await publicBalanceElement.waitForExist({timeout: 1e3});
-                await this.app.client.waitUntil(async () => Number(await publicBalanceElement.getText()) >= 40, {timeout: 1e3});
-            } catch {
-                // If generating 2 blocks failed to create a balance, generate 100 more so that we'll definitely have
-                // received a block reward.
-                await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 100').then(arguments[0])`, []);
-                await publicBalanceElement.waitForExist({timeout: 1e3});
-                await this.app.client.waitUntil(async () => Number(await publicBalanceElement.getText()) >= 40, {timeout: 1e3});
-            }
+        while (!await publicBalanceElement.isExisting() || Number(await publicBalanceElement.getText()) < 40) {
+            // Probably we're mining all the blocks ourselves.
+            await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
         }
 
         if (Number(await privateBalanceElement.getText()) < 20) {
