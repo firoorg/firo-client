@@ -686,6 +686,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToReceive, <any>{timeout: 10e3});
             await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToReceive, <any>{timeout: 10e3});
 
+            // Wait to make sure coin control entries are updated.
+            await new Promise(r => setTimeout(r, 2e3));
+
             if (coinControl) {
                 await (await this.app.client.$('a[href="#/send"]')).click();
 
