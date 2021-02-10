@@ -370,7 +370,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     it('anonymizes Firo', async function (this: This) {
-        this.timeout(20e3);
+        this.timeout(100e3);
 
         const publicBalanceElement = await this.app.client.$('.balance .public .amount');
         assert.isTrue(await publicBalanceElement.isExisting());
