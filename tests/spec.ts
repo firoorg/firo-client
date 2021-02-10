@@ -278,10 +278,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         // Check that there are existing payments.
         const paymentStatusElement = await this.app.client.$('td');
-        await paymentStatusElement.waitForExist({timeout: 20e3});
-
-        // Wait two seconds to make sure that all our data has loaded.
-        await new Promise(r => setTimeout(() => r(), 2e3));
+        await paymentStatusElement.waitForExist({timeout: 100e3});
     });
 
     this.beforeAll('is using regtest', async function (this: This) {
