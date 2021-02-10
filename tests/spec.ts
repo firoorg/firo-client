@@ -489,8 +489,17 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await (await this.app.client.$('#send-page')).waitForExist();
 
             if (paymentType === 'public') {
-                await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-                await (await this.app.client.$('.private-public-balance .toggle.is-public')).waitForExist();
+                const toggleInPrivateMode = await this.app.client.$('.private-public-balance .toggle.is-private');
+                if (await toggleInPrivateMode.isExisting()) {
+                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                    await toggleInPrivateMode.waitForExist({reverse: true});
+                }
+            } else {
+                const toggleInPublicMode = await this.app.client.$('.private-public-balance .toggle.is-public');
+                if (await toggleInPublicMode.isExisting()) {
+                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                    await toggleInPublicMode.waitForExist({reverse: true});
+                }
             }
 
             if (subtractTransactionFee) {
@@ -714,25 +723,18 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 balance = convertToSatoshi(await balanceElement.getText());
             }
 
-            await this.app.client.waitUntil(async () => {
-                let sumOfInputsInStore = await this.app.client.executeAsync(async () => {
-                    arguments[1](
-                        Object.values((<any>window).$store.getters['Transactions/availableUTXOs'])
-                            .filter((tx: TransactionOutput) =>
-                                (arguments[0] === 'private') == ['mint', 'mintIn'].includes(tx.category)
-                            )
-                            .reduce((a: number, tx: TransactionOutput) => a + tx.amount, 0)
-                    );
-                }, [balanceType]);
-
-                return sumOfInputsInStore === balance;
-            }, {interval: 500, timeout: 5e3});
-
-            const toggleSwitch = await this.app.client.$('.private-public-balance .toggle-switch');
-            await toggleSwitch.waitForExist();
             if (balanceType === 'public') {
-                await toggleSwitch.click();
-                await (await this.app.client.$('.private-public-balance .toggle.is-public')).waitForExist();
+                const toggleInPrivateMode = await this.app.client.$('.private-public-balance .toggle.is-private');
+                if (await toggleInPrivateMode.isExisting()) {
+                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                    await toggleInPrivateMode.waitForExist({reverse: true});
+                }
+            } else {
+                const toggleInPublicMode = await this.app.client.$('.private-public-balance .toggle.is-public');
+                if (await toggleInPublicMode.isExisting()) {
+                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
+                    await toggleInPublicMode.waitForExist({reverse: true});
+                }
             }
 
             await (await this.app.client.$('#custom-inputs-button')).click();
