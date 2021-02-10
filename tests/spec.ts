@@ -292,7 +292,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     });
 
     async function generateSufficientFiro(this: This) {
-        this.timeout(100e3);
+        this.timeout(200e3);
         this.slow(100e3);
 
         // This value doesn't actually _have_ to be above 1 if we're testing with an existing firod, but in a test
