@@ -49,6 +49,10 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
     });
 
     this.afterEach(async function (this: This) {
+        // Make sure there's time for the logs to capture all of the test output.
+        // fixme: remove winston so we don't have to deal with this shit
+        await new Promise(r => setTimeout(r, 1e3));
+
         // Getting these will clear the logs.
         const mainLogs = await this.app.client.getMainProcessLogs();
         const rendererLogs = await this.app.client.getRenderProcessLogs();
