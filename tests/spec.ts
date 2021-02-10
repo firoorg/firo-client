@@ -543,12 +543,16 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 const defaultTransactionFee = Number(await txFeeElement.getText());
 
                 await (await this.app.client.$('.use-custom-fee input[type="checkbox"]')).click();
-                await (await this.app.client.$('.use-custom-fee input[type="text"]')).setValue("9999");
+                await (await this.app.client.$('.use-custom-fee input[type="text"]')).setValue("999999");
                 await sendButton.waitForEnabled({reverse: true});
                 await sendButton.waitForEnabled();
 
-                const newTransactionFee = Number(await txFeeElement.getText());
-                assert.isAbove(newTransactionFee, defaultTransactionFee, "setting a fee of 9999 doesn't increase computed fee");
+                assert.isAbove(Number(await txFeeElement.getText()), defaultTransactionFee, "setting a fee of 999999 doesn't increase computed fee");
+
+                // Make sure to set it down so that fee estimation doesn't go crazy high and ruin the test.
+                await (await this.app.client.$('.use-custom-fee input[type="text"]')).setValue("9999");
+                await sendButton.waitForEnabled({reverse: true});
+                await sendButton.waitForEnabled();
             }
 
             const availableUTXOs = lodash.shuffle(
