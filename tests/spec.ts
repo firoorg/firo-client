@@ -273,7 +273,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
     this.beforeAll('waits to load our wallet', async function (this: This) {
-        this.timeout(20e3);
+        this.timeout(100e3);
         this.slow(20e3);
 
         // Check that there are existing payments.
