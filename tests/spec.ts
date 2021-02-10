@@ -633,18 +633,19 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             await (await this.app.client.$('a[href="#/transactions')).click();
 
-            // Give some time to make sure we've updated the store.
-            await new Promise(r => setTimeout(r, 1000));
-
-            const txOut: TransactionOutput = await this.app.client.executeScript(
-                "return Object.values($store.getters['Transactions/transactions'])" +
+            let txOut: TransactionOutput;
+            await this.app.client.waitUntil(async () => {
+                txOut = await this.app.client.executeScript(
+                    "return Object.values($store.getters['Transactions/transactions'])" +
                     ".find(tx => " +
-                        "(arguments[2] ? tx.amount + tx.fee : tx.amount) === arguments[0] && " +
-                        "tx.category === arguments[1] && " +
-                        "!tx.isChange" +
+                    "(arguments[2] ? tx.amount + tx.fee : tx.amount) === arguments[0] && " +
+                    "tx.category === arguments[1] && " +
+                    "!tx.isChange" +
                     ")",
-                [satoshiAmountToSend, paymentType === 'private' ? 'spendOut' : 'send', subtractTransactionFee]
-            );
+                    [satoshiAmountToSend, paymentType === 'private' ? 'spendOut' : 'send', subtractTransactionFee]
+                );
+                return !!txOut;
+            })
             assert.exists(txOut);
 
             if (paymentType === 'private' || !coinControl) {
@@ -699,9 +700,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                     await closePopupButton.waitForExist({reverse: true});
                 }
             }
-
-            // Sleep for 1500ms to make sure there's time for the client to update its data.
-            await new Promise(r => setTimeout(r, 1500));
         };
     }
 
