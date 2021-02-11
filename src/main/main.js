@@ -77,11 +77,6 @@ app.once('ready', async () => {
         ourWindow.webContents.emit("shutdown-requested", event);
     });
 
-    ourWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
-        const d = new Date();
-        console.log(`${d.getHours()}h${d.getMinutes()}m${d.getSeconds()}.${d.getMilliseconds()}s ${message}`);
-    });
-
     // Stop new alt-clicks from opening new BrowserWindows.
     //
     // NOTE: This MUST be done in the main process to work.

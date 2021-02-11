@@ -1196,14 +1196,14 @@ export class Firod {
             console.log(message);
         }
 
-        logger.debug(`Trying to acquire requestMutex for ${callName}...`);
+        logger.silly(`Trying to acquire requestMutex for ${callName}...`);
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
         let releaseLock = await this.requestMutex.lock();
-        logger.debug(`Acquired requestMutex for ${callName}`);
+        logger.silly(`Acquired requestMutex for ${callName}`);
 
         const release = () => {
-            logger.debug(`Releasing requestMutex for ${callName}...`)
+            logger.silly(`Releasing requestMutex for ${callName}...`)
             releaseLock();
         };
 

@@ -48,30 +48,19 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
         this.app.client.setTimeout({implicit: 0, script: 200e3});
     });
 
+    this.beforeEach(async function (this: This) {
+        console.log(`started: ${(new Date()).toISOString()}`);
+    });
+
     this.afterEach(async function (this: This) {
-        // Make sure there's time for the logs to capture all of the test output.
-        // fixme: remove winston so we don't have to deal with this shit
-        await new Promise(r => setTimeout(r, 1e3));
-
-        // Getting these will clear the logs.
-        const mainLogs = await this.app.client.getMainProcessLogs();
-        const rendererLogs = await this.app.client.getRenderProcessLogs();
-
-        if (this.currentTest.state === 'failed') {
-            console.error('Main process logs:');
-            console.error(mainLogs.join("\n"));
-
-            console.error('\n\nRenderer process logs:');
-            console.error(rendererLogs.map((msg: any) =>
-                `${(new Date(msg.timestamp)).toISOString()} [${msg.source}] ${msg.level}: ${msg.message}`
-            ).join("\n"));
-        }
+        console.log(`finished: ${(new Date()).toISOString()}`);
     });
 
     this.afterAll(async function (this: This) {
         this.timeout(10e3);
         // Wait for a small bit to make sure we won't trigger a race condition in the daemon.
         await new Promise(r => setTimeout(r, 1e3));
+        console.log((await this.app.client.getMainProcessLogs()).join('\n') + '\n');
         await this.app.stop();
     });
 }
@@ -316,10 +305,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
             await this.app.client.waitUntil(async () => Number(await privateBalanceElement.getText()) >= 20, {timeout: 1e3});
         }
-
-        // Clear logs so our output won't appear as debug output of failed tests.
-        await this.app.client.getMainProcessLogs();
-        await this.app.client.getRenderProcessLogs();
     }
     this.beforeEach('generates Firo if not enough is available', generateSufficientFiro);
 
