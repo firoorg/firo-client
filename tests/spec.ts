@@ -760,7 +760,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
 
             try {
-                assert.equal(sumOfInputs, balance, `expected - actual == ${balance - sumOfInputs}`);
+                assert.equal(convertToCoin(sumOfInputs), convertToCoin(balance), `expected - actual == ${convertToCoin(balance - sumOfInputs)}`);
             } finally {
                 const closePopupButton = await this.app.client.$('#close-popup-button');
                 await closePopupButton.click();
