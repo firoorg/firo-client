@@ -134,8 +134,10 @@ export default {
 
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
-                    await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                    const r = await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, this.coinControl);
+
+                    $store.commit('Transactions/markSpentTransaction', r.inputs);
                 }
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {

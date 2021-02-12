@@ -1405,7 +1405,7 @@ export class Firod {
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
     // this transaction.
     async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
-                     subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<string> {
+                     subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string, inputs: CoinControl}> {
         const data = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
@@ -1420,12 +1420,12 @@ export class Firod {
             }
         });
 
-        function isValidResponse(x: any): x is {txid: string} {
-            return x !== null && typeof x === 'object' && typeof x.txid === 'string';
+        function isValidResponse(x: any): x is {txid: string, inputs: CoinControl} {
+            return x !== null && typeof x === 'object' && typeof x.txid === 'string' && isValidCoinControl(x.inputs);
         }
 
         if (isValidResponse(data)) {
-            return data.txid;
+            return data;
         } else {
             throw new UnexpectedFirodResponse('create/sendZcoin', data);
         }

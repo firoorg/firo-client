@@ -77,7 +77,8 @@ export default {
             this.waiting = true;
 
             try {
-                await $daemon.mintAllLelantus(passphrase);
+                const r = await $daemon.mintAllLelantus(passphrase);
+                $store.commit('Transactions/markSpentTransaction', r.inputs);
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
                     this.error = 'Incorrect Passphrase';
