@@ -4,7 +4,7 @@
         <div class="private-balance">{{ convertToCoin(availablePrivate) }} <span class="ticker">FIRO</span></div>
         <label class="public-balance-label">PUBLIC BALANCE:</label>
         <div class="public-balance">{{ convertToCoin(availablePublic) }} <span class="ticker">FIRO</span></div>
-        <div class="toggle" :class="isPrivate ? 'is-private' : 'is-public'">
+        <div class="toggle" :class="[isPrivate ? 'is-private' : 'is-public', disabled ? 'toggle-disabled' : 'toggle-enabled']">
             <label class="toggle-label-private">PRIVATE</label>
             <div class="toggle-switch" @click="toggle()">
                 <div class="inner" />
@@ -70,6 +70,7 @@ export default {
 <style scoped lang="scss">
 @import "src/renderer/styles/sizes";
 @import "src/renderer/styles/typography";
+@import "src/renderer/styles/inputs";
 
 label {
     @include label();
@@ -109,6 +110,10 @@ label {
     }
 
     .toggle {
+        &.toggle-disabled {
+            opacity: $disabled-input-opacity;
+        }
+
         @include label();
         user-select: none;
         grid-row: 2;

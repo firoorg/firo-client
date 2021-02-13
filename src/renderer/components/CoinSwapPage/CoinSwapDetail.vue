@@ -10,7 +10,7 @@
                 </header>
 
                 <div class="radio-buttons-wrapper">
-                    <label class="radio-button-wrapper">Swap from FIRO
+                    <label class="radio-button-wrapper" :class="{disabled: formDisabled || !isBlockchainSynced}">Swap from FIRO
                         <input type="radio" v-model="isSwapFrom" :value="true">
                         <span class="checkmark" />
                     </label>
@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="field" id="label-field">
-                    <label>
+                    <label :class="{disabled: formDisabled}">
                         {{ isSwapFrom ? 'Receive' : 'Send' }}
                     </label>
 
@@ -32,7 +32,7 @@
                         label="coin"
                         v-model="selectedCoin"
                         :loading="!isSwitchainUnavailable && !doesSwitchainNotSupportFiro && !isMarketInfoLoaded"
-                        :disabled="isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
+                        :disabled="formDisabled || isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
                         :options="remoteCoins"
                         :placeholder="(isSwitchainUnavailable && 'Switchain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
                         :clearable="!!selectedCoin"
@@ -59,7 +59,7 @@
                     </vue-select>
                 </div>
 
-                <div class="field" id="amount-field">
+                <div class="field" id="amount-field" :class="{disabled: formDisabled}">
                     <label>
                         Amount
                     </label>
@@ -71,7 +71,7 @@
                             v-validate="amountValidations"
                             v-tooltip="getValidationTooltip('amount')"
                             type="text"
-                            :disabled="!selectedCoin"
+                            :disabled="formDisabled || !selectedCoin"
                             name="amount"
                             class="amount"
                             tabindex="3"
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="field" id="address-field">
+                <div class="field" id="address-field" :class="{disabled: formDisabled}">
                     <label>
                         Your {{ selectedCoin }} {{ isSwapFrom ? "destination" : "refund"}} address
                     </label>
@@ -97,7 +97,7 @@
                             type="text"
                             name="address"
                             tabindex="2"
-                            :disabled="!selectedCoin"
+                            :disabled="formDisabled || !selectedCoin"
                             :placeholder="isSwapFrom ? 'Destination address' : 'Refund address'"
                             spellcheck="false"
                         />
@@ -106,7 +106,7 @@
             </div>
 
             <div id="bottom">
-                <div id="totals">
+                <div id="totals" :class="{disabled: formDisabled}">
                     <div class="total-field" id="expected-rate">
                         <label>
                             Rate:
@@ -164,7 +164,7 @@
 
                 <CoinSwapFlowFromFiro
                     v-if="isSwapFrom"
-                    :disabled="!canBeginSwapFromFiro"
+                    :disabled="formDisabled || !canBeginSwapFromFiro"
                     :is-private="isPrivate"
                     :remote-currency="selectedCoin"
                     :firo-transaction-fee="firoTransactionFee"
@@ -175,12 +175,13 @@
                     :receive-address="address"
                     :expected-rate="conversionRate"
                     :signature="signature"
+                    :class="{disabled: formDisabled}"
                     @success="cleanupForm"
                 />
 
                 <CoinSwapFlowToFiro
                     v-else
-                    :disabled="!canBeginSwapToFiro"
+                    :disabled="formDisabled || !canBeginSwapToFiro"
                     :remote-currency="selectedCoin"
                     :remote-amount="amount"
                     :firo-amount="amountToReceive"
@@ -192,7 +193,7 @@
                 />
 
                 <div class="footer">
-                    <PrivatePublicBalance v-model="isPrivate" />
+                    <PrivatePublicBalance v-model="isPrivate" :disabled="!isSwapFrom || formDisabled" />
                 </div>
             </div>
         </div>
@@ -493,9 +494,14 @@ export default {
             availablePrivate: 'Balance/available',
             availablePublic: 'Balance/availablePublic',
             maxPrivateSend: 'Balance/maxPrivateSend',
+            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
+
+        formDisabled() {
+            return this.isSwapFrom && (!this.isBlockchainSynced || (this.isPrivate && !this.isLelantusAllowed));
+        },
 
         amountValidations () {
             if (!this.selectedCoin) {
@@ -696,6 +702,10 @@ label {
 
 .ticker {
     @include ticker();
+}
+
+.disabled {
+    opacity: $disabled-input-opacity;
 }
 
 .coin-swap-detail {

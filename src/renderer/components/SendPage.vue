@@ -576,11 +576,7 @@ export default {
             flex-flow: column;
 
             @at-root .disabled .not-footer {
-                opacity: 0.3;
-            }
-
-            @at-root .unsynced .footer {
-                opacity: 0.3;
+                opacity: $disabled-input-opacity;
             }
 
             #top {
