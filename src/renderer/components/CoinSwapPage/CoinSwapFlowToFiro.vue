@@ -125,7 +125,7 @@ export default {
 
             try {
                 const { error, response } = await this.api.postOrder({
-                    pair: `${this.remoteCurrency}-XZC`,
+                    pair: `${this.remoteCurrency}-FIRO`,
                     fromAmount: this.remoteAmount,
                     toAddress: walletAddress,
                     toAmount: this.firoAmount,

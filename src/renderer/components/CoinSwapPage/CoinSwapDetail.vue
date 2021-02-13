@@ -222,36 +222,36 @@ import {FirodErrorResponse} from "daemon/firod";
 // is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
 // one of them.
 const AllowedPairs = [
-    "XZC-BTC",
-    "XZC-ETH",
-    "XZC-ZEC",
-    "XZC-LTC",
-    "XZC-XRP",
-    "XZC-XLM",
-    "XZC-BNB",
-    "XZC-USDT",
-    "XZC-USDC",
-    "XZC-DAI",
-    "XZC-DASH",
-    "XZC-DCR",
-    "XZC-PAX",
-    "BTC-XZC",
-    "ETH-XZC",
-    "ZEC-XZC",
-    "LTC-XZC",
-    "XRP-XZC",
-    "XLM-XZC",
-    "BNB-XZC",
-    "USDT-XZC",
-    "USDC-XZC",
-    "DAI-XZC",
-    "DASH-XZC",
-    "DCR-XZC",
-    "PAX-XZC",
+    "FIRO-BTC",
+    "FIRO-ETH",
+    "FIRO-ZEC",
+    "FIRO-LTC",
+    "FIRO-XRP",
+    "FIRO-XLM",
+    "FIRO-BNB",
+    "FIRO-USDT",
+    "FIRO-USDC",
+    "FIRO-DAI",
+    "FIRO-DASH",
+    "FIRO-DCR",
+    "FIRO-PAX",
+    "BTC-FIRO",
+    "ETH-FIRO",
+    "ZEC-FIRO",
+    "LTC-FIRO",
+    "XRP-FIRO",
+    "XLM-FIRO",
+    "BNB-FIRO",
+    "USDT-FIRO",
+    "USDC-FIRO",
+    "DAI-FIRO",
+    "DASH-FIRO",
+    "DCR-FIRO",
+    "PAX-FIRO",
 ];
 
 const CoinNames = {
-    XZC: "Firo",
+    FIRO: "Firo",
     BTC: "Bitcoin",
     ETH: "Ethereum",
     ZEC: "ZCash",
@@ -568,14 +568,14 @@ export default {
 
         coinsFromFiro() {
             return Object.keys(this.marketInfo)
-                .filter(pair => pair.match(/^XZC-/))
+                .filter(pair => pair.match(/^FIRO-/))
                 .map(pair => pair.split('-')[1])
                 .sort();
         },
 
         coinsToFiro() {
             return Object.keys(this.marketInfo)
-                .filter(pair => pair.match(/-XZC$/))
+                .filter(pair => pair.match(/-FIRO$/))
                 .map(pair => pair.split('-')[0])
                 .sort();
         },
@@ -589,7 +589,7 @@ export default {
         },
 
         xzcPair() {
-            return this.isSwapFrom ? `XZC-${this.selectedCoin}` : `${this.selectedCoin}-XZC`;
+            return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
         },
 
         // We return a decimal-formatted string (or undefined).

@@ -142,7 +142,7 @@ export default {
             let response;
             try {
                 const order = {
-                    pair: `XZC-${remoteCurrency}`,
+                    pair: `FIRO-${remoteCurrency}`,
                     toAddress: receiveAddress,
                     refundAddress: walletAddress,
                     fromAmount: convertToCoin(firoAmount),
