@@ -243,8 +243,10 @@ export default {
 
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
-                    await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
+                    const r = await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
                         this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb, false);
+
+                    $store.commit('Transactions/markSpentTransaction', r.inputs);
                 }
 
                 await this.addCoinSwapRecords([this.coinSwapRecord]);
