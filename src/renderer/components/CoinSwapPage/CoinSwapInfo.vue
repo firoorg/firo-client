@@ -6,6 +6,9 @@
 
         <div class="content">
             <div v-if="showQrCode" ref="qrCode" class="qr-code" />
+            <div v-if="showQrCode" class="exchange-address">
+                {{ coinSwapData.exchangeAddress }}
+            </div>
 
             <div class="fields">
                 <div class="field">
@@ -250,6 +253,16 @@ export default {
     margin: {
         left: auto;
         right: auto;
+    }
+}
+
+.exchange-address {
+    text-align: center;
+    @include address();
+
+    margin: {
+        top: $size-small-space;
+        bottom: $size-popup-margin;
     }
 }
 

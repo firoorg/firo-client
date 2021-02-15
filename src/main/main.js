@@ -60,10 +60,10 @@ app.once('ready', async () => {
         frame: process.platform !== 'darwin',
         useContentSize: true,
         titleBarStyle: 'hiddenInset',
-        height: 780,
+        height: 800,
         width: 1400,
         minWidth: 1250,
-        minHeight: 660,
+        minHeight: 800,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true
