@@ -121,7 +121,7 @@
                         </div>
                     </div>
 
-                    <div v-if="isSwapFrom" class="total-field" id="firo-transaction-fee">
+                    <div v-if="isSwapFrom && !isBigWallet" class="total-field" id="firo-transaction-fee">
                         <label>
                             Firo Transaction fee:
                         </label>
@@ -167,6 +167,7 @@
                     :disabled="formDisabled || !canBeginSwapFromFiro"
                     :is-private="isPrivate"
                     :remote-currency="selectedCoin"
+                    :is-big-wallet="isBigWallet"
                     :firo-transaction-fee="firoTransactionFee"
                     :tx-fee-per-kb="smartFeePerKb"
                     :remote-transaction-fee="remoteTransactionFee"
@@ -311,7 +312,7 @@ export default {
             marketInfoRefreshNonce: 0,
             // This is used so we can clear an interval created on startup to refresh market info.
             refreshOffersIntervalId: null,
-
+            feeMap: {},
             selectedCoin: null,
             amount: '',
             address: ''
@@ -379,6 +380,37 @@ export default {
     },
 
     watch: {
+        // Returns [number (txfee in satoshi), error (string)], one of which will be null.
+        async currentTxFeeId() {
+            // It takes too long to calculate transaction fees on big wallets, so we just don't display them to the user.
+            if (this.isBigWallet) return;
+
+            if (!this.currentTxFeeId) return;
+            if (this.feeMap[this.currentTxFeeId]) return;
+
+            // Only calculate the fee once the user has stopped typing for 300ms.
+            const txFeeId = this.currentTxFeeId;
+            await new Promise(r => setTimeout(r, 300));
+            if (this.currentTxFeeId !== txFeeId) return;
+
+            let fee;
+            try {
+                if (this.isPrivate) {
+                    fee = [await $daemon.calcLelantusTxFee(this.satoshiAmount, this.smartFeePerKb, false), null];
+                } else {
+                    fee = [await $daemon.calcPublicTxFee(this.satoshiAmount, false, this.smartFeePerKb), null];
+                }
+            } catch (e) {
+                if (e instanceof FirodErrorResponse) {
+                    fee = [null, e.errorMessage];
+                } else {
+                    fee = [null, `${e}`];
+                }
+            }
+
+            this.$set(this.feeMap, txFeeId, fee);
+        },
+
         marketInfo() {
             if (!this.marketInfo) return;
 
@@ -447,44 +479,6 @@ export default {
 
                 return marketInfo
             }
-        },
-
-        // Returns [number (txfee in satoshi), error (string)], one of which will be null; or undefined if the amount
-        // field is invalid or if it's not a swap from Firo.
-        async firoTransactionFeeAndError() {
-            this.calculatingFiroTransactionFee = true;
-
-            if (!this.isSwapFrom) return;
-
-            // The whole point of this dance is to prevent repeated calls to the daemon, which are unfortunately slow.
-            const satoshiAmount = this.satoshiAmount;
-            const isPrivate = this.isPrivate;
-
-            if (!this.satoshiAmount) return;
-
-            await new Promise(r => setTimeout(r, 500));
-            if (!lodash.isEqual(
-                [satoshiAmount, isPrivate],
-                [this.satoshiAmount, this.isPrivate]
-            )) return;
-
-            if (this.getValidationTooltip('amount').content) return;
-
-            try {
-                if (this.isPrivate) {
-                    return [await $daemon.calcLelantusTxFee(satoshiAmount, this.smartFeePerKb, false), null];
-                } else {
-                    return [await $daemon.calcPublicTxFee(satoshiAmount, false, this.smartFeePerKb), null];
-                }
-            } catch (e) {
-                if (e instanceof FirodErrorResponse) {
-                    return [null, e.errorMessage];
-                } else {
-                    return [null, `${e}`];
-                }
-            } finally {
-                this.calculatingFiroTransactionFee = false;
-            }
         }
     },
 
@@ -496,8 +490,37 @@ export default {
             maxPrivateSend: 'Balance/maxPrivateSend',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
+            isBigWallet: 'Transactions/isBigWallet',
             _smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
+
+        firoTransactionFeeAndError() {
+            return this.feeMap[this.currentTxFeeId];
+        },
+
+        currentTxFeeId() {
+            if (!this.satoshiAmount) return;
+            if (this.useCustomFee && this.getValidationTooltip('txFeePerKb').content) return;
+            if (this.getValidationTooltip('amount').content) return;
+
+            return [
+                this.satoshiAmount,
+                this.txFeePerKb,
+                this.coinControl,
+                this.subtractFeeFromAmount,
+                this.isPrivate
+            ]
+                .map(String)
+                .join("\n");
+        },
+
+        firoTransactionFee() {
+            return this.firoTransactionFeeAndError && this.firoTransactionFeeAndError[0];
+        },
+
+        firoTransactionFeeError() {
+            return this.firoTransactionFeeAndError && this.firoTransactionFeeAndError[1];
+        },
 
         formDisabled() {
             return this.isSwapFrom && (!this.isBlockchainSynced || (this.isPrivate && !this.isLelantusAllowed));
@@ -515,18 +538,6 @@ export default {
             } else {
                 return `${this.xzcPair}AmountDoesntViolateAPILimits`;
             }
-        },
-
-        firoTransactionFee() {
-            if (this.calculatingFiroTransactionFee) return;
-            if (!this.selectedCoin) return;
-            return this.firoTransactionFeeAndError && this.firoTransactionFeeAndError[0];
-        },
-
-        firoTransactionFeeError() {
-            if (this.calculatingFiroTransactionFee) return;
-            if (!this.selectedCoin) return;
-            return this.firoTransactionFeeAndError && this.firoTransactionFeeAndError[1];
         },
 
         smartFeePerKb() {
@@ -629,11 +640,11 @@ export default {
             if (!this.satoshiAmount) return;
 
             if (this.isSwapFrom) {
-                if (!this.firoTransactionFee) return;
+                if (!this.isBigWallet && !this.firoTransactionFee) return;
 
                 const conversionRate = new Big(this.conversionRate);
                 const firoAmount = new Big(this.satoshiAmount) / 1e8;
-                const firoTxFee = new Big(this.firoTransactionFee) / 1e8;
+                const firoTxFee = this.isBigWallet ? 0 : new Big(this.firoTransactionFee) / 1e8;
                 const remoteTransactionFee = new Big(this.remoteTransactionFee);
 
                 const amountToReceive = (firoAmount - firoTxFee) * conversionRate - remoteTransactionFee;
@@ -651,7 +662,7 @@ export default {
         },
 
         canBeginSwapFromFiro() {
-            return !this.calculatingFiroTransactionFee && this.firoTransactionFee && this.selectedCoin && this.amount && this.address && !this.validationErrors.items.length;
+            return (this.isBigWallet || (!this.calculatingFiroTransactionFee && this.firoTransactionFee)) && this.selectedCoin && this.amount && this.address && !this.validationErrors.items.length;
         },
 
         canBeginSwapToFiro() {

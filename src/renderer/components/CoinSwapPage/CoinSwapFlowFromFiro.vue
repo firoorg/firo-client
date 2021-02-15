@@ -108,6 +108,10 @@ export default {
         // an identifier for a specific offer in order to lock-in rates
         signature: {
             type: String
+        },
+
+        isBigWallet: {
+            type: Boolean
         }
     },
 
@@ -136,7 +140,7 @@ export default {
 
             if (!(
                 isPrivate !== undefined && txFeePerKb && remoteCurrency && firoAmount && remoteAmount &&
-                firoTransactionFee && remoteTransactionFee && receiveAddress && expectedRate &&
+                (this.isBigWallet || firoTransactionFee) && remoteTransactionFee && receiveAddress && expectedRate &&
                 // We don't want to fetch records too eagerly, so we check that we're not in the button state before
                 // fetching.
                 show !== 'button'
