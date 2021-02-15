@@ -187,7 +187,6 @@ export interface ApiStatus {
         };
         hasMnemonic: boolean;
         smartFeePerKb: number;
-        hasSentInitialStateWallet: boolean;
     };
     meta: {
         status: number;
@@ -595,7 +594,6 @@ export class Firod {
     private blockchainLoadedEWH: EventWaitHandle<undefined>;
     private hasConnectedEWH: EventWaitHandle<undefined>;
     private initializersCompletedEWH: EventWaitHandle<undefined>;
-    private hasSentStateWalletEWH: EventWaitHandle<undefined>;
     // We resolve with true if firod has shutdown cleanly or false if it has crashed.
     private firodHasShutdown: EventWaitHandle<boolean>
 
@@ -662,7 +660,6 @@ export class Firod {
         this.blockchainLoadedEWH = new EventWaitHandle();
         this.hasConnectedEWH = new EventWaitHandle();
         this.initializersCompletedEWH = new EventWaitHandle();
-        this.hasSentStateWalletEWH = new EventWaitHandle();
         this.firodHasShutdown = new EventWaitHandle();
     }
 
@@ -1044,10 +1041,6 @@ export class Firod {
 
         if (apiStatus.data && apiStatus.data.reindexing === false && apiStatus.data.rescanning === false) {
             await this.blockchainLoadedEWH.release(undefined);
-        }
-
-        if (apiStatus.data && apiStatus.data.hasSentInitialStateWallet) {
-            await this.hasSentStateWalletEWH.release(undefined);
         }
 
         if (this.eventHandlers['apiStatus']) {
@@ -1831,11 +1824,6 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('initial/stateWallet', data);
-    }
-
-    // Wait until the entirety of initialStateWallet has been sent.
-    async awaitStateWallet(): Promise<void> {
-        await this.hasSentStateWalletEWH.block();
     }
 
     // Return the API status, waiting until one is available to return.

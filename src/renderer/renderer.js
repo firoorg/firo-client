@@ -229,13 +229,6 @@ window.$startDaemon = () => new Promise(resolve => {
                     await $quitApp(`An error occurred in our initializers: ${e}`);
                 }
 
-                await $daemon.awaitStateWallet();
-                // Do a fixed wait so that we have time to update to the state wallet entries that have been sent. It's
-                // only required on first load, not any subsequent reloads.
-                if (!store.getters['App/firodHasStarted']) {
-                    await new Promise(r => setTimeout(r, 2e3));
-                }
-
                 logger.info("firod has started.");
                 $setWaitingReason(undefined);
                 store.commit('App/setFirodHasStarted', true);
