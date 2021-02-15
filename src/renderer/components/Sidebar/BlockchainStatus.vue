@@ -38,7 +38,7 @@ export default {
         ...mapGetters({
             network: 'ApiStatus/network',
             connections: 'Blockchain/connections',
-            currentBlockHeight: 'Blockchain/currentBlockHeight',
+            currentBlockHeight: 'ApiStatus/currentBlockHeight',
             estimatedBlockHeight: 'Blockchain/estimatedBlockHeight',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
         })

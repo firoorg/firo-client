@@ -238,7 +238,7 @@ const getters = {
             if (!tx) console.warn(`Unknown transaction ${uniqId} in unspentUTXOs`);
             return tx;
         })
-        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['Blockchain/currentBlockHeight'] + 1),
+        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
 
@@ -285,7 +285,7 @@ const getters = {
     },
 
     mintsInProgress (state, getters, rootState, rootGetters) {
-        const currentBlockHeight = rootGetters['Blockchain/currentBlockHeight'];
+        const currentBlockHeight = rootGetters['ApiStatus/currentBlockHeight'];
         return Object.values(<{[id: string]: TransactionOutput}>getters['transactions'])
             .filter(tx => tx.category === 'mint' && (!tx.blockHeight || currentBlockHeight - tx.blockHeight < 5))
             .map((tx) => {

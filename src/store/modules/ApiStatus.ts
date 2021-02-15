@@ -22,6 +22,7 @@ const actions = {
 
 const getters = {
     apiStatus: (state) => state.apiStatus,
+    currentBlockHeight: (state) => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.blocks : 0,
     // 'main', 'test', or 'regtest'
     network: (state) => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.network : undefined,
     // Do we have an apiStatus?

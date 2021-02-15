@@ -204,7 +204,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            currentBlockHeight: 'Blockchain/currentBlockHeight'
+            currentBlockHeight: 'ApiStatus/currentBlockHeight'
         }),
 
         confirmations() {
