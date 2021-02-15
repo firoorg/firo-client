@@ -15,6 +15,7 @@
                 :fee="computedTxFee"
                 :total="totalAmount"
                 :is-private="isPrivate"
+                :is-big-wallet="isBigWallet"
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
@@ -99,6 +100,11 @@ export default {
         coinControl: {
             required: false,
             type: Array // CoinControl[]
+        },
+
+        isBigWallet: {
+            type: Boolean,
+            required: true
         }
     },
 
