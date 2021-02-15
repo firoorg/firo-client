@@ -212,6 +212,15 @@ export default {
                     _response: response
                 };
 
+                try {
+                    await this.addCoinSwapRecords([this.coinSwapRecord]);
+                } catch(e) {
+                    this.$log.error(`Failed to add CoinSwap record: ${e}`);
+                    this.show = 'error';
+                    this.error = e;
+                    return;
+                }
+
                 this.show = 'info';
                 return;
             }

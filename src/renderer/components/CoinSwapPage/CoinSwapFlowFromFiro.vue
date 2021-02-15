@@ -270,7 +270,14 @@ export default {
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 }
 
-                await this.addCoinSwapRecords([this.coinSwapRecord]);
+                try {
+                    await this.addCoinSwapRecords([this.coinSwapRecord]);
+                } catch(e) {
+                    this.$log.error(`Failed to add CoinSwap record: ${e}`);
+                    this.show = 'error';
+                    this.error = e;
+                    return;
+                }
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
                     this.error = 'Incorrect Passphrase';
