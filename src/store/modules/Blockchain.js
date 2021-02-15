@@ -19,7 +19,9 @@ const state = {
 
 export const mutations = {
     updateBlockchain(state, data) {
-        console.debug(`new block height: ${data.currentBlock.height}`);
+        if (state.currentBlock.height !== data.currentBlock.height) {
+            console.debug(`new block height: ${data.currentBlock.height}`);
+        }
 
         state.currentBlock.height = data.currentBlock.height;
         state.currentBlock.timestamp = data.currentBlock.timestamp;
