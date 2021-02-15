@@ -121,6 +121,9 @@ export default {
         async displayInfo() {
             this.show = 'wait';
 
+            while (!window.$daemon) {
+                await new Promise(r => setTimeout(r, 10));
+            }
             const walletAddress = await $daemon.getUnusedAddress();
 
             try {

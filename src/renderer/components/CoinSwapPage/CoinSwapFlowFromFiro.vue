@@ -129,6 +129,9 @@ export default {
             const show = this.show;
             const signature = this.signature;
 
+            while (!window.$daemon) {
+                await new Promise(r => setTimeout(r, 10));
+            }
             const walletAddress = await $daemon.getUnusedAddress();
 
             if (!(
