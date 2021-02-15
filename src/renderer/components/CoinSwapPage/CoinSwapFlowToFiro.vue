@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="disabled" @click="displayInfo">
+            <button :disabled="disabled" @click="showInfo">
                 Exchange
             </button>
         </div>
@@ -31,6 +31,7 @@ import APIWorker from 'lib/switchain-api';
 import {convertToCoin} from "lib/convert";
 import {mapActions} from "vuex";
 import Big from "big.js";
+import {isValidAddress} from "lib/isValidAddress";
 
 export default {
     name: 'CoinSwapFlowToFiro',
@@ -90,11 +91,6 @@ export default {
         // The expected amount of FIRO we will receive for each remoteCurrency, as a string whole-coin amount.
         expectedRate: {
             type: String
-        },
-
-        // an identifier for a specific offer in order to lock-in rates
-        signature: {
-            type: String
         }
     },
 
@@ -118,36 +114,88 @@ export default {
             if (emitSuccess) this.$emit('success');
         },
 
-        async displayInfo() {
+
+        async showInfo() {
+            if (this.show !== 'button') return;
             this.show = 'wait';
 
+            const pair = `${this.remoteCurrency}-FIRO`;
             while (!window.$daemon) {
                 await new Promise(r => setTimeout(r, 10));
             }
             const walletAddress = await $daemon.getUnusedAddress();
 
-            try {
-                const { error, response } = await this.api.postOrder({
+            let latestError = null;
+            for (let i = 0; i < 10; i++) {
+                const marketInfo = await this.api.getMarketInfo();
+                if (marketInfo.error) {
+                    latestError = `Error fetching market info: ${marketInfo.error}`;
+                    this.$log.error(latestError);
+                    await new Promise(r => setTimeout(r, 1e3));
+                    continue;
+                }
+
+                const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
+                if (!pairInfo) {
+                    this.show = 'error';
+                    this.error = `Pair ${pair} not found in Switchain markets`;
+                    return;
+                }
+
+                const order ={
                     pair: `${this.remoteCurrency}-FIRO`,
                     fromAmount: this.remoteAmount,
                     toAddress: walletAddress,
                     toAmount: this.firoAmount,
                     refundAddress: this.refundAddress,
-                    signature: this.signature
-                });
-                if (error || !response) throw error;
+                    signature: pairInfo.signature
+                };
+
+                this.$log.info("Posting order: %O", order);
+
+                let r;
+                try {
+                    r = await this.api.postOrder(order);
+                } catch (e) {
+                    latestError = `Error posting order: ${e}`;
+                    this.$log.error(latestError);
+                    continue;
+                }
+
+                if (r.error || !r.response) {
+                    latestError = `Got error posting order: ${r.error}`;
+                    this.$log.error(latestError);
+                    continue;
+                }
+
+                const response = r.response;
 
                 // Sanity check response
                 if (
-                    !(new Big(response.fromAmount)).eq(this.remoteAmount) ||
+                    !Big(response.fromAmount).eq(this.remoteAmount) ||
                     response.refundAddress !== this.refundAddress ||
                     response.toAddress !== walletAddress
                 ) {
-                    this.$log.error("Invalid Response: %O", response);
-                    throw 'invalid response from SwitchChain';
+                    latestError = `Invalid Response from Switchain: ${JSON.stringify(response)}`;
+                    this.$log.error(latestError);
+                    continue;
                 }
 
-                this.coinSwapRecord = {
+                const receiveAddressBookData = {
+                    address: walletAddress,
+                    label: `${pair} Swap (Order ${response.orderId})`,
+                    purpose: 'coinswapReceive'
+                };
+                $store.commit('AddressBook/updateAddress', receiveAddressBookData);
+                try {
+                    await $daemon.addAddressBookItem(receiveAddressBookData);
+                } catch (e) {
+                    this.$log.error(`Failed to add address book item: ${e}`);
+                    this.error = `Failed to add address book item: ${e}`;
+                    return;
+                }
+
+                this.coinSwapRecord =  {
                     orderId: response.orderId,
                     fromCoin: this.remoteCurrency,
                     toCoin: 'FIRO',
@@ -164,25 +212,13 @@ export default {
                     _response: response
                 };
 
-                await this.addCoinSwapRecords([this.coinSwapRecord]);
-
-                const refundAddressBookData = {
-                    address: walletAddress,
-                    label: `${this.remoteCurrency}-FIRO Swap (Order ${response.orderId})`,
-                    purpose: 'coinswapReceive'
-                };
-                $store.commit('AddressBook/updateAddress', refundAddressBookData);
-                await $daemon.addAddressBookItem(refundAddressBookData);
-            } catch (e) {
-                this.coinSwapRecord = null;
-                this.error = `${e}`;
-                this.show = 'error';
-
+                this.show = 'info';
                 return;
             }
 
-            this.show = 'info';
-            this.error = null;
+            this.show = 'error';
+            this.error = latestError || 'Uh oh, something went wrong :(';
+            this.$log.error(`Gave up sending to Switchain after 10 errors.`);
         }
     }
 };

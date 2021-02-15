@@ -1,21 +1,21 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="disabled" @click="show = 'info'">
+            <button :disabled="disabled" @click="showInfo">
                 Exchange
             </button>
         </div>
 
         <Popup v-if="show !== 'button'" :margin="show !== 'wait'">
             <CoinSwapInfo
-                v-if="show === 'info' && coinSwapRecord"
+                v-if="show === 'info'"
                 :coin-swap-data="coinSwapRecord"
                 :show-cancel="true"
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
             <PassphraseStep v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
-            <WaitOverlay v-if="show === 'wait' || show === 'info' && !coinSwapRecord" />
+            <WaitOverlay v-if="show === 'wait'" />
             <ErrorStep v-if="show === 'error'" :error="error" @ok="cancel()" />
         </Popup>
     </div>
@@ -53,7 +53,8 @@ export default {
             exchangeAddress: '',
             error: null,
             show: 'button',
-            passphrase: ''
+            passphrase: '',
+            coinSwapRecord: null
         };
     },
 
@@ -105,11 +106,6 @@ export default {
             type: String,
         },
 
-        // an identifier for a specific offer in order to lock-in rates
-        signature: {
-            type: String
-        },
-
         isBigWallet: {
             type: Boolean
         }
@@ -119,111 +115,129 @@ export default {
         this.api = new APIWorker();
     },
 
-    asyncComputed: {
-        async coinSwapRecord() {
-            const isPrivate = this.isPrivate;
-            const txFeePerKb = this.txFeePerKb;
-            const remoteCurrency = this.remoteCurrency;
-            const firoAmount = this.firoAmount;
-            const remoteAmount = this.remoteAmount;
-            const firoTransactionFee = this.firoTransactionFee;
-            const remoteTransactionFee = this.remoteTransactionFee;
-            const receiveAddress = this.receiveAddress;
-            const expectedRate = this.expectedRate;
-            const show = this.show;
-            const signature = this.signature;
-
-            while (!window.$daemon) {
-                await new Promise(r => setTimeout(r, 10));
-            }
-            const walletAddress = await $daemon.getUnusedAddress();
-
-            if (!(
-                isPrivate !== undefined && txFeePerKb && remoteCurrency && firoAmount && remoteAmount &&
-                (this.isBigWallet || firoTransactionFee) && remoteTransactionFee && receiveAddress && expectedRate &&
-                // We don't want to fetch records too eagerly, so we check that we're not in the button state before
-                // fetching.
-                show !== 'button'
-            )) return;
-
-            let response;
-            try {
-                const order = {
-                    pair: `FIRO-${remoteCurrency}`,
-                    toAddress: receiveAddress,
-                    refundAddress: walletAddress,
-                    fromAmount: convertToCoin(firoAmount),
-                    signature
-                };
-
-                this.$log.info("Posting order: %O", order);
-
-                // The API accepts a signature to commit to a specific offer, but it's only valid for 60s and is
-                // therefore unusable practically.
-                const r = await this.api.postOrder(order);
-                if (r.error || !r.response) throw r.error;
-                response = r.response;
-
-                // Sanity check response
-                if (
-                    response.fromAmount !== convertToCoin(firoAmount) ||
-                    response.refundAddress !== walletAddress ||
-                    response.toAddress !== receiveAddress ||
-                    !isValidAddress(response.exchangeAddress, 'main')
-                ) {
-                    this.$log.error("Invalid Response: %O", response);
-                    throw 'invalid response from SwitchChain';
-                }
-
-                // We do this here instead of attemptSend so that the user won't receive to this address again, even if
-                // they don't swap.
-                const refundAddressBookData = {
-                    address: walletAddress,
-                    label: `FIRO-${remoteCurrency} Swap Refund (Order ${response.orderId})`,
-                    purpose: 'coinswapRefund'
-                };
-
-                const sendAddressBookData = {
-                    address: response.exchangeAddress,
-                    label: `FIRO-${remoteCurrency} Swap (Order ${response.orderId})`,
-                    purpose: 'coinswapSend'
-                };
-
-                for (const data of [refundAddressBookData, sendAddressBookData]) {
-                    $store.commit('AddressBook/updateAddress', data);
-                    await $daemon.addAddressBookItem(data);
-                }
-            } catch(e) {
-                this.error = `${e}`;
-                this.show = 'error';
-                return
-            }
-
-            return {
-                orderId: response.orderId,
-                fromCoin: 'FIRO',
-                toCoin: remoteCurrency,
-                sendAmount: response.fromAmount,
-                expectedAmountToReceive: remoteAmount,
-                expectedRate: expectedRate,
-                fromFee: convertToCoin(firoTransactionFee),
-                expectedToFee: remoteTransactionFee,
-                status: 'waiting',
-                date: Date.now(),
-                exchangeAddress: response.exchangeAddress,
-                refundAddress: response.refundAddress,
-                receiveAddress: response.toAddress,
-                _response: response
-            };
-        }
-    },
-
     methods: {
         ...mapActions({
             addCoinSwapRecords: 'CoinSwap/addOrUpdateRecords'
         }),
 
         convertToCoin,
+
+        async showInfo() {
+            if (this.show !== 'button') return;
+            this.show = 'wait';
+
+            const pair = `FIRO-${this.remoteCurrency}`;
+            while (!window.$daemon) {
+                await new Promise(r => setTimeout(r, 10));
+            }
+            const walletAddress = await $daemon.getUnusedAddress();
+
+            let latestError = null;
+            for (let i = 0; i < 10; i++) {
+                const marketInfo = await this.api.getMarketInfo();
+                if (marketInfo.error) {
+                    latestError = `Error fetching market info: ${marketInfo.error}`;
+                    this.$log.error(latestError);
+                    await new Promise(r => setTimeout(r, 1e3));
+                    continue;
+                }
+
+                const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
+                if (!pairInfo) {
+                    this.show = 'error';
+                    this.error = `Pair ${pair} not found in Switchain markets`;
+                    return;
+                }
+
+                const order = {
+                    pair,
+                    toAddress: this.receiveAddress,
+                    refundAddress: walletAddress,
+                    fromAmount: convertToCoin(this.firoAmount),
+                    signature: pairInfo.signature
+                };
+
+                this.$log.info("Posting order: %O", order);
+
+                let r;
+                try {
+                    r = await this.api.postOrder(order);
+                } catch (e) {
+                    latestError = `Error posting order: ${e}`;
+                    this.$log.error(latestError);
+                    continue;
+                }
+
+                if (r.error || !r.response) {
+                    latestError = `Got error posting order: ${r.error}`;
+                    this.$log.error(latestError);
+                    continue;
+                }
+
+                const response = r.response;
+
+                // Sanity check response
+                if (
+                    response.fromAmount !== convertToCoin(this.firoAmount) ||
+                    response.refundAddress !== walletAddress ||
+                    response.toAddress !== this.receiveAddress ||
+                    !isValidAddress(response.exchangeAddress, 'main')
+                ) {
+                    latestError = `Invalid Response from Switchain: ${JSON.stringify(response)}`;
+                    this.$log.error(latestError);
+                    continue;
+                }
+
+                // We do this here instead of attemptSend so that the user won't receive to this address again, even if
+                // they don't swap.
+                const refundAddressBookData = {
+                    address: walletAddress,
+                    label: `${pair} Swap Refund (Order ${response.orderId})`,
+                    purpose: 'coinswapRefund'
+                };
+
+                const sendAddressBookData = {
+                    address: response.exchangeAddress,
+                    label: `${pair} Swap (Order ${response.orderId})`,
+                    purpose: 'coinswapSend'
+                };
+
+                for (const data of [refundAddressBookData, sendAddressBookData]) {
+                    $store.commit('AddressBook/updateAddress', data);
+                    try {
+                        await $daemon.addAddressBookItem(data);
+                    } catch (e) {
+                        this.$log.error(`Failed to add address book item: ${e}`);
+                        this.error = `Failed to add address book item: ${e}`;
+                        return;
+                    }
+                }
+
+                this.coinSwapRecord = {
+                    orderId: response.orderId,
+                    fromCoin: 'FIRO',
+                    toCoin: this.remoteCurrency,
+                    sendAmount: response.fromAmount,
+                    expectedAmountToReceive: this.remoteAmount,
+                    expectedRate: this.expectedRate,
+                    fromFee: convertToCoin(this.firoTransactionFee),
+                    expectedToFee: this.remoteTransactionFee,
+                    status: 'waiting',
+                    date: Date.now(),
+                    exchangeAddress: response.exchangeAddress,
+                    refundAddress: response.refundAddress,
+                    receiveAddress: response.toAddress,
+                    _response: response
+                };
+
+                this.show = 'info';
+                return;
+            }
+
+            this.show = 'error';
+            this.error = latestError || 'Uh oh, something went wrong :(';
+            this.$log.error(`Gave up sending to Switchain after 10 errors.`);
+        },
 
         goToPassphraseStep() {
             this.show = 'passphrase';
