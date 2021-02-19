@@ -8,7 +8,7 @@
 </template>
 
 <script>
-const { shell } = require('electron');
+import {shell} from 'electron';
 
 export default {
     name: "LelantusDisabledHeader",

@@ -116,7 +116,7 @@
                     </label>
 
                     <div class="value">
-                        {{ tx.txid }}
+                        <TransactionId :txid="tx.txid" />
                     </div>
                 </div>
 
@@ -177,6 +177,7 @@ import { format } from 'date-fns'
 import Popup from "renderer/components/shared/Popup";
 import Amount from "renderer/components/shared/Amount";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
+import TransactionId from "renderer/components/shared/TransactionId";
 
 export default {
     name: "TransactionInfo",
@@ -184,7 +185,8 @@ export default {
     components: {
         WaitOverlay,
         Popup,
-        Amount
+        Amount,
+        TransactionId
     },
 
     props: {

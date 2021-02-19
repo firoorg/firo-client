@@ -124,7 +124,10 @@
                         {{ coinSwapData.fromCoin }} Transaction
                     </label>
 
-                    <div class="value">
+                    <div v-if="coinSwapData.fromCoin === 'FIRO'" class="value">
+                        <TransactionId :txid="coinSwapData.depositTxId" />
+                    </div>
+                    <div v-else>
                         {{ coinSwapData.depositTxId }}
                     </div>
                 </div>
@@ -134,7 +137,10 @@
                         {{ coinSwapData.toCoin }} Transaction
                     </label>
 
-                    <div class="value">
+                    <div v-if="coinSwapData.toCoin === 'FIRO'" class="value">
+                        <TransactionId :txid="coinSwapData.outputTxId" />
+                    </div>
+                    <div v-else>
                         {{ coinSwapData.outputTxId }}
                     </div>
                 </div>
@@ -144,7 +150,10 @@
                         {{ coinSwapData.fromCoin }} Refund Transaction
                     </label>
 
-                    <div class="value">
+                    <div v-if="coinSwapData.fromCoin === 'FIRO'" class="value">
+                        <TransactionId :txid="coinSwapData.refundTx" />
+                    </div>
+                    <div v-else>
                         {{ coinSwapData.refundTx }}
                     </div>
                 </div>
@@ -178,11 +187,13 @@
 import { convertToCoin } from 'lib/convert'
 import Amount from "renderer/components/shared/Amount";
 import QRCode from "easyqrcodejs";
+import TransactionId from "renderer/components/shared/TransactionId";
 
 export default {
     name: 'CoinSwapInfo',
 
     components: {
+        TransactionId,
         Amount
     },
 
