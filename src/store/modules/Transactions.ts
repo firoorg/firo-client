@@ -42,8 +42,7 @@ const mutations = {
                             stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
                         }
 
-                        // mined and znode transactions without a blockHeight are orphans.
-                        if (['mined', 'znode'].includes(tx.category) && !tx.blockHeight) {
+                        if (tx.category === 'orphan') {
                             // Delete previous records associated with the transaction.
                             if (stateTransactions[tx.uniqId]) {
                                 logger.silly(`Got orphan ${tx.uniqId}, deleting associated records.`);

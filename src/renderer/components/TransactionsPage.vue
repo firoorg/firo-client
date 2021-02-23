@@ -117,6 +117,7 @@ export default {
                 if (tx.isChange && tx.category !== 'mined') {
                     continue;
                 }
+
                 // Mints are handled separately.
                 if (['mint', 'mintIn'].includes(tx.category)) {
                     continue;
