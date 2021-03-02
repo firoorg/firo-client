@@ -230,7 +230,6 @@ const actions = {
 const getters = {
     // a map of `${txid}-${txIndex}` to the full transaction object returned from firod
     transactions: (state) => state.transactions,
-    isBigWallet: (state, getters): boolean => getters.availableUTXOs.length > 500,
     availableUTXOs: (state, getters, rootState, rootGetters) =>
         Object.keys(state.unspentUTXOs)
         .map(uniqId => {

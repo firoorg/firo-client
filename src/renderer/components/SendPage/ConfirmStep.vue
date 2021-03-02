@@ -35,7 +35,7 @@
                 </div>
             </div>
 
-            <div v-if="!isBigWallet" class="field">
+            <div class="field">
                 <label>
                     Fee
                 </label>
@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <div v-if="!isBigWallet" class="field">
+            <div class="field">
                 <label>
                     Amount to Receive
                 </label>
@@ -109,11 +109,6 @@ export default {
         total: {
             required: true,
             type: Number
-        },
-
-        isBigWallet: {
-            required: true,
-            type: Boolean
         }
     },
 

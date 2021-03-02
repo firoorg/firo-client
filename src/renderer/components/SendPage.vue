@@ -147,7 +147,7 @@
                 </div>
 
                 <div id="bottom">
-                    <div v-if="!isBigWallet" id="totals" class="not-footer">
+                    <div id="totals" class="not-footer">
                         <div class="total-field" id="receive-amount">
                             <label>
                                 Recipient will receive:
@@ -188,7 +188,7 @@
                     </div>
 
                     <SendFlow
-                        :disabled="!isValidated"
+                        :disabled="!canBeginSend"
                         :is-private="isPrivate"
                         :label="label"
                         :address="address"
@@ -197,7 +197,6 @@
                         :computed-tx-fee="transactionFee || 0"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
-                        :is-big-wallet="isBigWallet"
                         class="not-footer"
                         @success="() => (feeMap = {}) && cleanupForm()"
                     />
@@ -274,8 +273,7 @@ export default {
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
-            smartFeePerKb: 'ApiStatus/smartFeePerKb',
-            isBigWallet: 'Transactions/isBigWallet'
+            smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
 
         transactionFeeAndError() {
@@ -351,9 +349,14 @@ export default {
             return this.subtractFeeFromAmount ? this.satoshiAmount : this.satoshiAmount + this.transactionFee;
         },
 
+        // We can begin the send if the fee has been shown and the form is valid.
+        canBeginSend () {
+            return this.isValidated && this.transactionFee > 0 && !this.totalAmountExceedsBalance;
+        },
+
         isValidated () {
             // this.errors was already calculated when amount and address were entered.
-            return this.amount && this.address && (this.isBigWallet || (this.transactionFee > 0 && !this.totalAmountExceedsBalance)) && !this.validationErrors.items.length;
+            return !!(this.amount && this.address && this.transactionFee && !this.validationErrors.items.length);
         },
 
         amountValidations () {
@@ -387,9 +390,6 @@ export default {
 
         // Returns [number (txfee in satoshi), error (string)], one of which will be null.
         async currentTxFeeId() {
-            // It takes too long to calculate transaction fees on big wallets, so we just don't display them to the user.
-            if (this.isBigWallet) return;
-
             if (!this.currentTxFeeId) return;
             if (this.feeMap[this.currentTxFeeId]) return;
 
