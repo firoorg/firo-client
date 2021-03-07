@@ -249,51 +249,6 @@ const getters = {
             .map(uniqId => state.transactions[uniqId])
             .filter(tx => tx.category === 'znode')
             .reduce((a,tx) => a + tx.amount, 0);
-    },
-
-    // a map of blockHeights to {totalMintAmount: number, blockTime: number}, where totalMintAmount is the total amount
-    // minted in that block and blockTime is the blockTime of the block.
-    consolidatedMints: (state) => {
-        // This is recalculated every time state.transactions is updated instead of being cached because the blockHeight
-        // a given transaction is in is not necessarily constant (ie. in the event of a reoganization), which means it's
-        // easier to redo the calculations every time than to look for that case and then invalidate the cache
-        // selectively.
-
-        const consolidatedMints = {};
-
-        for (const tx of Object.values(state.transactions) as TransactionOutput[]) {
-            if (tx.category !== 'mint') {
-                continue;
-            }
-
-            const block = tx.blockHeight || 0;
-
-            if (!consolidatedMints[block]) {
-                consolidatedMints[block] = {
-                    totalMintAmount: 0,
-                    blockTime: tx.blockTime,
-                    mints: []
-                };
-            }
-
-            consolidatedMints[block].mints.push(tx);
-            consolidatedMints[block].totalMintAmount += tx.amount;
-        }
-
-        return consolidatedMints;
-    },
-
-    mintsInProgress (state, getters, rootState, rootGetters) {
-        const currentBlockHeight = rootGetters['ApiStatus/currentBlockHeight'];
-        return Object.values(<{[id: string]: TransactionOutput}>getters['transactions'])
-            .filter(tx => tx.category === 'mint' && (!tx.blockHeight || currentBlockHeight - tx.blockHeight < 5))
-            .map((tx) => {
-                return {
-                    confirmations: tx.blockHeight ? currentBlockHeight - tx.blockHeight + 1 : 0,
-                    amount: tx.amount,
-                    id: tx.uniqId,
-                }
-            })
     }
 };
 
