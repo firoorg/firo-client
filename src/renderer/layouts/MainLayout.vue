@@ -30,6 +30,16 @@ export default {
         Sidebar
     },
 
+    watch: {
+        showPaymentPendingWarning() {
+            window.dispatchEvent(new Event('resize'));
+        },
+
+        isLelantusAllowed() {
+            window.dispatchEvent(new Event('resize'));
+        }
+    },
+
     computed: {
         ...mapGetters({
             showPaymentPendingWarning: 'App/showPaymentPendingWarning',
