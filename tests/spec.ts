@@ -427,15 +427,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.app.client.waitUntilTextExists('.address .label-text', label);
         }
 
-        // [0..num_of_table_entries]
-        const indexes = Array.from({length: (await this.app.client.$$('.address-book-item-editable-label')).length},(a, i) => i)
-
-        // We don't want to shuffle because it may equal indexes, and we don't want to reverse because there might be a
-        // bug that causes things to appear in reverse order.
-        const rearrage = x => [...x.splice(x.length/2), ...x.splice(0, x.length/2+1)].splice(addressLabels.length);
-        for (const i of rearrage(indexes)) {
+        const shuffledIndexes = lodash.shuffle(addressLabels.map((_, i) => i));
+        for (const i of shuffledIndexes) {
             const newLabel = String(Math.random());
-            addressLabels[i][1] = newLabel;
+            addressLabels[i][0] = newLabel;
 
             await (await this.app.client.$$('.address-book-item-editable-label a'))[i].click();
             const inputElement = await this.app.client.$('.address-book-item-editable-label input');
@@ -446,15 +441,18 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
 
         await (await this.app.client.$('a[href="#/send"]')).click();
+        await (await this.app.client.$('#send-page')).waitForExist();
         await (await this.app.client.$('a[href="#/receive"]')).click();
+        await (await this.app.client.$('.address .loaded')).waitForExist();
 
-        const actualLabels = (await this.app.client.$$('.animated-table .address-book-item-editable-label a'));
-        const actualAddresses = (await this.app.client.$$('.address-book-item-address'));
+        const actualLabels = await this.app.client.$$('.animated-table .address-book-item-editable-label a');
+        const actualAddresses = await this.app.client.$$('.address-book-item-address');
         assert.isAtLeast(actualLabels.length, addressLabels.length);
         assert.isAtLeast(actualAddresses.length, addressLabels.length);
         for (const [i, [label, address]] of Object.entries(addressLabels)) {
-            assert.equal(await actualAddresses[i].getText(), address);
-            assert.equal(await actualLabels[i].getText(), label);
+            if (!actualAddresses[i+1]) break;
+            assert.equal(await actualAddresses[i+1].getText(), address);
+            assert.equal(await actualLabels[i+1].getText(), label);
         }
     });
 
