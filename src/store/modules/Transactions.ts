@@ -36,7 +36,7 @@ const mutations = {
                             logger.warn(`Got 0 amount transaction ${tx.uniqId}`);
                         }
 
-                        if (tx.spendableAt === undefined || tx.spendableAt === -1 || tx.locked) {
+                        if (tx.category === 'orphan' || tx.spendableAt === undefined || tx.spendableAt === -1 || tx.locked) {
                             delete stateUnspentUTXOs[tx.uniqId];
                         } else {
                             stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
