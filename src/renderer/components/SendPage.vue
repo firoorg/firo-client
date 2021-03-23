@@ -423,6 +423,10 @@ export default {
             }
         },
 
+        subtractFeeFromAmount() {
+            this.$validator.validate('amount');
+        },
+
         useCustomInputs() {
             if (this.useCustomInputs) {
                 this.showCustomInputSelector = true;
