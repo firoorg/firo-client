@@ -10,13 +10,18 @@
 
                 <div class="right">
                     <div class="show-all-znodes">
-                        <input type="checkbox" v-model="showAllZnodes"" />
+                        <input type="checkbox" v-model="showAllZnodes" />
                         <label>SHOW ALL MASTERNODES</label>
                     </div>
 
                     <div class="node-count">
                         <label>NODE COUNT:</label>
                         <div class="value">{{ Object.keys(masternodes).length }}</div>
+                    </div>
+
+                    <div class="my-node-count">
+                        <label>MY NODES:</label>
+                        <div class="value">{{ myNodeCount }}</div>
                     </div>
                 </div>
             </div>
@@ -79,6 +84,10 @@ export default {
     },
 
     computed: {
+        myNodeCount() {
+            return Object.values(this.masternodes).filter(masternode => masternode.wallet.hasMasternode).length;
+        },
+
         filteredTableData() {
             [this.filter, this.showAllZnodes];
 
@@ -145,10 +154,18 @@ export default {
                 position: relative;
                 float: right;
 
-                .show-all-znodes, .node-count {
+                div {
                     display: inline-block;
 
+                    &:not(:last-child) {
+                        margin-right: $size-medium-space;
+                    }
+
                     label {
+                        @include label();
+                    }
+
+                    .value {
                         @include label();
                     }
 
@@ -158,16 +175,8 @@ export default {
                 }
 
                 .show-all-znodes {
-                    margin-right: $size-large-space;
-
                     label {
                         color: $color-text-accent;
-                    }
-                }
-
-                .node-count {
-                    .value {
-                        @include label();
                     }
                 }
             }
