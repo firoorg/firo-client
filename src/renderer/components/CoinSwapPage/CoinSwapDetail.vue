@@ -192,7 +192,7 @@
                 />
 
                 <div class="footer">
-                    <PrivatePublicBalance v-model="isPrivate" :disabled="!isSwapFrom || formDisabled" />
+                    <PrivatePublicBalance v-model="isPrivate" :disabled="!isSwapFrom || !this.isBlockchainSynced" />
                 </div>
             </div>
         </div>
