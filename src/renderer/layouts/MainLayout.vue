@@ -1,7 +1,7 @@
 <template>
     <div id="main-layout">
-        <AwaitingAnonymizationHeader v-if="showPaymentPendingWarning" />
-        <LelantusDisabledHeader v-else-if="!isLelantusAllowed" />
+        <LelantusDisabledHeader v-if="!isLelantusAllowed" />
+        <AwaitingAnonymizationHeader v-else-if="showPaymentPendingWarning" />
 
         <div id="main-content" :class="{'has-header': hasHeader}">
             <Sidebar id="sidebar" />
