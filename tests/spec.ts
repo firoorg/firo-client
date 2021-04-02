@@ -384,7 +384,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('.anonymize-dialog button.confirm')).click();
         await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
 
-        await publicBalanceElement.waitForExist({reverse: true});
+        await this.app.client.waitUntil(async () =>
+            !await publicBalanceElement.isExisting() || convertToSatoshi(await publicBalanceElement.getText()) < 0.001e8,
+            {timeoutMsg: "public balance should be below 0.001 FIRO"}
+        );
         await this.app.client.waitUntil(async () =>
             convertToSatoshi(await pendingBalanceElement.getText()) > originalPublicBalance + originalPendingBalance - 0.1e8,
             {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds"}
