@@ -12,6 +12,7 @@
                 :row-transition-name="rowTransition"
                 :no-data-template="noDataMessage"
                 v-bind="{ scopedSlots: $scopedSlots }"
+                :row-class="rowClass"
                 @vuetable:pagination-data="onPaginationData"
                 @vuetable:row-clicked="onRowClick"
                 @vuetable:field-event="(ev) => $emit('field-event', ev)"
@@ -88,6 +89,10 @@ export default {
         compareElements: {
             type: Function,
             default: (a, b) => a === b
+        },
+        rowClass: {
+            type: Function | String,
+            default: ''
         },
         globalData: {
             type: Object,

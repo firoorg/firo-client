@@ -122,3 +122,19 @@ $disabled-input-opacity: 0.3;
         }
     }
 }
+@mixin buttons-vertical-container {
+    display: flex;
+    flex-flow: column;
+
+    button {
+        @include button();
+    }
+
+    * {
+        height: 30px;
+
+        &:not(:first-child) {
+            margin-top: $size-small-space;
+        }
+    }
+}

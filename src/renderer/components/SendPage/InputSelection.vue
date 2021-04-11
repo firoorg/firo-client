@@ -1,11 +1,16 @@
 <template>
     <div>
+        <div v-if="showBreakingMasternodeWarning" class="breaking-masternode-warning">
+            Crossed out transactions are used as masternode collateral. Using them will break the associated node.
+        </div>
+
         <AnimatedTable
             ref="vuetable"
             :data="ourUnspentUTXOs"
             :fields="fields"
             :anti-overflow-hack="true"
             :global-data="selectionData"
+            :row-class="lockedClassOfRow"
             track-by="uniqId"
         />
     </div>
@@ -14,7 +19,6 @@
 <script>
 // $emits: input
 import {mapGetters} from "vuex";
-import {cloneDeep} from "lodash";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
 import TxIdIndex from "renderer/components/AnimatedTable/TxId";
@@ -44,6 +48,7 @@ export default {
 
     data() {
         return {
+            allowSendingLockedCoins: false,
             selectionData: {},
             fields: [
                 {name: UTXOSelector},
@@ -59,6 +64,10 @@ export default {
             availableUTXOs: 'Transactions/availableUTXOs'
         }),
 
+        showBreakingMasternodeWarning() {
+            return !!this.ourUnspentUTXOs.find(coin => coin.locked);
+        },
+
         selectedCoins() {
             return Object.entries(this.selectionData)
                 .filter(([k, v]) => !!v)
@@ -72,6 +81,12 @@ export default {
         }
     },
 
+    methods: {
+        lockedClassOfRow(row) {
+            return row.locked ? 'locked' : 'unlocked';
+        }
+    },
+
     watch: {
         selectedCoins() {
             this.$emit('input', this.selectedCoins);
@@ -80,8 +95,21 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+@import "src/renderer/styles/typography";
+@import "src/renderer/styles/sizes";
+
+.breaking-masternode-warning {
+    @include guidance();
+    text-align: center;
+    margin-bottom: $size-medium-space;
+}
+
 .animated-table {
     min-width: 50vw;
+
+    .locked {
+        text-decoration: line-through;
+    }
 }
 </style>

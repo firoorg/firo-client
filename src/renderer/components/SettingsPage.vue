@@ -23,27 +23,26 @@
 
         <hr class="hr1" />
 
-        <div class="pure-buttons">
-            <button @click="openBackupDialog">
-                Backup Wallet
-            </button>
+        <button class="backup-wallet" @click="openBackupDialog">
+            Backup Wallet
+        </button>
 
-            <button @click="redoSetup">
-                Redo Setup
-            </button>
+        <button class="redo-setup" @click="redoSetup">
+            Redo Setup
+        </button>
+
+        <div class="use-tor">
+            <input type="checkbox" v-model="useTor" />
+            <label>
+                Connect to Other Nodes via Tor
+            </label>
         </div>
 
-        <div class="tor-settings">
-            <div class="guidance">
-                Enabling Tor will increase your anonymity by hiding the IP address you connect to the Firo network with.
-            </div>
-
-            <div class="tor-checkbox-line">
-                <input type="checkbox" v-model="useTor" />
-                <label>
-                    Connect to Other Nodes via Tor
-                </label>
-            </div>
+        <div class="allow-breaking-masternodes">
+            <input type="checkbox" v-model="allowBreakingMasternodes" />
+            <label>
+                Allow Coin Control to Break Masternodes
+            </label>
         </div>
 
         <hr class="hr2" />
@@ -87,7 +86,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapGetters, mapMutations} from 'vuex'
 import {remote} from 'electron';
 import Popup from 'renderer/components/shared/Popup';
 import ErrorStep from "./SendPage/ErrorStep";
@@ -110,7 +109,8 @@ export default {
     computed: {
         ...mapGetters({
             apiStatus: 'ApiStatus/apiStatus',
-            hasMnemonic: 'ApiStatus/hasMnemonic'
+            hasMnemonic: 'ApiStatus/hasMnemonic',
+            _allowBreakingMasternodes: 'App/allowBreakingMasternodes'
         }),
 
         passphrasesMatch () {
@@ -119,6 +119,16 @@ export default {
 
         canChangePassphrase () {
             return this.currentPassphrase && this.newPassphrase && (this.newPassphrase === this.confirmNewPassphrase);
+        },
+
+        allowBreakingMasternodes: {
+            get() {
+                return this._allowBreakingMasternodes;
+            },
+
+            set(value) {
+                this.setAllowBreakingMasternodes(value);
+            }
         }
     },
 
@@ -149,6 +159,10 @@ export default {
     },
 
     methods: {
+        ...mapMutations({
+            setAllowBreakingMasternodes: 'App/setAllowBreakingMasternodes'
+        }),
+
         showPassphrase() {
             this.showDetail = 'passphrase';
             this.mnemonicWords = [];
@@ -240,22 +254,26 @@ export default {
 .settings-page {
     padding: $size-main-margin;
     display: grid;
+    align-items: center;
     grid-template-columns: 2fr 4fr 1fr;
     grid-template-areas: "header         header"
                          "hr1            hr1"
-                         "pure-buttons   tor-settings"
+                         "backup-wallet  use-tor"
+                         "redo-setup     allow-breaking-masternodes"
                          "hr2            hr2"
                          "detail-buttons detail";
 
-    .pure-buttons, .detail-buttons {
+    .backup-wallet, .redo-setup, .detail-buttons {
         padding-right: $size-main-margin;
     }
 
-    .tor-settings, .detail {
+    .use-tor, .allow-breaking-masternodes, .detail {
         padding-left: $size-main-margin;
     }
 
     button {
+        @include button();
+        height: 30px;
         width: $size-medium-button-width;
     }
 
@@ -283,18 +301,13 @@ export default {
         grid-area: header;
     }
 
-    .pure-buttons {
-        grid-area: pure-buttons;
-        @include buttons-vertical-container();
-    }
+    .backup-wallet {grid-area: backup-wallet;}
+    .redo-setup {grid-area: redo-setup;}
+    .allow-breaking-masternodes {grid-area: allow-breaking-masternodes;}
+    .use-tor {grid-area: use-tor;}
 
-    .tor-settings {
-        grid-area: tor-settings;
-
-        .guidance {
-            @include guidance();
-            margin-bottom: $size-between-field-space-medium;
-        }
+    .backup-wallet, .use-tor {
+        margin-bottom: $size-between-field-space-medium
     }
 
     .detail-buttons {

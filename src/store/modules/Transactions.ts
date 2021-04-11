@@ -36,7 +36,7 @@ const mutations = {
                             logger.warn(`Got 0 amount transaction ${tx.uniqId}`);
                         }
 
-                        if (tx.category === 'orphan' || tx.spendableAt === undefined || tx.spendableAt === -1 || tx.locked) {
+                        if (tx.category === 'orphan' || tx.spendableAt === undefined || tx.spendableAt === -1) {
                             delete stateUnspentUTXOs[tx.uniqId];
                         } else {
                             stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
@@ -237,6 +237,7 @@ const getters = {
             if (!tx) console.warn(`Unknown transaction ${uniqId} in unspentUTXOs`);
             return tx;
         })
+        .filter(tx => rootGetters['App/allowBreakingMasternodes'] || !tx.locked)
         .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,

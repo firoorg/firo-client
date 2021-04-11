@@ -16,7 +16,8 @@ const state = {
     // This is the value read from our configuration, not what is given to us in APIStatus.
     firoClientNetwork: null,
     waitingReason: 'Loading...',
-    firodHasStarted: false
+    firodHasStarted: false,
+    allowBreakingMasternodes: false
 }
 
 const mutations = {
@@ -78,6 +79,10 @@ const mutations = {
 
     setCachedMnemonic(state, value) {
         state.cachedMnemonic = value;
+    },
+
+    setAllowBreakingMasternodes(state, value) {
+        state.allowBreakingMasternodes = value;
     }
 }
 
@@ -98,6 +103,7 @@ const actions = {
 }
 
 const getters = {
+    allowBreakingMasternodes: (state) => state.allowBreakingMasternodes,
     defaultFiroRootDirectory: () => {
         switch (process.platform) {
         // This is the ID for *all* Windows versions
