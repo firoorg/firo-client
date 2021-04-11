@@ -12,7 +12,7 @@ interface This extends Mocha.Context {
     app: Application
 }
 
-if (process.env.BUILD_FIRO_CLIENT) {
+if (!process.env.NO_BUILD) {
     before(async function () {
         this.timeout(1000e3); // Make sure we have enough time to build our app.
         await require('../electron-vue/build');
