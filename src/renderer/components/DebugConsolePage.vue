@@ -358,8 +358,8 @@ export default {
             }
         },
 
-        resetclientconfig() {
-            this.$store.commit('App/setIsInitialized', false);
+        async resetclientconfig() {
+            await this.$store.dispatch('App/setIsInitialized', false);
             this.$nextTick($quitApp);
         }
     }

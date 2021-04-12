@@ -243,7 +243,7 @@ window.$startDaemon = () => new Promise(resolve => {
                 logger.info("firod has started.");
                 $setWaitingReason(undefined);
                 store.commit('App/setFirodHasStarted', true);
-                store.commit('App/setIsInitialized', true);
+                await store.dispatch('App/setIsInitialized', true);
                 resolve();
             } else {
                 // Direct the user to the lock wallet screen. We will never resolve(), but that shouldn't matter.

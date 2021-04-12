@@ -207,7 +207,7 @@ export default {
             $setWaitingReason(undefined);
 
             this.$log.info("Marking app as initialized...");
-            this.$store.commit('App/setIsInitialized', true);
+            await this.$store.dispatch('App/setIsInitialized', true);
 
             await this.$router.push('/main');
         }

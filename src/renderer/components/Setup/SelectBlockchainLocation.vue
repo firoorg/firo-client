@@ -163,10 +163,10 @@ export default {
             }
 
             this.$log.info(`Setting firoClientNetwork: ${this.network}`);
-            this.$store.commit('App/setFiroClientNetwork', this.network);
+            await this.$store.dispatch('App/setFiroClientNetwork', this.network);
 
             this.$log.info(`Setting blockchain location: ${this.dataDir}`);
-            this.$store.commit('App/setBlockchainLocation', this.dataDir);
+            await this.$store.dispatch('App/setBlockchainLocation', this.dataDir);
 
             // Wait for our updates to propagate to the store so it can be used by $startDaemon. sigh.
             await new Promise(async (resolve) => {

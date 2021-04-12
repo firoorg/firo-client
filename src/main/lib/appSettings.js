@@ -1,19 +1,27 @@
-import { getAppSettings } from 'lib/utils'
+import { getAppSettings } from 'lib/utils';
 
-import { createLogger } from 'lib/logger'
-const logger = createLogger('firo:appSettings')
+export const populateStoreWithAppSettings = async function ({store}) {
+    const appSettings = getAppSettings();
+    const settings = await appSettings.getAll();
 
-export const populateStoreWithAppSettings = async function ({ store }) {
-    for (const [categoryKey, value] of Object.entries(await getAppSettings().getAll())) {
-        logger.info(`key ${categoryKey} with value ${value}`);
+    // Migrate legacy names.
+    if (!settings.isInitialized && settings['app.SET_IS_INITIALIZED']) {
+        settings.isInitialized = settings['app.SET_IS_INITIALIZED'];
+        settings.network = settings['app.SET_ZCOIN_CLIENT_NETWORK'];
+        settings.blockchainLocation = settings['app.SET_BLOCKCHAIN_LOCATION'];
 
-        const action = categoryKey[0].toUpperCase() + categoryKey.substr(1).replace('.', '/');
+        await appSettings.set('app.SET_IS_INITIALIZED', false);
+        await appSettings.set('app.SET_ZCOIN_CLIENT_NETWORK', false);
+        await appSettings.set('app.SET_BLOCKCHAIN_LOCATION', false);
 
-        if (!store._actions[action]) {
-            logger.warn(`Ignoring unknown setting: ${action}`);
-            continue;
-        }
+        await appSettings.set('isInitialized', settings.isInitialized);
+        await appSettings.set('network', settings.network);
+        await appSettings.set('blockchainLocation', settings.blockchainLocation);
+    }
 
-        await store.dispatch(action, value);
+    if (settings.isInitialized) {
+        store.commit('App/setFiroClientNetwork', settings.network);
+        store.commit('App/setBlockchainLocation', settings.blockchainLocation);
+        store.commit('App/setIsInitialized', settings.isInitialized);
     }
 };

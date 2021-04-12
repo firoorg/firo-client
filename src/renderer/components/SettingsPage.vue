@@ -238,7 +238,7 @@ export default {
                 return;
             }
 
-            this.$store.commit('App/setIsInitialized', false);
+            await this.$store.dispatch('App/setIsInitialized', false);
             await $quitApp();
         }
     },

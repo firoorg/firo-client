@@ -21,35 +21,17 @@ const state = {
 }
 
 const mutations = {
-    // This is called when app settings are read. It DOES NOT persist information to disk itself. (cf. setIsInitialized)
-    // We will cause MainLayout.vue to stop showing IntroScreen.
-    SET_IS_INITIALIZED (state, value) {
-        state.isInitialized = value;
-    },
-
-    // This is called when app settings are read. It DOES NOT persist information itself. (cf. changeBlockchainLocation)
-    SET_BLOCKCHAIN_LOCATION (state, location) {
-        state.blockchainLocation = location;
-    },
-
-    // This is called when app settings are read. It DOES NOT persist information itself. (cf. setFiroClientNetwork)
-    SET_ZCOIN_CLIENT_NETWORK (state, network) {
-        state.firoClientNetwork = network;
-    },
-
     setFiroClientNetwork(state, network) {
         if (!["test", "mainnet", "regtest"].includes(network)) {
             throw `unknown network type: ${network}`;
         }
 
         state.firoClientNetwork = network;
-        getAppSettings().set('app.SET_ZCOIN_CLIENT_NETWORK', network);
     },
 
     // Mark down the blockchain location in settings.
     setBlockchainLocation(state, newLocation) {
         state.blockchainLocation = newLocation
-        getAppSettings().set(`app.SET_BLOCKCHAIN_LOCATION`, newLocation);
     },
 
     // Mark down that we have been initialized in settings. This will cause MainLayout.vue to stop showing IntroScreen.
@@ -65,7 +47,6 @@ const mutations = {
         }
 
         state.isInitialized = isInitialized;
-        getAppSettings().set(`app.SET_IS_INITIALIZED`, isInitialized);
     },
 
     // This determines whether WaitingScreen will be shown from MainLayout.
@@ -87,18 +68,19 @@ const mutations = {
 }
 
 const actions = {
-    async SET_IS_INITIALIZED({commit}, value) {
-        commit('SET_IS_INITIALIZED', value);
+    async setIsInitialized({commit}, value) {
+        await getAppSettings().set('isInitialized', value);
+        commit('setIsInitialized', value);
     },
 
-    // This is called when app settings are read. It DOES NOT set the blockchain location itself.
-    async SET_BLOCKCHAIN_LOCATION ({commit}, location) {
-        commit('SET_BLOCKCHAIN_LOCATION', location);
+    async setFiroClientNetwork({commit}, value) {
+        await getAppSettings().set('network', value);
+        commit('setFiroClientNetwork', value);
     },
 
-    // This is called when app settings are read. It DOES NOT set the blockchain location itself.
-    async SET_ZCOIN_CLIENT_NETWORK ({commit}, network) {
-        commit('SET_ZCOIN_CLIENT_NETWORK', network);
+    async setBlockchainLocation({commit}, value) {
+        await getAppSettings().set('blockchainLocation', value);
+        commit('setBlockchainLocation', value);
     }
 }
 
