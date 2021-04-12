@@ -65,8 +65,14 @@ NOT be stopped automatically on exit.
 ### Forcing Reinitialization
 
 If you want to reinitialize the client and don't want to use the `resetclientconfig` command in the debug console, you
-can set the enviornment variable `REINITIALIZE_FIRO_CLIENT` to `true`. If this is set, Firo Client will show the setup
-screen on startup regardless of whether it has already been initialized.
+can set the enviornment variable `IS_INITIALIZED` to `0`. If this is set, Firo Client will show the setup screen on
+startup regardless of whether it has already been initialized.
+
+### Setting Network from the Command Line
+
+You can set `NETWORK` and `BLOCKCHAIN_LOCATION` environment variables to change the blockchain location temporarily.
+`NETWORK` can be `main`, `regtest`, or `test`; `BLOCKCHAIN_LOCATION` should be the fully qualified path of the
+blockchain *excluding* the `regtest` or `testnet3` parts.
 
 ### Connecting to an Existing Firod
 

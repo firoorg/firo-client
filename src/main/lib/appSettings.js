@@ -19,6 +19,14 @@ export const populateStoreWithAppSettings = async function ({store}) {
         await appSettings.set('blockchainLocation', settings.blockchainLocation);
     }
 
+    if (process.env.NETWORK) settings.network = process.env.NETWORK;
+    if (process.env.BLOCKCHAIN_LOCATION) settings.blockchainLocation = process.env.BLOCKCHAIN_LOCATION;
+    if (process.env.IS_INITIALIZED) {
+        settings.isInitialized = !!JSON.parse(process.env.IS_INITIALIZED);
+    } else if (process.env.NETWORK && process.env.BLOCKCHAIN_LOCATION) {
+        settings.isInitialized = true;
+    }
+
     if (settings.isInitialized) {
         store.commit('App/setFiroClientNetwork', settings.network);
         store.commit('App/setBlockchainLocation', settings.blockchainLocation);

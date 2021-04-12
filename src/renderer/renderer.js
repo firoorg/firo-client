@@ -271,8 +271,7 @@ if (process.env.FIRO_CLIENT_REPL === 'true') {
 
     ourWindow.webContents.openDevTools();
 } else if (store.getters['App/isInitialized'] &&
-           existsSync(store.getters['App/walletLocation']) &&
-           process.env.REINITIALIZE_FIRO_CLIENT !== 'true') {
+           existsSync(store.getters['App/walletLocation'])) {
     startVue();
     ourWindow.show();
     $startDaemon().then(async () => {
