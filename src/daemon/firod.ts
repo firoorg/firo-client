@@ -633,6 +633,8 @@ export class Firod {
     runInitializersIfFirodIsRunning: boolean = false;
     // This is the number of seconds to wait before signalling firod as unresponsive.
     connectionTimeout: number = 30;
+    // Extra arguments to be passed to firod
+    extraFirodArgs: string[] = [];
 
     // firodLocation is the location of the firod binary.
     //
@@ -821,7 +823,7 @@ export class Firod {
             }
 
             // These are the arguments that will be passed to firod.
-            const args = ["-clientapi=1"];
+            const args = [...this.extraFirodArgs, "-clientapi=1"];
 
             if (process.platform === "win32") {
                 args.push("-daemon=0");

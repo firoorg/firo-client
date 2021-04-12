@@ -116,6 +116,12 @@ export default {
                     shortHelp: 'help [command]',
                     longHelp: 'List all commands, or get help for a specified command.',
                     cmd: async (commandline) => await this.help(commandline)
+                },
+
+                setargsfornextrun: {
+                    shortHelp: 'setargsfornextrun [...args]',
+                    longHelp: 'Set arguments to be passed to firod on the next run.',
+                    cmd: async (commandline)  => await this.setargsfornextrun(commandline)
                 }
             }
         }
@@ -361,6 +367,11 @@ export default {
         async resetclientconfig() {
             await this.$store.dispatch('App/setIsInitialized', false);
             this.$nextTick($quitApp);
+        },
+
+        async setargsfornextrun(commandline) {
+            await this.$store.dispatch('App/setTemporaryFirodArguments', commandline.split(' '));
+            return '';
         }
     }
 }

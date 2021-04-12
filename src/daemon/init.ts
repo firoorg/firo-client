@@ -6,8 +6,9 @@ import { Firod, MnemonicSettings } from './firod';
 // giving an error if there is an existing firod instance running OR the wallet is unlocked, we will connect to it
 // without running initializers.
 async function firod(store: any, network: 'mainnet' | 'test' | 'regtest', firodLocation: string, firodDataDir: string,
-                      mnemonicSettings?: MnemonicSettings, allowMultipleFirodInstances?: boolean,
-                      runInitializersIfFirodIsRunning?: boolean, connectionTimeout?: number): Promise<Firod> {
+                     mnemonicSettings?: MnemonicSettings, allowMultipleFirodInstances?: boolean,
+                     runInitializersIfFirodIsRunning?: boolean, connectionTimeout?: number,
+                     extraArgs?: []): Promise<Firod> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
@@ -50,6 +51,7 @@ async function firod(store: any, network: 'mainnet' | 'test' | 'regtest', firodL
         }
     }
     const firod = new Firod(network, firodLocation, firodDataDir, initializers, eventHandlers);
+    firod.extraFirodArgs = extraArgs;
     firod.allowMultipleFirodInstances = !!allowMultipleFirodInstances;
     firod.runInitializersIfFirodIsRunning = !!runInitializersIfFirodIsRunning;
     if (connectionTimeout) firod.connectionTimeout = connectionTimeout;

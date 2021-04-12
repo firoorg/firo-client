@@ -21,10 +21,16 @@ export const populateStoreWithAppSettings = async function ({store}) {
 
     if (process.env.NETWORK) settings.network = process.env.NETWORK;
     if (process.env.BLOCKCHAIN_LOCATION) settings.blockchainLocation = process.env.BLOCKCHAIN_LOCATION;
+    if (process.env.FIROD_ARGS) settings.temporaryFirodArguments = process.env.FIROD_ARGS.split(' ');
     if (process.env.IS_INITIALIZED) {
         settings.isInitialized = !!JSON.parse(process.env.IS_INITIALIZED);
     } else if (process.env.NETWORK && process.env.BLOCKCHAIN_LOCATION) {
         settings.isInitialized = true;
+    }
+
+    if (settings.temporaryFirodArguments) {
+        await appSettings.set('temporaryFirodArguments', false);
+        store.commit('App/setTemporaryFirodArguments', settings.temporaryFirodArguments)
     }
 
     if (settings.isInitialized) {

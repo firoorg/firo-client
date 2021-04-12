@@ -192,7 +192,8 @@ window.$startDaemon = () => new Promise(resolve => {
         store.getters['App/blockchainLocation'] || null, undefined,
         store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD === "true",
         !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_FIROD === "true",
-        process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined)
+        process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined,
+        store.getters['App/temporaryFirodArguments'] || [])
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;

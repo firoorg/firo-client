@@ -17,7 +17,8 @@ const state = {
     firoClientNetwork: null,
     waitingReason: 'Loading...',
     firodHasStarted: false,
-    allowBreakingMasternodes: false
+    allowBreakingMasternodes: false,
+    temporaryFirodArguments: []
 }
 
 const mutations = {
@@ -47,6 +48,10 @@ const mutations = {
         }
 
         state.isInitialized = isInitialized;
+    },
+
+    setTemporaryFirodArguments(state, args) {
+        state.temporaryFirodArguments = args || [];
     },
 
     // This determines whether WaitingScreen will be shown from MainLayout.
@@ -81,10 +86,16 @@ const actions = {
     async setBlockchainLocation({commit}, value) {
         await getAppSettings().set('blockchainLocation', value);
         commit('setBlockchainLocation', value);
+    },
+
+    async setTemporaryFirodArguments({commit}, value) {
+        await getAppSettings().set('temporaryFirodArguments', value);
+        commit('setTemporaryFirodArguments', value);
     }
 }
 
 const getters = {
+    temporaryFirodArguments: (state) => state.temporaryFirodArguments,
     allowBreakingMasternodes: (state) => state.allowBreakingMasternodes,
     defaultFiroRootDirectory: () => {
         switch (process.platform) {
