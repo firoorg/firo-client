@@ -1,6 +1,6 @@
 import {cloneDeep, merge} from 'lodash';
 import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem, CoinControl} from '../../daemon/firod';
-
+import Vue from "vue";
 import { createLogger } from '../../lib/logger'
 const logger = createLogger('firo:store:Transactions');
 
@@ -155,6 +155,14 @@ const mutations = {
         for (const uniqId of Object.keys(state.transactions).filter(k => inputs.find(i => k.includes(`${i[0]}-${i[1]}`)))) {
             logger.debug(`Marking txout ${uniqId} as used.`);
             delete state.unspentUTXOs[uniqId];
+        }
+    },
+
+    markLockedTransaction(state, {txout: [txid, txIndex], locked}) {
+        for (const tx of <TransactionOutput[]>Object.values(state.transactions)) {
+            if (tx.txid === txid && tx.txIndex == txIndex) {
+                Vue.set(tx, 'locked', locked);
+            }
         }
     }
 };
