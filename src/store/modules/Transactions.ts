@@ -249,7 +249,7 @@ const getters = {
         .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1),
     addressBook: (state) => state.addressBook,
     walletLoaded: (state) => state.walletLoaded,
-
+    lockedTransactions: (state) => Object.values(state.transactions).filter((tx: TransactionOutput) => tx.locked),
     // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
     addresses: (state) => state.addresses,
 

@@ -104,7 +104,9 @@ export default {
 
     computed: {
         ...mapGetters({
-            addressBook: 'AddressBook/addressBook'
+            addressBook: 'AddressBook/addressBook',
+            lockedTransactions: 'Transactions/lockedTransactions',
+            allowBreakingMasternodes: 'App/allowBreakingMasternodes'
         }),
 
         totalAmount() {
@@ -134,6 +136,13 @@ export default {
 
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else {
+                    if (this.coinControl && this.allowBreakingMasternodes) {
+                        const lockedCoins = this.coinControl.filter(coin =>
+                            this.lockedTransactions.find(tx => tx.txid === coin[0] && tx.txIndex === coin[1])
+                        );
+                        await $daemon.updateCoinLocks(passphrase, [], lockedCoins);
+                    }
+
                     const r = await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, this.coinControl);
 
