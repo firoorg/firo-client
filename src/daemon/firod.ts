@@ -1434,13 +1434,13 @@ export class Firod {
     }
 
     // Lock the coins in lockedCoins, and unlock the ones in unlockedCoins.
-    async updateCoinLocks(auth: string, lockedCoins: CoinControl, unlockedCoins: CoinControl): Promise<string> {
+    async updateCoinLocks(auth: string, lockedCoins: CoinControl, unlockedCoins: CoinControl): Promise<boolean> {
         const data = await this.send(auth, 'create', 'lockCoins', {
             lockedCoins: coinControlToString(lockedCoins),
             unlockedCoins: coinControlToString(unlockedCoins)
         });
 
-        if (typeof data === 'string') {
+        if (typeof data === "boolean") {
             return data;
         } else {
             throw new UnexpectedFirodResponse('create/lockCoins', data);
