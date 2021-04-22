@@ -267,7 +267,7 @@ const CoinNames = {
 };
 
 const AddressValidations = {};
-for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XLM', 'BNB', 'USDT', 'USDC', 'DASH', 'DCR', 'PAX']) {
+for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'USDT', 'USDC', 'DASH', 'DCR', 'PAX']) {
     AddressValidations[coin] = (address) => {
         try {
             return CryptoAddressValidator.validate(address, coin);
@@ -279,6 +279,8 @@ for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XLM', 'BNB', 'USDT', 'USDC', 'D
         }
     }
 }
+
+AddressValidations.DAI = (address) => CryptoAddressValidator.validate(address, 'ETH');
 
 export default {
     name: 'CoinSwapDetail',
