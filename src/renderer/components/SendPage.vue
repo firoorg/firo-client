@@ -403,7 +403,7 @@ export default {
                 if (this.isPrivate) {
                     fee = [await $daemon.calcLelantusTxFee(this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.coinControl), null];
                 } else {
-                    fee = [await $daemon.calcPublicTxFee(this.satoshiAmount, this.subtractFeeFromAmount, this.txFeePerKb), null];
+                    fee = [await $daemon.calcPublicTxFee(this.satoshiAmount, this.subtractFeeFromAmount, this.txFeePerKb, this.coinControl), null];
                 }
             } catch (e) {
                 if (e instanceof FirodErrorResponse) {

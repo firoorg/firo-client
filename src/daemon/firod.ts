@@ -1627,13 +1627,17 @@ export class Firod {
     //
     // We resolve() with the calculated fee in satoshi.
     // We reject() the promise if the firod call fails or received data is invalid.
-    async calcPublicTxFee(amount: number, subtractFeeFromAmount: boolean, feePerKb: number): Promise<number> {
+    async calcPublicTxFee(amount: number, subtractFeeFromAmount: boolean, feePerKb: number,
+                          coinControl?: CoinControl): Promise<number> {
         let data = await this.send(null, 'get', 'txFee', {
             addresses: {
                 [this.defaultAddress()]: amount
             },
             feePerKb,
-            subtractFeeFromAmount
+            subtractFeeFromAmount,
+            coinControl: {
+                selected: coinControlToString(coinControl)
+            }
         });
 
         function isValidResponse(x: any): x is {fee: number} {
