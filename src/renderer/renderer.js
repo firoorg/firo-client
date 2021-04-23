@@ -230,10 +230,7 @@ window.$startDaemon = () => new Promise(resolve => {
                     await $quitApp(`An error occurred in our initializers: ${e}`);
                 }
 
-                // fixme: This is currently broken on Linux.
-                if (['win32', 'darwin'].includes(process.platform)) {
-                    await $daemon.awaitStateWallet();
-                }
+                await $daemon.awaitStateWallet();
 
                 // Do a fixed wait so that we have time to update to the state wallet entries that have been sent. It's
                 // only required on first load, not any subsequent reloads.
