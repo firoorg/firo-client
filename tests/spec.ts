@@ -649,12 +649,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             })
             assert.exists(txOut);
 
-            if (paymentType === 'private' || !coinControl) {
-                // fixme: currently public tx fee estimation ignores coin control, and is sometimes wrong.
-                if (txOut.fee !== satoshiExpectedFee) {
-                    console.error(`tx ${txOut.txid}: got fee ${txOut.fee}, expected ${satoshiExpectedFee}`);
-                }
-            }
+            assert.equal(txOut.fee, satoshiExpectedFee, "actual transaction fee was not equal to calculated tx fee");
 
             const satoshiAmountToReceive = subtractTransactionFee ? txOut.amount : satoshiAmountToSend;
             const txIn: TransactionOutput = await this.app.client.executeScript(
