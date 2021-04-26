@@ -596,6 +596,7 @@ export class Firod {
     private hasConnectedEWH: EventWaitHandle<undefined>;
     private initializersCompletedEWH: EventWaitHandle<undefined>;
     private hasSentStateWalletEWH: EventWaitHandle<undefined>;
+    private blockchainSyncedEWH: EventWaitHandle<undefined>;
     // We resolve with true if firod has shutdown cleanly or false if it has crashed.
     private firodHasShutdown: EventWaitHandle<boolean>
 
@@ -665,6 +666,7 @@ export class Firod {
         this.hasConnectedEWH = new EventWaitHandle();
         this.initializersCompletedEWH = new EventWaitHandle();
         this.hasSentStateWalletEWH = new EventWaitHandle();
+        this.blockchainSyncedEWH = new EventWaitHandle();
         this.firodHasShutdown = new EventWaitHandle();
     }
 
@@ -765,6 +767,11 @@ export class Firod {
     // Wait for apiStatus to indicate we are not rescanning or reindexing.
     async awaitBlockchainLoaded() {
         await this.blockchainLoadedEWH.block();
+    }
+
+    // Wait for the blockchain to be synced.
+    async awaitBlockchainSynced() {
+        await this.blockchainSyncedEWH.block();
     }
 
     // Await connection to the requester socket.
@@ -1054,6 +1061,10 @@ export class Firod {
 
         if (apiStatus.data && apiStatus.data.hasSentInitialStateWallet) {
             await this.hasSentStateWalletEWH.release(undefined);
+        }
+
+        if (apiStatus.data && apiStatus.data.synced) {
+            await this.blockchainSyncedEWH.release(undefined);
         }
 
         if (this.eventHandlers['apiStatus']) {

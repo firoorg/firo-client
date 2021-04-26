@@ -10,8 +10,8 @@ export function handleEvent(store, firo: Firod, eventData: any) {
 }
 
 export async function initialize(store: any, firod: Firod) {
-    await firod.awaitApiIsReady();
-
-    const data = await firod.getMasternodeList();
-    store.dispatch('Masternode/updateMasternodeList', Object.values(data));
+    firod.awaitBlockchainSynced().then(async () => {
+        const data = await firod.getMasternodeList();
+        store.dispatch('Masternode/updateMasternodeList', Object.values(data));
+    });
 }
