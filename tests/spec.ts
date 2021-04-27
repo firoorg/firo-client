@@ -270,7 +270,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
     this.beforeAll('waits to load our wallet', async function (this: This) {
-        this.timeout(100e3);
+        // Set this to 0 so we have time to inspect https://github.com/firoorg/firo-client/issues/159
+        this.timeout(0);
         this.slow(20e3);
 
         // Check that there are existing payments.
