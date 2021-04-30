@@ -23,11 +23,9 @@ const mutations = {
         const stateUnspentUTXOs = cloneDeep(state.unspentUTXOs);
 
         logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
-        var unspentAlreadyProcess = false;
         for (const address of Object.keys(initialStateWallet.addresses)) {
             const addressData = initialStateWallet.addresses[address];
             if (!['inputs', 'lockedCoins', 'unlockedCoins'].includes(address)) {
-                unspentAlreadyProcess = true;
                 for (const transactions of Object.values(addressData.txids)) {
                     for (const tx of Object.values(transactions)) {
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
