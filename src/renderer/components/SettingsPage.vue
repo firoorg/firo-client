@@ -17,9 +17,13 @@
             />
         </Popup>
 
-        <h1 class="header">
-            firo client v2.0.0
-        </h1>
+        <div class="header">
+            <h1>firo client</h1>
+
+            <div class="version">
+                v{{ version }}
+            </div>
+        </div>
 
         <hr class="hr1" />
 
@@ -94,6 +98,7 @@ import SmallMnemonic from "./SettingsPage/SmallMnemonic";
 import {IncorrectPassphrase} from "daemon/firod";
 import SendStepPassphrase from "renderer/components/SendPage/PassphraseStep";
 import SuccessMessage from "renderer/components/SettingsPage/SuccessMessage";
+import version from "../../version";
 
 export default {
     name: 'SettingsPage',
@@ -134,6 +139,7 @@ export default {
 
     data () {
         return {
+            version,
             useTor: $store.getters['Settings/isConnectedViaTor'],
             showDetail: 'passphrase', // 'passphrase' | 'mnemonic'
             currentPassphrase: '',
@@ -299,6 +305,10 @@ export default {
 
     .header {
         grid-area: header;
+
+        .version {
+            @include guidance();
+        }
     }
 
     .backup-wallet {grid-area: backup-wallet;}

@@ -6,3 +6,4 @@ node_modules/
 firo-client-test.log
 .env
 coin-swap-pairs.json
+src/version.js
