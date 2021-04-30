@@ -198,6 +198,11 @@ const actions = {
             setInterval(() => dispatch('maybeDoStateWallet'), 300);
         }
 
+        if (Object.keys(initialStateWallet.addresses).length == 0) {
+            logger.warn("Received stateWallet with no addresses.");
+            return;
+        }
+
         logger.silly("Adding more items to the initialStateWallet cache...");
         cachedInitialStateWallets.push(initialStateWallet);
         lastStateWalletTime = (new Date()).getTime();
