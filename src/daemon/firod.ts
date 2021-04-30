@@ -984,7 +984,9 @@ export class Firod {
 
         new Promise(async () => {
             for await (const [topicBuffer, msgBuffer] of this.statusPublisherSocket) {
-                await this.gotApiStatus(msgBuffer.toString());
+                try {
+                    await this.gotApiStatus(msgBuffer.toString());
+                } catch {}
             }
         });
 
