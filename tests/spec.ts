@@ -34,6 +34,7 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
             args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
             env: {
                 FIRO_CLIENT_TEST: 'true',
+                NETWORK: 'regtest',
                 IS_INITIALIZED: String(!reinitializeFiroClient)
             }
         });
