@@ -28,6 +28,7 @@ import firod from '../daemon/init'
 import {convertToCoin} from "lib/convert";
 
 import { createLogger } from 'lib/logger';
+import process from "process";
 const logger = createLogger('firo:renderer:main.js');
 
 logger.info("Entering renderer/main.js...");
@@ -77,10 +78,16 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
 //
 // Note that the app starts off with the reason "Loading..." in order to not show the main window for a short time
 // before starting the daemon.
-window.$setWaitingReason = (reason) => {
+//
+// If final is true, subsequent messages not marked with final will not be displayed.
+let preventNonFinalMessages = false;
+window.$setWaitingReason = (reason, final=false) => {
     if (reason) {
         logger.info("Waiting: " + reason);
     }
+
+    preventNonFinalMessages ||= final;
+    if (preventNonFinalMessages && !final) return;
 
     $store.commit('App/setWaitingReason', reason);
 }
@@ -97,11 +104,38 @@ window.$quitApp = async (message=undefined) => {
 
     // $daemon will not be set if we are setting up.
     if (window.$daemon) {
-        $setWaitingReason("Shutting down firod...");
-        try {
-            await $daemon.stopDaemon();
-        } catch(e) {
-            logger.error(`Error stopping daemon: ${e}`);
+        $setWaitingReason("Shutting down firod...", true);
+
+        const shutDownSuccessful = !!await Promise.any([
+            (async () => {
+                try {
+                    await $daemon.stopDaemon();
+                } catch(e) {
+                    logger.error(`Error stopping daemon: ${e}`);
+                }
+
+                return true;
+            })(),
+            new Promise(r => setTimeout(r, 10e3))
+        ]);
+
+        if (!shutDownSuccessful) {
+            $setWaitingReason("Forcibly killing firod...", true);
+
+            const pid = (await $daemon.apiStatus()).data.pid;
+            // Windows doesn't support signals, so this is equivalent to SIGKILL there.
+            logger.info(`Killing firod (pid ${pid}) with SIGTERM...`);
+            process.kill(pid, 'SIGTERM');
+
+            const killSuccessful = !!await Promise.any([
+                (async () => {await $daemon.awaitFirodNotListening(); return true;})(),
+                new Promise(r => setTimeout(r, 5e3))
+            ]);
+
+            if (!killSuccessful) {
+                logger.info(`Killing firod (pid ${pid}) with SIGKILL...`);
+                process.kill(pid, 'SIGKILL');
+            }
         }
     } else {
         logger.warn("$daemon is not set; not trying to stop daemon");
@@ -114,11 +148,6 @@ window.$quitApp = async (message=undefined) => {
 // This event is fired from the main/index.js. It will prevent the default event, so we are responsible for closing the
 // process now.
 ourWindow.webContents.on('shutdown-requested', async () => {
-    if ($store.getters['App/waitingReason'] && !process.env.FIRO_CLIENT_TEST) {
-        logger.warn("Ignoring shutdown attempt in a critical period.");
-        return;
-    }
-
     await $quitApp();
 });
 
