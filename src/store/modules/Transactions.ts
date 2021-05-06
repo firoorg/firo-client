@@ -200,7 +200,8 @@ const actions = {
 
         if (Object.keys(initialStateWallet.addresses).length == 0) {
             logger.warn("Received stateWallet with no addresses.");
-            return;
+            // We can't unconditionally return here because we need walletLoaded to be set on startup.
+            if (cachedInitialStateWallets.length > 0) return;
         }
 
         logger.silly("Adding more items to the initialStateWallet cache...");
