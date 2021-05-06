@@ -20,9 +20,7 @@
         <div class="header">
             <h1>firo client</h1>
 
-            <div class="version">
-                v{{ version }}
-            </div>
+            <div class="version">v{{ version }} (firod {{ daemonVersion }})</div>
         </div>
 
         <hr class="hr1" />
@@ -115,6 +113,7 @@ export default {
         ...mapGetters({
             apiStatus: 'ApiStatus/apiStatus',
             hasMnemonic: 'ApiStatus/hasMnemonic',
+            daemonVersion: 'ApiStatus/version',
             _allowBreakingMasternodes: 'App/allowBreakingMasternodes'
         }),
 

@@ -22,6 +22,7 @@ const actions = {
 
 const getters = {
     apiStatus: (state) => state.apiStatus,
+    version: (state) => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.version : '(unknown)',
     currentBlockHeight: (state) => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.blocks : 0,
     // 'main', 'test', or 'regtest'
     network: (state) => (state.apiStatus && state.apiStatus.data) ? state.apiStatus.data.network : undefined,
