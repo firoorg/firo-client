@@ -30,7 +30,7 @@ const logger = winston.createLogger({
         new winston.transports.File({
             filename: logPath,
             handleExceptions: true,
-	        level: process.env.FIRO_CLIENT_DEBUG_LEVEL || 'info',
+	        level: process.env.FIRO_CLIENT_DEBUG_LEVEL || 'debug',
         })
     ]
 })
