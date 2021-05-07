@@ -400,6 +400,10 @@ export default {
                 } else {
                     fee = [await $daemon.calcPublicTxFee(this.satoshiAmount, false, this.smartFeePerKb), null];
                 }
+
+                if (this.satoshiAmount + fee[0] > this.available) {
+                    fee = [null, 'Insufficient funds'];
+                }
             } catch (e) {
                 if (e instanceof FirodErrorResponse) {
                     fee = [null, e.errorMessage];
