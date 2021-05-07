@@ -495,7 +495,7 @@ export default {
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             isBigWallet: 'Transactions/isBigWallet',
-            _smartFeePerKb: 'ApiStatus/smartFeePerKb'
+            smartFeePerKb: 'ApiStatus/smartFeePerKb'
         }),
 
         firoTransactionFeeAndError() {
@@ -542,10 +542,6 @@ export default {
             } else {
                 return `${this.xzcPair}AmountDoesntViolateAPILimits`;
             }
-        },
-
-        smartFeePerKb() {
-            return Math.max(this._smartFeePerKb, 10);
         },
 
         // The information about the currently selected market, or undefined if marketInfo isn't loaded or no coin is

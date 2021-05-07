@@ -309,7 +309,7 @@ export default {
         },
 
         txFeePerKb() {
-            return Number(this.userTxFeePerKb) || Math.max(this.smartFeePerKb, 10);
+            return Number(this.userTxFeePerKb) || this.smartFeePerKb;
         },
 
         filteredSendAddresses () {
