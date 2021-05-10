@@ -101,7 +101,7 @@
     "heatmap.js": "^2.0.5",
     "js-yaml": "^3.14.0",
     "lato-font": "^3.0.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "lodash.merge": "^4.6.2",
     "normalize-scss": "^7.0.1",
     "resolve-url-loader": "^3.1.2",
