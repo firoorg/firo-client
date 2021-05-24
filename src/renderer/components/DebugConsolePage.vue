@@ -42,6 +42,7 @@
                     contenteditable="true"
                     @keydown="onInput"
                     @keyup="updateSuggestions"
+                    @paste="onPaste"
                 >
                 </div>
             </div>
@@ -348,6 +349,32 @@ export default {
                 this.focusInput();
                 this.updateSuggestions();
             });
+        },
+
+        onPaste(event) {
+            event.preventDefault();
+
+            const clipboardData = event.clipboardData.getData('text/plain');
+            // DOMParser does not execute script tags or load images.
+            const node = new DOMParser().parseFromString(clipboardData, 'text/html');
+            const clipboardText = (node.body.textContent || '').replace(/\s/g, ' ');
+
+            const selection = document.getSelection();
+            const selectionRange = selection.getRangeAt(0);
+            let startOffset = selectionRange.startOffset;
+            let endOffset = selectionRange.endOffset
+
+            // Insert text at cursor.
+            let text = '';
+            const el = this.$refs.currentInput;
+            text += el.textContent.slice(0, startOffset);
+            text += clipboardText;
+            text += el.textContent.slice(endOffset);
+            el.innerText = text;
+
+            const newOffset = startOffset + clipboardText.length;
+            selectionRange.setStart(el.firstChild, newOffset);
+            selectionRange.setEnd(el.firstChild, newOffset);
         },
 
         async legacyRpc(commandline) {
