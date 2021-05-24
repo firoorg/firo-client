@@ -176,7 +176,7 @@ export default {
 
                 .show-all-znodes {
                     label {
-                        color: $color-text-accent;
+                        color: var(--color-text-accent);
                     }
                 }
             }

@@ -16,7 +16,7 @@ export default {
 @import "src/renderer/styles/colors";
 
 .loader {
-    background-color: $firo-old-brick;
+    background-color: var(--firo-old-brick);
     animation: loader 5s cubic-bezier(.8,0,.2,1) infinite;
     height: 40px;
     width: 41px;

@@ -27,7 +27,7 @@ export default {
 
 .amount {
     @include amount();
-    color: $color-amount-negative;
+    color: var(--color-amount-negative);
 }
 
 .ticker {

@@ -233,7 +233,7 @@ $top-height: 40%;
             padding: $size-tiny-space;
 
             &.shadow {
-                box-shadow: $size-shadow-radius $size-shadow-radius $size-shadow-radius $size-shadow-radius $color-shadow;
+                box-shadow: $size-shadow-radius $size-shadow-radius $size-shadow-radius $size-shadow-radius var(--color-shadow);
             }
 
             border: {

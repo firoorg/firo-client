@@ -22,7 +22,7 @@
 
         &.hidden {
             &.unverified {
-                color: $color-error;
+                color: var(--color-error);
             }
         }
     }

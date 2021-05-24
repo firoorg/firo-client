@@ -71,7 +71,7 @@ export default {
     .network-badge {
         @include monospace();
         user-select: text;
-        color: $color-text-accent;
+        color: var(--color-text-accent);
         font-size: 0.8em;
     }
 

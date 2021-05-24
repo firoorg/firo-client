@@ -61,8 +61,8 @@ export default {
 @import "src/renderer/styles/sizes";
 
 @mixin highlight-styles() {
-    color: $color-menu-link-text-highlighted;
-    background-color: $color-menu-highlighted-element;
+    color: var(--color-menu-link-text-highlighted);
+    background-color: var(--color-menu-highlighted-element);
     font-weight: bold;
 }
 
@@ -70,7 +70,7 @@ nav {
     a {
         display: block;
 
-        color: $color-menu-link-text;
+        color: var(--color-menu-link-text);
         text-decoration: none;
 
         padding: {

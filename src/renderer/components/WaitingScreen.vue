@@ -52,7 +52,7 @@ export default {
     width: 100vw;
     z-index: $z-waiting-screen;
     text-align: center;
-    background-color: $color-loading-background;
+    background-color: var(--color-loading-background);
 
     .inner {
         // Center .inner horizontally and vertically.
@@ -72,7 +72,7 @@ export default {
         }
 
         .reason {
-            color: $color-text-accent;
+            color: var(--color-text-accent);
             font-style: italic;
         }
     }

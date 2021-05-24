@@ -414,8 +414,8 @@ export default {
     height: 100%;
     word-break: break-all;
 
-    background-color: $color-debug-background;
-    color: $color-debug-text;
+    background-color: var(--color-debug-background);
+    color: var(--color-debug-text);
 
     &:focus {
         outline: none;

@@ -63,7 +63,7 @@ export default {
     height: 100vh;
     width: 100vw;
     // Make #popup transparent. It will still steal clicks of all external elements.
-    background-color: $color-popup-outside;
+    background-color: var(--color-popup-outside);
 
     display: flex;
     align-items: center;
@@ -83,7 +83,7 @@ export default {
             }
 
             #inner-popup {
-                background-color: $color-popup-background;
+                background-color: var(--color-popup-background);
                 width: fit-content;
                 box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
                 border-radius: 8px;

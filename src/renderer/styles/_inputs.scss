@@ -27,7 +27,7 @@ $disabled-input-opacity: 0.3;
 
 @mixin input-field {
     @include common-input-mixin();
-    background-color: $color-input-background;
+    background-color: var(--color-input-background);
 }
 
 @mixin wide-input-field() {
@@ -37,8 +37,8 @@ $disabled-input-opacity: 0.3;
 
 @mixin search-input() {
     @include common-input-mixin();
-    background-color: $color-search-input-background;
-    box-shadow: $size-shadow-radius $size-shadow-radius $size-shadow-radius 0 $color-shadow;
+    background-color: var(--color-search-input-background);
+    box-shadow: $size-shadow-radius $size-shadow-radius $size-shadow-radius 0 var(--color-shadow);
     width: $size-large-field-width;
 
     border: {
@@ -61,8 +61,8 @@ $disabled-input-opacity: 0.3;
 }
 
 @mixin button {
-    background-color: $color-big-button;
-    color: $color-big-button-text;
+    background-color: var(--color-big-button);
+    color: var(--color-big-button-text);
     font-weight: bold;
 
     &:focus {
@@ -83,7 +83,7 @@ $disabled-input-opacity: 0.3;
 
     &.active {
         color: white;
-        background-color: $firo-brick-red;
+        background-color: var(--firo-brick-red);
         border: none;
         font-weight: bold;
     }

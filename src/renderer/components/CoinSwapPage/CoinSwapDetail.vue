@@ -720,7 +720,7 @@ label {
     box-sizing: border-box;
     padding: $size-detail-margin;
     height: 100%;
-    background-color: $color-detail-background;
+    background-color: var(--color-detail-background);
 
     .title-wrapper {
         display: flex;

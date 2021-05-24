@@ -70,15 +70,15 @@ export default {
 
 .vuetable-td-component-amount {
     .outgoing {
-        color: $color-amount-negative;
+        color: var(--color-amount-negative);
     }
 
     .incoming {
-        color: $color-amount-positive;
+        color: var(--color-amount-positive);
     }
 
     .mint, .payment-request {
-        color: $color-amount-neutral;
+        color: var(--color-amount-neutral);
     }
 }
 </style>

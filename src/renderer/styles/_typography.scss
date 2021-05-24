@@ -31,7 +31,7 @@ h3 {
 }
 
 body {
-    color: $color-text;
+    color: var(--color-text);
     font: {
         family: "Source Sans Pro";
         size: $font-size-normal;
@@ -39,7 +39,7 @@ body {
 }
 
 a {
-    color: darken($color-text, 15%);
+    color: var(--color-dark-text), 15%;
 }
 
 @mixin large {
@@ -67,7 +67,7 @@ a {
 }
 
 @mixin ticker {
-    color: $color-ticker;
+    color: var(--color-ticker);
 }
 
 @mixin amount {
@@ -109,7 +109,7 @@ a {
 
 @mixin warning {
     @include guidance();
-    color: $color-error;
+    color: var(--color-error);
 }
 
 @mixin optional-action {
@@ -120,7 +120,7 @@ a {
     @include monospace();
     @include mini();
     user-select: text;
-    color: $color-error;
+    color: var(--color-error);
     font: {
         weight: bold;
         style: italic;

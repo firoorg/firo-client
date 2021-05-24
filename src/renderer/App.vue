@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" class="light-mode">
         <div id="app-drag-area" />
 
         <div :v-show="waitingReason">
@@ -31,7 +31,6 @@ export default {
 
 <style lang="scss">
 @import './styles';
-@import './styles/z';
 
 #app {
     position: fixed;

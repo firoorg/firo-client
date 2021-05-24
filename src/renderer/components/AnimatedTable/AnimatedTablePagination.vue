@@ -98,7 +98,7 @@ export default {
 
 a {
     display: inline-block;
-    color: $color-text;
+    color: var(--color-text);
     cursor: pointer;
 }
 
@@ -107,12 +107,12 @@ a {
 
     &.disabled {
         cursor: default;
-        color: $color-text-disabled;
+        color: var(--color-text-disabled);
     }
 }
 
 .numbers {
-    background: lighten($color-main-background, 20%);
+    background: var(--color-lightened-main-background);
     border-radius: $size-tiny-space;
     overflow: hidden;
     padding: {
@@ -121,15 +121,15 @@ a {
     }
     a {
         padding: $size-tiny-space;
-        color: $color-text;
+        color: var(--color-text);
 
         &:hover,
         &:focus {
-            background: $color-input-background;
+            background: var(--color-input-background);
         }
 
         &.active {
-            background: darken($color-main-background, 5%);
+            background: var(--color-darkened-main-background);
         }
     }
 }

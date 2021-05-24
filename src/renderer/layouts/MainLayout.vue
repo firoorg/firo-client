@@ -77,14 +77,14 @@ export default {
             float: left;
             width: $size-sidebar-width;
             height: 100%;
-            background: $color-menu-background;
+            background: var(--color-menu-background);
         }
 
         #primary {
             float: right;
             width: calc(100vw - #{$size-sidebar-width});
             height: 100%;
-            background: $color-main-background;
+            background: var(--color-main-background);
         }
     }
 }

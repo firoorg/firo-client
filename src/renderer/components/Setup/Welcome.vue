@@ -38,7 +38,7 @@ export default {
 
     .content {
         .firo {
-            color: $color-text-accent;
+            color: var(--color-text-accent);
         }
     }
 

@@ -108,7 +108,7 @@ export default {
 
 .anonymize-dialog {
     @include popup();
-    color: $color-text;
+    color: var(--color-text);
 
     input[type="password"] {
         @include wide-input-field();

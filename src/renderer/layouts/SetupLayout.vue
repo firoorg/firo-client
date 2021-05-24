@@ -26,7 +26,7 @@ export default {
 
 .setup-layout {
     position: fixed;
-    background-color: $color-setup-background;
+    background-color: var(--color-setup-background);
     height: 100vh;
     width: 100vw;
 
@@ -44,7 +44,7 @@ export default {
     }
 
     .setup-child {
-        background-color: $color-setup-foreground;
+        background-color: var(--color-setup-foreground);
         padding: $size-small-space;
         border-radius: $size-small-space;
         max-width: 90%;

@@ -238,7 +238,7 @@ export default {
 
     .emphasis {
         font-weight: bold;
-        color: $color-error;
+        color: var(--color-error);
     }
 }
 

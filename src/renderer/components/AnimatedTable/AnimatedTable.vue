@@ -275,7 +275,7 @@ export default {
         th {
             padding-bottom: 1em;
             font-weight: bold;
-            color: $color-table-heading;
+            color: var(--color-table-heading);
         }
     }
 
@@ -286,16 +286,16 @@ export default {
 
             // alternating colours for different rows
             &:nth-child(odd) {
-                background: darken($color-table-background, 10%);
+                background: var(--color-darkened-table-background);
             }
             &:nth-child(even) {
-                background: $color-table-background;
+                background: var(--color-table-background);
             }
 
             // highlight on hover
             &:hover {
                 td {
-                    background: lighten($color-table-background, 20%);
+                    background: var(--color-lightened-table-background);
                 }
             }
 
