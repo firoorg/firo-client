@@ -66,7 +66,7 @@ export default {
         height: 100%;
         max-height: 11rem;
         display: inline-block;
-        padding-left: emRhythm(1);
+        padding-left: 0.5em;
     }
 
     svg {

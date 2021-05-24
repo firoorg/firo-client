@@ -29,41 +29,41 @@ export default {
     $dim: 5;
 
     .spinner {
-        width: emRhythm($dim);
-        height: emRhythm($dim);
+        width: #{$dim/2};
+        height: #{$dim/2};
 
         position: relative;
 
         &.dark {
             .double-bounce1,
             .double-bounce2 {
-                background-color: $color--polo-light;
+                background-color: #F5F7FF;
             }
         }
 
         &.green {
             .double-bounce1,
             .double-bounce2 {
-                background-color: $color--green;
+                background-color: #23B852;
             }
         }
 
         &.comet {
             .double-bounce1,
             .double-bounce2 {
-                background-color: $color--comet-dark;
+                background-color: #52527A;
             }
         }
 
         &.small {
-            width: emRhythm(3);
-            height: emRhythm(3);
+            width: #{$dim/3};
+            height: #{$dim/3};
         }
 
         &.mini {
             margin-bottom: -.16em;
-            width: emRhythm(2);
-            height: emRhythm(2);
+            width: #{$dim/2};
+            height: #{$dim/2};
         }
     }
 
@@ -72,7 +72,7 @@ export default {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background-color: $color--dark;
+        background-color: #1F1F2E;
         opacity: 0.8;
         position: absolute;
         top: 0;

@@ -105,7 +105,7 @@ export default {
     .payment-request-status-animation {
         height: 100%;
         display: inline-block;
-        padding-left: emRhythm(1);
+        padding-left: 0.5em;
     }
 
     svg {
