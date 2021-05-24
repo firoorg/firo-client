@@ -177,6 +177,7 @@ export interface ApiStatus {
         pid: number;
         reindexing: boolean;
         rescanning: boolean;
+        reindexingProgress?: number;
         modules: {
             [moduleName: string]: boolean;
         };

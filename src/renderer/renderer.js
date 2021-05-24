@@ -5,9 +5,7 @@ import VeeValidate from 'vee-validate'
 import AsyncComputed from "vue-async-computed";
 import Focus from 'renderer/directives/focus'
 
-import upperFirst from 'lodash/upperFirst'
-import camelCase from 'lodash/camelCase'
-
+import Big from 'big.js';
 import {existsSync} from 'fs';
 
 import i18n from 'lib/i18n'
@@ -235,8 +233,13 @@ window.$startDaemon = () => new Promise(resolve => {
             await $daemon.awaitApiResponse();
 
             if (await $daemon.isReindexing()) {
-                $setWaitingReason("Waiting for firod to reindex. This may take an extremely long time...");
+                let interval = setInterval(async () => {
+                    const progress = Big(((await $daemon.apiStatus()).data.reindexingProgress || 0) * 100).round(3).toString();
+                    $setWaitingReason(`(${progress}%) Waiting for firod to reindex. This may take an extremely long time...`);
+                }, 500);
+
                 await $daemon.awaitBlockchainLoaded();
+                clearInterval(interval);
             } else if (await $daemon.isRescanning()) {
                 $setWaitingReason("Waiting for firod to rescan the block index. This may take a long time...");
                 await $daemon.awaitBlockchainLoaded();
