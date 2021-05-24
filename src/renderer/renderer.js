@@ -232,17 +232,16 @@ window.$startDaemon = () => new Promise(resolve => {
             $setWaitingReason("Waiting for firod to start the API...");
             await $daemon.awaitApiResponse();
 
-            if (await $daemon.isReindexing()) {
+            if (await $daemon.isReindexing() || await $daemon.isRescanning()) {
+                const action = (await $daemon.isReindexing()) ? 'reindex' : 'rescan';
+
                 let interval = setInterval(async () => {
                     const progress = Big(((await $daemon.apiStatus()).data.reindexingProgress || 0) * 100).round(3).toString();
-                    $setWaitingReason(`(${progress}%) Waiting for firod to reindex. This may take an extremely long time...`);
+                    $setWaitingReason(`(${progress}%) Waiting for firod to ${action}. This may take an extremely long time...`);
                 }, 500);
 
                 await $daemon.awaitBlockchainLoaded();
                 clearInterval(interval);
-            } else if (await $daemon.isRescanning()) {
-                $setWaitingReason("Waiting for firod to rescan the block index. This may take a long time...");
-                await $daemon.awaitBlockchainLoaded();
             }
 
             $setWaitingReason("Waiting for the API to indicate it's ready to receive commands...");
