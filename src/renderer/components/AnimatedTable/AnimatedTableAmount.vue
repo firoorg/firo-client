@@ -12,7 +12,13 @@
         class="vuetable-td-component-amount"
     >
         <span
-            v-if="['spendOut', 'send'].includes(category)"
+            v-if="rowData.amount === 0"
+            class="zero"
+        >
+            0
+        </span>
+        <span
+            v-else-if="['spendOut', 'send'].includes(category)"
             class="outgoing"
         >
             -{{ amount }} FIRO
@@ -22,18 +28,6 @@
             class="incoming"
         >
             +{{ amount }} FIRO
-        </span>
-        <span
-            v-else-if="category === 'mint'"
-            class="mint"
-        >
-            ({{ amount }} FIRO)
-        </span>
-        <span
-            v-else-if="category === 'payment-request'"
-            class="payment-request"
-        >
-            ({{ amount }} FIRO)
         </span>
         <span v-else>
             This is a bug.

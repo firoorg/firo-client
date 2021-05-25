@@ -135,7 +135,6 @@ export default {
                     extraSearchText = 'Mined Transaction';
                     break;
 
-                case 'mintIn':
                 case 'receive':
                 case 'spendIn':
                     extraSearchText = 'Incoming Transaction';
@@ -151,6 +150,11 @@ export default {
                     break
                 }
 
+                let address = tx.address;
+                if (!address || tx.amount === 0) {
+                    address = "SCRIPT";
+                }
+
                 tableData.push({
                     // id is the path of the detail route for the transaction.
                     id: `/transaction-info/${id}`,
@@ -159,7 +163,7 @@ export default {
                     blockHeight: tx.blockHeight,
                     date: tx.blockTime * 1000 || Infinity,
                     amount: tx.amount,
-                    address: tx.address,
+                    address,
                     label:
                         tx.label ||
                         (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
