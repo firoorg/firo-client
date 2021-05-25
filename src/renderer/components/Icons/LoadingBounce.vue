@@ -15,7 +15,7 @@ export default {
     props: {
         color: {
             type: String,
-            default: null
+            default: "comet"
         },
         size: {
             type: String,
@@ -26,11 +26,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    $dim: 5;
-
     .spinner {
-        width: #{$dim/2};
-        height: #{$dim/2};
+        width: 2.5em;
+        height: 2.5em;
 
         position: relative;
 
@@ -56,14 +54,14 @@ export default {
         }
 
         &.small {
-            width: #{$dim/3};
-            height: #{$dim/3};
+            width: 0.833em;
+            height: 0.833em;
         }
 
         &.mini {
             margin-bottom: -.16em;
-            width: #{$dim/2};
-            height: #{$dim/2};
+            width: 1em;
+            height: 1em;
         }
     }
 
