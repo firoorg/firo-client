@@ -10,13 +10,6 @@
         v-else
         :class="`${category}-label`"
     >
-        <span
-            v-if="category === 'payment-request'"
-            class="payment-request-warning"
-        >
-            Payment Request:
-        </span>
-
         <span v-if="label" class="label-text">
             {{ label }}
         </span>
@@ -39,10 +32,6 @@
 
         <span v-else-if="['receive', 'spendIn', 'mintIn'].includes(category)">
             Incoming Transaction ({{ address }})
-        </span>
-
-        <span v-else-if="category === 'payment-request'">
-            {{ paymentRequestAddress }}
         </span>
 
         <span v-else>
