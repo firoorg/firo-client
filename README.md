@@ -53,7 +53,7 @@ npm run dev
 ### Debug Levels
 
 By default, firo-client will log to `userData/combined.log` in the application data directory at debug level. This
-can be changed with the environment variable `FIRO_CLIENT_DEBUG_LEVEL`.
+can be changed with the environment variable `LOG`.
 
 ### REPL
 
