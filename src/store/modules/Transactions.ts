@@ -30,10 +30,6 @@ const mutations = {
                     for (const tx of Object.values(transactions)) {
                         tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
 
-                        if (!tx.amount) {
-                            logger.warn(`Got 0 amount transaction ${tx.uniqId}`);
-                        }
-
                         if (tx.category === 'orphan' || tx.spendableAt === undefined || tx.spendableAt === -1) {
                             delete stateUnspentUTXOs[tx.uniqId];
                         } else {
