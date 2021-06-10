@@ -344,6 +344,7 @@ export default {
             this.$refs.currentInput.contentEditable = true;
             this.$refs.currentInput.innerText = '';
             this.temporaryBuffer = '';
+            this.historyIndex = 0;
 
             this.$nextTick(() => {
                 this.focusInput();
