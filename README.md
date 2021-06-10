@@ -5,6 +5,8 @@
 This is an (experimental) client for the [Firo](https://firo.io/) network. Currently, it requires connection to a
 fully trusted firod full node.
 
+Currently you must use node version 15 due to a dependency on sass-loader.
+
 ## Installing firod
 
 For an unbundled install, it's required that you manually link binaries compiled from the `client-api` branch of the
