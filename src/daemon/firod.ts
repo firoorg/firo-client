@@ -1058,10 +1058,6 @@ export class Firod {
             await this.blockchainLoadedEWH.release(undefined);
         }
 
-        if (!this.hasSentStateWalletEWH.hasCompleted()) {
-            logger.info(JSON.stringify(apiStatus));
-        }
-
         if (apiStatus.data && apiStatus.data.hasSentInitialStateWallet) {
             await this.hasSentStateWalletEWH.release(undefined);
         }
