@@ -1258,8 +1258,8 @@ export class Firod {
                     return;
                 }
 
-                if (callName === 'create/rpc') {
-                    // Don't log anything about rpc requests.
+                if (callName === 'create/rpc' || callName === 'create/showMnemonics') {
+                    // Don't log anything about rpc or mnemonic requests.
                 } else if (messageString.length > 1024) {
                     logger.debug(`received reply from firod for ${callName}: <%d bytes>`, messageString.length);
                     logger.silly(`content of %d byte reply to ${callName}: %O`, messageString.length, message);
