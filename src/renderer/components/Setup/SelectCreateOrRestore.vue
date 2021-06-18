@@ -28,7 +28,8 @@ export default {
 
     methods: {
         goBack() {
-            this.$router.back();
+            // this.$router.back() fails if the select directory dialog was used on the SelectBlockchainLocation page.
+            this.$router.push('/setup/select-blockchain-location');
         },
 
         async writeDownMnemonic() {
