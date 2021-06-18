@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="light-mode">
+    <div id="app">
         <div id="app-drag-area" />
 
         <div :v-show="waitingReason">
@@ -25,7 +25,11 @@ export default {
 
     computed: mapGetters({
         waitingReason: 'App/waitingReason'
-    })
+    }),
+
+    mounted() {
+        document.getElementsByTagName('body')[0].classList.add('light-mode');
+    }
 }
 </script>
 

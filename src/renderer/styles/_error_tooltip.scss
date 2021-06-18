@@ -1,0 +1,8 @@
+.tooltip.error {
+    .tooltip-inner {
+        color: var(--color-tooltip-text);
+        background-color: var(--color-tooltip-background);
+        padding: 1em;
+        border-radius: 0.5em;
+    }
+}
