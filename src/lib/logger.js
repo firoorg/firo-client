@@ -30,7 +30,7 @@ const logger = winston.createLogger({
         new winston.transports.File({
             filename: logPath,
             handleExceptions: true,
-	        level: process.env.LOG || 'debug',
+	        level: process.env.LOG || 'info',
         })
     ]
 })
