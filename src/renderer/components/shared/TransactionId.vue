@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="txid">{{ txid }}</div>
+        <copyable class="txid">{{ txid }}</copyable>
         <a v-if="showOpenInBlockExplorer" href="#" @click="openInBlockExplorer">
             open in block explorer
         </a>
@@ -10,9 +10,14 @@
 <script>
 import {mapGetters} from 'vuex';
 import {shell} from 'electron';
+import Copyable from "renderer/components/shared/Copyable";
 
 export default {
     name: "TransactionId",
+
+    components: {
+        Copyable
+    },
 
     props: {
         txid: {

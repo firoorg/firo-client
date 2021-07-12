@@ -58,9 +58,7 @@
                             Block Hash
                         </label>
 
-                        <div class="value">
-                            {{ tx.blockHash }}
-                        </div>
+                        <copyable class="value">{{ tx.blockHash }}</copyable>
                     </div>
 
                     <div class="field">
@@ -130,14 +128,12 @@
                     </div>
                 </div>
 
-                <div class="field">
+                <div v-if="tx.address" class="field">
                     <label>
                         Recipient Address
                     </label>
 
-                    <div class="value">
-                        {{ tx.address }}
-                    </div>
+                    <copyable class="value">{{ tx.address }}</copyable>
                 </div>
 
                 <div v-if="tx.fee" class="field">
@@ -178,6 +174,7 @@ import Popup from "renderer/components/shared/Popup";
 import Amount from "renderer/components/shared/Amount";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
 import TransactionId from "renderer/components/shared/TransactionId";
+import Copyable from "renderer/components/shared/Copyable";
 
 export default {
     name: "TransactionInfo",
@@ -186,7 +183,8 @@ export default {
         WaitOverlay,
         Popup,
         Amount,
-        TransactionId
+        TransactionId,
+        Copyable
     },
 
     props: {
@@ -220,6 +218,10 @@ export default {
     },
 
     methods: {
+        copy(...ev) {
+            document.ev = ev;
+        },
+
         async rebroadcast() {
             this.rebroadcastingStep = 'wait';
             try {
@@ -239,6 +241,10 @@ export default {
 @import "src/renderer/styles/popup";
 @import "src/renderer/styles/info-popup";
 @import "src/renderer/styles/typography";
+
+.copyable:after {
+    content: "📋";
+}
 
 .rebroadcast-status {
     @include popup();
