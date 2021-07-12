@@ -479,9 +479,9 @@ export default {
 
         this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
             getMessage: () =>
-                `Due to private transaction spend limits, you may not spend more than 1001 FIRO (including fees) in one transaction`,
+                `Due to private transaction spend limits, you may not spend more than 5001 FIRO (including fees) in one transaction`,
 
-            validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 1001e8 : convertToSatoshi(value) <= 1000.99e8
+            validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 5001e8 : convertToSatoshi(value) <= 5000.99e8
         });
 
         this.$validator.extend('txFeeIsValid', {
