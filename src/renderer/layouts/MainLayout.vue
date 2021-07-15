@@ -77,7 +77,6 @@ export default {
             float: left;
             width: $size-sidebar-width;
             height: 100%;
-            background: var(--color-menu-background);
         }
 
         #primary {

@@ -1,6 +1,6 @@
 <template>
-    <span>
-        <span class="amount">{{ formattedAmount }}</span><span v-if="ticker" class="ticker">&nbsp;{{ ticker }}</span>
+    <span class="amount">
+        <span class="amount-value">{{ formattedAmount }}</span><span v-if="ticker" class="ticker">&nbsp;{{ ticker }}</span>
     </span>
 </template>
 
@@ -35,10 +35,6 @@ export default {
 @import "src/renderer/styles/typography";
 
 .amount {
-    @include amount();
-}
-
-.ticker {
-    @include ticker();
+    font-weight: bold;
 }
 </style>

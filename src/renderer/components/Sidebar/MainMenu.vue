@@ -57,42 +57,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-
 @mixin highlight-styles() {
-    color: var(--color-menu-link-text-highlighted);
-    background-color: var(--color-menu-highlighted-element);
-    font-weight: bold;
+    border-radius: 4px;
+    color: white;
+    background-color: var(--color-primary-background);
 }
 
 nav {
     a {
         display: block;
 
-        color: var(--color-menu-link-text);
+        color: var(--color-text-primary);
+        font-weight: bold;
         text-decoration: none;
 
-        padding: {
-            left: $size-sidebar-link-horizontal-padding;
-            right: $size-sidebar-link-horizontal-padding;
-            top: $size-sidebar-link-vertical-padding;
-            bottom: $size-sidebar-link-vertical-padding;
-        }
+        padding: 8px;
 
-        .inner {
-            padding: $size-sidebar-link-inner-padding;
-
-            &:hover {
-                @include highlight-styles();
-            }
+        &:hover {
+            @include highlight-styles();
         }
     }
 
     a.router-link-active {
-        .inner {
-            @include highlight-styles();
-        }
+        @include highlight-styles();
     }
 }
 </style>

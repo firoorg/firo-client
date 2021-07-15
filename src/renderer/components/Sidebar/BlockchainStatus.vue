@@ -54,10 +54,6 @@ export default {
 #blockchain-status {
     @include small();
     font-style: italic;
-    margin: {
-        bottom: $size-tiny-space;
-        left: $size-tiny-space;
-    }
 
     // This is the loading bounce.
     .spinner {

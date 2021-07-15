@@ -1,19 +1,23 @@
 <template>
-    <section class="balance">
-        <div class="private">
+    <section class="balances">
+        <div class="balance private">
+            <label>Balance:</label>
             <amount :amount="available" ticker="FIRO" />
         </div>
 
-        <div v-if="locked > 0" class="locked">
-            +&nbsp;<amount :amount="locked" ticker="locked" />
+        <div v-if="locked > 0" class="balance locked">
+            <label>Locked:</label>
+            <amount :amount="locked" ticker="FIRO" />
         </div>
 
-        <div v-if="availablePublic > 0" class="public">
-            +&nbsp;<amount :amount="availablePublic" ticker="public" />
+        <div v-if="availablePublic > 0" class="balance public">
+            <label>Public:</label>
+            <amount :amount="availablePublic" ticker="FIRO" />
         </div>
 
-        <div v-if="(pending + immature) > 0" class="pending">
-            +&nbsp;<amount :amount="pending + immature" ticker="pending" />
+        <div v-if="(pending + immature) > 0" class="balance pending">
+            <label>Pending:</label>
+            <amount :amount="pending + immature" ticker="FIRO" />
         </div>
     </section>
 </template>
@@ -44,16 +48,25 @@ export default {
 <style lang="scss" scoped>
 @import "src/renderer/styles/sizes";
 
-.balance {
-    opacity: 0.8;
-    text-align: right;
-    margin: {
-        top: $size-small-space;
-        right: $size-small-space;
-    }
+.balances {
+    user-select: text;
 
-    .locked, .public, .pending {
-        opacity: 0.6;
+    .balance {
+        opacity: 0.5;
+        &.private { opacity: 1; }
+
+        display: flex;
+        justify-content: space-between;
+
+        margin: {
+            top: 5px;
+            bottom: 5px;
+        }
+
+        label {
+            font-weight: bold;
+            color: var(--color-primary);
+        }
     }
 }
 </style>

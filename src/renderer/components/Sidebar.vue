@@ -17,6 +17,7 @@
         </div>
 
         <balance id="sidebar-balance" />
+        <div id="sidebar-divider" />
         <main-menu id="main-menu" />
         <blockchain-status id="blockchain-status" />
     </div>
@@ -50,7 +51,13 @@ export default {
 @import 'src/renderer/styles/sizes';
 
 #sidebar {
+    background: var(--color-background-sidebar);
     user-select: none;
+
+    padding: {
+        left: $size-small-space;
+        right: $size-small-space;
+    }
 
     #logo, .network-badge {
         width: fit-content;
@@ -61,8 +68,6 @@ export default {
     }
 
     #logo {
-        margin-top: $size-menu-top-margin;
-
         svg {
             height: $size-menu-logo;
         }
@@ -71,12 +76,23 @@ export default {
     .network-badge {
         @include monospace();
         user-select: text;
-        color: var(--color-text-accent);
+        color: var(--color-primary);
         font-size: 0.8em;
     }
 
-    #sidebar-balance {
-        user-select: text;
+    #sidebar-balance, hr#sidebar-divider {
+        margin: {
+            top: $size-small-space;
+        }
+    }
+
+    #sidebar-divider {
+        height: 1px;
+        background: var(--color-text-subtle-border);
+        margin: {
+            top: 10px;
+            bottom: 20px;
+        }
     }
 
     #main-menu {
@@ -86,7 +102,8 @@ export default {
     #blockchain-status {
         user-select: text;
         position: absolute;
-        bottom: 0;
+        left: $size-tiny-space;
+        bottom: $size-tiny-space;
     }
 }
 </style>
