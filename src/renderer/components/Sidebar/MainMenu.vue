@@ -1,45 +1,31 @@
 <template>
     <nav class="main-menu">
         <router-link to="/send">
-            <div class="inner">
-                Send
-            </div>
+            Send
         </router-link>
 
         <router-link to="/receive">
-            <div class="inner">
-                Receive
-            </div>
+            Receive
         </router-link>
 
         <router-link to="/transactions">
-            <div class="inner">
-                Transactions
-            </div>
+            Transactions
         </router-link>
 
         <router-link v-if="network === 'main'" to="/coinswap">
-            <div class="inner">
-                Coin Swap
-            </div>
+            Coin Swap
         </router-link>
 
         <router-link to="/znodes">
-            <div class="inner">
-                Masternodes
-            </div>
+            Masternodes
         </router-link>
 
         <router-link to="/settings">
-            <div class="inner">
-                Settings
-            </div>
+            Settings
         </router-link>
 
         <router-link to="/debugconsole">
-            <div class="inner">
-                Debug Console
-            </div>
+            Debug Console
         </router-link>
     </nav>
 </template>
@@ -57,12 +43,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@mixin highlight-styles() {
-    border-radius: 4px;
-    color: white;
-    background-color: var(--color-primary-background);
-}
-
 nav {
     a {
         display: block;
@@ -72,14 +52,20 @@ nav {
         text-decoration: none;
 
         padding: 8px;
+        border-radius: 4px;
 
         &:hover {
-            @include highlight-styles();
+            background-color: var(--color-primary-button-hover);
         }
-    }
 
-    a.router-link-active {
-        @include highlight-styles();
+        &:active {
+            background-color: var(--color-primary-button-pressed);
+        }
+
+        &.router-link-active {
+            background-color: var(--color-primary-background);
+            color: white;
+        }
     }
 }
 </style>
