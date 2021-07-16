@@ -1,7 +1,11 @@
 <template>
     <div>
         <div class="buttons">
-            <button id="send-button" :disabled="disabled" @click="show = 'confirm'">
+            <button class="solid-button unrecommended" :disabled="show !== 'button'" @click="reset()">
+                Reset
+            </button>
+
+            <button class="solid-button recommended" :disabled="disabled" @click="show = 'confirm'">
                 Send
             </button>
         </div>
@@ -26,7 +30,7 @@
 </template>
 
 <script>
-// $emits: success
+// $emits: success, reset
 
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import {mapGetters} from "vuex";
@@ -124,6 +128,11 @@ export default {
             this.show = 'button';
         },
 
+        reset() {
+            this.cancel();
+            this.$emit('reset');
+        },
+
         async attemptSend () {
             this.show = 'wait';
             const passphrase = this.passphrase;
@@ -197,9 +206,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/inputs";
-
 .buttons {
-    @include buttons-container();
+    display: flex;
+    justify-content: space-evenly;
 }
 </style>

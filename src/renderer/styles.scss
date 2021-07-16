@@ -1,9 +1,70 @@
 @import "styles/reset";
 @import 'styles/typography';
 @import 'styles/colors';
+@import 'styles/sizes';
+@import 'styles/inputs';
 @import 'styles/z';
 @import 'styles/error_tooltip';
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 17px;
+    margin: 0;
+
+    -webkit-appearance: none;
+    outline: none;
+    border: {
+        width: 1px;
+        radius: 3px;
+        style: solid;
+        color: rgba(60, 57, 57, 0.6);
+    }
+
+    &:hover {
+        border-color: var(--color-secondary);
+    }
+
+    &:checked {
+        background-color: var(--color-secondary);
+    }
+}
+
+button.solid-button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+
+    width: 145px;
+    height: 30px;
+    border-radius: 20px;
+
+    &.recommended {
+        color: var(--color-secondary-contrast);
+        background-color: var(--color-secondary);
+
+        &:active {
+            background-color: var(--color-secondary-button-pressed);
+        }
+
+        &:disabled {
+            background-color: var(--color-secondary-button-disabled);
+        }
+    }
+
+    &.unrecommended {
+        color: var(--color-text-primary);
+        background-color: var(--color-text-minimal-button-background);
+
+        &:active {
+            background-color: var(--color-text-minimal-button-background-pressed);
+        }
+
+        &:disabled {
+            color: var(--color-text-disabled);
+        }
+    }
 }

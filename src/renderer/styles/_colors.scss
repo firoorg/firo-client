@@ -24,12 +24,14 @@ body {
     --color-background-no-data: #FBFBFB;
     --color-background-tag: rgba(216, 225, 235, 0.2);
     --color-background-sidebar: #F7F9FB;
+    --color-background-detail: #FAFAFB;
 
     --color-text-primary: #3C3939;
     --color-text-secondary: rgba(15, 14, 14, 0.6);
     --color-text-disabled: rgba(15, 14, 14, 0.4);
     --color-text-subtle-border: rgba(0, 0, 0, 0.1);
     --color-text-minimal-button-background: rgba(60, 57, 57, 0.05);
+    --color-text-minimal-button-background-pressed: rgba(60, 57, 57, 0.1);
 
     --color-primary: #9B1C2E;
     --color-primary-background: #AB3748;
@@ -44,6 +46,7 @@ body {
     --color-secondary-button-disabled: rgba(47, 162, 153, 0.5);
     --color-secondary-tag-background: rgba(47, 162, 153, 0.1);
     --color-secondary-button-minimal-background: rgba(47, 162, 153, 0.05);
+    --color-secondary-contrast: #FDFDFF;
 
     --color-tertiary: #A22F72;
     --color-tertiary-disabled: rgba(162, 47, 114, 0.5);
@@ -70,7 +73,6 @@ body {
     --color-text: black;
     --color-dark-text: black;
     --color-text-accent: var(--firo-brick-red);
-    --color-text-disabled: var(--firo-silver);
     --color-ticker: var(--color-text-accent);
     --color-error: red;
 

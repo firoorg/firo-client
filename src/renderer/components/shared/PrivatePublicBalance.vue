@@ -1,15 +1,23 @@
 <template>
     <div class="private-public-balance">
-        <label class="private-balance-label">PRIVATE BALANCE:</label>
-        <div class="private-balance">{{ convertToCoin(availablePrivate) }} <span class="ticker">FIRO</span></div>
-        <label class="public-balance-label">PUBLIC BALANCE:</label>
-        <div class="public-balance">{{ convertToCoin(availablePublic) }} <span class="ticker">FIRO</span></div>
+        <hr />
+
+        <div class="balance-line">
+            <label>Private Balance:</label>
+            <amount :amount="availablePrivate" ticker="FIRO" />
+        </div>
+
+        <div class="balance-line">
+            <label>Public Balance:</label>
+            <amount :amount="availablePublic" ticker="FIRO" />
+        </div>
+
         <div class="toggle" :class="[isPrivate ? 'is-private' : 'is-public', disabled ? 'toggle-disabled' : 'toggle-enabled']">
-            <label class="toggle-label-private">PRIVATE</label>
+            <label class="toggle-label-private">Private</label>
             <div class="toggle-switch" @click="toggle()">
                 <div class="inner" />
             </div>
-            <label class="toggle-label-public">PUBLIC</label>
+            <label class="toggle-label-public">Public</label>
         </div>
     </div>
 </template>
@@ -18,9 +26,14 @@
 // $emits: toggle (isPrivate)
 import {mapGetters} from "vuex";
 import {convertToCoin} from "lib/convert";
+import Amount from "renderer/components/shared/Amount";
 
 export default {
     name: "PrivatePublicBalance",
+
+    components: {
+        Amount
+    },
 
     props: {
         value: {
@@ -72,73 +85,58 @@ export default {
 @import "src/renderer/styles/typography";
 @import "src/renderer/styles/inputs";
 
-label {
-    @include label();
-}
-
-.ticker {
-    @include ticker();
-}
-
 .private-public-balance {
-    @include small();
-    margin-top: $size-small-space;
-
-    display: grid;
-    grid-gap: $size-tiny-space;
-
-    .private-balance-label {
-        grid-row: 1;
-        grid-column: 1;
+    hr {
+        margin-top: 30px;
+        opacity: 0.2;
     }
 
-    .private-balance {
-        text-align: right;
-        grid-row: 1;
-        grid-column: 2;
-    }
+    .balance-line {
+        margin-top: 10px;
+        display: flex;
 
-    .public-balance-label {
-        grid-row: 2;
-        grid-column: 1;
-    }
+        label {
+            width: fit-content;
+            font-weight: bold;
+        }
 
-    .public-balance {
-        text-align: right;
-        grid-row: 2;
-        grid-column: 2;
+        .amount {
+            flex-grow: 1;
+            text-align: right;
+            color: var(--color-primary);
+            font-weight: bold;
+        }
     }
 
     .toggle {
+        margin-top: 15px;
+
         &.toggle-disabled {
             opacity: $disabled-input-opacity;
         }
 
         @include label();
         user-select: none;
-        grid-row: 2;
-        grid-column: 4;
-        justify-self: end;
 
         .toggle-switch {
             height: 0.7em;
-            width: $size-medium-space;
+            width: 20px;
             padding: 1px;
             display: inline-block;
-            background-color: black;
+            background-color: var(--color-text-disabled);
             border-radius: 5px;
 
             .inner {
                 height: 0.7em;
                 display: inline-block;
                 position: relative;
-                width: $size-medium-space / 2;
-                background-color: red;
+                width: 10px;
+                background-color: var(--color-text-secondary);
                 border-radius: 5px;
 
                 @at-root .toggle.is-private {
                     .toggle-label-public {
-                        opacity: 0.4;
+                        opacity: 0.5;
                     }
 
                     .inner {
@@ -148,7 +146,7 @@ label {
 
                 @at-root .toggle.is-public {
                     .toggle-label-private {
-                        opacity: 0.4;
+                        opacity: 0.5;
                     }
 
                     .inner {

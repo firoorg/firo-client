@@ -17,12 +17,12 @@ $size-sidebar-width: 280px;
 $size-shadow-radius: 4px;
 
 // These are only used on pages with a right sidebar.
-$size-primary-content-width: 48vw;
-$size-secondary-content-width: calc(100vw - #{$size-sidebar-width} - #{$size-primary-content-width});
+$size-secondary-content-width: 360px;
+$size-primary-content-width: calc(100vw - #{$size-sidebar-width} - #{$size-secondary-content-width});
 
 $size-very-tiny-space: 2pt;
 $size-tiny-space: 5pt;
-$size-small-space: 20px;
+$size-small-space: 15px;
 $size-medium-space: 21pt;
 $size-large-space: 28pt;
 

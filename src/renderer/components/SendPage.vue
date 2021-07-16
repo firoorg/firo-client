@@ -20,12 +20,8 @@
 
         <section class="send-detail">
             <div class="inner" :class="{disabled: formDisabled, unsynced: !isBlockchainSynced}">
-                <div id="top" class="not-footer">
-                    <div class="field" id="label-field">
-                        <label>
-                            Label
-                        </label>
-
+                <div class="top not-footer">
+                    <InputFrame label="Label">
                         <input
                             id="label"
                             ref="label"
@@ -34,16 +30,12 @@
                             type="text"
                             name="label"
                             tabindex="1"
-                            placeholder="Label (optional)"
+                            placeholder="Label"
                             :disabled="formDisabled"
                         />
-                    </div>
+                    </InputFrame>
 
-                    <div class="field" id="address-field">
-                        <label>
-                            Address
-                        </label>
-
+                    <InputFrame label="Address">
                         <input
                             id="address"
                             ref="address"
@@ -57,126 +49,98 @@
                             spellcheck="false"
                             :disabled="formDisabled"
                         />
+                    </InputFrame>
 
-                        <div id="add-to-address-book">
-                            <a href="#" :class="{disabled: formDisabled || !showAddToAddressBook}" @click="addToAddressBook">
-                                Add to Address Book
-                            </a>
-                        </div>
+                    <div class="checkbox-field add-to-address-book" :class="{disabled: !showAddToAddressBook}">
+                        <PlusButton :disabled="!showAddToAddressBook" />
+                        <label @click="addToAddressBook">Add to address book</label>
                     </div>
 
-                    <div class="field" id="amount-field">
-                        <label>
-                            Amount
-                        </label>
+                    <InputFrame class="input-frame-amount" label="Amount">
+                        <input
+                            id="amount"
+                            ref="amount"
+                            v-model="amount"
+                            v-validate.initial="amountValidations"
+                            v-tooltip="getValidationTooltip('amount')"
+                            type="text"
+                            name="amount"
+                            class="amount"
+                            tabindex="3"
+                            placeholder="Amount"
+                        />
+                    </InputFrame>
 
-                        <div class="input-with-tip-container">
-                            <input
-                                id="amount"
-                                ref="amount"
-                                v-model="amount"
-                                v-validate.initial="amountValidations"
-                                v-tooltip="getValidationTooltip('amount')"
-                                type="text"
-                                name="amount"
-                                class="amount"
-                                tabindex="3"
-                                placeholder="Amount"
-                                :disabled="formDisabled"
-                            />
-
-                            <span class="tip ticker">
-                                FIRO
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <div class="custom-input-checkbox-container">
-                            <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled" />
-                            <label>
-                                <a href="#" id="custom-inputs-button" :class="{disabled: formDisabled}" @click="useCustomInputs = showCustomInputSelector = !formDisabled">
-                                    Custom Inputs (Coin Control)
-                                </a>
-                            </label>
-                        </div>
-
-                        <div v-if="useCustomInputs" class="selected-coin-value">
-                            <label>Max Send:</label>
-                            <div class="value">
-                                <amount :amount="coinControlSelectedAmount" /> <span class="ticker">FIRO</span>
-                            </div>
-                        </div>
+                    <div class="checkbox-field">
+                        <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled"/>
+                        <label><a href="#" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
 
                         <Popup v-if="showCustomInputSelector" :close="() => showCustomInputSelector = false">
                             <InputSelection v-model="customInputs" :is-private="isPrivate" />
                         </Popup>
                     </div>
 
-                    <div class="field use-custom-fee">
-                        <label>
-                            <input type="checkbox" v-model="useCustomFee" :disabled="formDisabled" />
-                            Custom Transaction Fee
-                        </label>
-
-                        <div v-show="useCustomFee" class="input-with-tip-container">
-                            <input
-                                id="txFeePerKb"
-                                ref="txFeePerKb"
-                                v-model="userTxFeePerKb"
-                                v-validate.initial="'txFeeIsValid'"
-                                v-tooltip="getValidationTooltip('txFeePerKb')"
-                                :placeholder="smartFeePerKb"
-                                type="text"
-                                name="txFeePerKb"
-                                tabindex="4"
-                            />
-
-                            <span class="tip">
-                                sat/kb
-                            </span>
-                        </div>
+                    <div v-if="useCustomInputs" class="max-send">
+                        <label>Max Send:</label>
+                        <amount :amount="coinControlSelectedAmount" ticker="FIRO" />
                     </div>
 
-                    <div class="field" id="subtract-fee-from-amount">
-                        <input v-model="subtractFeeFromAmount" type="checkbox" checked :disabled="formDisabled" />
-                        <label>
-                            Take Transaction Fee From Amount
-                        </label>
+                    <div class="checkbox-field">
+                        <input type="checkbox" v-model="subtractFeeFromAmount" />
+                        <label>Take Transaction Fee From Amount</label>
                     </div>
-                </div>
 
-                <div id="bottom">
-                    <div id="totals" class="not-footer">
-                        <div class="total-field" id="receive-amount">
+                    <div class="checkbox-field">
+                        <input type="checkbox" v-model="useCustomFee" />
+                        <label>Custom Transaction Fee</label>
+                    </div>
+
+                    <InputFrame v-if="useCustomFee" class="input-frame-tx-fee" unit="sat/kb">
+                        <input
+                            id="txFeePerKb"
+                            ref="txFeePerKb"
+                            v-model="userTxFeePerKb"
+                            v-validate.initial="'txFeeIsValid'"
+                            v-tooltip="getValidationTooltip('txFeePerKb')"
+                            :placeholder="smartFeePerKb"
+                            type="text"
+                            name="txFeePerKb"
+                            tabindex="4"
+                        />
+                    </InputFrame>
+
+                    <hr />
+
+                    <div class="totals not-footer">
+                        <div class="total-field">
                             <label>
                                 Recipient will receive:
                             </label>
 
                             <div v-if="transactionFee" class="value">
-                                <amount :amount="amountToReceive" /> <span class="ticker">FIRO</span>
+                                <amount :amount="amountToReceive" ticker="FIRO" />
                             </div>
                             <div v-else class="value" />
                         </div>
 
-                        <div class="total-field" id="transaction-fee">
+                        <div class="total-field">
                             <label>
                                 Transaction fee:
                             </label>
 
                             <div v-if="transactionFee" class="value">
-                                <amount :amount="transactionFee" /> <span class="ticker">FIRO</span>
+                                <amount :amount="transactionFee" ticker="FIRO" />
                             </div>
                             <div v-else class="value" />
                         </div>
 
-                        <div class="total-field" id="total-amount">
+                        <div class="total-field">
                             <label>
                                 Total:
                             </label>
 
                             <div v-if="transactionFee" class="value">
-                                <amount :amount="totalAmount" /> <span class="ticker">FIRO</span>
+                                <amount :amount="totalAmount" ticker="FIRO" />
                             </div>
 
                             <div v-else class="value" />
@@ -186,7 +150,9 @@
                             {{ transactionFeeError }}
                         </div>
                     </div>
+                </div>
 
+                <div class="bottom">
                     <SendFlow
                         :disabled="!canBeginSend"
                         :is-private="isPrivate"
@@ -199,6 +165,7 @@
                         :coin-control="coinControl"
                         class="not-footer"
                         @success="() => (feeMap = {}) && cleanupForm()"
+                        @reset="() => (feeMap = {}) && cleanupForm(false)"
                     />
 
                     <div class="footer">
@@ -224,17 +191,21 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
+import InputFrame from "renderer/components/shared/InputFrame";
+import PlusButton from "renderer/components/shared/PlusButton";
 
 export default {
     name: 'SendPage',
 
     components: {
+        PlusButton,
         PrivatePublicBalance,
         AnimatedTable,
         SendFlow,
         Amount,
         InputSelection,
-        Popup
+        Popup,
+        InputFrame
     },
 
     inject: [
@@ -319,7 +290,7 @@ export default {
         },
 
         showAddToAddressBook () {
-            return isValidAddress(this.address, this.network) && !this.addressBook[this.address];
+            return !this.formDisabled && isValidAddress(this.address, this.network) && (!this.addressBook[this.address] || this.addressBook[this.address].label !== this.label);
         },
 
         coinControl () {
@@ -495,8 +466,6 @@ export default {
 
         async addToAddressBook() {
             if (!this.showAddToAddressBook) return;
-            if (this.formDisabled) return;
-            if (this.addressBook[this.address]) return;
 
             const item = {
                 address: this.address,
@@ -515,6 +484,8 @@ export default {
         cleanupForm(enablePrivate=true) {
             if (enablePrivate) this.isPrivate = true;
             this.useCustomInputs = false;
+            this.useCustomFee = false;
+            this.subtractFeeFromAmount = false;
             this.label = '';
             this.amount = '';
             this.address = '';
@@ -524,10 +495,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
+@import "src/renderer/styles/checkbox-field";
 
 #send-page {
     height: 100%;
@@ -557,26 +525,7 @@ export default {
         box-sizing: border-box;
         padding: $size-detail-margin;
         height: 100%;
-        background-color: var(--color-detail-background);
-
-        label {
-            @include label();
-        }
-
-        .input-with-tip-container {
-            width: fit-content;
-            position: relative;
-
-            .tip {
-                position: absolute;
-                bottom: $size-input-vertical-padding;
-                right: $size-input-horizontal-padding;
-            }
-        }
-
-        .ticker {
-            @include ticker();
-        }
+        background-color: var(--color-background-detail);
 
         .inner {
             height: 100%;
@@ -587,81 +536,71 @@ export default {
                 opacity: $disabled-input-opacity;
             }
 
-            #top {
+            .top {
                 flex-grow: 1;
 
-                .field {
-                    width: fit-content;
+                .framed-input {
+                    width: 100%;
+                }
 
-                    &:not(:first-child) {
-                        margin-top: $size-between-field-space-big;
-                    }
+                .add-to-address-book {
+                    margin-bottom: 10px;
 
-                    label, input[type="text"] {
-                        display: block;
-                    }
-
-                    input[type="text"] {
-                        @include wide-input-field();
-                    }
-
-                    &#address-field {
-                        input {
-                            @include address();
-                        }
-
-                        #add-to-address-book {
-                            text-align: right;
-
-                            a {
-                                @include small();
-                                @include optional-action;
-
-                                &.disabled {
-                                    cursor: default;
-                                    opacity: 0.3;
-                                }
-                            }
+                    &:not(.disabled) {
+                        &, label {
+                            cursor: pointer;
                         }
                     }
 
-                    &#select-custom-inputs {
-                        a {
-                            @include optional-action();
+                    &.disabled {
+                        &, label {
+                            color: var(--color-text-disabled);
                         }
                     }
 
-                    &#subtract-fee-from-amount {
-                        * {
-                            display: inline;
-                        }
-                    }
-
-                    .custom-input-checkbox-container {
-                        * {
-                            display: inline-block;
-                        }
-
-                        a.disabled {
-                            cursor: default;
-                        }
-                    }
-
-                    .selected-coin-value {
-                        * {
-                            display: inline;
-                        }
+                    label {
+                        color: var(--color-secondary);
+                        font-weight: bold;
                     }
                 }
-            }
 
-            #bottom {
-                #totals {
+                .input-frame-amount {
+                    margin-bottom: 20px;
+                }
+
+                .checkbox-field:not(.add-to-address-book) {
+                    margin-bottom: 6px;
+                }
+
+                .max-send {
+                    margin-bottom: 10px;
+                    opacity: 0.5;
+                    font-weight: bold;
+
+                    label, .amount {
+                        display: inline-block;
+                    }
+
+                    .amount {
+                        color: var(--color-secondary);
+                    }
+                }
+
+                hr {
+                    opacity: 0.2;
+
+                    margin: {
+                        top: 30px;
+                    }
+                }
+
+                .totals {
                     .total-field {
-                        margin-bottom: $size-small-space;
+                        margin-top: 10px;
 
                         label, .value {
                             display: inline;
+                            @include label();
                         }
 
                         label {
@@ -673,7 +612,9 @@ export default {
                         }
                     }
                 }
+            }
 
+            .bottom {
                 .error {
                     @include error();
                     margin-bottom: $size-small-space;
