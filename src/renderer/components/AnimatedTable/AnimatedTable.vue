@@ -252,57 +252,40 @@ export default {
 }
 
 .animated-table {
-    .vuetable-body-wrapper {
-        & > table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-    }
+    table {
+        width: 100%;
 
-    tr {
-        text-align: left;
-
-        td, th {
-            &:first-child {
-                padding-left: $size-table-row-horizontal-padding;
-            }
-
-            &:last-child {
-                padding-right: $size-table-row-horizontal-padding;
-            }
-        }
-
-        th {
-            padding-bottom: 1em;
-            font-weight: bold;
-            color: var(--color-table-heading);
-        }
-    }
-
-    .vuetable-body {
         tr {
-            cursor: pointer;
-            box-sizing: border-box;
+            text-align: left;
 
-            // alternating colours for different rows
-            &:nth-child(odd) {
-                background: var(--color-darkened-table-background);
-            }
-            &:nth-child(even) {
-                background: var(--color-table-background);
-            }
+            td, th {
+                vertical-align: middle;
+                box-shadow: 0 1px 0 0 var(--color-text-subtle-border);
 
-            // highlight on hover
-            &:hover {
-                td {
-                    background: var(--color-lightened-table-background);
+                &:first-child {
+                    padding-left: $size-table-row-horizontal-padding;
+                }
+
+                &:last-child {
+                    padding-right: $size-table-row-horizontal-padding;
                 }
             }
 
-            td {
-                padding: {
-                    top: $size-table-row-vertical-padding;
-                    bottom: $size-table-row-vertical-padding;
+            th {
+                padding-bottom: 1em;
+                font-weight: bold;
+            }
+        }
+
+        tbody {
+            tr {
+                cursor: pointer;
+
+                td {
+                    padding: {
+                        top: $size-table-row-vertical-padding;
+                        bottom: $size-table-row-vertical-padding;
+                    }
                 }
             }
         }

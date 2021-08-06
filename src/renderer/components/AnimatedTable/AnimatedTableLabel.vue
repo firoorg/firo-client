@@ -79,13 +79,4 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-
-.payment-request-label {
-    color: var(--color-text-disabled);
-}
-
-td > span:not(.label-text) {
-    font-style: italic;
-}
 </style>

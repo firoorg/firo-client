@@ -83,7 +83,7 @@ export default {
             }
 
             #inner-popup {
-                background-color: var(--color-popup-background);
+                background-color: var(--color-background-popups);
                 width: fit-content;
                 box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
                 border-radius: 8px;

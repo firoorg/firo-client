@@ -107,6 +107,7 @@ export default {
 
 .animated-table {
     min-width: 50vw;
+    max-height: 75vh;
 
     .locked {
         text-decoration: line-through;
