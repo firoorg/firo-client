@@ -83,7 +83,7 @@ export default {
             float: right;
             width: calc(100vw - #{$size-sidebar-width});
             height: 100%;
-            background: var(--color-main-background);
+            background: var(--color-background-main);
         }
     }
 }
