@@ -64,7 +64,7 @@ nav {
 
         &.router-link-active {
             background-color: var(--color-primary-background);
-            color: white;
+            color: var(--color-text-primary);
         }
     }
 }

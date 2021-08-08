@@ -1,7 +1,7 @@
 // These are the colors defined in the Firo Brand Guidelines.
 // Names are taken from http://chir.ag/projects/name-that-color/
 
-body {
+:root {
     // Primary
     --firo-old-brick: #9b1c2e;
     --firo-merlot: #7c1624;
@@ -17,7 +17,7 @@ body {
     --firo-wild-sand: #f4f4f4;
 }
 
-.light-mode {
+:root {
     --color-background-main: #FDFDFE;
     --color-background-popups: #FFFFFF;
     --color-background-containers: #FFFFFF;
@@ -56,6 +56,9 @@ body {
     --color-status-success: #5EA77B;
     --color-status-error: #EC505D;
 
+    --color-warning-background: #9B1C2E;
+    --color-warning-text: #FDFDFF;
+
     // Old colours
 
     --color-main-background: white;
@@ -67,8 +70,6 @@ body {
     --color-setup-background: #{darken(#e1ebf1, 5%)};
     --color-setup-foreground: #{darken(#f6f8fc, 5%)};
 
-    --color-warning-background: var(--firo-brick-red);
-    --color-warning-text: white;
 
     --color-text: black;
     --color-dark-text: black;
@@ -107,4 +108,99 @@ body {
 
     --color-debug-background: var(--color-darkened-menu-background);
     --color-debug-text: var(--firo-gray);
+}
+
+@media(prefers-color-scheme: dark) {
+    :root {
+        --color-background-main: #1C1C1C;
+        --color-background-popups: #FFFFFF;
+        --color-background-containers: #FFFFFF;
+        --color-background-no-data: #FBFBFB;
+        --color-background-tag: rgba(216, 225, 235, 0.2);
+        --color-background-sidebar: #212429;
+        --color-background-detail: #212429;
+
+        --color-text-primary: #D2D3D4;
+        --color-text-secondary: rgba(15, 14, 14, 0.6);
+        --color-text-disabled: rgba(15, 14, 14, 0.4);
+        --color-text-subtle-border: #3A3A3A;
+        --color-text-minimal-button-background: #2C2F34;
+        --color-text-minimal-button-background-pressed: rgba(60, 57, 57, 0.1);
+
+        --color-primary: #8D2932;
+        --color-primary-background: #AB3748;
+        --color-primary-button-pressed: #8D071A;
+        --color-primary-button-disabled: rgba(155, 28, 46, 0.5);
+        --color-primary-button-hover: #EBEFF4;
+        --color-primary-button-minimal-background: rgba(155, 28, 46, 0.1);
+        --color-primary-button-subtle-background: rgba(155, 28, 46, 0.05);
+
+        --color-secondary: #2FA299;
+        --color-secondary-button-pressed: #149389;
+        --color-secondary-button-disabled: rgba(47, 162, 153, 0.5);
+        --color-secondary-tag-background: rgba(47, 162, 153, 0.1);
+        --color-secondary-button-minimal-background: #3A6A67;
+        --color-secondary-contrast: #FDFDFF;
+
+        --color-tertiary: #A22F72;
+        --color-tertiary-disabled: rgba(162, 47, 114, 0.5);
+        --color-tertiary-tag-background: rgba(162, 47, 114, 0.1);
+        --color-tertiary-button-minimal-background: rgba(162, 47, 114, 0.05);
+
+        --color-status-success: #5EA77B;
+        --color-status-error: #EC505D;
+
+        --color-warning-background: #9B1C2E;
+        --color-warning-text: #FDFDFF;
+
+        // Old colours
+
+        --color-main-background: white;
+        --color-lightened-main-background: white;
+        --color-menu-background: #e1ebf1;
+        --color-darkened-menu-background: #{darken(#e1ebf1, 5%)};
+        --color-detail-background: #f6f8fc;
+        --color-loading-background: #e5e5e5;
+        --color-setup-background: #{darken(#e1ebf1, 5%)};
+        --color-setup-foreground: #{darken(#f6f8fc, 5%)};
+
+
+        --color-text: black;
+        --color-dark-text: black;
+        --color-text-accent: var(--firo-brick-red);
+        --color-ticker: var(--color-text-accent);
+        --color-error: red;
+
+        --color-input-text: var(--color-text);
+        --color-input-placeholder: var(--color-text);
+        --color-input-background: #f6f8fc;
+        --color-search-input-background: white;
+
+        --color-shadow: rgba(0, 0, 0, 0.25);
+
+        --color-big-button: white;
+        --color-big-button-text: var(--color-text);
+
+        --color-popup-outside: rgba(0, 0, 0, 0.6);
+        --color-popup-background: white;
+
+        --color-tooltip-text: white;
+        --color-tooltip-background: #F92848;
+
+        --color-menu-link-text: black;
+        --color-menu-link-text-highlighted: white;
+        --color-menu-highlighted-element: var(--firo-brick-red);
+
+        --color-table-background: #F6F8FC;
+        --color-lightened-table-background: #{lighten(#F6F8FC, 20%)};
+        --color-darkened-table-background: #{darken(#F6F8FC, 10%)};
+        --color-table-heading: var(--color-text);
+
+        --color-amount-positive: var(--color-text);
+        --color-amount-negative: var(--color-text);
+        --color-amount-neutral: var(--color-text);
+
+        --color-debug-background: var(--color-darkened-menu-background);
+        --color-debug-text: var(--firo-gray);
+    }
 }

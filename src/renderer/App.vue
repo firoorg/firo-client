@@ -25,11 +25,7 @@ export default {
 
     computed: mapGetters({
         waitingReason: 'App/waitingReason'
-    }),
-
-    mounted() {
-        document.getElementsByTagName('body')[0].classList.add('light-mode');
-    }
+    })
 }
 </script>
 
