@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div class="input-selection-popup">
         <div v-if="showBreakingMasternodeWarning" class="breaking-masternode-warning">
             Crossed out transactions are used as masternode collateral. Using them will break the associated node.
         </div>
 
         <AnimatedTable
             ref="vuetable"
+            no-data-message="No inputs available"
             :data="ourUnspentUTXOs"
             :fields="fields"
-            :anti-overflow-hack="true"
             :global-data="selectionData"
             :row-class="lockedClassOfRow"
             track-by="uniqId"
@@ -99,18 +99,20 @@ export default {
 @import "src/renderer/styles/typography";
 @import "src/renderer/styles/sizes";
 
-.breaking-masternode-warning {
-    @include guidance();
-    text-align: center;
-    margin-bottom: $size-medium-space;
-}
+.input-selection-popup {
+    .breaking-masternode-warning {
+        @include guidance();
+        text-align: center;
+        margin-bottom: $size-medium-space;
+    }
 
-.animated-table {
-    min-width: 50vw;
-    max-height: 75vh;
+    .animated-table {
+        min-width: 50vw;
+        height: 75vh;
 
-    .locked {
-        text-decoration: line-through;
+        .locked {
+            text-decoration: line-through;
+        }
     }
 }
 </style>

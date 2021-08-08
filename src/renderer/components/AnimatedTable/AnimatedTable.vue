@@ -1,6 +1,6 @@
 <template>
     <div class="animated-table">
-        <div class="table-container" ref="table-container">
+        <div class="table-container" ref="tableContainer">
             <vuetable
                 ref="vuetable"
                 :api-mode="false"
@@ -97,13 +97,6 @@ export default {
         globalData: {
             type: Object,
             required: false
-        },
-        // FIXME: For reasons I haven't been able to figure out, flex-grow will cause .table-container to sometimes
-        //        outgrow the available space. This sets our table to be smaller so that won't happen. It seems to only
-        //        be necessary when AnimatedTable is embedded in Popup, which happens in InputSelection.
-        antiOverflowHack: {
-            type: Boolean,
-            default: false
         }
     },
 
@@ -167,14 +160,13 @@ export default {
 
     methods: {
         setPerPage() {
-            this.perPage = 0;
+            this.perPage = 1;
             this.$nextTick(() => {
-                const tableContainer = document.querySelector('.table-container');
-                const tableHeader = document.querySelector('.table-container th');
-                const tableRow = document.querySelector('.table-container td');
+                const tableContainer = this.$refs.tableContainer;
+                const tableHeader = tableContainer.querySelector('th');
+                const tableRow = tableContainer.querySelector('td');
                 if (tableContainer && tableHeader && tableRow) {
                     this.perPage = Math.floor((tableContainer.clientHeight - tableHeader.clientHeight) / tableRow.clientHeight);
-                    if (this.antiOverflowHack) this.perPage -= 2;
                     this.$refs.vuetable.refresh();
                 }
             });
