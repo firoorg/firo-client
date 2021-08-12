@@ -356,6 +356,9 @@ export default {
             this.amount = to.query.amount || '';
         },
 
+        filteredSendAddresses() {
+            this.$nextTick(() => window.dispatchEvent(new Event('resize')));
+        },
 
         // Returns [number (txfee in satoshi), error (string)], one of which will be null.
         async currentTxFeeId() {
