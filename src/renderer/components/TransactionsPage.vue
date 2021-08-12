@@ -2,12 +2,7 @@
     <section class="transactions-page">
         <div class="inner">
             <div class="top-section">
-                <input
-                    v-model="filter"
-                    type="text"
-                    class="table-filter-input"
-                    placeholder="Filter by label or address"
-                />
+                <SearchInput v-model="filter" placeholder="Filter by label or address" />
 
                 <div v-if="showUnsyncedWarning" class="show-unsynced-warning">
                     The blockchain is not yet synced. Payment information may be incomplete or inaccurate.
@@ -48,6 +43,7 @@ import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
 import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
 import Popup from "renderer/components/shared/Popup";
 import { convertToCoin } from "lib/convert";
+import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
     {name: RelativeDate, width: '160pt'},
@@ -59,6 +55,7 @@ export default {
     name: 'TransactionsPage',
 
     components: {
+        SearchInput,
         AnimatedTable,
         Popup,
         TransactionInfo
@@ -88,11 +85,11 @@ export default {
         },
 
         filteredTableData() {
-            window.dispatchEvent(new Event('resize'));
+            this.$nextTick(() => window.dispatchEvent(new Event('resize')));
         },
 
         showUnsyncedWarning() {
-            window.dispatchEvent(new Event('resize'));
+            this.$nextTick(() => window.dispatchEvent(new Event('resize')));
         }
     },
 
@@ -230,22 +227,8 @@ export default {
         flex-flow: column;
 
         .top-section {
-            height: fit-content;
-
-            .table-filter-input {
-                margin: {
-                    left: auto;
-                    right: 0;
-                    bottom: $size-medium-space;
-                }
-
-                @include search-input();
-                max-width: 100%;
-            }
-
-            .filter-input {
-                position: relative;
-                display: inline-block;
+            .search-input {
+                margin-bottom: $size-main-margin;
             }
 
             .show-unsynced-warning, .awaiting-updates {

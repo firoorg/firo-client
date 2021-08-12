@@ -55,10 +55,6 @@ export default {
             color: var(--color-text-subtle-border);
             radius: 20px;
         }
-
-        &:placeholder-shown {
-            caret-color: transparent;
-        }
     }
 }
 </style>
