@@ -1,28 +1,20 @@
 <template>
     <div class="receive-page">
         <div class="top">
-            <div ref="outerQrCode" class="outer">
-                <div ref="qrContainer" class="qr-container">
-                    <div ref="qrContainerInner" class="inner" style="display: none">
-                        <div ref="qrCode" class="qr-code" />
-                    </div>
+            <div ref="qrCode" class="qr-code" />
+
+            <div class="right">
+                <div class="title">
+                    Scan this QR code to receive Firo
                 </div>
-            </div>
 
-            <div class="address">
-                <div v-if="address" class="loaded">
-                    <div class="label">
-                        <input v-if="isEditing" ref="editableLabel" class="label-input" type="text" :placeholder="label" v-model.lazy="label" @blur="isEditing = false" />
-                        <div v-else class="label-text">{{ label }}</div>
+                <InputFrame label="Receiving Address">
+                    <input type="text" disabled="true" :value="address" />
+                </InputFrame>
 
-                        <!-- The Ok! button doesn't need an action because clicking anywhere outside label-input will
-                             trigger the rename. -->
-                        <input v-if="isEditing" type="button" value="Ok!" />
-                        <input v-else type="button" value="Edit" @click="editLabel" />
-                    </div>
-
-                    <copyable class="copyable-address">{{ address }}</copyable>
-                </div>
+                <InputFrame label="Label">
+                    <input type="text" placeholder="Unlabelled" v-model.lazy="label" />
+                </InputFrame>
             </div>
         </div>
 
@@ -47,6 +39,7 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import Copyable from "renderer/components/shared/Copyable";
+import InputFrame from "renderer/components/shared/InputFrame";
 
 const FiroSymbol = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyNC4yLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCA1MjAgNTIwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MjAgNTIwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojRkVGRUZFO30NCgkuc3Qxe2ZpbGw6IzlCMUMyRTt9DQo8L3N0eWxlPg0KPGc+DQoJPGc+DQoJCTxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjI2MCIgY3k9IjI2MCIgcj0iMjUyLjciLz4NCgk8L2c+DQoJPGc+DQoJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNTUuNiwzNzAuN2M1LjksMCwxMS4yLTMuMiwxNC04LjRsMzcuMy03MC42aC01Ny41Yy04LjcsMC0xNS44LTcuMS0xNS44LTE1Ljh2LTMxLjYNCgkJCWMwLTguNyw3LjEtMTUuOCwxNS44LTE1LjhoOTAuOWw3MC42LTEzMy45YzIuNy01LjIsOC4xLTguNCwxNC04LjRoMTE4LjhDMzk3LjUsMzcuNCwzMzIuMyw3LDI2MCw3QzEyMC4zLDcsNywxMjAuMyw3LDI2MA0KCQkJYzAsMzkuNyw5LjIsNzcuMywyNS41LDExMC43SDE1NS42eiIvPg0KCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzY0LjQsMTQ5LjNjLTUuOSwwLTExLjIsMy4yLTE0LDguNGwtMzcuMyw3MC42aDU3LjVjOC43LDAsMTUuOCw3LjEsMTUuOCwxNS44djMxLjYNCgkJCWMwLDguNy03LjEsMTUuOC0xNS44LDE1LjhoLTkwLjlsLTcwLjYsMTMzLjljLTIuNyw1LjItOC4xLDguNC0xNCw4LjRINzYuNEMxMjIuNSw0ODIuNiwxODcuNyw1MTMsMjYwLDUxMw0KCQkJYzEzOS43LDAsMjUzLTExMy4zLDI1My0yNTNjMC0zOS43LTkuMi03Ny4zLTI1LjUtMTEwLjdIMzY0LjR6Ii8+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=";
 
@@ -54,8 +47,8 @@ export default {
     name: "ReceivePage",
 
     components: {
-        AnimatedTable,
-        Copyable
+        InputFrame,
+        AnimatedTable
     },
 
     data() {
@@ -63,7 +56,6 @@ export default {
             address: null,
             isEditing: false,
             qrCode: null,
-            resizeListener: () => this.resizeQrCode(),
             isDefaultAddress: true,
 
             tableFields: [
@@ -83,7 +75,7 @@ export default {
 
         label: {
             get() {
-                return (this.addressBook[this.address] && this.addressBook[this.address].label) || 'Unlabelled';
+                return (this.addressBook[this.address] && this.addressBook[this.address].label) || '';
             },
 
             async set(newLabel) {
@@ -105,12 +97,6 @@ export default {
         }
 
         await this.displayAddress();
-
-        window.addEventListener('resize', this.resizeListener);
-    },
-
-    destroyed() {
-        window.removeEventListener('resize', this.resizeListener);
     },
 
     // Make sure we always display a fresh address.
@@ -174,32 +160,14 @@ export default {
             } else {
                 this.qrCode = new QRCode(this.$refs.qrCode, {
                     text: this.address,
-                    height: 2048,
-                    width: 2048,
+                    height: 200,
+                    width: 200,
                     colorDark: 'black',
                     colorLight: 'white',
                     logo: FiroSymbol,
-                    logoBackgroundColor: 'white',
-                    onRenderingEnd: () => this.resizeQrCode()
+                    logoBackgroundColor: 'white'
                 });
             }
-        },
-
-        resizeQrCode() {
-            // Don't throw errors during reload.
-            if (!this.$refs.outerQrCode) return;
-
-            this.$refs.outerQrCode.classList.remove('shadow');
-            this.$refs.qrContainerInner.style.display = 'none';
-
-            const size = `${this.$refs.qrContainer.clientHeight}px`;
-            const img = this.$refs.qrCode.querySelector('img');
-            img.style.height = size;
-            img.style.width = size;
-            img.style.display = 'initial';
-
-            this.$refs.qrContainerInner.style.display = 'initial';
-            this.$refs.outerQrCode.classList.add('shadow');
         }
     }
 }
@@ -216,84 +184,38 @@ $top-height: 40%;
 .receive-page {
     height: 100%;
     padding: $size-main-margin;
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 
     .top {
-        height: $top-height;
         display: flex;
-        flex-direction: column;
-        justify-content: end;
+        margin-bottom: $size-main-margin;
 
-        .outer {
-            flex-grow: 1;
-            padding: $size-tiny-space;
-
-            &.shadow {
-                box-shadow: $size-shadow-radius $size-shadow-radius $size-shadow-radius $size-shadow-radius var(--color-shadow);
-            }
-
-            border: {
-                width: 0;
-                radius: $size-shadow-radius;
-            }
-
-            width: fit-content;
-            margin: {
-                left: auto;
-                right: auto;
-            }
-
-            .qr-container {
-                height: 100%;
-            }
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin-right: $size-main-margin;
         }
 
-        .address {
-            flex-grow: 0;
+        .right {
+            flex-grow: 1;
 
-            .label {
-                @include label();
-                width: fit-content;
-                margin: {
-                    left: auto;
-                    right: auto;
-                    top: $size-tiny-space;
-                }
-
-                * {
-                    display: inline;
-                }
-
-                .label-text {
-                    margin-bottom: $size-very-tiny-space;
-                }
-
-                .label-input {
-                    @include wide-input-field();
-                    margin-bottom: $size-tiny-space;
-                }
-
-                input[type="button"] {
-                    @include undecorated-button();
+            .title {
+                margin-bottom: $size-main-margin;
+                font: {
+                    weight: bold;
+                    size: 14px;
                 }
             }
 
-            .copyable-address {
-                @include address();
-                display: block;
-                width: fit-content;
-                margin: {
-                    left: auto;
-                    right: auto;
-                    bottom: $size-tiny-space;
-                }
+            .framed-input {
+                width: 420px;
             }
         }
     }
 
     .bottom {
-        height: calc(100% - #{$top-height});
-        padding-top: $size-main-margin;
+        flex-grow: 1;
 
         .animated-table {
             height: 100%;
