@@ -1,37 +1,7 @@
 <template>
     <div>
         <WaitOverlay v-if="waiting" />
-
-        <div v-else class="anonymize-dialog">
-            <div class="title">
-                Secure {{ convertToCoin(availablePublic) }} FIRO
-            </div>
-
-            <div class="content">
-                <input
-                    v-focus
-                    v-model="passphrase"
-                    type="password"
-                    name="passphrase"
-                    placeholder="Enter Your Passphrase"
-                    @keyup.enter="tryAnonymize()"
-                />
-
-                <div v-if="error" class="error">
-                    {{ error }}
-                </div>
-            </div>
-
-            <div class="buttons">
-                <button class="cancel" @click="cancel()">
-                    Cancel
-                </button>
-
-                <button class="confirm" :disabled="!passphrase" @click="tryAnonymize()">
-                    Confirm
-                </button>
-            </div>
-        </div>
+        <PassphraseInput v-else v-model="passphrase" :error="error" @cancel="cancel()" @confirm="tryAnonymize()" />
     </div>
 </template>
 
@@ -40,11 +10,15 @@ import {convertToCoin} from "lib/convert";
 import {mapGetters} from "vuex";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
+import Amount from "renderer/components/shared/Amount";
+import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
 export default {
     name: "AnonymizeDialog",
 
     components: {
+        Amount,
+        PassphraseInput,
         WaitOverlay
     },
 
@@ -100,23 +74,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/popup";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/typography";
 
-.anonymize-dialog {
-    @include popup();
-    color: var(--color-text);
-
-    input[type="password"] {
-        @include wide-input-field();
-    }
-
-    .error {
-        margin-top: $size-between-field-space-big;
-        @include error();
-    }
-}
 </style>
