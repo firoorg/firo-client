@@ -13,11 +13,17 @@
             :row-class="lockedClassOfRow"
             track-by="uniqId"
         />
+
+        <div class="two-button-holder">
+            <button class="solid-button unrecommended" @click="cancel()">Cancel</button>
+            <button class="solid-button recommended" @click="ok()">OK</button>
+        </div>
     </div>
 </template>
 
 <script>
-// $emits: input
+// $emits: input, cancel, ok
+import {fromPairs} from "lodash";
 import {mapGetters} from "vuex";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
@@ -35,15 +41,8 @@ export default {
     },
 
     props: {
-        value: {
-            type: Array, // TransactionOutput[]
-            required: true // We should be passed an empty Array to begin with.
-        },
-
-        isPrivate: {
-            type: Boolean,
-            required: true
-        }
+        value: Array,
+        isPrivate: Boolean
     },
 
     data() {
@@ -70,7 +69,7 @@ export default {
 
         selectedCoins() {
             return Object.entries(this.selectionData)
-                .filter(([k, v]) => !!v)
+                .filter(([k, v]) => v)
                 .map(([uniqId, v]) => this.transactions[uniqId]);
         },
 
@@ -82,12 +81,25 @@ export default {
     },
 
     methods: {
+        ok() {
+            this.$emit(this.selectedCoins.length ? 'ok' : 'cancel');
+        },
+
+        cancel() {
+            this.selectionData = {};
+            this.$emit('cancel');
+        },
+
         lockedClassOfRow(row) {
             return row.locked ? 'locked' : 'unlocked';
         }
     },
 
     watch: {
+        value() {
+            this.selectionData = fromPairs(this.value.map(tx => [tx.uniqId, true]));
+        },
+
         selectedCoins() {
             this.$emit('input', this.selectedCoins);
         }
@@ -95,15 +107,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/sizes";
-
+<style scoped lang="scss">
 .input-selection-popup {
+    padding: var(--popup-padding);
+
     .breaking-masternode-warning {
-        @include guidance();
         text-align: center;
-        margin-bottom: $size-medium-space;
+        margin-bottom: var(--popup-padding);
     }
 
     .animated-table {

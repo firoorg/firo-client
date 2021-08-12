@@ -22,7 +22,7 @@
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
-            <PassphraseStep v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
+            <PassphraseInput v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
             <WaitOverlay v-if="show === 'wait'" />
             <ErrorStep v-if="show === 'error'" :error="error" @ok="cancel()" />
         </Popup>
@@ -36,7 +36,7 @@ import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import {mapGetters} from "vuex";
 import Popup from "renderer/components/shared/Popup";
 import ConfirmStep from "./ConfirmStep";
-import PassphraseStep from "./PassphraseStep";
+import PassphraseInput from "../shared/PassphraseInput";
 import ErrorStep from "./ErrorStep";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
 
@@ -46,7 +46,7 @@ export default {
     components: {
         Popup,
         ConfirmStep,
-        PassphraseStep,
+        PassphraseInput,
         ErrorStep,
         WaitOverlay
     },
@@ -60,50 +60,15 @@ export default {
     },
 
     props: {
-        disabled: {
-            required: true,
-            type: Boolean
-        },
-
-        label: {
-            required: true,
-            type: String,
-        },
-
-        address: {
-            required: true,
-            type: String
-        },
-
-        amount: {
-            required: true,
-            type: Number
-        },
-
-        txFeePerKb: {
-            required: true,
-            type: Number
-        },
-
-        computedTxFee: {
-            required: true,
-            type: Number
-        },
-
-        subtractFeeFromAmount: {
-            required: true,
-            type: Boolean
-        },
-
-        isPrivate: {
-            required: true,
-            type: Boolean
-        },
-
-        coinControl: {
-            required: false,
-            type: Array // CoinControl[]
-        }
+        disabled: Boolean,
+        label: String,
+        address: String,
+        amount: Number,
+        txFeePerKb: Number,
+        computedTxFee: Number,
+        subtractFeeFromAmount: Boolean,
+        isPrivate: Boolean,
+        coinControl: Array
     },
 
     computed: {

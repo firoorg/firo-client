@@ -1,11 +1,7 @@
 <template>
     <div id="send-page">
         <div id="send-primary">
-            <input
-                v-model="filter"
-                type="text"
-                placeholder="Search by label or address"
-            />
+            <SearchInput v-model="filter" placeholder="Search by label or address" />
 
             <AnimatedTable
                 ref="table"
@@ -75,8 +71,8 @@
                         <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled"/>
                         <label><a href="#" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
 
-                        <Popup v-if="showCustomInputSelector" :close="() => showCustomInputSelector = false">
-                            <InputSelection v-model="customInputs" :is-private="isPrivate" />
+                        <Popup v-if="showCustomInputSelector">
+                            <InputSelection v-model="customInputs" :is-private="isPrivate" @cancel="useCustomInputs = showCustomInputSelector = false" @ok="showCustomInputSelector = false" />
                         </Popup>
                     </div>
 
@@ -191,6 +187,7 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
+import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
 
@@ -205,7 +202,8 @@ export default {
         Amount,
         InputSelection,
         Popup,
-        InputFrame
+        InputFrame,
+        SearchInput
     },
 
     inject: [
@@ -509,12 +507,8 @@ export default {
 
         padding: $size-main-margin;
 
-        input[type="text"] {
-            @include search-input();
-            margin-bottom: $size-medium-space;
-        }
-
         .animated-table {
+            margin-top: $size-main-margin;
             flex-grow: 1;
         }
     }

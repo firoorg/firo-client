@@ -10,6 +10,14 @@
     box-sizing: border-box;
 }
 
+:root {
+    --popup-padding: 15px;
+}
+
+.address {
+    font-family: "Robot Mono", monospace;
+}
+
 input[type="checkbox"] {
     width: 18px;
     height: 17px;
@@ -71,4 +79,11 @@ button.solid-button {
             color: var(--color-text-disabled);
         }
     }
+}
+
+.two-button-holder {
+    width: 400px;
+    margin: auto;
+    display: flex;
+    justify-content: space-evenly;
 }

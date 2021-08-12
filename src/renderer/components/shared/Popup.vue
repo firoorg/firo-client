@@ -1,30 +1,14 @@
 <template>
     <div id="popup">
-        <div class="outer">
-            <div class="inner">
-                <div v-if="close" class="close-button-container">
-                    <a id="close-popup-button" href="#" @click="close()">
-                        <CloseIcon />
-                    </a>
-                </div>
-
-                <div id="inner-popup" :class="{'no-popup-margin': !margin, 'has-close-button': !!close}">
-                    <slot class="content" />
-                </div>
-            </div>
+        <div class="inner-popup">
+            <slot />
         </div>
     </div>
 </template>
 
 <script>
-import CloseIcon from "renderer/components/Icons/CloseIcon";
-
 export default {
     name: "Popup",
-
-    components: {
-        CloseIcon
-    },
 
     created() {
         document.getElementsByTagName('body')[0].classList.add('vue-tooltip-z-index-hack');
@@ -32,30 +16,14 @@ export default {
 
     destroyed() {
         document.getElementsByTagName('body')[0].classList.remove('vue-tooltip-z-index-hack');
-    },
-
-    props: {
-        margin: {
-            type: Boolean,
-            default: true
-        },
-
-        // close MUST NOT be given if margin is false.
-        close: {
-            type: Function,
-            required: false
-        }
     }
 }
 </script>
 
 <style scoped lang="scss">
 @import "src/renderer/styles/z";
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
 
-#popup {
+#popup { // There can be only one.
     z-index: $z-popup;
     position: absolute;
     left: 0;
@@ -69,30 +37,12 @@ export default {
     align-items: center;
     justify-content: center;
 
-    .outer {
-        box-sizing: border-box;
-
-        .inner {
-            position: relative;
-
-            .close-button-container {
-                position: absolute;
-                width: fit-content;
-                top: $size-tiny-space;
-                right: $size-tiny-space;
-            }
-
-            #inner-popup {
-                background-color: var(--color-background-popups);
-                width: fit-content;
-                box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
-                border-radius: 8px;
-
-                &:not(.no-popup-margin) {
-                    padding: $size-popup-margin;
-                }
-            }
-        }
+    .inner-popup {
+        background-color: var(--color-background-popups);
+        width: fit-content;
+        height: fit-content;
+        box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
+        border-radius: 8px;
     }
 }
 </style>

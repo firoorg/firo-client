@@ -1,76 +1,45 @@
 <template>
-    <div>
+    <div class="info-popup">
         <div class="title">
             Confirm {{ isPrivate ? '' : 'Public '}}Send
         </div>
 
-        <div class="content">
-            <div v-if="label" class="field">
-                <label>
-                    Label
-                </label>
+        <table>
+            <tr v-if="label">
+                <td>Label</td>
+                <td>{{ label }}</td>
+            </tr>
 
-                <div class="value">
-                    {{ label }}
-                </div>
-            </div>
+            <tr>
+                <td>Address</td>
+                <td class="address value">{{ address }}</td>
+            </tr>
 
-            <div class="field">
-                <label>
-                    Address
-                </label>
+            <tr>
+                <td>Total to Send</td>
+                <td><Amount class="value" :amount="total" ticker="FIRO" /></td>
+            </tr>
 
-                <div class="address value">
-                    {{ address }}
-                </div>
-            </div>
+            <tr>
+                <td>Fee</td>
+                <td><Amount class="value" :amount="fee" ticker="FIRO" /></td>
+            </tr>
 
-            <div class="field">
-                <label>
-                    Total to Send
-                </label>
-
-                <div class="value">
-                    <Amount :amount="total" /> <span class="ticker">FIRO</span>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>
-                    Fee
-                </label>
-
-                <div class="value tx-fee-value">
-                    <Amount :amount="fee" /> <span class="ticker">FIRO</span>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>
-                    Amount to Receive
-                </label>
-
-                <div class="value">
-                    <Amount :amount="amount" /> <span class="ticker">FIRO</span>
-                </div>
-            </div>
-        </div>
+            <tr>
+                <td>Amount to Receive</td>
+                <td><Amount class="value" :amount="amount" ticker="FIRO" /></td>
+            </tr>
+        </table>
 
         <div class="buttons">
-            <button class="cancel disrecommended" @click="$emit('cancel')">
-                Cancel
-            </button>
-
-            <button class="confirm" @click="$emit('confirm')">
-                Confirm
-            </button>
+            <button class="solid-button unrecommended" @click="$emit('cancel')">Cancel</button>
+            <button class="solid-button recommended" @click="$emit('confirm')">Confirm</button>
         </div>
     </div>
 </template>
 
 <script>
 // $emits: cancel, confirm
-import { convertToCoin } from 'lib/convert'
 import Amount from "renderer/components/shared/Amount";
 
 export default {
@@ -81,73 +50,16 @@ export default {
     },
 
     props: {
-        isPrivate: {
-            required: true,
-            type: Boolean
-        },
-
-        label: {
-            required: true,
-            type: String
-        },
-
-        address: {
-            required: true,
-            type: String
-        },
-
-        amount: {
-            required: true,
-            type: Number
-        },
-
-        fee: {
-            required: true,
-            type: Number
-        },
-
-        total: {
-            required: true,
-            type: Number
-        }
-    },
-
-    methods: {
-        convertToCoin
+        isPrivate: Boolean,
+        label: String,
+        address: String,
+        amount: Number, // amount to receive
+        fee: Number,
+        total: Number // total to send
     }
 }
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/popup";
-
-@include popup();
-
-.ticker {
-    @include ticker();
-}
-
-.address {
-    @include address();
-}
-
-.content {
-    .field {
-        margin-bottom: $size-between-field-space-small;
-
-        label {
-            margin-right: $size-medium-space;
-            width: fit-content;
-            @include label();
-        }
-
-        .value {
-            width: available;
-            display: inline;
-            float: right;
-        }
-    }
-}
+@import "src/renderer/styles/info-popup";
 </style>

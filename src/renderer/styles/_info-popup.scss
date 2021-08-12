@@ -1,53 +1,50 @@
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/popup";
-@import "src/renderer/styles/colors";
+@import "src/renderer/styles/sizes";
 
 @mixin info-popup() {
-    @include popup();
+}
 
-    .warning {
+.info-popup {
+    padding: var(--popup-padding);
+
+    .title {
         text-align: center;
-        @include warning();
+        padding-bottom: var(--popup-padding);
+        font-weight: bold;
+        border-bottom: {
+            style: solid;
+            width: 1px;
+            color: var(--color-text-subtle-border);
+        }
     }
 
-    .guidance {
-        text-align: center;
-        @include guidance();
-    }
+    table {
+        min-width: 500px;
+        margin: {
+            top: var(--popup-padding);
+            bottom: var(--popup-padding);
+        }
 
-    .value {
-        @include small-mono();
-    }
-
-    .content {
-        // We do NOT want the size to be adaptive to the screen.
-        min-width: 450pt;
-
-        .fields {
-            width: 100%;
-            display: table;
-
-            .status {
-                font-weight: bold;
+        tr {
+            &:not(:first-child) td {
+                padding-top: 10px;
             }
 
-            .field {
-                display: table-row;
-
-                label, .value {
-                    display: table-cell;
-                    padding-bottom: $size-between-field-space-small;
+            td {
+                &:first-child {
+                    font-weight: bold;
                 }
 
-                label {
-                    @include label();
-                }
-
-                .value {
+                &:last-child {
                     text-align: right;
                 }
             }
         }
+    }
+
+    .buttons {
+        width: 400px;
+        margin: auto;
+        display: flex;
+        justify-content: space-evenly;
     }
 }
