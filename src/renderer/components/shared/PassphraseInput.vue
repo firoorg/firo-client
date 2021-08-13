@@ -45,7 +45,7 @@ export default {
 
 <style lang="scss" scoped>
 .passphrase-input {
-    padding: var(--popup-padding);
+    padding: var(--padding-popup);
 
     .title {
         text-align: center;
@@ -54,8 +54,8 @@ export default {
 
     input {
         margin: {
-            top: var(--popup-padding);
-            bottom: var(--popup-padding);
+            top: var(--padding-popup);
+            bottom: var(--padding-popup);
             left: auto;
             right: auto;
         }

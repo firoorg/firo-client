@@ -4,11 +4,11 @@
 }
 
 .info-popup {
-    padding: var(--popup-padding);
+    padding: var(--padding-popup);
 
     .title {
         text-align: center;
-        padding-bottom: var(--popup-padding);
+        padding-bottom: var(--padding-popup);
         font-weight: bold;
         border-bottom: {
             style: solid;
@@ -20,8 +20,8 @@
     table {
         min-width: 500px;
         margin: {
-            top: var(--popup-padding);
-            bottom: var(--popup-padding);
+            top: var(--padding-popup);
+            bottom: var(--padding-popup);
         }
 
         tr {
