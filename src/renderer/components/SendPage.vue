@@ -184,7 +184,7 @@ import {FirodErrorResponse} from "daemon/firod";
 import InputSelection from "renderer/components/SendPage/InputSelection";
 import Popup from "renderer/components/shared/Popup";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
+import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
 import SearchInput from "renderer/components/shared/SearchInput";
@@ -224,7 +224,7 @@ export default {
             useCustomInputs: false,
             customInputs: [],
             tableFields: [
-                {name: AddressBookItemEditableLabel, width: "160pt"},
+                {name: AddressBookItemLabel, width: "160pt"},
                 {name: AddressBookItemAddress}
             ],
             feeMap: {},

@@ -36,7 +36,7 @@ import {clipboard} from "electron";
 import {mapGetters, mapMutations} from "vuex";
 import QRCode from "easyqrcodejs";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import AddressBookItemEditableLabel from "renderer/components/AnimatedTable/AddressBookItemEditableLabel";
+import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import Copyable from "renderer/components/shared/Copyable";
 import InputFrame from "renderer/components/shared/InputFrame";
@@ -59,7 +59,7 @@ export default {
             isDefaultAddress: true,
 
             tableFields: [
-                {name: AddressBookItemEditableLabel, width: "160pt"},
+                {name: AddressBookItemLabel, width: "160pt"},
                 {name: AddressBookItemAddress}
             ]
         };
