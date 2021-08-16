@@ -1,20 +1,36 @@
-// These are the colors defined in the Firo Brand Guidelines.
-// Names are taken from http://chir.ag/projects/name-that-color/
-
 :root {
-    // Primary
-    --firo-old-brick: #9b1c2e;
-    --firo-merlot: #7c1624;
-    --firo-brick-red: #ba2a45;
-    --firo-soft-peach: #f7f0f1;
+    // Legacy colours
 
-    // Secondary
-    --firo-creole: #110202;
-    --firo-white: #ffffff;
-    --firo-mine-shaft: #3d3939;
-    --firo-gray: #878787;
-    --firo-silver: #cfcccc;
-    --firo-wild-sand: #f4f4f4;
+    --firo-old-brick: #9b1c2e;
+    --firo-brick-red: #ba2a45;
+
+    --color-detail-background: #f6f8fc;
+    --color-loading-background: #e5e5e5;
+    --color-setup-background: #{darken(#e1ebf1, 5%)};
+    --color-setup-foreground: #{darken(#f6f8fc, 5%)};
+
+    --color-text: black;
+    --color-dark-text: black;
+    --color-text-accent: var(--firo-brick-red);
+    --color-ticker: var(--color-text-accent);
+    --color-error: red;
+
+    --color-input-background: #f6f8fc;
+    --color-search-input-background: white;
+
+    --color-shadow: rgba(0, 0, 0, 0.25);
+
+    --color-big-button: white;
+    --color-big-button-text: var(--color-text);
+
+    --color-popup-outside: rgba(0, 0, 0, 0.6);
+
+    --color-tooltip-text: white;
+    --color-tooltip-background: #F92848;
+
+    --color-amount-positive: var(--color-text);
+    --color-amount-negative: var(--color-text);
+    --color-amount-neutral: var(--color-text);
 }
 
 :root {
@@ -58,56 +74,6 @@
 
     --color-warning-background: #9B1C2E;
     --color-warning-text: #FDFDFF;
-
-    // Old colours
-
-    --color-main-background: white;
-    --color-lightened-main-background: white;
-    --color-menu-background: #e1ebf1;
-    --color-darkened-menu-background: #{darken(#e1ebf1, 5%)};
-    --color-detail-background: #f6f8fc;
-    --color-loading-background: #e5e5e5;
-    --color-setup-background: #{darken(#e1ebf1, 5%)};
-    --color-setup-foreground: #{darken(#f6f8fc, 5%)};
-
-
-    --color-text: black;
-    --color-dark-text: black;
-    --color-text-accent: var(--firo-brick-red);
-    --color-ticker: var(--color-text-accent);
-    --color-error: red;
-
-    --color-input-text: var(--color-text);
-    --color-input-placeholder: var(--color-text);
-    --color-input-background: #f6f8fc;
-    --color-search-input-background: white;
-
-    --color-shadow: rgba(0, 0, 0, 0.25);
-
-    --color-big-button: white;
-    --color-big-button-text: var(--color-text);
-
-    --color-popup-outside: rgba(0, 0, 0, 0.6);
-    --color-popup-background: white;
-
-    --color-tooltip-text: white;
-    --color-tooltip-background: #F92848;
-
-    --color-menu-link-text: black;
-    --color-menu-link-text-highlighted: white;
-    --color-menu-highlighted-element: var(--firo-brick-red);
-
-    --color-table-background: #F6F8FC;
-    --color-lightened-table-background: #{lighten(#F6F8FC, 20%)};
-    --color-darkened-table-background: #{darken(#F6F8FC, 10%)};
-    --color-table-heading: var(--color-text);
-
-    --color-amount-positive: var(--color-text);
-    --color-amount-negative: var(--color-text);
-    --color-amount-neutral: var(--color-text);
-
-    --color-debug-background: var(--color-darkened-menu-background);
-    --color-debug-text: var(--firo-gray);
 }
 
 @media(prefers-color-scheme: dark) {
@@ -152,55 +118,5 @@
 
         --color-warning-background: #9B1C2E;
         --color-warning-text: #FDFDFF;
-
-        // Old colours
-
-        --color-main-background: white;
-        --color-lightened-main-background: white;
-        --color-menu-background: #e1ebf1;
-        --color-darkened-menu-background: #{darken(#e1ebf1, 5%)};
-        --color-detail-background: #f6f8fc;
-        --color-loading-background: #e5e5e5;
-        --color-setup-background: #{darken(#e1ebf1, 5%)};
-        --color-setup-foreground: #{darken(#f6f8fc, 5%)};
-
-
-        --color-text: black;
-        --color-dark-text: black;
-        --color-text-accent: var(--firo-brick-red);
-        --color-ticker: var(--color-text-accent);
-        --color-error: red;
-
-        --color-input-text: var(--color-text);
-        --color-input-placeholder: var(--color-text);
-        --color-input-background: #f6f8fc;
-        --color-search-input-background: white;
-
-        --color-shadow: rgba(0, 0, 0, 0.25);
-
-        --color-big-button: white;
-        --color-big-button-text: var(--color-text);
-
-        --color-popup-outside: rgba(0, 0, 0, 0.6);
-        --color-popup-background: white;
-
-        --color-tooltip-text: white;
-        --color-tooltip-background: #F92848;
-
-        --color-menu-link-text: black;
-        --color-menu-link-text-highlighted: white;
-        --color-menu-highlighted-element: var(--firo-brick-red);
-
-        --color-table-background: #F6F8FC;
-        --color-lightened-table-background: #{lighten(#F6F8FC, 20%)};
-        --color-darkened-table-background: #{darken(#F6F8FC, 10%)};
-        --color-table-heading: var(--color-text);
-
-        --color-amount-positive: var(--color-text);
-        --color-amount-negative: var(--color-text);
-        --color-amount-neutral: var(--color-text);
-
-        --color-debug-background: var(--color-darkened-menu-background);
-        --color-debug-text: var(--firo-gray);
     }
 }
