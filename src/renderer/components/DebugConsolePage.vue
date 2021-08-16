@@ -407,26 +407,19 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/typography";
-
 .debug-page {
     overflow: scroll;
     user-select: text;
     height: 100%;
     word-break: break-all;
-
-    background-color: var(--color-debug-background);
-    color: var(--color-debug-text);
+    font-family: "Robot Mono", monospace;
 
     &:focus {
         outline: none;
     }
 
     .console {
-        @include monospace();
-
-        padding: $size-main-margin;
+        padding: var(--padding-main);
 
         .input-line {
             font-weight: bold;
@@ -434,17 +427,11 @@ export default {
             .prompt, .input {
                 display: inline;
             }
-
-            .input {
-                margin-left: $size-tiny-space;
-                max-width: border-box;
-            }
         }
 
         .output {
             .info {
-                font-style: italic;
-                margin-bottom: $size-small-space;
+                margin-bottom: 6px;
 
                 word-break: normal;
 
@@ -459,22 +446,25 @@ export default {
 
             .output {
                 white-space: pre-wrap;
-                margin-bottom: $size-tiny-space;
+                margin-bottom: 6px;
             }
         }
 
         .current-input-line {
             .prompt {
                 user-select: none;
+                vertical-align: middle;
             }
 
             .input {
+                vertical-align: middle;
                 outline: none;
             }
         }
 
         .suggestions {
-            margin-top: $size-very-tiny-space;
+            margin-top: 6px;
+            word-break: break-word;
 
             .suggestion {
                 &.selected {

@@ -1,7 +1,7 @@
 <template>
     <div class="search-input">
         <div class="search-icon">🔍</div>
-        <input type="text" :value="value" :placeholder="placeholder" @input="$emit('input', $event.target.value)" />
+        <input type="text" :value="value" :placeholder="placeholder" spellcheck="false" @input="$emit('input', $event.target.value)" />
     </div>
 </template>
 
