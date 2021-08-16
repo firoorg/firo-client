@@ -97,7 +97,6 @@ a {
 @mixin label {
     user-select: text;
     font-weight: bold;
-    margin-bottom: $size-tiny-space;
 }
 
 @mixin guidance {

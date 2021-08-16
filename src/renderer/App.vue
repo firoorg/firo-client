@@ -40,7 +40,7 @@ export default {
         position: absolute;
         top: 0;
         z-index: $z-app-drag-area;
-        height: $size-app-drag-area-height;
+        height: 16px;
         width: 100vw;
 
         // Allow the user to drag the window from this area.

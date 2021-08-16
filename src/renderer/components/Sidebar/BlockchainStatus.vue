@@ -57,11 +57,11 @@ export default {
 
     // This is the loading bounce.
     .spinner {
-        margin-right: $size-tiny-space;
+        margin-right: 6px;
     }
 
     .connecting, .syncing-text {
-        margin-bottom: $size-tiny-space;
+        margin-bottom: 6px;
         * {
             display: inline-block;
         }

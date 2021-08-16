@@ -90,7 +90,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: $size-tiny-space;
+    padding-top: 6px;
     text-align: center;
     user-select: none;
 
@@ -98,12 +98,12 @@ export default {
 
 a {
     display: inline-block;
-    color: var(--color-text);
+    color: var(--color-text-primary);
     cursor: pointer;
 }
 
 .icon {
-    padding: $size-tiny-space;
+    padding: 6px;
 
     &.disabled {
         cursor: default;
@@ -112,24 +112,23 @@ a {
 }
 
 .numbers {
-    background: var(--color-lightened-main-background);
-    border-radius: $size-tiny-space;
+    border-radius: 6px;
     overflow: hidden;
     padding: {
-        left: $size-tiny-space;
-        right: $size-tiny-space;
+        left: 6px;
+        right: 6px;
     }
     a {
-        padding: $size-tiny-space;
-        color: var(--color-text);
+        padding: 6px;
+        color: var(--color-text-secondary);
 
         &:hover,
         &:focus {
-            background: var(--color-input-background);
+            background: var(--color-background-tag);
         }
 
         &.active {
-            background: var(--color-darkened-main-background);
+            color: var(--color-text-primary);
         }
     }
 }
