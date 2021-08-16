@@ -39,6 +39,7 @@
                     ref="currentInput"
                     id="current-input"
                     class="input"
+                    spellcheck="false"
                     contenteditable="true"
                     @keydown="onInput"
                     @keyup="updateSuggestions"
