@@ -1,40 +1,30 @@
 <template>
     <div class="masternodes-page">
-        <div class="inner">
-            <div class="header">
-                <input
-                    class="filter-input"
-                    v-model="filter"
-                    placeholder="Filter by label, ip address or collateral address"
-                />
+        <div class="header">
+            <SearchInput v-model="filter" placeholder="Filter by label, ip, or collateral address" />
 
-                <div class="right">
-                    <div class="show-all-znodes">
-                        <input type="checkbox" v-model="showAllZnodes" />
-                        <label>SHOW ALL MASTERNODES</label>
-                    </div>
-
-                    <div class="node-count">
-                        <label>NODE COUNT:</label>
-                        <div class="value">{{ Object.keys(masternodes).length }}</div>
-                    </div>
-
-                    <div class="my-node-count">
-                        <label>MY NODES:</label>
-                        <div class="value">{{ myNodeCount }}</div>
-                    </div>
-                </div>
+            <div class="checkbox-field header-part show-all-masternodes">
+                <input type="checkbox" v-model="showAllZnodes" />
+                <label>Show All Masternodes</label>
             </div>
 
-            <div class="animated-table-container">
-                <AnimatedTable
-                    :data="filteredTableData"
-                    :fields="tableFields"
-                    track-by="proTxHash"
-                    no-data-message="You don't have any Masternodes."
-                    :on-row-select="(rowData) => selectedMasternode = rowData"
-                />
+            <div class="checkbox-field header-part">
+                <label>Node Count: {{ Object.keys(masternodes).length }}</label>
             </div>
+
+            <div class="checkbox-field header-part">
+                <label>My Nodes: {{ myNodeCount }}</label>
+            </div>
+        </div>
+
+        <div class="animated-table-container">
+            <AnimatedTable
+                :data="filteredTableData"
+                :fields="tableFields"
+                track-by="proTxHash"
+                no-data-message="You don't have any Masternodes."
+                :on-row-select="(rowData) => selectedMasternode = rowData"
+            />
         </div>
 
         <Popup v-if="selectedMasternode">
@@ -54,6 +44,7 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import MasternodeCollateralAddress from "renderer/components/AnimatedTable/MasternodeCollateralAddress";
 import MasternodeNextPaymentBlock from "renderer/components/AnimatedTable/MasternodeNextPaymentBlock";
 import MasternodeIP from "renderer/components/AnimatedTable/MasternodeIP";
+import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
     {name: MasternodeIP, width: "160pt"},
@@ -65,6 +56,7 @@ export default {
     name: "MasternodesPage",
 
     components: {
+        SearchInput,
         AnimatedTable,
         Popup,
         MasternodeInfo
@@ -123,73 +115,52 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/colors";
 
 .masternodes-page {
     height: 100%;
+    padding: var(--padding-main);
 
-    .inner {
-        box-sizing: border-box;
-        height: 100%;
-        padding: $size-main-margin;
+    display: flex;
+    flex-flow: column;
 
+    .header {
+        margin-bottom: var(--padding-main);
         display: flex;
-        flex-flow: column;
 
-        .header {
-            width: 100%;
-            overflow: auto;
-            padding-bottom: $size-small-space;
-
-            .filter-input {
-                @include search-input();
-                position: relative;
-                float: left;
+        .header-part {
+            margin: {
+                top: 11px;
+                bottom: 11px;
+                left: var(--padding-main);
             }
 
-            .right {
-                position: relative;
-                float: right;
-
-                div {
-                    display: inline-block;
-
-                    &:not(:last-child) {
-                        margin-right: $size-medium-space;
-                    }
-
-                    label {
-                        @include label();
-                    }
-
-                    .value {
-                        @include label();
-                    }
-
-                    * {
-                        display: inline;
-                    }
-                }
-
-                .show-all-znodes {
-                    label {
-                        color: var(--color-text-accent);
-                    }
+            &:not(:last-child) {
+                padding-right: var(--padding-main);
+                border-right: {
+                    style: solid;
+                    width: 1px;
+                    color: var(--color-text-subtle-border);
                 }
             }
-        }
 
-        .animated-table-container {
-            flex-grow: 1;
+            width: fit-content;
+            white-space: nowrap;
+            line-height: 18px;
+            vertical-align: middle;
 
-            .animated-table {
-                height: 100%;
+            &.show-all-masternodes label {
+                margin-left: 6px;
+                font-weight: bold;
             }
         }
     }
-}
 
+    .animated-table-container {
+        flex-grow: 1;
+
+        .animated-table {
+            height: 100%;
+        }
+    }
+}
 </style>

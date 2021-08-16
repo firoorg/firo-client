@@ -11,6 +11,7 @@
 }
 
 :root {
+    --padding-main: 15px;
     --padding-popup: 15px;
 }
 
@@ -20,7 +21,7 @@
 
 input[type="checkbox"] {
     width: 18px;
-    height: 17px;
+    height: 18px;
     margin: 0;
 
     -webkit-appearance: none;
