@@ -1,27 +1,18 @@
 <template>
-    <section class="coin-swap-page">
-        <div class="inner">
-            <div class="top-section">
-                <input
-                    v-model="filter"
-                    type="text"
-                    class="table-filter-input"
-                    placeholder="Filter"
-                />
-            </div>
+    <div class="coin-swap-list">
+        <SearchInput v-model="filter" placeholder="Search by ticker, amount, or status" />
 
-            <animated-table
-                :data="filteredTableData"
-                :fields="tableFields"
-                track-by="orderId"
-                no-data-message="No Swaps Made Yet"
-                :sort-order="sortOrder"
-                :compare-elements="comparePayments"
-                :per-page="17"
-                :on-page-change="pageNumber => currentPage = pageNumber"
-                :on-row-select="(rowData) => selectedRow = rowData"
-            />
-        </div>
+        <animated-table
+            :data="filteredTableData"
+            :fields="tableFields"
+            track-by="orderId"
+            no-data-message="No Swaps Made Yet"
+            :sort-order="sortOrder"
+            :compare-elements="comparePayments"
+            :per-page="17"
+            :on-page-change="pageNumber => currentPage = pageNumber"
+            :on-row-select="(rowData) => selectedRow = rowData"
+        />
 
         <Popup v-if="selectedRow">
             <CoinSwapInfo
@@ -30,7 +21,7 @@
                 @confirm="selectedRow = null"
             />
         </Popup>
-    </section>
+    </div>
 </template>
 
 <script>
@@ -42,6 +33,7 @@ import CoinSwapSendAmount from "renderer/components/AnimatedTable/CoinSwapSendAm
 import CoinSwapReceivedAmount from "renderer/components/CoinSwapPage/CoinSwapReceivedAmount";
 import CoinSwapStatus from "renderer/components/CoinSwapPage/CoinSwapStatus";
 import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo";
+import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
     {name: CoinSwapStatus, width: '40pt'},
@@ -54,6 +46,7 @@ export default {
     name: 'CoinSwapList',
 
     components: {
+        SearchInput,
         CoinSwapInfo,
         AnimatedTable,
         Popup
@@ -119,59 +112,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/colors";
-
-.coin-swap-page {
+.coin-swap-list {
     height: 100%;
+    padding: var(--padding-main);
 
-    .inner {
-        box-sizing: border-box;
-        height: 100%;
+    display: flex;
+    flex-flow: column;
 
-        display: flex;
-        flex-flow: column;
+    .search-input {
+        margin-bottom: var(--padding-main);
+    }
 
-        .top-section {
-            height: fit-content;
-
-            .table-filter-input {
-                margin: {
-                    top: $size-small-space;
-                    left: auto;
-                    right: 0;
-                    bottom: $size-medium-space;
-                }
-
-                @include wide-input-field();
-                max-width: 100%;
-            }
-
-            .filter-input {
-                position: relative;
-                display: inline-block;
-            }
-
-            .show-unsynced-warning, .awaiting-updates {
-                text-align: center;
-                font: {
-                    size: 0.9em;
-                    style: italic;
-                    weight: bold;
-                }
-
-                margin-bottom: 1em;
-            }
-
-            .show-unsynced-warning {
-                color: red;
-            }
-        }
-
-        .animated-table {
-            flex-grow: 1;
-        }
+    .animated-table {
+        flex-grow: 1;
     }
 }
 </style>

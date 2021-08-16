@@ -183,8 +183,6 @@ export default {
 
 .info-popup {
     table {
-        min-width: 800px;
-
         .rebroadcast {
             font-size: 0.8em;
         }

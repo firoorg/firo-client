@@ -1,10 +1,7 @@
 <template>
-    <div id="send-page">
-        <div id="send-primary">
-            <CoinSwapList />
-        </div>
-
-        <CoinSwapDetail />
+    <div class="coin-swap-page">
+        <CoinSwapList class="coin-swap-primary" />
+        <CoinSwapDetail class="coin-swap-detail" />
     </div>
 </template>
 
@@ -22,15 +19,17 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import 'src/renderer/styles/colors';
-@import 'src/renderer/styles/sizes';
-#send-page {
+<style lang="scss" scoped>
+.coin-swap-page {
+    display: flex;
     height: 100%;
-    #send-primary {
-        height: 100%;
-        width: $size-primary-content-width;
-        float: left;
+
+    .coin-swap-primary {
+        flex-grow: 1;
+    }
+
+    .coin-swap-detail {
+        width: var(--width-detail);
     }
 }
 </style>

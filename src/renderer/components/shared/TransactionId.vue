@@ -1,9 +1,6 @@
 <template>
-    <div>
-        <copyable class="txid">{{ txid }}</copyable>
-        <a v-if="showOpenInBlockExplorer" href="#" @click="openInBlockExplorer">
-            open in block explorer
-        </a>
+    <div class="txid">
+        {{ txid }}<a v-if="showOpenInBlockExplorer" href="#" @click="openInBlockExplorer">👁</a>
     </div>
 </template>
 
@@ -20,10 +17,7 @@ export default {
     },
 
     props: {
-        txid: {
-            type: String,
-            required: true
-        },
+        txid: String,
     },
 
     computed: {
@@ -38,7 +32,7 @@ export default {
 
     methods: {
         openInBlockExplorer() {
-            if (confirm("This link will take you to an external block explorer. Explorers may log your IP addresses " +
+            if (confirm("This link will take you to an external block explorer. Explorers may log your IP address " +
                         "and tie them to the transaction ID you are looking up. Continue anyway?")) {
                 if (this.network === 'main') {
                     shell.openExternal(`https://explorer.firo.org/tx/${this.txid}`);
@@ -52,13 +46,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-
-.txid {
-    @include txid();
-}
-
 a {
-    @include supermini();
+    margin-left: 2px;
+    text-decoration: none;
+    font-size: 8px;
+    vertical-align: top;
 }
 </style>
