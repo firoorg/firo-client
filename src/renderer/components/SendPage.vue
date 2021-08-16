@@ -1,6 +1,6 @@
 <template>
-    <div id="send-page">
-        <div id="send-primary">
+    <div class="send-page">
+        <div class="send-primary">
             <SearchInput v-model="filter" placeholder="Search by label or address" />
 
             <AnimatedTable
@@ -14,9 +14,9 @@
             />
         </div>
 
-        <section class="send-detail">
-            <div class="inner" :class="{disabled: formDisabled, unsynced: !isBlockchainSynced}">
-                <div class="top not-footer">
+        <div class="send-detail" :class="{disabled: formDisabled}">
+            <div class="inner">
+                <div class="top">
                     <InputFrame label="Label">
                         <input
                             id="label"
@@ -105,9 +105,7 @@
                         />
                     </InputFrame>
 
-                    <hr />
-
-                    <div class="totals not-footer">
+                    <div class="totals">
                         <div class="total-field">
                             <label>
                                 Recipient will receive:
@@ -141,14 +139,14 @@
 
                             <div v-else class="value" />
                         </div>
-
-                        <div v-if="transactionFeeError" class="error">
-                            {{ transactionFeeError }}
-                        </div>
                     </div>
                 </div>
 
                 <div class="bottom">
+                    <div v-if="transactionFeeError" class="error">
+                        {{ transactionFeeError }}
+                    </div>
+
                     <SendFlow
                         :disabled="!canBeginSend"
                         :is-private="isPrivate"
@@ -159,7 +157,6 @@
                         :computed-tx-fee="transactionFee || 0"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
-                        class="not-footer"
                         @success="() => (feeMap = {}) && cleanupForm()"
                         @reset="() => (feeMap = {}) && cleanupForm(false)"
                     />
@@ -169,7 +166,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 </template>
 
@@ -498,40 +495,38 @@ export default {
 <style lang="scss">
 @import "src/renderer/styles/checkbox-field";
 
-#send-page {
+.send-page {
     height: 100%;
+    display: flex;
 
-    #send-primary {
+    .send-primary {
         height: 100%;
-        width: $size-primary-content-width;
-        float: left;
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
 
-        padding: $size-main-margin;
+        padding: var(--padding-main);
 
         .animated-table {
-            margin-top: $size-main-margin;
+            margin-top: var(--padding-main);
             flex-grow: 1;
         }
     }
 
     .send-detail {
-        width: $size-secondary-content-width;
-        float: right;
-        box-sizing: border-box;
-        padding: $size-detail-margin;
         height: 100%;
+        width: var(--width-detail);
+        padding: var(--padding-main);
         background-color: var(--color-background-detail);
+
+        &.disabled {
+            opacity: 0.3;
+        }
 
         .inner {
             height: 100%;
             display: flex;
             flex-flow: column;
-
-            @at-root .disabled .not-footer {
-                opacity: $disabled-input-opacity;
-            }
 
             .top {
                 flex-grow: 1;
@@ -583,38 +578,27 @@ export default {
                     }
                 }
 
-                hr {
-                    opacity: 0.2;
-
-                    margin: {
-                        top: 30px;
-                    }
-                }
-
                 .totals {
+                    margin-top: 30px;
+                    padding-top: 30px;
+                    border-top: {
+                        width: 1px;
+                        color: var(--color-text-subtle-border);
+                        style: solid;
+                    }
+
                     .total-field {
-                        margin-top: 10px;
-
-                        label, .value {
-                            display: inline;
-                            @include label();
-                        }
-
-                        label {
-                            margin-right: $size-medium-space;
-                        }
-
-                        .value {
-                            float: right;
-                        }
+                        display: flex;
+                        justify-content: space-between;
                     }
                 }
             }
 
             .bottom {
                 .error {
-                    @include error();
-                    margin-bottom: $size-small-space;
+                    font-weight: bold;
+                    text-align: center;
+                    margin-bottom: var(--padding-main);
                 }
             }
         }
