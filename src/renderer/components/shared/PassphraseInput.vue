@@ -1,5 +1,5 @@
 <template>
-    <div class="passphrase-input">
+    <div class="info-popup passphrase-input">
         <div class="title">
             Enter Your Passphrase
         </div>
@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <div class="two-button-holder">
+        <div class="buttons">
             <button class="solid-button unrecommended" @click="$emit('cancel')">
                 Cancel
             </button>
@@ -44,35 +44,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.passphrase-input {
-    padding: var(--padding-popup);
-
-    .title {
-        text-align: center;
-        font-weight: bold;
-    }
-
-    input {
-        margin: {
-            top: var(--padding-popup);
-            bottom: var(--padding-popup);
-            left: auto;
-            right: auto;
-        }
-
-        width: 400px;
-        height: 40px;
-
-        padding: 10px;
-
-        border: {
-            color: var(--color-text-subtle-border);
-            radius: 6px;
-        }
-    }
-
-    .error {
-        text-align: center;
-    }
-}
+@import "src/renderer/styles/info-popup";
+@import "src/renderer/styles/passphrase-input";
 </style>

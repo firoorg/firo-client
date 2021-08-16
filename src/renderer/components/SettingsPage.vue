@@ -1,88 +1,46 @@
 <template>
     <div class="settings-page">
-        <Popup v-if="errorMessage">
-            <ErrorStep :error="errorMessage" @ok="() => errorMessage = null" />
-        </Popup>
+        <Popup v-if="show">
+            <div v-if="show === 'message'" class="info-popup">
+                <div class="title">{{ messageTitle }}</div>
+                <div class="content">{{ message }}</div>
+                <div class="buttons">
+                    <button class="solid-button recommended" @click="show = null">OK</button>
+                </div>
+            </div>
 
-        <Popup v-if="successMessage">
-            <SuccessMessage :message="successMessage" @ok="() => successMessage = null" />
-        </Popup>
+            <div v-else-if="show === 'confirm-reset'" class="info-popup">
+                <div class="title">Confirm Settings Reset</div>
+                <div class="content">Are you sure you want to reset settings? This will not delete any of your data.</div>
+                <div class="buttons">
+                    <button class="solid-button recommended" @ok="show = null">Cancel</button>
+                    <button class="solid-button unrecommended" @ok="redoSetup">Yes, I'm sure</button>
+                </div>
+            </div>
 
-        <Popup v-if="showMnemonicPassphrasePopup">
-            <SendStepPassphrase
-                v-model="mnemonicPassphrase"
-                :error="mnemonicPassphraseError"
-                @cancel="clearMnemonicPassphrasePopup"
-                @confirm="tryShowMnemonicRecoveryPhrase"
-            />
+            <WaitOverlay v-else-if="show === 'wait'" />
+            <MnemonicPopup v-else-if="show === 'mnemonic'" @ok="show = null" />
+            <ChangePassphrasePopup v-else-if="show === 'change-passphrase'" @cancel="show = null" @ok="show = null" />
         </Popup>
 
         <div class="header">
-            <h1>firo client</h1>
-
-            <div class="version">v{{ version }} (firod {{ daemonVersion }})</div>
+            <div class="version">Firo Client v{{ version }}</div>
+            <div class="version">firod {{ daemonVersion }}</div>
         </div>
 
-        <hr class="hr1" />
-
-        <button class="backup-wallet" @click="openBackupDialog">
-            Backup Wallet
-        </button>
-
-        <button class="redo-setup" @click="redoSetup">
-            Redo Setup
-        </button>
-
-        <div class="use-tor">
-            <input type="checkbox" v-model="useTor" />
-            <label>
-                Connect to Other Nodes via Tor
-            </label>
-        </div>
-
-        <div class="allow-breaking-masternodes">
-            <input type="checkbox" v-model="allowBreakingMasternodes" />
-            <label>
-                Allow Coin Control to Break Masternodes
-            </label>
-        </div>
-
-        <hr class="hr2" />
-
-        <div class="detail-buttons">
-            <button :class="{active: showDetail === 'passphrase'}" @click="showPassphrase">
-                Change Passphrase
-            </button>
-
-            <button v-if="hasMnemonic" :class="{active: showDetail === 'mnemonic'}" @click="() => showMnemonicPassphrasePopup = true">
-                Show Mnemonic Recovery Phrase
-            </button>
-
-            <div v-else>
+        <div class="options">
+            <div class="checkbox-option" @click="useTor = !useTor">
+                <label>Connect to other nodes via Tor</label>
+                <input type="checkbox" v-model="useTor" />
             </div>
-        </div>
-
-        <div class="detail">
-            <div v-if="showDetail === 'passphrase'" class="change-passphrase">
-                <div class="passphrase-inputs">
-                    <label>Current Passphrase:</label>
-                    <input id="current-passphrase-input" type="password" v-model="currentPassphrase" />
-
-                    <label>New Passphrase:</label>
-                    <input id="new-passphrase-input" type="password" v-model="newPassphrase" :class="{matching: passphrasesMatch}" />
-
-                    <label>Confirm Passphrase:</label>
-                    <input id="confirm-new-passphrase-input" type="password" v-model="confirmNewPassphrase" :class="{matching: passphrasesMatch}" />
-                </div>
-
-                <div class="buttons">
-                    <button id="change-passphrase-button" :disabled="!canChangePassphrase" :class="{active: canChangePassphrase}" @click="changePassphrase">
-                        Change Passphrase
-                    </button>
-                </div>
+            <div class="checkbox-option" @click="allowBreakingMasternodes = !allowBreakingMasternodes">
+                <label>Allow Coin Control to Break Masternodes</label>
+                <input type="checkbox" v-model="allowBreakingMasternodes" />
             </div>
-
-            <SmallMnemonic v-if="showDetail === 'mnemonic'" :words="mnemonicWords" />
+            <a @click="openBackupDialog">Backup Wallet</a>
+            <a @click="show = 'change-passphrase'">Change Passphrase</a>
+            <a @click="show = 'mnemonic'">Show Recovery Phrase</a>
+            <a @click="show = 'confirm-reset'">Reset Settings</a>
         </div>
     </div>
 </template>
@@ -90,23 +48,20 @@
 <script>
 import {mapGetters, mapMutations} from 'vuex'
 import {remote} from 'electron';
-import Popup from 'renderer/components/shared/Popup';
-import ErrorStep from "./SendPage/ErrorStep";
-import SmallMnemonic from "./SettingsPage/SmallMnemonic";
-import {IncorrectPassphrase} from "daemon/firod";
-import SendStepPassphrase from "renderer/components/SendPage/PassphraseStep";
-import SuccessMessage from "renderer/components/SettingsPage/SuccessMessage";
 import version from "../../version";
+import Popup from 'renderer/components/shared/Popup';
+import MnemonicPopup from "renderer/components/SettingsPage/MnemonicPopup";
+import ChangePassphrasePopup from "renderer/components/SettingsPage/ChangePassphrasePopup";
+import WaitOverlay from "renderer/components/shared/WaitOverlay";
 
 export default {
     name: 'SettingsPage',
 
     components: {
-        SendStepPassphrase,
         Popup,
-        ErrorStep,
-        SmallMnemonic,
-        SuccessMessage
+        WaitOverlay,
+        MnemonicPopup,
+        ChangePassphrasePopup
     },
 
     computed: {
@@ -116,14 +71,6 @@ export default {
             daemonVersion: 'ApiStatus/version',
             _allowBreakingMasternodes: 'App/allowBreakingMasternodes'
         }),
-
-        passphrasesMatch () {
-            return !this.confirmNewPassphrase || this.newPassphrase === this.confirmNewPassphrase;
-        },
-
-        canChangePassphrase () {
-            return this.currentPassphrase && this.newPassphrase && (this.newPassphrase === this.confirmNewPassphrase);
-        },
 
         allowBreakingMasternodes: {
             get() {
@@ -140,15 +87,7 @@ export default {
         return {
             version,
             useTor: $store.getters['Settings/isConnectedViaTor'],
-            showDetail: 'passphrase', // 'passphrase' | 'mnemonic'
-            currentPassphrase: '',
-            newPassphrase: '',
-            confirmNewPassphrase: '',
-            changePassphraseError: null,
-            showMnemonicPassphrasePopup: false,
-            mnemonicPassphrase: '',
-            mnemonicPassphraseError: null,
-            mnemonicWords: [],
+            show: null, // 'change-passphrase' | 'mnemonic'
             successMessage: null,
             errorMessage: null
         };
@@ -168,53 +107,6 @@ export default {
             setAllowBreakingMasternodes: 'App/setAllowBreakingMasternodes'
         }),
 
-        showPassphrase() {
-            this.showDetail = 'passphrase';
-            this.mnemonicWords = [];
-        },
-
-        clearMnemonicPassphrasePopup() {
-            this.mnemonicPassphrase = '';
-            this.mnemonicPassphraseError = null;
-            this.showMnemonicPassphrasePopup = false;
-        },
-
-        async tryShowMnemonicRecoveryPhrase() {
-            if (this.showDetail === 'mnemonic') return;
-
-            try {
-                this.mnemonicWords = await $daemon.showMnemonics(this.mnemonicPassphrase);
-                this.clearMnemonicPassphrasePopup();
-                this.showDetail = 'mnemonic';
-            } catch (e) {
-                this.mnemonicPassphrase = '';
-                if (e instanceof IncorrectPassphrase) {
-                    this.mnemonicPassphraseError = 'Incorrect Passphrase';
-                } else {
-                    this.mnemonicPassphraseError = `${e}`;
-                }
-            }
-        },
-
-        async changePassphrase() {
-            if (!this.canChangePassphrase) return;
-
-            try {
-                await $daemon.setPassphrase(this.currentPassphrase, this.newPassphrase);
-                this.newPassphrase = '';
-                this.confirmNewPassphrase = '';
-                this.successMessage = 'Passphrase Changed!'
-            } catch (e) {
-                if (e instanceof IncorrectPassphrase) {
-                    this.errorMessage = 'Incorrect Passphrase';
-                } else {
-                    this.errorMessage = `${e}`;
-                }
-            }
-
-            this.currentPassphrase = '';
-        },
-
         async openBackupDialog() {
             const selected = await remote.dialog.showOpenDialog({
                 title: "Select Backup File Directory",
@@ -228,21 +120,20 @@ export default {
             const backupDirectory = selected.filePaths[0];
             if (!backupDirectory) return;
 
-            this.popoverStep = 'wait';
+            this.show = 'wait';
 
             try {
                 await $daemon.backup(backupDirectory);
-                this.successMessage = 'Your wallet.dat has been backed up.';
+                this.messageTitle = 'Success!';
+                this.message = 'Your wallet.dat has been backed up.';
             } catch (e) {
-                this.errorMessage = (e.error && e.error.message) ? e.error.message : String(e);
+                this.messageTitle = 'Error';
+                this.message = e && e.message ? e.message : `${e}`;
             }
+            this.show = 'message';
         },
 
         async redoSetup() {
-            if (!confirm("Are you sure you want to reset the configuration?")) {
-                return;
-            }
-
             await this.$store.dispatch('App/setIsInitialized', false);
             await $quitApp();
         }
@@ -251,106 +142,98 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
+@import "src/renderer/styles/info-popup";
 
 .settings-page {
-    padding: $size-main-margin;
-    display: grid;
-    align-items: center;
-    grid-template-columns: 2fr 4fr 1fr;
-    grid-template-areas: "header         header"
-                         "hr1            hr1"
-                         "backup-wallet  use-tor"
-                         "redo-setup     allow-breaking-masternodes"
-                         "hr2            hr2"
-                         "detail-buttons detail";
-
-    .backup-wallet, .redo-setup, .detail-buttons {
-        padding-right: $size-main-margin;
-    }
-
-    .use-tor, .allow-breaking-masternodes, .detail {
-        padding-left: $size-main-margin;
-    }
-
-    button {
-        @include button();
-        height: 30px;
-        width: $size-medium-button-width;
-    }
-
-    label {
-        @include label();
-    }
-
-    hr {
-        width: 100%;
-        margin: {
-            top: $size-medium-space;
-            bottom: $size-medium-space
-        }
-
-        &.hr1 {
-            grid-area: hr1;
-        }
-
-        &.hr2 {
-            grid-area: hr2;
-        }
+    padding: {
+        top: var(--padding-main);
+        bottom: var(--padding-main);
+        left: calc(var(--padding-main) - 3px);
+        right: calc(var(--padding-main) - 3px);
     }
 
     .header {
-        grid-area: header;
+        margin: {
+            left: 3px;
+            right: 3px;
+            bottom: var(--padding-main);
+        }
 
-        .version {
-            @include guidance();
+        color: var(--color-primary);
+        font: {
+            size: 24px;
+            weight: bold;
+        }
+
+        display: flex;
+
+        .version:not(:first-child) {
+            margin-left: var(--padding-main);
+        }
+
+        .version:not(:last-child) {
+            padding-right: var(--padding-main);
+            border-right: {
+                style: solid;
+                width: 1px;
+                color: var(--color-text-subtle-border);
+            }
         }
     }
 
-    .backup-wallet {grid-area: backup-wallet;}
-    .redo-setup {grid-area: redo-setup;}
-    .allow-breaking-masternodes {grid-area: allow-breaking-masternodes;}
-    .use-tor {grid-area: use-tor;}
+    .options {
+        a, .checkbox-option {
+            cursor: pointer;
+            font-weight: bold;
 
-    .backup-wallet, .use-tor {
-        margin-bottom: $size-between-field-space-medium
-    }
+            display: block;
 
-    .detail-buttons {
-        grid-area: detail-buttons;
-        @include buttons-vertical-container();
-    }
-
-    .detail {
-        grid-area: detail;
-
-        .change-passphrase {
-            .passphrase-inputs {
-                display: grid;
-                grid-row-gap: $size-between-field-space-medium;
-                grid-template-columns: 1fr 2fr;
+            padding: {
+                left: 3px;
+                right: 3px;
+                top: var(--padding-main);
+                bottom: var(--padding-main);
             }
 
-            input[type="password"] {
-                @include input-field();
+            border-top: {
+                style: solid;
+                width: 1px;
+                color: var(--color-text-subtle-border);
             }
 
-            .change-passphrase-error {
-                text-align: center;
-                margin-top: $size-between-field-space-medium;
-                @include error();
+            &:last-child {
+                border-bottom: {
+                    style: solid;
+                    width: 1px;
+                    color: var(--color-text-subtle-border);
+                }
             }
 
-            .buttons {
-                margin-top: $size-between-field-space-medium;
-                @include buttons-vertical-container;
+            &:hover {
+                border-radius: 5px;
+                background-color: var(--color-primary-button-hover);
 
-                button {
-                    width: fit-content;
-                    margin: auto;
+                padding: {
+                    top: calc(var(--padding-main) + 1px);
+                    bottom: calc(var(--padding-main) + 1px);
+                }
+
+                border-top-style: none;
+                border-bottom-style: none;
+                & + * {
+                    border-top-style: none;
+                }
+            }
+        }
+
+        .checkbox-option {
+            display: flex;
+            justify-content: space-between;
+
+            label {
+                padding: {
+                    top: 3px;
+                    bottom: 3px;
                 }
             }
         }
