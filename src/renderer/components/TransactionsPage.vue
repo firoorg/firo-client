@@ -211,39 +211,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/colors";
-
 .transactions-page {
     height: 100%;
 
     .inner {
-        box-sizing: border-box;
         height: 100%;
-        padding: $size-main-margin;
+        padding: var(--padding-main);
 
         display: flex;
         flex-flow: column;
 
         .top-section {
             .search-input {
-                margin-bottom: $size-main-margin;
+                margin-bottom: var(--padding-main);
             }
 
             .show-unsynced-warning, .awaiting-updates {
                 text-align: center;
-                font: {
-                    size: 0.9em;
-                    style: italic;
-                    weight: bold;
-                }
+                font-weight: bold;
 
-                margin-bottom: 1em;
-            }
-
-            .show-unsynced-warning {
-                color: red;
+                margin-bottom: var(--padding-main);
             }
         }
 
