@@ -3,7 +3,7 @@
         <WaitOverlay />
     </div>
 
-    <div v-else-if="rebroadcastingStep === 'error'" class="rebroadcast-status">
+    <div v-else-if="rebroadcastingStep === 'error'" class="info-popup">
         <div class="title">
             Rebroadcast Failed
         </div>
@@ -13,13 +13,13 @@
         </div>
 
         <div class="buttons">
-            <button @click="rebroadcastingError = rebroadcastingStep = null">
+            <button class="solid-button recommended" @click="rebroadcastingError = rebroadcastingStep = null">
                 OK
             </button>
         </div>
     </div>
 
-    <div v-else-if="rebroadcastingStep === 'success'" class="rebroadcast-status">
+    <div v-else-if="rebroadcastingStep === 'success'" class="info-popup">
         <div class="title">
             Success!
         </div>
@@ -29,7 +29,7 @@
         </div>
 
         <div class="buttons">
-            <button @click="rebroadcastingStep = null">
+            <button class="solid-button recommended" @click="rebroadcastingStep = null">
                 OK
             </button>
         </div>
@@ -40,126 +40,67 @@
             Transaction Information
         </div>
 
-        <div class="content">
-            <div class="fields">
-                <template v-if="tx.blockHeight">
-                    <div class="field">
-                        <label>
-                            Block Height
-                        </label>
+        <table>
+            <template v-if="tx.blockHeight">
+                <tr>
+                    <td>Block Height</td>
+                    <td>{{ tx.blockHeight }}</td>
+                </tr>
 
-                        <div class="value">
-                            {{ tx.blockHeight }}
-                        </div>
-                    </div>
+                <tr>
+                    <td>Block Hash</td>
+                    <td class="monospace">{{ tx.blockHash }}</td>
+                </tr>
 
-                    <div class="field">
-                        <label>
-                            Block Hash
-                        </label>
+                <tr>
+                    <td>Block Time</td>
+                    <td>{{ formattedBlockTime }}</td>
+                </tr>
+            </template>
 
-                        <copyable class="value">{{ tx.blockHash }}</copyable>
-                    </div>
+            <tr v-else>
+                <td>Status</td>
+                <td>Unconfirmed <a href="#" class="rebroadcast" @click="rebroadcast">(rebroadcast)</a></td>
+            </tr>
 
-                    <div class="field">
-                        <label>
-                            Block Time
-                        </label>
+            <tr>
+                <td>Confirmations</td>
+                <td>{{ confirmations }}</td>
+            </tr>
 
-                        <div class="value">
-                            {{ formattedBlockTime }}
-                        </div>
-                    </div>
-                </template>
+            <tr>
+                <td>Category</td>
+                <td>{{ tx.category }}</td>
+            </tr>
 
-                <template v-else>
-                    <div class="field">
-                        <label>
-                            Status
-                        </label>
+            <tr>
+                <td>Transaction ID</td>
+                <td class="monospace">{{ tx.txid }}</td>
+            </tr>
 
-                        <div class="value status unconfirmed">
-                            <div class="text">UNCONFIRMED</div>
+            <tr>
+                <td>Transaction Index</td>
+                <td>{{ tx.txIndex }}</td>
+            </tr>
 
-                            <a href="#" class="rebroadcast" @click="rebroadcast">
-                                Rebroadcast
-                            </a>
-                        </div>
-                    </div>
-                </template>
+            <tr v-if="tx.address">
+                <td>Recipient Address</td>
+                <td>{{ tx.address }}</td>
+            </tr>
 
-                <div class="field">
-                    <label>
-                        Confirmations
-                    </label>
+            <tr v-if="tx.fee">
+                <td>Fee</td>
+                <td><Amount :amount="tx.fee" ticker="FIRO" /></td>
+            </tr>
 
-                    <div class="value">
-                        {{ confirmations }}
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        Category
-                    </label>
-
-                    <div class="value">
-                        {{ tx.category }}
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        Transaction ID
-                    </label>
-
-                    <div class="value">
-                        <TransactionId :txid="tx.txid" />
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        Transaction Index
-                    </label>
-
-                    <div class="value">
-                        {{ tx.txIndex }}
-                    </div>
-                </div>
-
-                <div v-if="tx.address" class="field">
-                    <label>
-                        Recipient Address
-                    </label>
-
-                    <copyable class="value">{{ tx.address }}</copyable>
-                </div>
-
-                <div v-if="tx.fee" class="field">
-                    <label>
-                        Fee
-                    </label>
-
-                    <div class="value">
-                        <Amount :amount="tx.fee" ticker="FIRO" />
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        Received Amount
-                    </label>
-
-                    <div class="value">
-                        <Amount :amount="tx.amount" ticker="FIRO" />
-                    </div>
-                </div>
-            </div>
-        </div>
+            <tr>
+                <td>Received Amount</td>
+                <td><Amount :amount="tx.amount" ticker="FIRO" /></td>
+            </tr>
+        </table>
 
         <div class="buttons">
-            <button @click="$emit('ok')">
+            <button class="solid-button recommended" @click="$emit('ok')">
                 OK
             </button>
         </div>
@@ -238,31 +179,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/popup";
 @import "src/renderer/styles/info-popup";
-@import "src/renderer/styles/typography";
-
-.copyable:after {
-    content: "📋";
-}
-
-.rebroadcast-status {
-    @include popup();
-
-    .content {
-        @include guidance();
-    }
-}
 
 .info-popup {
-    @include info-popup();
+    table {
+        min-width: 800px;
 
-    .unconfirmed {
-        a {
-            display: block;
-            margin-top: $size-between-field-space-small / 2;
-            @include supermini();
-            @include optional-action();
+        .rebroadcast {
+            font-size: 0.8em;
         }
     }
 }

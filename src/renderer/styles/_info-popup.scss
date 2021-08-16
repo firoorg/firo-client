@@ -17,7 +17,7 @@
         }
     }
 
-    table {
+    table, .content {
         min-width: 500px;
         margin: {
             top: var(--padding-popup);
@@ -36,9 +36,14 @@
 
                 &:last-child {
                     text-align: right;
+                    font-family: "Robot Mono";
                 }
             }
         }
+    }
+
+    .content {
+        text-align: center;
     }
 
     .buttons {
