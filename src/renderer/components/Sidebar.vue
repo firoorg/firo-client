@@ -47,16 +47,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'src/renderer/styles/colors';
-@import 'src/renderer/styles/sizes';
-
 #sidebar {
     background: var(--color-background-sidebar);
     user-select: none;
 
     padding: {
-        left: $size-small-space;
-        right: $size-small-space;
+        left: 12px;
+        right: 12px;
     }
 
     #logo, .network-badge {
@@ -69,12 +66,11 @@ export default {
 
     #logo {
         svg {
-            height: $size-menu-logo;
+            height: 80px;
         }
     }
 
     .network-badge {
-        @include monospace();
         user-select: text;
         color: var(--color-primary);
         font-size: 0.8em;
@@ -82,7 +78,7 @@ export default {
 
     #sidebar-balance, hr#sidebar-divider {
         margin: {
-            top: $size-small-space;
+            top: 12px;
         }
     }
 
@@ -91,19 +87,15 @@ export default {
         background: var(--color-text-subtle-border);
         margin: {
             top: 10px;
-            bottom: 20px;
+            bottom: 10px;
         }
-    }
-
-    #main-menu {
-        margin-top: 1em;
     }
 
     #blockchain-status {
         user-select: text;
         position: absolute;
-        left: $size-tiny-space;
-        bottom: $size-tiny-space;
+        left: 6px;
+        bottom: 6px;
     }
 }
 </style>
