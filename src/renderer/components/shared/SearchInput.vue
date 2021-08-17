@@ -50,10 +50,17 @@ export default {
             right: 20px;
         }
 
+        color: var(--color-text-primary);
+        background: var(--color-background-sidebar);
+
         outline: none;
         border: {
             color: var(--color-text-subtle-border);
             radius: 20px;
+        }
+
+        @media(prefers-color-scheme: dark) {
+            border: none;
         }
     }
 }
