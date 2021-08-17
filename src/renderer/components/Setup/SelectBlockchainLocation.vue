@@ -1,45 +1,34 @@
 <template>
-    <div class="blockchain-location">
+    <div class="blockchain-location info-popup">
         <div class="title">
-            Configuration
+            Select Network and Blockchain Location
         </div>
 
         <div class="content">
-            <label style="grid-area: datadir-label">
-                Data Directory:
-            </label>
+            <div class="row">
+                <label>Data Directory</label>
+                <div class="datadir-field">
+                    <div id="datadir-value">{{ dataDir }}</div>
 
-            <div style="grid-area: datadir-selector">
-                <div id="datadir-value">
-                    {{ dataDir }}
-                </div>
-
-                <div id="datadir-actions">
-                    <a href="#" @click="changeDataDir">
-                        Change
-                    </a>
-
-                    <a href="#" id="reset-data-dir" @click="resetDataDir">
-                        Reset
-                    </a>
+                    <div class="datadir-actions">
+                        <a href="#" @click="changeDataDir">Change</a>
+                        <a href="#" class="reset-data-dir" @click="resetDataDir">Reset</a>
+                    </div>
                 </div>
             </div>
 
-             <label style="grid-area: network-label">
-                 Network:
-             </label>
-
-            <select style="grid-area: network-value" v-model="network">
-                <option value="mainnet">Mainnet (default)</option>
-                <option value="test">Testnet</option>
-                <option value="regtest">Regtest</option>
-            </select>
+            <div class="row network">
+                <label>Network</label>
+                <select style="grid-area: network-value" v-model="network">
+                    <option value="mainnet">Mainnet (default)</option>
+                    <option value="test">Testnet</option>
+                    <option value="regtest">Regtest</option>
+                </select>
+            </div>
         </div>
 
         <div class="buttons">
-            <button @click="continueSetup">
-                Next
-            </button>
+            <button class="solid-button recommended" @click="continueSetup">Next</button>
         </div>
     </div>
 </template>
@@ -193,47 +182,31 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/popup";
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/sizes";
-
 .blockchain-location {
-    @include popup();
-    width: max-content;
-
     .content {
-        display: grid;
-        grid-gap: $size-small-space;
-        grid-template-areas: "datadir-label datadir-selector"
-                             "network-label network-value";
+        min-width: 0;
+        width: fit-content;
+        text-align: left;
 
-        label {
-            @include label();
-        }
+        .row {
+            display: flex;
 
-        #datadir-actions {
-            @include optional-action();
-
-            a:not(:first-child) {
-                margin-left: 0.5em;
-            }
-        }
-
-        .config-option {
-            display: table-row;
-
-            label, .value {
-                display: table-cell;
+            &.network {
+                margin-top: var(--padding-popup);
             }
 
-            &:not(first-child) {
-                margin-top: $size-between-field-space-big;
+            label {
+                width: 150px;
+            }
+
+            .datadir-actions {
+                font-size: 0.8em;
+
+                .reset-data-dir {
+                    margin-left: 6px;
+                }
             }
         }
-    }
-
-    .buttons {
-        width: 30%;
     }
 }
 </style>

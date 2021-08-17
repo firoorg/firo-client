@@ -1,6 +1,5 @@
-
 <template>
-    <div class="lock-wallet">
+    <div class="lock-wallet info-popup">
         <div class="title">
             Select a Passphrase for Your Wallet
         </div>
@@ -8,15 +7,11 @@
         <div class="content">
             <div class="guidance">
                 Your wallet will be encrypted with your chosen passphrase. It is <span class="emphasis">IMPOSSIBLE</span> to
-                recover your funds if you forget your passphrase.
+                recover your funds if you forget your passphrase and mnemonic.
             </div>
 
-            <div class="input-group">
-                <label for="passphrase">
-                    Enter Your Passphrase
-                </label>
-
-                <div class="passphrase-input-and-meter">
+            <div class="passphrase-input">
+                <InputFrame label="Passphrase">
                     <input
                         type="password"
                         id="passphrase"
@@ -24,48 +19,42 @@
                         @focus="() => passphraseInputIsFocused = true"
                         @blur="() => passphraseInputIsFocused = false"
                     />
-                    <div id="passphrase-strength-meter" :class="`strength-${passphraseStrength}`" />
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label for="confirm-passphrase">
-                    Confirm Your Passphrase
-                </label>
-
-                <input
-                    :class="hasMismatchedPassphrase ? 'mismatched' : 'matched'"
-                    v-model="confirmPassphrase"
-                    type="password"
-                    id="confirm-passphrase"
-                />
+                </InputFrame>
+                <InputFrame label="Confirm Passphrase">
+                    <input
+                        :class="hasMismatchedPassphrase ? 'mismatched' : 'matched'"
+                        v-model="confirmPassphrase"
+                        type="password"
+                        id="confirm-passphrase"
+                    />
+                </InputFrame>
             </div>
 
             <div v-if="isExistingWallet" class="existing-wallet-confirmation">
-                <div class="guidance">
-                    You are locking an existing wallet, which already has private keys in it. It will be
-                    <span class="emphasis">IMPOSSIBLE</span> to access this wallet again unless you have the passphrase
-                    given above.
-                </div>
+                You are locking an existing wallet, which already has private keys in it. It will be
+                <span class="emphasis">IMPOSSIBLE</span> to access this wallet again unless you have the passphrase
+                given above.
 
-                <div class="confirm-existing-wallet">
+                <div class="checkbox-field">
                     <input type="checkbox" v-model="hasConfirmedExistingWallet" />
-                    I understand that I will not be able to access my <span class="emphasis">existing wallet</span> without
-                    this passphrase.
+                    <label>
+                        I understand I will not be able to access my <span class="emphasis">existing wallet</span>
+                        without this passphrase.
+                    </label>
                 </div>
             </div>
         </div>
 
         <div class="buttons">
-            <button v-if="isExistingWallet" @click="quit" tabindex="-1">
+            <button v-if="isExistingWallet" class="solid-button unrecommended" @click="quit" tabindex="-1">
                 Quit
             </button>
 
-            <button v-else id="back-button" @click="goBack" tabindex="-1">
+            <button v-else id="back-button" class="solid-button unrecommended" @click="goBack" tabindex="-1">
                 Back
             </button>
 
-            <button id="ok-button" @click="lockWallet" tabindex="-1" :disabled="!canProceed">
+            <button id="ok-button" class="solid-button recommended" @click="lockWallet" tabindex="-1" :disabled="!canProceed">
                 OK
             </button>
         </div>
@@ -76,10 +65,11 @@
 import zxcvbn from 'zxcvbn';
 import {Firod} from "daemon/firod";
 import {mapGetters} from "vuex";
+import InputFrame from "renderer/components/shared/InputFrame";
 
 export default {
     name: "LockWallet",
-
+    components: {InputFrame},
     data() {
         return {
             passphrase: '',
@@ -216,106 +206,28 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/popup";
-@import "src/renderer/styles/inputs";
-
-@include popup();
-
-* {
-    user-select: none !important;
-}
-
-.lock-wallet {
-    width: $size-large-field-width * 2 !important;
-}
-
-.guidance {
-    font-style: italic;
-    text-align: center;
+.content {
+    width: 500px;
 
     .emphasis {
-        font-weight: bold;
-        color: var(--color-error);
+        color: var(--color-primary);
     }
-}
 
-.content {
-    width: fit-content;
-    margin: auto;
-
-    .input-group {
-        margin-top: $size-between-field-space-big;
-
-        label {
-            display: block;
-
-            @include label();
-            @include large();
-        }
-
-        input {
-            @include wide-input-field();
-        }
-
-        .passphrase-input-and-meter {
-            width: fit-content;
-
-            .passphrase-strength-meter {
-                height: 0.4em;
-                border-radius: 10px;
-
-                &.strength-0 {
-                    width: 3%;
-                    background-color: red;
-                }
-
-                &.strength-1 {
-                    width: 25%;
-                    background-color: red;
-                }
-
-                &.strength-2 {
-                    width: 50%;
-                    background-color: orange;
-                }
-
-                &.strength-3 {
-                    width: 75%;
-                    background-color: yellowgreen;
-                }
-
-                &.strength-4 {
-                    width: 100%;
-                    background-color: green;
-                }
-            }
-        }
-
-        #confirm-passphrase {
-            &.mismatched {
-                box-shadow: 0 0 0 3px red;
-            }
-        }
+    .guidance {
+        margin: auto;
+        width: 400px;
+        text-align: center;
+        margin-bottom: var(--padding-popup);
+        font-weight: bold;
     }
 
     .existing-wallet-confirmation {
-        margin-top: $size-small-space;
+        margin-top: var(--padding-popup);
+        text-align: left;
 
-        .confirm-existing-wallet {
-            margin-top: $size-tiny-space;
-            @include label();
-
-            input {
-                margin-right: $size-tiny-space;
-            }
+        .checkbox-field {
+            margin-top: var(--padding-popup);
         }
     }
-}
-
-.buttons {
-    margin-top: $size-small-space;
 }
 </style>

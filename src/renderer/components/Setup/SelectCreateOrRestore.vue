@@ -1,20 +1,18 @@
 <template>
-    <div class="select-create-or-restore">
-        <div class="title">
-            Do you want to create a new wallet or restore with a mnemonic?
-        </div>
+    <div class="info-popup">
+        <div class="content">Do you want to create a new wallet or restore with a mnemonic?</div>
 
         <div class="buttons">
-            <button id="back-button" @click="goBack">
+            <button id="back-button" class="solid-button unrecommended" @click="goBack">
                 Go Back
             </button>
 
-            <button id="create-new-wallet" @click="writeDownMnemonic">
-                Create New Wallet
+            <button id="create-new-wallet" class="solid-button recommended" @click="writeDownMnemonic">
+                Create a New Wallet
             </button>
 
-            <button id="recover-from-mnemonic" @click="recoverFromMnemonic">
-                Recover from a Mnemonic
+            <button id="recover-from-mnemonic" class="solid-button recommended" @click="recoverFromMnemonic">
+                Restore with a Mnemonic
             </button>
         </div>
     </div>
@@ -58,20 +56,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/popup";
-@import "src/renderer/styles/sizes";
-
-@include popup();
-
 * {
     user-select: none !important;
 }
 
-.title {
-    margin-bottom: $size-medium-space;
-
-    .buttons {
-        justify-content: space-between;
-    }
+.buttons {
+    width: 800px;
+    max-width: 800px;
 }
 </style>

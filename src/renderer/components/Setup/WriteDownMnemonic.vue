@@ -1,21 +1,21 @@
 <template>
-    <div class="write-down-mnemonic">
+    <div class="info-popup write-down-mnemonic">
         <div class="title">
-            Below is your 24-word passphrase. Write it down and keep it safe. You will shortly be asked to re-enter it.
+            Write Down Your Seed Phrase
         </div>
 
         <div class="content">
-            <span v-for="(_, n) in 24" class="mnemonic-word visible" :id="`mnemonic-word-${n}`">
+            <div v-for="(_, n) in 24" class="mnemonic-word visible" :id="`mnemonic-word-${n}`">
                 {{ words[n] }}
-            </span>
+            </div>
         </div>
 
         <div class="buttons">
-            <button id="back-button" @click="goBack">
+            <button id="back-button" class="solid-button unrecommended" @click="goBack">
                 Go Back
             </button>
 
-            <button id="confirm-button" @click="confirmHasWrittenDown">
+            <button id="confirm-button" class="solid-button recommended" @click="confirmHasWrittenDown">
                 I have written down my seed phrase
             </button>
         </div>
@@ -46,20 +46,11 @@ export default {
 
 <style scoped lang="scss">
 @import 'src/renderer/styles/mnemonic';
-@import 'src/renderer/styles/popup';
 
-@include popup()
-
-.title {
-    user-select: none;
-}
-
-.content {
-    user-select: text;
-    @include mnemonic();
-}
-
-.buttons {
-    width: fit-content;
+.write-down-mnemonic {
+    .content {
+        user-select: text;
+        @include mnemonic();
+    }
 }
 </style>

@@ -26,34 +26,36 @@ export default {
 
 .setup-layout {
     position: fixed;
-    background-color: var(--color-setup-background);
+    background-color: var(--color-background-detail);
     height: 100vh;
     width: 100vw;
+    user-select: none;
 
     .logo {
         width: fit-content;
         margin: {
             left: auto;
             right: auto;
-            top: $size-large-space;
+            top: var(--padding-main);
         };
 
         svg {
-            height: $size-setup-logo-height;
+            height: 160px;
         }
     }
 
     .setup-child {
-        background-color: var(--color-setup-foreground);
-        padding: $size-small-space;
-        border-radius: $size-small-space;
+        background-color: var(--color-background-main);
+        padding: var(--padding-main);
+        border-radius: var(--padding-main);
         max-width: 90%;
         width: fit-content;
         margin: {
-            top: $size-large-space;
+            top: var(--padding-main);
             left: auto;
             right: auto;
         };
+        box-shadow: 0 2px 6px rgba(60, 57, 57, 0.08)
     }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-    <div class="recover-from-mnemonic">
+    <div class="info-popup recover-from-mnemonic">
         <div class="title">
-            Enter your recovery phrase below.
+            Enter Your Recovery Mnemonic
         </div>
 
         <div class="content">
@@ -32,7 +32,7 @@
                        :class="['mnemonic-word', 'hidden', isMnemonicValid ? 'verified' : 'unverified']"
                        type="text"
                        v-model="newWords[i]"
-                       placeholder="______"
+                       spellcheck="false"
                        :tabindex="i + 1"
                        @keydown="preventInvalidCharInput"
                        @keydown.enter="(ev) => onWhitespace(ev, i)"
@@ -44,33 +44,31 @@
             </div>
 
             <div class="protective-passphrase">
-                <input type="checkbox" v-model="hasProtectivePassphrase" id="hasProtectivePassphrase" />
-                <label class="question" for="hasProtectivePassphrase">
-                    My wallet has a protective passphrase.
-                </label>
+                <div class="checkbox-field">
+                    <input type="checkbox" v-model="hasProtectivePassphrase" id="hasProtectivePassphrase" />
+                    <label class="question" for="hasProtectivePassphrase">
+                        My wallet has a protective passphrase.
+                    </label>
+                </div>
 
                 <div v-if="hasProtectivePassphrase" class="protective-passphrase-inputs">
-                    <label class="question" for="protectivePassphrase">
-                        Passphrase:
-                    </label>
+                    <InputFrame label="Passphrase">
+                        <input type="password" id="protectivePassphrase" v-model="protectivePassphrase" />
+                    </InputFrame>
 
-                    <input type="password" id="protectivePassphrase" v-model="protectivePassphrase" />
-
-                    <label class="question" for="confirmProtectivePassphrase">
-                        Confirm Passphrase:
-                    </label>
-
-                    <input type="password" id="confirmProtectivePassphrase" v-model="confirmProtectivePassphrase" />
+                    <InputFrame label="Confirm Passphrase">
+                        <input type="password" id="confirmProtectivePassphrase" v-model="confirmProtectivePassphrase" />
+                    </InputFrame>
                 </div>
             </div>
         </div>
 
         <div class="buttons">
-            <button id="back-button" @click="goBack">
+            <button id="back-button" class="solid-button unrecommended" @click="goBack">
                 Go Back
             </button>
 
-            <button id="ok-button" @click="submit" :disabled="!isVerified">
+            <button id="ok-button" class="solid-button recommended" @click="submit" :disabled="!isVerified">
                 OK
             </button>
         </div>
@@ -79,9 +77,14 @@
 
 <script>
 import {validateMnemonic} from "daemon/firod";
+import InputFrame from "renderer/components/shared/InputFrame";
 
 export default {
     name: "RecoverFromMnemonic",
+
+    components: {
+        InputFrame
+    },
 
     data() {
         return {
@@ -220,53 +223,29 @@ export default {
 
 <style lang="scss" scoped>
 @import 'src/renderer/styles/mnemonic';
-@import 'src/renderer/styles/popup';
-@import 'src/renderer/styles/sizes';
-@import 'src/renderer/styles/typography';
-
-@include popup()
 
 * {
     user-select: none !important;
 }
 
 .content {
-    .mnemonic-length-question {
-        @include label();
-
-        input {
-            margin-left: 1em;
-        }
+    .mnemonic-length, .protective-passphrase {
+        text-align: left;
     }
 
     .protective-passphrase {
-        @include label();
-
         .protective-passphrase-inputs {
-            width: fit-content;
-            display: grid;
-            grid-template-columns: auto 1fr;
-
-            label {
-                margin-right: 2em;
-            }
-
-            input {
-                width: 15em;
-            }
+            margin-top: var(--padding-popup);
+            width: 500px;
         }
     }
 
     .mnemonic {
         @include mnemonic();
         margin: {
-            top: $size-medium-space;
-            bottom: $size-medium-space;
+            top: var(--padding-popup);
+            bottom: var(--padding-popup);
         }
     }
-}
-
-.buttons {
-    width: fit-content;
 }
 </style>

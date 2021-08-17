@@ -6,6 +6,9 @@
 @import 'styles/z';
 @import 'styles/error_tooltip';
 
+
+@import "src/renderer/styles/info-popup";
+
 * {
     box-sizing: border-box;
 }
@@ -48,7 +51,7 @@ button.solid-button {
     border: none;
     outline: none;
 
-    width: 145px;
+    min-width: 145px;
     height: 30px;
     border-radius: 20px;
 

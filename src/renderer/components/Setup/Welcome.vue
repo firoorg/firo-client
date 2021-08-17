@@ -1,5 +1,5 @@
 <template>
-    <div class="welcome">
+    <div class="welcome info-popup">
         <div class="title">Welcome!</div>
 
         <div class="content">
@@ -7,7 +7,7 @@
         </div>
 
         <div class="buttons">
-            <button @click="next">
+            <button class="solid-button recommended" @click="next">
                 Let's Go
             </button>
         </div>
@@ -28,22 +28,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/popup";
-@import "src/renderer/styles/colors";
-
 .welcome {
-    @include popup();
-    max-width: 30% !important;
-    text-align: center;
+    font-weight: bold;
 
     .content {
-        .firo {
-            color: var(--color-text-accent);
-        }
-    }
+        min-width: 250px !important;
+        width: 250px;
 
-    .buttons {
-        width: 30%;
+        .firo {
+            color: var(--color-primary);
+        }
     }
 }
 </style>

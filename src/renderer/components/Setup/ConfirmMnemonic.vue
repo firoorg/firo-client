@@ -1,7 +1,7 @@
 <template>
-    <div class="confirm-mnemonic">
+    <div class="info-popup confirm-mnemonic">
         <div class="title">
-            Enter the missing words from your mnemonic recovery phrase below:
+            Confirm Your Recovery Phrase
         </div>
 
         <div class="content">
@@ -11,7 +11,7 @@
                     :id="`hidden-word-${n}`"
                     type="text"
                     v-model="newWords[n]"
-                    placeholder="______"
+                    spellcheck="false"
                     :tabindex="hiddenWordPositions.indexOf(n) + 1"
                 />
                 <span v-else class="mnemonic-word visible" :id="`visible-word-${n}`">
@@ -21,12 +21,12 @@
         </div>
 
         <div class="buttons">
-            <button id="back-button" @click="goBack" tabindex="-1">
+            <button id="back-button" class="solid-button unrecommended" @click="goBack" tabindex="-1">
                 Back
             </button>
 
-            <button id="ok-button" @click="goToConfirmLockWallet" tabindex="-1" :disabled="!isVerified">
-                OK
+            <button id="ok-button" class="solid-button recommended" @click="goToConfirmLockWallet" tabindex="-1" :disabled="!isVerified">
+                Confirm
             </button>
         </div>
     </div>
@@ -93,19 +93,8 @@ export default {
 
 <style lang="scss" scoped>
 @import 'src/renderer/styles/mnemonic';
-@import 'src/renderer/styles/popup';
-
-@include popup()
-
-.confirm-mnemonic * {
-    user-select: none;
-}
 
 .content {
     @include mnemonic();
-}
-
-.buttons {
-    width: fit-content;
 }
 </style>
