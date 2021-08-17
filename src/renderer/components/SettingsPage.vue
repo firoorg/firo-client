@@ -13,8 +13,8 @@
                 <div class="title">Confirm Settings Reset</div>
                 <div class="content">Are you sure you want to reset settings? This will not delete any of your data.</div>
                 <div class="buttons">
-                    <button class="solid-button recommended" @ok="show = null">Cancel</button>
-                    <button class="solid-button unrecommended" @ok="redoSetup">Yes, I'm sure</button>
+                    <button class="solid-button recommended" @click="show = null">Cancel</button>
+                    <button class="solid-button unrecommended" @click="redoSetup">Yes, I'm sure</button>
                 </div>
             </div>
 
