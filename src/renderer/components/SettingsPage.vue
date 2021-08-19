@@ -29,6 +29,15 @@
         </div>
 
         <div class="options">
+            <div class="select-option">
+                <label>Appearance</label>
+                <select class="selector" v-model="colorTheme" >
+                    <option value="system">System</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </div>
+
             <div class="checkbox-option" @click="useTor = !useTor">
                 <label>Connect to other nodes via Tor</label>
                 <input type="checkbox" v-model="useTor" />
@@ -46,18 +55,20 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex'
+import {mapGetters, mapMutations, mapActions} from 'vuex'
 import {remote} from 'electron';
 import version from "../../version";
 import Popup from 'renderer/components/shared/Popup';
 import MnemonicPopup from "renderer/components/SettingsPage/MnemonicPopup";
 import ChangePassphrasePopup from "renderer/components/SettingsPage/ChangePassphrasePopup";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
+import InputFrame from "renderer/components/shared/InputFrame";
 
 export default {
     name: 'SettingsPage',
 
     components: {
+        InputFrame,
         Popup,
         WaitOverlay,
         MnemonicPopup,
@@ -69,6 +80,7 @@ export default {
             apiStatus: 'ApiStatus/apiStatus',
             hasMnemonic: 'ApiStatus/hasMnemonic',
             daemonVersion: 'ApiStatus/version',
+            _colorTheme: 'App/colorTheme',
             _allowBreakingMasternodes: 'App/allowBreakingMasternodes'
         }),
 
@@ -79,6 +91,17 @@ export default {
 
             set(value) {
                 this.setAllowBreakingMasternodes(value);
+            }
+        },
+
+        colorTheme: {
+            get() {
+                return this._colorTheme;
+            },
+
+            set(value) {
+                console.log(value);
+                this.setColorTheme(value);
             }
         }
     },
@@ -105,6 +128,10 @@ export default {
     methods: {
         ...mapMutations({
             setAllowBreakingMasternodes: 'App/setAllowBreakingMasternodes'
+        }),
+
+        ...mapActions({
+            setColorTheme: 'App/setColorTheme'
         }),
 
         async openBackupDialog() {
@@ -182,7 +209,7 @@ export default {
     }
 
     .options {
-        a, .checkbox-option {
+        a, .checkbox-option, .select-option {
             cursor: pointer;
             font-weight: bold;
 
@@ -226,14 +253,25 @@ export default {
             }
         }
 
-        .checkbox-option {
+        .checkbox-option, .select-option {
             display: flex;
             justify-content: space-between;
+        }
 
+        .checkbox-option {
             label {
                 padding: {
                     top: 3px;
                     bottom: 3px;
+                }
+            }
+        }
+
+        .select-option {
+            label {
+                padding: {
+                    top: 8px;
+                    bottom: 8px;
                 }
             }
         }

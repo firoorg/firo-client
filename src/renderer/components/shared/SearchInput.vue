@@ -54,9 +54,16 @@ export default {
         background: var(--color-background-sidebar);
 
         outline: none;
-        border: {
-            color: var(--color-text-subtle-border);
-            radius: 20px;
+
+        @at-root #app.light-color-scheme &, & {
+            border: {
+                color: var(--color-text-subtle-border);
+                radius: 20px;
+            }
+        }
+
+        @at-root #app.dark-color-scheme & {
+            border: none;
         }
 
         @media(prefers-color-scheme: dark) {

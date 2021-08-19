@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" :class="`${colorTheme}-color-theme`">
         <div id="app-drag-area" />
 
         <div :v-show="waitingReason">
@@ -24,7 +24,8 @@ export default {
     },
 
     computed: mapGetters({
-        waitingReason: 'App/waitingReason'
+        waitingReason: 'App/waitingReason',
+        colorTheme: 'App/colorTheme'
     })
 }
 </script>

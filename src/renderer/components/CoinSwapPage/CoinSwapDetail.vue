@@ -723,6 +723,14 @@ export default {
                         align-items: center;
 
                         svg {
+                            @at-root #app.light-color-scheme & {
+                                filter: none;
+                            }
+
+                            @at-root #app.dark-color-scheme & {
+                                filter: brightness(0.8);
+                            }
+
                             @media(prefers-color-scheme: dark) {
                                 filter: brightness(0.8);
                             }

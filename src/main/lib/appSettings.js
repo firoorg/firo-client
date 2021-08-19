@@ -38,4 +38,8 @@ export const populateStoreWithAppSettings = async function ({store}) {
         store.commit('App/setBlockchainLocation', settings.blockchainLocation);
         store.commit('App/setIsInitialized', settings.isInitialized);
     }
+
+    if (settings.colorTheme) {
+        store.commit('App/setColorTheme', settings.colorTheme);
+    }
 };

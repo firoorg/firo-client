@@ -47,6 +47,23 @@ input[type="checkbox"] {
     }
 }
 
+select.selector {
+    height: 30px;
+
+    padding: {
+        left: var(--padding-main);
+        right: var(--padding-main);
+    }
+
+    outline: none;
+    border: {
+        radius: 20px;
+    }
+
+    color: inherit;
+    background-color: inherit;
+}
+
 button.solid-button {
     border: none;
     outline: none;
