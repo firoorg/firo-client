@@ -1,7 +1,11 @@
 <template>
     <div>
         <div class="buttons">
-            <button :disabled="disabled" @click="showInfo">
+            <button class="solid-button unrecommended" @click="$emit('reset')">
+                Reset
+            </button>
+
+            <button :disabled="disabled" class="solid-button recommended" @click="showInfo">
                 Exchange
             </button>
         </div>
@@ -302,9 +306,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import 'src/renderer/styles/inputs';
-
 .buttons {
-    @include buttons-container();
+    display: flex;
+    justify-content: space-evenly;
 }
 </style>

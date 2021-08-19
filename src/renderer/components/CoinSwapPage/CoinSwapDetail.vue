@@ -1,30 +1,21 @@
 <template>
     <section class="coin-swap-detail">
         <div class="inner">
-            <div id="top">
-                <header class="header-wrapper">
-                    <div class="title-wrapper">
-                        <h2 class="total-field">Coin Swap</h2>
-                        <div class="logo-wrapper">Powered by <SwitchainIcon /></div>
-                    </div>
-                </header>
+            <div class="top">
+                <SwitchainIcon class="switchain-icon" />
 
-                <div class="radio-buttons-wrapper">
-                    <label class="radio-button-wrapper" :class="{disabled: formDisabled || !isBlockchainSynced}">Swap from FIRO
-                        <input type="radio" v-model="isSwapFrom" :value="true">
-                        <span class="checkmark" />
-                    </label>
-                    <label class="radio-button-wrapper">Swap to FIRO
-                        <input type="radio" v-model="isSwapFrom" :value="false">
-                        <span class="checkmark" />
-                    </label>
+                <div class="field checkbox-field">
+                    <input type="radio" v-model="isSwapFrom" :value="true" :disabled="formDisabled" />
+                    <label>Swap from FIRO</label>
                 </div>
 
-                <div class="field" id="label-field">
-                    <label :class="{disabled: formDisabled}">
-                        {{ isSwapFrom ? 'Receive' : 'Send' }}
-                    </label>
+                <div class="field checkbox-field">
+                    <input type="radio" v-model="isSwapFrom" :value="false">
+                    <label>Swap to FIRO</label>
+                </div>
 
+                <div class="field pseudo-input-frame">
+                    <label>{{ isSwapFrom ? 'Receive' : 'Send' }}</label>
                     <!-- The use of option.coin below is a function of vue-select, wherein option[label] is set to the
                          selected value rather than option itself. -->
                     <vue-select
@@ -35,15 +26,10 @@
                         :disabled="formDisabled || isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
                         :options="remoteCoins"
                         :placeholder="(isSwitchainUnavailable && 'Switchain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
-                        :clearable="!!selectedCoin"
                     >
-                        <template v-slot:spinner="loading">
-                            <div class="spinner" v-if="loading">Loading...</div>
-                        </template>
-
                         <template v-slot:option="option">
                             <div class="coin-option">
-                                <CoinIcon :coin="option.coin" :width="25" :height="25" />
+                                <CoinIcon :coin="option.coin" :width="20" :height="20" />
                                 <div class="coin-short-name">{{ option.coin }}</div>
                                 <div class="coin-name">{{ CoinNames[option.coin] }}</div>
                             </div>
@@ -51,7 +37,7 @@
 
                         <template v-slot:selected-option="option">
                             <div class="coin-option" v-if="option">
-                                <CoinIcon :coin="option.coin" :width="25" :height="25" />
+                                <CoinIcon :coin="option.coin" :width="20" :height="20" />
                                 <div class="coin-short-name">{{ option.coin }}</div>
                                 <div class="coin-name">{{ CoinNames[option.coin] }}</div>
                             </div>
@@ -59,58 +45,39 @@
                     </vue-select>
                 </div>
 
-                <div class="field" id="amount-field" :class="{disabled: formDisabled}">
-                    <label>
-                        Amount
-                    </label>
-                    <div class="input-with-tip-container">
-                        <input
-                            id="amount"
-                            ref="amount"
-                            v-model="amount"
-                            v-validate="amountValidations"
-                            v-tooltip="getValidationTooltip('amount')"
-                            type="text"
-                            :disabled="formDisabled || !selectedCoin"
-                            name="amount"
-                            class="amount"
-                            tabindex="3"
-                            :placeholder="isSwapFrom ? `From ${isPrivate ? 'private' : 'public'} balance` : 'Amount'"
-                        />
-                        <span class="tip ticker">
-                            {{ isSwapFrom ? "FIRO" : selectedCoin }}
-                        </span>
-                    </div>
-                </div>
+                <InputFrame label="Amount" :unit="isSwapFrom ? 'FIRO' : selectedCoin">
+                    <input
+                        id="amount"
+                        ref="amount"
+                        v-model="amount"
+                        v-validate="amountValidations"
+                        v-tooltip="getValidationTooltip('amount')"
+                        type="text"
+                        :disabled="formDisabled || !selectedCoin"
+                        name="amount"
+                        class="amount"
+                        tabindex="3"
+                    />
+                </InputFrame>
 
-                <div class="field" id="address-field" :class="{disabled: formDisabled}">
-                    <label>
-                        Your {{ selectedCoin }} {{ isSwapFrom ? "destination" : "refund"}} address
-                    </label>
-                    <div class="input-with-tip-container">
-                        <input
-                            id="address"
-                            ref="address"
-                            v-model="address"
-                            v-validate="`${selectedCoin}AddressIsValid`"
-                            v-tooltip="getValidationTooltip('address')"
-                            type="text"
-                            name="address"
-                            tabindex="2"
-                            :disabled="formDisabled || !selectedCoin"
-                            :placeholder="isSwapFrom ? 'Destination address' : 'Refund address'"
-                            spellcheck="false"
-                        />
-                    </div>
-                </div>
-            </div>
+                <InputFrame :label="`${selectedCoin ? `${selectedCoin} ` : ''}${isSwapFrom ? 'Destination' : 'Refund'} Address`">
+                    <input
+                        id="address"
+                        ref="address"
+                        v-model="address"
+                        v-validate="`${selectedCoin}AddressIsValid`"
+                        v-tooltip="getValidationTooltip('address')"
+                        type="text"
+                        name="address"
+                        tabindex="2"
+                        :disabled="formDisabled || !selectedCoin"
+                        spellcheck="false"
+                    />
+                </InputFrame>
 
-            <div id="bottom">
-                <div id="totals" :class="{disabled: formDisabled}">
-                    <div class="total-field" id="expected-rate">
-                        <label>
-                            Rate:
-                        </label>
+                <div class="totals">
+                    <div class="total-field">
+                        <label>Rate:</label>
 
                         <div v-if="isMarketInfoLoaded && !!selectedCoin" class="value">
                             <span class="amount">1</span>
@@ -121,10 +88,8 @@
                         </div>
                     </div>
 
-                    <div v-if="isSwapFrom && !isBigWallet" class="total-field" id="firo-transaction-fee">
-                        <label>
-                            Firo Transaction fee:
-                        </label>
+                    <div v-if="isSwapFrom && !isBigWallet" class="total-field">
+                        <label>Firo Transaction fee:</label>
 
                         <div class="value">
                             <div v-if="firoTransactionFee">
@@ -134,10 +99,8 @@
                         </div>
                     </div>
 
-                    <div v-if="selectedCoin" class="total-field" id="remote-transaction-fee">
-                        <label>
-                            {{ CoinNames[selectedCoin] }} Transaction Fee:
-                        </label>
+                    <div v-if="selectedCoin" class="total-field">
+                        <label>{{ CoinNames[selectedCoin] }} Transaction Fee:</label>
 
                         <div class="value">
                             <span class="amount">{{ remoteTransactionFee }}</span>
@@ -146,9 +109,7 @@
                     </div>
 
                     <div class="total-field" id="total-amount">
-                        <label>
-                            You will receive:
-                        </label>
+                        <label>You will receive:</label>
 
                         <div  v-if="amountToReceive" class="value">
                             ~
@@ -156,10 +117,12 @@
                             <span class="ticker">{{ isSwapFrom ? selectedCoin : 'FIRO' }}</span>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div v-if="firoTransactionFeeError" class="error">
-                        {{ firoTransactionFeeError }}
-                    </div>
+            <div class="bottom">
+                <div v-if="firoTransactionFeeError" class="error">
+                    {{ firoTransactionFeeError }}
                 </div>
 
                 <CoinSwapFlowFromFiro
@@ -176,6 +139,7 @@
                     :receive-address="address"
                     :expected-rate="conversionRate"
                     :class="{disabled: formDisabled}"
+                    @reset="cleanupForm"
                     @success="cleanupForm"
                 />
 
@@ -188,6 +152,7 @@
                     :firo-transaction-fee="remoteTransactionFee"
                     :refund-address="address"
                     :expected-rate="conversionRate"
+                    @reset="cleanupForm"
                     @success="cleanupForm"
                 />
 
@@ -216,6 +181,7 @@ import SwitchainIcon from 'renderer/components/Icons/SwitchainIcon';
 import BackButtonIcon from 'renderer/components/Icons/BackButtonIcon';
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
 import {FirodErrorResponse} from "daemon/firod";
+import InputFrame from "renderer/components/shared/InputFrame";
 
 // This is the list of currency pairs that we want to be available in the app. It is not necessarily symmetrical, and it
 // is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
@@ -286,6 +252,7 @@ export default {
     name: 'CoinSwapDetail',
 
     components: {
+        InputFrame,
         CoinSwapFlowToFiro,
         CoinSwapFlowFromFiro,
         VueSelect,
@@ -499,7 +466,7 @@ export default {
         }),
 
         firoTransactionFeeAndError() {
-            return this.feeMap[this.currentTxFeeId];
+            return this.isSwapFrom ? this.feeMap[this.currentTxFeeId] : null;
         },
 
         currentTxFeeId() {
@@ -677,172 +644,135 @@ export default {
             this.selectedCoin = null;
             this.amount = '';
             this.address = ''
+            this.error = null;
         }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-@import 'src/renderer/styles/inputs';
-@import 'src/renderer/styles/sizes';
-@import 'src/renderer/styles/typography';
-
-label {
-    @include label();
-}
-
-.amount {
-    @include amount();
-}
-
-.input-with-tip-container {
-    width: fit-content;
-    position: relative;
-
-    .tip {
-        position: absolute;
-        bottom: $size-input-vertical-padding;
-        right: $size-input-horizontal-padding;
-    }
-}
-
-.ticker {
-    @include ticker();
-}
-
-.disabled {
-    opacity: $disabled-input-opacity;
-}
+@import "src/renderer/styles/checkbox-field";
+@import "src/renderer/styles/z";
 
 .coin-swap-detail {
-    width: $size-secondary-content-width;
-    float: right;
-    box-sizing: border-box;
-    padding: $size-detail-margin;
+    padding: var(--padding-main);
     height: 100%;
-    background-color: var(--color-detail-background);
-
-    .title-wrapper {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        
-        .logo-wrapper {
-            height: 18px;
-            display: flex;
-            line-height: 18px;
-            margin: auto 0;
-        }
-    }
+    background-color: var(--color-background-detail);
 
     .inner {
         height: 100%;
         display: flex;
         flex-flow: column;
 
-        #top {
+        .top {
             flex-grow: 1;
 
-            .field {
-                &:not(:first-child) {
-                    margin-top: $size-between-field-space-big;
-                }
+            .switchain-icon {
+                position: fixed;
+                right: var(--padding-main);
+            }
 
-                label,
-                input[type='text'] {
-                    display: block;
-                }
+            // :first-child is .switchain-icon
+            .field:not(:nth-child(2)) {
+                margin-top: var(--padding-main);
+            }
 
-                input[type='text'] {
-                    @include wide-input-field();
-                }
+            .pseudo-input-frame {
+                position: relative;
+                height: 50px;
 
-                &#address-field {
-                    input {
-                        @include address();
+                label {
+                    position: absolute;
+                    left: 9px;
+                    font-size: 12px;
+                    letter-spacing: 0.4px;
+                    background-color: var(--color-background-sidebar);
+                    z-index: $z-input-frame-label;
+                    padding: {
+                        left: 5px;
+                        right: 5px;
                     }
                 }
 
-                &#select-custom-inputs {
-                    a {
-                        @include optional-action();
-                    }
-                }
+                .v-select {
+                    position: absolute;
+                    top: 6px;
+                    bottom: 0;
+                    right: 0;
+                    left: 0;
 
-                &#subtract-fee-from-amount {
-                    * {
-                        display: inline;
-                    }
-                }
+                    height: 36px;
 
-                .custom-input-checkbox-container {
-                    * {
-                        display: inline-block;
+                    .dropdown-toggle {
+                        font-weight: bold;
+                        height: 100%;
+                        width: 100%;
+                        padding: {
+                            top: 11px;
+                            bottom: 11px;
+                            left: 14px;
+                            right: 14px;
+                        }
+                        background-color: inherit;
+                        border: none;
+                        outline: none;
                     }
-                }
 
-                .selected-coin-value {
-                    * {
-                        display: inline;
+                    .coin-option {
+                        display: flex;
+                        align-items: center;
+
+                        svg {
+                            @media(prefers-color-scheme: dark) {
+                                filter: brightness(0.8);
+                            }
+                        }
+
+                        .coin-short-name {
+                            border: {
+                                width: 1px;
+                                style: solid;
+                                color: var(--color-text-subtle-border);
+                                radius: 5px;
+                            }
+                            padding: {
+                                top: 2px;
+                                bottom: 2px;
+                                left: 2px;
+                                right: 2px;
+                            }
+                            margin-left: 8px;
+                        }
+
+                        .coin-name {
+                            padding-left: 8px;
+                        }
                     }
                 }
             }
-        }
 
-        #bottom {
-            #totals {
+            .totals {
+                margin-top: 30px;
+                padding-top: 30px;
+                border-top: {
+                    width: 1px;
+                    color: var(--color-text-subtle-border);
+                    style: solid;
+                }
+
                 .total-field {
-                    margin-bottom: $size-small-space;
-
-                    label,
-                    .value {
-                        display: inline;
-                    }
-
-                    label {
-                        margin-right: $size-medium-space;
-                    }
-
-                    .value {
-                        float: right;
-                    }
+                    display: flex;
+                    justify-content: space-between;
                 }
             }
+        }
 
+        .bottom {
             .error {
-                @include error();
-                margin-bottom: $size-small-space;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: var(--padding-main);
             }
-        }
-    }
-
-    .radio-buttons-wrapper {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .v-select {
-        width: $size-large-field-width;
-    }
-
-    .coin-option {
-        display: flex;
-        align-items: center;
-
-        .coin-short-name {
-            border: 1px solid rgba(34, 36, 38, 0.15);
-            background-color: white;
-            padding-top: 2px;
-            padding-bottom: 2px;
-            padding-left: 3px;
-            padding-right: 2px;
-            color: rgba(0, 0, 0, 0.87);
-            border-radius: 5px;
-            margin-left: 8px;
-        }
-
-        .coin-name {
-            padding-left: 8px;
         }
     }
 }
