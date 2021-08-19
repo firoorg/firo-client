@@ -166,10 +166,10 @@ export default {
     width: 400pt;
 
     .field {
-        margin-bottom: $size-between-field-space-small;
+        margin-bottom: var(--padding-main)
 
         label {
-            margin-right: $size-medium-space;
+            margin-right: var(--padding-main);
             width: fit-content;
             @include label();
         }

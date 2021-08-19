@@ -83,9 +83,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-
 .pagination {
     display: flex;
     justify-content: center;

@@ -174,34 +174,27 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/inputs";
-@import "src/renderer/styles/typography";
-
-
-$top-height: 40%;
-
 .receive-page {
     height: 100%;
-    padding: $size-main-margin;
+    padding: var(--padding-main);
     display: flex;
     flex-direction: column;
 
     .top {
         display: flex;
-        margin-bottom: $size-main-margin;
+        margin-bottom: var(--padding-main);
 
         .qr-code {
             width: 200px;
             height: 200px;
-            margin-right: $size-main-margin;
+            margin-right: var(--padding-main);
         }
 
         .right {
             flex-grow: 1;
 
             .title {
-                margin-bottom: $size-main-margin;
+                margin-bottom: var(--padding-main);
                 font: {
                     weight: bold;
                     size: 14px;

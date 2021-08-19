@@ -21,9 +21,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-
 .setup-layout {
     position: fixed;
     background-color: var(--color-background-detail);

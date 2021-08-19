@@ -54,14 +54,14 @@ export default {
 </script>
 
 <style lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
+$size-warning-banner: 40px;
+$size-sidebar-width: 280px;
 
 #main-layout {
     height: 100vh;
 
     .warning-header {
-        height: $size-warning-banner;
+        height: 40px;
     }
 
     #main-content {

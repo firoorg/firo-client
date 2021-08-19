@@ -46,8 +46,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/sizes";
-
 .balances {
     user-select: text;
 

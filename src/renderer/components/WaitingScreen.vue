@@ -48,8 +48,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
 @import "src/renderer/styles/z";
 
 $speed: 2.5s;

@@ -47,13 +47,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
-
-
 #blockchain-status {
-    @include small();
-    font-style: italic;
+    font: {
+        style: italic;
+        size: 0.8em;
+    }
 
     // This is the loading bounce.
     .spinner {

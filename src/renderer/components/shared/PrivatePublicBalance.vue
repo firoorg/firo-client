@@ -81,10 +81,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
-
 .private-public-balance {
     hr {
         margin-top: 30px;
@@ -112,7 +108,7 @@ export default {
         margin-top: 15px;
 
         &.toggle-disabled {
-            opacity: $disabled-input-opacity;
+            color: var(--color-text-disabled);
         }
 
         @include label();
@@ -136,7 +132,7 @@ export default {
 
                 @at-root .toggle.is-private {
                     .toggle-label-public {
-                        opacity: 0.5;
+                        color: var(--color-text-disabled);
                     }
 
                     .inner {
@@ -146,7 +142,7 @@ export default {
 
                 @at-root .toggle.is-public {
                     .toggle-label-private {
-                        opacity: 0.5;
+                        color: var(--color-text-disabled);
                     }
 
                     .inner {

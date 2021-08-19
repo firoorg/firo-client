@@ -230,9 +230,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/sizes";
-
 .animated-table {
     display: flex;
     flex-flow: column;
@@ -255,16 +252,16 @@ export default {
                 box-shadow: 0 1px 0 0 var(--color-text-subtle-border);
 
                 &:first-child {
-                    padding-left: $size-table-row-horizontal-padding;
+                    padding-left: var(--padding-main);
                 }
 
                 &:last-child {
-                    padding-right: $size-table-row-horizontal-padding;
+                    padding-right: var(--padding-main);
                 }
             }
 
             th {
-                padding-bottom: 1em;
+                padding-bottom: var(--padding-main);
                 font-weight: bold;
             }
         }
@@ -275,8 +272,8 @@ export default {
 
                 td {
                     padding: {
-                        top: $size-table-row-vertical-padding;
-                        bottom: $size-table-row-vertical-padding;
+                        top: var(--padding-main);
+                        bottom: var(--padding-main);
                     }
                 }
             }
