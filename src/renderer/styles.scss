@@ -38,6 +38,8 @@ input[type="checkbox"] {
         color: rgba(60, 57, 57, 0.6);
     }
 
+    background-color: var(--color-text-minimal-button-background);
+
     &:hover {
         border-color: var(--color-secondary);
     }
@@ -60,8 +62,8 @@ select.selector {
         radius: 20px;
     }
 
-    color: inherit;
-    background-color: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-text-minimal-button-background);
 }
 
 button.solid-button {

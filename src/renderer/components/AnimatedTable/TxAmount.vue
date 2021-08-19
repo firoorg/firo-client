@@ -24,10 +24,4 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-
-.amount {
-    @include amount();
-    text-align: right;
-}
 </style>

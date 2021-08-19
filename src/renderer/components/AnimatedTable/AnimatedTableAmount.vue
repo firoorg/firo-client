@@ -59,20 +59,4 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/typography";
-
-.vuetable-td-component-amount {
-    .outgoing {
-        color: var(--color-amount-negative);
-    }
-
-    .incoming {
-        color: var(--color-amount-positive);
-    }
-
-    .mint, .payment-request {
-        color: var(--color-amount-neutral);
-    }
-}
 </style>

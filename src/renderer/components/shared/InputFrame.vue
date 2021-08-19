@@ -60,6 +60,7 @@ export default {
                 left: 14px;
                 right: 14px;
             }
+            color: inherit;
             background-color: inherit;
             border: none;
             outline: none;

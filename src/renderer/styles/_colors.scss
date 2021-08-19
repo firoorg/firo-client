@@ -78,25 +78,25 @@
 
 @mixin dark-theme {
     --color-background-main: #1C1C1C;
-    --color-background-popups: #FFFFFF;
-    --color-background-containers: #FFFFFF;
-    --color-background-no-data: #FBFBFB;
-    --color-background-tag: rgba(216, 225, 235, 0.2);
+    --color-background-popups: #404040;
+    --color-background-containers: #404040;
+    --color-background-no-data: #404040;
+    --color-background-tag: #404040;
     --color-background-sidebar: #212429;
     --color-background-detail: #212429;
 
     --color-text-primary: #D2D3D4;
-    --color-text-secondary: rgba(15, 14, 14, 0.6);
-    --color-text-disabled: rgba(15, 14, 14, 0.4);
+    --color-text-secondary: rgba(210, 211, 212, 0.6);
+    --color-text-disabled: rgba(210, 211, 212, 0.4);
     --color-text-subtle-border: #3A3A3A;
     --color-text-minimal-button-background: #2C2F34;
     --color-text-minimal-button-background-pressed: rgba(60, 57, 57, 0.1);
 
     --color-primary: #8D2932;
-    --color-primary-background: #AB3748;
+    --color-primary-background: #8D071A;
     --color-primary-button-pressed: #8D071A;
     --color-primary-button-disabled: rgba(155, 28, 46, 0.5);
-    --color-primary-button-hover: #EBEFF4;
+    --color-primary-button-hover: #AB3748;
     --color-primary-button-minimal-background: rgba(155, 28, 46, 0.1);
     --color-primary-button-subtle-background: rgba(155, 28, 46, 0.05);
 
