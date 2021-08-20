@@ -136,10 +136,7 @@ export default {
             }
 
             if (!isEqual) {
-                this.$refs.vuetable.refresh()
-                this.onPageChange(1);
-
-                this.$nextTick(() => this.resizeListener());
+                this.refresh();
             }
         }
     },
@@ -159,6 +156,16 @@ export default {
     },
 
     methods: {
+        reload() {
+            this.$refs.vuetable.reload();
+        },
+
+        refresh() {
+            this.$refs.vuetable.refresh()
+            this.onPageChange(1);
+            this.$nextTick(() => this.resizeListener());
+        },
+
         setPerPage() {
             this.perPage = 1;
             this.$nextTick(() => {

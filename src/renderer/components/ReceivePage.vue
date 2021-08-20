@@ -20,8 +20,9 @@
 
         <div class="bottom">
             <AnimatedTable
+                ref="animatedTable"
                 :fields="tableFields"
-                :data="receiveAddresses"
+                :data="tableData"
                 :on-row-select="navigateToAddressBookItem"
                 :compare-elements="(a, b) => a.address === b.address && a.label === b.label"
                 track-by="address"
@@ -38,8 +39,10 @@ import QRCode from "easyqrcodejs";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
+import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator";
 import Copyable from "renderer/components/shared/Copyable";
 import InputFrame from "renderer/components/shared/InputFrame";
+import {cloneDeep, fromPairs} from "lodash";
 
 const FiroSymbol = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyNC4yLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCA1MjAgNTIwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MjAgNTIwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojRkVGRUZFO30NCgkuc3Qxe2ZpbGw6IzlCMUMyRTt9DQo8L3N0eWxlPg0KPGc+DQoJPGc+DQoJCTxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjI2MCIgY3k9IjI2MCIgcj0iMjUyLjciLz4NCgk8L2c+DQoJPGc+DQoJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNTUuNiwzNzAuN2M1LjksMCwxMS4yLTMuMiwxNC04LjRsMzcuMy03MC42aC01Ny41Yy04LjcsMC0xNS44LTcuMS0xNS44LTE1Ljh2LTMxLjYNCgkJCWMwLTguNyw3LjEtMTUuOCwxNS44LTE1LjhoOTAuOWw3MC42LTEzMy45YzIuNy01LjIsOC4xLTguNCwxNC04LjRoMTE4LjhDMzk3LjUsMzcuNCwzMzIuMyw3LDI2MCw3QzEyMC4zLDcsNywxMjAuMyw3LDI2MA0KCQkJYzAsMzkuNyw5LjIsNzcuMywyNS41LDExMC43SDE1NS42eiIvPg0KCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzY0LjQsMTQ5LjNjLTUuOSwwLTExLjIsMy4yLTE0LDguNGwtMzcuMyw3MC42aDU3LjVjOC43LDAsMTUuOCw3LjEsMTUuOCwxNS44djMxLjYNCgkJCWMwLDguNy03LjEsMTUuOC0xNS44LDE1LjhoLTkwLjlsLTcwLjYsMTMzLjljLTIuNyw1LjItOC4xLDguNC0xNCw4LjRINzYuNEMxMjIuNSw0ODIuNiwxODcuNyw1MTMsMjYwLDUxMw0KCQkJYzEzOS43LDAsMjUzLTExMy4zLDI1My0yNTNjMC0zOS43LTkuMi03Ny4zLTI1LjUtMTEwLjdIMzY0LjR6Ii8+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=";
 
@@ -59,6 +62,7 @@ export default {
             isDefaultAddress: true,
 
             tableFields: [
+                {name: CurrentAddressIndicator},
                 {name: AddressBookItemLabel, width: "160pt"},
                 {name: AddressBookItemAddress}
             ]
@@ -85,8 +89,12 @@ export default {
                     this.isDefaultAddress = false;
                     await this.$store.commit('AddressBook/updateAddress', newAddress);
                 }
-                this.isEditing = false;
             }
+        },
+
+        tableData() {
+            this.$nextTick(() => this.$refs.animatedTable.reload());
+            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
         }
     },
 

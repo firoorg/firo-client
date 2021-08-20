@@ -4,7 +4,7 @@
             <SearchInput v-model="filter" placeholder="Search by label or address" />
 
             <AnimatedTable
-                ref="table"
+                ref="animatedTable"
                 :fields="tableFields"
                 :data="filteredSendAddresses"
                 :track-by="'address'"
@@ -171,7 +171,7 @@
 </template>
 
 <script>
-import lodash from 'lodash';
+import lodash, {cloneDeep} from 'lodash';
 import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress} from 'lib/isValidAddress';
@@ -181,6 +181,7 @@ import {FirodErrorResponse} from "daemon/firod";
 import InputSelection from "renderer/components/SendPage/InputSelection";
 import Popup from "renderer/components/shared/Popup";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
+import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator";
 import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
@@ -221,6 +222,7 @@ export default {
             useCustomInputs: false,
             customInputs: [],
             tableFields: [
+                {name: CurrentAddressIndicator},
                 {name: AddressBookItemLabel, width: "160pt"},
                 {name: AddressBookItemAddress}
             ],
@@ -279,9 +281,12 @@ export default {
         },
 
         filteredSendAddresses () {
-            // filter must be outside the closure for reactivity to work.
-            const filter = this.filter;
-            return this.sendAddresses.filter(address => address.label.includes(filter) || address.address.includes(filter));
+            this.$nextTick(() => this.$refs.animatedTable.reload());
+            return cloneDeep(
+                this.sendAddresses
+                    .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
+                    .map(address => ({isSelected: address.address === this.address, ...address}))
+            );
         },
 
         showAddToAddressBook () {
