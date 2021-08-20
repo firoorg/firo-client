@@ -24,6 +24,7 @@ export default {
 
     methods: {
         toggle(ev) {
+            console.log(this.rowData.uniqId);
             Vue.set(this.vuetable.globalData, this.rowData.uniqId, ev.target.checked);
         }
     }

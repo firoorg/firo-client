@@ -23,7 +23,7 @@
 
 <script>
 // $emits: input, cancel, ok
-import {fromPairs} from "lodash";
+import {fromPairs, isEqual} from "lodash";
 import {mapGetters} from "vuex";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
@@ -68,6 +68,7 @@ export default {
         },
 
         selectedCoins() {
+            console.log(this.selectionData);
             return Object.entries(this.selectionData)
                 .filter(([k, v]) => v)
                 .map(([uniqId, v]) => this.transactions[uniqId]);
@@ -97,7 +98,10 @@ export default {
 
     watch: {
         value() {
-            this.selectionData = fromPairs(this.value.map(tx => [tx.uniqId, true]));
+            const newSelectionData = fromPairs(this.value.map(tx => [tx.uniqId, true]));
+            if (!isEqual(newSelectionData, this.selectionData)) {
+                this.selectionData = newSelectionData;
+            }
         },
 
         selectedCoins() {
