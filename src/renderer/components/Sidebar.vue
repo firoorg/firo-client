@@ -2,7 +2,8 @@
     <div id="sidebar">
         <div id="logo">
             <router-link to="/main">
-                <FiroLogoDark />
+                <FiroLogoDark class="logo-dark" />
+                <FiroLogoWhite class="logo-white" />
             </router-link>
         </div>
 
@@ -25,6 +26,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import FiroLogoWhite from 'renderer/assets/FiroLogoWhite.svg';
 import FiroLogoDark from 'renderer/assets/FiroLogoDark.svg';
 import Balance from 'renderer/components/Sidebar/Balance'
 import MainMenu from 'renderer/components/Sidebar/MainMenu'
@@ -34,6 +36,7 @@ export default {
     name: 'Sidebar',
 
     components: {
+        FiroLogoWhite,
         FiroLogoDark,
         Balance,
         MainMenu,
@@ -67,6 +70,34 @@ export default {
     #logo {
         svg {
             height: 80px;
+        }
+
+        .logo-dark {
+            display: block;
+
+            @at-root #app.dark-color-theme & {
+                display: none;
+            }
+
+            @media(prefers-color-scheme: dark) {
+                @at-root #app:not(.light-color-theme) & {
+                    display: none;
+                }
+            }
+        }
+
+        .logo-white {
+            display: none;
+
+            @at-root #app.dark-color-theme & {
+                display: block;
+            }
+
+            @media(prefers-color-scheme: dark) {
+                @at-root #app:not(.light-color-theme) & {
+                    display: block;
+                }
+            }
         }
     }
 
