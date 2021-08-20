@@ -7,11 +7,7 @@
 
             <FiroSymbolWhite />
 
-            <div class="dotdotdot">
-                <div />
-                <div />
-                <div />
-            </div>
+            <DotDotDot />
 
             <div class="reason">
                 {{ reason }}
@@ -22,11 +18,13 @@
 
 <script>
 import FiroSymbolWhite from "renderer/assets/FiroSymbolWhite.svg";
+import DotDotDot from "renderer/components/shared/DotDotDot";
 
 export default {
     name: "WaitingScreen",
 
     components: {
+        DotDotDot,
         FiroSymbolWhite
     },
 
@@ -78,28 +76,6 @@ $speed: 2.5s;
 
             g {
                 fill: var(--color-primary);
-            }
-        }
-
-        .dotdotdot {
-            @keyframes blink {
-                0% {background-color: var(--color-primary);}
-                15% {background-color: var(--color-primary-button-disabled);}
-                65% {background-color: var(--color-primary-button-disabled);}
-                66% {background-color: var(--color-primary);}
-                100% {background-color: var(--color-primary);}
-            }
-
-            div {
-                display: inline-block;
-                width: 10px;
-                height: 10px;
-                border-radius: 5px;
-                animation: blink 4.5s infinite;
-                background-color: var(--color-primary-button-disabled);
-
-                &:nth-child(1) { animation-delay: -3s; }
-                &:nth-child(2) { animation-delay: -1.5s; }
             }
         }
 
