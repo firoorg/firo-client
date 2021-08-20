@@ -650,6 +650,47 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.v-select {
+    .dropdown-toggle {
+        color: var(--color-text-primary) !important;
+        background-color: inherit !important;
+
+        input {
+            background-color: inherit !important;
+        }
+    }
+
+    button.clear {
+        color: var(--color-text-primary) !important;
+    }
+
+    i {
+        background-color: inherit !important;
+
+        &::before {
+            border-color: var(--color-text-primary) !important;
+        }
+    }
+
+    .selected-tag {
+        color: inherit !important;
+    }
+
+    .dropdown-menu {
+        background: var(--color-background-tag) !important;
+
+        li {
+            background-color: inherit !important;
+        }
+
+        a {
+            color: var(--color-text-primary) !important;
+        }
+    }
+}
+</style>
+
 <style lang="scss" scoped>
 @import "src/renderer/styles/checkbox-field";
 @import "src/renderer/styles/z";
@@ -670,6 +711,7 @@ export default {
             .switchain-icon {
                 position: fixed;
                 right: var(--padding-main);
+                filter: brightness(2.0);
             }
 
             // :first-child is .switchain-icon
@@ -721,20 +763,6 @@ export default {
                     .coin-option {
                         display: flex;
                         align-items: center;
-
-                        svg {
-                            @at-root #app.light-color-scheme & {
-                                filter: none;
-                            }
-
-                            @at-root #app.dark-color-scheme & {
-                                filter: brightness(0.8);
-                            }
-
-                            @media(prefers-color-scheme: dark) {
-                                filter: brightness(0.8);
-                            }
-                        }
 
                         .coin-short-name {
                             border: {

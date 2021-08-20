@@ -26,6 +26,9 @@
             right: auto;
         }
 
+        max-width: 80vw;
+        word-wrap: anywhere;
+
         tr {
             &:not(:first-child) td {
                 padding-top: 10px;

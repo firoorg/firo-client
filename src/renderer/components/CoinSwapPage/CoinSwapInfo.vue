@@ -199,10 +199,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/info-popup";
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
-
 @include info-popup();
 
 .qr-code {
@@ -216,7 +212,6 @@ export default {
 
 .exchange-address {
     text-align: center;
-    @include address();
 
     margin: {
         top: var(--padding-popup);
@@ -225,14 +220,11 @@ export default {
 }
 
 .footer {
+    max-width: 500px;
     margin: {
         top: var(--padding-popup);
         left: auto;
         right: auto;
     }
-}
-
-.status-expired, .status-failed {
-    @include error();
 }
 </style>

@@ -18,7 +18,7 @@
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
-            <PassphraseStep v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
+            <PassphraseInput v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
             <WaitOverlay v-if="show === 'wait'" />
             <ErrorStep v-if="show === 'error'" :error="error" @ok="cancel()" />
         </Popup>
@@ -38,11 +38,13 @@ import APIWorker from 'lib/switchain-api';
 import {convertToCoin} from "lib/convert";
 import {isValidAddress} from "lib/isValidAddress";
 import {mapActions, mapGetters} from "vuex";
+import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
 export default {
     name: 'CoinSwapFlowFromFiro',
 
     components: {
+        PassphraseInput,
         Popup,
         CoinSwapInfo,
         PassphraseStep,
@@ -212,7 +214,8 @@ export default {
                         await $daemon.addAddressBookItem(data);
                     } catch (e) {
                         this.$log.error(`Failed to add address book item: ${e}`);
-                        this.error = `Failed to add address book item: ${e}`;
+                        this.error = `Failed to add address book item: ${e && e.message ? e.message : e}`;
+                        this.show = 'error';
                         return;
                     }
                 }

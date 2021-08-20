@@ -22,15 +22,4 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/typography";
-
-.amount {
-    @include amount();
-    color: var(--color-amount-negative);
-}
-
-.ticker {
-    @include ticker();
-}
 </style>

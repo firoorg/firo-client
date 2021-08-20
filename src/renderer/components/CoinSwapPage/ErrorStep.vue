@@ -1,5 +1,5 @@
 <template>
-    <div class="error-step">
+    <div class="info-popup">
         <div class="title">Error</div>
 
         <div class="content">
@@ -7,7 +7,7 @@
         </div>
 
         <div class="buttons">
-            <button @click="$emit('ok')">
+            <button class="solid-button recommended" @click="$emit('ok')">
                 Ok
             </button>
         </div>
@@ -28,12 +28,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/popup";
-
-@include popup();
-
-.content {
-    @include error();
-}
+@import "src/renderer/styles/info-popup";
 </style>
