@@ -150,15 +150,20 @@ export default {
         async createNewAddress() {
             if (!this.address) return;
 
+            let unusedAddress = await $daemon.getUnusedAddress();
             if (this.isDefaultAddress) {
                 const newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], '');
-                console.log(newAddress);
                 await this.$store.commit('AddressBook/updateAddress', newAddress);
+                unusedAddress = await $daemon.getUnusedAddress();
+            } else if (this.addressBook[unusedAddress]) {
+                const newAddress = await $daemon.updateAddressBookItem(this.addressBook[unusedAddress], '');
+                await this.$store.commit('AddressBook/updateAddress', newAddress);
+                unusedAddress = await $daemon.getUnusedAddress();
             }
 
             this.isDefaultAddress = true;
             this.label = '';
-            this.address = await $daemon.getUnusedAddress();
+            this.address = unusedAddress;
             this.setAddressBook(await $daemon.readAddressBook());
             this.$nextTick(async () => {
                 await this.displayAddress();
