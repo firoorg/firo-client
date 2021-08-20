@@ -1,187 +1,100 @@
 <template>
-    <div>
+    <div class="info-popup">
         <div class="title">
             Masternode Information
         </div>
 
-        <div class="content">
-            <div class="fields">
-                <div class="field">
-                    <label>
-                        Status
-                    </label>
+        <table>
+            <tr>
+                <td>Status</td>
+                <td>{{ masternode.state.status || 'SYNCING' }}</td>
+            </tr>
 
-                    <div class="value">
-                        {{ masternode.state.status || 'SYNCING' }}
-                    </div>
-                </div>
+            <tr>
+                <td>Pro Tx Hash</td>
+                <td>{{ masternode.proTxHash }}</td>
+            </tr>
 
-                <div class="field">
-                    <label>
-                        Pro Tx Hash
-                    </label>
+            <tr>
+                <td>Collateral Output</td>
+                <td>{{ masternode.collateralHash }}-{{ masternode.collateralIndex }}</td>
+            </tr>
 
-                    <div class="value">
-                        {{ masternode.proTxHash }}
-                    </div>
-                </div>
+            <tr>
+                <td>Operator Reward</td>
+                <td>{{ masternode.operatorReward }}</td>
+            </tr>
 
-                <div class="field">
-                    <label>
-                        Collateral Output
-                    </label>
+            <tr>
+                <td>IP:port</td>
+                <td>{{ masternode.state.service }}</td>
+            </tr>
 
-                    <div class="value">
-                        {{ masternode.collateralHash }}-{{ masternode.collateralIndex }}
-                    </div>
-                </div>
+            <tr>
+                <td>Registered At Block #</td>
+                <td>{{ masternode.state.registeredHeight }}</td>
+            </tr>
 
-                <div class="field">
-                    <label>
-                        Operator Reward
-                    </label>
+            <tr>
+                <td>Last Paid At Block #</td>
+                <td>{{ masternode.state.lastPaidHeight }}</td>
+            </tr>
 
-                    <div class="value">
-                        {{ masternode.operatorReward }}
-                    </div>
-                </div>
+            <tr>
+                <td>Next Payment At Block #</td>
+                <td>{{ masternode.state.nextPaymentHeight }}</td>
+            </tr>
 
-                <div class="field">
-                    <label>
-                        IP:port
-                    </label>
+            <template v-if="masternode.state.PoSePenalty">
+                <tr>
+                    <td>PoSe Penalty</td>
+                    <td>{{ masternode.state.PoSePenalty }}</td>
+                </tr>
 
-                    <div class="value">
-                        {{ masternode.state.service }}
-                    </div>
-                </div>
+                <tr>
+                    <td>PoSe Revived Height</td>
+                    <td>{{ masternode.state.PoSeRevivedHeight }}</td>
+                </tr>
 
-                <div class="field">
-                    <label>
-                        Registered At Block #
-                    </label>
+                <tr>
+                    <td>PoSe Ban Height</td>
+                    <td>{{ masternode.state.PoSeBanHeight }}</td>
+                </tr>
 
-                    <div class="value">
-                        {{ masternode.state.registeredHeight }}
-                    </div>
-                </div>
+                <tr>
+                    <td>Revocation Reason</td>
+                    <td>{{ masternode.state.revocationReason }}</td>
+                </tr>
+            </template>
 
-                <div class="field">
-                    <label>
-                        Last Paid At Block #
-                    </label>
+            <tr>
+                <td>Owner Address</td>
+                <td>{{ masternode.state.ownerAddress }}</td>
+            </tr>
 
-                    <div class="value">
-                        {{ masternode.state.lastPaidHeight }}
-                    </div>
-                </div>
+            <tr>
+                <td>Voting Address</td>
+                <td>{{ masternode.state.votingAddress }}</td>
+            </tr>
 
-                <div class="field">
-                    <label>
-                        Next Payment At Block #
-                    </label>
+            <tr>
+                <td>Payout Address</td>
+                <td>{{ masternode.state.payoutAddress }}</td>
+            </tr>
 
-                    <div class="value">
-                        {{ masternode.state.nextPaymentHeight }}
-                    </div>
-                </div>
+            <tr>
+                <td>PubKey Operator</td>
+                <td>{{ masternode.state.pubKeyOperator }}</td>
+            </tr>
 
-                <template v-if="masternode.state.PoSePenalty">
-                    <div class="field">
-                        <label>
-                            PoSe Penalty
-                        </label>
-
-                        <div class="value">
-                            {{ masternode.state.PoSePenalty }}
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>
-                            PoSe Revived Height
-                        </label>
-
-                        <div class="value">
-                            {{ masternode.state.PoSeRevivedHeight }}
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>
-                            PoSe Ban Height
-                        </label>
-
-                        <div class="value">
-                            {{ masternode.state.PoSeBanHeight }}
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>
-                            Revocation Reason
-                        </label>
-
-                        <div class="value">
-                            {{ masternode.state.revocationReason }}
-                        </div>
-                    </div>
-                </template>
-
-                <div class="field">
-                    <label>
-                        Owner Address
-                    </label>
-
-                    <div class="value">
-                        {{ masternode.state.ownerAddress }}
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        Voting Address
-                    </label>
-
-                    <div class="value">
-                        {{ masternode.state.votingAddress }}
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        Payout Address
-                    </label>
-
-                    <div class="value">
-                        {{ masternode.state.payoutAddress }}
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>
-                        PubKey Operator
-                    </label>
-
-                    <div class="value">
-                        {{ masternode.state.pubKeyOperator }}
-                    </div>
-                </div>
-
-                <div v-if="masternode.state.operatorPayoutAddress" class="field">
-                    <label>
-                        Operator Payout Address
-                    </label>
-
-                    <div class="value">
-                        {{ masternode.state.operatorPayoutAddress }}
-                    </div>
-                </div>
-            </div>
-        </div>
+            <tr v-if="masternode.state.operatorPayoutAddress">
+                <td>Operator Payout Address</td>
+                <td>{{ masternode.state.operatorPayoutAddress }}</td>
+            </tr>
+        </table>
 
         <div class="buttons">
-            <button @click="$emit('ok')">
+            <button class="solid-button recommended" @click="$emit('ok')">
                 OK
             </button>
         </div>
@@ -196,16 +109,11 @@ export default {
 
     props: {
         // This is a MasternodeEvent from src/daemon/firod.ts
-        masternode: {
-            type: Object,
-            required: true
-        }
+        masternode: Object
     }
 }
 </script>
 
 <style scoped lang="scss">
 @import "src/renderer/styles/info-popup";
-
-@include info-popup();
 </style>
