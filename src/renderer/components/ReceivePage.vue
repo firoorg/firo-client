@@ -29,7 +29,7 @@
                 :fields="tableFields"
                 :data="tableData"
                 :on-row-select="navigateToAddressBookItem"
-                :compare-elements="(a, b) => a.address === b.address && a.label === b.label"
+                :compare-elements="(a, b) => a.address === b.address"
                 track-by="address"
                 no-data-message="No Saved Addresses"
             />
