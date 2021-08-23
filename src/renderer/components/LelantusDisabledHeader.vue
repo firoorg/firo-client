@@ -1,9 +1,9 @@
 <template>
     <div class="warning-header">
-        <span>
+        <div>
             Lelantus has been disabled. See <a href="#" @click="openTwitter">@firoorg on Twitter</a> for more
             information.
-        </span>
+        </div>
     </div>
 </template>
 
