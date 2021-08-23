@@ -2,7 +2,7 @@
     <th v-if="isHeader" class="vuetable-th-component-status" @click="$emit('click', rowField, $event)">
     </th>
 
-    <td v-else class="vuetable-td-component-coinswap-status ico-font" :title="rowData.status">
+    <td v-else class="vuetable-td-component-coinswap-status" :title="rowData.status">
         <div v-if="rowData.status === 'expired'">
             &#xef1b;
         </div>
@@ -72,5 +72,9 @@ export default {
         timing-function: linear;
         iteration-count: infinite;
     }
+}
+
+td {
+    font-family: "IcoFont";
 }
 </style>
