@@ -9,7 +9,7 @@
                 :data="filteredSendAddresses"
                 :track-by="'address'"
                 :on-row-select="navigateToAddressBookItem"
-                :compare-elements="(a, b) => a.address === b.address && a.label === b.label"
+                :compare-elements="(a, b) => a.address === b.address"
                 no-data-message="No Saved Addresses"
             />
         </div>
@@ -482,6 +482,7 @@ export default {
                 const item = this.addressBook[this.address]
                 await $daemon.updateAddressBookItem(item, this.label);
                 $store.commit('AddressBook/updateAddress', {...item, label: this.label});
+                this.$refs.animatedTable.reload();
             } else {
                 const item = {
                     address: this.address,
@@ -490,6 +491,7 @@ export default {
                 };
                 $store.commit('AddressBook/updateAddress', item);
                 await $daemon.addAddressBookItem(item);
+                this.$refs.animatedTable.refresh();
             }
         },
 
