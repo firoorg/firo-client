@@ -23,5 +23,8 @@ export default {
 <style scoped lang="scss">
 td.address-book-item-label {
     width: 180px;
+    max-width: 180px;
+    overflow: scroll;
+    scrollbar-base-color: inherit;
 }
 </style>
