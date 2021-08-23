@@ -1,7 +1,8 @@
 <template>
     <div class="setup-layout">
         <div class="logo">
-            <FiroLogoDark />
+            <FiroLogoDark class="logo-dark" />
+            <FiroLogoWhite class="logo-white" />
         </div>
 
         <router-view class="setup-child" />
@@ -9,13 +10,15 @@
 </template>
 
 <script>
-import FiroLogoDark from "renderer/assets/FiroLogoDark.svg";
+import FiroLogoWhite from 'renderer/assets/FiroLogoWhite.svg';
+import FiroLogoDark from 'renderer/assets/FiroLogoDark.svg';
 
 export default {
     name: "SetupLayout",
 
     components: {
-        FiroLogoDark
+        FiroLogoDark,
+        FiroLogoWhite
     }
 }
 </script>
@@ -38,6 +41,34 @@ export default {
 
         svg {
             height: 160px;
+        }
+
+        .logo-dark {
+            display: block;
+
+            @at-root #app.dark-color-theme & {
+                display: none;
+            }
+
+            @media(prefers-color-scheme: dark) {
+                @at-root #app:not(.light-color-theme) & {
+                    display: none;
+                }
+            }
+        }
+
+        .logo-white {
+            display: none;
+
+            @at-root #app.dark-color-theme & {
+                display: block;
+            }
+
+            @media(prefers-color-scheme: dark) {
+                @at-root #app:not(.light-color-theme) & {
+                    display: block;
+                }
+            }
         }
     }
 
