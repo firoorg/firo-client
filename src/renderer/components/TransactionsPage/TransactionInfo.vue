@@ -75,7 +75,7 @@
 
             <tr>
                 <td>Transaction ID</td>
-                <td class="monospace">{{ tx.txid }}</td>
+                <td><TransactionId :txid="tx.txid" /></td>
             </tr>
 
             <tr>
