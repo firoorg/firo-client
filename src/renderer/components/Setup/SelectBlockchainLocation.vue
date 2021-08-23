@@ -19,7 +19,7 @@
 
             <div class="row network">
                 <label>Network</label>
-                <select style="grid-area: network-value" v-model="network">
+                <select class="selector" v-model="network">
                     <option value="mainnet">Mainnet (default)</option>
                     <option value="test">Testnet</option>
                     <option value="regtest">Regtest</option>
@@ -193,6 +193,13 @@ export default {
 
             &.network {
                 margin-top: var(--padding-base);
+
+                label {
+                    padding: {
+                        top: 8px;
+                        bottom: 8px;
+                    }
+                }
             }
 
             label {
