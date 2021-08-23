@@ -1,0 +1,46 @@
+button.solid-button {
+    border: none;
+    outline: none;
+
+    min-width: 145px;
+    height: 30px;
+    border-radius: 20px;
+
+    cursor: pointer;
+    &:disabled {
+        cursor: default;
+    }
+
+    &.recommended {
+        color: var(--color-secondary-contrast);
+        background-color: var(--color-secondary);
+
+        &:active {
+            background-color: var(--color-secondary-button-pressed);
+        }
+
+        &:disabled {
+            background-color: var(--color-secondary-button-disabled);
+        }
+    }
+
+    &.unrecommended {
+        color: var(--color-text-primary);
+        background-color: var(--color-text-minimal-button-background);
+
+        &:active {
+            background-color: var(--color-text-minimal-button-background-pressed);
+        }
+
+        &:disabled {
+            color: var(--color-text-disabled);
+        }
+    }
+}
+
+.two-button-holder {
+    width: 400px;
+    margin: auto;
+    display: flex;
+    justify-content: space-evenly;
+}
