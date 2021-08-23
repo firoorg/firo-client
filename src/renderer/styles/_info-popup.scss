@@ -30,6 +30,7 @@
             }
 
             td {
+                user-select: text;
                 vertical-align: bottom;
 
                 &:first-child {
