@@ -69,7 +69,7 @@ export default {
 
             tableFields: [
                 {name: CurrentAddressIndicator},
-                {name: AddressBookItemLabel, width: "160pt"},
+                {name: AddressBookItemLabel},
                 {name: AddressBookItemAddress}
             ]
         };

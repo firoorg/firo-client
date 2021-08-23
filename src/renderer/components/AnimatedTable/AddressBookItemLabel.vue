@@ -21,4 +21,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+td.address-book-item-label {
+    width: 180px;
+}
 </style>

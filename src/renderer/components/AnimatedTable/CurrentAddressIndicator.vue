@@ -18,25 +18,24 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.current-indicator {
-    height: 14px;
-    width: 14px;
+td {
+    width: 40px;
 
-    margin: {
-        top: -1px;
-        bottom: -1px;
-    }
+    .current-indicator {
+        height: 14px;
+        width: 14px;
 
-    border: {
-        radius: 7px;
-        color: var(--color-text-disabled);
-        width: 2px;
-        style: solid;
-    }
+        border: {
+            radius: 7px;
+            color: var(--color-text-disabled);
+            width: 2px;
+            style: solid;
+        }
 
-    &.selected {
-        border-color: var(--color-secondary);
-        background-color: var(--color-secondary);
+        &.selected {
+            border-color: var(--color-secondary);
+            background-color: var(--color-secondary);
+        }
     }
 }
 </style>
