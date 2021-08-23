@@ -20,7 +20,7 @@ export default {
 <style scoped lang="scss">
 .txid-index {
     font: {
-        size: 0.7em;
+        size: 0.8em;
         family: "Robot Mono";
     }
 }

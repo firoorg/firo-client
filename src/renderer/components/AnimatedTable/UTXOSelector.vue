@@ -32,6 +32,8 @@ export default {
 
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+td {
+    padding-right: var(--padding-base);
+}
 </style>
