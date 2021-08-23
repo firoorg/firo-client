@@ -19,17 +19,23 @@ export default {
 .framed-input {
     position: relative;
     height: 50px;
+    background-color: inherit;
 
     label {
         position: absolute;
         left: 9px;
         font-size: 12px;
         letter-spacing: 0.4px;
-        background-color: var(--color-background-sidebar);
         z-index: var(--z-input-frame-label);
         padding: {
             left: 5px;
             right: 5px;
+        }
+
+        background-color: var(--color-background-main);
+
+        @at-root .detail & {
+            background-color: var(--color-background-detail);
         }
     }
 

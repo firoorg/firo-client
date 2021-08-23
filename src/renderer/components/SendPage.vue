@@ -14,7 +14,7 @@
             />
         </div>
 
-        <div class="send-detail" :class="{disabled: formDisabled}">
+        <div class="send-detail detail" :class="{disabled: formDisabled}">
             <div class="inner">
                 <div class="top">
                     <InputFrame label="Label">

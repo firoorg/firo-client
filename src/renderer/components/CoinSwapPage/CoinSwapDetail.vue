@@ -1,5 +1,5 @@
 <template>
-    <section class="coin-swap-detail">
+    <section class="coin-swap-detail detail">
         <div class="inner">
             <div class="top">
                 <SwitchainIcon class="switchain-icon" />
