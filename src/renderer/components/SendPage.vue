@@ -282,11 +282,9 @@ export default {
 
         filteredSendAddresses () {
             this.$nextTick(() => this.$refs.animatedTable.reload());
-            return cloneDeep(
-                this.sendAddresses
-                    .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
-                    .map(address => ({isSelected: address.address === this.address, ...address}))
-            );
+            return this.sendAddresses
+                .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
+                .map(address => ({isSelected: address.address === this.address, ...address}));
         },
 
         showAddToAddressBook () {
@@ -356,10 +354,6 @@ export default {
             this.address = to.query.address || '';
             this.label = to.query.label || '';
             this.amount = to.query.amount || '';
-        },
-
-        filteredSendAddresses() {
-            this.$nextTick(() => window.dispatchEvent(new Event('resize')));
         },
 
         // Returns [number (txfee in satoshi), error (string)], one of which will be null.
