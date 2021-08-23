@@ -28,7 +28,6 @@
 
 import Popup from 'renderer/components/shared/Popup';
 import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
-import PassphraseStep from './PassphraseStep';
 import ErrorStep from './ErrorStep';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import APIWorker from 'lib/switchain-api';
@@ -43,7 +42,6 @@ export default {
     components: {
         Popup,
         CoinSwapInfo,
-        PassphraseStep,
         ErrorStep,
         WaitOverlay
     },

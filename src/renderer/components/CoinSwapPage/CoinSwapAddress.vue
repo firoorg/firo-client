@@ -28,11 +28,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/colors";
-@import "src/renderer/styles/typography";
-
 .vuetable-td-component-coinswap-address {
-    @include monospace();
-    @include mini();
+    font: {
+        family: "Robot Mono";
+        size: 0.7em;
+    }
 }
 </style>

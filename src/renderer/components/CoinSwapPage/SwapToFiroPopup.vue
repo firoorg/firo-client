@@ -142,23 +142,19 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
 @import "src/renderer/styles/popup";
 
 @include popup();
 
-.ticker {
-    @include ticker();
-}
-
 .address {
-    @include address();
-    font-size: 80%;
+    font: {
+        size: 0.8em;
+        family: "Robot Mono";
+    }
 }
 
 .amount {
-    @include amount();
+    font-weight: bold;
 }
 
 .content {
@@ -171,7 +167,7 @@ export default {
         label {
             margin-right: var(--padding-main);
             width: fit-content;
-            @include label();
+            font-weight: bold;
         }
 
         .value {

@@ -21,10 +21,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-
 .address {
-    @include address();
+    font-family: "Robot Mono";
     font-size: 0.9em;
 }
 </style>

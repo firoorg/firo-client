@@ -1,12 +1,7 @@
-@import "src/renderer/styles/sizes";
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/inputs";
-
-
 @mixin popup {
     .title {
         text-align: center;
-        @include label();
+        font-weight: bold;
     }
 
     .content {
@@ -14,6 +9,9 @@
     }
 
     .buttons {
-        @include buttons-container();
+        width: 500px !important;
+        margin: auto;
+        display: flex;
+        justify-content: space-evenly;
     }
 }

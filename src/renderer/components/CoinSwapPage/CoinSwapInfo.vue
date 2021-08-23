@@ -199,8 +199,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@include info-popup();
-
 .qr-code {
     display: block;
     width: fit-content;

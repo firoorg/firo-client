@@ -1,23 +1,33 @@
 @import "styles/reset";
-@import 'styles/typography';
+@import "styles/fonts";
 @import 'styles/colors';
-@import 'styles/sizes';
-@import 'styles/inputs';
 @import 'styles/z';
 @import 'styles/error_tooltip';
-
-
 @import "src/renderer/styles/info-popup";
-
-* {
-    box-sizing: border-box;
-}
 
 :root {
     --padding-main: 15px;
     --padding-popup: 15px;
 
     --width-detail: 360px;
+
+    color: var(--color-text-primary);
+    font: {
+        family: "Rubik";
+        size: 14px;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.ico-font {
+    font-family: "IcoFont";
+}
+
+a {
+    color: inherit;
 }
 
 .address {

@@ -16,8 +16,8 @@
     z-index: $z-tooltip;
 
     .tooltip-inner {
-        color: var(--color-tooltip-text);
-        background-color: var(--color-tooltip-background);
+        color: white;
+        background-color: #F92848;
         padding: 1em;
         border-radius: 0.5em;
     }

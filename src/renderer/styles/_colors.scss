@@ -1,38 +1,3 @@
-:root {
-    // Legacy colours
-
-    --firo-old-brick: #9b1c2e;
-    --firo-brick-red: #ba2a45;
-
-    --color-detail-background: #f6f8fc;
-    --color-loading-background: #e5e5e5;
-    --color-setup-background: #{darken(#e1ebf1, 5%)};
-    --color-setup-foreground: #{darken(#f6f8fc, 5%)};
-
-    --color-text: black;
-    --color-dark-text: black;
-    --color-text-accent: var(--firo-brick-red);
-    --color-ticker: var(--color-text-accent);
-    --color-error: red;
-
-    --color-input-background: #f6f8fc;
-    --color-search-input-background: white;
-
-    --color-shadow: rgba(0, 0, 0, 0.25);
-
-    --color-big-button: white;
-    --color-big-button-text: var(--color-text);
-
-    --color-popup-outside: rgba(0, 0, 0, 0.6);
-
-    --color-tooltip-text: white;
-    --color-tooltip-background: #F92848;
-
-    --color-amount-positive: var(--color-text);
-    --color-amount-negative: var(--color-text);
-    --color-amount-neutral: var(--color-text);
-}
-
 @mixin light-theme {
     --color-background-main: #FDFDFE;
     --color-background-popups: #FFFFFF;
@@ -74,6 +39,8 @@
 
     --color-warning-background: #9B1C2E;
     --color-warning-text: #FDFDFF;
+
+    --color-popup-outside: rgba(0, 0, 0, 0.6);
 }
 
 @mixin dark-theme {
@@ -117,6 +84,8 @@
 
     --color-warning-background: #9B1C2E;
     --color-warning-text: #FDFDFF;
+
+    --color-popup-outside: rgba(0, 0, 0, 0.6);
 }
 
 :root {

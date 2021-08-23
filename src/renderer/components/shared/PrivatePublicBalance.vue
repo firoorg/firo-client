@@ -111,7 +111,7 @@ export default {
             color: var(--color-text-disabled);
         }
 
-        @include label();
+        font-weight: bold;
         user-select: none;
 
         .toggle-switch {

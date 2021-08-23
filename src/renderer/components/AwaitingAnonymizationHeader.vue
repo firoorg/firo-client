@@ -1,10 +1,8 @@
 <template>
     <div>
         <div class="warning-header">
-            <h3>
-                {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
-                <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure them.
-            </h3>
+            {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
+            <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure them.
         </div>
 
         <Popup v-if="showAnonymizeDialog">

@@ -31,7 +31,6 @@
 import {FirodErrorResponse, IncorrectPassphrase} from 'daemon/firod';
 import Popup from 'renderer/components/shared/Popup';
 import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
-import PassphraseStep from './PassphraseStep';
 import ErrorStep from './ErrorStep';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import APIWorker from 'lib/switchain-api';
@@ -47,7 +46,6 @@ export default {
         PassphraseInput,
         Popup,
         CoinSwapInfo,
-        PassphraseStep,
         ErrorStep,
         WaitOverlay
     },

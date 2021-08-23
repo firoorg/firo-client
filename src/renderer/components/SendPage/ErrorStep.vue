@@ -28,12 +28,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-@import "src/renderer/styles/popup";
-
-@include popup();
-
-.content {
-    @include error();
-}
+@import "src/renderer/styles/info-popup";
 </style>

@@ -55,8 +55,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-
 @keyframes spin {
     from {
         transform: rotate(0deg);

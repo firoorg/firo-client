@@ -18,9 +18,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/typography";
-
 .txid-index {
-    @include txid();
+    font: {
+        size: 0.7em;
+        family: "Robot Mono";
+    }
 }
 </style>
