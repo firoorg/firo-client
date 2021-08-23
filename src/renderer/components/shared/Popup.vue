@@ -21,10 +21,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/z";
-
 #popup { // There can be only one.
-    z-index: $z-popup;
+    z-index: var(--z-popup);
     position: absolute;
     left: 0;
     top: 0;

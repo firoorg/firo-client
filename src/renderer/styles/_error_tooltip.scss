@@ -1,5 +1,3 @@
-@import "./z";
-
 @at-root {
     // So this is a fix for a really icky issue with vue-tooltip's use of transform: translate3d directives, which make
     // it impossible to properly use z-indexes. Popup and WaitingScreen will add this to the root element when they are
@@ -13,8 +11,6 @@
 }
 
 .tooltip.error {
-    z-index: $z-tooltip;
-
     .tooltip-inner {
         color: white;
         background-color: #F92848;

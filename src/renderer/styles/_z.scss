@@ -1,5 +1,7 @@
-$z-input-frame-label: 2;
-$z-tooltip: 3;
-$z-popup: 4;
-$z-waiting-screen: 5;
-$z-app-drag-area: 6;
+:root {
+    --z-input-frame-label: 1;
+    --z-tooltip: 2;
+    --z-popup: 3;
+    --z-waiting-screen: 4;
+    --z-app-drag-area: 5;
+}

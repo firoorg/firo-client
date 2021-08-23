@@ -40,7 +40,7 @@ export default {
     #app-drag-area {
         position: absolute;
         top: 0;
-        z-index: $z-app-drag-area;
+        z-index: var(--z-app-drag-area);
         height: 16px;
         width: 100vw;
 

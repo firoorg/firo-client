@@ -46,15 +46,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/z";
-
 $speed: 2.5s;
 
 .waiting-screen {
     position: fixed;
     height: 100vh;
     width: 100vw;
-    z-index: $z-waiting-screen;
+    z-index: var(--z-waiting-screen);
     text-align: center;
     background-color: var(--color-background-detail);
 

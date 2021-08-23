@@ -693,7 +693,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "src/renderer/styles/checkbox-field";
-@import "src/renderer/styles/z";
 
 .coin-swap-detail {
     padding: var(--padding-main);
@@ -729,7 +728,7 @@ export default {
                     font-size: 12px;
                     letter-spacing: 0.4px;
                     background-color: var(--color-background-sidebar);
-                    z-index: $z-input-frame-label;
+                    z-index: var(--z-input-frame-label);
                     padding: {
                         left: 5px;
                         right: 5px;

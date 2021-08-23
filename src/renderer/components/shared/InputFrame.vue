@@ -16,8 +16,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/z";
-
 .framed-input {
     position: relative;
     height: 50px;
@@ -28,7 +26,7 @@ export default {
         font-size: 12px;
         letter-spacing: 0.4px;
         background-color: var(--color-background-sidebar);
-        z-index: $z-input-frame-label;
+        z-index: var(--z-input-frame-label);
         padding: {
             left: 5px;
             right: 5px;
