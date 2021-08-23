@@ -1,0 +1,16 @@
+select.selector {
+    height: 30px;
+
+    padding: {
+        left: var(--padding-base);
+        right: var(--padding-base);
+    }
+
+    outline: none;
+    border: {
+        radius: 20px;
+    }
+
+    color: var(--color-text-primary);
+    background-color: var(--color-text-minimal-button-background);
+}
