@@ -484,13 +484,19 @@ export default {
         async addToAddressBook() {
             if (!isValidAddress(this.address, this.network) || !this.label) return;
 
-            const item = {
-                address: this.address,
-                label: this.label,
-                purpose: 'send'
-            };
-            $store.commit('AddressBook/updateAddress', item);
-            await $daemon.addAddressBookItem(item);
+            if (this.addressBook[this.address]) {
+                const item = this.addressBook[this.address]
+                await $daemon.updateAddressBookItem(item, this.label);
+                $store.commit('AddressBook/updateAddress', {...item, label: this.label});
+            } else {
+                const item = {
+                    address: this.address,
+                    label: this.label,
+                    purpose: 'send'
+                };
+                $store.commit('AddressBook/updateAddress', item);
+                await $daemon.addAddressBookItem(item);
+            }
         },
 
         navigateToAddressBookItem(addressBookItem) {
