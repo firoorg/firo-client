@@ -419,7 +419,7 @@ export default {
     }
 
     .console {
-        padding: var(--padding-main);
+        padding: var(--padding-base);
 
         .input-line {
             font-weight: bold;

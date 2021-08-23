@@ -173,17 +173,17 @@ export default {
 
 .settings-page {
     padding: {
-        top: var(--padding-main);
-        bottom: var(--padding-main);
-        left: calc(var(--padding-main) - 3px);
-        right: calc(var(--padding-main) - 3px);
+        top: var(--padding-base);
+        bottom: var(--padding-base);
+        left: calc(var(--padding-base) - 3px);
+        right: calc(var(--padding-base) - 3px);
     }
 
     .header {
         margin: {
             left: 3px;
             right: 3px;
-            bottom: var(--padding-main);
+            bottom: var(--padding-base);
         }
 
         color: var(--color-primary);
@@ -195,11 +195,11 @@ export default {
         display: flex;
 
         .version:not(:first-child) {
-            margin-left: var(--padding-main);
+            margin-left: var(--padding-base);
         }
 
         .version:not(:last-child) {
-            padding-right: var(--padding-main);
+            padding-right: var(--padding-base);
             border-right: {
                 style: solid;
                 width: 1px;
@@ -218,8 +218,8 @@ export default {
             padding: {
                 left: 3px;
                 right: 3px;
-                top: var(--padding-main);
-                bottom: var(--padding-main);
+                top: var(--padding-base);
+                bottom: var(--padding-base);
             }
 
             border-top: {
@@ -241,8 +241,8 @@ export default {
                 background-color: var(--color-primary-button-hover);
 
                 padding: {
-                    top: calc(var(--padding-main) + 1px);
-                    bottom: calc(var(--padding-main) + 1px);
+                    top: calc(var(--padding-base) + 1px);
+                    bottom: calc(var(--padding-base) + 1px);
                 }
 
                 border-top-style: none;

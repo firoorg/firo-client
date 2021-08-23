@@ -208,25 +208,25 @@ export default {
 
 .receive-page {
     height: 100%;
-    padding: var(--padding-main);
+    padding: var(--padding-base);
     display: flex;
     flex-direction: column;
 
     .top {
         display: flex;
-        margin-bottom: var(--padding-main);
+        margin-bottom: var(--padding-base);
 
         .qr-code {
             width: 200px;
             height: 200px;
-            margin-right: var(--padding-main);
+            margin-right: var(--padding-base);
         }
 
         .right {
             flex-grow: 1;
 
             .title {
-                margin-bottom: var(--padding-main);
+                margin-bottom: var(--padding-base);
                 font: {
                     weight: bold;
                     size: 14px;

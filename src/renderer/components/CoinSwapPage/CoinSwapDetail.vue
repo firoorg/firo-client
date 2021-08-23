@@ -695,7 +695,7 @@ export default {
 @import "src/renderer/styles/checkbox-field";
 
 .coin-swap-detail {
-    padding: var(--padding-main);
+    padding: var(--padding-base);
     height: 100%;
     background-color: var(--color-background-detail);
 
@@ -709,13 +709,13 @@ export default {
 
             .switchain-icon {
                 position: fixed;
-                right: var(--padding-main);
+                right: var(--padding-base);
                 filter: brightness(2.0);
             }
 
             // :first-child is .switchain-icon
             .field:not(:nth-child(2)) {
-                margin-top: var(--padding-main);
+                margin-top: var(--padding-base);
             }
 
             .pseudo-input-frame {
@@ -806,7 +806,7 @@ export default {
             .error {
                 font-weight: bold;
                 text-align: center;
-                margin-bottom: var(--padding-main);
+                margin-bottom: var(--padding-base);
             }
         }
     }

@@ -1,9 +1,9 @@
 .info-popup {
-    padding: var(--padding-popup);
+    padding: var(--padding-base);
 
     .title {
         text-align: center;
-        padding-bottom: var(--padding-popup);
+        padding-bottom: var(--padding-base);
         font-weight: bold;
         border-bottom: {
             style: solid;
@@ -15,8 +15,8 @@
     table, .content {
         min-width: 500px;
         margin: {
-            top: var(--padding-popup);
-            bottom: var(--padding-popup);
+            top: var(--padding-base);
+            bottom: var(--padding-base);
             left: auto;
             right: auto;
         }
@@ -37,7 +37,7 @@
                 }
 
                 &:last-child {
-                    padding-left: var(--padding-popup);
+                    padding-left: var(--padding-base);
                     text-align: right;
                     font-family: "Robot Mono";
                 }

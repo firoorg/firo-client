@@ -42,8 +42,8 @@ export default {
         svg {
             width: 50px;
             margin: {
-                top: var(--padding-popup);
-                bottom: var(--padding-popup);
+                top: var(--padding-base);
+                bottom: var(--padding-base);
                 left: auto;
                 right: auto;
             }

@@ -510,10 +510,10 @@ export default {
         display: flex;
         flex-direction: column;
 
-        padding: var(--padding-main);
+        padding: var(--padding-base);
 
         .animated-table {
-            margin-top: var(--padding-main);
+            margin-top: var(--padding-base);
             flex-grow: 1;
         }
     }
@@ -521,7 +521,7 @@ export default {
     .send-detail {
         height: 100%;
         width: var(--width-detail);
-        padding: var(--padding-main);
+        padding: var(--padding-base);
         background-color: var(--color-background-detail);
 
         &.disabled {
@@ -603,7 +603,7 @@ export default {
                 .error {
                     font-weight: bold;
                     text-align: center;
-                    margin-bottom: var(--padding-main);
+                    margin-bottom: var(--padding-base);
                 }
             }
         }

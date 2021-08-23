@@ -259,16 +259,16 @@ export default {
                 box-shadow: 0 1px 0 0 var(--color-text-subtle-border);
 
                 &:first-child {
-                    padding-left: var(--padding-main);
+                    padding-left: var(--padding-base);
                 }
 
                 &:last-child {
-                    padding-right: var(--padding-main);
+                    padding-right: var(--padding-base);
                 }
             }
 
             th {
-                padding-bottom: var(--padding-main);
+                padding-bottom: var(--padding-base);
                 font-weight: bold;
             }
         }
@@ -279,8 +279,8 @@ export default {
 
                 td {
                     padding: {
-                        top: var(--padding-main);
-                        bottom: var(--padding-main);
+                        top: var(--padding-base);
+                        bottom: var(--padding-base);
                     }
                 }
             }

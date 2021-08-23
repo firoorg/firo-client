@@ -33,7 +33,7 @@ export default {
         margin: {
             left: auto;
             right: auto;
-            top: var(--padding-main);
+            top: var(--padding-base);
         };
 
         svg {
@@ -43,12 +43,12 @@ export default {
 
     .setup-child {
         background-color: var(--color-background-main);
-        padding: var(--padding-main);
-        border-radius: var(--padding-main);
+        padding: var(--padding-base);
+        border-radius: var(--padding-base);
         max-width: 90%;
         width: fit-content;
         margin: {
-            top: var(--padding-main);
+            top: var(--padding-base);
             left: auto;
             right: auto;
         };

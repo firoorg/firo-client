@@ -113,11 +113,11 @@ export default {
 
 <style scoped lang="scss">
 .input-selection-popup {
-    padding: var(--padding-popup);
+    padding: var(--padding-base);
 
     .breaking-masternode-warning {
         text-align: center;
-        margin-bottom: var(--padding-popup);
+        margin-bottom: var(--padding-base);
     }
 
     .animated-table {

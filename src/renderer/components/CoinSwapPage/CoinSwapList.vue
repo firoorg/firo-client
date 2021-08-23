@@ -114,13 +114,13 @@ export default {
 <style lang="scss" scoped>
 .coin-swap-list {
     height: 100%;
-    padding: var(--padding-main);
+    padding: var(--padding-base);
 
     display: flex;
     flex-flow: column;
 
     .search-input {
-        margin-bottom: var(--padding-main);
+        margin-bottom: var(--padding-base);
     }
 
     .animated-table {

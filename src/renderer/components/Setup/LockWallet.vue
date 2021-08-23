@@ -217,16 +217,16 @@ export default {
         margin: auto;
         width: 400px;
         text-align: center;
-        margin-bottom: var(--padding-popup);
+        margin-bottom: var(--padding-base);
         font-weight: bold;
     }
 
     .existing-wallet-confirmation {
-        margin-top: var(--padding-popup);
+        margin-top: var(--padding-base);
         text-align: left;
 
         .checkbox-field {
-            margin-top: var(--padding-popup);
+            margin-top: var(--padding-base);
         }
     }
 }

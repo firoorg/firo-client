@@ -212,15 +212,15 @@ export default {
     text-align: center;
 
     margin: {
-        top: var(--padding-popup);
-        bottom: var(--padding-popup);
+        top: var(--padding-base);
+        bottom: var(--padding-base);
     }
 }
 
 .footer {
     max-width: 500px;
     margin: {
-        top: var(--padding-popup);
+        top: var(--padding-base);
         left: auto;
         right: auto;
     }

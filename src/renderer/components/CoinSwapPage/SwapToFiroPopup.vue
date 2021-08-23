@@ -162,10 +162,10 @@ export default {
     width: 400pt;
 
     .field {
-        margin-bottom: var(--padding-main)
+        margin-bottom: var(--padding-base)
 
         label {
-            margin-right: var(--padding-main);
+            margin-right: var(--padding-base);
             width: fit-content;
             font-weight: bold;
         }

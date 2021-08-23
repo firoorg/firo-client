@@ -216,21 +216,21 @@ export default {
 
     .inner {
         height: 100%;
-        padding: var(--padding-main);
+        padding: var(--padding-base);
 
         display: flex;
         flex-flow: column;
 
         .top-section {
             .search-input {
-                margin-bottom: var(--padding-main);
+                margin-bottom: var(--padding-base);
             }
 
             .show-unsynced-warning, .awaiting-updates {
                 text-align: center;
                 font-weight: bold;
 
-                margin-bottom: var(--padding-main);
+                margin-bottom: var(--padding-base);
             }
         }
 

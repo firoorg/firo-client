@@ -118,24 +118,24 @@ export default {
 
 .masternodes-page {
     height: 100%;
-    padding: var(--padding-main);
+    padding: var(--padding-base);
 
     display: flex;
     flex-flow: column;
 
     .header {
-        margin-bottom: var(--padding-main);
+        margin-bottom: var(--padding-base);
         display: flex;
 
         .header-part {
             margin: {
                 top: 11px;
                 bottom: 11px;
-                left: var(--padding-main);
+                left: var(--padding-base);
             }
 
             &:not(:last-child) {
-                padding-right: var(--padding-main);
+                padding-right: var(--padding-base);
                 border-right: {
                     style: solid;
                     width: 1px;

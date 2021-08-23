@@ -192,7 +192,7 @@ export default {
             display: flex;
 
             &.network {
-                margin-top: var(--padding-popup);
+                margin-top: var(--padding-base);
             }
 
             label {

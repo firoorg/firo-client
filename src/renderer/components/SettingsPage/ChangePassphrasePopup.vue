@@ -92,7 +92,7 @@ export default {
 
 .change-passphrase-popup {
     input[type="password"]:not(:first-child) {
-        margin-top: var(--padding-popup);
+        margin-top: var(--padding-base);
     }
 }
 </style>

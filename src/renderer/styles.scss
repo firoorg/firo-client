@@ -6,8 +6,7 @@
 @import "src/renderer/styles/info-popup";
 
 :root {
-    --padding-main: 15px;
-    --padding-popup: 15px;
+    --padding-base: 15px;
 
     --width-detail: 360px;
 
@@ -63,8 +62,8 @@ select.selector {
     height: 30px;
 
     padding: {
-        left: var(--padding-main);
-        right: var(--padding-main);
+        left: var(--padding-base);
+        right: var(--padding-base);
     }
 
     outline: none;

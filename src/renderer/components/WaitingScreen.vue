@@ -66,8 +66,8 @@ $speed: 2.5s;
         svg {
             width: 80px;
             margin: {
-                top: var(--padding-popup);
-                bottom: var(--padding-popup);
+                top: var(--padding-base);
+                bottom: var(--padding-base);
                 left: auto;
                 right: auto;
             }
@@ -78,7 +78,7 @@ $speed: 2.5s;
         }
 
         .reason {
-            margin-top: var(--padding-popup);
+            margin-top: var(--padding-base);
         }
     }
 }

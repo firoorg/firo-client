@@ -235,7 +235,7 @@ export default {
 
     .protective-passphrase {
         .protective-passphrase-inputs {
-            margin-top: var(--padding-popup);
+            margin-top: var(--padding-base);
             width: 500px;
         }
     }
@@ -243,8 +243,8 @@ export default {
     .mnemonic {
         @include mnemonic();
         margin: {
-            top: var(--padding-popup);
-            bottom: var(--padding-popup);
+            top: var(--padding-base);
+            bottom: var(--padding-base);
         }
     }
 }
