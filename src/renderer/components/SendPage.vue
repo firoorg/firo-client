@@ -498,8 +498,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import "src/renderer/styles/checkbox-field";
-
 .send-page {
     height: 100%;
     display: flex;

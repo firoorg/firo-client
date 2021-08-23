@@ -1,0 +1,38 @@
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+
+    -webkit-appearance: none;
+    outline: none;
+    border: {
+        width: 1px;
+        radius: 3px;
+        style: solid;
+        color: rgba(60, 57, 57, 0.6);
+    }
+
+    background-color: var(--color-text-minimal-button-background);
+
+    &:hover {
+        border-color: var(--color-secondary);
+    }
+
+    &:checked {
+        background-color: var(--color-secondary);
+    }
+}
+
+.checkbox-field {
+    display: flex;
+    height: 18px;
+
+    label {
+        padding: {
+            left: 8px;
+            top: 3px;
+            bottom: 3px;
+        }
+        width: fit-content;
+    }
+}

@@ -692,8 +692,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@import "src/renderer/styles/checkbox-field";
-
 .coin-swap-detail {
     padding: var(--padding-base);
     height: 100%;

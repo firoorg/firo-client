@@ -2,6 +2,7 @@
 @import "styles/fonts";
 @import 'styles/colors';
 @import 'styles/z';
+@import 'styles/checkbox';
 @import 'styles/error_tooltip';
 @import "src/renderer/styles/info-popup";
 
@@ -31,31 +32,6 @@ a {
 
 .address {
     font-family: "Robot Mono", monospace;
-}
-
-input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-
-    -webkit-appearance: none;
-    outline: none;
-    border: {
-        width: 1px;
-        radius: 3px;
-        style: solid;
-        color: rgba(60, 57, 57, 0.6);
-    }
-
-    background-color: var(--color-text-minimal-button-background);
-
-    &:hover {
-        border-color: var(--color-secondary);
-    }
-
-    &:checked {
-        background-color: var(--color-secondary);
-    }
 }
 
 select.selector {

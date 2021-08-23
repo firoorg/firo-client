@@ -204,8 +204,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/renderer/styles/checkbox-field";
-
 .receive-page {
     height: 100%;
     padding: var(--padding-base);
