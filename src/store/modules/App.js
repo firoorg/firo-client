@@ -19,7 +19,9 @@ const state = {
     firodHasStarted: false,
     allowBreakingMasternodes: false,
     temporaryFirodArguments: [],
-    colorTheme: 'system'
+    colorTheme: 'system',
+    // This is used to make ReceivePage load quicker.
+    cachedAddress: ""
 }
 
 const mutations = {
@@ -77,6 +79,10 @@ const mutations = {
             throw "unknown color theme value";
         }
         state.colorTheme = value;
+    },
+
+    setCachedAddress(state, value) {
+        state.cachedAddress = value;
     }
 }
 
@@ -179,7 +185,8 @@ const getters = {
     // overlay.
     waitingReason: (state) => state.waitingReason,
     cachedMnemonic: (state) => state.cachedMnemonic,
-    colorTheme: (state) => state.colorTheme || 'system'
+    colorTheme: (state) => state.colorTheme || 'system',
+    cachedAddress: (state) => state.cachedAddress
 }
 
 export default {

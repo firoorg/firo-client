@@ -80,8 +80,19 @@ export default {
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
             addresses: 'Transactions/addresses',
-            transactions: 'Transactions/transactions'
+            transactions: 'Transactions/transactions',
+            _cachedAddress: 'App/cachedAddress'
         }),
+
+        cachedAddress: {
+            get() {
+                return this._cachedAddress;
+            },
+
+            set(value) {
+                this.$store.commit('App/setCachedAddress', value);
+            }
+        },
 
         label: {
             get() {
@@ -104,13 +115,23 @@ export default {
         }
     },
 
-    async created() {
+    async mounted() {
         // Make sure everything shows properly on reload.
         while (!window.$daemon) {
             await new Promise(r => setTimeout(r, 10));
         }
 
-        await this.displayAddress();
+        if (this.cachedAddress) {
+            this.address = this.cachedAddress;
+            this.makeQrCode();
+        }
+
+        const newAddress = await $daemon.getUnusedAddress();
+        if (this.address != newAddress) {
+            this.address = newAddress;
+            this.cachedAddress = this.address;
+            await this.displayAddress();
+        }
     },
 
     // Make sure we always display a fresh address.
@@ -118,6 +139,7 @@ export default {
         async addresses() {
             if (this.isDefaultAddress && this.addresses[this.address]) {
                 this.address = await $daemon.getUnusedAddress();
+                this.cachedAddress = this.address;
                 await this.displayAddress();
             }
         },
@@ -178,13 +200,20 @@ export default {
         },
 
         async displayAddress() {
-            this.address ||= await $daemon.getUnusedAddress();
+            if (!this.address) {
+                this.address = await $daemon.getUnusedAddress();
+                this.cachedAddress = this.address;
+            }
 
             // Don't throw errors during reload.
             while (!this.$refs.qrCode) {
                 await new Promise(r => setTimeout(r, 100));
             }
 
+            this.makeQrCode();
+        },
+
+        makeQrCode() {
             if (this.qrCode) {
                 this.qrCode.makeCode(this.address)
             } else {
