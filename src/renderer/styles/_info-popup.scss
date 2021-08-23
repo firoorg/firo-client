@@ -42,6 +42,7 @@
                 }
 
                 &:last-child {
+                    padding-left: var(--padding-popup);
                     text-align: right;
                     font-family: "Robot Mono";
                 }
