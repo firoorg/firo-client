@@ -10,9 +10,10 @@
 
 :root {
     --padding-base: 15px;
-
     --width-detail: 360px;
+}
 
+#app {
     color: var(--color-text-primary);
     font: {
         family: "Rubik";
