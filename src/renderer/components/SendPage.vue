@@ -489,9 +489,8 @@ export default {
                     label: this.label,
                     purpose: 'send'
                 };
-                $store.commit('AddressBook/updateAddress', item);
+                $store.commit('AddressBook/updateAddress', {...item, createdAt: Date.now()});
                 await $daemon.addAddressBookItem(item);
-                this.$refs.animatedTable.refresh();
             }
         },
 
