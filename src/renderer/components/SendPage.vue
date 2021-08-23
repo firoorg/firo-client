@@ -21,7 +21,7 @@
                         <input
                             id="label"
                             ref="label"
-                            v-model.trim="label"
+                            v-model.trim.lazy="label"
                             v-focus
                             type="text"
                             name="label"
@@ -290,7 +290,7 @@ export default {
         },
 
         showAddToAddressBook () {
-            return !this.formDisabled && isValidAddress(this.address, this.network) && (!this.addressBook[this.address] || this.addressBook[this.address].label !== this.label);
+            return !this.formDisabled && isValidAddress(this.address, this.network) && !this.addressBook[this.address];
         },
 
         coinControl () {
@@ -421,6 +421,14 @@ export default {
 
         isPrivate() {
             this.cleanupForm(false);
+        },
+
+        label() {
+            if ((this.addressBook[this.address] || {}).purpose === 'send') this.addToAddressBook();
+        },
+
+        address() {
+            if ((this.addressBook[this.address] || {}).purpose === 'send') this.addToAddressBook();
         }
     },
 
@@ -468,7 +476,7 @@ export default {
         convertToCoin,
 
         async addToAddressBook() {
-            if (!this.showAddToAddressBook) return;
+            if (!isValidAddress(this.address, this.network) || !this.label) return;
 
             const item = {
                 address: this.address,
