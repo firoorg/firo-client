@@ -424,11 +424,17 @@ export default {
         },
 
         label() {
-            if ((this.addressBook[this.address] || {}).purpose === 'send') this.addToAddressBook();
+            const a = this.addressBook[this.address];
+            if (a && a.purpose === 'send' && a.label !== this.label) {
+                this.addToAddressBook();
+            }
         },
 
         address() {
-            if ((this.addressBook[this.address] || {}).purpose === 'send') this.addToAddressBook();
+            const a = this.addressBook[this.address];
+            if (a && a.purpose === 'send' && a.label !== this.label) {
+                this.addToAddressBook();
+            }
         }
     },
 
