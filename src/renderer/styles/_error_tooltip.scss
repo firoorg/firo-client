@@ -12,9 +12,23 @@
 
 .tooltip.error {
     .tooltip-inner {
-        color: white;
-        background-color: #F92848;
-        padding: 1em;
-        border-radius: 0.5em;
+        color: var(--color-status-error-contrast);
+        background-color: var(--color-status-error);
+        padding: var(--padding-base);
+        border-radius: 5px;
+    }
+
+    .tooltip-arrow {
+        $size: 7px;
+
+        z-index: 1;
+        position: absolute;
+        right: -$size;
+        border-style: solid;
+        border-width: $size 0 $size $size;
+        border-color: var(--color-status-error);
+        border-top-color: transparent !important;
+        border-right-color: transparent !important;
+        border-bottom-color: transparent !important;
     }
 }

@@ -37,7 +37,9 @@ require('./utils/validationRules/isFiroAddress');
 require('./utils/validationRules/notExceedingBalance');
 
 Vue.use(VTooltip, {
-    defaultBoundariesElement: 'default-tooltip-boundary'
+    defaultBoundariesElement: 'default-tooltip-boundary',
+    defaultContainer: '#app'
+
 })
 Vue.use(AsyncComputed);
 Vue.use(VueTimeago, {
