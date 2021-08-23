@@ -186,8 +186,6 @@ export default {
                 $setWaitingReason("Sanity checking mnemonic...");
                 const mnemonicSanityCheck = (await $daemon.showMnemonics(this.passphrase)).join(' ');
                 if (mnemonicSanityCheck !== this.mnemonic.mnemonic) {
-                    console.log(this.mnemonic.mnemonic);
-                    console.log(mnemonicSanityCheck);
                     // This should never happen.
                     await $quitApp("Mnemonic sanity check failed. This is a bug. Seek help from the Firo team; do not try to use the client again.");
                 }

@@ -100,7 +100,6 @@ export default {
             },
 
             set(value) {
-                console.log(value);
                 this.setColorTheme(value);
             }
         }

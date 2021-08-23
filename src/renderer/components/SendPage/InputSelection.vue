@@ -68,7 +68,6 @@ export default {
         },
 
         selectedCoins() {
-            console.log(this.selectionData);
             return Object.entries(this.selectionData)
                 .filter(([k, v]) => v)
                 .map(([uniqId, v]) => this.transactions[uniqId]);
