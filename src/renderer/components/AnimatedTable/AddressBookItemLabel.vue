@@ -24,7 +24,7 @@ export default {
 td.address-book-item-label {
     width: 180px;
     max-width: 180px;
-    overflow: scroll;
-    scrollbar-base-color: inherit;
+    overflow: hidden;
+    white-space: nowrap;
 }
 </style>
