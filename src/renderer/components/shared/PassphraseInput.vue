@@ -21,11 +21,11 @@
         </div>
 
         <div class="buttons">
-            <button class="solid-button unrecommended" @click="$emit('cancel')">
+            <button class="solid-button unrecommended cancel" @click="$emit('cancel')">
                 Cancel
             </button>
 
-            <button class="solid-button recommended" :disabled="!value" @click="$emit('confirm')">
+            <button class="solid-button recommended confirm" :disabled="!value" @click="$emit('confirm')">
                 Confirm
             </button>
         </div>

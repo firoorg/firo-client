@@ -344,27 +344,27 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('anonymizes Firo', async function (this: This) {
         this.timeout(100e3);
 
-        const publicBalanceElement = await this.app.client.$('.balance .public .amount');
+        const publicBalanceElement = await this.app.client.$('.balance.public .amount-value');
         assert.isTrue(await publicBalanceElement.isExisting());
         const originalPublicBalance = convertToSatoshi(await publicBalanceElement.getText());
 
-        const pendingBalanceElement = await this.app.client.$('.balance .pending .amount');
+        const pendingBalanceElement = await this.app.client.$('.balance.pending .amount-value');
         let originalPendingBalance = 0;
         if (pendingBalanceElement.isExisting()) originalPendingBalance = convertToSatoshi(await pendingBalanceElement.getText());
 
         await (await this.app.client.$('#anonymize-firo-link')).click();
-        await (await this.app.client.$('.anonymize-dialog')).waitForExist();
-        await (await this.app.client.$('.anonymize-dialog button.cancel')).click();
-        await (await this.app.client.$('.anonymize-dialog')).waitForExist({reverse: true});
+        await (await this.app.client.$('.passphrase-input')).waitForExist();
+        await (await this.app.client.$('.passphrase-input button.cancel')).click();
+        await (await this.app.client.$('.passphrase-input')).waitForExist({reverse: true});
 
         await (await this.app.client.$('#anonymize-firo-link')).click();
-        await (await this.app.client.$('.anonymize-dialog')).waitForExist();
-        await (await this.app.client.$('.anonymize-dialog input[type="password"]')).setValue(passphrase + "-invalid");
-        await (await this.app.client.$('.anonymize-dialog button.confirm')).click();
-        await (await this.app.client.$('.anonymize-dialog .error')).waitForExist();
+        await (await this.app.client.$('.passphrase-input')).waitForExist();
+        await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase + "-invalid");
+        await (await this.app.client.$('.passphrase-input button.confirm')).click();
+        await (await this.app.client.$('.passphrase-input .error')).waitForExist();
 
-        await (await this.app.client.$('.anonymize-dialog input[type="password"]')).setValue(passphrase);
-        await (await this.app.client.$('.anonymize-dialog button.confirm')).click();
+        await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase);
+        await (await this.app.client.$('.passphrase-input button.confirm')).click();
         await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
 
         await this.app.client.waitUntil(async () =>
