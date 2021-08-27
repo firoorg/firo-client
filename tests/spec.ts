@@ -393,45 +393,37 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('adds, edits, and properly orders receive addresses', async function (this: This) {
         this.timeout(30e3);
 
+        await (await this.app.client.$('a[href="#/receive"]')).click();
+
         const addressLabels: [string, string][] = [];
 
         for (let x = 0; x < 5; x++) {
-            await (await this.app.client.$('a[href="#/send"]')).click();
-            await (await this.app.client.$('a[href="#/receive"]')).click();
-            await (await this.app.client.$('.address .loaded')).waitForExist();
-
-            const label = String(Math.random());
-            const address = await (await this.app.client.$('a.address')).getText();
+            const label = Array.from({length: 10}, () => String.fromCharCode(97+Math.random()*26)).join('');
+            const address = await (await this.app.client.$('#receive-address')).getValue();
+            await (await this.app.client.$('#receive-address-label')).setValue(label);
+            await (await this.app.client.$('#receive-address')).click();
+            await this.app.client.waitUntilTextExists('td.address-book-item-label', label);
             addressLabels.unshift([label, address]);
 
-            await (await this.app.client.$('.label input[type="button"]')).click();
-            const labelInput = await this.app.client.$('.label-input');
-            await labelInput.waitForExist();
-            await labelInput.setValue(label);
-            await (await this.app.client.$('.label input[type="button"]')).click();
-            await labelInput.waitForExist({reverse: true});
-            await this.app.client.waitUntilTextExists('.address .label-text', label);
+            await (await this.app.client.$('#create-new-address-button')).click();
+            await this.app.client.waitUntil(async () => await (await this.app.client.$('#receive-address')).getValue() != address);
+            assert.notEqual(await (await this.app.client.$('#receive-address-label')).getValue(), label);
         }
 
-        const shuffledIndexes = lodash.shuffle(addressLabels.map((_, i) => i));
-        for (const i of shuffledIndexes) {
-            const newLabel = String(Math.random());
-            addressLabels[i][0] = newLabel;
-
-            await (await this.app.client.$$('.address-book-item-editable-label a'))[i].click();
-            const inputElement = await this.app.client.$('.address-book-item-editable-label input');
-            await inputElement.waitForExist();
-            await inputElement.setValue(newLabel);
-            await inputElement.keys('Enter');
-            await inputElement.waitForExist({reverse: true});
-        }
+        const i = 2;
+        await (await this.app.client.$$('tr'))[i+2].click();
+        await this.app.client.waitUntil(async () => await (await this.app.client.$('#receive-address')).getValue() == addressLabels[i][1]);
+        addressLabels[i][0] = Array.from({length: 10}, () => String.fromCharCode(97+Math.random()*26)).join('');
+        await (await this.app.client.$('#receive-address-label')).setValue(addressLabels[i][0]);
+        await (await this.app.client.$('#receive-address')).click();
+        await this.app.client.waitUntilTextExists(`tr:nth-child(${i+2}) .address-book-item-label`, addressLabels[i][0]);
 
         await (await this.app.client.$('a[href="#/send"]')).click();
-        await (await this.app.client.$('#send-page')).waitForExist();
+        await (await this.app.client.$('.send-page')).waitForExist();
         await (await this.app.client.$('a[href="#/receive"]')).click();
-        await (await this.app.client.$('.address .loaded')).waitForExist();
+        await (await this.app.client.$('#receive-address')).waitForExist();
 
-        const actualLabels = await this.app.client.$$('.animated-table .address-book-item-editable-label a');
+        const actualLabels = await this.app.client.$$('.address-book-item-label');
         const actualAddresses = await this.app.client.$$('.address-book-item-address');
         assert.isAtLeast(actualLabels.length, addressLabels.length);
         assert.isAtLeast(actualAddresses.length, addressLabels.length);

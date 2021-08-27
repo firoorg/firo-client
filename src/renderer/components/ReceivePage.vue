@@ -13,10 +13,10 @@
                 </InputFrame>
 
                 <InputFrame label="Label">
-                    <input type="text" placeholder="Unlabelled" v-model.lazy="label" />
+                    <input id="receive-address-label" type="text" placeholder="Unlabelled" v-model.lazy="label" />
                 </InputFrame>
 
-                <div class="checkbox-field create-new-address" @click="createNewAddress">
+                <div id="create-new-address-button" class="checkbox-field" @click="createNewAddress">
                     <PlusButton />
                     <label>Create a new address</label>
                 </div>
@@ -264,7 +264,7 @@ export default {
                 width: 420px;
             }
 
-            .create-new-address {
+            #create-new-address-button {
                 &, label { cursor: pointer; }
                 color: var(--color-secondary);
                 font-weight: bold;
