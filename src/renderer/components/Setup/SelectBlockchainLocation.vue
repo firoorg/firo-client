@@ -12,14 +12,14 @@
 
                     <div class="datadir-actions">
                         <a href="#" @click="changeDataDir">Change</a>
-                        <a href="#" class="reset-data-dir" @click="resetDataDir">Reset</a>
+                        <a href="#" id="reset-data-dir" @click="resetDataDir">Reset</a>
                     </div>
                 </div>
             </div>
 
             <div class="row network">
                 <label>Network</label>
-                <select class="selector" v-model="network">
+                <select class="selector" id="datadir-selector" v-model="network">
                     <option value="mainnet">Mainnet (default)</option>
                     <option value="test">Testnet</option>
                     <option value="regtest">Regtest</option>
@@ -209,7 +209,7 @@ export default {
             .datadir-actions {
                 font-size: 0.8em;
 
-                .reset-data-dir {
+                #reset-data-dir {
                     margin-left: 6px;
                 }
             }

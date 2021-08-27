@@ -1,5 +1,5 @@
 <template>
-    <div class="info-popup">
+    <div class="info-popup select-create-or-restore">
         <div class="content">Do you want to create a new wallet or restore with a mnemonic?</div>
 
         <div class="buttons">

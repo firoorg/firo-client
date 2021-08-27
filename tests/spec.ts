@@ -84,7 +84,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
     it('allows selecting blockchain location and network', async function (this: This) {
         this.slow(1e3);
 
-        await (await this.app.client.$('select')).selectByAttribute('value', 'regtest');
+        await (await this.app.client.$('#datadir-selector')).selectByAttribute('value', 'regtest');
 
         const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
         // os.tmpdir() isn't actually unique. :-/
