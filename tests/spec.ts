@@ -69,12 +69,6 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
 describe('Regtest Setup', function (this: Mocha.Suite) {
     scaffold.bind(this)(true);
 
-    if (!process.env.TEST_WALLET_CREATION) {
-        this.beforeAll(function (this: This) {
-            this.skip();
-        });
-    }
-
     it('opens a window', async function (this: This) {
         assert.equal(await this.app.client.getWindowCount(), 1);
     });
