@@ -130,8 +130,6 @@ export default {
     },
 
     async mounted () {
-        this.focusInput();
-
         // This is needed when we're reloading the page.
         while (!window.$daemon) {
             await new Promise(r => setTimeout(r, 10));
@@ -144,13 +142,9 @@ export default {
         this.availableCommands = sort_dedup(commands.concat(Object.keys(this.clientCommands)));
     },
 
-    beforeRouteEnter(_to, _from, next) {
-        // This is called after the component is loaded. It can't be placed in mounted() because mounted() won't be
-        // called when the user returns to this screen since we use <keep-alive> in MainLayout.vue.
-        next(self => {
-            self.scrollToBottom();
-            self.focusInput();
-        });
+    async activated() {
+        this.scrollToBottom();
+        this.focusInput();
     },
 
     methods: {
