@@ -286,8 +286,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         // This value doesn't actually _have_ to be above 1 if we're testing with an existing firod, but in a test
         // environment we've probably made some error and it's best to check for that now.
-        const privateBalanceElement = await this.app.client.$('.balance .private .amount');
-        const publicBalanceElement = await this.app.client.$('.balance .public .amount');
+        const privateBalanceElement = await this.app.client.$('.balance.private .amount-value');
+        const publicBalanceElement = await this.app.client.$('.balance.public .amount-value');
 
         while (!await publicBalanceElement.isExisting() || Number(await publicBalanceElement.getText()) < 40) {
             // Probably we're mining all the blocks ourselves.
@@ -296,7 +296,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         if (Number(await privateBalanceElement.getText()) < 20) {
             // At least 2 coins are required in the anonymity set before we can spend.
-            for (const cmd of [`walletpassphrase ${passphrase} 5`, 'mintlelantus 10', 'mintlelantus 10', 'generate 6']) {
+            for (const cmd of [`walletpassphrase ${passphrase} 5`, 'mintlelantus 10', 'mintlelantus 10', 'generate 2']) {
                 await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', [cmd]);
             }
             await this.app.client.waitUntil(async () => Number(await privateBalanceElement.getText()) >= 20, {timeout: 1e3});
