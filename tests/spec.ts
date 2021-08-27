@@ -307,51 +307,38 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('can change the passphrase', async function (this: This) {
         await (await this.app.client.$('a[href="#/settings"]')).click();
 
-        const currentPassphraseElement = await this.app.client.$('#current-passphrase-input');
-        const newPassphraseElement = await this.app.client.$('#new-passphrase-input');
-        const confirmNewPassphaseElement = await this.app.client.$('#confirm-new-passphrase-input');
-        const changePassphraseButton = await this.app.client.$('#change-passphrase-button');
+        await (await this.app.client.$('#change-passphrase-button')).click();
+        await (await this.app.client.$('.change-passphrase-popup')).waitForExist();
+        await (await this.app.client.$('#cancel-button')).click();
+        await (await this.app.client.$('.change-passphrase-popup')).waitForExist({reverse: true});
 
-        await currentPassphraseElement.setValue('invalid-passphrase');
-        await newPassphraseElement.setValue('wont-be-our-passphrase');
-        await confirmNewPassphaseElement.setValue('wont-be-our-passphrase');
-        await changePassphraseButton.waitForEnabled();
-        await changePassphraseButton.click();
+        await (await this.app.client.$('#change-passphrase-button')).click();
+        await (await this.app.client.$('.change-passphrase-popup')).waitForExist();
+        await (await this.app.client.$('#current-passphrase')).setValue('invalid-passphrase');
+        await (await this.app.client.$('#new-passphrase')).setValue('wont-be-our-passphrase');
+        await (await this.app.client.$('#confirm-new-passphrase')).setValue('wont-be-our-passphrase');
+        await (await this.app.client.$('#confirm-button')).waitForEnabled();
+        await (await this.app.client.$('#confirm-button')).click();
+        await (await this.app.client.$('.change-passphrase-popup .error')).waitForExist();
+        assert.equal(await (await this.app.client.$('.change-passphrase-popup .error')).getText(), 'Incorrect Passphrase');
 
-        const okButton = await this.app.client.$('.error-step .ok-button');
-        await okButton.waitForExist();
-        await okButton.click();
-        await okButton.waitForExist({reverse: true});
+        await (await this.app.client.$('#current-passphrase')).setValue(passphrase);
+        await (await this.app.client.$('#new-passphrase')).setValue(passphrase + '_');
+        await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '_');
+        await (await this.app.client.$('#confirm-button')).waitForEnabled();
+        await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '__');
+        await (await this.app.client.$('#confirm-button')).waitForEnabled({reverse: true});
+        await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '_');
+        await (await this.app.client.$('#confirm-button')).waitForEnabled();
+        await (await this.app.client.$('#confirm-button')).click();
+        await (await this.app.client.$('#ok-button')).waitForExist();
+        await (await this.app.client.$('#ok-button')).click();
+        await (await this.app.client.$('.change-passphrase-popup')).waitForExist({reverse: true});
 
-        await currentPassphraseElement.setValue(passphrase);
-        await newPassphraseElement.setValue('temporary-passphrase');
-        await confirmNewPassphaseElement.setValue('temporary-passphrase');
-        await changePassphraseButton.waitForEnabled();
-        await confirmNewPassphaseElement.setValue('doesnt-match');
-        await changePassphraseButton.waitForEnabled({reverse: true});
-
-        await confirmNewPassphaseElement.setValue('temporary-passphrase');
-        await changePassphraseButton.waitForEnabled();
-        await changePassphraseButton.click();
-
-        const okButton2 = await this.app.client.$('.success-step .ok-button');
-        await okButton2.waitForExist({timeout: 20e3});
-        await okButton2.click();
-        await okButton2.waitForExist({reverse: true});
-
-        await currentPassphraseElement.setValue('temporary-passphrase');
-        await newPassphraseElement.setValue(passphrase);
-        await confirmNewPassphaseElement.setValue(passphrase);
-        await changePassphraseButton.waitForEnabled();
-        await changePassphraseButton.click();
-
-        const okButton3 = await this.app.client.$('.success-step .ok-button');
-        await okButton2.waitForExist({timeout: 20e3});
-        await okButton3.click();
-        await okButton3.waitForExist({reverse: true});
-
-        // Wait some time so that there won't be a race condition unlocking the wallet in subsequent tests.
-        await new Promise(r => setTimeout(r, 2e3));
+        // Change the passphrase back, avoiding race conditions.
+        await new Promise(r => setTimeout(r, 500));
+        await this.app.client.executeAsyncScript('$daemon.setPassphrase(arguments[0], arguments[1]).then(arguments[2])', [passphrase + '_', passphrase]);
+        await new Promise(r => setTimeout(r, 500));
     });
 
     it('anonymizes Firo', async function (this: This) {

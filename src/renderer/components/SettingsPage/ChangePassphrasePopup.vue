@@ -5,21 +5,21 @@
 
         <div v-if="success" class="content">Your passphrase has been changed.</div>
         <div v-else class="content">
-            <input v-focus type="password" placeholder="Enter Your Passphrase" v-model="currentPassphrase" @keyup.enter="changePassphrase" />
-            <input type="password" placeholder="Enter Your New Passphrase" v-model="newPassphrase" @keyup.enter="changePassphrase" />
-            <input type="password" placeholder="Confirm Your Passphrase" v-model="confirmNewPassphrase" @keyup.enter="changePassphrase" />
+            <input v-focus id="current-passphrase" type="password" placeholder="Enter Your Passphrase" v-model="currentPassphrase" @keyup.enter="changePassphrase" />
+            <input id="new-passphrase" type="password" placeholder="Enter Your New Passphrase" v-model="newPassphrase" @keyup.enter="changePassphrase" />
+            <input id="confirm-new-passphrase" type="password" placeholder="Confirm Your Passphrase" v-model="confirmNewPassphrase" @keyup.enter="changePassphrase" />
             <div v-if="error" class="error">{{ error }}</div>
         </div>
 
         <div v-if="success" class="buttons">
-            <button class="solid-button recommended" @click="ok">OK</button>
+            <button id="ok-button" class="solid-button recommended" @click="ok">OK</button>
         </div>
         <div v-else class="buttons">
-            <button class="solid-button unrecommended" @click="cancel">
+            <button id="cancel-button" class="solid-button unrecommended" @click="cancel">
                 Cancel
             </button>
 
-            <button class="solid-button recommended" :disabled="!canChangePassphrase" @click="changePassphrase">
+            <button id="confirm-button" class="solid-button recommended" :disabled="!canChangePassphrase" @click="changePassphrase">
                 Confirm
             </button>
         </div>

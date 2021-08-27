@@ -47,7 +47,7 @@
                 <input type="checkbox" v-model="allowBreakingMasternodes" />
             </div>
             <a @click="openBackupDialog">Backup Wallet</a>
-            <a @click="show = 'change-passphrase'">Change Passphrase</a>
+            <a id="change-passphrase-button" @click="show = 'change-passphrase'">Change Passphrase</a>
             <a @click="show = 'mnemonic'">Show Recovery Phrase</a>
             <a @click="show = 'confirm-reset'">Reset Settings</a>
         </div>
