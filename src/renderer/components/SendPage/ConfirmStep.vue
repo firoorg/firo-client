@@ -1,5 +1,5 @@
 <template>
-    <div class="info-popup">
+    <div class="info-popup confirm-step">
         <div class="title">
             Confirm {{ isPrivate ? '' : 'Public '}}Send
         </div>

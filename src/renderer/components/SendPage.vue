@@ -69,7 +69,7 @@
 
                     <div class="checkbox-field">
                         <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled"/>
-                        <label><a href="#" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
+                        <label><a id="custom-inputs-button" href="#" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
 
                         <Popup v-if="showCustomInputSelector">
                             <InputSelection v-model="customInputs" :is-private="isPrivate" @cancel="useCustomInputs = showCustomInputSelector = false" @ok="showCustomInputSelector = false" />
@@ -82,12 +82,12 @@
                     </div>
 
                     <div class="checkbox-field">
-                        <input type="checkbox" v-model="subtractFeeFromAmount" />
+                        <input id="subtract-fee-from-amount" type="checkbox" v-model="subtractFeeFromAmount" />
                         <label>Take Transaction Fee From Amount</label>
                     </div>
 
                     <div class="checkbox-field">
-                        <input type="checkbox" v-model="useCustomFee" />
+                        <input id="use-custom-fee" type="checkbox" v-model="useCustomFee" />
                         <label>Custom Transaction Fee</label>
                     </div>
 
@@ -122,7 +122,7 @@
                                 Transaction fee:
                             </label>
 
-                            <div v-if="transactionFee" class="value">
+                            <div v-if="transactionFee" id="computed-transaction-fee" class="value">
                                 <amount :amount="transactionFee" ticker="FIRO" />
                             </div>
                             <div v-else class="value" />

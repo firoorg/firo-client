@@ -451,7 +451,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const amountToSend = convertToCoin(satoshiAmountToSend);
 
             await (await this.app.client.$('a[href="#/send')).click();
-            await (await this.app.client.$('#send-page')).waitForExist();
+            await (await this.app.client.$('.send-page')).waitForExist();
 
             if (paymentType === 'public') {
                 const toggleInPrivateMode = await this.app.client.$('.private-public-balance .toggle.is-private');
@@ -468,7 +468,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
 
             if (subtractTransactionFee) {
-                await (await this.app.client.$('#subtract-fee-from-amount input')).click();
+                await (await this.app.client.$('#subtract-fee-from-amount')).click();
             }
 
             const sendButton = await this.app.client.$('#send-button');
@@ -502,23 +502,6 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await address.clearValue();
             await address.setValue(sendAddress);
             await sendButton.waitForEnabled();
-
-            if (customTransactionFee) {
-                const txFeeElement = await this.app.client.$('#transaction-fee .value .amount');
-                const defaultTransactionFee = Number(await txFeeElement.getText());
-
-                await (await this.app.client.$('.use-custom-fee input[type="checkbox"]')).click();
-                await (await this.app.client.$('.use-custom-fee input[type="text"]')).setValue("999999");
-                await sendButton.waitForEnabled({reverse: true});
-                await sendButton.waitForEnabled();
-
-                assert.isAbove(Number(await txFeeElement.getText()), defaultTransactionFee, "setting a fee of 999999 doesn't increase computed fee");
-
-                // Make sure to set it down so that fee estimation doesn't go crazy high and ruin the test.
-                await (await this.app.client.$('.use-custom-fee input[type="text"]')).setValue("9999");
-                await sendButton.waitForEnabled({reverse: true});
-                await sendButton.waitForEnabled();
-            }
 
             const availableUTXOs = lodash.shuffle(
                 <TransactionOutput[]>await this.app.client.execute((isPrivate) => {
@@ -554,29 +537,41 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 }
                 assert.equal(selectorsClicked, selectedUTXOs.length, "we clicked an incorrect number of selectors");
 
-                await (await this.app.client.$('#close-popup-button')).click();
+                await (await this.app.client.$('.input-selection-popup button.recommended')).click();
             }
+
+            const computedTxFeeElement = await this.app.client.$('#computed-transaction-fee .amount-value');
+            if (customTransactionFee) {
+                await (await this.app.client.$('#use-custom-fee')).click();
+
+                assert(computedTxFeeElement.isExisting);
+                const originalFee = convertToSatoshi(await computedTxFeeElement.getText());
+                const txFeeInput = await this.app.client.$('#txFeePerKb');
+
+                await txFeeInput.setValue("999999");
+                await sendButton.waitUntil(async () => convertToSatoshi(await computedTxFeeElement.getText()) > originalFee);
+            }
+            const satoshiExpectedFee = convertToSatoshi(await computedTxFeeElement.getText());
 
             await sendButton.waitForEnabled();
             await sendButton.click();
 
-            const cancelButton = await this.app.client.$('button.cancel');
+            const cancelButton = await this.app.client.$('.confirm-step button.unrecommended');
             await cancelButton.waitForExist();
             await cancelButton.click();
             await cancelButton.waitForExist({reverse: true});
 
             await sendButton.click();
 
-            const confirmButton = await this.app.client.$('button.confirm');
+            const confirmButton = await this.app.client.$('.confirm-step button.recommended');
             await confirmButton.waitForExist();
-            const satoshiExpectedFee = convertToSatoshi(await (await this.app.client.$('.tx-fee-value .amount')).getText());
             await confirmButton.click();
 
-            const passphraseInput = await this.app.client.$('input[type="password"]');
+            const passphraseInput = await this.app.client.$('.passphrase-input input[type="password"]');
             await passphraseInput.waitForExist();
             await passphraseInput.setValue(passphrase + '-invalid');
 
-            const realSendButton = await this.app.client.$('button.confirm');
+            const realSendButton = await this.app.client.$('.passphrase-input button.recommended');
             await realSendButton.click();
 
             await (await this.app.client.$('.passphrase-input .error')).waitForExist();
@@ -584,18 +579,18 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const passphraseInput2 = await this.app.client.$('input[type="password"]');
             await passphraseInput2.setValue(passphrase);
 
-            const realSendButton2 = await this.app.client.$('button.confirm');
+            const realSendButton2 = await this.app.client.$('.passphrase-input button.recommended');
             await realSendButton2.click();
 
-            const waiting = await this.app.client.$('#wait-overlay');
-            await waiting.waitForExist();
-            await waiting.waitForExist({reverse: true, timeout: 100e3});
+            const waitOverlay = await this.app.client.$('.wait-overlay');
+            await waitOverlay.waitForExist();
+            await waitOverlay.waitForExist({reverse: true, timeout: 20e3});
 
             const errorElement = await this.app.client.$('.error-step .content');
             if (await errorElement.isExisting()) {
                 const error = await errorElement.getText();
 
-                const closeErrorStep = await this.app.client.$('.error-step .ok-button');
+                const closeErrorStep = await this.app.client.$('.error-step button.recommended');
                 await closeErrorStep.click();
                 await closeErrorStep.waitForExist({reverse: true});
 
@@ -645,7 +640,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToReceive, <any>{timeout: 10e3});
 
             // Wait to make sure coin control entries are updated.
-            await new Promise(r => setTimeout(r, 2e3));
+            await new Promise(r => setTimeout(r, 1e3));
 
             if (coinControl) {
                 await (await this.app.client.$('a[href="#/send"]')).click();
@@ -671,7 +666,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                         await nextPageLink.click();
                     }
                 } finally {
-                    const closePopupButton = await this.app.client.$('#close-popup-button');
+                    const closePopupButton = await this.app.client.$('#popup button.recommended');
                     await closePopupButton.click();
                     await closePopupButton.waitForExist({reverse: true});
                 }

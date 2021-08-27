@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div class="send-flow">
         <div class="buttons">
-            <button class="solid-button unrecommended" :disabled="show !== 'button'" @click="reset()">
+            <button id="reset-button" class="solid-button unrecommended" :disabled="show !== 'button'" @click="reset()">
                 Reset
             </button>
 
-            <button class="solid-button recommended" :disabled="disabled" @click="show = 'confirm'">
+            <button id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'confirm'">
                 Send
             </button>
         </div>
