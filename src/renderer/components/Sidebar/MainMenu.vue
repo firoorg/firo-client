@@ -60,11 +60,12 @@ nav {
 
         &:active {
             background-color: var(--color-primary-button-pressed);
+            color: var(--color-primary-contrast);
         }
 
         &.router-link-active {
             background-color: var(--color-primary-background);
-            color: var(--color-text-primary);
+            color: var(--color-primary-contrast);
         }
     }
 }
