@@ -715,7 +715,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             let sumOfInputs = 0;
             while (true) {
                 sumOfInputs = (await Promise.all(
-                    (await this.app.client.$$('#popup .amount')).map(async e =>
+                    (await this.app.client.$$('#popup .amount-value')).map(async e =>
                         convertToSatoshi(await e.getText())
                     )
                 )).reduce((a, x) => a + x, sumOfInputs);
@@ -728,7 +728,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             try {
                 assert.equal(convertToCoin(sumOfInputs), convertToCoin(balance), `expected - actual == ${convertToCoin(balance - sumOfInputs)}`);
             } finally {
-                const closePopupButton = await this.app.client.$('#close-popup-button');
+                const closePopupButton = await this.app.client.$('#popup button.recommended');
                 await closePopupButton.click();
                 await closePopupButton.waitForExist({reverse: true});
             }
