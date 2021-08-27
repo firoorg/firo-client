@@ -382,12 +382,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('a[href="#/receive"]')).click();
 
-        const receiveAddressElement = await this.app.client.$('a.address');
+        const receiveAddressElement = await this.app.client.$('#receive-address');
         await receiveAddressElement.waitForExist();
 
-        let originalReceiveAddress = await receiveAddressElement.getText();
+        let originalReceiveAddress = await receiveAddressElement.getValue();
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generatetoaddress 1 ${originalReceiveAddress}').then(arguments[0])`, []);
-        await this.app.client.waitUntil(async () => (await receiveAddressElement.getText()) !== originalReceiveAddress);
+        await this.app.client.waitUntil(async () => (await receiveAddressElement.getValue()) !== originalReceiveAddress);
     });
 
     it('adds, edits, and properly orders receive addresses', async function (this: This) {

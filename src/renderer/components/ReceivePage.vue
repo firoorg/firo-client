@@ -9,7 +9,7 @@
                 </div>
 
                 <InputFrame label="Receiving Address">
-                    <input type="text" disabled="true" :value="address" />
+                    <input id="receive-address" type="text" disabled="true" :value="address" />
                 </InputFrame>
 
                 <InputFrame label="Label">
