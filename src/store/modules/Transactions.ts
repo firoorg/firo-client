@@ -258,7 +258,60 @@ const getters = {
             .map(uniqId => state.transactions[uniqId])
             .filter(tx => tx.category === 'znode')
             .reduce((a,tx) => a + tx.amount, 0);
-    }
+    },
+
+    calculateTransactionFee: (state, getters) => {
+        getters.availableUTXOs;
+
+        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coins?: TransactionOutput[]): number => {
+            console.log(`query: ${amount}`);
+
+            const constantSize = isPrivate ? 1234 : 78;
+            const inputSize = isPrivate ? 2560 : 148;
+
+            if (coins) {
+                if (coins.find(tx => ['mint', 'mintIn'].includes(tx.category) != isPrivate)) return 0;
+
+                const totalSize = constantSize + inputSize * coins.length;
+                const gathered = coins
+                    .reduce((a, tx) => a + tx.amount, 0);
+                let fee = Math.floor(totalSize / 1000 * feePerKb);
+                if (fee === 0) fee = 1;
+
+                if (subtractFeeFromAmount && fee >= amount) return 0;
+                if (gathered < (subtractFeeFromAmount ? amount : amount + fee)) {
+                    return 0;
+                }
+
+                return fee;
+            } else if (isPrivate) {
+                const utxos = getters.availableUTXOs
+                    .filter(tx => ['mint', 'mintIn'].includes(tx.category))
+                    .sort((a, b) => b.amount - a.amount);
+
+                let totalSize = constantSize;
+                let gathered = 0;
+
+                for (const utxo of utxos) {
+                    gathered += utxo.amount;
+                    totalSize += inputSize;
+                    let fee = Math.floor(totalSize / 1000 * feePerKb);
+                    if (fee === 0) fee = 1;
+
+                    if (subtractFeeFromAmount) {
+                        if (gathered >= amount && amount > fee) return fee;
+                    } else {
+                        if (gathered >= amount + fee) return fee;
+                    }
+                }
+
+                return 0;
+            } else {
+                // We'll implement this later.
+                return 0;
+            }
+        };
+    },
 };
 
 export default {

@@ -143,10 +143,6 @@
                 </div>
 
                 <div class="bottom">
-                    <div v-if="transactionFeeError" class="error">
-                        {{ transactionFeeError }}
-                    </div>
-
                     <SendFlow
                         :disabled="!canBeginSend"
                         :is-private="isPrivate"
@@ -215,7 +211,6 @@ export default {
             address: this.$route.query.address || '',
             subtractFeeFromAmount: false,
             useCustomFee: false,
-            // In certain cases, firod might suggest very low fees. Practically, we probably never want this.
             userTxFeePerKb: '',
             isPrivate: true,
             showCustomInputSelector: false,
@@ -226,7 +221,6 @@ export default {
                 {name: AddressBookItemLabel},
                 {name: AddressBookItemAddress}
             ],
-            feeMap: {},
             // This is the search term to filter addresses by.
             filter: ''
         }
@@ -241,39 +235,17 @@ export default {
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
-            smartFeePerKb: 'ApiStatus/smartFeePerKb'
+            smartFeePerKb: 'ApiStatus/smartFeePerKb',
+            calculateTransactionFee: 'Transactions/calculateTransactionFee'
         }),
 
-        transactionFeeAndError() {
-            return this.feeMap[this.currentTxFeeId];
-        },
-
-        currentTxFeeId() {
-            if (!this.satoshiAmount) return;
-            if (this.useCustomFee && this.getValidationTooltip('txFeePerKb').content) return;
-            if (this.getValidationTooltip('amount').content) return;
-
-            return [
-                this.satoshiAmount,
-                this.txFeePerKb,
-                this.coinControl,
-                this.subtractFeeFromAmount,
-                this.isPrivate
-            ]
-                .map(String)
-                .join("\n");
+        transactionFee() {
+            if (!this.satoshiAmount) return 0;
+            return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
         },
 
         formDisabled() {
             return !this.isBlockchainSynced || (this.isPrivate && !this.isLelantusAllowed);
-        },
-
-        transactionFee() {
-            return this.transactionFeeAndError && this.transactionFeeAndError[0];
-        },
-
-        transactionFeeError() {
-            return this.transactionFeeAndError && this.transactionFeeAndError[1];
         },
 
         txFeePerKb() {
@@ -356,38 +328,6 @@ export default {
             this.amount = to.query.amount || '';
         },
 
-        // Returns [number (txfee in satoshi), error (string)], one of which will be null.
-        async currentTxFeeId() {
-            if (!this.currentTxFeeId) return;
-            if (this.feeMap[this.currentTxFeeId]) return;
-
-            // Only calculate the fee once the user has stopped typing for 300ms.
-            const txFeeId = this.currentTxFeeId;
-            await new Promise(r => setTimeout(r, 300));
-            if (this.currentTxFeeId !== txFeeId) return;
-
-            let fee;
-            try {
-                if (this.isPrivate) {
-                    fee = [await $daemon.calcLelantusTxFee(this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.coinControl), null];
-                } else {
-                    fee = [await $daemon.calcPublicTxFee(this.satoshiAmount, this.subtractFeeFromAmount, this.txFeePerKb, this.coinControl), null];
-                }
-
-                if (!this.subtractFeeFromAmount && this.satoshiAmount + fee[0] > (this.coinControl ? this.coinControlSelectedAmount : this.available)) {
-                    fee = [null, 'Insufficient funds'];
-                }
-            } catch (e) {
-                if (e instanceof FirodErrorResponse) {
-                    fee = [null, e.errorMessage];
-                } else {
-                    fee = [null, `${e}`];
-                }
-            }
-
-            this.$set(this.feeMap, txFeeId, fee);
-        },
-
         useCustomFee() {
             if (!this.useCustomFee) {
                 // Make sure the validation warning goes away.
@@ -410,6 +350,10 @@ export default {
         },
 
         coinControlSelectedAmount() {
+            this.$validator.validateAll();
+        },
+
+        userTxFeePerKb() {
             this.$validator.validateAll();
         },
 
@@ -443,14 +387,11 @@ export default {
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availableXzc will still be reactively updated.
             getMessage: () => this.useCustomInputs ?
-                `Amount is over the sum of your selected coins, ${convertToCoin(this.coinControlSelectedAmount)} FIRO`
+                `Amount (including fees) is over the sum of your selected coins, ${convertToCoin(this.coinControlSelectedAmount)} FIRO`
                 :
-                `Amount is over your available balance of ${convertToCoin(this.available)} FIRO`,
+                `Amount (including fees) is over your available balance of ${convertToCoin(this.available)} FIRO`,
 
-            validate: (value) => this.useCustomInputs ?
-                convertToSatoshi(value) <= this.coinControlSelectedAmount
-                :
-                convertToSatoshi(value) <= this.available
+            validate: (value) => !!this.transactionFee
         });
 
         this.$validator.extend('amountIsValid', {
@@ -463,7 +404,7 @@ export default {
             getMessage: () =>
                 `Due to private transaction spend limits, you may not spend more than 5001 FIRO (including fees) in one transaction`,
 
-            validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 5001e8 : convertToSatoshi(value) <= 5000.99e8
+            validate: (value) => this.totalAmount <= 5001e8
         });
 
         this.$validator.extend('txFeeIsValid', {
