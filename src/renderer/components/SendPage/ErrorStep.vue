@@ -1,5 +1,5 @@
 <template>
-    <div class="error-step">
+    <div class="info-popup error-step">
         <div class="title">Error</div>
 
         <div class="content">
@@ -7,7 +7,7 @@
         </div>
 
         <div class="buttons">
-            <button class="ok-button" @click="$emit('ok')">
+            <button class="solid-button recommended ok-button" @click="$emit('ok')">
                 Ok
             </button>
         </div>
