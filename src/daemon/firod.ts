@@ -1258,9 +1258,9 @@ export class Firod {
                     // Don't log anything about rpc or mnemonic requests.
                 } else if (messageString.length > 1024) {
                     logger.debug(`received reply from firod for ${callName}: <%d bytes>`, messageString.length);
-                    logger.silly(`content of %d byte reply to ${callName}: %O`, messageString.length, message);
+                    logger.silly(`content of ${messageString.length} byte reply to ${callName}: ${JSON.stringify(message, undefined, 2)}`);
                 } else {
-                    logger.debug(`received reply from firod for ${callName}: %O`, message);
+                    logger.debug(`received reply from firod for ${callName}: ${JSON.stringify(message, undefined, 2)}`);
                 }
 
                 if (isFirodResponseMessage(message)) {
