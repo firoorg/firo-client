@@ -541,14 +541,18 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
 
             const computedTxFeeElement = await this.app.client.$('#computed-transaction-fee .amount-value');
-            if (customTransactionFee) {
-                await (await this.app.client.$('#use-custom-fee')).click();
 
+            await (await this.app.client.$('#use-custom-fee')).click();
+            const txFeeInput = await this.app.client.$('#txFeePerKb');
+            assert(txFeeInput.isExisting());
+            let txFeePerKb = Number(await txFeeInput.getAttribute('placeholder'));
+            assert.isAtLeast(txFeePerKb, 1);
+            if (customTransactionFee) {
                 assert(computedTxFeeElement.isExisting);
                 const originalFee = convertToSatoshi(await computedTxFeeElement.getText());
-                const txFeeInput = await this.app.client.$('#txFeePerKb');
 
-                await txFeeInput.setValue("999999");
+                txFeePerKb = Math.min(999999, txFeePerKb*2);
+                await txFeeInput.setValue(txFeePerKb);
                 await sendButton.waitUntil(async () => convertToSatoshi(await computedTxFeeElement.getText()) > originalFee);
             }
             const satoshiExpectedFee = convertToSatoshi(await computedTxFeeElement.getText());
@@ -619,8 +623,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             })
             assert.exists(txOut);
 
-            const size = (await this.app.client.executeAsyncScript('$daemon.legacyRpc(`getrawtransaction ${arguments[0]} true`).then(arguments[1])', [txOut.txid])).result.size;
-            assert.equal(txOut.fee, satoshiExpectedFee, `actual transaction fee was not equal to calculated tx fee (size ${size})`);
+            const txinfo = (await this.app.client.executeAsyncScript('$daemon.legacyRpc(`getrawtransaction ${arguments[0]} true`).then(arguments[1])', [txOut.txid])).result;
+            assert.equal(txOut.fee, satoshiExpectedFee, `actual fee was not equal to calculated fee (size ${txinfo.size}, vsize ${txinfo.vsize}, expected fee/kb ${txFeePerKb}, txid ${txOut.txid})`);
 
             const satoshiAmountToReceive = subtractTransactionFee ? txOut.amount : satoshiAmountToSend;
             const txIn: TransactionOutput = await this.app.client.executeScript(
