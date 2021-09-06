@@ -75,7 +75,8 @@ export default {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
             lockedTransactions: 'Transactions/lockedTransactions',
-            allowBreakingMasternodes: 'App/allowBreakingMasternodes'
+            allowBreakingMasternodes: 'App/allowBreakingMasternodes',
+            selectPublicInputs: 'Transactions/selectPublicInputs'
         }),
 
         totalAmount() {
@@ -117,8 +118,11 @@ export default {
                         await $daemon.updateCoinLocks(passphrase, [], lockedCoins);
                     }
 
+                    // Under the hood we'll always use coin control for public sends because the daemon uses a very
+                    // complex stochastic algorithm that interferes with fee calculation.
+                    const coinControl = this.coinControl || this.selectPublicInputs(this.amount, this.txFeePerKb, this.subtractFeeFromAmount).map(utxo => [utxo.txid, utxo.txIndex]);
                     const r = await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, this.coinControl);
+                        this.subtractFeeFromAmount, coinControl);
 
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 }

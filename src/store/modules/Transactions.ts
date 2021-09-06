@@ -235,6 +235,50 @@ const actions = {
     }
 };
 
+function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, availableUTXOs: TransactionOutput[], isCoinControl=false): [number, TransactionOutput[]] {
+    const constantSize = isPrivate ? 1234 : 78;
+    const inputSize = isPrivate ? 2560 : 148;
+
+    if (isCoinControl) {
+        if (availableUTXOs.find(tx => ['mint', 'mintIn'].includes(tx.category) != isPrivate)) return undefined;
+
+        const totalSize = constantSize + inputSize * availableUTXOs.length;
+        const gathered = availableUTXOs
+            .reduce((a, tx) => a + tx.amount, 0);
+        let fee = Math.floor(totalSize / 1000 * feePerKb);
+        if (fee === 0) fee = 1;
+
+        if (subtractFeeFromAmount && fee >= amount) return undefined;
+        if (gathered < (subtractFeeFromAmount ? amount : amount + fee)) {
+            return undefined;
+        }
+
+        return [fee, availableUTXOs];
+    }
+
+    const utxos = availableUTXOs
+        .filter(tx => ['mint', 'mintIn'].includes(tx.category) == isPrivate)
+        .sort((a, b) => b.amount - a.amount);
+
+    let totalSize = constantSize;
+    let gathered = 0;
+
+    const selectedUTXOs = [];
+    for (const utxo of utxos) {
+        gathered += utxo.amount;
+        totalSize += inputSize;
+        selectedUTXOs.push(utxo);
+
+        let fee = Math.floor(totalSize / 1000 * feePerKb);
+        if (fee === 0) fee = 1;
+
+        if (subtractFeeFromAmount && amount <= fee) continue;
+        if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) return [fee, selectedUTXOs]
+    }
+
+    return undefined;
+}
+
 const getters = {
     // a map of `${txid}-${txIndex}` to the full transaction object returned from firod
     transactions: (state) => state.transactions,
@@ -260,58 +304,18 @@ const getters = {
             .reduce((a,tx) => a + tx.amount, 0);
     },
 
+    selectPublicInputs: (state, getters) => {
+        return (amount: number, feePerKb: number, subtractFeeFromAmount: boolean): TransactionOutput[] => {
+            return selectUTXOs(false, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs)[1];
+        }
+    },
+
     calculateTransactionFee: (state, getters) => {
         getters.availableUTXOs;
 
-        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coins?: TransactionOutput[]): number => {
-            console.log(`query: ${amount}`);
-
-            const constantSize = isPrivate ? 1234 : 78;
-            const inputSize = isPrivate ? 2560 : 148;
-
-            if (coins) {
-                if (coins.find(tx => ['mint', 'mintIn'].includes(tx.category) != isPrivate)) return 0;
-
-                const totalSize = constantSize + inputSize * coins.length;
-                const gathered = coins
-                    .reduce((a, tx) => a + tx.amount, 0);
-                let fee = Math.floor(totalSize / 1000 * feePerKb);
-                if (fee === 0) fee = 1;
-
-                if (subtractFeeFromAmount && fee >= amount) return 0;
-                if (gathered < (subtractFeeFromAmount ? amount : amount + fee)) {
-                    return 0;
-                }
-
-                return fee;
-            } else if (isPrivate) {
-                const utxos = getters.availableUTXOs
-                    .filter(tx => ['mint', 'mintIn'].includes(tx.category))
-                    .sort((a, b) => b.amount - a.amount);
-
-                let totalSize = constantSize;
-                let gathered = 0;
-
-                for (const utxo of utxos) {
-                    gathered += utxo.amount;
-                    totalSize += inputSize;
-                    let fee = Math.floor(totalSize / 1000 * feePerKb);
-                    if (fee === 0) fee = 1;
-
-                    if (subtractFeeFromAmount) {
-                        if (gathered >= amount && amount > fee) return fee;
-                    } else {
-                        if (gathered >= amount + fee) return fee;
-                    }
-                }
-
-                return 0;
-            } else {
-                // We'll implement this later.
-                return 0;
-            }
-        };
-    },
+        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coins?: TransactionOutput[]): number =>
+            (selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, coins || getters.availableUTXOs, !!coins) || [])[0];
+    }
 };
 
 export default {

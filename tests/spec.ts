@@ -619,7 +619,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             })
             assert.exists(txOut);
 
-            assert.equal(txOut.fee, satoshiExpectedFee, "actual transaction fee was not equal to calculated tx fee");
+            const size = (await this.app.client.executeAsyncScript('$daemon.legacyRpc(`getrawtransaction ${arguments[0]} true`).then(arguments[1])', [txOut.txid])).result.size;
+            assert.equal(txOut.fee, satoshiExpectedFee, `actual transaction fee was not equal to calculated tx fee (size ${size})`);
 
             const satoshiAmountToReceive = subtractTransactionFee ? txOut.amount : satoshiAmountToSend;
             const txIn: TransactionOutput = await this.app.client.executeScript(
