@@ -491,8 +491,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await amount.setValue(amountToSend);
             await sendButton.waitForEnabled();
 
+            // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+            await amount.clearValue();
             await amount.setValue('99999999999999');
             await sendButton.waitForEnabled({reverse: true});
+            // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+            await amount.clearValue();
             await amount.setValue(amountToSend);
             await sendButton.waitForEnabled();
 
