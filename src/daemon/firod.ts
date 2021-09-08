@@ -206,6 +206,8 @@ export interface TransactionOutput {
     txid: string;
     txIndex: number;
     firstSeenAt: number;
+    txType: 'nonstandard' | 'pubkey' | 'pubkeyhash' | 'scripthash' | 'multisig' | 'nulldata' | 'witness_v0_keyhash' |
+        'witness_v0_scripthash' | 'zerocoinmint' | 'zerocoinmintv3' | 'lelantusmint';
     label?: string;
     fee?: number;
     amount: number;

@@ -235,14 +235,29 @@ const actions = {
     }
 };
 
+function signatureSizeForUTXO(utxo: TransactionOutput) {
+    switch (utxo.txType) {
+        case "lelantusmint":
+            return 2560;
+        case "zerocoinmintv3": // Sigma
+            return 2560;
+        case "pubkey":
+            return 114;
+        case "pubkeyhash":
+            return 153;
+    }
+    // There shouldn't be other script types, but if there are, overestimate the fee.
+    console.log(`strange type ${utxo.txType} for utxo ${utxo.txid}-${utxo.txIndex}`);
+    return 5000
+}
+
 function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, availableUTXOs: TransactionOutput[], isCoinControl=false): [number, TransactionOutput[]] {
-    const constantSize = isPrivate ? 1234 : 78;
-    const inputSize = isPrivate ? 2560 : 148;
+    const constantSize = isPrivate ? 1234 : 73;
 
     if (isCoinControl) {
         if (availableUTXOs.find(tx => ['mint', 'mintIn'].includes(tx.category) != isPrivate)) return undefined;
 
-        const totalSize = constantSize + inputSize * availableUTXOs.length;
+        const totalSize = constantSize + availableUTXOs.map(signatureSizeForUTXO).reduce((a, x) => a + x, 0);
         const gathered = availableUTXOs
             .reduce((a, tx) => a + tx.amount, 0);
         let fee = Math.floor(totalSize / 1000 * feePerKb);
@@ -266,14 +281,14 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
     const selectedUTXOs = [];
     for (const utxo of utxos) {
         gathered += utxo.amount;
-        totalSize += inputSize;
+        totalSize += signatureSizeForUTXO(utxo);
         selectedUTXOs.push(utxo);
 
         let fee = Math.floor(totalSize / 1000 * feePerKb);
         if (fee === 0) fee = 1;
 
         if (subtractFeeFromAmount && amount <= fee) continue;
-        if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) return [fee, selectedUTXOs]
+        if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) return [fee, selectedUTXOs];
     }
 
     return undefined;
