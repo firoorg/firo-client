@@ -395,6 +395,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('a[href="#/receive"]')).click();
 
+        // This is used to avoid a race condition that appears only when tests are sequentially executed.
+        const originalAddress = await (await this.app.client.$('#receive-address')).getValue();
+        await this.app.client.waitUntilTextExists('td.address-book-item-address', originalAddress);
+
         const addressLabels: [string, string][] = [];
 
         for (let x = 0; x < 5; x++) {
