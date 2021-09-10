@@ -244,7 +244,7 @@ function signatureSizeForUTXO(utxo: TransactionOutput) {
         case "pubkey":
             return 114;
         case "pubkeyhash":
-            return 153;
+            return 148;
     }
     // There shouldn't be other script types, but if there are, overestimate the fee.
     console.log(`strange type ${utxo.txType} for utxo ${utxo.txid}-${utxo.txIndex}`);
@@ -252,7 +252,7 @@ function signatureSizeForUTXO(utxo: TransactionOutput) {
 }
 
 function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, availableUTXOs: TransactionOutput[], isCoinControl=false): [number, TransactionOutput[]] {
-    const constantSize = isPrivate ? 1234 : 73;
+    const constantSize = isPrivate ? 1234 : 78;
 
     if (isCoinControl) {
         if (availableUTXOs.find(tx => ['mint', 'mintIn'].includes(tx.category) != isPrivate)) return undefined;
