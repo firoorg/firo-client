@@ -219,8 +219,8 @@ window.$startDaemon = () => new Promise(resolve => {
     $setWaitingReason("Starting up firod...");
     firod(store, store.getters['App/firoClientNetwork'], store.getters['App/firodLocation'],
         store.getters['App/blockchainLocation'] || null, undefined,
-        store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD === "true",
-        !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_FIROD === "true",
+        store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
+        !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
         process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined,
         store.getters['App/temporaryFirodArguments'] || [])
         .then(async z => {

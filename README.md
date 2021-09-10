@@ -79,7 +79,7 @@ blockchain *excluding* the `regtest` or `testnet3` parts.
 ### Connecting to an Existing Firod
 
 If you want to allow the client to connect to an existing instance of firod, you can set the environment variable
-`ALLOW_EXISTING_FIROD` to `true`. Note that the existing firod instance will be shut down when the client exits.
+`ALLOW_EXISTING_FIROD` to `1`. Note that the existing firod instance will be shut down when the client exits.
 
 ### Firod Connection Timeout
 
