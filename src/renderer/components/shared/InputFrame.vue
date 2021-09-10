@@ -1,17 +1,26 @@
 <template>
     <div class="framed-input" :class="{'has-unit': unit}">
         <label>{{ label }}</label>
-        <div class="frame">
+        <div class="frame" ref="frame">
             <slot />
             <div v-if="unit" class="unit">{{ unit }}</div>
+            <div v-else-if="copy" class="copy" @click="copyContent">📋</div>
         </div>
     </div>
 </template>
 
 <script>
+import {clipboard} from "electron";
+
 export default {
     name: "InputFrame",
-    props: ['label', 'unit']
+    props: ['label', 'unit', 'copy'],
+
+    methods: {
+        copyContent() {
+            clipboard.writeText(this.$refs.frame.querySelector('input').value);
+        }
+    }
 }
 </script>
 
@@ -70,7 +79,7 @@ export default {
             outline: none;
         }
 
-        .unit {
+        .unit, .copy {
             @at-root .framed-input.has-unit input {
                 width: 80% !important;
             }
@@ -80,6 +89,10 @@ export default {
             width: 20%;
             right: 14px;
             bottom: 10px;
+        }
+
+        .copy {
+            cursor: pointer;
         }
     }
 }

@@ -8,7 +8,7 @@
                     Scan this QR code to receive Firo
                 </div>
 
-                <InputFrame label="Receiving Address">
+                <InputFrame label="Receiving Address" :copy="true">
                     <input id="receive-address" type="text" disabled="true" :value="address" />
                 </InputFrame>
 
