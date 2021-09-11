@@ -21,7 +21,7 @@
                 :sort-order="sortOrder"
                 :compare-elements="comparePayments"
                 :on-page-change="(pageNumber) => this.currentPage = pageNumber"
-                :on-row-select="(rowData) => selectedTx = rowData.tx"
+                :on-row-select="(rowData) => selectedTx = rowData"
             />
         </div>
 
@@ -95,9 +95,8 @@ export default {
 
     computed: {
         ...mapGetters({
-            transactions: 'Transactions/transactions',
-            addresses: 'Transactions/addresses',
-            paymentRequests: 'PaymentRequest/paymentRequests',
+            userVisibleTransactions: 'Transactions/userVisibleTransactions',
+            addressBook: 'AddressBook/addressBook',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
             isReindexing: 'ApiStatus/isReindexing'
         }),
@@ -109,63 +108,12 @@ export default {
         latestTableData () {
             const tableData = [];
 
-            for (const [id, tx] of Object.entries(this.transactions)) {
-                // Mined transactions are incorrectly marked as change.
-                if (tx.isChange && tx.category !== 'mined') {
-                    continue;
-                }
-
-                // Mints are handled separately.
-                if (['mint', 'mintIn'].includes(tx.category)) {
-                    continue;
-                }
-
-                if (!['mined', 'receive', 'spendIn', 'send', 'spendOut', 'znode'].includes(tx.category)) {
-                    this.$log.error(`unknown category '${tx.category}' on tx ${id}`);
-                    continue;
-                }
-
-                // Coordinate this with the default values in AnimatedTableLabel.
-                let extraSearchText;
-                switch (tx.category) {
-                case 'mined':
-                    extraSearchText = 'Mined Transaction';
-                    break;
-
-                case 'receive':
-                case 'spendIn':
-                    extraSearchText = 'Incoming Transaction';
-                    break;
-
-                case 'send':
-                case 'spendOut':
-                    extraSearchText = 'Outgoing Transaction';
-                    break;
-
-                case 'znode':
-                    extraSearchText = 'Znode Payment';
-                    break
-                }
-
-                let address = tx.address;
-                if (!address || tx.amount === 0) {
-                    address = "SCRIPT";
-                }
-
+            for (const txo of this.userVisibleTransactions) {
                 tableData.push({
-                    // id is the path of the detail route for the transaction.
-                    id: `/transaction-info/${id}`,
-                    txid: tx.txid,
-                    category: tx.category,
-                    blockHeight: tx.blockHeight,
-                    date: tx.blockTime * 1000 || Infinity,
-                    amount: tx.amount,
-                    address,
-                    label:
-                        tx.label ||
-                        (this.paymentRequests[tx.address] ? this.paymentRequests[tx.address].label : undefined),
-                    extraSearchText: extraSearchText + (['send', 'spendOut'].includes(tx.category) ? '-' : '+') + convertToCoin(tx.amount),
-                    tx
+                    id: `${txo.blockHash}-${txo.txid}-${txo.index}-${txo.isFromMe ? 'outgoing' : 'incoming'}`,
+                    label: (this.addressBook[txo.destination] || {}).label || txo.destination,
+                    extraSearchText: (txo.isFromMe ? '-' : '+') + convertToCoin(txo.amount),
+                    ...txo
                 });
             }
 
@@ -179,7 +127,7 @@ export default {
 
             let filter = this.filter.toLowerCase();
             return this.tableData.filter(tableRow =>
-                ['label', 'address', 'category', 'extraSearchText'].find(key =>
+                ['label', 'address', 'extraSearchText'].find(key =>
                     tableRow[key] && tableRow[key].toLowerCase().indexOf(filter) !== -1
                 )
             )
@@ -188,7 +136,7 @@ export default {
         sortOrder () {
             return [
                 {
-                    sortField: 'date',
+                    sortField: 'firstSeenAt',
                     direction: 'desc'
                 }
             ]
@@ -196,11 +144,7 @@ export default {
     },
 
     methods: {
-        comparePayments(a, b) {
-            return !['id', 'category', 'blockHeight', 'date', 'amount', 'address', 'label'].find(field =>
-                a[field] !== b[field]
-            );
-        },
+        comparePayments: (a, b) => a.id === b.id,
 
         reloadTable() {
             this.tableData = this.newTableData;

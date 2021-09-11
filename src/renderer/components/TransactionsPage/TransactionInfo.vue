@@ -69,8 +69,8 @@
             </tr>
 
             <tr>
-                <td>Category</td>
-                <td>{{ tx.category }}</td>
+                <td>Transaction Privacy</td>
+                <td>{{ tx.inputPrivacy }}</td>
             </tr>
 
             <tr>
@@ -80,15 +80,15 @@
 
             <tr>
                 <td>Transaction Index</td>
-                <td>{{ tx.txIndex }}</td>
+                <td>{{ tx.index }}</td>
             </tr>
 
-            <tr v-if="tx.address">
+            <tr v-if="tx.destination">
                 <td>Recipient Address</td>
-                <td>{{ tx.address }}</td>
+                <td>{{ tx.destination }}</td>
             </tr>
 
-            <tr v-if="tx.fee">
+            <tr>
                 <td>Fee</td>
                 <td><Amount :amount="tx.fee" ticker="FIRO" /></td>
             </tr>
@@ -129,7 +129,7 @@ export default {
     },
 
     props: {
-        // This is a TransactionOutput from src/daemon/firod.ts
+        // This is a TXO from store/Transactions.ts
         tx: {
             type: Object,
             required: true

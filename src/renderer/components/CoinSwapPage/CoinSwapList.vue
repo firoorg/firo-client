@@ -63,12 +63,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            transactions: 'Transactions/transactions',
-            addresses: 'Transactions/addresses',
-            consolidatedMints: 'Transactions/consolidatedMints',
-            paymentRequests: 'PaymentRequest/paymentRequests',
-            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            isReindexing: 'ApiStatus/isReindexing',
             coinSwapRecords: 'CoinSwap/records'
         }),
 

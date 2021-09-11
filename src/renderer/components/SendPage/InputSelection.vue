@@ -59,7 +59,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            transactions: 'Transactions/transactions',
+            TXOMap: 'Transactions/TXOMap',
             availableUTXOs: 'Transactions/availableUTXOs'
         }),
 
@@ -70,12 +70,12 @@ export default {
         selectedCoins() {
             return Object.entries(this.selectionData)
                 .filter(([k, v]) => v)
-                .map(([uniqId, v]) => this.transactions[uniqId]);
+                .map(([txidIndex, v]) => this.TXOMap[txidIndex]);
         },
 
         ourUnspentUTXOs() {
             return this.availableUTXOs
-                .filter(tx => ['mint', 'mintIn'].includes(tx.category) === this.isPrivate)
+                .filter(tx => tx.isPrivate === this.isPrivate)
                 .sort((a, b) => (b.amount - a.amount) || a.txid.localeCompare(b.txid));
         }
     },
@@ -96,13 +96,6 @@ export default {
     },
 
     watch: {
-        value() {
-            const newSelectionData = fromPairs(this.value.map(tx => [tx.uniqId, true]));
-            if (!isEqual(newSelectionData, this.selectionData)) {
-                this.selectionData = newSelectionData;
-            }
-        },
-
         selectedCoins() {
             this.$emit('input', this.selectedCoins);
         }

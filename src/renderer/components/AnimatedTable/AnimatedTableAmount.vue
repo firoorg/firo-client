@@ -7,31 +7,10 @@
         Amount
     </th>
 
-    <td
-        v-else
-        class="vuetable-td-component-amount"
-    >
-        <span
-            v-if="rowData.amount === 0"
-            class="zero"
-        >
-            0
-        </span>
-        <span
-            v-else-if="['spendOut', 'send'].includes(category)"
-            class="outgoing"
-        >
-            -{{ amount }} FIRO
-        </span>
-        <span
-            v-else-if="['spendIn', 'receive', 'mined', 'znode', 'mintIn'].includes(category)"
-            class="incoming"
-        >
-            +{{ amount }} FIRO
-        </span>
-        <span v-else>
-            This is a bug.
-        </span>
+    <td v-else class="vuetable-td-component-amount">
+        <span v-if="rowData.amount === 0">0</span>
+        <span v-else-if="rowData.isFromMe" class="outgoing">-{{ amount }} FIRO</span>
+        <span v-else-if="rowData.isToMe" class="incoming">+{{ amount }} FIRO</span>
     </td>
 </template>
 
@@ -47,10 +26,6 @@ export default {
     ],
 
     computed: {
-        category () {
-            return this.rowData.category;
-        },
-
         amount () {
             return convertToCoin(this.rowData.amount);
         }

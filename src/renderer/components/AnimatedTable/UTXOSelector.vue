@@ -1,7 +1,7 @@
 <template>
     <th v-if="isHeader"></th>
     <td v-else>
-        <input :id="`utxo-selector-${this.rowData.txid}-${this.rowData.txIndex}`" class="utxo-selector" ref="checkbox" type="checkbox" @input="toggle" />
+        <input :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" ref="checkbox" type="checkbox" @input="toggle" />
     </td>
 </template>
 
@@ -16,15 +16,21 @@ export default {
         VuetableFieldMixin
     ],
 
+    computed: {
+        txidIndex() {
+            return `${this.rowData.txid}-${this.rowData.index}`;
+        }
+    },
+
     watch: {
         rowData() {
-            this.$refs.checkbox.checked = !!this.vuetable.globalData[this.rowData.uniqId];
+            this.$refs.checkbox.checked = !!this.vuetable.globalData[this.txidIndex];
         }
     },
 
     methods: {
         toggle(ev) {
-            Vue.set(this.vuetable.globalData, this.rowData.uniqId, ev.target.checked);
+            Vue.set(this.vuetable.globalData, this.txidIndex, ev.target.checked);
         }
     }
 }

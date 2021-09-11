@@ -1,265 +1,119 @@
-import {cloneDeep, merge} from 'lodash';
-import {StateWallet, TransactionOutput, TransactionEvent, AddressBookItem, CoinControl} from '../../daemon/firod';
+import {Transaction, TxOut, CoinControl} from '../../daemon/firod';
 import Vue from "vue";
-import { createLogger } from '../../lib/logger'
-const logger = createLogger('firo:store:Transactions');
+import {cloneDeep, fromPairs} from "lodash";
 
-// This is the data format we're given in 'address' events.
-type AddressEvent = StateWallet;
+export interface TXO extends TxOut {
+    blockHash?: string;
+    blockHeight?: number;
+    blockTime?: number;
+
+    txid: string;
+    index: number;
+    // This indicates whether this input should be used for new private transactions.
+    isPrivate: boolean;
+    // This indicates whether the transaction as a whole was private.
+    inputPrivacy: 'public' | 'zerocoin' | 'sigma' | 'lelantus' | 'mined';
+    validAt: number;
+    firstSeenAt: number;
+    isFromMe: boolean;
+    fee: number;
+    spendSize?: number; // undefined if unknown
+}
+
+function txosFromTx(tx: Transaction): TXO[] {
+    const txos: TXO[] = [];
+
+    let index = -1;
+    for (const txout of tx.outputs) {
+        index += 1;
+
+        // This is for txouts of multi-recipient transactions that we've received funds from that go to other wallets.
+        if (!tx.isFromMe && !txout.isToMe) continue;
+
+        let spendSize = undefined;
+        switch (txout.scriptType) {
+            case "lelantus-mint":
+            case "lelantus-jmint":
+            case "lelantus-joinsplit":
+            case "sigma-mint":
+            case "sigma-spend":
+                spendSize = 2560;
+                break;
+
+            case "pay-to-public-key":
+                spendSize = 114;
+                break;
+
+            case "pay-to-public-key-hash":
+            case "pay-to-script-hash":
+                spendSize = 148;
+                break;
+
+            default:
+                console.warn(`${tx.txid}-${index} has an unknown scriptType`);
+        }
+
+        const isPrivate = ['lelantus-mint', 'lelantus-jmint', 'sigma-mint'].includes(txout.scriptType)
+
+        let validAt = Infinity;
+        if (!tx.blockHeight) validAt = Infinity;
+        else if (tx.inputType == "mined") validAt = tx.blockHeight + 101;
+        else if (tx.inputType == 'sigma') validAt = tx.blockHeight + 6;
+        else if (tx.inputType == 'lelantus') validAt = tx.blockHeight + 2;
+        else if (isPrivate) validAt = tx.blockHeight + 2;
+        else if (tx.inputType == 'public' && !isPrivate) validAt = 0;
+
+        txos.push({
+            blockHash: tx.blockHash,
+            blockHeight: tx.blockHeight,
+            blockTime: tx.blockTime,
+            txid: tx.txid,
+            index,
+            isPrivate,
+            inputPrivacy: tx.inputType,
+            isFromMe: tx.isFromMe,
+            validAt,
+            firstSeenAt: tx.firstSeenAt,
+            spendSize,
+            fee: tx.fee,
+            ...txout
+        });
+    }
+
+    return txos;
+}
 
 const state = {
-    transactions: <{[uniqId: string]: TransactionOutput}>{},
-    // values are keys of transactions in state.transactions associated with the address
-    addresses: <{[address: string]: string[]}>{},
-    unspentUTXOs: <{[uniqId: string]: number}>{},
-    addressBook: <{[address: string]: AddressBookItem}>{},
-    walletLoaded: false
+    transactions: <{[txid: string]: Transaction}>{}
 };
 
 const mutations = {
-    setWalletState(state, initialStateWallet: StateWallet) {
-        const stateTransactions = cloneDeep(state.transactions);
-        const stateAddresses = cloneDeep(state.addresses);
-        const stateUnspentUTXOs = cloneDeep(state.unspentUTXOs);
-
-        logger.info("Setting wallet state: %d addresses", Object.keys(initialStateWallet.addresses).length);
-        for (const address of Object.keys(initialStateWallet.addresses)) {
-            const addressData = initialStateWallet.addresses[address];
-            if (!['inputs', 'lockedCoins', 'unlockedCoins'].includes(address)) {
-                for (const transactions of Object.values(addressData.txids)) {
-                    for (const tx of Object.values(transactions)) {
-                        tx.uniqId = `${tx.txid}-${tx.txIndex}-${tx.category}`;
-
-                        if (tx.category === 'orphan' || tx.spendableAt === undefined || tx.spendableAt === -1) {
-                            delete stateUnspentUTXOs[tx.uniqId];
-                        } else {
-                            stateUnspentUTXOs[tx.uniqId] = tx.spendableAt;
-                        }
-
-                        if (tx.category === 'orphan') {
-                            // Delete previous records associated with the transaction.
-                            if (stateTransactions[tx.uniqId]) {
-                                logger.silly(`Got orphan ${tx.uniqId}, deleting associated records.`);
-                                delete stateTransactions[tx.uniqId];
-                                delete stateUnspentUTXOs[tx.uniqId];
-                                stateAddresses[tx.address] = stateAddresses[tx.address].filter(id => id !== tx.uniqId);
-                            }
-
-                            // We don't want to display orphan transactions in the UI.
-                            continue;
-                        }
-
-                        stateTransactions[tx.uniqId] = tx;
-
-                        // Mint transactions will have no associated address.
-                        if (!tx.address) {
-                            continue;
-                        }
-
-                        if (!stateAddresses[tx.address]) {
-                            stateAddresses[tx.address] = [];
-                        }
-                        stateAddresses[tx.address].push(tx.uniqId);
-                    }
-                }
-            } else if (['lockedCoins'].includes(address)) {
-                for (const outpoint of Object.values(addressData)) {
-                    for (const [id, tx] of Object.entries(state.transactions)) {
-                        if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                            stateTransactions[id].locked = true;
-                        }
-                    }
-                }
-            } else if (['unlockedCoins'].includes(address)) {
-                for (const outpoint of Object.values(addressData)) {
-                    for (const [id, tx] of Object.entries(state.transactions)) {
-                        if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                            stateTransactions[id].locked = false;
-                        }
-                    }
-                }
-            }
+    setWalletState(state, walletState: Transaction[]) {
+        const txs = cloneDeep(state.transactions);
+        for (const tx of walletState) {
+            txs[tx.txid] = tx;
         }
-
-        if (initialStateWallet.addresses['inputs']) {
-            const addressData = initialStateWallet.addresses['inputs'];
-            for (const outpoint of Object.values(addressData)) {
-                for (const [id, tx] of Object.entries(state.transactions)) {
-                    //logger.info('spent: %s', id);
-                    if (id.includes(`${outpoint.txid}-${outpoint.index}-`)) {
-                        stateTransactions[id].spendable = false;
-                        delete stateUnspentUTXOs[id];
-                    }
-                }
-            }
-        }
-
-        // Mints to ourselves are listed twice. Filter them out here.
-        for (const uniqId of Object.keys(stateTransactions)) {
-            if (uniqId.includes('-mintIn')) {
-                const mintId = uniqId.replace('-mintIn', '-mint');
-                if (stateTransactions[mintId]) {
-                    delete stateTransactions[uniqId];
-                    delete stateUnspentUTXOs[uniqId];
-
-                    stateTransactions[mintId].isChange = true;
-                }
-            }
-
-            if (uniqId.includes('-mint')) {
-                const receiveId = uniqId.replace('-mint', '-receive');
-                if (stateTransactions[receiveId]) {
-                    delete stateTransactions[receiveId];
-                    delete stateUnspentUTXOs[receiveId];
-                }
-
-
-                const spendInId = uniqId.replace('-mint', '-receive');
-                if (stateTransactions[spendInId]) {
-                    delete stateTransactions[spendInId];
-                    delete stateUnspentUTXOs[spendInId];
-                }
-            }
-        }
-
-        state.addresses = stateAddresses;
-        state.transactions = stateTransactions;
-        state.unspentUTXOs = stateUnspentUTXOs;
-        state.walletLoaded = true;
-    },
-
-    setLockState(state, uniqIds: string[]) {
-        for(const uniqId of uniqIds) {
-            state.transactions[uniqId].locked = !state.transactions[uniqId].locked;
-        }
-        state.transactions = {...state.transactions};
-    },
-
-    setHasMnemonic(state, hasM: boolean) {
-        state.hasMnemonic = hasM;
-        state.hasMnemonic = {...state.hasMnemonic};
-    },
-
-    setShouldShowWarning(state, warning: boolean) {
-        state.shouldShowWarning = warning;
-        state.shouldShowWarning = {...state.shouldShowWarning};
+        state.transactions = txs;
     },
 
     markSpentTransaction(state, inputs: CoinControl) {
-        for (const uniqId of Object.keys(state.transactions).filter(k => inputs.find(i => k.includes(`${i[0]}-${i[1]}`)))) {
-            logger.debug(`Marking txout ${uniqId} as used.`);
-            delete state.unspentUTXOs[uniqId];
-        }
-    },
-
-    markLockedTransaction(state, {txout: [txid, txIndex], locked}) {
-        for (const tx of <TransactionOutput[]>Object.values(state.transactions)) {
-            if (tx.txid === txid && tx.txIndex == txIndex) {
-                Vue.set(tx, 'locked', locked);
-            }
+        for (const input of inputs) {
+            const tx = state.transactions[input[0]];
+            Vue.set(tx.outputs[input[1]], 'isSpent', true);
         }
     }
 };
 
-// Used to cache multiple transactions coming in quick succession.
-let cachedInitialStateWallets: StateWallet[] = [];
-let lastStateWalletTime: number;
-let hasStartedCachedStateWalletWatcher = false;
-
-const actions = {
-    // We're called every second and are responsible for consolidation stateWallet events into a single update. Our
-    // interval timer is set the first time a call to addCachedStateWallet is made.
-    maybeDoStateWallet({commit}) {
-        // If there are no items in cachedInitialStateWallet or it's been less than 1 second since the last item was
-        // added, do nothing.
-        if (!cachedInitialStateWallets.length || ((new Date()).getTime() - lastStateWalletTime) < 1e3) {
-            return;
-        }
-
-        logger.debug("1s has passed since the last stateWallet update. Beginning batch-processing.");
-
-        // fixme: addCachedStateWallet calls are asynchronous, but mergedInitialStateWallet depends on the order of
-        //        elements in cachedInitialStateWallet for properly detecting orphaned or reorganised transactions. In
-        //        practice this shouldn't be a huge issue because the window for this to happen is very small.
-        const mergedInitialStateWallet: StateWallet = merge([], ...cachedInitialStateWallets);
-        cachedInitialStateWallets = [];
-        lastStateWalletTime = undefined;
-        commit('setWalletState', mergedInitialStateWallet);
-    },
-
-    addCachedStateWallet({commit, dispatch}, initialStateWallet: StateWallet) {
-        // Call maybeDoStateWallet every second.
-        if (!hasStartedCachedStateWalletWatcher) {
-            hasStartedCachedStateWalletWatcher = true;
-            setInterval(() => dispatch('maybeDoStateWallet'), 300);
-        }
-
-        if (Object.keys(initialStateWallet.addresses).length == 0) {
-            logger.warn("Received stateWallet with no addresses.");
-            // We can't unconditionally return here because we need walletLoaded to be set on startup.
-            if (cachedInitialStateWallets.length > 0) return;
-        }
-
-        logger.silly("Adding more items to the initialStateWallet cache...");
-        cachedInitialStateWallets.push(initialStateWallet);
-        lastStateWalletTime = (new Date()).getTime();
-    },
-
-    // We're called by stateWallet (in initialize).
-    setWalletState({dispatch, rootGetters}, initialStateWallet: StateWallet) {
-        logger.silly('setWalletState');
-        dispatch('addCachedStateWallet', initialStateWallet);
-    },
-
-    handleTransactionEvent({dispatch, rootGetters}, transactionEvent: TransactionEvent) {
-        logger.silly('handleTransactionEvent');
-        dispatch('addCachedStateWallet', {addresses: transactionEvent});
-    },
-    
-    handleAddressEvent({dispatch, rootGetters}, addressEvent: AddressEvent) {
-        logger.silly('handleAddressEvent');
-        dispatch('addCachedStateWallet', addressEvent)
-    },
-
-    changeLockStatus({commit, rootGetters}, uniqIds: string[]) {
-        logger.info('changeLockStatus');
-        commit('setLockState', uniqIds)
-    },
-
-    changeHasMnemonic({commit, rootGetters}, hasM: boolean) {
-        commit('setHasMnemonic', hasM);
-    },
-
-    changeShouldShowWarning({commit, rootGetters}, warning: boolean) {
-        commit('setShouldShowWarning', warning);
-    }
-};
-
-function signatureSizeForUTXO(utxo: TransactionOutput) {
-    switch (utxo.txType) {
-        case "lelantusmint":
-            return 2560;
-        case "zerocoinmintv3": // Sigma
-            return 2560;
-        case "pubkey":
-            return 114;
-        case "pubkeyhash":
-            return 148;
-    }
-    // There shouldn't be other script types, but if there are, overestimate the fee.
-    console.log(`strange type ${utxo.txType} for utxo ${utxo.txid}-${utxo.txIndex}`);
-    return 5000
-}
-
-function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, availableUTXOs: TransactionOutput[], isCoinControl=false): [number, TransactionOutput[]] {
+function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [number, TXO[]] {
     const constantSize = isPrivate ? 1234 : 78;
 
-    if (isCoinControl) {
-        if (availableUTXOs.find(tx => ['mint', 'mintIn'].includes(tx.category) != isPrivate)) return undefined;
+    if (coinControl) {
+        if (availableUTXOs.find(utxo => utxo.isPrivate != isPrivate)) return undefined;
 
-        const totalSize = constantSize + availableUTXOs.map(signatureSizeForUTXO).reduce((a, x) => a + x, 0);
-        const gathered = availableUTXOs
-            .reduce((a, tx) => a + tx.amount, 0);
+        // assume 5000 as the signature size for unknown outputs.
+        const totalSize = constantSize + availableUTXOs.reduce((a, utxo) => a + utxo.spendSize || 5000, 0);
+        const gathered = availableUTXOs.reduce((a, utxo) => a + utxo.amount, 0);
+
         let fee = Math.floor(totalSize / 1000 * feePerKb);
         if (fee === 0) fee = 1;
 
@@ -272,7 +126,7 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
     }
 
     const utxos = availableUTXOs
-        .filter(tx => ['mint', 'mintIn'].includes(tx.category) == isPrivate)
+        .filter(utxo => utxo.isPrivate == isPrivate)
         .sort((a, b) => b.amount - a.amount);
 
     let totalSize = constantSize;
@@ -281,55 +135,53 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
     const selectedUTXOs = [];
     for (const utxo of utxos) {
         gathered += utxo.amount;
-        totalSize += signatureSizeForUTXO(utxo);
+        totalSize += utxo.spendSize;
         selectedUTXOs.push(utxo);
 
         let fee = Math.floor(totalSize / 1000 * feePerKb);
         if (fee === 0) fee = 1;
 
         if (subtractFeeFromAmount && amount <= fee) continue;
-        if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) return [fee, selectedUTXOs];
+        if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) {
+            return [fee, selectedUTXOs];
+        }
     }
 
     return undefined;
 }
 
 const getters = {
-    // a map of `${txid}-${txIndex}` to the full transaction object returned from firod
-    transactions: (state) => state.transactions,
-    availableUTXOs: (state, getters, rootState, rootGetters) =>
-        Object.keys(state.unspentUTXOs)
-        .map(uniqId => {
-            const tx = state.transactions[uniqId];
-            if (!tx) console.warn(`Unknown transaction ${uniqId} in unspentUTXOs`);
-            return tx;
-        })
-        .filter(tx => rootGetters['App/allowBreakingMasternodes'] || !tx.locked)
-        .filter(tx => tx && tx.spendableAt >= 0 && tx.spendableAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1),
-    addressBook: (state) => state.addressBook,
-    walletLoaded: (state) => state.walletLoaded,
-    lockedTransactions: (state) => Object.values(state.transactions).filter((tx: TransactionOutput) => tx.locked),
-    // a map of addresses to a list of `${txid}-${txIndex}` associated with the address
-    addresses: (state) => state.addresses,
+    transactions: (state): {[txid: string]: Transaction} => state.transactions,
+    TXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
+        .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx)), [])
+        // Don't display orphaned mining transactions.
+        .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined')),
+    TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.TXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
+    UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) => !txo.isSpent),
+    availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
+        txo.isToMe &&
+        (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
+        txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
+    ),
 
-    getZnodeRewardsReceivedAtAddress: (state) => {
-        return (address) => (state.addresses[address] || [])
-            .map(uniqId => state.transactions[uniqId])
-            .filter(tx => tx.category === 'znode')
-            .reduce((a,tx) => a + tx.amount, 0);
-    },
+    userVisibleTransactions: (state, getters): TXO[] => getters.TXOs
+        .filter((txo: TXO) => !txo.isChange && txo.destination)
+        .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
+        .reduce((a: TXO[], txo: TXO) => a.concat(txo.isFromMe && txo.isToMe ? [{...txo, isFromMe: false}, {...txo, isToMe: false}] : [txo]), []),
 
-    selectPublicInputs: (state, getters) => {
-        return (amount: number, feePerKb: number, subtractFeeFromAmount: boolean): TransactionOutput[] => {
-            return selectUTXOs(false, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs)[1];
+    selectInputs: (state, getters): (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean) => CoinControl => {
+        getters.availableUTXOs;
+        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean): CoinControl => {
+            return selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs, false)[1].map(utxo => [utxo.txid, utxo.index]);
         }
     },
 
-    calculateTransactionFee: (state, getters) => {
+    calculateTransactionFee: (state, getters): (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => number => {
         getters.availableUTXOs;
-
-        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coins?: TransactionOutput[]): number =>
-            (selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, coins || getters.availableUTXOs, !!coins) || [])[0];
+        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coinControl?: TXO[]): number => {
+            const x = selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
+            return x && x[0];
+        };
     }
 };
 
@@ -337,6 +189,5 @@ export default {
     namespaced: true,
     state,
     mutations,
-    actions,
     getters
 };

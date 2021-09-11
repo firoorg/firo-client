@@ -6,21 +6,13 @@
     >
         Date
     </th>
+    <td v-else-if="!rowData.blockHeight" class="unconfirmed">Unconfirmed</td>
     <td
         v-else
         class="vuetable-td-component-relative-date"
         :title="absoluteDate || 'Pending'"
-        :class="`${category}-date`"
     >
-        <timeago
-            v-if="relativeDate"
-            :key="rowData.id"
-            :datetime="relativeDate"
-            :auto-update="30"
-        />
-        <span v-else>
-            ~
-        </span>
+        <timeago :datetime="rowData.firstSeenAt * 1000"  :auto-update="30" />
     </td>
 </template>
 
@@ -36,37 +28,15 @@ export default {
     ],
 
     computed: {
-        category () {
-            return this.rowData.category;
-        },
-
-        relativeDate () {
-            let d = this.rowData.date;
-            // If we're set to Infinity, don't render anything. We do this instead of just putting undefined here in
-            // order to get sorted before everything else.
-            if (d === Infinity) {
-                return undefined
-            }
-
-            return d
-        },
-
         absoluteDate () {
-            const d = this.rowData.date;
-            // If we're set to Infinity, don't render anything. We do this instead of just putting undefined here in
-            // order to get sorted before everything else.
-            if (d === Infinity) {
-                return undefined
-            }
-
-            return format(new Date(d), "HH:MM, D MMM YYYY")
+            return format(new Date(this.rowData.firstSeenAt * 1000), "HH:MM, D MMM YYYY")
         }
     }
 }
 </script>
 
-<style scoped>
-.payment-request-date {
-    color: gray;
+<style scoped lang="scss">
+.unconfirmed {
+    font-style: italic;
 }
 </style>

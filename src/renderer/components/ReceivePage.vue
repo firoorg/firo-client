@@ -63,7 +63,7 @@ export default {
 
     data() {
         return {
-            address: null,
+            address: ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address,
             qrCode: null,
             isDefaultAddress: true,
 
@@ -79,32 +79,21 @@ export default {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
-            addresses: 'Transactions/addresses',
-            transactions: 'Transactions/transactions',
-            _cachedAddress: 'App/cachedAddress'
+            txos: 'Transactions/TXOs',
         }),
-
-        cachedAddress: {
-            get() {
-                return this._cachedAddress;
-            },
-
-            set(value) {
-                this.$store.commit('App/setCachedAddress', value);
-            }
-        },
 
         label: {
             get() {
-                return (this.addressBook[this.address] && this.addressBook[this.address].label) || '';
+                return (this.addressBook[this.address] || {label: ''}).label;
             },
 
             async set(newLabel) {
                 if (!this.address) return;
                 if (newLabel) {
-                    const newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], newLabel);
                     this.isDefaultAddress = false;
-                    await this.$store.commit('AddressBook/updateAddress', newAddress);
+
+                    await $daemon.updateAddressBookItem(this.addressBook[this.address], newLabel);
+                    this.setAddressBook(await $daemon.readAddressBook());
                 }
             }
         },
@@ -115,42 +104,15 @@ export default {
         }
     },
 
-    async mounted() {
-        // Make sure everything shows properly on reload.
-        while (!window.$daemon) {
-            await new Promise(r => setTimeout(r, 10));
-        }
-
-        if (this.cachedAddress) {
-            this.address = this.cachedAddress;
-            this.makeQrCode();
-        }
-
-        const newAddress = await $daemon.getUnusedAddress();
-        if (this.address != newAddress) {
-            this.address = newAddress;
-            this.cachedAddress = this.address;
-            await this.displayAddress();
-        }
-    },
-
     // Make sure we always display a fresh address.
     watch: {
-        async addresses() {
-            if (this.isDefaultAddress && this.addresses[this.address]) {
-                this.address = await $daemon.getUnusedAddress();
-                this.cachedAddress = this.address;
-                await this.displayAddress();
-            }
-        },
-
         // When we receive transactions to the default address, we need to add it to the list of old addresses and show
         // a new default address.
         //
         // This is a stopgap measure until we can add functionality in firod to send us the address book in proper
         // events. This is the only page on which the list of receive addresses can be viewed, so the effect is the
         // same.
-        transactions: {
+        txos: {
             immediate: true,
             async handler() {
                 // Don't throw errors during reload.
@@ -158,8 +120,36 @@ export default {
                     await new Promise(r => setTimeout(r, 100));
                 }
 
-                this.setAddressBook(await $daemon.readAddressBook());
-                // The displayed address and QR code will be updated in the addresses watcher.
+                if (!this.address || (this.isDefaultAddress && this.txos.find(txo => txo.destination === this.address))) {
+                    await this.createNewAddress(true);
+                }
+            }
+        },
+
+        // Update the QR code
+        address: {
+            immediate: true,
+            async handler() {
+                if (!this.address) return;
+
+                // Don't throw errors during reload.
+                while (!this.$refs.qrCode) {
+                    await new Promise(r => setTimeout(r, 100));
+                }
+
+                if (this.qrCode) {
+                    this.qrCode.makeCode(this.address)
+                } else {
+                    this.qrCode = new QRCode(this.$refs.qrCode, {
+                        text: this.address,
+                        height: 200,
+                        width: 200,
+                        colorDark: 'black',
+                        colorLight: 'white',
+                        logo: FiroSymbol,
+                        logoBackgroundColor: 'white'
+                    });
+                }
             }
         }
     },
@@ -170,63 +160,26 @@ export default {
         }),
 
         async createNewAddress() {
-            if (!this.address) return;
+            const address = await $daemon.getUnusedAddress();
 
-            let unusedAddress = await $daemon.getUnusedAddress();
-            if (this.isDefaultAddress) {
-                const newAddress = await $daemon.updateAddressBookItem(this.addressBook[this.address], '');
-                await this.$store.commit('AddressBook/updateAddress', newAddress);
-                unusedAddress = await $daemon.getUnusedAddress();
-            } else if (this.addressBook[unusedAddress]) {
-                const newAddress = await $daemon.updateAddressBookItem(this.addressBook[unusedAddress], '');
-                await this.$store.commit('AddressBook/updateAddress', newAddress);
-                unusedAddress = await $daemon.getUnusedAddress();
-            }
-
-            this.isDefaultAddress = true;
-            this.label = '';
-            this.address = unusedAddress;
-            this.setAddressBook(await $daemon.readAddressBook());
-            this.$nextTick(async () => {
-                await this.displayAddress();
-                this.$refs.animatedTable.refresh();
+            await $daemon.addAddressBookItem({
+                address,
+                label: '',
+                purpose: 'receive'
             });
+            const addressBook = await $daemon.readAddressBook();
+            this.setAddressBook(addressBook);
+
+            this.label = '';
+            this.isDefaultAddress = true;
+            // We have to replicated the sorting of this.receiveAddresses here due to timing issues. $nextTick doesn't
+            // work either. :(
+            this.address = addressBook.sort((a, b) => b.createdAt - a.createdAt)[0].address;
         },
 
         navigateToAddressBookItem(item) {
             this.isDefaultAddress = false;
             this.address = item.address;
-            this.displayAddress();
-        },
-
-        async displayAddress() {
-            if (!this.address) {
-                this.address = await $daemon.getUnusedAddress();
-                this.cachedAddress = this.address;
-            }
-
-            // Don't throw errors during reload.
-            while (!this.$refs.qrCode) {
-                await new Promise(r => setTimeout(r, 100));
-            }
-
-            this.makeQrCode();
-        },
-
-        makeQrCode() {
-            if (this.qrCode) {
-                this.qrCode.makeCode(this.address)
-            } else {
-                this.qrCode = new QRCode(this.$refs.qrCode, {
-                    text: this.address,
-                    height: 200,
-                    width: 200,
-                    colorDark: 'black',
-                    colorLight: 'white',
-                    logo: FiroSymbol,
-                    logoBackgroundColor: 'white'
-                });
-            }
         }
     }
 }

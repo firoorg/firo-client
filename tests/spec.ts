@@ -6,7 +6,7 @@ import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
 import {convertToCoin, convertToSatoshi} from "../src/lib/convert";
-import {TransactionOutput} from "../src/daemon/firod";
+import {TXO} from "../src/store/modules/Transactions";
 
 interface This extends Mocha.Context {
     app: Application
@@ -306,6 +306,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     this.beforeEach('generates Firo if not enough is available', generateSufficientFiro);
 
     it('can change the passphrase', async function (this: This) {
+        this.timeout(100e3);
+
         await (await this.app.client.$('a[href="#/settings"]')).click();
 
         await (await this.app.client.$('#change-passphrase-button')).click();
@@ -332,7 +334,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '_');
         await (await this.app.client.$('#confirm-button')).waitForEnabled();
         await (await this.app.client.$('#confirm-button')).click();
-        await (await this.app.client.$('#ok-button')).waitForExist();
+        await (await this.app.client.$('#ok-button')).waitForExist({timeout: 100e3});
         await (await this.app.client.$('#ok-button')).click();
         await (await this.app.client.$('.change-passphrase-popup')).waitForExist({reverse: true});
 
@@ -407,10 +409,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const address = await (await this.app.client.$('#receive-address')).getValue();
             await (await this.app.client.$('#receive-address-label')).setValue(label);
             await (await this.app.client.$('#receive-address')).click();
-            await this.app.client.waitUntilTextExists('td.address-book-item-label', label);
+            await this.app.client.waitUntilTextExists('tr:nth-child(2) td.address-book-item-label', label);
             addressLabels.unshift([label, address]);
 
-            await (await this.app.client.$('#create-new-address-button')).click();
+            await (await this.app.client.$('tr:nth-child(1) td.address-book-item-label')).click();
             await this.app.client.waitUntil(async () => await (await this.app.client.$('#receive-address')).getValue() != address);
             assert.notEqual(await (await this.app.client.$('#receive-address-label')).getValue(), label);
         }
@@ -514,9 +516,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
 
             const availableUTXOs = lodash.shuffle(
-                <TransactionOutput[]>await this.app.client.execute((isPrivate) => {
+                <TXO[]>await this.app.client.execute((isPrivate) => {
                     return (<any>window).$store.getters['Transactions/availableUTXOs']
-                        .filter(tx => ['mint', 'mintIn'].includes(tx.category) === isPrivate);
+                        .filter(tx => tx.isPrivate === isPrivate);
                 }, paymentType === 'private')
             );
             const selectedUTXOs = [];
@@ -524,7 +526,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             for (const utxo of availableUTXOs) {
                 if (selectedUTXOsAmount >= satoshiAmountToSend) break;
                 selectedUTXOsAmount += utxo.amount;
-                selectedUTXOs.push(`${utxo.txid}-${utxo.txIndex}`);
+                selectedUTXOs.push(`${utxo.txid}-${utxo.index}`);
             }
             if (selectedUTXOsAmount < satoshiAmountToSend) assert.fail('insufficient utxos to cover send amount');
 
@@ -547,7 +549,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 }
                 assert.equal(selectorsClicked, selectedUTXOs.length, "we clicked an incorrect number of selectors");
 
-                await (await this.app.client.$('.input-selection-popup button.recommended')).click();
+                const button = await this.app.client.$('.input-selection-popup button.recommended');
+                await button.waitForExist();
+                await button.click();
+                await button.waitForExist({reverse: true});
             }
 
             const computedTxFeeElement = await this.app.client.$('#computed-transaction-fee .amount-value');
@@ -623,16 +628,16 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             await (await this.app.client.$('a[href="#/transactions')).click();
 
-            let txOut: TransactionOutput;
+            let txOut: TXO;
             await this.app.client.waitUntil(async () => {
                 txOut = await this.app.client.executeScript(
-                    "return Object.values($store.getters['Transactions/transactions'])" +
-                    ".find(tx => " +
-                    "(arguments[2] ? tx.amount + tx.fee : tx.amount) === arguments[0] && " +
-                    "tx.category === arguments[1] && " +
-                    "!tx.isChange" +
+                    "return Object.values($store.getters['Transactions/TXOs']).find(tx => " +
+                        "(arguments[2] ? tx.amount + tx.fee : tx.amount) === arguments[0] && " +
+                        "tx.inputPrivacy === (arguments[1] ? 'lelantus' : 'public') && " +
+                        "tx.scriptType === 'pay-to-public-key-hash' && " +
+                        "!tx.isChange" +
                     ")",
-                    [satoshiAmountToSend, paymentType === 'private' ? 'spendOut' : 'send', subtractTransactionFee]
+                    [satoshiAmountToSend, paymentType === 'private', subtractTransactionFee]
                 );
                 return !!txOut;
             })
@@ -641,19 +646,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const txinfo = (await this.app.client.executeAsyncScript('$daemon.legacyRpc(`getrawtransaction ${arguments[0]} true`).then(arguments[1])', [txOut.txid])).result;
             assert.equal(txOut.fee, satoshiExpectedFee, `actual fee was not equal to calculated fee (size ${txinfo.size}, vsize ${txinfo.vsize}, expected fee/kb ${txFeePerKb}, txid ${txOut.txid})`);
 
-            const satoshiAmountToReceive = subtractTransactionFee ? txOut.amount : satoshiAmountToSend;
-            const txIn: TransactionOutput = await this.app.client.executeScript(
-                "return Object.values($store.getters['Transactions/transactions'])" +
-                    ".find(tx => " +
-                        "tx.amount === arguments[0] && " +
-                        "tx.category === arguments[1] && " +
-                        "!tx.isChange" +
-                    ")",
-                [satoshiAmountToReceive, paymentType === 'private' ? 'spendIn' : 'receive']
-            );
-            assert.exists(txIn);
-
-            const amountToReceive = convertToCoin(satoshiAmountToReceive);
+            const amountToReceive = convertToCoin(txOut.amount);
 
             // The type signature of timeout on waitUntilTextExists is incorrect.
             await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToReceive, <any>{timeout: 10e3});

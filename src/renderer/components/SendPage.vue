@@ -167,13 +167,11 @@
 </template>
 
 <script>
-import lodash, {cloneDeep} from 'lodash';
 import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress} from 'lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from 'lib/convert';
 import Amount from "renderer/components/shared/Amount";
-import {FirodErrorResponse} from "daemon/firod";
 import InputSelection from "renderer/components/SendPage/InputSelection";
 import Popup from "renderer/components/shared/Popup";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
@@ -240,7 +238,7 @@ export default {
         }),
 
         transactionFee() {
-            if (!this.satoshiAmount) return 0;
+            if (!this.satoshiAmount) return undefined;
             return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
         },
 
@@ -264,11 +262,11 @@ export default {
         },
 
         coinControl () {
-            return this.customInputs.length ? this.customInputs.map(tx => [tx.txid, tx.txIndex]) : undefined;
+            return this.customInputs.length ? this.customInputs.map(txo => [txo.txid, txo.index]) : undefined;
         },
 
         coinControlSelectedAmount () {
-            return this.customInputs.reduce((a, tx) => a + tx.amount, 0);
+            return this.customInputs.reduce((a, txo) => a + txo.amount, 0);
         },
 
         available () {

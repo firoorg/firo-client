@@ -62,19 +62,6 @@ const getters = {
         const enabledZnodeCount = rootGetters['ApiStatus/enabledZnodeCount'];
         const blockTime = rootGetters['Blockchain/averageBlockTimeInMilliSeconds'];
         return  blockTime * enabledZnodeCount;
-    },
-
-    // Returns the last time the Znode was paid (in seconds after the Epoch), or null if the Znode has never been paid.
-    getLastPaidTime: (state, getters, rootState, rootGetters): ((znodeAddress: string) => number | null) => {
-        return (znodeAddress: string): number => {
-            const latestZnodeTx = (rootGetters['Transactions/addresses'][znodeAddress] || [])
-                .map(uniqId => rootGetters['Transactions/transactions'][uniqId])
-                .filter(tx => tx.category === 'znode')
-                .sort((a, b) => b.blockTime - a.blockTime)
-                [0];
-
-            return latestZnodeTx ? latestZnodeTx.blockTime : null;
-        }
     }
 };
 

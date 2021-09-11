@@ -196,74 +196,38 @@ export interface ApiStatus {
     error: string | null;
 }
 
-// one transaction output, of which a transaction may have many.
-export interface TransactionOutput {
-    // A unique ID generated on the client side (outside this file) which identifies the transaction. It will be
-    // different for outgoing and incoming versions of the same transactions.
-    uniqId?: string;
-    isChange: boolean;
-    category: string;
-    txid: string;
-    txIndex: number;
-    firstSeenAt: number;
-    txType: 'nonstandard' | 'pubkey' | 'pubkeyhash' | 'scripthash' | 'multisig' | 'nulldata' | 'witness_v0_keyhash' |
-        'witness_v0_scripthash' | 'zerocoinmint' | 'zerocoinmintv3' | 'lelantusmint';
-    label?: string;
-    fee?: number;
+export interface TxOut {
+    scriptType: 'pay-to-public-key' | 'pay-to-public-key-hash' | 'pay-to-script-hash' | 'pay-to-witness-script-hash' |
+        'zerocoin-mint' | 'zerocoin-remint' | 'zerocoin-spend' | 'sigma-spend' | 'sigma-mint' | 'lelantus-mint' |
+        'lelantus-jmint' | 'lelantus-joinsplit' | 'unknown';
     amount: number;
-    address?: string;
-    blockHeight?: number;
-    blockHash?: string;
-    blockTime?: number;
-    available?: boolean;
-    // This may be undefined or -1, in which case the transaction is not spendable; 0, in which case the transaction
-    // should be spendable now (e.g. non-coinbase transactions), or another positive value, in which case the
-    // transaction is spendable after that block number.
-    spendableAt?: number;
-    locked?: boolean;
+    isChange: boolean;
+    isLocked: boolean;
+    isSpent: boolean;
+    isToMe: boolean;
+    destination?: string;
 }
-function isValidTransactionOutput(x: any): x is TransactionOutput {
-    const r = x !== null &&
-        typeof x === 'object' &&
-        (x.uniqId === undefined || typeof x.uniqId === 'string') &&
-        typeof x.isChange === 'boolean' &&
-        typeof x.category === 'string' &&
-        typeof x.txid === 'string' &&
-        typeof x.txIndex === 'number' &&
-        typeof x.firstSeenAt === 'number' &&
-        (x.label === undefined || typeof x.label === 'string') &&
-        (x.fee === undefined || typeof x.fee === 'number') &&
-        typeof x.amount === 'number' &&
-        (x.address === undefined || typeof x.address === 'string') &&
-        (x.blockHeight === undefined || typeof x.blockHeight === 'number') &&
-        (x.blockHash === undefined || typeof x.blockHash === 'string') &&
-        (x.blockTime === undefined || typeof x.blockTime === 'number') &&
-        (x.spendable === undefined || typeof x.spendable === 'boolean') &&
-        (x.available === undefined || typeof x.available === 'boolean') &&
-        (x.locked === undefined || typeof x.locked === 'boolean');
 
-    if (!r) {
-        logger.error("Invalid transaction output: %O", x);
-    }
+export interface Transaction {
+    txid: string;
+    inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus';
+    isFromMe: boolean;
+    firstSeenAt: number;
+    fee: number;
+    outputs: TxOut[];
 
-    return r;
+    // blockHash MAY be set without blockHeight or blockTime, in which case the transaction is from an orphaned block.
+    // If inputType is not 'mined', the transaction should be included at a later date, unless it's been double spent.
+    // Therefore, you should check for whether a transaction has been included or not be seeing whether blockHeight is
+    // set, not blockHash.
+    blockHash?: string;
+    blockHeight?: number;
+    blockTime?: number;
 }
 
 export interface TransactionInput {
     txid: string;
     index: number;
-}
-function isValidTransactionInput(x: any): x is TransactionInput {
-    const r = x !== null &&
-        typeof x === 'object' &&
-        typeof x.txid === 'string' &&
-        typeof x.index === 'number';
-
-    if (!r) {
-        logger.error("Invalid transaction input: %O", x);
-    }
-
-    return r;
 }
 
 export interface AddressBookItem {
@@ -285,108 +249,6 @@ function isValidAddressBookItem(x: any): x is AddressBookItem {
     }
 
     return r;
-}
-
-// This is the data format for initial/stateWallet.
-export interface StateWallet {
-    inputs?: {
-        [outpoint: string]: TransactionInput
-    },
-
-    lockedCoins?: {
-        [outpoint: string]: TransactionInput
-    },
-
-    unlockedCoins?: {
-        [outpoint: string]: TransactionInput
-    },
-
-    addresses: {
-        // maybeAddress could also be the string "MINT"
-        [maybeAddress: string]: {
-            txids: {
-                [grouping: string]: {
-                    [maybeTxid: string]: TransactionOutput
-                }
-            }
-        }
-    }
-}
-function isValidStateWallet(x: any): x is StateWallet {
-    if (x === null || typeof x !== 'object' || x.addresses === null || typeof x.addresses !== 'object') {
-        return false;
-    }
-
-    if (x.inputs && !Object.values(x.inputs).find(e => !isValidTransactionInput(e))) {
-        return false;
-    }
-
-    if (x.lockedCoins && !Object.values(x.lockedCoins).find(e => !isValidTransactionInput(e))) {
-        return false;
-    }
-
-    if (x.unlockedCoins && !Object.values(x.unlockedCoins).find(isValidTransactionInput)) {
-        return false;
-    }
-
-    for (const [k, v] of <any[]>Object.entries(x.addresses)) {
-        if (['inputs', 'lockedCoins', 'unlockedCoins'].includes(k)) continue;
-
-        if (v === null ||
-            typeof v !== 'object' ||
-            v.txids === null ||
-            typeof v.txids !== 'object' ||
-            (v.inputs !== undefined && typeof v.inputs !== 'object') ||
-            (v.lockedCoins !== undefined && typeof v.lockedCoins !== 'object') ||
-            (v.unlockedCoins !== undefined && typeof v.unlockedCoins !== 'object')) {
-
-            logger.error(`Invalid stateWallet address ${k}: ${JSON.stringify(v)}`)
-            return false;
-        }
-
-        if (Object.values(v.txids).find(grouping =>
-            grouping === null || typeof grouping !== 'object' || Object.values(grouping).find(e => !isValidTransactionOutput(e) && !<any>console.log(e))
-        )) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-// This is the data format we're given in 'transaction' events.
-export interface TransactionEvent {
-    // maybeAddress could also be the string "MINT"
-    [maybeAddress: string]: {
-        txids: {
-            [grouping: string]: {
-                [txid: string]: TransactionOutput
-            }
-        },
-
-        inputs?: {
-            [outpoint: string]: TransactionInput
-        },
-
-        lockedCoins?: {
-            [outpoint: string]: TransactionInput
-        },
-
-        unlockedCoins?: {
-            [outpoint: string]: TransactionInput
-        },
-
-        total: {
-            [txCategory: string]: {
-                send?: number;
-                mint?: number;
-                spend?: number;
-                mined?: number;
-                znode?: number;
-                receive?: number;
-            }
-        }
-    }
 }
 
 export interface MasternodeEvent {
@@ -598,7 +460,6 @@ export class Firod {
     private blockchainLoadedEWH: EventWaitHandle<undefined>;
     private hasConnectedEWH: EventWaitHandle<undefined>;
     private initializersCompletedEWH: EventWaitHandle<undefined>;
-    private hasSentStateWalletEWH: EventWaitHandle<undefined>;
     private blockchainSyncedEWH: EventWaitHandle<undefined>;
     // We resolve with true if firod has shutdown cleanly or false if it has crashed.
     private firodHasShutdown: EventWaitHandle<boolean>
@@ -668,7 +529,6 @@ export class Firod {
         this.blockchainLoadedEWH = new EventWaitHandle();
         this.hasConnectedEWH = new EventWaitHandle();
         this.initializersCompletedEWH = new EventWaitHandle();
-        this.hasSentStateWalletEWH = new EventWaitHandle();
         this.blockchainSyncedEWH = new EventWaitHandle();
         this.firodHasShutdown = new EventWaitHandle();
     }
@@ -1058,10 +918,6 @@ export class Firod {
 
         if (apiStatus.data && apiStatus.data.reindexing === false && apiStatus.data.rescanning === false) {
             await this.blockchainLoadedEWH.release(undefined);
-        }
-
-        if (apiStatus.data && apiStatus.data.hasSentInitialStateWallet) {
-            await this.hasSentStateWalletEWH.release(undefined);
         }
 
         if (apiStatus.data && apiStatus.data.synced) {
@@ -1840,24 +1696,9 @@ export class Firod {
         }
     }
 
-    // Calling this causes a number of address events containing information about the state of the wallet to be sent in
-    // addition to the return value here. Handlers for address events must be set *in addition* to processing the return
-    // value of this function.
-    //
-    // WARNING: THE RETURN VALUE OF THIS FUNCTION CONTAINS ONLY A SMALL PORTION OF THE REQUESTED DATA.
-    async getStateWallet(): Promise<StateWallet> {
-        const data = await this.send(null, 'initial', 'stateWallet', null);
-
-        if (isValidStateWallet(data)) {
-            return data;
-        }
-
-        throw new UnexpectedFirodResponse('initial/stateWallet', data);
-    }
-
-    // Wait until the entirety of initialStateWallet has been sent.
-    async awaitStateWallet(): Promise<void> {
-        await this.hasSentStateWalletEWH.block();
+    // Returns a list of all our transactions.
+    async getStateWallet(): Promise<Transaction[]> {
+        return <Transaction[]>await this.send(null, 'initial', 'stateWallet', null);
     }
 
     // Return the API status, waiting until one is available to return.
