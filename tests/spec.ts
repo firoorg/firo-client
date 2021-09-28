@@ -443,7 +443,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         paymentType: 'public' | 'private',
         subtractTransactionFee: boolean,
         customTransactionFee: boolean,
-        coinControl: boolean
+        coinControl: boolean,
+        checkValidations: boolean = false
     ): (this: This) => Promise<void> {
         return async function (this: This) {
             this.timeout(100e3);
@@ -487,30 +488,30 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await amount.setValue(amountToSend);
             await sendButton.waitForEnabled();
 
-            // Check validations
+            if (checkValidations) {
+                await amount.setValue('0.0000000001');
+                await sendButton.waitForEnabled({reverse: true});
+                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+                await amount.clearValue();
+                await amount.setValue(amountToSend);
+                await sendButton.waitForEnabled();
 
-            await amount.setValue('0.0000000001');
-            await sendButton.waitForEnabled({reverse: true});
-            // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-            await amount.clearValue();
-            await amount.setValue(amountToSend);
-            await sendButton.waitForEnabled();
+                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+                await amount.clearValue();
+                await amount.setValue('99999999999999');
+                await sendButton.waitForEnabled({reverse: true});
+                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+                await amount.clearValue();
+                await amount.setValue(amountToSend);
+                await sendButton.waitForEnabled();
 
-            // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-            await amount.clearValue();
-            await amount.setValue('99999999999999');
-            await sendButton.waitForEnabled({reverse: true});
-            // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-            await amount.clearValue();
-            await amount.setValue(amountToSend);
-            await sendButton.waitForEnabled();
-
-            await address.setValue('invalid-address');
-            await sendButton.waitForEnabled({reverse: true});
-            // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-            await address.clearValue();
-            await address.setValue(sendAddress);
-            await sendButton.waitForEnabled();
+                await address.setValue('invalid-address');
+                await sendButton.waitForEnabled({reverse: true});
+                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
+                await address.clearValue();
+                await address.setValue(sendAddress);
+                await sendButton.waitForEnabled();
+            }
 
             const availableUTXOs = lodash.shuffle(
                 <TransactionOutput[]>await this.app.client.execute((isPrivate) => {
@@ -569,27 +570,32 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await sendButton.waitForEnabled();
             await sendButton.click();
 
-            const cancelButton = await this.app.client.$('.confirm-step button.unrecommended');
-            await cancelButton.waitForExist();
-            await cancelButton.click();
-            await cancelButton.waitForExist({reverse: true});
+            if (checkValidations) {
+                const cancelButton = await this.app.client.$('.confirm-step button.unrecommended');
+                await cancelButton.waitForExist();
+                await cancelButton.click();
+                await cancelButton.waitForExist({reverse: true});
 
-            await sendButton.click();
+                await sendButton.click();
+            }
 
             const confirmButton = await this.app.client.$('.confirm-step button.recommended');
             await confirmButton.waitForExist();
             await confirmButton.click();
 
-            const passphraseInput = await this.app.client.$('.passphrase-input input[type="password"]');
-            await passphraseInput.waitForExist();
-            await passphraseInput.setValue(passphrase + '-invalid');
+            if (checkValidations) {
+                const passphraseInput = await this.app.client.$('.passphrase-input input[type="password"]');
+                await passphraseInput.waitForExist();
+                await passphraseInput.setValue(passphrase + '-invalid');
 
-            const realSendButton = await this.app.client.$('.passphrase-input button.recommended');
-            await realSendButton.click();
+                const realSendButton = await this.app.client.$('.passphrase-input button.recommended');
+                await realSendButton.click();
 
-            await (await this.app.client.$('.passphrase-input .error')).waitForExist();
+                await (await this.app.client.$('.passphrase-input .error')).waitForExist();
+            }
 
             const passphraseInput2 = await this.app.client.$('input[type="password"]');
+            await passphraseInput2.waitForExist();
             await passphraseInput2.setValue(passphrase);
 
             const realSendButton2 = await this.app.client.$('.passphrase-input button.recommended');
@@ -688,6 +694,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         };
     }
 
+    it('checks send validations', sendsAndReceivesPayment('private', false, false, false, true));
     it('sends and receives a private payment', sendsAndReceivesPayment('private', false, false, false));
     it('sends and receives a public payment', sendsAndReceivesPayment('public', false, false, false));
     it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true, false, false));
