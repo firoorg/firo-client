@@ -15,7 +15,7 @@
                 v-if="show === 'confirm'"
                 :label="label"
                 :address="address"
-                :amount="amount"
+                :amount="subtractFeeFromAmount ? amount - computedTxFee : amount"
                 :fee="computedTxFee"
                 :total="totalAmount"
                 :is-private="isPrivate"
