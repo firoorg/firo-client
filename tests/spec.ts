@@ -35,7 +35,8 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
             env: {
                 FIRO_CLIENT_TEST: 'true',
                 NETWORK: 'regtest',
-                IS_INITIALIZED: String(!reinitializeFiroClient)
+                IS_INITIALIZED: String(!reinitializeFiroClient),
+                ALLOW_EXISTING_FIROD: '1'
             }
         });
 
