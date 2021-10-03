@@ -6,6 +6,7 @@ export interface TXO extends TxOut {
     blockHash?: string;
     blockHeight?: number;
     blockTime?: number;
+    isInstantSendLocked: boolean;
 
     txid: string;
     index: number;
@@ -76,6 +77,7 @@ function txosFromTx(tx: Transaction): TXO[] {
             firstSeenAt: tx.firstSeenAt,
             spendSize,
             fee: tx.fee,
+            isInstantSendLocked: tx.isInstantSendLocked,
             ...txout
         });
     }

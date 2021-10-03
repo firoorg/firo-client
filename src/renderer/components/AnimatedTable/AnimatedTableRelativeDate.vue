@@ -6,7 +6,7 @@
     >
         Date
     </th>
-    <td v-else-if="!rowData.blockHeight" class="unconfirmed">Unconfirmed</td>
+    <td v-else-if="!rowData.blockHeight && !rowData.isInstantSendLocked" class="unconfirmed">Unconfirmed</td>
     <td
         v-else
         class="vuetable-td-component-relative-date"

@@ -58,6 +58,11 @@
                 </tr>
             </template>
 
+            <tr v-else-if="tx.isInstantSendLocked">
+                <td>Status</td>
+                <td>InstantSend Locked</td>
+            </tr>
+
             <tr v-else>
                 <td>Status</td>
                 <td>Unconfirmed <a href="#" class="rebroadcast" @click="rebroadcast">(rebroadcast)</a></td>

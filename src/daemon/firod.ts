@@ -223,6 +223,8 @@ export interface Transaction {
     blockHash?: string;
     blockHeight?: number;
     blockTime?: number;
+
+    isInstantSendLocked: boolean;
 }
 
 export interface TransactionInput {
