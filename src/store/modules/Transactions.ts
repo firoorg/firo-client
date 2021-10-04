@@ -60,8 +60,8 @@ function txosFromTx(tx: Transaction): TXO[] {
         if (!tx.blockHeight) validAt = Infinity;
         else if (tx.inputType == "mined") validAt = tx.blockHeight + 101;
         else if (tx.inputType == 'sigma') validAt = tx.blockHeight + 6;
-        else if (tx.inputType == 'lelantus') validAt = tx.blockHeight + 2;
-        else if (isPrivate) validAt = tx.blockHeight + 2;
+        else if (tx.inputType == 'lelantus') validAt = tx.blockHeight + 1;
+        else if (isPrivate) validAt = tx.blockHeight + 1;
         else if (tx.inputType == 'public' && !isPrivate) validAt = 0;
 
         txos.push({
