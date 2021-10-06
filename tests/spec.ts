@@ -649,8 +649,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const amountToReceive = convertToCoin(txOut.amount);
 
             // The type signature of timeout on waitUntilTextExists is incorrect.
-            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming', amountToReceive, <any>{timeout: 10e3});
-            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .outgoing', amountToReceive, <any>{timeout: 10e3});
+            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming-outgoing', amountToReceive, <any>{timeout: 10e3});
 
             // Wait to make sure coin control entries are updated.
             await new Promise(r => setTimeout(r, 1e3));

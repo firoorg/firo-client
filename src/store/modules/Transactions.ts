@@ -168,8 +168,7 @@ const getters = {
 
     userVisibleTransactions: (state, getters): TXO[] => getters.TXOs
         .filter((txo: TXO) => !txo.isChange && txo.destination)
-        .sort((a, b) => b.firstSeenAt - a.firstSeenAt)
-        .reduce((a: TXO[], txo: TXO) => a.concat(txo.isFromMe && txo.isToMe ? [{...txo, isFromMe: false}, {...txo, isToMe: false}] : [txo]), []),
+        .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 
     selectInputs: (state, getters): (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean) => CoinControl => {
         getters.availableUTXOs;
