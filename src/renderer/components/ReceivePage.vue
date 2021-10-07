@@ -1,25 +1,27 @@
 <template>
     <div class="receive-page">
         <div class="top">
-            <div ref="qrCode" class="qr-code" />
-
-            <div class="right">
+            <div class="left">
                 <div class="title">
                     Scan this QR code to receive Firo
                 </div>
 
-                <InputFrame label="Receiving Address" :copy="true">
-                    <input id="receive-address" type="text" disabled="true" :value="address" />
-                </InputFrame>
+                <div class="receiving-address">
+                    <InputFrame label="Receiving Address">
+                        <input id="receive-address" type="text" disabled="true" :value="address" />
+                    </InputFrame>
+
+                    <CopyAddressIcon :address="address" />
+                    <RefreshAddressIcon :onclick="createNewAddress" />
+                </div>
 
                 <InputFrame label="Label">
                     <input id="receive-address-label" type="text" placeholder="Unlabelled" v-model.lazy="label" />
                 </InputFrame>
+            </div>
 
-                <div id="create-new-address-button" class="checkbox-field" @click="createNewAddress">
-                    <PlusButton />
-                    <label>Create a new address</label>
-                </div>
+            <div class="qr-code-container">
+                <div ref="qrCode" class="qr-code" />
             </div>
         </div>
 
@@ -45,10 +47,9 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
 import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
 import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator";
-import Copyable from "renderer/components/shared/Copyable";
 import InputFrame from "renderer/components/shared/InputFrame";
-import PlusButton from "renderer/components/shared/PlusButton";
-import {cloneDeep, fromPairs} from "lodash";
+import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon";
+import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon";
 
 const FiroSymbol = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyNC4yLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCA1MjAgNTIwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MjAgNTIwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojRkVGRUZFO30NCgkuc3Qxe2ZpbGw6IzlCMUMyRTt9DQo8L3N0eWxlPg0KPGc+DQoJPGc+DQoJCTxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjI2MCIgY3k9IjI2MCIgcj0iMjUyLjciLz4NCgk8L2c+DQoJPGc+DQoJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNTUuNiwzNzAuN2M1LjksMCwxMS4yLTMuMiwxNC04LjRsMzcuMy03MC42aC01Ny41Yy04LjcsMC0xNS44LTcuMS0xNS44LTE1Ljh2LTMxLjYNCgkJCWMwLTguNyw3LjEtMTUuOCwxNS44LTE1LjhoOTAuOWw3MC42LTEzMy45YzIuNy01LjIsOC4xLTguNCwxNC04LjRoMTE4LjhDMzk3LjUsMzcuNCwzMzIuMyw3LDI2MCw3QzEyMC4zLDcsNywxMjAuMyw3LDI2MA0KCQkJYzAsMzkuNyw5LjIsNzcuMywyNS41LDExMC43SDE1NS42eiIvPg0KCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzY0LjQsMTQ5LjNjLTUuOSwwLTExLjIsMy4yLTE0LDguNGwtMzcuMyw3MC42aDU3LjVjOC43LDAsMTUuOCw3LjEsMTUuOCwxNS44djMxLjYNCgkJCWMwLDguNy03LjEsMTUuOC0xNS44LDE1LjhoLTkwLjlsLTcwLjYsMTMzLjljLTIuNyw1LjItOC4xLDguNC0xNCw4LjRINzYuNEMxMjIuNSw0ODIuNiwxODcuNyw1MTMsMjYwLDUxMw0KCQkJYzEzOS43LDAsMjUzLTExMy4zLDI1My0yNTNjMC0zOS43LTkuMi03Ny4zLTI1LjUtMTEwLjdIMzY0LjR6Ii8+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=";
 
@@ -56,8 +57,9 @@ export default {
     name: "ReceivePage",
 
     components: {
-        PlusButton,
         InputFrame,
+        CopyAddressIcon,
+        RefreshAddressIcon,
         AnimatedTable
     },
 
@@ -104,6 +106,10 @@ export default {
         }
     },
 
+    destroyed() {
+        this.qrCode.clear();
+    },
+
     // Make sure we always display a fresh address.
     watch: {
         // When we receive transactions to the default address, we need to add it to the list of old addresses and show
@@ -145,9 +151,7 @@ export default {
                         height: 200,
                         width: 200,
                         colorDark: 'black',
-                        colorLight: 'white',
-                        logo: FiroSymbol,
-                        logoBackgroundColor: 'white'
+                        colorLight: '#EBF0F5'
                     });
                 }
             }
@@ -158,6 +162,10 @@ export default {
         ...mapMutations({
             setAddressBook: 'AddressBook/setAddressBook'
         }),
+
+        copyAddress() {
+            clipboard.writeText(this.address);
+        },
 
         async createNewAddress() {
             const address = await $daemon.getUnusedAddress();
@@ -198,16 +206,11 @@ export default {
         display: flex;
         margin-bottom: var(--padding-base);
 
-        .qr-code {
-            width: 200px;
-            height: 200px;
-            margin-right: var(--padding-base);
-        }
-
-        .right {
+        .left {
             flex-grow: 1;
 
-            .title {
+            .title, .regular-or-rap {
+                vertical-align: center;
                 margin-bottom: var(--padding-base);
                 font: {
                     weight: bold;
@@ -215,14 +218,50 @@ export default {
                 }
             }
 
-            .framed-input {
-                width: 420px;
+            .regular-or-rap {
+                .radio-field {
+                    display: inline-block;
+
+                    &:not(:first-child) {
+                        margin-left: var(--padding-base);
+                    }
+                }
             }
 
-            #create-new-address-button {
-                &, label { cursor: pointer; }
-                color: var(--color-secondary);
-                font-weight: bold;
+            .framed-input {
+                width: 580px;
+            }
+
+            .receiving-address {
+                .framed-input {
+                    display: inline-block;
+                }
+
+                svg {
+                    cursor: pointer;
+                    display: inline-block;
+                    margin: {
+                        left: var(--padding-base);
+                        top: 14px;
+                        bottom: 14px;
+                    }
+                }
+            }
+        }
+
+        .qr-code-container {
+            // These need to be specified explicitly so the generation of the QR code doesn't mess up our layout.
+            height: calc(200px + var(--padding-base) * 2);
+            width: calc(200px + var(--padding-base) * 2);
+
+            margin: var(--padding-base);
+            padding: var(--padding-base);
+            border-radius: var(--padding-base);
+            background-color: #EBF0F5;
+
+            .qr-code {
+                width: 200px;
+                height: 200px;
             }
         }
     }
