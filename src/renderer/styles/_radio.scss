@@ -1,0 +1,39 @@
+input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+
+    -webkit-appearance: none;
+    outline: none;
+
+    border: {
+        style: solid;
+        radius: 7px;
+        width: 1px;
+        color: var(--color-secondary);
+    }
+
+    &:selection {
+        outline: none;
+    }
+
+    &:checked {
+        background-color: var(--color-secondary);
+    }
+}
+
+.radio-field {
+    display: flex;
+    height: 14px;
+
+    label {
+        font-size: 14px;
+
+        padding: {
+            left: 4px;
+            top: 3px;
+            bottom: 3px;
+        }
+        width: fit-content;
+    }
+}

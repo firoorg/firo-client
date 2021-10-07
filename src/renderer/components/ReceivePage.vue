@@ -6,6 +6,18 @@
                     Scan this QR code to receive Firo
                 </div>
 
+                <div class="regular-or-rap">
+                    <div class="radio-field">
+                        <input type="radio" v-model="useRap" :value="false" />
+                        <label>Regular Address</label>
+                    </div>
+
+                    <div class="radio-field">
+                        <input type="radio" v-model="useRap" :value="true" />
+                        <label>RAP Address</label>
+                    </div>
+                </div>
+
                 <div class="receiving-address">
                     <InputFrame label="Receiving Address">
                         <input id="receive-address" type="text" disabled="true" :value="address" />
@@ -68,6 +80,7 @@ export default {
             address: ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address,
             qrCode: null,
             isDefaultAddress: true,
+            useRap: false,
 
             tableFields: [
                 {name: CurrentAddressIndicator},
