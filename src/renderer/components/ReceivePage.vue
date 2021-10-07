@@ -174,7 +174,9 @@ export default {
             this.isDefaultAddress = true;
             // We have to replicated the sorting of this.receiveAddresses here due to timing issues. $nextTick doesn't
             // work either. :(
-            this.address = addressBook.sort((a, b) => b.createdAt - a.createdAt)[0].address;
+            this.address = addressBook
+                .filter(a => a.purpose === 'receive')
+                .sort((a, b) => b.createdAt - a.createdAt)[0].address;
         },
 
         navigateToAddressBookItem(item) {
