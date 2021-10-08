@@ -30,6 +30,11 @@
                 <InputFrame label="Label">
                     <input id="receive-address-label" type="text" placeholder="Unlabelled" v-model.lazy="label" />
                 </InputFrame>
+
+                <div class="rap-guidance">
+                    Transactions to RAP addresses cannot be linked together, regardless of how often the address is used
+                    or how many people it is given to.
+                </div>
             </div>
 
             <div class="qr-code-container">
@@ -241,8 +246,14 @@ export default {
                 }
             }
 
-            .framed-input {
+            .framed-input, .rap-guidance {
                 width: 580px;
+            }
+
+            .rap-guidance {
+                font-weight: bold;
+                margin-top: var(--padding-base);
+                text-align: center;
             }
 
             .receiving-address {
