@@ -229,7 +229,7 @@ export default {
             network: 'ApiStatus/network',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
-            availablePrivate: 'Balance/available',
+            availablePrivate: 'Balance/availablePrivate',
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',

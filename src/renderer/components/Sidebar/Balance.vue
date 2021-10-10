@@ -2,7 +2,7 @@
     <section class="balances">
         <div class="balance private">
             <label>Balance:</label>
-            <amount :amount="available" ticker="FIRO" />
+            <amount :amount="availablePrivate" ticker="FIRO" />
         </div>
 
         <div v-if="locked > 0" class="balance locked">
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex' /* , mapActions */
+import { mapGetters } from 'vuex'
 import Amount from 'renderer/components/shared/Amount'
 
 export default {
@@ -35,7 +35,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            available: 'Balance/available',
+            availablePrivate: 'Balance/availablePrivate',
             locked: 'Balance/locked',
             availablePublic: 'Balance/availablePublic',
             pending: 'Balance/pending',

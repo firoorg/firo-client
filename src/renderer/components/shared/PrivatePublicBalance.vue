@@ -54,7 +54,7 @@ export default {
     },
 
     computed: mapGetters({
-        availablePrivate: "Balance/available",
+        availablePrivate: "Balance/availablePrivate",
         availablePublic: "Balance/availablePublic"
     }),
 

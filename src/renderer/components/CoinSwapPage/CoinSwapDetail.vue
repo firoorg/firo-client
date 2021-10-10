@@ -455,8 +455,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            totalBalance: 'Balance/total',
-            availablePrivate: 'Balance/available',
+            availablePrivate: 'Balance/availablePrivate',
             availablePublic: 'Balance/availablePublic',
             maxPrivateSend: 'Balance/maxPrivateSend',
             isBlockchainSynced: 'Blockchain/isBlockchainSynced',
