@@ -160,36 +160,38 @@ function assertValidNetwork(x: any): x is Network {
     return true;
 }
 
-export interface ApiStatus {
-    data: {
-        version: number;
-        protocolVersion: number;
-        walletVersion: number;
-        walletLock: boolean;
-        disabledSporks: string[],
-        dataDir: string;
-        // Note that this is DIFFERENT from the Network type.
-        network: 'main' | 'test' | 'regtest';
-        blocks: number;
-        connections: number;
-        devAuth: boolean;
-        synced: boolean;
-        pid: number;
-        reindexing: boolean;
-        rescanning: boolean;
-        reindexingProgress?: number;
-        modules: {
-            [moduleName: string]: boolean;
-        };
-        Znode?: {
-            localCount: number;
-            totalCount: number;
-            enabledCount: number;
-        };
-        hasMnemonic: boolean;
-        smartFeePerKb: number;
-        hasSentInitialStateWallet: boolean;
+export interface ApiStatusData {
+    version: number;
+    protocolVersion: number;
+    walletVersion: number;
+    walletLock: boolean;
+    disabledSporks: string[],
+    dataDir: string;
+    // Note that this is DIFFERENT from the Network type.
+    network: 'main' | 'test' | 'regtest';
+    blocks: number;
+    connections: number;
+    devAuth: boolean;
+    synced: boolean;
+    pid: number;
+    reindexing: boolean;
+    rescanning: boolean;
+    reindexingProgress?: number;
+    modules: {
+        [moduleName: string]: boolean;
     };
+    Znode?: {
+        localCount: number;
+        totalCount: number;
+        enabledCount: number;
+    };
+    hasMnemonic: boolean;
+    smartFeePerKb: number;
+    hasSentInitialStateWallet: boolean;
+}
+
+export interface ApiStatus {
+    data: ApiStatusData;
     meta: {
         status: number;
     };
