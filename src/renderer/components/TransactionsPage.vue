@@ -97,7 +97,7 @@ export default {
         ...mapGetters({
             userVisibleTransactions: 'Transactions/userVisibleTransactions',
             addressBook: 'AddressBook/addressBook',
-            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
+            isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             isReindexing: 'ApiStatus/isReindexing'
         }),
 

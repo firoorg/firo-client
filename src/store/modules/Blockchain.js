@@ -67,13 +67,6 @@ export const getters = {
     connections: (state) => state.connections,
     hasConnections: (state) => !!state.connections,
     estimatedTimeUntilSynced: (state) => state.estimatedTimeUntilSynced,
-    estimatedBlockHeight: (state, getters) => {
-        const now = Date.now()
-        const remainingTime = now - (getters.currentBlockTimestamp * 1000)
-        const remainingBlocks = remainingTime / getters.averageBlockTimeInMilliSeconds
-
-        return Math.floor(getters.currentBlockHeight + remainingBlocks)
-    }
 
 }
 

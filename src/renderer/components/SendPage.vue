@@ -228,7 +228,7 @@ export default {
         ...mapGetters({
             network: 'ApiStatus/network',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
-            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
+            isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             availablePrivate: 'Balance/availablePrivate',
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',

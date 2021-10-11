@@ -60,7 +60,7 @@ const getters = {
     // in milliseconds
     paymentPeriod: (state, getters, rootState, rootGetters): number => {
         const enabledZnodeCount = rootGetters['ApiStatus/enabledZnodeCount'];
-        const blockTime = rootGetters['Blockchain/averageBlockTimeInMilliSeconds'];
+        const blockTime = 300e3;
         return  blockTime * enabledZnodeCount;
     }
 };

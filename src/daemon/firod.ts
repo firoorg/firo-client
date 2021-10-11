@@ -188,6 +188,7 @@ export interface ApiStatusData {
     hasMnemonic: boolean;
     smartFeePerKb: number;
     hasSentInitialStateWallet: boolean;
+    latestBlockTimestamp: number;
 }
 
 export interface ApiStatus {

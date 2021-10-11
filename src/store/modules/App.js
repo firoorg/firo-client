@@ -174,7 +174,7 @@ const getters = {
     isInitialized: (state) => state.isInitialized,
     firodHasStarted: (state) => state.firodHasStarted,
     showPaymentPendingWarning: (state, getters, rootState, rootGetters) =>
-        rootGetters['Blockchain/isBlockchainSynced'] && rootGetters['Balance/availablePublic'] > 0.01e8,
+        rootGetters['ApiStatus/isBlockchainSynced'] && rootGetters['Balance/availablePublic'] > 0.01e8,
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.
     waitingReason: (state) => state.waitingReason,

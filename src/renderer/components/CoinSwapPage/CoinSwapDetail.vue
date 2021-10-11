@@ -458,7 +458,7 @@ export default {
             availablePrivate: 'Balance/availablePrivate',
             availablePublic: 'Balance/availablePublic',
             maxPrivateSend: 'Balance/maxPrivateSend',
-            isBlockchainSynced: 'Blockchain/isBlockchainSynced',
+            isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             isBigWallet: 'Transactions/isBigWallet',
             smartFeePerKb: 'ApiStatus/smartFeePerKb'
