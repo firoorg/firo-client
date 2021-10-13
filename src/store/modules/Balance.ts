@@ -1,53 +1,37 @@
 import {TXO} from "./Transactions";
 
-function sumTxos(predicate: (txo: TXO, nextHeight: number) => boolean): (a, b, c, rootGetters) => number {
-    return (state, getters, rootState, rootGetters): number => rootGetters['Transactions/TXOs']
-        .filter((txo: TXO) => predicate(txo, rootGetters['ApiStatus/currentBlockHeight']+1))
-        .reduce((a, txo: TXO) => a + txo.amount, 0);
-}
-
 const getters = {
-    availablePrivate: sumTxos((txo: TXO, nextHeight: number) =>
-        txo.isToMe &&
-        !txo.isSpent &&
-        !txo.isLocked &&
-        txo.isPrivate &&
-        txo.validAt <= nextHeight
-    ),
-    unconfirmedPrivate: sumTxos((txo: TXO, nextHeight: number) =>
-        txo.isToMe &&
-        !txo.isSpent &&
-        !txo.isLocked &&
-        txo.isPrivate &&
-        txo.validAt > nextHeight
-    ),
-    availablePublic: sumTxos((txo: TXO, nextHeight: number) =>
-        txo.isToMe &&
-        !txo.isSpent &&
-        !txo.isLocked &&
-        !txo.isPrivate &&
-        txo.validAt <= nextHeight
-    ),
-    unconfirmedPublic: sumTxos((txo: TXO, nextHeight: number) =>
-        txo.isToMe &&
-        !txo.isSpent &&
-        !txo.isLocked &&
-        !txo.isPrivate &&
-        txo.validAt > nextHeight
-    ),
+    balances: (state, getters, rootState, rootGetters) => {
+        let [availablePrivate, unconfirmedPrivate, availablePublic, unconfirmedPublic, locked, immature] = [0, 0, 0, 0, 0, 0, 0];
+        let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
+
+        for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
+            if (!txo.isToMe || txo.isSpent) continue;
+            else if (txo.isLocked) locked += txo.amount;
+            else if (txo.inputPrivacy == 'mined' && txo.validAt > nextHeight) immature += txo.amount;
+            else if (txo.isPrivate && txo.validAt <= nextHeight) availablePrivate += txo.amount;
+            else if (txo.isPrivate) unconfirmedPrivate += txo.amount;
+            else if (txo.validAt <= nextHeight) availablePublic += txo.amount;
+            else unconfirmedPublic += txo.amount;
+        }
+
+        return {
+            availablePrivate,
+            unconfirmedPrivate,
+            availablePublic,
+            unconfirmedPublic,
+            locked,
+            immature
+        };
+    },
+
+    availablePrivate: (state, getters) => getters.balances.availablePrivate,
+    unconfirmedPrivate: (state, getters) => getters.balances.unconfirmedPrivate,
+    availablePublic: (state, getters) => getters.balances.availablePublic,
+    unconfirmedPublic: (state, getters) => getters.balances.unconfirmedPublic,
     // This includes unconfirmed and immature locked funds.
-    locked: sumTxos((txo: TXO, nextHeight: number) =>
-        txo.isToMe &&
-        !txo.isSpent &&
-        txo.isLocked
-    ),
-    immature: sumTxos((txo: TXO, nextHeight: number) =>
-        txo.isToMe &&
-        !txo.isSpent &&
-        !txo.isLocked &&
-        txo.inputPrivacy === 'mined' &&
-        txo.validAt > nextHeight
-    ),
+    locked: (state, getters) => getters.balances.locked,
+    immature: (state, getters) => getters.balances.immature,
     pending: (state, getters) => getters.unconfirmedPrivate + getters.unconfirmedPublic
 }
 
