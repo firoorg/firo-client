@@ -89,19 +89,34 @@ const state = {
     transactions: <{[txid: string]: Transaction}>{}
 };
 
+let upcomingTransactions: {[txid: string]: Transaction} = {};
+let upcomingTransactionsLastUpdated = Infinity;
+let ticker;
+
 const mutations = {
     setWalletState(state, walletState: Transaction[]) {
-        const txs = cloneDeep(state.transactions);
         for (const tx of walletState) {
-            txs[tx.txid] = tx;
+            upcomingTransactions[tx.txid] = tx;
         }
-        state.transactions = txs;
+        upcomingTransactionsLastUpdated = Date.now();
+
+        if (!ticker) {
+            console.log('updating transaction data');
+            state.transactions = cloneDeep(upcomingTransactions)
+            upcomingTransactionsLastUpdated = Infinity;
+            ticker = setInterval(() => {
+                if (upcomingTransactionsLastUpdated > Date.now() - 1000) return;
+                console.log('updating transaction data');
+                upcomingTransactionsLastUpdated = Infinity;
+                state.transactions = cloneDeep(upcomingTransactions);
+            }, 500);
+        }
     },
 
     markSpentTransaction(state, inputs: CoinControl) {
         for (const input of inputs) {
-            const tx = state.transactions[input[0]];
-            Vue.set(tx.outputs[input[1]], 'isSpent', true);
+            upcomingTransactions[input[0]].outputs[input[1]].isSpent = true;
+            upcomingTransactionsLastUpdated = Date.now();
         }
     }
 };
