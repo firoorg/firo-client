@@ -41,7 +41,7 @@ const store = new Vuex.Store({
         Transactions,
         Window
     },
-    strict: process.env.NODE_ENV !== 'production' // this up to you
+    strict: false
 })
 
 //if (process.env.NODE_ENV !== 'production') {
