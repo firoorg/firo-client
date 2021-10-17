@@ -15,9 +15,14 @@
             <amount :amount="availablePublic" ticker="FIRO" />
         </div>
 
-        <div v-if="(pending + immature) > 0" class="balance pending">
+        <div v-if="pending > 0" class="balance pending">
             <label>Pending:</label>
-            <amount :amount="pending + immature" ticker="FIRO" />
+            <amount :amount="pending" ticker="FIRO" />
+        </div>
+
+        <div v-if="immature > 0" class="balance immature">
+            <label>Immature:</label>
+            <amount :amount="immature" ticker="FIRO" />
         </div>
     </section>
 </template>
