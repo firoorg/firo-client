@@ -55,7 +55,7 @@ export default {
 
 <style lang="scss">
 $size-warning-banner: 40px;
-$size-sidebar-width: 280px;
+$size-sidebar-width: 290px;
 
 #main-layout {
     height: 100vh;

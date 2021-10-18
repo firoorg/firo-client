@@ -2,7 +2,8 @@ import {TXO} from "./Transactions";
 
 const getters = {
     balances: (state, getters, rootState, rootGetters) => {
-        let [availablePrivate, unconfirmedPrivate, availablePublic, unconfirmedPublic, locked, immature] = [0, 0, 0, 0, 0, 0, 0];
+        let [availablePrivate, unconfirmedPrivate, unconfirmedPrivateChange, availablePublic, unconfirmedPublic,
+             unconfirmedPublicChange, locked, immature] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
         for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
@@ -10,16 +11,20 @@ const getters = {
             else if (txo.isLocked) locked += txo.amount;
             else if (txo.inputPrivacy == 'mined' && txo.validAt > nextHeight) immature += txo.amount;
             else if (txo.isPrivate && txo.validAt <= nextHeight) availablePrivate += txo.amount;
+            else if (txo.isPrivate && txo.isChange) unconfirmedPrivateChange += txo.amount;
             else if (txo.isPrivate) unconfirmedPrivate += txo.amount;
             else if (txo.validAt <= nextHeight) availablePublic += txo.amount;
+            else if (txo.isChange) unconfirmedPublicChange += txo.amount;
             else unconfirmedPublic += txo.amount;
         }
 
         return {
             availablePrivate,
             unconfirmedPrivate,
+            unconfirmedPrivateChange,
             availablePublic,
             unconfirmedPublic,
+            unconfirmedPublicChange,
             locked,
             immature
         };
@@ -32,7 +37,8 @@ const getters = {
     // This includes unconfirmed and immature locked funds.
     locked: (state, getters) => getters.balances.locked,
     immature: (state, getters) => getters.balances.immature,
-    pending: (state, getters) => getters.unconfirmedPrivate + getters.unconfirmedPublic
+    pendingChange: (state, getters) => getters.balances.unconfirmedPrivateChange + getters.balances.unconfirmedPublicChange,
+    incoming: (dtate, getters) => getters.balances.unconfirmedPrivate + getters.balances.unconfirmedPublic
 }
 
 export default {

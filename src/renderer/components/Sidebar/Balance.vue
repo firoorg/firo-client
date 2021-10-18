@@ -15,9 +15,14 @@
             <amount :amount="availablePublic" ticker="FIRO" />
         </div>
 
-        <div v-if="pending > 0" class="balance pending">
-            <label>Pending:</label>
-            <amount :amount="pending" ticker="FIRO" />
+        <div v-if="incoming > 0" class="balance incoming">
+            <label>Incoming:</label>
+            <amount :amount="incoming" ticker="FIRO" />
+        </div>
+
+        <div v-if="pendingChange > 0" class="balance pending">
+            <label>Pending Change:</label>
+            <amount :amount="pendingChange" ticker="FIRO" />
         </div>
 
         <div v-if="immature > 0" class="balance immature">
@@ -43,7 +48,8 @@ export default {
             availablePrivate: 'Balance/availablePrivate',
             locked: 'Balance/locked',
             availablePublic: 'Balance/availablePublic',
-            pending: 'Balance/pending',
+            incoming: 'Balance/incoming',
+            pendingChange: 'Balance/pendingChange',
             immature: 'Balance/immature'
         })
     }
