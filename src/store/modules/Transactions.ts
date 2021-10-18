@@ -57,12 +57,10 @@ function txosFromTx(tx: Transaction): TXO[] {
         const isPrivate = ['lelantus-mint', 'lelantus-jmint', 'sigma-mint'].includes(txout.scriptType)
 
         let validAt = Infinity;
-        if (!tx.blockHeight) validAt = Infinity;
+        if (!tx.blockHeight && !tx.isInstantSendLocked) validAt = Infinity;
         else if (tx.inputType == "mined") validAt = tx.blockHeight + 101;
-        else if (tx.inputType == 'sigma') validAt = tx.blockHeight + 6;
-        else if (tx.inputType == 'lelantus') validAt = tx.blockHeight + 1;
-        else if (isPrivate) validAt = tx.blockHeight + 1;
-        else if (tx.inputType == 'public' && !isPrivate) validAt = 0;
+        else if (!isPrivate) validAt = 0;
+        else if (isPrivate && tx.blockHeight) validAt = tx.blockHeight + 1;
 
         txos.push({
             blockHash: tx.blockHash,
