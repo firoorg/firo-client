@@ -32,8 +32,8 @@
                 </InputFrame>
 
                 <div class="rap-guidance">
-                    Transactions to RAP addresses cannot be linked together, regardless of how often the address is used
-                    or how many people it is given to.
+                    RAP Addresses provide additional privacy when receiving FIRO as these addresses cannot be looked up
+                    on a blockchain explorer.
                 </div>
             </div>
 
