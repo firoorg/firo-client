@@ -247,7 +247,7 @@ export default {
             }
 
             .framed-input, .rap-guidance {
-                width: 580px;
+                width: calc(100% - 85px);
             }
 
             .rap-guidance {
