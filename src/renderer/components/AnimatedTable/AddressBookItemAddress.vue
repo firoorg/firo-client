@@ -1,9 +1,9 @@
 <template>
-    <th v-if="isHeader">
+    <th v-if="isHeader" class="address">
         Address
     </th>
 
-    <td v-else class="address-book-item-address">
+    <td v-else class="address">
         {{ rowData.address }}
     </td>
 </template>
@@ -19,3 +19,13 @@ export default {
     ]
 }
 </script>
+
+<style scoped lang="scss">
+// Truncate RAP addresses.
+td {
+    width: available;
+    max-width: 1px; // (╯°Д°）╯
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
