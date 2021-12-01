@@ -3,9 +3,11 @@
         <div class="header">
             <SearchInput v-model="filter" placeholder="Filter by label, ip, or collateral address" />
 
-            <div class="checkbox-field header-part show-all-masternodes">
-                <input type="checkbox" v-model="showAllZnodes" />
-                <label>Show All Masternodes</label>
+            <div class="header-part show-all-masternodes">
+                <div class="checkbox-field">
+                    <input type="checkbox" v-model="showAllZnodes">
+                    <label>Show All Masternodes</label>
+                </div>
             </div>
 
             <div class="checkbox-field header-part">
@@ -143,15 +145,13 @@ export default {
                 }
             }
 
+            & > label {
+                padding-left: 0;
+            }
+
             width: fit-content;
             white-space: nowrap;
-            line-height: 18px;
             vertical-align: middle;
-
-            &.show-all-masternodes label {
-                margin-left: 6px;
-                font-weight: bold;
-            }
         }
     }
 
