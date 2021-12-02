@@ -70,6 +70,11 @@ export default new Router({
                     path: '/coinswap',
                     component: require('renderer/components/CoinSwapPage.vue').default,
                 },
+
+                {
+                    path: '/elysium',
+                    component: require('renderer/components/ElysiumPage.vue').default
+                },
                 
                 {
                     path: '/znodes',

@@ -12,6 +12,10 @@
             Transactions
         </router-link>
 
+        <router-link to="/elysium">
+            Elysium
+        </router-link>
+
         <router-link v-if="network === 'main'" to="/coinswap">
             Coin Swap
         </router-link>

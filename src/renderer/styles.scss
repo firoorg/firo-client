@@ -1,12 +1,13 @@
-@import "styles/reset";
-@import "styles/fonts";
+@import 'styles/reset';
+@import 'styles/fonts';
 @import 'styles/colors';
 @import 'styles/z';
 @import 'styles/buttons';
 @import 'styles/checkbox';
 @import 'styles/error_tooltip';
 @import 'styles/selector';
-@import "src/renderer/styles/info-popup";
+@import 'styles/smooth-input';
+@import 'styles/info-popup';
 
 :root {
     --padding-base: 15px;
