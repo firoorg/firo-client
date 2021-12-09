@@ -26,6 +26,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: default;
 
     .inner-popup {
         background-color: var(--color-background-popups);
