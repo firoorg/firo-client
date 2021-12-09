@@ -12,7 +12,7 @@
                 </div>
 
                 <Popup v-if="showPopup == 'createToken'">
-                    <CreateTokenForm v-model="createTokenFormData" @submit="createToken" @cancel="createTokenFormData = {}; showPopup = ''" />
+                    <CreateTokenForm @submit="createToken" @cancel="createTokenFormData = {}; showPopup = ''" />
                 </Popup>
             </div>
 
@@ -85,14 +85,13 @@ export default {
                     privateBalance: 1e8,
                     publicBalance: 1e8+143,
                 }
-            ],
-            createTokenFormData: {}
+            ]
         };
     },
 
     methods: {
-        createToken() {
-            alert(JSON.stringify(this.createTokenFormData, null, 2));
+        createToken(createTokenFormData) {
+            alert(JSON.stringify(createTokenFormData));
         }
     }
 }

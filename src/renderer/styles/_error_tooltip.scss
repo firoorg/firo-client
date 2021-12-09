@@ -1,4 +1,8 @@
+$tooltip-size: 7px;
+
 .tooltip.error {
+    z-index: var(--z-tooltip);
+
     .tooltip-inner {
         color: var(--color-status-error-contrast);
         background-color: var(--color-status-error);
@@ -7,16 +11,24 @@
     }
 
     .tooltip-arrow {
-        $size: 7px;
-
         z-index: 1;
         position: absolute;
-        right: -$size;
+        right: -$tooltip-size;
         border-style: solid;
-        border-width: $size 0 $size $size;
+        border-width: $tooltip-size 0 $tooltip-size $tooltip-size;
         border-color: var(--color-status-error);
         border-top-color: transparent !important;
         border-right-color: transparent !important;
         border-bottom-color: transparent !important;
     }
+}
+
+.popup-tooltip {
+    z-index: var(--z-popup-tooltip) !important;
+}
+
+.right-tooltip .tooltip-arrow {
+    transform: scaleX(-1);
+    right: unset !important;
+    left: -$tooltip-size;
 }
