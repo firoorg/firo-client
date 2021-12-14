@@ -182,6 +182,7 @@ const getters = {
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
         txo.isToMe &&
         (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
+        txo.spendSize &&
         txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
     ),
 
