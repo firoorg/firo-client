@@ -50,6 +50,12 @@ function txosFromTx(tx: Transaction): TXO[] {
                 spendSize = 148;
                 break;
 
+            case "pay-to-witness-script-hash":
+            case "zerocoin-mint":
+            case "zerocoin-remint":
+            case "zerocoin-spend":
+                break;
+
             default:
                 console.warn(`${tx.txid}-${index} has an unknown scriptType`);
         }
