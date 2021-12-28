@@ -1,4 +1,4 @@
-import {Transaction, TxOut, CoinControl} from '../../daemon/firod';
+import {Transaction, TxOut, CoinControl, ElysiumData} from '../../daemon/firod';
 import Vue from "vue";
 import {cloneDeep, fromPairs} from "lodash";
 
@@ -19,6 +19,7 @@ export interface TXO extends TxOut {
     isFromMe: boolean;
     fee: number;
     spendSize?: number; // undefined if unknown
+    elysium?: ElysiumData;
 }
 
 function txosFromTx(tx: Transaction): TXO[] {
@@ -54,6 +55,7 @@ function txosFromTx(tx: Transaction): TXO[] {
             case "zerocoin-mint":
             case "zerocoin-remint":
             case "zerocoin-spend":
+            case "elysium":
                 break;
 
             default:
@@ -82,6 +84,7 @@ function txosFromTx(tx: Transaction): TXO[] {
             spendSize,
             fee: tx.fee,
             isInstantSendLocked: tx.isInstantSendLocked,
+            elysium: tx.elysium,
             ...txout
         });
     }
@@ -176,18 +179,52 @@ const getters = {
     TXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
         .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx)), [])
         // Don't display orphaned mining transactions.
-        .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined')),
+        .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
+        // Hide Elysium notification transactions. These shouldn't be spent normally because a TXO outputting to a given
+        // Elysium address is required to mint or spend publicly from that address.
+        .filter(txo => !(txo.elysium && !txo.isChange && txo.scriptType !== 'elysium')),
     TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.TXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
     UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) => !txo.isSpent),
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
         txo.isToMe &&
+        // Elysium has reference outputs that we should not allow the user to spend.
+        !(txo.elysium && !txo.isChange) &&
         (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
         txo.spendSize &&
         txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
     ),
 
+    // This will display:
+    // 1) valid Elysium non-Lelantus Mint transactions
+    // 2) unconfirmed Elysium non-Lelantus Mint from us
+    // 3) InstantSend-locked non-Elysium transactions
+    // 4) unconfirmed transactions from us
+    // 5) mined non-Elysium transactions
+    //
+    // It will not display:
+    // 1) mined and invalid Elysium transactions (whether or not they are from us)
+    // 2) orphan transactions
+    // 3) unconfirmed and non-InstantSend-locked transactions to us
+    // 4) unconfirmed but InstantSend-locked Elysium transactions to us
+    // 5) Elysium reference outputs
+    // 6) Elysium Lelantus Mint transactions
     userVisibleTransactions: (state, getters): TXO[] => getters.TXOs
-        .filter((txo: TXO) => !txo.isChange && txo.destination)
+        .filter((txo: TXO) =>
+                !txo.isChange &&
+                !(txo.inputPrivacy === 'mined' && !txo.blockHeight) &&
+                (
+                    (
+                        txo.scriptType === 'elysium' &&
+                        txo.elysium &&
+                        txo.elysium.property &&
+                        ((txo.isFromMe && !txo.blockHeight) || txo.elysium.valid) &&
+                        txo.elysium.type !== 'Lelantus Mint' &&
+                        txo.elysium.property.ecosystem === 'main'
+                    )
+                        ||
+                    (!txo.elysium && txo.destination && (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe))
+                )
+        )
         .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 
     selectInputs: (state, getters): (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean) => CoinControl => {

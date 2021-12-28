@@ -202,13 +202,42 @@ export interface ApiStatus {
 export interface TxOut {
     scriptType: 'pay-to-public-key' | 'pay-to-public-key-hash' | 'pay-to-script-hash' | 'pay-to-witness-script-hash' |
         'zerocoin-mint' | 'zerocoin-remint' | 'zerocoin-spend' | 'sigma-spend' | 'sigma-mint' | 'lelantus-mint' |
-        'lelantus-jmint' | 'lelantus-joinsplit' | 'unknown';
+        'lelantus-jmint' | 'lelantus-joinsplit' | 'elysium' | 'unknown';
     amount: number;
     isChange: boolean;
     isLocked: boolean;
     isSpent: boolean;
     isToMe: boolean;
     destination?: string;
+}
+
+type ElysiumPropertyLelantusStatus = "SoftDisabled" | "SoftEnabled" | "HardDisabled" | "HardEnabled";
+export interface ElysiumPropertyData {
+    id: number;
+    issuer: string;
+    creationTx: string;
+    isDivisible: boolean;
+    ecosystem: "main" | "test";
+    isFixed: boolean;
+    isManaged: boolean;
+    lelantusStatus: ElysiumPropertyLelantusStatus;
+    name: string;
+    category: string;
+    subcategory: string;
+    data: string;
+    url: string;
+}
+
+export interface ElysiumData {
+    isFromMe: boolean;
+    isToMe: boolean;
+    sender: string;
+    receiver: string;
+    type: string;
+    version: number;
+    valid: boolean;
+    amount?: number;
+    property?: ElysiumPropertyData;
 }
 
 export interface Transaction {
@@ -218,6 +247,7 @@ export interface Transaction {
     firstSeenAt: number;
     fee: number;
     outputs: TxOut[];
+    elysium?: ElysiumData;
 
     // blockHash MAY be set without blockHeight or blockTime, in which case the transaction is from an orphaned block.
     // If inputType is not 'mined', the transaction should be included at a later date, unless it's been double spent.
