@@ -1,7 +1,14 @@
 <template>
     <div class="search-input">
         <div class="search-icon">🔍</div>
-        <input type="text" :value="value" :placeholder="placeholder" spellcheck="false" @input="$emit('input', $event.target.value)" />
+        <input
+            type="text"
+            :value="value"
+            :placeholder="placeholder"
+            spellcheck="false"
+            @input="!lazy && $emit('input', $event.target.value)"
+            @change="lazy && $emit('input', $event.target.value)"
+        >
     </div>
 </template>
 
@@ -9,10 +16,7 @@
 export default {
     name: "SearchInput",
 
-    props: {
-        value: String,
-        placeholder: String
-    }
+    props: ['value', 'placeholder', 'lazy']
 }
 </script>
 

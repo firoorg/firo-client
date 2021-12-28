@@ -3,47 +3,56 @@
         <div class="title">Add Token</div>
 
         <div class="content">
-            <SearchInput v-model="query" placeholder="Enter the transaction ID creating the token, or its property ID" />
+            <SearchInput :lazy="true" v-model="query" placeholder="Enter the transaction ID creating the token, or its property ID" />
+
+            <div v-if="property.notFound" class="not-found">
+                Token Not Found
+            </div>
 
             <div class="token-data">
-                <div class="half-width">
+                <div class="token-name">
                     <label>Token Name</label>
                     <div class="value">{{ property.name }}</div>
                 </div>
 
-                <div class="half-width">
+                <div class="token-balance">
                     <label>Balance</label>
                     <div class="value">{{ totalBalance }}</div>
                 </div>
 
-                <div class="half-width">
+                <div class="token-category">
                     <label>Category</label>
                     <div class="value">{{ property.category }}</div>
                 </div>
 
-                <div class="half-width">
+                <div class="token-subcategory">
                     <label>Sub-Category</label>
                     <div class="value">{{ property.subcategory }}</div>
                 </div>
 
-                <div class="full-width">
+                <div class="token-description">
                     <label>Description</label>
-                    <div class="value double-height">{{ property.description }}</div>
+                    <div class="value">{{ property.description }}</div>
                 </div>
 
-                <div class="full-width">
+                <div class="token-url">
                     <label>URL</label>
                     <div class="value">
                         <a v-if="isValidUrl" @click="openExternal(property.url)" href="#">{{ property.url }}</a>
                         <template v-else>{{ property.url }}</template>
                     </div>
                 </div>
+
+                <div class="token-creation-tx">
+                    <label>Creation Transaction</label>
+                    <div class="value">{{ property.creationTx }}</div>
+                </div>
             </div>
         </div>
 
         <div class="buttons">
             <button class="solid-button unrecommended" @click="$emit('cancel')">Cancel</button>
-            <button class="solid-button recommended" @click="submit">OK</button>
+            <button :disabled="!property.id" class="solid-button recommended" @click="$emit('submit', property.id)">OK</button>
         </div>
     </div>
 </template>
@@ -66,6 +75,17 @@ export default {
         };
     },
 
+    watch: {
+        async query() {
+            try {
+                this.property = await $daemon.getElysiumPropertyInfo(Number(this.query) || this.query);
+            } catch (e) {
+                if (e.name != 'FirodErrorResponse') throw e;
+                this.property = {notFound: true};
+            }
+        }
+    },
+
     computed: {
         isValidUrl() {
             if (!this.property.url) return false;
@@ -83,54 +103,78 @@ export default {
     },
 
     methods: {
-        openExternal: electron.shell.openExternal,
-
-        async submit() {
-            this.$emit('submit', tokenId);
-        }
+        openExternal: electron.shell.openExternal
     }
 }
 </script>
 
 <style scoped lang="scss">
 .content {
+    .not-found {
+        margin-top: var(--padding-base);
+        font-weight: bold;
+    }
+
     .token-data {
         margin: var(--padding-base);
-
-        display: flex;
-        flex-wrap: wrap;
-
         text-align: left;
 
-        .half-width, .full-width {
-            flex: 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-gap: var(--padding-base);
+
+        .token-name {
+            grid-row: 1;
+            grid-column: 1;
         }
 
-        .half-width {
-            flex-basis: 50%;
+        .token-balance {
+            grid-row: 1;
+            grid-column: 2;
         }
 
-        .full-width {
-            flex-basis: 100%;
+        .token-category {
+            grid-row: 2;
+            grid-column: 1;
+        }
+
+        .token-subcategory {
+            grid-row: 2;
+            grid-column: 2;
+        }
+
+        .token-description {
+            grid-row: 3 / 4;
+            grid-column: 1 / 3;
+        }
+
+        .token-url {
+            grid-row: 5;
+            grid-column: 1 / 3;
+        }
+
+        .token-creation-tx {
+            grid-row: 6;
+            grid-column: 1 / 3;
+
+            .value {
+                // max width of a txid with our font
+                min-width: 570px;
+            }
         }
 
         label {
+            display: block;
             color: var(--color-text-secondary);
         }
 
         .value {
-            height: 1em;
-
-            &.double-height {
-                height: 3em;
-            }
-
+            cursor: text;
+            user-select: text;
             overflow: hidden;
-
-            margin: {
-                top: calc(var(--padding-base) / 2);
-                bottom: var(--padding-base);
-            }
+            min-height: 1em;
+            max-height: 4em;
+            margin-top: calc(var(--padding-base) / 2);
         }
     }
 }

@@ -101,6 +101,7 @@ export default {
         },
 
         addToken(tokenId) {
+            this.showPopup = '';
             alert(`Add token: ${tokenId}`);
         }
     }
