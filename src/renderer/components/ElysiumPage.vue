@@ -21,6 +21,10 @@
                     <PlusButton />
                     <label @click="showPopup = 'addExistingToken'">Add Existing Token</label>
                 </div>
+
+                <Popup v-if="showPopup == 'addExistingToken'">
+                    <AddTokenForm @submit="addToken" @cancel="showPopup = ''" />
+                </Popup>
             </div>
 
             <div class="right-element">
@@ -46,6 +50,7 @@ import SearchInput from "renderer/components/shared/SearchInput";
 import PlusButton from "renderer/components/shared/PlusButton";
 import Popup from "renderer/components/shared/Popup";
 import CreateTokenForm from "renderer/components/ElysiumPage/CreateTokenForm";
+import AddTokenForm from "renderer/components/ElysiumPage/AddTokenForm";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import ElysiumTokenId from "renderer/components/AnimatedTable/ElysiumTokenId";
 import ElysiumTokenTicker from "renderer/components/AnimatedTable/ElysiumTokenTicker";
@@ -68,6 +73,7 @@ export default {
         SearchInput,
         Popup,
         CreateTokenForm,
+        AddTokenForm,
         PlusButton,
         AnimatedTable
     },
@@ -92,6 +98,10 @@ export default {
     methods: {
         createToken(createTokenFormData) {
             alert(JSON.stringify(createTokenFormData));
+        },
+
+        addToken(tokenId) {
+            alert(`Add token: ${tokenId}`);
         }
     }
 }
