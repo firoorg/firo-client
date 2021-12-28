@@ -110,9 +110,9 @@ export default {
 
             for (const txo of this.userVisibleTransactions) {
                 tableData.push({
-                    id: `${txo.blockHash}-${txo.txid}-${txo.index}-${txo.isFromMe ? 'outgoing' : 'incoming'}`,
+                    id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
                     label: (this.addressBook[txo.destination] || {}).label || txo.destination,
-                    extraSearchText: (txo.isFromMe ? '-' : '+') + convertToCoin(txo.amount),
+                    extraSearchText: (txo.isFromMe ? '-' : '+') + convertToCoin(txo.amount) + (txo.elysium ? ` elysium ${txo.elysium.sender} ${txo.elysium.receiver} ${txo.elysium.amount} ${txo.elysium.property && txo.elysium.property.name}` : ''),
                     ...txo
                 });
             }

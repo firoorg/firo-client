@@ -6,36 +6,9 @@
         Label
     </th>
 
-    <td
-        v-else
-        :class="`${category}-label`"
-    >
+    <td v-else>
         <span v-if="label" class="label-text">
             {{ label }}
-        </span>
-
-        <span v-else-if="category === 'mint'">
-            Private Mint
-        </span>
-
-        <span v-else-if="category === 'mined'">
-            Mined Transaction
-        </span>
-
-        <span v-else-if="category === 'znode'">
-            Znode Payment
-        </span>
-
-        <span v-else-if="['send', 'spendOut'].includes(category)">
-            Outgoing Transaction ({{ address }})
-        </span>
-
-        <span v-else-if="['receive', 'spendIn', 'mintIn'].includes(category)">
-            Incoming Transaction ({{ address }})
-        </span>
-
-        <span v-else>
-            Unknown Transaction: This is a bug
         </span>
     </td>
 </template>
@@ -58,21 +31,11 @@ export default {
             addressBook: 'AddressBook/addressBook'
         }),
 
-        category () {
-            return this.rowData.category;
-        },
-
-        address () {
-            return this.rowData.address;
-        },
-
         label () {
             if (this.rowData.label) return this.rowData.label;
-            if (this.addressBook[this.address]) return this.addressBook[this.address].label;
-        },
-
-        paymentRequestAddress () {
-            return this.category === 'payment-request' ? this.rowData.address : null;
+            const address = this.rowData.elysium ? this.rowData.elysium.receiver || this.rowData.elysium.sender : this.rowData.address;
+            if (this.addressBook[address] && this.addressBook[address].label) return this.addressBook[address].label;
+            return address;
         }
     }
 }

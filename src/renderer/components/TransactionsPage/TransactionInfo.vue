@@ -58,7 +58,7 @@
                 </tr>
             </template>
 
-            <tr v-else-if="tx.isInstantSendLocked">
+            <tr v-else-if="tx.isInstantSendLocked && !tx.elysium">
                 <td>Status</td>
                 <td>InstantSend Locked</td>
             </tr>
@@ -88,10 +88,39 @@
                 <td>{{ tx.index }}</td>
             </tr>
 
-            <tr v-if="tx.destination">
-                <td>Recipient Address</td>
-                <td>{{ tx.destination }}</td>
+            <tr v-if="tx.elysium">
+                <td>Transaction Type</td>
+                <td>{{ tx.elysium.type }}</td>
             </tr>
+
+            <tr v-if="tx.elysium && tx.elysium.sender">
+                <td>Sender Address</td>
+                <td>{{ tx.elysium.sender }}</td>
+            </tr>
+
+            <tr v-if="tx.elysium ? tx.elysium.receiver : tx.destination">
+                <td>Recipient Address</td>
+                <td v-if="tx.elysium">{{ tx.elysium.receiver }}</td>
+                <td v-else>{{ tx.destination }}</td>
+            </tr>
+
+            <template v-if="tx.elysium && tx.elysium.property">
+                <tr>
+                    <td>Property ID</td>
+                    <td>{{ tx.elysium.property.id }}</td>
+                </tr>
+
+                <tr>
+                    <td>Property Name</td>
+                    <td>{{ tx.elysium.property.name }}</td>
+                </tr>
+
+                <tr v-if="tx.elysium.property.url">
+                    <td>Property URL</td>
+                    <td v-if="isValidUrl"><a @click="openExternal(tx.elysium.property.url)" href="#">{{ tx.elysium.property.url }}</a></td>
+                    <td v-else>{{ tx.elysium.property.url }}</td>
+                </tr>
+            </template>
 
             <tr>
                 <td>Fee</td>
@@ -100,7 +129,8 @@
 
             <tr>
                 <td>Received Amount</td>
-                <td><Amount :amount="tx.amount" ticker="FIRO" /></td>
+                <td v-if="tx.elysium"><ElysiumAmount :tx="tx" /></td>
+                <td v-else><Amount :amount="tx.amount" ticker="FIRO" /></td>
             </tr>
         </table>
 
@@ -114,6 +144,7 @@
 
 <script>
 // $emits: ok
+import electron from "electron";
 import {mapGetters} from "vuex";
 import { format } from 'date-fns'
 import Popup from "renderer/components/shared/Popup";
@@ -121,6 +152,7 @@ import Amount from "renderer/components/shared/Amount";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
 import TransactionId from "renderer/components/shared/TransactionId";
 import Copyable from "renderer/components/shared/Copyable";
+import ElysiumAmount from "renderer/components/shared/ElysiumAmount";
 
 export default {
     name: "TransactionInfo",
@@ -130,7 +162,8 @@ export default {
         Popup,
         Amount,
         TransactionId,
-        Copyable
+        Copyable,
+        ElysiumAmount
     },
 
     props: {
@@ -160,10 +193,22 @@ export default {
 
         formattedBlockTime() {
             return format(this.tx.blockTime * 1000, "hh:mm:ss, D MMM YYYY");
+        },
+
+        isValidUrl() {
+            if (!this.tx.elysium || !this.tx.elysium.property.url) return false;
+            try {
+                const parsed = new URL(this.tx.elysium.property.url);
+                return parsed.protocol === 'https:';
+            } catch {
+                return false;
+            }
         }
     },
 
     methods: {
+        openExternal: electron.shell.openExternal,
+
         copy(...ev) {
             document.ev = ev;
         },
