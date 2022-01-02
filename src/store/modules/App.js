@@ -19,6 +19,7 @@ const state = {
     firodHasStarted: false,
     allowBreakingMasternodes: false,
     temporaryFirodArguments: [],
+    enableElysium: false,
     colorTheme: 'system'
 }
 
@@ -72,6 +73,10 @@ const mutations = {
         state.allowBreakingMasternodes = value;
     },
 
+    setEnableElysium(state, value) {
+        state.enableElysium = value;
+    },
+
     setColorTheme(state, value) {
         if (!['system', 'dark', 'light'].includes(value)) {
             throw "unknown color theme value";
@@ -99,6 +104,11 @@ const actions = {
     async setTemporaryFirodArguments({commit}, value) {
         await getAppSettings().set('temporaryFirodArguments', value);
         commit('setTemporaryFirodArguments', value);
+    },
+
+    async setEnableElysium({commit}, value) {
+        await getAppSettings().set('enableElysium', value);
+        commit('setEnableElysium', value);
     },
 
     async setColorTheme({commit}, value) {
@@ -179,6 +189,7 @@ const getters = {
     // overlay.
     waitingReason: (state) => state.waitingReason,
     cachedMnemonic: (state) => state.cachedMnemonic,
+    enableElysium: (state) => state.enableElysium || false,
     colorTheme: (state) => state.colorTheme || 'system'
 }
 

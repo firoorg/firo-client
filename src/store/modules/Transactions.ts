@@ -208,12 +208,13 @@ const getters = {
     // 4) unconfirmed but InstantSend-locked Elysium transactions to us
     // 5) Elysium reference outputs
     // 6) Elysium Lelantus Mint transactions
-    userVisibleTransactions: (state, getters): TXO[] => getters.TXOs
+    userVisibleTransactions: (state, getters, rootState, rootGetters): TXO[] => getters.TXOs
         .filter((txo: TXO) =>
                 !txo.isChange &&
                 !(txo.inputPrivacy === 'mined' && !txo.blockHeight) &&
                 (
                     (
+                        rootGetters['App/enableElysium'] &&
                         txo.scriptType === 'elysium' &&
                         txo.elysium &&
                         txo.elysium.property &&

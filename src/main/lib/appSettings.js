@@ -42,4 +42,8 @@ export const populateStoreWithAppSettings = async function ({store}) {
     if (settings.colorTheme) {
         store.commit('App/setColorTheme', settings.colorTheme);
     }
+
+    if (settings.enableElysium) {
+        store.commit('App/setEnableElysium', settings.enableElysium);
+    }
 };

@@ -12,7 +12,7 @@
             Transactions
         </router-link>
 
-        <router-link to="/elysium">
+        <router-link v-if="enableElysium" to="/elysium">
             Elysium
         </router-link>
 
@@ -41,7 +41,8 @@ export default {
     name: 'MainMenu',
 
     computed: mapGetters({
-        network: 'ApiStatus/network'
+        network: 'ApiStatus/network',
+        enableElysium: 'App/enableElysium'
     })
 }
 </script>

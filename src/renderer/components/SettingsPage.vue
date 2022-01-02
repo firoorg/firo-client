@@ -38,6 +38,11 @@
                 </select>
             </div>
 
+            <div class="checkbox-option" @click="enableElysium = !enableElysium">
+                <label>Enable Elysium (Experimental)</label>
+                <input type="checkbox" :checked="enableElysium" />
+            </div>
+
             <div class="checkbox-option" @click="useTor = !useTor">
                 <label>Connect to other nodes via Tor</label>
                 <input type="checkbox" :checked="useTor" />
@@ -86,6 +91,7 @@ export default {
             hasMnemonic: 'ApiStatus/hasMnemonic',
             daemonVersion: 'ApiStatus/version',
             _colorTheme: 'App/colorTheme',
+            _enableElysium: 'App/enableElysium',
             _allowBreakingMasternodes: 'App/allowBreakingMasternodes'
         }),
 
@@ -96,6 +102,16 @@ export default {
 
             set(value) {
                 this.setAllowBreakingMasternodes(value);
+            }
+        },
+
+        enableElysium: {
+            get() {
+                return this._enableElysium;
+            },
+
+            set(value) {
+                this.setEnableElysium(value);
             }
         },
 
@@ -135,7 +151,8 @@ export default {
         }),
 
         ...mapActions({
-            setColorTheme: 'App/setColorTheme'
+            setColorTheme: 'App/setColorTheme',
+            setEnableElysium: 'App/setEnableElysium'
         }),
 
         async openBackupDialog() {
