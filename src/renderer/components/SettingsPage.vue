@@ -40,15 +40,20 @@
 
             <div class="checkbox-option" @click="useTor = !useTor">
                 <label>Connect to other nodes via Tor</label>
-                <input type="checkbox" v-model="useTor" />
+                <input type="checkbox" :checked="useTor" />
             </div>
+
             <div class="checkbox-option" @click="allowBreakingMasternodes = !allowBreakingMasternodes">
                 <label>Allow Coin Control to Break Masternodes</label>
-                <input type="checkbox" v-model="allowBreakingMasternodes" />
+                <input type="checkbox" :checked="allowBreakingMasternodes" />
             </div>
+
             <a @click="openBackupDialog">Backup Wallet</a>
+
             <a id="change-passphrase-button" @click="show = 'change-passphrase'">Change Passphrase</a>
+
             <a @click="show = 'mnemonic'">Show Recovery Phrase</a>
+
             <a @click="show = 'confirm-reset'">Reset Settings</a>
         </div>
     </div>
