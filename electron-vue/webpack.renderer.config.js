@@ -87,6 +87,13 @@ let rendererConfig = {
                 }
             },
             {
+                test: /\.svg\.data$/,
+                loader: 'url-loader',
+                options: {
+                    mimetype: 'image/svg+xml'
+                }
+            },
+            {
                 test: /\.svg$/,
                 loader: 'vue-svg-loader',
                 options: {

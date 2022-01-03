@@ -17,6 +17,13 @@
         <div class="send-detail detail" :class="{disabled: formDisabled}">
             <div class="inner">
                 <div class="top">
+                    <Dropdown
+                        v-if="enableElysium"
+                        labelText="Asset"
+                        :options="availableAssets"
+                        v-model="selectedAsset"
+                    />
+
                     <InputFrame label="Label">
                         <input
                             id="label"
@@ -171,6 +178,7 @@ import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress} from 'lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from 'lib/convert';
+import Dropdown from "renderer/components/shared/Dropdown";
 import Amount from "renderer/components/shared/Amount";
 import InputSelection from "renderer/components/SendPage/InputSelection";
 import Popup from "renderer/components/shared/Popup";
@@ -182,11 +190,13 @@ import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalanc
 import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
+import FiroSymbol from "renderer/assets/CoinIcons/FiroSymbol.svg.data";
 
 export default {
     name: 'SendPage',
 
     components: {
+        Dropdown,
         PlusButton,
         PrivatePublicBalance,
         AnimatedTable,
@@ -220,12 +230,14 @@ export default {
                 {name: AddressBookItemAddress}
             ],
             // This is the search term to filter addresses by.
-            filter: ''
+            filter: '',
+            selectedAsset: 'FIRO'
         }
     },
 
     computed: {
         ...mapGetters({
+            enableElysium: 'App/enableElysium',
             network: 'ApiStatus/network',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
@@ -236,6 +248,10 @@ export default {
             smartFeePerKb: 'ApiStatus/smartFeePerKb',
             calculateTransactionFee: 'Transactions/calculateTransactionFee'
         }),
+
+        availableAssets() {
+            return [{id: 'FIRO', name: 'Firo', icon: FiroSymbol}];
+        },
 
         transactionFee() {
             if (!this.satoshiAmount) return undefined;
