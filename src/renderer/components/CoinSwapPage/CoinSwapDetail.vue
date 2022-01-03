@@ -14,36 +14,14 @@
                     <label>Swap to FIRO</label>
                 </div>
 
-                <div class="field pseudo-input-frame">
-                    <label>{{ isSwapFrom ? 'Receive' : 'Send' }}</label>
-                    <!-- The use of option.coin below is a function of vue-select, wherein option[label] is set to the
-                         selected value rather than option itself. -->
-                    <vue-select
-                        class="select"
-                        label="coin"
-                        v-model="selectedCoin"
-                        :loading="!isSwitchainUnavailable && !doesSwitchainNotSupportFiro && !isMarketInfoLoaded"
-                        :disabled="formDisabled || isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
-                        :options="remoteCoins"
-                        :placeholder="(isSwitchainUnavailable && 'Switchain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
-                    >
-                        <template v-slot:option="option">
-                            <div class="coin-option">
-                                <CoinIcon :coin="option.coin" :width="20" :height="20" />
-                                <div class="coin-short-name">{{ option.coin }}</div>
-                                <div class="coin-name">{{ CoinNames[option.coin] }}</div>
-                            </div>
-                        </template>
-
-                        <template v-slot:selected-option="option">
-                            <div class="coin-option" v-if="option">
-                                <CoinIcon :coin="option.coin" :width="20" :height="20" />
-                                <div class="coin-short-name">{{ option.coin }}</div>
-                                <div class="coin-name">{{ CoinNames[option.coin] }}</div>
-                            </div>
-                        </template>
-                    </vue-select>
-                </div>
+                <Dropdown
+                    :label-text="isSwapFrom ? 'Receive' : 'Send'"
+                    :disabled="formDisabled || isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
+                    :loading="!isSwitchainUnavailable && !doesSwitchainNotSupportFiro && !isMarketInfoLoaded"
+                    :empty-text="(isSwitchainUnavailable && 'Switchain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
+                    :options="remoteCoins"
+                    v-model="selectedCoin"
+                />
 
                 <InputFrame label="Amount" :unit="isSwapFrom ? 'FIRO' : selectedCoin">
                     <input
@@ -172,16 +150,64 @@ import { mapGetters } from 'vuex';
 import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro';
 import CoinSwapFlowToFiro from "renderer/components/CoinSwapPage/CoinSwapFlowToFiro";
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
-import { VueSelect } from 'vue-select';
 import APIWorker from 'lib/switchain-api';
 import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
 import CircularTimer from 'renderer/components/Icons/CircularTimer';
-import CoinIcon from './CoinIcon';
 import SwitchainIcon from 'renderer/components/Icons/SwitchainIcon';
 import BackButtonIcon from 'renderer/components/Icons/BackButtonIcon';
 import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
 import {FirodErrorResponse} from "daemon/firod";
 import InputFrame from "renderer/components/shared/InputFrame";
+import Dropdown from "renderer/components/shared/Dropdown";
+
+import FIROIcon from "renderer/assets/CoinIcons/FIRO.svg.data";
+import BNBIcon from "renderer/assets/CoinIcons/BNB.svg.data";
+import BTCIcon from "renderer/assets/CoinIcons/BTC.svg.data";
+import DAIIcon from "renderer/assets/CoinIcons/DAI.svg.data";
+import DASHIcon from "renderer/assets/CoinIcons/DASH.svg.data";
+import DCRIcon from "renderer/assets/CoinIcons/DCR.svg.data";
+import ETHIcon from "renderer/assets/CoinIcons/ETH.svg.data";
+import LTCIcon from "renderer/assets/CoinIcons/LTC.svg.data";
+import PAXIcon from "renderer/assets/CoinIcons/PAX.svg.data";
+import USDCIcon from "renderer/assets/CoinIcons/USDC.svg.data";
+import USDTIcon from "renderer/assets/CoinIcons/USDT.svg.data";
+import XLMIcon from "renderer/assets/CoinIcons/XLM.svg.data";
+import XRPIcon from "renderer/assets/CoinIcons/XRP.svg.data";
+import ZECIcon from "renderer/assets/CoinIcons/ZEC.svg.data";
+
+const CoinIcons = {
+    FIRO: FIROIcon,
+    BTC: BTCIcon,
+    ETH: ETHIcon,
+    ZEC: ZECIcon,
+    LTC: LTCIcon,
+    XRP: XRPIcon,
+    XLM: XLMIcon,
+    BNB: BNBIcon,
+    USDT: USDTIcon,
+    USDC: USDCIcon,
+    DAI: DAIIcon,
+    DASH: DASHIcon,
+    DCR: DCRIcon,
+    PAX: PAXIcon,
+};
+
+const CoinNames = {
+    FIRO: "Firo",
+    BTC: "Bitcoin",
+    ETH: "Ethereum",
+    ZEC: "ZCash",
+    LTC: "Litecoin",
+    XRP: "Ripple",
+    XLM: "Stellar",
+    BNB: "Binance Coin",
+    USDT: "Tether",
+    USDC: "USD Coin",
+    DAI: "Dai",
+    DASH: "Dash",
+    DCR: "Decred",
+    PAX: "Paxos Standard",
+};
 
 // This is the list of currency pairs that we want to be available in the app. It is not necessarily symmetrical, and it
 // is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
@@ -215,23 +241,6 @@ const AllowedPairs = [
     "PAX-FIRO",
 ];
 
-const CoinNames = {
-    FIRO: "Firo",
-    BTC: "Bitcoin",
-    ETH: "Ethereum",
-    ZEC: "ZCash",
-    LTC: "Litecoin",
-    XRP: "Ripple",
-    XLM: "Stellar",
-    BNB: "Binance Coin",
-    USDT: "Tether",
-    USDC: "USD Coin",
-    DAI: "Dai",
-    DASH: "Dash",
-    DCR: "Decred",
-    PAX: "Paxos Standard",
-};
-
 const AddressValidations = {};
 for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'USDT', 'USDC', 'DASH', 'DCR', 'PAX']) {
     AddressValidations[coin] = (address) => {
@@ -252,13 +261,12 @@ export default {
     name: 'CoinSwapDetail',
 
     components: {
+        Dropdown,
         InputFrame,
         CoinSwapFlowToFiro,
         CoinSwapFlowFromFiro,
-        VueSelect,
         LoadingBounce,
         CircularTimer,
-        CoinIcon,
         SwitchainIcon,
         BackButtonIcon,
         PrivatePublicBalance
@@ -280,7 +288,7 @@ export default {
             // This is used so we can clear an interval created on startup to refresh market info.
             refreshOffersIntervalId: null,
             feeMap: {},
-            selectedCoin: null,
+            selectedCoin: '',
             amount: '',
             address: ''
         };
@@ -558,7 +566,14 @@ export default {
         },
 
         remoteCoins() {
-            return this.isSwapFrom ? this.coinsFromFiro : this.coinsToFiro;
+            return (this.isSwapFrom ? this.coinsFromFiro : this.coinsToFiro).map(pair => {
+                const coin = pair.split('-').find(x => x !== 'FIRO');
+                return {
+                    id: coin,
+                    icon: CoinIcons[coin],
+                    name: CoinNames[coin]
+                }
+            });
         },
 
         firoPair() {
@@ -711,76 +726,8 @@ export default {
             }
 
             // :first-child is .switchain-icon
-            .field:not(:nth-child(2)) {
+            .dropdown, .field:not(:nth-child(2)) {
                 margin-top: var(--padding-base);
-            }
-
-            .pseudo-input-frame {
-                position: relative;
-                height: 50px;
-
-                label {
-                    position: absolute;
-                    left: 9px;
-                    font-size: 12px;
-                    letter-spacing: 0.4px;
-                    background-color: var(--color-background-sidebar);
-                    z-index: var(--z-input-frame-label);
-                    padding: {
-                        left: 5px;
-                        right: 5px;
-                    }
-                }
-
-                .v-select {
-                    position: absolute;
-                    top: 6px;
-                    bottom: 0;
-                    right: 0;
-                    left: 0;
-
-                    height: 36px;
-
-                    .dropdown-toggle {
-                        font-weight: bold;
-                        height: 100%;
-                        width: 100%;
-                        padding: {
-                            top: 11px;
-                            bottom: 11px;
-                            left: 14px;
-                            right: 14px;
-                        }
-                        background-color: inherit;
-                        border: none;
-                        outline: none;
-                    }
-
-                    .coin-option {
-                        display: flex;
-                        align-items: center;
-
-                        .coin-short-name {
-                            border: {
-                                width: 1px;
-                                style: solid;
-                                color: var(--color-text-subtle-border);
-                                radius: 5px;
-                            }
-                            padding: {
-                                top: 2px;
-                                bottom: 2px;
-                                left: 2px;
-                                right: 2px;
-                            }
-                            margin-left: 8px;
-                        }
-
-                        .coin-name {
-                            padding-left: 8px;
-                        }
-                    }
-                }
             }
 
             .totals {
