@@ -74,6 +74,17 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
     }, 60e3);
 });
 
+// Make sure we always have information about our selected tokens.
+$store.watch(() => $store.getters['Elysium/selectedTokens'], async (coins) => {
+    while (!window.$daemon) await new Promise(r => setTimeout(r, 1e3));
+
+    const tokenData = $store.getters['Elysium/tokenData'];
+    const coinsNeedingData = coins.filter(coin => !tokenData[coin]);
+    const coinData = await Promise.all(coinsNeedingData.map(coin => $daemon.getElysiumPropertyInfo(coin)));
+
+    $store.commit('Elysium/addTokenData', coinData);
+}, {immediate: true});
+
 // Show the waiting screen with reason, or, if reason may be undefined, close it.
 //
 // Note that the app starts off with the reason "Loading..." in order to not show the main window for a short time

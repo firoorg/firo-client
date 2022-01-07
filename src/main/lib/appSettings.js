@@ -46,4 +46,9 @@ export const populateStoreWithAppSettings = async function ({store}) {
     if (settings.enableElysium) {
         store.commit('App/setEnableElysium', settings.enableElysium);
     }
+
+    if (settings.selectedElysiumTokens) {
+        console.log(`sET: ${JSON.stringify(settings.selectedElysiumTokens)}`);
+        store.commit('Elysium/addSelectedTokens', settings.selectedElysiumTokens);
+    }
 };

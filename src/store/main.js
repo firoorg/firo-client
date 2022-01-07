@@ -10,6 +10,7 @@ import App from "store/modules/App";
 import Balance from "store/modules/Balance";
 import Blockchain from "store/modules/Blockchain";
 import CoinSwap from "store/modules/CoinSwap";
+import Elysium from "store/modules/Elysium";
 import Masternode from "store/modules/Masternode";
 import Settings from "store/modules/Settings";
 import Transactions from "store/modules/Transactions";
@@ -30,6 +31,7 @@ const store = new Vuex.Store({
         Balance,
         Blockchain,
         CoinSwap,
+        Elysium,
         Masternode,
         Settings,
         Transactions

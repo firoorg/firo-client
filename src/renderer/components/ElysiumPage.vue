@@ -35,17 +35,16 @@
             </div>
         </div>
 
-        <div class="animated-table-container">
-            <AnimatedTable
-                no-data-message="You haven't added any tokens yet."
-                :data="myTokensTableData"
-                :fields="myTokensTableFields"
-            />
-        </div>
+        <AnimatedTable
+            no-data-message="You haven't added any tokens yet."
+            :data="myTokensTableData"
+            :fields="myTokensTableFields"
+        />
     </div>
 </template>
 
 <script>
+import {mapActions, mapGetters} from "vuex";
 import SearchInput from "renderer/components/shared/SearchInput";
 import PlusButton from "renderer/components/shared/PlusButton";
 import Popup from "renderer/components/shared/Popup";
@@ -82,27 +81,46 @@ export default {
         return {
             searchInput: '',
             showPopup: '',
-            myTokensTableFields,
-            myTokensTableData: [
-                {
-                    id: 1,
-                    name: 'Test Token',
-                    ticker: 'TT',
-                    privateBalance: 1e8,
-                    publicBalance: 1e8+143,
-                }
-            ]
+            myTokensTableFields
         };
     },
 
+    computed: {
+        ...mapGetters({
+            selectedTokens: 'Elysium/selectedTokens',
+            tokenData: 'Elysium/tokenData'
+        }),
+
+        myTokensTableData() {
+            return this.selectedTokens
+                .map(tk => this.tokenData[tk])
+                .filter(tk => tk)
+                .map(tk => {
+                    const m = tk.name.match(/^(.*) \(([A-Z0-9]{3,4})\)$/);
+
+                    return {
+                        id: tk.id,
+                        name: m ? m[1] : tk.name,
+                        ticker: m ? m[2] : `E:${tk.id}`,
+                        privateBalance: 0,
+                        publicBalance: 0
+                    };
+                });
+        }
+    },
+
     methods: {
+        ...mapActions({
+            addSelectedTokens: 'Elysium/addSelectedTokens'
+        }),
+
         createToken(createTokenFormData) {
             alert(JSON.stringify(createTokenFormData));
         },
 
         addToken(tokenId) {
             this.showPopup = '';
-            alert(`Add token: ${tokenId}`);
+            this.addSelectedTokens([tokenId]);
         }
     }
 }
@@ -112,6 +130,9 @@ export default {
 .elysium-page {
     height: 100%;
     padding: var(--padding-base);
+
+    display: flex;
+    flex-direction: column;
 
     .header {
         width: 100%;
@@ -136,6 +157,10 @@ export default {
                 cursor: pointer;
             }
         }
+    }
+
+    .animated-table {
+        flex-grow: 1;
     }
 }
 </style>
