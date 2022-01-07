@@ -190,7 +190,7 @@ import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalanc
 import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
-import FiroSymbol from "renderer/assets/CoinIcons/Firo.svg.data";
+import FiroSymbol from "renderer/assets/CoinIcons/FIRO.svg.data";
 
 export default {
     name: 'SendPage',
