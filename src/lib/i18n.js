@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 
-import types from 'store/types'
 import languages from 'lang'
 import dateTimeFormats from 'lang/dateTimeFormats'
 
@@ -33,7 +32,7 @@ export function setupLocales ({ store }) {
         }
     }, {})
 
-    store.dispatch(types.settings.SET_AVAILABLE_LOCALES, locales)
+    store.dispatch('SET_AVAILABLE_LOCALES', locales)
 }
 
 export function getLocale ({ app, store }) {
@@ -52,7 +51,7 @@ export function getModule ({ app, store, onLocaleChange }) {
     Vue.use(VueI18n)
 
     store.subscribe((mutation, state) => {
-        if (mutation.type !== types.settings.SET_LOCALE) {
+        if (mutation.type !== 'SET_LOCALE') {
             return
         }
 

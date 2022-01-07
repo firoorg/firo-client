@@ -5,18 +5,14 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import AddressBook from "store/modules/AddressBook";
-import AddressValidation from "store/modules/AddressValidation";
 import ApiStatus from "store/modules/ApiStatus";
 import App from "store/modules/App";
 import Balance from "store/modules/Balance";
 import Blockchain from "store/modules/Blockchain";
 import CoinSwap from "store/modules/CoinSwap";
 import Masternode from "store/modules/Masternode";
-import Notification from "store/modules/Notification";
-import PaymentRequest from "store/modules/PaymentRequest";
 import Settings from "store/modules/Settings";
 import Transactions from "store/modules/Transactions";
-import Window from "store/modules/Window";
 
 import { createLogger } from 'lib/logger'
 
@@ -29,18 +25,14 @@ const clients = []
 const store = new Vuex.Store({
     modules: {
         AddressBook,
-        AddressValidation,
         ApiStatus,
         App,
         Balance,
         Blockchain,
         CoinSwap,
         Masternode,
-        Notification,
-        PaymentRequest,
         Settings,
-        Transactions,
-        Window
+        Transactions
     }
 })
 

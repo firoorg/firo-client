@@ -1,5 +1,4 @@
 import { format } from 'util'
-import * as types from '../types/Settings'
 import { createLogger } from 'lib/logger'
 
 const logger = createLogger('firo:store:settings')
@@ -31,9 +30,9 @@ const state = {
 }
 
 const mutations = {
-    [types.UPDATE_SETTING] () {},
+    UPDATE_SETTING() {},
 
-    [types.MNEMONIC_WARNING_SETTING] (state, showW) {
+    MNEMONIC_WARNING_SETTING(state, showW) {
         state.showWarning = showW
     },
 
@@ -43,7 +42,7 @@ const mutations = {
 }
 
 const actions = {
-    [types.SET_INITIAL_STATE] ({ state, commit, getters }, initialState) {
+    SET_INITIAL_STATE({ state, commit, getters }, initialState) {
         logger.info('got initial settings state %o', initialState)
 
         if (!initialState) return;
@@ -54,7 +53,7 @@ const actions = {
         })
     },
 
-    [types.ON_SETTINGS_SUBSCRIPTION] ({ state, commit, getters }, data) {
+    ON_SETTINGS_SUBSCRIPTION({ state, commit, getters }, data) {
         if (!data) return;
 
         commit.setDaemonSettings({ state, commit, getters }, {
@@ -63,8 +62,8 @@ const actions = {
         })
     },
 
-    [types.MNEMONIC_WARNING_SETTING] ({ state, commit }, showW) {
-        commit(types.MNEMONIC_WARNING_SETTING, showW);
+    MNEMONIC_WARNING_SETTING({ state, commit }, showW) {
+        commit('MNEMONIC_WARNING_SETTING', showW);
     },
 }
 

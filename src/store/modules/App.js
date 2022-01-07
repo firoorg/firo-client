@@ -1,7 +1,5 @@
-import fs from 'fs'
 import path from 'path'
 import {homedir} from 'os'
-import * as types from '../types/App'
 import { getAppSettings, getApp } from 'lib/utils'
 import { createLogger } from 'lib/logger'
 
