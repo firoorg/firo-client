@@ -56,7 +56,7 @@ function isFirodResponseMessage(x: any): x is FirodResponseMessage {
         typeof x.meta === 'object' &&
         typeof x.meta.status === 'number' &&
         (
-            (x.error === null && x.data !== null) ||
+            (x.error === null && x.data !== undefined) ||
             (
                 x.data === null &&
                 x.error !== null &&
