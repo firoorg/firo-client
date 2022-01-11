@@ -1507,6 +1507,26 @@ export class Firod {
         return <string[]>data;
     }
 
+    // Create an Elysium property, returning the ID of the create property transaction. This will throw if we don't have
+    // more than 0.002 public FIRO in a single address.
+    async createElysiumProperty(auth: string, isFixed: boolean, isDivisible: boolean, amount: string | undefined,
+                                name: string, category: string, subcategory: string, data: string,
+                                url: string): Promise<string> {
+        if (!isFixed && amount) throw 'managed properties should not put in an amount';
+
+        return <string>await this.send(auth, null, 'createElysiumProperty', {
+            isFixed,
+            isDivisible,
+            amount,
+            name,
+            category,
+            subcategory,
+            data,
+            url
+        });
+
+    }
+
     // Get information about an Elysium property from its property id or from the tx that created it.
     async getElysiumPropertyInfo(property: number | string): Promise<ElysiumPropertyData> {
         if (typeof property == 'number') {

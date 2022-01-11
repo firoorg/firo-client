@@ -48,7 +48,7 @@
                     name="issuanceAmount"
                     placeholder="Issuance Amount"
                     v-model="issuanceAmount"
-                    v-validate="{required: true, min_value: isDivisible ? 0.00000001 : 1, max_value: isDivisible ? 92233720368 : 9223372036854775807, integer: !isDivisible}"
+                    v-validate="{required: true, min_value: isDivisible ? 0.00000001 : 1, max_value: isDivisible ? 92233720368 : 9223372036854775807, integer: true}"
                     v-tooltip="getValidationTooltip('issuanceAmount')"
                 >
 

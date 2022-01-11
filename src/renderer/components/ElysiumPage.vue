@@ -1,5 +1,9 @@
 <template>
     <div class="elysium-page">
+        <Popup v-if="showPopup == 'passphrase'">
+            <PassphraseInput :error="passphraseError" v-model="passphrase" @cancel="showPopup = ''" @confirm="completeCreateToken" />
+        </Popup>
+
         <div class="header">
             <div class="search-input-holder">
                 <SearchInput v-model="searchInput" placeholder="Search by token id, ticker, or name" />
@@ -12,7 +16,7 @@
                 </div>
 
                 <Popup v-if="showPopup == 'createToken'">
-                    <CreateTokenForm @submit="createToken" @cancel="createTokenFormData = {}; showPopup = ''" />
+                    <CreateTokenForm @submit="beginCreateToken" @cancel="createTokenFormData = {}; showPopup = ''" />
                 </Popup>
             </div>
 
@@ -56,6 +60,7 @@ import ElysiumTokenTicker from "renderer/components/AnimatedTable/ElysiumTokenTi
 import ElysiumTokenName from "renderer/components/AnimatedTable/ElysiumTokenName";
 import ElysiumTokenPrivateBalance from "renderer/components/AnimatedTable/ElysiumTokenPrivateBalance";
 import ElysiumTokenPublicBalance from "renderer/components/AnimatedTable/ElysiumTokenPublicBalance";
+import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
 const myTokensTableFields = [
     {name: ElysiumTokenId},
@@ -69,6 +74,7 @@ export default {
     name: "ElysiumPage",
 
     components: {
+        PassphraseInput,
         SearchInput,
         Popup,
         CreateTokenForm,
@@ -79,9 +85,12 @@ export default {
 
     data() {
         return {
+            myTokensTableFields,
             searchInput: '',
             showPopup: '',
-            myTokensTableFields
+            passphrase: '',
+            passphraseError: null,
+            newTokenData: null
         };
     },
 
@@ -114,8 +123,23 @@ export default {
             addSelectedTokens: 'Elysium/addSelectedTokens'
         }),
 
-        createToken(createTokenFormData) {
-            alert(JSON.stringify(createTokenFormData));
+        async beginCreateToken(tokenData) {
+            this.newTokenData = tokenData;
+            this.showPopup = 'passphrase';
+        },
+
+        async completeCreateToken() {
+            const d = this.newTokenData;
+            try {
+                await $daemon.createElysiumProperty(this.passphrase, true, d.isDivisible,
+                    d.isDivisible ? `${d.issuanceAmount}000000` : d.issuanceAmount, d.name,
+                    d.category, d.subcategory, d.description, d.url);
+
+                this.showPopup = '';
+                this.newTokenData = null;
+            } catch (e) {
+                this.passphraseError = e.message;
+            }
         },
 
         addToken(tokenId) {
