@@ -16,7 +16,7 @@ export default {
 
     computed: {
         amount() {
-            return this.tx.elysium.property.isDivisible ? this.tx.elysium.amount * 1e2 : this.tx.elysium.amount * 1e8;
+            return this.tx.elysium.property.isDivisible ? this.tx.elysium.amount : this.tx.elysium.amount * 1e8;
         },
 
         ticker() {

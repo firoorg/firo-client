@@ -132,7 +132,7 @@ export default {
             const d = this.newTokenData;
             try {
                 await $daemon.createElysiumProperty(this.passphrase, true, d.isDivisible,
-                    d.isDivisible ? `${d.issuanceAmount}000000` : d.issuanceAmount, d.name,
+                    d.isDivisible ? `${d.issuanceAmount}00000000` : d.issuanceAmount, d.name,
                     d.category, d.subcategory, d.description, d.url);
 
                 this.showPopup = '';
