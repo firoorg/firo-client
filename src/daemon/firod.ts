@@ -34,7 +34,7 @@ function isStandardFirodRequest(x): x is StandardFirodRequest {
         x.auth !== null &&
         typeof x.auth === 'object' &&
         (x.auth.passphrase === null || typeof x.auth.passphrase === 'string') &&
-        typeof x.type === 'string' &&
+        (typeof x.type === 'string' || x.type === null) &&
         typeof x.collection === 'string';
 }
 
@@ -1099,10 +1099,7 @@ export class Firod {
 
         let callName = '<unknown>';
         if (isStandardFirodRequest(message)) {
-            callName = `${message.type}/${message.collection}`;
-        } else { // fixme
-            console.log('<unknown>');
-            console.log(message);
+            callName = message.type ? `${message.type}/${message.collection}` : message.collection;
         }
 
         logger.silly(`Trying to acquire requestMutex for ${callName}...`);
