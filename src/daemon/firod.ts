@@ -1507,6 +1507,13 @@ export class Firod {
         return <string[]>data;
     }
 
+    async mintElysium(auth: string, address: string, propertyId: number): Promise<string | null> {
+        return <string | null>await this.send(auth, null, 'mintElysium', {
+            address,
+            propertyId
+        });
+    }
+
     // Create an Elysium property, returning the ID of the create property transaction. This will throw if we don't have
     // more than 0.002 public FIRO in a single address.
     async createElysiumProperty(auth: string, isFixed: boolean, isDivisible: boolean, amount: string | undefined,
