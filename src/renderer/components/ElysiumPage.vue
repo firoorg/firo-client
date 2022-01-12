@@ -97,7 +97,8 @@ export default {
     computed: {
         ...mapGetters({
             selectedTokens: 'Elysium/selectedTokens',
-            tokenData: 'Elysium/tokenData'
+            tokenData: 'Elysium/tokenData',
+            aggregatedBalances: 'Elysium/aggregatedBalances'
         }),
 
         myTokensTableData() {
@@ -106,13 +107,14 @@ export default {
                 .filter(tk => tk)
                 .map(tk => {
                     const m = tk.name.match(/^(.*) \(([A-Z0-9]{3,4})\)$/);
+                    const b = this.aggregatedBalances[tk.id] || {priv: 0, pending: 0};
 
                     return {
                         id: tk.id,
                         name: m ? m[1] : tk.name,
                         ticker: m ? m[2] : `E:${tk.id}`,
-                        privateBalance: 0,
-                        publicBalance: 0
+                        privateBalance: b.priv,
+                        publicBalance: b.pending
                     };
                 });
         }

@@ -228,12 +228,17 @@ export interface ElysiumPropertyData {
     url: string;
 }
 
+type ElysiumTransactionType = "Simple Send" | "Restricted Send" | "Send All" | "Savings" | "Savings COMPROMISED" |
+    "Rate-Limiting" | "Automatic Dispensary" | "Create Property - Fixed" | "Create Property - Variable" |
+    "Create Property - Manual" | "Grant Property Tokens" | "Revoke Property Tokens" | "Change Issuer Address" |
+    "Enable Freezing" | "Disable Freezing" | "Freeze Property Tokens" | "Unfreeze Property Tokens" | "Notification" |
+    "ALERT" | "Feature Deactivation" | "Feature Activation" | "Lelantus Mint" | "Lelantus JoinSplit" |
+    "Change Lelantus Status" | "* unknown type *";
 export interface ElysiumData {
-    isFromMe: boolean;
     isToMe: boolean;
     sender: string;
     receiver: string;
-    type: string;
+    type: ElysiumTransactionType;
     version: number;
     valid: boolean;
     amount?: number;
