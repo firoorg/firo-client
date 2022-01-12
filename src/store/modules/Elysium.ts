@@ -90,6 +90,16 @@ const getters = {
         return r;
     },
 
+    tokensNeedingAnonymization: (state, getters) => {
+        const r = [];
+        for (const token of Object.keys(getters.balances)) {
+            for (const addr of Object.keys(getters.balances[token].pub)) {
+                r.push([Number(token), addr]);
+            }
+        }
+        return r;
+    },
+
     selectedTokens: (state) => Object.keys(state.selectedTokens).map(Number).sort((a, b) => a-b),
     tokenData: (state) => state.tokenData
 };

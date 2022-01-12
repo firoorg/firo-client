@@ -31,7 +31,8 @@ export default {
     },
 
     computed: mapGetters({
-        availablePublic: 'Balance/availablePublic'
+        availablePublic: 'Balance/availablePublic',
+        tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization'
     }),
 
     methods: {
@@ -62,6 +63,25 @@ export default {
                     this.error = `${e}`;
                 }
 
+                this.waiting = false;
+                return;
+            }
+
+            const elysiumErrors = [];
+            for (const [token, address] of this.tokensNeedingAnonymization) {
+                try {
+                    await $daemon.mintElysium(passphrase, address, token);
+                } catch (e) {
+                    if (e instanceof FirodErrorResponse) {
+                        elysiumErrors.push(e.errorMessage);
+                    } else {
+                        elysiumErrors.push(`${e}`);
+                    }
+                }
+            }
+            console.log(elysiumErrors);
+            if (elysiumErrors.length) {
+                this.error = JSON.stringify(elysiumErrors);
                 this.waiting = false;
                 return;
             }

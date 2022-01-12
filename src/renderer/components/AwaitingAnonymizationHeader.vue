@@ -2,8 +2,24 @@
     <div>
         <div class="warning-header">
             <div>
-                {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
-                <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure them.
+                <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
+                    {{ convertToCoin(availablePublic) }} FIRO and {{ nTokensNeedingAnonymization }} Elysium tokens
+                    awaiting anonymization.
+                </span>
+                <span v-else-if="availablePublic && nTokensNeedingAnonymization">
+                    {{ convertToCoin(availablePublic) }} FIRO and 1 Elysium token awaiting anonymization.
+                </span>
+                <span v-else-if="nTokensNeedingAnonymization > 1">
+                    {{ nTokensNeedingAnonymization }} Elysium tokens awaiting anonymization.
+                </span>
+                <span v-else-if="nTokensNeedingAnonymization">
+                    1 Elysium token awaiting anonymization.
+                </span>
+                <span v-else-if="availablePublic">
+                    {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
+                </span>
+                <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure
+                {{ nTokensNeedingAnonymization > 1 || availablePublic ? "them" : "it" }}.
             </div>
         </div>
 
@@ -36,16 +52,21 @@ export default {
         };
     },
 
-    computed: mapGetters({
-        availablePublic: 'Balance/availablePublic'
-    }),
+    computed: {
+        ...mapGetters({
+            availablePublic: 'Balance/availablePublic',
+            enableElysium: 'App/enableElysium',
+            tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization'
+        }),
+
+        nTokensNeedingAnonymization() {
+            if (!this.enableElysium) return 0;
+            return this.tokensNeedingAnonymization.map(x=>x[0]).sort().reduce((a, x) => a[a.length-1] == x ? a : [...a, x], []).length;
+        }
+    },
 
     methods: {
         convertToCoin,
-
-        anonymizeFunds() {
-            this. true;
-        },
 
         closeDialog() {
             this.showAnonymizeDialog = false;
