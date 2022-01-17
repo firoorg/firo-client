@@ -106,15 +106,14 @@ export default {
                 .map(tk => this.tokenData[tk])
                 .filter(tk => tk)
                 .map(tk => {
-                    const m = tk.name.match(/^(.*) \(([A-Z0-9]{3,4})\)$/);
                     const b = this.aggregatedBalances[tk.id] || {priv: 0, pending: 0};
 
                     return {
                         id: tk.id,
-                        name: m ? m[1] : tk.name,
-                        ticker: m ? m[2] : `E:${tk.id}`,
-                        privateBalance: b.priv,
-                        publicBalance: b.pending
+                        name: tk.nameMinusTicker,
+                        ticker: tk.ticker,
+                        privateBalance: tk.isDivisible ? b.priv : `${b.priv}`,
+                        publicBalance: tk.isDivisible ? b.pending : `${b.pending}`
                     };
                 });
         }

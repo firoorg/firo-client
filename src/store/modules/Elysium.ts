@@ -12,7 +12,8 @@ const state = {
 const mutations = {
     addTokenData(state, tokenData: ElysiumPropertyData[]) {
         for (const token of tokenData) {
-            Vue.set(state.tokenData, token.id, token);
+            const m = token.name.match(/^(.*) \(([A-Z0-9]{1,4})\)$/);
+            Vue.set(state.tokenData, token.id, {...token, nameMinusTicker: m ? m[1] : token.name, ticker: m ? m[2] : `E:${token.id}`});
         }
     },
 
