@@ -51,43 +51,39 @@ export default {
             this.passphrase = '';
             this.waiting = true;
 
-            try {
-                const r = await $daemon.mintAllLelantus(passphrase);
-                $store.commit('Transactions/markSpentTransaction', r.inputs);
-            } catch (e) {
-                if (e instanceof IncorrectPassphrase) {
-                    this.error = 'Incorrect Passphrase';
-                } else if (e instanceof FirodErrorResponse) {
-                    this.error = e.errorMessage;
-                } else {
-                    this.error = `${e}`;
-                }
+            const errors = [];
 
-                this.waiting = false;
-                return;
-            }
-
-            const elysiumErrors = [];
             for (const [token, address] of this.tokensNeedingAnonymization) {
                 try {
                     await $daemon.mintElysium(passphrase, address, token);
                 } catch (e) {
-                    if (e instanceof FirodErrorResponse) {
-                        elysiumErrors.push(e.errorMessage);
+                    if (e instanceof IncorrectPassphrase) {
+                        this.error = 'Incorrect Passphrase';
+                        this.waiting = false;
+                        return;
+                    } else if (e instanceof FirodErrorResponse) {
+                        errors.push(e.errorMessage);
                     } else {
-                        elysiumErrors.push(`${e}`);
+                        errors.push(`${e}`);
                     }
                 }
             }
-            console.log(elysiumErrors);
-            if (elysiumErrors.length) {
-                this.error = JSON.stringify(elysiumErrors);
-                this.waiting = false;
-                return;
+
+            try {
+                const r = await $daemon.mintAllLelantus(passphrase);
+                $store.commit('Transactions/markSpentTransaction', r.inputs);
+            } catch (e) {
+                if (e instanceof FirodErrorResponse) {
+                    errors.unshift(e.errorMessage);
+                } else {
+                    errors.unshift(`${e}`);
+                }
             }
 
             this.waiting = false;
-            this.$emit('complete');
+
+            if (errors.length) this.error = JSON.stringify(errors);
+            else this.$emit('complete');
         }
     }
 }

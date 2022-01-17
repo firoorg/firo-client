@@ -119,8 +119,8 @@ export default {
         async submit() {
             if (!await this.$validator.validateAll()) return;
 
-            const r = {};
-            for (const p of ['name', 'ticker', 'category', 'subcategory', 'issuanceAmount', 'isDivisible', 'description', 'url']) {
+            const r = {name: `${this.name} (${this.ticker})`};
+            for (const p of ['category', 'subcategory', 'issuanceAmount', 'isDivisible', 'description', 'url']) {
                 r[p] = this[p];
             }
             this.$emit('submit', r);

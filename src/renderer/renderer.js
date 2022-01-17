@@ -22,7 +22,7 @@ import router from './router'
 import store from '../store/renderer'
 
 import firod from '../daemon/init'
-
+import {getAppSettings} from "lib/utils";
 import {convertToCoin} from "lib/convert";
 
 import { createLogger } from 'lib/logger';
@@ -75,14 +75,19 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
 });
 
 // Make sure we always have information about our selected tokens.
-$store.watch(() => $store.getters['Elysium/selectedTokens'], async (coins) => {
-    while (!window.$daemon) await new Promise(r => setTimeout(r, 1e3));
+$store.watch(() => $store.getters['Elysium/selectedTokens'], async () => {
+    while (!window.$daemon || !$store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
+    const coins = $store.getters['Elysium/selectedTokens'] || [];
 
     const tokenData = $store.getters['Elysium/tokenData'];
     const coinsNeedingData = coins.filter(coin => !tokenData[coin]);
     const coinData = await Promise.all(coinsNeedingData.map(coin => $daemon.getElysiumPropertyInfo(coin)));
 
     $store.commit('Elysium/addTokenData', coinData);
+
+    if ($store.getters['Elysium/hasModifiedSelectedTokens']) {
+        await getAppSettings().set('selectedElysiumTokens', $store.getters['Elysium/allSelectedTokens']);
+    }
 }, {immediate: true});
 
 // Show the waiting screen with reason, or, if reason may be undefined, close it.
