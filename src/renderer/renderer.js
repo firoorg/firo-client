@@ -5,6 +5,7 @@ import VeeValidate from 'vee-validate'
 import AsyncComputed from "vue-async-computed";
 import Focus from 'renderer/directives/focus'
 
+import {isEqual} from 'lodash';
 import Big from 'big.js';
 import {existsSync} from 'fs';
 
@@ -75,6 +76,7 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
 });
 
 // Make sure we always have information about our selected tokens.
+let lastSelectedTokens = [];
 $store.watch(() => $store.getters['Elysium/selectedTokens'], async () => {
     while (!window.$daemon || !$store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
     const coins = $store.getters['Elysium/selectedTokens'] || [];
@@ -85,8 +87,9 @@ $store.watch(() => $store.getters['Elysium/selectedTokens'], async () => {
 
     $store.commit('Elysium/addTokenData', coinData);
 
-    if ($store.getters['Elysium/hasModifiedSelectedTokens']) {
+    if ($store.getters['Elysium/hasModifiedSelectedTokens'] && !isEqual(coins.sort(), lastSelectedTokens.sort())) {
         await getAppSettings().set('selectedElysiumTokens', $store.getters['Elysium/allSelectedTokens']);
+        lastSelectedTokens = coins.sort();
     }
 }, {immediate: true});
 
