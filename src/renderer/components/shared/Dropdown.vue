@@ -108,7 +108,7 @@ export default {
         }
 
         .dropdown-menu > .highlight > a {
-            background: var(--color-background-tag);
+            background: var(--color-secondary-tag-background);
         }
 
         .dropdown-toggle {
