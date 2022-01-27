@@ -36,21 +36,22 @@
                 <input
                     class="smooth-input"
                     type="text"
-                    placeholder="Subcategory"
-                    v-model="subcategory"
+                    name="issuanceAmount"
+                    placeholder="Issuance Amount"
+                    :disabled="isManaged"
+                    v-model="issuanceAmount"
+                    v-validate="{required: !isManaged, min_value: isDivisible ? 0.00000002 : 2, max_value: isDivisible ? 92233720368 : 9223372036854775807, integer: true}"
+                    v-tooltip="getValidationTooltip('issuanceAmount')"
                 >
             </div>
 
             <div class="line">
-                <input
-                    class="smooth-input"
-                    type="text"
-                    name="issuanceAmount"
-                    placeholder="Issuance Amount"
-                    v-model="issuanceAmount"
-                    v-validate="{required: true, min_value: isDivisible ? 0.00000002 : 2, max_value: isDivisible ? 92233720368 : 9223372036854775807, integer: true}"
-                    v-tooltip="getValidationTooltip('issuanceAmount')"
-                >
+                <div class="checkbox-container">
+                    <div class="checkbox-field">
+                        <input type="checkbox" v-model="isManaged">
+                        <label>Enable Management</label>
+                    </div>
+                </div>
 
                 <div class="checkbox-container">
                     <div class="checkbox-field">
@@ -95,10 +96,17 @@ export default {
             category: '',
             subcategory: '',
             issuanceAmount: '',
+            isManaged: false,
             isDivisible: true,
             description: '',
             url: ''
         };
+    },
+
+    watch: {
+        isManaged() {
+            if (this.isManaged) this.issuanceAmount = '';
+        }
     },
 
     computed: {
@@ -119,7 +127,7 @@ export default {
         async submit() {
             if (!await this.$validator.validateAll()) return;
 
-            const r = {name: `${this.name} (${this.ticker})`};
+            const r = {name: `${this.name} (${this.ticker})`, isFixed: !this.isManaged};
             for (const p of ['category', 'subcategory', 'issuanceAmount', 'isDivisible', 'description', 'url']) {
                 r[p] = this[p];
             }
@@ -142,12 +150,20 @@ export default {
             &:not(:last-child) {
                 margin-right: var(--padding-base);
             }
+
+            &[disabled] {
+                background-color: var(--color-background-no-data);
+            }
         }
 
         .checkbox-container {
             display: inline-block;
             width: 200px;
             vertical-align: middle;
+
+            &:not(:last-child) {
+                margin-right: var(--padding-base);
+            }
         }
     }
 
