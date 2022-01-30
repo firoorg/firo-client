@@ -25,7 +25,7 @@ export default {
         },
 
         ticker() {
-            return this.tokenData[this.tx.elysium.property.creationTx].ticker;
+            return (this.tokenData[this.tx.elysium.property.creationTx] || {ticker: ''}).ticker;
         }
     }
 }

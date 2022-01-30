@@ -74,7 +74,7 @@
                         />
                     </InputFrame>
 
-                    <div class="checkbox-field">
+                    <div v-show="selectedAsset == 'FIRO'" class="checkbox-field">
                         <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled"/>
                         <label><a id="custom-inputs-button" href="#" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
 
@@ -83,22 +83,22 @@
                         </Popup>
                     </div>
 
-                    <div v-if="useCustomInputs" class="max-send">
+                    <div v-show="selectedAsset == 'FIRO'" v-if="useCustomInputs" class="max-send">
                         <label>Max Send:</label>
                         <amount :amount="coinControlSelectedAmount" ticker="FIRO" />
                     </div>
 
-                    <div class="checkbox-field">
+                    <div v-show="selectedAsset == 'FIRO'" class="checkbox-field">
                         <input id="subtract-fee-from-amount" type="checkbox" v-model="subtractFeeFromAmount" />
                         <label>Take Transaction Fee From Amount</label>
                     </div>
 
-                    <div class="checkbox-field">
+                    <div v-show="selectedAsset == 'FIRO'" class="checkbox-field">
                         <input id="use-custom-fee" type="checkbox" v-model="useCustomFee" />
                         <label>Custom Transaction Fee</label>
                     </div>
 
-                    <InputFrame v-if="useCustomFee" class="input-frame-tx-fee" unit="sat/kb">
+                    <InputFrame v-show="selectedAsset == 'FIRO'" v-if="useCustomFee" class="input-frame-tx-fee" unit="sat/kb">
                         <input
                             id="txFeePerKb"
                             ref="txFeePerKb"
@@ -112,7 +112,7 @@
                         />
                     </InputFrame>
 
-                    <div class="totals">
+                    <div v-show="selectedAsset == 'FIRO'" class="totals">
                         <div class="total-field">
                             <label>
                                 Recipient will receive:
@@ -152,6 +152,7 @@
                 <div class="bottom">
                     <SendFlow
                         :disabled="!canBeginSend"
+                        :asset="selectedAsset"
                         :is-private="isPrivate"
                         :label="label"
                         :address="address"
@@ -165,7 +166,7 @@
                     />
 
                     <div class="footer">
-                        <PrivatePublicBalance :disabled="!isBlockchainSynced" v-model="isPrivate" />
+                        <PrivatePublicBalance :asset="selectedAsset" :disabled="!isBlockchainSynced" v-model="isPrivate" />
                     </div>
                 </div>
             </div>
@@ -246,15 +247,24 @@ export default {
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
             smartFeePerKb: 'ApiStatus/smartFeePerKb',
-            calculateTransactionFee: 'Transactions/calculateTransactionFee'
+            calculateTransactionFee: 'Transactions/calculateTransactionFee',
+            selectedTokens: 'Elysium/selectedTokens',
+            tokenData: 'Elysium/tokenData',
+            aggregatedElysiumBalances: 'Elysium/aggregatedBalances'
         }),
 
         availableAssets() {
-            return [{id: 'FIRO', name: 'Firo', icon: FiroSymbol}];
+            const assets = [{id: 'FIRO', name: 'Firo', icon: FiroSymbol}];
+            for (const tk of this.selectedTokens) {
+                const token = this.tokenData[tk];
+                if (!token) continue;
+                assets.push({id: token.id, name: token.name});
+            }
+            return assets;
         },
 
         transactionFee() {
-            if (!this.satoshiAmount) return undefined;
+            if (this.selectedAsset != 'FIRO' || !this.satoshiAmount) return undefined;
             return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
         },
 
@@ -286,12 +296,19 @@ export default {
         },
 
         available () {
-            return this.isPrivate ? this.availablePrivate : this.availablePublic;
+            if (this.selectedAsset != 'FIRO') return this.aggregatedElysiumBalances[this.selectedAsset].priv;
+            else if (this.isPrivate) return this.availablePrivate;
+            else return this.availablePublic;
+        },
+
+        ticker () {
+            if (this.selectedAsset == 'FIRO') return 'FIRO';
+            else return this.tokenData[this.selectedAsset].ticker;
         },
 
         // This is the amount the user entered in satoshis.
         satoshiAmount () {
-            return convertToSatoshi(this.amount);
+            return (this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ? convertToSatoshi(this.amount) : Number(this.amount);
         },
 
         // This is the amount the user will receive. It may be less than satoshiAmount.
@@ -306,12 +323,12 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && this.transactionFee > 0 && !this.totalAmountExceedsBalance;
+            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0 && !this.totalAmountExceedsBalance));
         },
 
         isValidated () {
             // this.errors was already calculated when amount and address were entered.
-            return !!(this.amount && this.address && this.transactionFee && !this.validationErrors.items.length);
+            return !!(this.amount && this.address && (this.selectedAsset != 'FIRO' || this.transactionFee) && !this.validationErrors.items.length);
         },
 
         amountValidations () {
@@ -387,6 +404,17 @@ export default {
             if (a && a.purpose === 'send' && a.label !== this.label) {
                 this.addToAddressBook();
             }
+        },
+
+        selectedAsset() {
+            if (this.selectedAsset != 'FIRO') {
+                this.isPrivate = true;
+                this.useCustomInputs = false;
+                this.useCustomFee = false;
+                this.subtractFeeFromAmount = false;
+            }
+
+            this.$validator.validateAll();
         }
     },
 
@@ -400,25 +428,40 @@ export default {
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availableXzc will still be reactively updated.
-            getMessage: () => this.useCustomInputs ?
-                `Amount (including fees) is over the sum of your selected coins, ${convertToCoin(this.coinControlSelectedAmount)} FIRO`
-                :
-                `Amount (including fees) is over your available balance of ${convertToCoin(this.available)} FIRO`,
+            getMessage: () => {
+                if (this.useCustomInputs)
+                    return `Amount (including fees) is over the sum of your selected coins, ${convertToCoin(this.coinControlSelectedAmount)} FIRO`;
+                else if (this.selectedAsset == 'FIRO')
+                    return `Amount (including fees) is over your available balance of ${convertToCoin(this.available)} FIRO`;
+                else if (this.tokenData[this.selectedAsset].isDivisible)
+                    return `Amount (including fees) is over your available balance of ${convertToCoin(this.available)} ${this.ticker}`;
+                else
+                    return `Amount (including fees) is over your available balance of ${this.available} ${this.ticker}`;
+            },
 
-            validate: (value) => !!this.transactionFee
+
+            validate: (value) => {
+                return this.selectedAsset == 'FIRO' ? !!this.transactionFee : this.aggregatedElysiumBalances[this.selectedAsset].priv >= this.satoshiAmount
+            }
         });
 
         this.$validator.extend('amountIsValid', {
-            getMessage: () => 'Amount must be a multiple of 0.00000001',
+            getMessage: () => `Amount must be a multiple of ${(this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ? '0.00000001' : '1'}`,
             // We use a regex here so as to not to have to deal with floating point issues.
-            validate: (value) => Number(value) !== 0 && !!value.match(/^\d+(\.\d{1,8})?$/)
+            validate: (value) =>
+                Number(value) !== 0 &&
+                ((this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ?
+                     !!value.match(/^\d+(\.\d{1,8})?$/)
+                    :
+                    !!value.match(/^\d+$/)
+                )
         });
 
         this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
             getMessage: () =>
                 `Due to private transaction spend limits, you may not spend more than 5001 FIRO (including fees) in one transaction`,
 
-            validate: (value) => this.totalAmount <= 5001e8
+            validate: (value) => this.selectedAsset != 'FIRO' || this.totalAmount <= 5001e8
         });
 
         this.$validator.extend('txFeeIsValid', {

@@ -76,7 +76,9 @@ const getters = {
                 if (e.valid && e.isToMe) r[id].pub[e.receiver] += e.amount;
             } else if (e.type == "Lelantus JoinSplit") {
                 if (txo.isFromMe) r[id].priv -= e.amount;
+
                 if (e.valid && e.isToMe) r[id].pub[e.receiver] += e.amount;
+                else if (e.isToMe) r[id].privUnconfirmed += e.amount;
             } else if (e.type == "Create Property - Fixed") {
                 if (txo.isFromMe && e.valid) r[id].pub[e.sender] += e.amount;
             } else if (e.type == "Grant Property Tokens") {

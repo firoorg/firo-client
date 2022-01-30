@@ -11,8 +11,17 @@
         </div>
 
         <Popup v-if="show !== 'button'" :margin="show !== 'wait'">
+            <ElysiumConfirmStep
+                v-if="asset != 'FIRO' && show === 'confirm'"
+                :asset="asset"
+                :label="label"
+                :address="address"
+                :amount="amount"
+                @cancel="cancel()"
+                @confirm="goToPassphraseStep()"
+            />
             <ConfirmStep
-                v-if="show === 'confirm'"
+                v-else-if="show === 'confirm'"
                 :label="label"
                 :address="address"
                 :amount="subtractFeeFromAmount ? amount - computedTxFee : amount"
@@ -22,9 +31,9 @@
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
-            <PassphraseInput v-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
-            <WaitOverlay v-if="show === 'wait'" />
-            <ErrorStep v-if="show === 'error'" :error="error" @ok="cancel()" />
+            <PassphraseInput v-else-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
+            <WaitOverlay v-else-if="show === 'wait'" />
+            <ErrorStep v-else-if="show === 'error'" :error="error" @ok="cancel()" />
         </Popup>
     </div>
 </template>
@@ -35,6 +44,7 @@
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import {mapGetters} from "vuex";
 import Popup from "renderer/components/shared/Popup";
+import ElysiumConfirmStep from "./ElysiumConfirmStep";
 import ConfirmStep from "./ConfirmStep";
 import PassphraseInput from "../shared/PassphraseInput";
 import ErrorStep from "./ErrorStep";
@@ -45,6 +55,7 @@ export default {
 
     components: {
         Popup,
+        ElysiumConfirmStep,
         ConfirmStep,
         PassphraseInput,
         ErrorStep,
@@ -68,7 +79,8 @@ export default {
         computedTxFee: Number,
         subtractFeeFromAmount: Boolean,
         isPrivate: Boolean,
-        coinControl: Array
+        coinControl: Array,
+        asset: String | Number
     },
 
     computed: {
@@ -105,7 +117,10 @@ export default {
             this.passphrase = '';
 
             try {
-                if (this.isPrivate) {
+                if (this.asset != 'FIRO') {
+                    const r = await $daemon.sendElysium(passphrase, this.asset, this.address, this.amount);
+                    $store.commit('Transactions/markSpentTransaction', r.inputs);
+                } else if (this.isPrivate) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
                     const coinControl = this.coinControl || this.selectInputs(true, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);

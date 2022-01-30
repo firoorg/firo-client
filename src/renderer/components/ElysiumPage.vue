@@ -140,6 +140,7 @@ export default {
                 $store.commit('Transactions/markSpentTransaction', r.inputs);
                 this.addSelectedTokens([r.txid]);
 
+                $store.commit('Transactions/markSpentTransaction', r.inputs);
                 this.showPopup = '';
                 this.newTokenData = null;
             } catch (e) {

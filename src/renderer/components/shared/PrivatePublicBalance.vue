@@ -4,15 +4,15 @@
 
         <div class="balance-line">
             <label>Private Balance:</label>
-            <amount :amount="availablePrivate" ticker="FIRO" />
+            <amount :amount="availablePrivate" :ticker="ticker" />
         </div>
 
         <div class="balance-line">
-            <label>Public Balance:</label>
-            <amount :amount="availablePublic" ticker="FIRO" />
+            <label>{{ asset == 'FIRO' ? 'Public Balance' : 'Pending Balance' }}:</label>
+            <amount :amount="availablePublic" :ticker="ticker" />
         </div>
 
-        <div class="toggle" :class="[isPrivate ? 'is-private' : 'is-public', disabled ? 'toggle-disabled' : 'toggle-enabled']">
+        <div class="toggle" :class="[isPrivate ? 'is-private' : 'is-public', (asset != 'FIRO' || disabled) ? 'toggle-disabled' : 'toggle-enabled']">
             <label class="toggle-label-private">Private</label>
             <div class="toggle-switch" @click="toggle()">
                 <div class="inner" />
@@ -35,17 +35,7 @@ export default {
         Amount
     },
 
-    props: {
-        value: {
-            type: Boolean,
-            required: true
-        },
-
-        disabled: {
-            type: Boolean,
-            default: false
-        }
-    },
+    props: ['asset', 'value', 'disabled'],
 
     data() {
         return {
@@ -53,10 +43,26 @@ export default {
         };
     },
 
-    computed: mapGetters({
-        availablePrivate: "Balance/availablePrivate",
-        availablePublic: "Balance/availablePublic"
-    }),
+    computed: {
+        ...mapGetters({
+            availablePrivateFiro: "Balance/availablePrivate",
+            availablePublicFiro: "Balance/availablePublic",
+            elysiumBalances: "Elysium/aggregatedBalances",
+            tokenData: "Elysium/tokenData"
+        }),
+
+        ticker() {
+            return this.asset == 'FIRO' ? 'FIRO' : this.tokenData[this.asset].ticker;
+        },
+
+        availablePrivate() {
+            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePrivateFiro : this.elysiumBalances[this.asset].priv);
+        },
+
+        availablePublic() {
+            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePublicFiro : this.elysiumBalances[this.asset].pending);
+        }
+    },
 
     watch: {
         value: {
@@ -71,8 +77,12 @@ export default {
     methods: {
         convertToCoin,
 
+        adjustAmount(amount) {
+            return this.asset == 'FIRO' || this.tokenData[this.asset].isDivisible ? amount : `${amount}`;
+        },
+
         toggle() {
-            if (this.disabled) return;
+            if (this.disabled || this.asset != 'FIRO') return;
             this.isPrivate = !this.isPrivate;
             this.$emit('input', this.isPrivate);
         }
