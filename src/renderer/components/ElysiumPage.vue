@@ -59,7 +59,7 @@ import ElysiumTokenId from "renderer/components/AnimatedTable/ElysiumTokenId";
 import ElysiumTokenTicker from "renderer/components/AnimatedTable/ElysiumTokenTicker";
 import ElysiumTokenName from "renderer/components/AnimatedTable/ElysiumTokenName";
 import ElysiumTokenPrivateBalance from "renderer/components/AnimatedTable/ElysiumTokenPrivateBalance";
-import ElysiumTokenPublicBalance from "renderer/components/AnimatedTable/ElysiumTokenPublicBalance";
+import ElysiumTokenPendingBalance from "renderer/components/AnimatedTable/ElysiumTokenPendingBalance";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
 const myTokensTableFields = [
@@ -67,7 +67,7 @@ const myTokensTableFields = [
     {name: ElysiumTokenTicker},
     {name: ElysiumTokenName},
     {name: ElysiumTokenPrivateBalance},
-    {name: ElysiumTokenPublicBalance}
+    {name: ElysiumTokenPendingBalance}
 ];
 
 export default {
@@ -114,7 +114,7 @@ export default {
                         name: tk.nameMinusTicker,
                         ticker: tk.ticker,
                         privateBalance: tk.isDivisible ? b.priv : `${b.priv}`,
-                        publicBalance: tk.isDivisible ? b.pending : `${b.pending}`
+                        pendingBalance: tk.isDivisible ? b.pending : `${b.pending}`
                     };
                 });
         }

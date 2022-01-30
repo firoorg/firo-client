@@ -1,7 +1,7 @@
 <template>
-    <th v-if="isHeader">Public Balance</th>
+    <th v-if="isHeader">Pending Balance</th>
     <td v-else>
-        <Amount :amount="rowData.publicBalance" />
+        <Amount :amount="rowData.pendingBalance" />
     </td>
 </template>
 
@@ -10,7 +10,7 @@ import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue
 import Amount from "renderer/components/shared/Amount";
 
 export default {
-    name: "ElysiumTokenPublicBalance",
+    name: "ElysiumTokenPendingBalance",
 
     mixins: [
         VuetableFieldMixin
