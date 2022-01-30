@@ -1512,8 +1512,8 @@ export class Firod {
         return <string[]>data;
     }
 
-    async mintElysium(auth: string, address: string, propertyId: number): Promise<string | null> {
-        return <string | null>await this.send(auth, null, 'mintElysium', {
+    async mintElysium(auth: string, address: string, propertyId: number): Promise<{inputs: string[], txids: string[]}> {
+        return <any>await this.send(auth, null, 'mintElysium', {
             address,
             propertyId
         });
@@ -1523,10 +1523,10 @@ export class Firod {
     // more than 0.002 public FIRO in a single address.
     async createElysiumProperty(auth: string, isFixed: boolean, isDivisible: boolean, amount: string | undefined,
                                 name: string, category: string, subcategory: string, data: string,
-                                url: string): Promise<string> {
+                                url: string): Promise<{inputs: string[], txid: string}> {
         if (!isFixed && amount) throw 'managed properties should not put in an amount';
 
-        return <string>await this.send(auth, null, 'createElysiumProperty', {
+        return <any>await this.send(auth, null, 'createElysiumProperty', {
             isFixed,
             isDivisible,
             amount,

@@ -55,7 +55,8 @@ export default {
 
             for (const [token, address] of this.tokensNeedingAnonymization) {
                 try {
-                    await $daemon.mintElysium(passphrase, address, token);
+                    const r = await $daemon.mintElysium(passphrase, address, token);
+                    $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } catch (e) {
                     if (e instanceof IncorrectPassphrase) {
                         this.error = 'Incorrect Passphrase';

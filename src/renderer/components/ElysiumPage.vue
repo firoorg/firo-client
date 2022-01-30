@@ -132,9 +132,11 @@ export default {
         async completeCreateToken() {
             const d = this.newTokenData;
             try {
-                await $daemon.createElysiumProperty(this.passphrase, d.isFixed, d.isDivisible,
+                const r = await $daemon.createElysiumProperty(this.passphrase, d.isFixed, d.isDivisible,
                     (d.isFixed || undefined) && (d.isDivisible ? `${d.issuanceAmount}00000000` : d.issuanceAmount),
                     d.name, d.category, d.subcategory, d.description, d.url);
+
+                $store.commit('Transactions/markSpentTransaction', r.inputs);
 
                 this.showPopup = '';
                 this.newTokenData = null;
