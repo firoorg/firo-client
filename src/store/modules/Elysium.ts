@@ -22,29 +22,25 @@ const mutations = {
     },
 
     addSelectedTokens(state, [block1, tokens]: [string, number[]]) {
-        const s = cloneDeep(state.allSelectedTokens);
-        if (!s[block1]) s[block1] = {};
-        for (const token of tokens) s[block1][token] = true;
+        const b = [...(state.allSelectedTokens[block1]||[])];
+        for (const token of tokens) if (!b.includes(token)) b.push(token);
         state.hasModifiedSelectedTokens = true;
-        state.allSelectedTokens = s;
+        Vue.set(state.allSelectedTokens, block1, b.sort());
     },
 
-    removeSelectedToken(state, [block1, tokens]: [string, number[]]) {
-        const s = cloneDeep(state.allSelectedTokens);
-        if (!s[block1]) s[block1] = {};
-        for (const token of tokens) delete s[block1][token];
+    removeSelectedTokens(state, [block1, tokens]: [string, number[]]) {
         state.hasModifiedSelectedTokens = true;
-        state.allSelectedTokens = s;
+        Vue.set(state.allSelectedTokens, block1, (state.allSelectedTokens[block1] || []).filter(tk => !tokens.includes(tk)));
     }
 };
 
 const actions = {
-    addSelectedTokens({commit, getters, rootGetters}, tokens: number[]) {
+    addSelectedTokens({commit, rootGetters}, tokens: number[]) {
         commit('addSelectedTokens', [rootGetters['ApiStatus/block1'], tokens]);
     },
 
-    removeSelectedToken({commit, getters, rootGetters}, tokens: number[]) {
-        commit('removeSelectedToken', [rootGetters['ApiStatus/block1'], tokens]);
+    removeSelectedTokens({commit, rootGetters}, tokens: number[]) {
+        commit('removeSelectedTokens', [rootGetters['ApiStatus/block1'], tokens]);
     }
 };
 
@@ -93,10 +89,10 @@ const getters = {
     aggregatedBalances: (state, getters) => {
         const r = {};
 
-        for (const token of Object.keys(getters.balances)) {
+        for (const [token, data] of Object.entries(<ElysiumBalances>getters.balances)) {
             r[token] = {
-                priv: getters.balances[token].priv,
-                pending: (<any>Object.values(getters.balances[token].pub)).reduce((a, x) => a + x, 0)
+                priv: data.priv,
+                pending: Object.values(data.pub).reduce((a, x) => a + x, 0) + data.privUnconfirmed
             };
         }
 
@@ -105,9 +101,9 @@ const getters = {
 
     tokensNeedingAnonymization: (state, getters) => {
         const r = [];
-        for (const token of Object.keys(getters.balances)) {
-            for (const addr of Object.keys(getters.balances[token].pub)) {
-                if (getters.balances[token].pub[addr]) r.push([Number(token), addr]);
+        for (const [token, data] of Object.entries(<ElysiumBalances>getters.balances)) {
+            for (const [addr, pubValue] of Object.entries(data.pub)) {
+                if (pubValue) r.push([token, addr]);
             }
         }
         return r;
