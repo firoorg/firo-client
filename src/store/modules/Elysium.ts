@@ -1,11 +1,11 @@
 import Vue from "vue";
 import {ElysiumData, ElysiumPropertyData} from "../../daemon/firod";
 import {cloneDeep} from "lodash";
+import {TXO} from "./Transactions";
 
 const state = {
     hasModifiedSelectedTokens: false,
-    allSelectedTokens: <{[block1: string]: number[]}>{},
-    selectedTokens: <number[]>[],
+    allSelectedTokens: <{[block1: string]: string[]}>{},
     tokenData: <{[id: number]: ElysiumPropertyData}>{}
 };
 
@@ -13,7 +13,7 @@ const mutations = {
     addTokenData(state, tokenData: ElysiumPropertyData[]) {
         for (const token of tokenData) {
             const m = token.name.match(/^(.*) \(([A-Z0-9]{1,4})\)$/);
-            Vue.set(state.tokenData, token.id, {...token, nameMinusTicker: m ? m[1] : token.name, ticker: m ? m[2] : `E:${token.id}`});
+            Vue.set(state.tokenData, token.creationTx, {...token, nameMinusTicker: m ? m[1] : token.name, ticker: m ? m[2] : `E:${token.id || '...'}`});
         }
     },
 
@@ -45,7 +45,7 @@ const actions = {
 };
 
 interface ElysiumBalances {
-    [id: number]: {
+    [id: string]: {
         priv: number,
         privUnconfirmed: number,
         pub: {
@@ -57,11 +57,11 @@ interface ElysiumBalances {
 const getters = {
     balances: (state, getters, rootState, rootGetters): ElysiumBalances => {
         const r: ElysiumBalances = {};
-        for (const txo of rootGetters['Transactions/TXOs']) {
+        for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
             const e: ElysiumData = txo.elysium;
             if (!e || (txo.blockHeight && !e.valid) || txo.scriptType !== 'elysium' || !e.property || !e.amount) continue;
 
-            const id = e.property.id;
+            const id = e.property.creationTx;
             r[id] = r[id] || {priv: 0, privUnconfirmed: 0, pub: {}};
             if (e.sender && txo.isFromMe && !r[id].pub[e.sender]) r[id].pub[e.sender] = 0;
             if (e.isToMe && !r[id].pub[e.receiver]) r[id].pub[e.receiver] = 0;
@@ -111,7 +111,7 @@ const getters = {
 
     allSelectedTokens: (state) => state.allSelectedTokens,
     hasModifiedSelectedTokens: (state) => state.hasModifiedSelectedTokens,
-    selectedTokens: (state, getters, rootState, rootGetters) => rootGetters['ApiStatus/block1'] ? Object.keys(getters.allSelectedTokens[rootGetters['ApiStatus/block1']] || {}).map(Number).sort((a, b) => a-b) : [],
+    selectedTokens: (state, getters, rootState, rootGetters) => getters.allSelectedTokens[rootGetters['ApiStatus/block1']] || [],
     tokenData: (state) => state.tokenData
 };
 

@@ -105,8 +105,9 @@ export default {
             return this.selectedTokens
                 .map(tk => this.tokenData[tk])
                 .filter(tk => tk)
+                .sort((a, b) => a.id - b.id)
                 .map(tk => {
-                    const b = this.aggregatedBalances[tk.id] || {priv: 0, pending: 0};
+                    const b = this.aggregatedBalances[tk.creationTx] || {priv: 0, pending: 0};
 
                     return {
                         id: tk.id,
@@ -137,6 +138,7 @@ export default {
                     d.name, d.category, d.subcategory, d.description, d.url);
 
                 $store.commit('Transactions/markSpentTransaction', r.inputs);
+                this.addSelectedTokens([r.txid]);
 
                 this.showPopup = '';
                 this.newTokenData = null;

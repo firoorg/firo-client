@@ -52,7 +52,7 @@
 
         <div class="buttons">
             <button class="solid-button unrecommended" @click="$emit('cancel')">Cancel</button>
-            <button :disabled="!property.id" class="solid-button recommended" @click="$emit('submit', property.id)">OK</button>
+            <button :disabled="!property.id" class="solid-button recommended" @click="$emit('submit', property.creationTx)">OK</button>
         </div>
     </div>
 </template>
@@ -78,7 +78,8 @@ export default {
     watch: {
         async query() {
             try {
-                this.property = await $daemon.getElysiumPropertyInfo(Number(this.query) || this.query);
+                const p = await $daemon.getElysiumPropertyInfo(Number(this.query) || this.query);
+                this.property = p.creationTx != "0000000000000000000000000000000000000000000000000000000000000000" ? p : {notFound: true};
             } catch (e) {
                 if (e.name != 'FirodErrorResponse') throw e;
                 this.property = {notFound: true};

@@ -77,13 +77,21 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
 
 // Make sure we always have information about our selected tokens.
 let lastSelectedTokens = [];
-$store.watch(() => $store.getters['Elysium/selectedTokens'], async () => {
+$store.watch(() => $store.getters['Elysium/selectedTokens'], async (newValue, oldValue) => {
+    if (isEqual(newValue, oldValue)) return;
+    console.log('abc');
     while (!window.$daemon || !$store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
-    const coins = $store.getters['Elysium/selectedTokens'] || [];
+    const coins = $store.getters['Elysium/selectedTokens'];
 
     const tokenData = $store.getters['Elysium/tokenData'];
     const coinsNeedingData = coins.filter(coin => !tokenData[coin]);
-    const coinData = await Promise.all(coinsNeedingData.map(coin => $daemon.getElysiumPropertyInfo(coin)));
+    const coinData = (await Promise.all(coinsNeedingData.map(async coin => {
+        try {
+            return await $daemon.getElysiumPropertyInfo(coin);
+        } catch (e) {
+            console.warn(`Failed to get elysium property info for ${coin}: ${e}`);
+        }
+    }))).filter(x=>x);
 
     $store.commit('Elysium/addTokenData', coinData);
 
@@ -92,6 +100,15 @@ $store.watch(() => $store.getters['Elysium/selectedTokens'], async () => {
         lastSelectedTokens = coins.sort();
     }
 }, {immediate: true});
+
+$store.watch(() => $store.getters['ApiStatus/currentBlockHeight'], async (newValue, oldValue) => {
+    if (newValue == oldValue) return;
+
+    const tokenData = $store.getters['Elysium/tokenData'];
+    const coinsNeedingData = Object.values(tokenData).filter(td => !td.id).map(td => td.creationTx);
+    const coinData = await Promise.all(coinsNeedingData.map(coin => $daemon.getElysiumPropertyInfo(coin)));
+    $store.commit('Elysium/addTokenData', coinData);
+})
 
 // Show the waiting screen with reason, or, if reason may be undefined, close it.
 //
