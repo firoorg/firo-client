@@ -56,11 +56,11 @@ export default {
         },
 
         availablePrivate() {
-            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePrivateFiro : this.elysiumBalances[this.asset].priv);
+            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePrivateFiro : (this.elysiumBalances[this.asset] || {priv: 0}).priv);
         },
 
         availablePublic() {
-            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePublicFiro : this.elysiumBalances[this.asset].pending);
+            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePublicFiro : (this.elysiumBalances[this.asset] || {pending: 0}).pending);
         }
     },
 
