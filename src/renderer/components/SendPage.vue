@@ -258,7 +258,7 @@ export default {
             for (const tk of this.selectedTokens) {
                 const token = this.tokenData[tk];
                 if (!token) continue;
-                assets.push({id: token.id, name: token.name});
+                assets.push({id: token.creationTx, name: token.name});
             }
             return assets;
         },

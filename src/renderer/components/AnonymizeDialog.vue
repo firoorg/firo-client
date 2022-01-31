@@ -32,7 +32,8 @@ export default {
 
     computed: mapGetters({
         availablePublic: 'Balance/availablePublic',
-        tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization'
+        tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
+        tokenData: 'Elysium/tokenData'
     }),
 
     methods: {
@@ -55,7 +56,8 @@ export default {
 
             for (const [token, address] of this.tokensNeedingAnonymization) {
                 try {
-                    const r = await $daemon.mintElysium(passphrase, address, token);
+                    const id = this.tokenData[token].id;
+                    const r = await $daemon.mintElysium(passphrase, address, id);
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } catch (e) {
                     if (e instanceof IncorrectPassphrase) {

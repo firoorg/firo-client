@@ -88,7 +88,8 @@ export default {
             addressBook: 'AddressBook/addressBook',
             lockedTransactions: 'Transactions/lockedTransactions',
             allowBreakingMasternodes: 'App/allowBreakingMasternodes',
-            selectInputs: 'Transactions/selectInputs'
+            selectInputs: 'Transactions/selectInputs',
+            tokenData: 'Elysium/tokenData'
         }),
 
         totalAmount() {
@@ -118,7 +119,8 @@ export default {
 
             try {
                 if (this.asset != 'FIRO') {
-                    const r = await $daemon.sendElysium(passphrase, this.asset, this.address, this.amount);
+                    const id = this.tokenData[this.asset].id;
+                    const r = await $daemon.sendElysium(passphrase, id, this.address, this.amount);
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else if (this.isPrivate) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
