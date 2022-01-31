@@ -81,6 +81,9 @@ const getters = {
                 else if (e.isToMe) r[id].privUnconfirmed += e.amount;
             } else if (e.type == "Create Property - Fixed") {
                 if (txo.isFromMe && e.valid) r[id].pub[e.sender] += e.amount;
+                // TODO: Change the names here, as the unconfirmed funds are not actually private. Still, it's how we
+                //       want to treat them.
+                else if (txo.isFromMe) r[id].privUnconfirmed += e.amount;
             } else if (e.type == "Grant Property Tokens") {
                 if (e.isToMe && e.valid) r[id].pub[e.receiver] += e.amount;
             }
