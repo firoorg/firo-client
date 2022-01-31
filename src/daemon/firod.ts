@@ -241,6 +241,8 @@ export interface ElysiumData {
     type: ElysiumTransactionType;
     version: number;
     valid: boolean;
+    // This will be present only the transaction is confirmed and not valid.
+    invalidReason?: string;
     amount?: number;
     property?: ElysiumPropertyData;
 }
