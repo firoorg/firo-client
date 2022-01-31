@@ -104,6 +104,7 @@ const getters = {
     tokensNeedingAnonymization: (state, getters) => {
         const r = [];
         for (const [token, data] of Object.entries(<ElysiumBalances>getters.balances)) {
+            if (!getters.selectedTokens.includes(token)) continue;
             for (const [addr, pubValue] of Object.entries(data.pub)) {
                 if (pubValue) r.push([token, addr]);
             }
