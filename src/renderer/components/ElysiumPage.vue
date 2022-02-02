@@ -33,7 +33,7 @@
 
             <div class="right-element">
                 <div class="checkbox-field">
-                    <input type="checkbox">
+                    <input type="checkbox" v-model="showUnknownTokens">
                     <label>Show Unknown Tokens</label>
                 </div>
             </div>
@@ -90,19 +90,21 @@ export default {
             showPopup: '',
             passphrase: '',
             passphraseError: null,
-            newTokenData: null
+            newTokenData: null,
+            showUnknownTokens: false
         };
     },
 
     computed: {
         ...mapGetters({
+            selectedAndOwnedTokens: 'Elysium/selectedAndOwnedTokens',
             selectedTokens: 'Elysium/selectedTokens',
             tokenData: 'Elysium/tokenData',
             aggregatedBalances: 'Elysium/aggregatedBalances'
         }),
 
         myTokensTableData() {
-            return this.selectedTokens
+            return (this.showUnknownTokens ? this.selectedAndOwnedTokens : this.selectedTokens)
                 .map(tk => this.tokenData[tk])
                 .filter(tk => tk)
                 .sort((a, b) => a.id - b.id)

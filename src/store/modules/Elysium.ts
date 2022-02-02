@@ -126,6 +126,8 @@ const getters = {
     allSelectedTokens: (state) => state.allSelectedTokens,
     hasModifiedSelectedTokens: (state) => state.hasModifiedSelectedTokens,
     selectedTokens: (state, getters, rootState, rootGetters) => getters.allSelectedTokens[rootGetters['ApiStatus/block1']] || [],
+    selectedAndOwnedTokens: (state, getters) =>
+        [...Object.keys(getters.aggregatedBalances), ...getters.selectedTokens].sort().reduce((a, x) => a[a.length-1] == x ? a : [...a, x], []),
     tokenData: (state) => state.tokenData
 };
 
