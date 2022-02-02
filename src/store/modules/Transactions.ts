@@ -102,6 +102,11 @@ let ticker;
 
 const mutations = {
     setWalletState(state, walletState: Transaction[]) {
+        if (!Object.keys(upcomingTransactions).length) {
+            console.log('resetting upcomingTransactions');
+            upcomingTransactions = cloneDeep(state.transactions);
+        }
+
         for (const tx of walletState) {
             upcomingTransactions[tx.txid] = tx;
         }
