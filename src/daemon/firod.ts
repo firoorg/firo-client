@@ -244,6 +244,9 @@ export interface ElysiumData {
     // This will be present only the transaction is confirmed and not valid.
     invalidReason?: string;
     amount?: number;
+    // This will only be present on Lelantus JoinSplit transactions. Its value is the change amount minted. It will be
+    // -1 if there was an error retrieving the relevant data; that shouldn't normally happen.
+    joinmintAmount?: number;
     property?: ElysiumPropertyData;
 }
 

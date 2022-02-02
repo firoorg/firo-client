@@ -76,6 +76,14 @@ const getters = {
                 if (e.valid && e.isToMe) r[id].pub[e.receiver] += e.amount;
             } else if (e.type == "Lelantus JoinSplit") {
                 if (txo.isFromMe) r[id].priv -= e.amount;
+                if (txo.isFromMe && !e.valid) {
+                    if (e.joinmintAmount >= 0) {
+                        r[id].priv -= e.joinmintAmount;
+                        r[id].privUnconfirmed += e.joinmintAmount;
+                    } else {
+                        console.error(`Transaction ${txo.txid} has an erroneous joinmintAmount.`);
+                    }
+                }
 
                 if (e.valid && e.isToMe) r[id].pub[e.receiver] += e.amount;
                 else if (e.isToMe) r[id].privUnconfirmed += e.amount;
