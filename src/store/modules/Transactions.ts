@@ -181,8 +181,9 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
 
 const getters = {
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
-    TXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
-        .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx)), [])
+    allTXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
+        .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx)), []),
+    TXOs: (state, getters): TXO[] => getters.allTXOs
         // Don't display orphaned mining transactions.
         .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
         // Hide Elysium notification transactions. These shouldn't be spent normally because a TXO outputting to a given
