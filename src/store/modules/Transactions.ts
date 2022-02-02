@@ -220,7 +220,8 @@ const getters = {
                         txo.elysium.property &&
                         ((txo.isFromMe && !txo.blockHeight) || txo.elysium.valid) &&
                         txo.elysium.type !== 'Lelantus Mint' &&
-                        txo.elysium.property.ecosystem === 'main'
+                        txo.elysium.property.ecosystem === 'main' &&
+                        rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)
                     )
                         ||
                     (!txo.elysium && txo.destination && (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe))
