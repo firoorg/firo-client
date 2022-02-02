@@ -41,7 +41,7 @@
 
         <AnimatedTable
             no-data-message="You haven't added any tokens yet."
-            :data="myTokensTableData"
+            :data="filteredMyTokensTableData"
             :fields="myTokensTableFields"
         />
     </div>
@@ -119,6 +119,15 @@ export default {
                         pendingBalance: tk.isDivisible ? b.pending : `${b.pending}`
                     };
                 });
+        },
+
+        filteredMyTokensTableData() {
+            if (!this.searchInput) return this.myTokensTableData;
+            return this.myTokensTableData.filter(tk =>
+                ['id', 'name', 'ticker', 'privateBalance', 'pendingBalance']
+                    .map(f => tk[f])
+                    .find(f => String(f).includes(this.searchInput))
+            );
         }
     },
 
