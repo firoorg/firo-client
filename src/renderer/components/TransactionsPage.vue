@@ -112,7 +112,10 @@ export default {
                 tableData.push({
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
                     label: (this.addressBook[txo.destination] || {}).label || txo.destination,
-                    extraSearchText: (txo.isFromMe ? '-' : '+') + convertToCoin(txo.amount) + (txo.elysium ? ` elysium ${txo.elysium.sender} ${txo.elysium.receiver} ${txo.elysium.amount} ${txo.elysium.property && txo.elysium.property.name}` : ''),
+                    extraSearchText:
+                        `${txo.isFromMe ? '-' : '+'}${convertToCoin(txo.amount)}` + '\0' +
+                        (txo.elysium ? ` elysium ${txo.elysium.sender} ${txo.elysium.receiver} ${txo.elysium.amount} ${txo.elysium.property && txo.elysium.property.name}` : '') + '\0' +
+                        `${txo.blockHeight || 'Unconfirmed'}`,
                     ...txo
                 });
             }
@@ -127,7 +130,7 @@ export default {
 
             let filter = this.filter.toLowerCase();
             return this.tableData.filter(tableRow =>
-                ['label', 'address', 'extraSearchText'].find(key =>
+                ['label', 'address', 'extraSearchText', 'txid'].find(key =>
                     tableRow[key] && tableRow[key].toLowerCase().indexOf(filter) !== -1
                 )
             )
