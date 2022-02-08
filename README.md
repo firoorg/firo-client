@@ -23,8 +23,7 @@ git clone --branch client-api https://github.com/firoorg/firo
 Now you must build firod, instructions for which will be located in `doc/build`, in the `README*.md` and `build*.md`
 files relevant to your platform. In addition to the instructions included there, the additional flag `--enable-clientapi`
 must be passed to the `./configure` script when it is invoked during the build process as described in the aforementioned
-files. (If this flag is not passed correctly during the buld process, the client will timeout on bootup with an unhelpful
-error message.)
+files.
 
 Once firod is built, it will be located at `src/firod` relative to the directory you cloned firo into. You must then
 copy it into `assets/core/win32`, `assets/core/linux`, or `assets/core/darwin`. e.g. if you followed the command above

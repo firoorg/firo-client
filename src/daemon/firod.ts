@@ -125,7 +125,7 @@ export class IncorrectPassphrase extends FirodError {
 // This is thrown when connecting to firod takes too long. It probably indicates that firod is already running.
 export class FirodConnectionTimeout extends FirodError {
     constructor(seconds: number) {
-        super(`unable to connect to firod within ${seconds}s; a reason this might happen is that you have another instance of firod not managed by Firo Client running`);
+        super(`unable to connect to firod within ${seconds}s; a reason this might happen is that you have another instance of firod not managed by Firo Client running or if firod was not built with --enable-clientapi passed to ./configure`);
         this.name = 'FirodConnectionTimeout';
     }
 }
