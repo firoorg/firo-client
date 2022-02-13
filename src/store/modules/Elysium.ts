@@ -77,7 +77,7 @@ const getters = {
             } else if (e.type == "Lelantus JoinSplit") {
                 if (txo.isFromMe && (e.valid || !txo.blockHeight)) r[id].priv -= e.amount;
                 if (txo.isFromMe && !txo.blockHeight) {
-                    if (e.joinmintAmount >= 0) {
+                    if (e.joinmintAmount >= 0 && false) {
                         r[id].priv -= e.joinmintAmount;
                         r[id].privUnconfirmed += e.joinmintAmount;
                     } else {

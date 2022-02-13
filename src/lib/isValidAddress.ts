@@ -14,11 +14,15 @@ const ADDRESS_PREFIXES = {
     regtest: {
         pubkeyAddress: 65, // ['T'],
         scriptAddress: 178 // ['2']
+    },
+    'regtest-ql': {
+        pubkeyAddress: 65, // ['T'],
+        scriptAddress: 178 // ['2']
     }
 };
 
 // Is address a valid address on the Firo {network} network?
-export function isValidAddress(address: string, network: 'test' | 'main' | 'regtest'): boolean {
+export function isValidAddress(address: string, network: 'test' | 'main' | 'regtest' | 'regtest-ql'): boolean {
     let addressData;
 
     try {

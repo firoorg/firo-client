@@ -23,7 +23,8 @@ const state = {
         main: 'https://explorer.firo.io/%s/%s',
         // This isn't an actual site (obviously), but it'll only show up in testing and it should be fairly obvious
         // what's happening, so meh.
-        regtest: 'https://regtestexplorer.invalid/%s/%s'
+        regtest: 'https://regtestexplorer.invalid/%s/%s',
+        'regtest-ql': 'https://regtestexplorer.invalid/%s/%s'
     },
     showWarning: true,
     daemonSettings: {}

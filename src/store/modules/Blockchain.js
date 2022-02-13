@@ -60,7 +60,7 @@ export const getters = {
     },
     status: (state) => state.status || {},
     isSynced: (state, getters) => getters.status.isSynced,
-    isBlockchainSynced: (state, getters, rootState, rootGetters) => getters.status.isBlockchainSynced || rootGetters['ApiStatus/network'] === 'regtest',
+    isBlockchainSynced: (state, getters, rootState, rootGetters) => getters.status.isBlockchainSynced || ['regtest', 'regtest-ql'].includes(rootGetters['ApiStatus/network']),
     isWinnersListSynced: (state, getters) => getters.status.isWinnersListSynced,
     isZnodeListSynced: (state, getters) => getters.status.isZnodeListSynced,
     averageBlockTimeInMilliSeconds: (state) => state.averageBlockTime * 1000,

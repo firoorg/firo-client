@@ -1,6 +1,6 @@
 <template>
     <div id="blockchain-status">
-        <div v-if="connections === 0 && network !== 'regtest'" class="connecting">
+        <div v-if="connections === 0 && !['regtest', 'regtest-ql'].includes(network)" class="connecting">
             <loading-bounce size="mini" />
             Connecting...
         </div>

@@ -168,7 +168,7 @@ export interface ApiStatusData {
     disabledSporks: string[],
     dataDir: string;
     // Note that this is DIFFERENT from the Network type.
-    network: 'main' | 'test' | 'regtest';
+    network: 'main' | 'test' | 'regtest' | 'regtest-ql';
     blocks: number;
     connections: number;
     devAuth: boolean;
@@ -609,7 +609,7 @@ export class Firod {
                     break;
 
                 case "regtest":
-                    walletLocation = path.join(this.firodDataDir, "regtest", "wallet.dat");
+                    walletLocation = path.join(this.firodDataDir, "regtest-ql", "wallet.dat");
                     break
 
                 default:
@@ -776,7 +776,7 @@ export class Firod {
                     break;
 
                 case 'regtest':
-                    args.push("-regtest=1");
+                    args.push("-regtest-ql=1");
                     // dandelion=0 needs to be set for mining to actually include transactions on regtest.
                     args.push("-dandelion=0");
                     break;
@@ -987,6 +987,7 @@ export class Firod {
         let reqPort, pubPort;
         switch (apiStatus.data.network) {
             case 'regtest':
+            case 'regtest-ql':
                 reqPort = constants.firodAddress.regtestPort.request;
                 pubPort = constants.firodAddress.regtestPort.publisher;
                 break;

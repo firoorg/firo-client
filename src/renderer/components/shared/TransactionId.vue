@@ -26,7 +26,7 @@ export default {
         }),
 
         showOpenInBlockExplorer() {
-            return this.network !== 'regtest';
+            return !['regtest', 'regtest-ql'].includes(this.network);
         }
     },
 

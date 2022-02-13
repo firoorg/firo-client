@@ -67,7 +67,7 @@ export default {
                 break;
 
             case "regtest":
-                dataSubDir = path.join(this.dataDir, "regtest");
+                dataSubDir = path.join(this.dataDir, "regtest-ql");
                 break;
 
             case "test":

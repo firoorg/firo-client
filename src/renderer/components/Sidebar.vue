@@ -10,7 +10,7 @@
         <div v-if="network === 'test'" class="network-badge">
             Testnet
         </div>
-        <div v-else-if="network === 'regtest'" class="network-badge">
+        <div v-else-if="network === 'regtest' || network === 'regtest-ql'" class="network-badge">
             Regtest
         </div>
         <div v-else-if="network !== 'main'" class="network-badge">
