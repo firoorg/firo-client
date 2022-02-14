@@ -249,7 +249,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
 
         await (await this.app.client.$('a[href="#/debugconsole"]')).click();
 
-        await this.app.client.keys([..."generate 1000".split(''), "Enter"]);
+        await this.app.client.keys([..."generate 100".split(''), "Enter"]);
         await this.app.client.waitUntil(
             async () => (await (await this.app.client.$('#current-input')).getText()) === '',
             {timeout: 500e3}
@@ -257,8 +257,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
     });
 
     it('has the correct balance after generating FIRO from the debug console', async function (this: This) {
-        await this.app.client.waitUntilTextExists('.public .amount', '38343');
-        await this.app.client.waitUntilTextExists('.pending .amount', '4300');
+        await this.app.client.waitUntilTextExists('.balance.immature .amount', '4000');
     });
 });
 
