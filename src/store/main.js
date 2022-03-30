@@ -1,5 +1,6 @@
 // background.js
 import { ipcMain } from 'electron'
+import axios from 'axios';
 
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -18,7 +19,7 @@ import Settings from "store/modules/Settings";
 import Transactions from "store/modules/Transactions";
 import Window from "store/modules/Window";
 
-import { createLogger } from 'lib/logger'
+import { createLogger } from 'lib/logger';
 
 const logger = createLogger('firo:store:main')
 
@@ -87,6 +88,13 @@ ipcMain.on('vuex-action', (event, args) => {
         logger.debug("%O", args)
         event.sender.send('vuex-error', error)
     }
+})
+
+
+ipcMain.handle('stealth-pair', async (event, args) => {
+    const url = `https://api.stealthex.io/api/v2/pairs/firo?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`;
+    const result = await axios.get(url)
+    return result.data;
 })
 
 export default store
