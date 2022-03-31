@@ -36,8 +36,8 @@ import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo";
 import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
-    {name: CoinSwapStatus, width: '40pt'},
-    {name: AnimatedTableRelativeDate, width: '120pt'},
+    {name: CoinSwapStatus, width: '60pt'},
+    {name: AnimatedTableRelativeDate, width: '150pt'},
     {name: CoinSwapSendAmount},
     {name: CoinSwapReceivedAmount, width: '150pt'}
 ];
@@ -77,7 +77,7 @@ export default {
 
             let filter = this.filter.toLowerCase();
             return this.tableData.filter(tableRow =>
-                ['fromCoin', 'toCoin', 'sentAmount', 'receiveAmount', 'fee', 'status', 'extraSearchText'].find(
+                ['date', 'fromCoin', 'toCoin', 'sentAmount', 'receiveAmount', 'fee', 'status', 'extraSearchText'].find(
                     key => tableRow[key] && tableRow[key].toLowerCase().indexOf(filter) !== -1
                 )
             );

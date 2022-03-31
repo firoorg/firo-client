@@ -6,7 +6,7 @@
     <svg :width="width" :height="height" v-else-if="coin === 'XRP'"><XRPIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'XLM'"><XLMIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'BCHABC'"><BCHABCIcon /></svg>
-    <svg :width="width" :height="height" v-else-if="coin === 'BNB'"><BNBIcon /></svg>
+    <svg :width="width" :height="height" v-else-if="coin === 'BNB'|| coin==='BNBBSC'"><BNBIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'USDT'"><USDTIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'USDC'"><USDCIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'DAI'"><DAIIcon /></svg>
@@ -14,6 +14,8 @@
     <svg :width="width" :height="height" v-else-if="coin === 'DCR'"><DCRIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'PAX'"><PAXIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'TUSD'"><TUSDIcon /></svg>
+    <svg :width="width" :height="height" v-else-if="coin === 'KMD'"><KMDIcon /></svg>
+    <svg :width="width" :height="height" v-else-if="coin === 'BCH'"><BCHIcon /></svg>
 </template>
 
 <script>
@@ -32,6 +34,8 @@ import DASHIcon from 'renderer/components/Icons/DASHIcon';
 import DCRIcon from 'renderer/components/Icons/DCRIcon';
 import PAXIcon from 'renderer/components/Icons/PAXIcon';
 import TUSDIcon from 'renderer/components/Icons/TUSDIcon';
+import KMDIcon from 'renderer/components/Icons/KMDIcon';
+import BCHIcon from 'renderer/components/Icons/BCHIcon';
 
 export default {
     name: 'CoinIcon',
@@ -51,7 +55,9 @@ export default {
         DASHIcon,
         DCRIcon,
         PAXIcon,
-        TUSDIcon
+        TUSDIcon,
+        KMDIcon,
+        BCHIcon
     },
 
     props: {

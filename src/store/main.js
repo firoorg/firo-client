@@ -90,11 +90,23 @@ ipcMain.on('vuex-action', (event, args) => {
     }
 })
 
-
 ipcMain.handle('stealth-pair', async (event, args) => {
     const url = `https://api.stealthex.io/api/v2/pairs/firo?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`;
     const result = await axios.get(url)
     return result.data;
 })
+
+ipcMain.handle('stealth-range', async (event, args) => {
+    const url = `https://api.stealthex.io/api/v2/range/btc/eth?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`;
+    const result = await axios.get(url)
+    return result.data;
+})
+
+ipcMain.handle('stealth-rate', async (event, args) => {
+    const url = `https://api.stealthex.io/api/v2/estimate/btc/eth?amount=0.1&api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`;
+    const result = await axios.get(url)
+    return result.data;
+})
+
 
 export default store

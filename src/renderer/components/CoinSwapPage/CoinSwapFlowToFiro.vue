@@ -31,6 +31,7 @@ import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
 import ErrorStep from './ErrorStep';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import APIWorker from 'lib/switchain-api';
+import ChangeAPIWorker from 'lib/changenow-api';
 import {convertToCoin} from "lib/convert";
 import {mapActions} from "vuex";
 import Big from "big.js";
@@ -80,9 +81,9 @@ export default {
             type: String,
         },
 
-        // This is a decimal STRING representing a whole coin amount of FIRO that will be charged as a fee.
+        // This is a decimal Number representing a whole coin amount of FIRO that will be charged as a fee.
         firoTransactionFee: {
-            type: String,
+            type: Number,
         },
 
         // The address that funds will be refunded at if the trade fails for some reason.
@@ -92,12 +93,13 @@ export default {
 
         // The expected amount of FIRO we will receive for each remoteCurrency, as a string whole-coin amount.
         expectedRate: {
-            type: String
+            type: Number
         }
     },
 
     created() {
-        this.api = new APIWorker();
+        //this.api = new APIWorker();
+        this.api = new ChangeAPIWorker();
     },
 
     methods: {
@@ -129,28 +131,34 @@ export default {
 
             let latestError = null;
             for (let i = 0; i < 10; i++) {
-                const marketInfo = await this.api.getMarketInfo();
-                if (marketInfo.error) {
-                    latestError = `Error fetching market info: ${marketInfo.error}`;
-                    this.$log.error(latestError);
-                    await new Promise(r => setTimeout(r, 1e3));
-                    continue;
-                }
+                // const marketInfo = await this.api.getMarketInfo();
+                // if (marketInfo.error) {
+                //     latestError = `Error fetching market info: ${marketInfo.error}`;
+                //     this.$log.error(latestError);
+                //     await new Promise(r => setTimeout(r, 1e3));
+                //     continue;
+                // }
 
-                const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
-                if (!pairInfo) {
-                    this.show = 'error';
-                    this.error = `Pair ${pair} not found in Switchain markets`;
-                    return;
-                }
+                // const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
+                // if (!pairInfo) {
+                //     this.show = 'error';
+                //     this.error = `Pair ${pair} not found in Switchain markets`;
+                //     return;
+                // }
 
                 const order ={
-                    pair: `${this.remoteCurrency}-FIRO`,
-                    fromAmount: this.remoteAmount,
-                    toAddress: walletAddress,
-                    toAmount: this.firoAmount,
+                    from:this.remoteCurrency.toLowerCase(),
+                    to:"firo",
+                    address: walletAddress,
                     refundAddress: this.refundAddress,
-                    signature: pairInfo.signature
+                    amount: this.remoteAmount
+
+                    //pair: `${this.remoteCurrency}-FIRO`,
+                    //fromAmount: this.remoteAmount,
+                    //toAddress: walletAddress,
+                    //toAmount: this.firoAmount,
+                    //refundAddress: this.refundAddress,
+                    //signature: pairInfo.signature
                 };
 
                 this.$log.info("Posting order: %O", order);
@@ -174,18 +182,18 @@ export default {
 
                 // Sanity check response
                 if (
-                    !Big(response.fromAmount).eq(this.remoteAmount) ||
+                    //!Big(response.fromAmount).eq(this.remoteAmount) ||
                     response.refundAddress !== this.refundAddress ||
-                    response.toAddress !== walletAddress
+                    response.payoutAddress !== walletAddress
                 ) {
-                    latestError = `Invalid Response from Switchain: ${JSON.stringify(response)}`;
+                    latestError = `Invalid Response from ChangeNow: ${JSON.stringify(response)}`;
                     this.$log.error(latestError);
                     continue;
                 }
 
                 const receiveAddressBookData = {
                     address: walletAddress,
-                    label: `${pair} Swap (Order ${response.orderId})`,
+                    label: `${pair} Swap (Order ${response.id})`,
                     purpose: 'coinswapReceive'
                 };
                 $store.commit('AddressBook/updateAddress', receiveAddressBookData);
@@ -198,7 +206,7 @@ export default {
                 }
 
                 this.coinSwapRecord =  {
-                    orderId: response.orderId,
+                    orderId: response.id,
                     fromCoin: this.remoteCurrency,
                     toCoin: 'FIRO',
                     sendAmount: this.remoteAmount,
@@ -207,7 +215,7 @@ export default {
                     expectedToFee: this.firoTransactionFee,
                     status: 'waiting',
                     date: Date.now(),
-                    exchangeAddress: response.exchangeAddress,
+                    exchangeAddress: response.payinAddress,
                     refundAddress: this.refundAddress,
                     receiveAddress: walletAddress,
                     expectedRate: this.expectedRate,

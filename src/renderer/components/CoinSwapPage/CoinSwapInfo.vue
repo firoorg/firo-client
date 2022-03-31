@@ -15,7 +15,7 @@
                 </tr>
 
                 <tr>
-                    <td>Switchain Swap ID</td>
+                    <td>Swap ID</td>
                     <td>{{ coinSwapData.orderId }}</td>
                 </tr>
 
@@ -39,7 +39,7 @@
                     <td class="value">
                         <Amount amount="1" :ticker="coinSwapData.fromCoin" />
                         =
-                        <Amount :amount="coinSwapData.expectedRate" :ticker="coinSwapData.toCoin" />
+                        <Amount :amount="coinSwapData.expectedRate.toString()" :ticker="coinSwapData.toCoin" />
                     </td>
                 </tr>
 
@@ -55,12 +55,12 @@
 
                 <tr>
                     <td>Expected {{ coinSwapData.toCoin }} Fee</td>
-                    <td><Amount :amount="coinSwapData.expectedToFee" :ticker="coinSwapData.toCoin" /></td>
+                    <td><Amount :amount="coinSwapData.expectedToFee.toString()" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr>
                     <td>Estimated Total to Receive</td>
-                    <td><Amount :amount="coinSwapData.expectedAmountToReceive" :ticker="coinSwapData.toCoin" /></td>
+                    <td><Amount :amount="coinSwapData.expectedAmountToReceive.toString()" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr v-if="coinSwapData.actualAmountToReceive">
@@ -107,13 +107,13 @@
             </table>
 
             <div v-if="showQrCode" class="footer guidance">
-                Please send the exact amount shown. If you send a different amount, you will need to contact Switchain
-                support at <a href="mailto:help@switchain.com">help@switchain.com</a> to recover your funds.
+                Please send the exact amount shown. If you send a different amount, you will need to contact ChangeNow
+                support at <a href="mailto:support@changenow.io">support.changenow.io</a> to recover your funds.
             </div>
 
             <div v-else class="footer guidance">
-                If you need assistance or funds fail to arrive in a timely fashion, you can contact Switchain at
-                <a href="mailto:help@switchain.com">help@switchain.com</a>.
+                If you need assistance or funds fail to arrive in a timely fashion, you can contact ChangeNow at
+                <a href="mailto:support@changenow.io">support.changenow.io</a>.
             </div>
         </div>
 

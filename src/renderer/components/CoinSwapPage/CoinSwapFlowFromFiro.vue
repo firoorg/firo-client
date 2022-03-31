@@ -34,6 +34,8 @@ import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
 import ErrorStep from './ErrorStep';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import APIWorker from 'lib/switchain-api';
+import ChangeAPIWorker from 'lib/changenow-api';
+import StealthAPIWorker from 'lib/stealth-api';
 import {convertToCoin} from "lib/convert";
 import {isValidAddress} from "lib/isValidAddress";
 import {mapActions, mapGetters} from "vuex";
@@ -98,7 +100,7 @@ export default {
 
         // This is a decimal STRING representing a whole coin amount, NOT satoshi
         remoteTransactionFee: {
-            type: String,
+            type: Number,
         },
 
         // The address that funds will be received at.
@@ -107,7 +109,7 @@ export default {
         },
 
         expectedRate: {
-            type: String,
+            type: Number,
         },
 
         isBigWallet: {
@@ -116,7 +118,8 @@ export default {
     },
 
     created() {
-        this.api = new APIWorker();
+        //this.api = new APIWorker();
+        this.api = new ChangeAPIWorker();
     },
 
     methods: {
@@ -138,27 +141,27 @@ export default {
 
             let latestError = null;
             for (let i = 0; i < 10; i++) {
-                const marketInfo = await this.api.getMarketInfo();
-                if (marketInfo.error) {
-                    latestError = `Error fetching market info: ${marketInfo.error}`;
-                    this.$log.error(latestError);
-                    await new Promise(r => setTimeout(r, 1e3));
-                    continue;
-                }
+                // const marketInfo = await this.api.getMarketInfo();
+                // if (marketInfo.error) {
+                //     latestError = `Error fetching market info: ${marketInfo.error}`;
+                //     this.$log.error(latestError);
+                //     await new Promise(r => setTimeout(r, 1e3));
+                //     continue;
+                // }
 
-                const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
-                if (!pairInfo) {
-                    this.show = 'error';
-                    this.error = `Pair ${pair} not found in Switchain markets`;
-                    return;
-                }
+                // const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
+                // if (!pairInfo) {
+                //     this.show = 'error';
+                //     this.error = `Pair ${pair} not found in Switchain markets`;
+                //     return;
+                // }
 
                 const order = {
-                    pair,
-                    toAddress: this.receiveAddress,
+                    from:"firo",
+                    to:this.remoteCurrency.toLowerCase(),
+                    address: this.receiveAddress,
                     refundAddress: walletAddress,
-                    fromAmount: convertToCoin(this.firoAmount),
-                    signature: pairInfo.signature
+                    amount: convertToCoin(this.firoAmount)
                 };
 
                 this.$log.info("Posting order: %O", order);
@@ -179,15 +182,13 @@ export default {
                 }
 
                 const response = r.response;
-
                 // Sanity check response
                 if (
-                    response.fromAmount !== convertToCoin(this.firoAmount) ||
+                    //response.amount !== convertToCoin(this.firoAmount) ||
                     response.refundAddress !== walletAddress ||
-                    response.toAddress !== this.receiveAddress ||
-                    !isValidAddress(response.exchangeAddress, 'main')
+                    response.payoutAddress !== this.receiveAddress
                 ) {
-                    latestError = `Invalid Response from Switchain: ${JSON.stringify(response)}`;
+                    latestError = `Invalid Response from ChangeNow: ${JSON.stringify(response)}`;
                     this.$log.error(latestError);
                     continue;
                 }
@@ -196,14 +197,14 @@ export default {
                 // they don't swap.
                 const refundAddressBookData = {
                     address: walletAddress,
-                    label: `${pair} Swap Refund (Order ${response.orderId})`,
-                    purpose: 'coinswapRefund'
+                    label: `${pair} Swap Refund (Order ${response.id})`,
+                    purpose: 'changeNowRefund'
                 };
 
                 const sendAddressBookData = {
-                    address: response.exchangeAddress,
-                    label: `${pair} Swap (Order ${response.orderId})`,
-                    purpose: 'coinswapSend'
+                    address: response.payinAddress,
+                    label: `${pair} Swap (Order ${response.id})`,
+                    purpose: 'changeNowSend'
                 };
 
                 for (const data of [refundAddressBookData, sendAddressBookData]) {
@@ -219,19 +220,19 @@ export default {
                 }
 
                 this.coinSwapRecord = {
-                    orderId: response.orderId,
+                    orderId: response.id,
                     fromCoin: 'FIRO',
                     toCoin: this.remoteCurrency,
-                    sendAmount: response.fromAmount,
-                    expectedAmountToReceive: this.remoteAmount,
+                    sendAmount: convertToCoin(this.firoAmount),
+                    expectedAmountToReceive: response.amount,
                     expectedRate: this.expectedRate,
                     fromFee: convertToCoin(this.firoTransactionFee),
                     expectedToFee: this.remoteTransactionFee,
                     status: 'waiting',
                     date: Date.now(),
-                    exchangeAddress: response.exchangeAddress,
+                    exchangeAddress: response.payinAddress,
                     refundAddress: response.refundAddress,
-                    receiveAddress: response.toAddress,
+                    receiveAddress: response.payoutAddress,
                     _response: response
                 };
 
@@ -241,7 +242,7 @@ export default {
 
             this.show = 'error';
             this.error = latestError || 'Uh oh, something went wrong :(';
-            this.$log.error(`Gave up sending to Switchain after 10 errors.`);
+            this.$log.error(`Gave up sending to ChangeNow after 10 errors.`);
         },
 
         goToPassphraseStep() {

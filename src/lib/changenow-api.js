@@ -38,49 +38,27 @@ class ChangeAPIWorker {
     // async getMarketInfo() -> Promise<{
     //   error?: string, // the error response, if any; error XOR response will be set.
     //   response?: {
-    //     pair: string,     // CUR1-CUR2 eg. USDT-FIRO
-    //     quote: string,    // the string-encoded rational number of currency CUR1 equal to CUR2, eg. "3.1415"
-    //     expiryTs: number, // the UNIX timestamp until which the information is valid
+    //     from: string,     // eg. usdt
+    //     to: string,    // btc
+    //     rate: number, // rate
     //     minerFee: number, // the satoshi amount miner fee
-    //     minLimit: number, // the minimum amount of CUR1 that must be sent
-    //     maxLimit: number, // the maximum amount of CUR1 that must be sent
-    //     signature: string // a UUID representing the pair/quote
+    //     min: number, // the minimum amount of CUR1 that must be sent
+    //     max: number, // the maximum amount of CUR1 that must be sent
     //   }[],
     // }>
     async getMarketInfo() {
-        const url = `${this.API_URI}marketinfo/`;
-
-        const [serverError, response] = await Utils.to(
-            Http.get({
-                url
-            })
-        );
-
-        const errorMessage = this.errorMessage(serverError, response);
-
-        if (errorMessage) return { error: errorMessage };
-
-        return { error: null, response };
-    }
-
-    async getAvailableCurrency() {
-        const url = `${this.API_URI}currencies-to/firo`;
-        //const url = `${this.API_URI}pairs/firo?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643&fixed=true&fiat=false`;
+        const uri = `${this.API_URI}market-info/fixed-rate/1de3010c3462e7d532d0ac373e848ef59c617cc69f70de4feefc0f78da51ad9b`;
 
         const [serverError, temp] = await Utils.to(
-            // Http.get({
-            //     url
-            // })
-            axios.get(url)
+            axios.get(uri)
         );
         const response = temp.data;
         const errorMessage = this.errorMessage(serverError, temp);
-
+        
         if (errorMessage) return { error: errorMessage };
 
         return { error: null, response };
     }
-
 
     async getOffer({ pair, amount }) {
         const params = { pair };
@@ -102,16 +80,31 @@ class ChangeAPIWorker {
         return { error: null, response };
     }
 
+    // async getOrderStatus({ orderId }) {
+    //     const uri = `${this.API_URI}order/${orderId}`;
+
+    //     const [serverError, response] = await Utils.to(
+    //         Http.get({
+    //             url: uri
+    //         })
+    //     );
+
+    //     const errorMessage = this.errorMessage(serverError, response);
+
+    //     if (errorMessage) return { error: errorMessage };
+
+    //     return { error: null, response };
+    // }
+
     async getOrderStatus({ orderId }) {
-        const uri = `${this.API_URI}order/${orderId}`;
+        const uri = `${this.API_URI}transactions/${orderId}/1de3010c3462e7d532d0ac373e848ef59c617cc69f70de4feefc0f78da51ad9b`;
 
-        const [serverError, response] = await Utils.to(
-            Http.get({
-                url: uri
-            })
+        const [serverError, temp] = await Utils.to(
+            //Http.get({ url: uri })
+            axios.get(uri)
         );
-
-        const errorMessage = this.errorMessage(serverError, response);
+        const response = temp.data;
+        const errorMessage = this.errorMessage(serverError, temp);
 
         if (errorMessage) return { error: errorMessage };
 
@@ -139,40 +132,84 @@ class ChangeAPIWorker {
         return { error: null, response };
     }
 
-    async postOrder({ toAddress, refundAddress, pair, fromAmount, toAmount, signature, userIP }) {
-        const uri = `${this.API_URI}order/`;
+    // async postOrder({ toAddress, refundAddress, pair, fromAmount, toAmount, signature, userIP }) {
+    //     const uri = `${this.API_URI}order/`;
+
+    //     const body = {
+    //         toAddress,
+    //         refundAddress,
+    //         pair
+    //     };
+
+    //     if (fromAmount) {
+    //         body.fromAmount = fromAmount;
+    //     } else if (toAmount) {
+    //         body.toAmount = toAmount;
+    //     } else {
+    //         console.log('switchainApiClient.postOrder.error.requiredFromAmountOrToAmountField');
+    //     }
+
+    //     if (signature) body.signature = signature;
+
+    //     const headers = {};
+
+    //     if (userIP) headers['x-user-ip'] = userIP;
+
+    //     const [serverError, response] = await Utils.to(
+    //         Http.post({
+    //             url: uri,
+    //             headers,
+    //             options: {
+    //                 data: JSON.stringify(body)
+    //             }
+    //         })
+    //     );
+
+    //     const errorMessage = this.errorMessage(serverError, response);
+
+    //     if (errorMessage) return { error: errorMessage };
+
+    //     return { error: null, response };
+    // }
+
+    async postOrder({ from, to, address, amount, extraId, refundAddress, refundExtraId, userId, payload, contactEmail }) {
+        const uri = `${this.API_URI}transactions/fixed-rate/1de3010c3462e7d532d0ac373e848ef59c617cc69f70de4feefc0f78da51ad9b`;
 
         const body = {
-            toAddress,
+            from,
+            to,
+            address,
+            amount,
             refundAddress,
-            pair
         };
 
-        if (fromAmount) {
-            body.fromAmount = fromAmount;
-        } else if (toAmount) {
-            body.toAmount = toAmount;
-        } else {
-            console.log('switchainApiClient.postOrder.error.requiredFromAmountOrToAmountField');
+        if (extraId) {
+            body.extraId = extraId;
+        } else if (refundExtraId) {
+            body.refundExtraId = refundExtraId;
+        } else if (userId) {
+            body.userId = userId;
+        } else if (payload) {
+            body.payload = payload;
+        } else if (refundExtraId) {
+            body.contactEmail = contactEmail;
         }
-
-        if (signature) body.signature = signature;
-
+        
         const headers = {};
+        headers['Content-Type'] = "application/json";
 
-        if (userIP) headers['x-user-ip'] = userIP;
-
-        const [serverError, response] = await Utils.to(
-            Http.post({
-                url: uri,
-                headers,
-                options: {
-                    data: JSON.stringify(body)
-                }
-            })
+        const [serverError, temp] = await Utils.to(
+            // Http.post({
+            //     url: uri,
+            //     headers,
+            //     options: {
+            //         data: JSON.stringify(body)
+            //     }
+            // })  
+            axios.post(uri, body)
         );
-
-        const errorMessage = this.errorMessage(serverError, response);
+        const response = temp.data;
+        const errorMessage = this.errorMessage(serverError, temp);
 
         if (errorMessage) return { error: errorMessage };
 

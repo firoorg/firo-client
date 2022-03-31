@@ -1,6 +1,5 @@
 <template>
-    <th v-if="isHeader" class="vuetable-th-component-status" @click="$emit('click', rowField, $event)">
-    </th>
+    <th v-if="isHeader" class="vuetable-th-component-status" @click="$emit('click', rowField, $event)">Status</th>
 
     <td v-else class="vuetable-td-component-coinswap-status" :title="rowData.status">
         <div v-if="rowData.status === 'expired'">
@@ -19,7 +18,7 @@
             <div class="spin">&#xe819;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'exchanging'">
+        <div v-else-if="rowData.status === 'exchanging' || rowData.status === 'sending'">
             <div class="spin">&#xe819;</div>
         </div>
 
@@ -27,7 +26,7 @@
             <div class="spin">&#xe819;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'confirmed'">
+        <div v-else-if="rowData.status === 'confirmed' || rowData.status === 'finished' ">
             &#xeed6;
         </div>
 

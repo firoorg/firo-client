@@ -5,11 +5,13 @@ import {cloneDeep} from 'lodash';
 import path from "path";
 import {getApp} from '../../lib/utils';
 import APIWorker from '../../lib/switchain-api';
+import ChangeAPIWorker from '../../lib/changenow-api';
 import {createLogger} from '../../lib/logger';
 const logger = createLogger('firo:store:CoinSwap');
 
 // Used to communicate with the CoinSwap API.
-const apiWorker = new APIWorker();
+// const apiWorker = new APIWorker();
+const apiWorker = new ChangeAPIWorker();
 // Used to synchronise access to on-disk state.
 const coinSwapFileLock = new Mutex();
 

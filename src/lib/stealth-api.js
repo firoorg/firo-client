@@ -74,6 +74,25 @@ class StealthAPIWorker {
         const data = await ipcRenderer.invoke('stealth-pair');
         return data;
     }
+    
+    async getRange(from, to) {        
+        // await ipcRenderer.invoke('stealth-pair').then((data) => {
+        //     //console.log(data);
+        //     return data;
+        // }).catch((resp) => console.warn(resp))
+        const data = await ipcRenderer.invoke('stealth-range', from, to);
+        return data;
+    }
+
+    async getRate() {        
+        // await ipcRenderer.invoke('stealth-pair').then((data) => {
+        //     //console.log(data);
+        //     return data;
+        // }).catch((resp) => console.warn(resp))
+        const data = await ipcRenderer.invoke('stealth-rate');
+        return data;
+    }
+
 
     async getOffer({ pair, amount }) {
         const params = { pair };
