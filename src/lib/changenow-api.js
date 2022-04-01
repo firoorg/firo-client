@@ -47,7 +47,7 @@ class ChangeAPIWorker {
     //   }[],
     // }>
     async getMarketInfo() {
-        const uri = `${this.API_URI}market-info/fixed-rate/1de3010c3462e7d532d0ac373e848ef59c617cc69f70de4feefc0f78da51ad9b`;
+        const uri = `${this.API_URI}market-info/fixed-rate/`;
 
         const [serverError, temp] = await Utils.to(
             axios.get(uri)
@@ -97,7 +97,7 @@ class ChangeAPIWorker {
     // }
 
     async getOrderStatus({ orderId }) {
-        const uri = `${this.API_URI}transactions/${orderId}/1de3010c3462e7d532d0ac373e848ef59c617cc69f70de4feefc0f78da51ad9b`;
+        const uri = `${this.API_URI}transactions/${orderId}/`;
 
         const [serverError, temp] = await Utils.to(
             //Http.get({ url: uri })
@@ -173,7 +173,7 @@ class ChangeAPIWorker {
     // }
 
     async postOrder({ from, to, address, amount, extraId, refundAddress, refundExtraId, userId, payload, contactEmail }) {
-        const uri = `${this.API_URI}transactions/fixed-rate/1de3010c3462e7d532d0ac373e848ef59c617cc69f70de4feefc0f78da51ad9b`;
+        const uri = `${this.API_URI}transactions/fixed-rate/`;
 
         const body = {
             from,
