@@ -83,7 +83,7 @@ export default {
 
         // This is a decimal Number representing a whole coin amount of FIRO that will be charged as a fee.
         firoTransactionFee: {
-            type: Number,
+            type: String,
         },
 
         // The address that funds will be refunded at if the trade fails for some reason.
@@ -93,7 +93,7 @@ export default {
 
         // The expected amount of FIRO we will receive for each remoteCurrency, as a string whole-coin amount.
         expectedRate: {
-            type: Number
+            type: String
         }
     },
 
@@ -131,34 +131,13 @@ export default {
 
             let latestError = null;
             for (let i = 0; i < 10; i++) {
-                // const marketInfo = await this.api.getMarketInfo();
-                // if (marketInfo.error) {
-                //     latestError = `Error fetching market info: ${marketInfo.error}`;
-                //     this.$log.error(latestError);
-                //     await new Promise(r => setTimeout(r, 1e3));
-                //     continue;
-                // }
-
-                // const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
-                // if (!pairInfo) {
-                //     this.show = 'error';
-                //     this.error = `Pair ${pair} not found in Switchain markets`;
-                //     return;
-                // }
-
+                
                 const order ={
                     from:this.remoteCurrency.toLowerCase(),
                     to:"firo",
                     address: walletAddress,
                     refundAddress: this.refundAddress,
                     amount: this.remoteAmount
-
-                    //pair: `${this.remoteCurrency}-FIRO`,
-                    //fromAmount: this.remoteAmount,
-                    //toAddress: walletAddress,
-                    //toAmount: this.firoAmount,
-                    //refundAddress: this.refundAddress,
-                    //signature: pairInfo.signature
                 };
 
                 this.$log.info("Posting order: %O", order);
@@ -182,7 +161,6 @@ export default {
 
                 // Sanity check response
                 if (
-                    //!Big(response.fromAmount).eq(this.remoteAmount) ||
                     response.refundAddress !== this.refundAddress ||
                     response.payoutAddress !== walletAddress
                 ) {

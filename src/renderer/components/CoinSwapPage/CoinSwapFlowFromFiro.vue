@@ -33,11 +33,9 @@ import Popup from 'renderer/components/shared/Popup';
 import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
 import ErrorStep from './ErrorStep';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay';
-import APIWorker from 'lib/switchain-api';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import {convertToCoin} from "lib/convert";
-import {isValidAddress} from "lib/isValidAddress";
 import {mapActions, mapGetters} from "vuex";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
@@ -100,7 +98,7 @@ export default {
 
         // This is a decimal STRING representing a whole coin amount, NOT satoshi
         remoteTransactionFee: {
-            type: Number,
+            type: String,
         },
 
         // The address that funds will be received at.
@@ -109,7 +107,7 @@ export default {
         },
 
         expectedRate: {
-            type: Number,
+            type: String,
         },
 
         isBigWallet: {
@@ -141,21 +139,6 @@ export default {
 
             let latestError = null;
             for (let i = 0; i < 10; i++) {
-                // const marketInfo = await this.api.getMarketInfo();
-                // if (marketInfo.error) {
-                //     latestError = `Error fetching market info: ${marketInfo.error}`;
-                //     this.$log.error(latestError);
-                //     await new Promise(r => setTimeout(r, 1e3));
-                //     continue;
-                // }
-
-                // const pairInfo = marketInfo.response.find(mi => mi.pair === pair);
-                // if (!pairInfo) {
-                //     this.show = 'error';
-                //     this.error = `Pair ${pair} not found in Switchain markets`;
-                //     return;
-                // }
-
                 const order = {
                     from:"firo",
                     to:this.remoteCurrency.toLowerCase(),
@@ -184,7 +167,6 @@ export default {
                 const response = r.response;
                 // Sanity check response
                 if (
-                    //response.amount !== convertToCoin(this.firoAmount) ||
                     response.refundAddress !== walletAddress ||
                     response.payoutAddress !== this.receiveAddress
                 ) {

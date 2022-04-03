@@ -203,24 +203,7 @@ import InputFrame from "renderer/components/shared/InputFrame";
 // This is the list of currency pairs that we want to be available in the app. It is not necessarily symmetrical, and it
 // is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
 // one of them.
-// const AllowedPairs = [
-//     "BTC",
-//     "ETH",
-//     "ZEC",
-//     "LTC",
-//     "XRP",
-//     "XLM",
-//     "BNB",
-//     "BNBBSC",
-//     "USDT",
-//     "USDC",
-//     "DAI",
-//     "DASH",
-//     "DCR",
-//     "PAX",
-//     "KMD",
-//     "BCH",
-// ];
+
 const AllowedPairs = [
     "FIRO-BTC",
     "FIRO-ETH",
@@ -285,9 +268,7 @@ const AddressValidations = {};
 for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'BNBBSC','USDT', 'USDC', 'DASH', 'DCR', 'PAX', 'KMD', 'BCH']) {
     AddressValidations[coin] = (address) => {
         try {
-            if (coin == "BNBBSC" || coin == "BNB" ) coin = 'ETH';
-            console.log("coin---------"+coin);
-            console.log('result======='+CryptoAddressValidator.validate(address, coin))
+            if (coin == "BNBBSC") coin = 'ETH';
             return CryptoAddressValidator.validate(address, coin);
         } catch {
             // This case should never occur unless the library is updated to remove functionality or such, but it's
@@ -325,7 +306,6 @@ export default {
     data() {
         return {
             chainName: "ChangeNow",
-            //chainName: "StealthEx",
             show:"button",
             ChainOptions,
             CoinNames,
@@ -348,7 +328,6 @@ export default {
         // Set up VeeValidator rules.
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
-            // this.availableXzc will still be reactively updated.
             getMessage: () => `Amount is over your available balance of ${convertToCoin(this.available)} FIRO`,
 
             validate: (value) => convertToSatoshi(value) <= this.available
@@ -386,12 +365,9 @@ export default {
             this.$validator.extend(`${currency}AddressIsValid`, {
                 getMessage: () => `Invalid ${name} Address`,
                 // We make sure to check if we have a validation for the currency to make sure we fail closed.
-                //validate: (value) => !!(AddressValidations[currency] && AddressValidations[currency](value))
                 validate: (value) => !!(AddressValidations[currency] && AddressValidations[currency](value))
             });
         }
-
-        // Additional validations are created in the watcher for marketInfo
     },
 
     created() {
@@ -492,12 +468,6 @@ export default {
                     }
                     this.$log.silly("Got ChangeNow currency information.");
                     
-                    // response.map(market=>{
-                    //     if (AllowedPairs.includes(market.ticker.toUpperCase()) && market.supportsFixedRate && market.isAvailable){
-                    //         temp={'coin':market.ticker};
-                    //         marketInfo.push(temp);
-                    //     }
-                    // })
                     marketInfo = lodash.fromPairs(
                         response.filter(market => AllowedPairs.includes("FIRO-"+market.to.toUpperCase()) && market.from === "firo")
                             .map(market => ["FIRO-"+market.to.toUpperCase(), market]).concat(
@@ -533,14 +503,7 @@ export default {
                         return {_switchainDoesntSupportFiro: true};
                     }
 
-                }                
-                                
-                // for (const ticker of AllowedPairs) {
-                //     if (!marketInfo[ticker.toLowerCase()]) {
-                //         console.warn(`No CoinSwap market for ${ticker}.`);
-                //     }
-                // }
-
+                }  
                 return marketInfo
             }
         }
@@ -616,13 +579,12 @@ export default {
         //     max: number, // the maximum amount of CUR1 that must be sent
         // }
         currentMarketInfo() {
-            //if (this.marketInfo[this.xzcPair]) console.log(this.marketInfo[this.xzcPair].rate);
             return this.marketInfo[this.xzcPair];
         },
 
         // This is a string representation of the whole-coin amount of the remote currency taken as a transaction fee.
         remoteTransactionFee() {
-            return this.currentMarketInfo && this.currentMarketInfo.minerFee;
+            return String(this.currentMarketInfo && this.currentMarketInfo.minerFee);
         },
 
         isMarketInfoLoaded() {
@@ -656,22 +618,13 @@ export default {
             //return this.marketInfo;
         },
 
-        // firoPair() {
-        //     return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
-        // },
-
         xzcPair() {
             return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
         },
 
         // We return a decimal-formatted string (or undefined).
         conversionRate() {
-            if (this.chainName === "ChangeNow"){
-                //return this.currentMarketInfo && this.currentMarketInfo.rate;
-                return this.currentMarketInfo && this.currentMarketInfo.rate;
-            } else {
-
-            }            
+            return this.currentMarketInfo && String(this.currentMarketInfo.rate);
         },
 
         // This is a number in satoshi units of the remote currency.

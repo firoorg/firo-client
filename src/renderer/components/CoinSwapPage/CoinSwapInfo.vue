@@ -39,7 +39,7 @@
                     <td class="value">
                         <Amount amount="1" :ticker="coinSwapData.fromCoin" />
                         =
-                        <Amount :amount="coinSwapData.expectedRate.toString()" :ticker="coinSwapData.toCoin" />
+                        <Amount :amount="String(coinSwapData.expectedRate)" :ticker="coinSwapData.toCoin" />
                     </td>
                 </tr>
 
@@ -55,12 +55,12 @@
 
                 <tr>
                     <td>Expected {{ coinSwapData.toCoin }} Fee</td>
-                    <td><Amount :amount="coinSwapData.expectedToFee.toString()" :ticker="coinSwapData.toCoin" /></td>
+                    <td><Amount :amount="String(coinSwapData.expectedToFee)" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr>
                     <td>Estimated Total to Receive</td>
-                    <td><Amount :amount="coinSwapData.expectedAmountToReceive.toString()" :ticker="coinSwapData.toCoin" /></td>
+                    <td><Amount :amount="String(coinSwapData.expectedAmountToReceive)" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr v-if="coinSwapData.actualAmountToReceive">
