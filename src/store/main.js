@@ -96,16 +96,39 @@ ipcMain.handle('stealth-pair', async (event, args) => {
     return result.data;
 })
 
-ipcMain.handle('stealth-range', async (event, args) => {
-    const url = `https://api.stealthex.io/api/v2/range/btc/eth?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`;
+ipcMain.handle('stealth-min', async (event, from, to) => {
+    const url = 'https://api.stealthex.io/api/v2/range/'+from+'/'+to+'?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643';
     const result = await axios.get(url)
     return result.data;
 })
 
-ipcMain.handle('stealth-rate', async (event, args) => {
-    const url = `https://api.stealthex.io/api/v2/estimate/btc/eth?amount=0.1&api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`;
+ipcMain.handle('stealth-rate', async (event, from, to, amount) => {
+    const url = 'https://api.stealthex.io/api/v2/estimate/'+from+'/'+to+'?amount='+amount+'&api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643';
     const result = await axios.get(url)
     return result.data;
+})
+
+ipcMain.handle('stealth-post', async (event, currency_from, currency_to, address_to, amount_from, refund_address) => {
+    const url = 'https://api.stealthex.io/api/v2/exchange?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643'     
+    const body = JSON.stringify({
+        "currency_from":currency_from,
+        "currency_to":currency_to,
+        "address_to":address_to,
+        "amount_from":amount_from,
+        "refund_address":refund_address,
+    });
+    
+    const config = {
+        method: 'post',
+        url: url,
+        headers: { 
+        'Content-Type': 'application/json'
+        },
+        data : body
+    };
+    
+    const result = await axios(config)
+    return JSON.stringify(result.data);
 })
 
 

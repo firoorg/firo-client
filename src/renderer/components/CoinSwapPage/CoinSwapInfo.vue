@@ -15,6 +15,11 @@
                 </tr>
 
                 <tr>
+                    <td>Chain</td>
+                    <td>{{ coinSwapData.chainName }}</td>
+                </tr>
+
+                <tr>
                     <td>Swap ID</td>
                     <td>{{ coinSwapData.orderId }}</td>
                 </tr>

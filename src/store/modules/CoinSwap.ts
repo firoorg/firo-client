@@ -4,17 +4,18 @@ import {promises as fs} from 'fs';
 import {cloneDeep} from 'lodash';
 import path from "path";
 import {getApp} from '../../lib/utils';
-import APIWorker from '../../lib/switchain-api';
 import ChangeAPIWorker from '../../lib/changenow-api';
 import {createLogger} from '../../lib/logger';
 const logger = createLogger('firo:store:CoinSwap');
 
 // Used to communicate with the CoinSwap API.
-// const apiWorker = new APIWorker();
+
 const apiWorker = new ChangeAPIWorker();
 // Used to synchronise access to on-disk state.
 const coinSwapFileLock = new Mutex();
 
+// a chain name associated with an order
+type ChainName = string;
 // a unique identifier associated with an order
 type OrderId = string;
 // e.g. "FIRO", "USDT", "BTC", "BCHABC", etc.
@@ -22,7 +23,7 @@ type CurrencyCode = string;
 // a whole coin amount of a given coin, e.g. "1.08" FIRO = 1.08e8 FIRO satoshi
 type Amount = string;
 // the status of the request; this will be updated from 'waiting' to some other value, and then not again.
-type CoinSwapStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'refunded' | 'failed';
+type CoinSwapStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' |'finished' | 'refunded' | 'failed';
 // a UNIX timestamp
 type Timestamp = number;
 // a coin address, of any type of coin
@@ -35,6 +36,8 @@ interface CoinSwapRecord {
     //
     // the status of the order
     status: CoinSwapStatus,
+    // the name of the chain that the order is made
+    chainName: ChainName,
     // a UUID representing the order
     orderId: OrderId,
     // the currency code for the coin to be sent to the exchange
@@ -69,10 +72,6 @@ interface CoinSwapRecord {
     // The transaction ID of the deposit transaction
     depositTxId?: TransactionId,
 
-    // Data in this section will be populated from an API reply when status changes to 'exchanging'
-    //
-    // [intentionally left blank]
-
     // Data in this section will be populated from an API reply when status changes to 'confirming'
     //
     // The actual amount that will be received.
@@ -98,7 +97,7 @@ const state = {
 };
 
 const mutations = {
-    updateCoinSwapRecords(state, records: CoinSwapRecord[]) {
+    updateCoinSwapRecords(state: { records: object; }, records: CoinSwapRecord[]) {
         for (const record of records) {
             Vue.set(state.records, record.orderId, record);
         }
@@ -111,7 +110,7 @@ const actions = {
     async readRecordsFromFile({getters, commit}): Promise<void> {
         const release = await coinSwapFileLock.lock();
 
-        let data;
+        let data: string;
         try {
             data = (await fs.readFile(getters.coinSwapFileLocation, {encoding: 'utf8'})).toString();
         } catch (err) {
@@ -126,7 +125,7 @@ const actions = {
 
         const records = data
             .split('\n')
-            .map(r => {
+            .map((r: string) => {
                 // The last value will always be empty.
                 if (!r) return undefined;
 
@@ -138,7 +137,7 @@ const actions = {
                     return undefined;
                 }
             })
-            .filter(r => !!r);
+            .filter((r: any) => !!r);
         commit('updateCoinSwapRecords', records);
     },
 
@@ -147,7 +146,7 @@ const actions = {
 
         const release = await coinSwapFileLock.lock();
 
-        let handle;
+        let handle: fs.FileHandle;
         try {
             handle = await fs.open(getters.coinSwapFileLocation, 'a');
         } catch (err) {
@@ -189,9 +188,9 @@ const actions = {
             logger.debug(`Fetching status for CoinSwap record ${record.orderId}...`);
 
             try {
-                const {error, response} = await apiWorker.getOrderStatus(record);
+                const{error, response} = await apiWorker.getOrderStatus(record);
+                
                 if (error) throw error;
-
                 if (response.status !== record.status) {
                     logger.info(`Updating status of CoinSwap record ${record.orderId} to '${response.status}...`);
 
@@ -237,7 +236,7 @@ const getters = {
         :
         path.join(getApp().getPath('userData'), 'coin-swap.jsonl'),
 
-    records: (state) => state.records
+    records: (state: { records: any; }) => state.records
 };
 
 export default {

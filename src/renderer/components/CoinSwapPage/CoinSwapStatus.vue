@@ -14,15 +14,7 @@
             <div class="spin">&#xeffa;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'received'">
-            <div class="spin">&#xe819;</div>
-        </div>
-
-        <div v-else-if="rowData.status === 'exchanging' || rowData.status === 'sending'">
-            <div class="spin">&#xe819;</div>
-        </div>
-
-        <div v-else-if="rowData.status === 'confirming'">
+        <div v-else-if="rowData.status === 'received' || rowData.status === 'exchanging' || rowData.status === 'sending' || rowData.status === 'confirming'">
             <div class="spin">&#xe819;</div>
         </div>
 

@@ -54,7 +54,7 @@
                         v-validate="amountValidations"
                         v-tooltip="getValidationTooltip('amount')"
                         type="text"
-                        :disabled="formDisabled || !selectedCoin"
+                        :disabled="formDisabled || !selectedCoin || !isCurrentMarketInfoLoaded"
                         name="amount"
                         class="amount"
                         tabindex="3"
@@ -100,7 +100,7 @@
                         </div>
                     </div>
 
-                    <div v-if="selectedCoin" class="total-field">
+                    <div v-if="selectedCoin && chainName !== 'StealthEx' && chainName !=='Swapzone' " class="total-field">
                         <label>{{ CoinNames[selectedCoin] }} Transaction Fee:</label>
 
                         <div class="value">
@@ -130,6 +130,7 @@
                     v-if="isSwapFrom"
                     :disabled="formDisabled || !canBeginSwapFromFiro"
                     :is-private="isPrivate"
+                    :chain-name="chainName"
                     :remote-currency="selectedCoin"
                     :is-big-wallet="isBigWallet"
                     :firo-transaction-fee="firoTransactionFee"
@@ -139,6 +140,7 @@
                     :remote-amount="amountToReceive"
                     :receive-address="address"
                     :expected-rate="conversionRate"
+                    :quota-id="quotaId"
                     :class="{disabled: formDisabled}"
                     @reset="cleanupForm"
                     @success="cleanupForm"
@@ -147,12 +149,14 @@
                 <CoinSwapFlowToFiro
                     v-else
                     :disabled="formDisabled || !canBeginSwapToFiro"
+                    :chain-name="chainName"
                     :remote-currency="selectedCoin"
                     :remote-amount="amount"
                     :firo-amount="amountToReceive"
                     :firo-transaction-fee="remoteTransactionFee"
                     :refund-address="address"
                     :expected-rate="conversionRate"
+                    :quota-id="quotaId"
                     @reset="cleanupForm"
                     @success="cleanupForm"
                 />
@@ -188,9 +192,9 @@ import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowF
 import CoinSwapFlowToFiro from "renderer/components/CoinSwapPage/CoinSwapFlowToFiro";
 import { convertToSatoshi, convertToCoin } from 'lib/convert';
 import { VueSelect } from 'vue-select';
-import APIWorker from 'lib/switchain-api';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
+import SwapzoneAPIWorker from 'lib/swapzone-api';
 import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
 import CircularTimer from 'renderer/components/Icons/CircularTimer';
 import CoinIcon from './CoinIcon';
@@ -201,9 +205,7 @@ import {FirodErrorResponse} from "daemon/firod";
 import InputFrame from "renderer/components/shared/InputFrame";
 
 // This is the list of currency pairs that we want to be available in the app. It is not necessarily symmetrical, and it
-// is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for
-// one of them.
-
+// is also not necessarily the case that all the pairs will be shown, eg. in the event that the server drops support for one of them.
 const AllowedPairs = [
     "FIRO-BTC",
     "FIRO-ETH",
@@ -214,6 +216,7 @@ const AllowedPairs = [
     "FIRO-BNB",
     "FIRO-BNBBSC",
     "FIRO-USDT",
+    "FIRO-USDTBSC",
     "FIRO-USDC",
     "FIRO-DAI",
     "FIRO-DASH",
@@ -230,6 +233,7 @@ const AllowedPairs = [
     "BNB-FIRO",
     "BNBBSC-FIRO",
     "USDT-FIRO",
+    "USDTBSC-FIRO",
     "USDC-FIRO",
     "DAI-FIRO",
     "DASH-FIRO",
@@ -250,6 +254,7 @@ const CoinNames = {
     BNB: "Binance Coin",    
     BNBBSC: "BNB Smart Chain",
     USDT: "Tether",
+    USDTBSC: "BSC Tether",
     USDC: "USD Coin",
     DAI: "Dai",
     DASH: "Dash",
@@ -262,13 +267,14 @@ const CoinNames = {
 const ChainOptions = [
     {chain: "ChangeNow"},
     {chain: "StealthEx"},
+    {chain: "Swapzone"},
 ];
 
 const AddressValidations = {};
-for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'BNBBSC','USDT', 'USDC', 'DASH', 'DCR', 'PAX', 'KMD', 'BCH']) {
+for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'BNBBSC','USDT', 'USDTBSC', 'USDC', 'DASH', 'DCR', 'PAX', 'KMD', 'BCH']) {
     AddressValidations[coin] = (address) => {
         try {
-            if (coin == "BNBBSC") coin = 'ETH';
+            if (coin == "BNBBSC" || coin == "USDTBSC") coin = 'ETH';
             return CryptoAddressValidator.validate(address, coin);
         } catch {
             // This case should never occur unless the library is updated to remove functionality or such, but it's
@@ -305,7 +311,11 @@ export default {
 
     data() {
         return {
+            changeAPI: null, 
+            stealthAPI: null,
+            swapzonAPI: null,
             chainName: "ChangeNow",
+            quotaId: null,
             show:"button",
             ChainOptions,
             CoinNames,
@@ -325,9 +335,10 @@ export default {
     },
 
     beforeMount () {
-        // Set up VeeValidator rules.
+        // Set up VeeValidator rules.        
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
+            // this.availableXzc will still be reactively updated.
             getMessage: () => `Amount is over your available balance of ${convertToCoin(this.available)} FIRO`,
 
             validate: (value) => convertToSatoshi(value) <= this.available
@@ -368,6 +379,8 @@ export default {
                 validate: (value) => !!(AddressValidations[currency] && AddressValidations[currency](value))
             });
         }
+
+        // Additional validations are created in the watcher for marketInfo
     },
 
     created() {
@@ -375,6 +388,9 @@ export default {
         this.refreshOffersIntervalId = setInterval(() => {
             this.marketInfoRefreshNonce++;
         }, 60e3);
+        this.changeAPI = new ChangeAPIWorker();
+        this.stealthAPI = new StealthAPIWorker();
+        this.swapzoneAPI = new SwapzoneAPIWorker();
     },
 
     destroyed() {
@@ -419,7 +435,6 @@ export default {
 
         marketInfo() {
             if (!this.marketInfo) return;
-
             for (const [pair, info] of Object.entries(this.marketInfo)) {
                 this.$validator.extend(`${pair}AmountDoesntViolateAPILimits`, {
                     getMessage: () => `Amount must be between ${info.min} and ${info.max}`,
@@ -430,11 +445,24 @@ export default {
                         } catch {
                             return false;
                         }
-
                         return v.gte(info.min) && v.lte(info.max);
                     }
                 })
             }
+        },
+        currentMarketInfo() {
+            this.$validator.extend('currentAmountDoesntViolateAPILimits', {
+                getMessage: () => `Amount must be between ${this.currentMarketInfo.min} and ${this.currentMarketInfo.max}`,
+                validate: (value) => {
+                    let v;
+                    try {
+                        v = new Big(value);
+                    } catch {
+                        return false;
+                    }
+                    return v.gte(this.currentMarketInfo.min) && v.lte(this.currentMarketInfo.max);
+                }
+            })
         },
 
         isPrivate() {
@@ -454,11 +482,9 @@ export default {
 
                 let response;
                 let marketInfo = [];
-                let temp;
                 if (this.chainName === "ChangeNow") {
                     try {
-                        const api = new ChangeAPIWorker();
-                        const mi = await api.getMarketInfo();
+                        const mi = await this.changeAPI.getMarketInfo(); 
                         if (mi.error) throw mi.error;
                         response = mi.response;                        
                     } catch (error) {
@@ -476,14 +502,12 @@ export default {
                     );
                     
                     if (!Object.keys(marketInfo).length) {
-                        this.$log.error("ChangeNow doesn't seem to support FIRO now. :(");
+                        this.$log.error("ChangeNow doesn't seem to support FIRO now.");
                         return {_switchainDoesntSupportFiro: true};
                     }
-
-                } else {
+                } else if (this.chainName === "StealthEx" ){
                     try {
-                        const stealth = new StealthAPIWorker();
-                        response = await stealth.getAvailableCurrency();
+                        response = await this.stealthAPI.getMarketInfo();
                     } catch (error) {
                         console.warn(`Error fetching StealthTx currency info: ${error}`);
                         setTimeout(() => this.marketInfoRefreshNonce++, 10e3);
@@ -491,22 +515,128 @@ export default {
                     }
                     this.$log.silly("Got Stealth currency information.");
 
-                    response.forEach(element => {
-                        if (AllowedPairs.includes(element.toUpperCase())){
-                            temp={'coin':element};
-                            marketInfo.push(temp);
-                        }
-                    });
+                    marketInfo = lodash.fromPairs(
+                        response.filter(market => AllowedPairs.includes("FIRO-"+market.toUpperCase().replace("-","")))
+                            .map(market => ["FIRO-"+market.toUpperCase().replace("-",""), market]).concat(
+                        response.filter(market => AllowedPairs.includes(market.toUpperCase().replace("-","")+"-FIRO"))
+                            .map(market => [market.toUpperCase().replace("-","")+"-FIRO", market]))
+                    );
                     
                     if (!Object.keys(marketInfo).length) {
-                        this.$log.error("Stealth doesn't seem to support FIRO now. :(");
+                        this.$log.error("Stealth doesn't seem to support FIRO now.");
                         return {_switchainDoesntSupportFiro: true};
                     }
 
-                }  
+                } else if (this.chainName === "Swapzone"){
+                    try {
+                        const mi = await this.swapzoneAPI.getMarketInfo();
+                        if (mi.error) throw mi.error;
+                        response = mi.response;      
+                    } catch (error) {
+                        console.warn(`Error fetching Swapzone currency info: ${error}`);
+                        setTimeout(() => this.marketInfoRefreshNonce++, 10e3);
+                        return {_switchainIsUnavailable: true};
+                    }
+                    this.$log.silly("Got Stealth currency information.");
+
+                    marketInfo = lodash.fromPairs(
+                        response.filter(market => AllowedPairs.includes("FIRO-"+market.toUpperCase().replace("-","")))
+                            .map(market => ["FIRO-"+market.toUpperCase().replace("-",""), market]).concat(
+                        response.filter(market => AllowedPairs.includes(market.toUpperCase().replace("-","")+"-FIRO"))
+                            .map(market => [market.toUpperCase().replace("-","")+"-FIRO", market]))
+                    );
+                    
+                    if (!Object.keys(marketInfo).length) {
+                        this.$log.error("Swapzone doesn't seem to support FIRO now.");
+                        return {_switchainDoesntSupportFiro: true};
+                    }
+                }
+
                 return marketInfo
             }
-        }
+        },
+
+        currentMarketInfo: {
+            default: {_isLoading: true},
+            async get() {
+                if (this.chainName === "StealthEx" && this.selectedCoin){
+                    let from, to, amount, min, max;
+                
+                    if (this.isSwapFrom){
+                        from = 'firo'; 
+                        if (this.selectedCoin.toUpperCase() === "BNBBSC") {
+                            to = "bnb-bsc";
+                        } else {
+                            to = this.selectedCoin.toLowerCase();
+                        }
+                    } else {
+                        if (this.selectedCoin.toUpperCase() === "BNBBSC") {
+                            from = "bnb-bsc";
+                        } else {
+                            from = this.selectedCoin.toLowerCase(); 
+                        }                        
+                        to = 'firo';
+                    }
+                    const response = await this.stealthAPI.getMin(from, to);
+                    
+                    if (response.max_amount === undefined) {                   
+                        max = 10e20
+                    } else {
+                        max = response.max_amount
+                    }
+                    if (response.min_amount === undefined) {                   
+                        min = 1;
+                        amount = 1;
+                    } else {
+                        min = response.min_amount;
+                        amount = Math.round(response.min_amount)+2;
+                    } 
+                    
+                    const response1 = await this.stealthAPI.getRate(from, to, amount);
+                    const result = {from:from, to:to, min:min, max:max, rate:response1.estimated_amount/amount, minerFee:0}
+                    this._isLoading = false;
+                    return result;
+                } else if (this.chainName === "Swapzone" && this.selectedCoin){
+                    let from, to, amount, min, max;
+                
+                    if (this.isSwapFrom){
+                        from = 'firo'; 
+                        to = this.selectedCoin.toLowerCase();
+                    } else {
+                        from = this.selectedCoin.toLowerCase(); 
+                        to = 'firo';
+                    }
+                    const response = await this.stealthAPI.getMin(from, to);
+                    
+                    if (response.max_amount === undefined) {                   
+                        max = 10e20
+                    } else {
+                        max = response.max_amount
+                    }
+                    if (response.min_amount === undefined) {                   
+                        min = 1;
+                    } else {
+                        min = Math.ceil(response.min_amount)+1;
+                    } 
+                    amount = min;
+                    
+                    const response1 = await this.swapzoneAPI.getRate(from, to, amount);
+                    this.quotaId = response1.quotaId;
+                    const result = {from:from, to:to, min:min, max:max, rate:response1.amountTo/amount, minerFee:0, quotaId:response1.quotaId}
+                    this._isLoading = false;
+                    return result;
+                }else {  
+                    return this.marketInfo[this.xzcPair];
+                } 
+            }
+        },
+        
+        isCurrentMarketInfoLoaded: {
+            default: {_isLoading: true},
+            async get() {
+                return this.currentMarketInfo && !this.currentMarketInfo._isLoading;
+            }
+        },
     },
 
     computed: {
@@ -549,7 +679,6 @@ export default {
         },
 
         formDisabled() {
-            //return this.isSwapFrom && (!this.isBlockchainSynced || (this.isPrivate && !this.isLelantusAllowed));
             return (!this.isBlockchainSynced || (this.isPrivate && !this.isLelantusAllowed));
         },
 
@@ -557,29 +686,26 @@ export default {
             if (!this.selectedCoin) {
                 return '';
             } else if (this.isSwapFrom) {
-                if (this.isPrivate) {
-                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountDoesntViolateSpendLimit`;
+                if (this.chainName === "ChangeNow"){
+                    if (this.isPrivate) {
+                        return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountDoesntViolateSpendLimit`;
+                    } else {
+                        return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance`;
+                    }
                 } else {
-                    return `${this.xzcPair}AmountDoesntViolateAPILimits|amountIsWithinAvailableBalance`;
-                }
+                    if (this.isPrivate) {
+                        return `currentAmountDoesntViolateAPILimits|amountIsWithinAvailableBalance|privateAmountDoesntViolateSpendLimit`;
+                    } else {
+                        return `currentAmountDoesntViolateAPILimits|amountIsWithinAvailableBalance`;
+                    }
+                }                
             } else {
-                return `${this.xzcPair}AmountDoesntViolateAPILimits`;
+                if (this.chainName === "ChangeNow"){
+                    return `${this.xzcPair}AmountDoesntViolateAPILimits`;
+                } else {
+                    return `currentAmountDoesntViolateAPILimits`;
+                }
             }
-        },
-
-        // The information about the currently selected market, or undefined if marketInfo isn't loaded or no coin is
-        // selected.
-        // Returns:
-        // {
-        //     from: string,     // CUR1 eg. USDT
-        //     to: string,     // CUR2 eg. FIRO
-        //     rate: string,    // the string-encoded rational number of currency CUR1 equal to CUR2, eg. "3.1415"
-        //     minerFee: number, // the satoshi amount miner fee
-        //     min: number, // the minimum amount of CUR1 that must be sent
-        //     max: number, // the maximum amount of CUR1 that must be sent
-        // }
-        currentMarketInfo() {
-            return this.marketInfo[this.xzcPair];
         },
 
         // This is a string representation of the whole-coin amount of the remote currency taken as a transaction fee.
@@ -624,7 +750,7 @@ export default {
 
         // We return a decimal-formatted string (or undefined).
         conversionRate() {
-            return this.currentMarketInfo && String(this.currentMarketInfo.rate);
+            return this.currentMarketInfo && String(this.currentMarketInfo.rate) ;
         },
 
         // This is a number in satoshi units of the remote currency.
@@ -672,7 +798,7 @@ export default {
 
                 const amountToReceive = remoteAmount * conversionRate - remoteTxFee;
                 return amountToReceive.toPrecision(8);
-            }
+            }                
         },
 
         canBeginSwapFromFiro() {
@@ -700,13 +826,18 @@ export default {
         },
 
         chainSelect() {
+            this.cleanupForm(true);
             this.show = 'info';
         }, 
 
         changeChain() {
-            let temp = this.$refs['modalRef'].selectedValue;
-            this.show = 'button';
-            this.chainName = temp.chain;
+            let temp = this.$refs['modalRef'].selectedValue;                
+            this.show = 'button';             
+            if (temp.chain === undefined){ 
+                this.chainName = temp;
+            } else {
+                this.chainName = temp.chain;
+            }
         },
 
         cancel() {

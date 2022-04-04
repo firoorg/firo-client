@@ -1,26 +1,8 @@
-import Http from './http-utils';
 import Utils from './coinswap-utils';
 import axios from 'axios';
 
 class ChangeAPIWorker {
-    API_URI = 'https://api.changenow.io/v1/';
-    //API_URI = 'https://api.stealthex.io/api/v2/';
-
-    buildUrl({ url, params }) {
-        const query = [];
-
-        for (let key in params) {
-            if (typeof params[key] === 'object') {
-                for (let k in params[key]) {
-                    query.push(k + '=' + params[key][k]);
-                }
-            } else {
-                query.push(key + '=' + params[key]);
-            }
-        }
-
-        return `${url}?${query.join('&')}`;
-    }
+    API_URL = 'https://api.changenow.io/v1/';
 
     errorMessage(serverError, response) {
         if (serverError) {
@@ -35,22 +17,11 @@ class ChangeAPIWorker {
         return;
     }
 
-    // async getMarketInfo() -> Promise<{
-    //   error?: string, // the error response, if any; error XOR response will be set.
-    //   response?: {
-    //     from: string,     // eg. usdt
-    //     to: string,    // btc
-    //     rate: number, // rate
-    //     minerFee: number, // the satoshi amount miner fee
-    //     min: number, // the minimum amount of CUR1 that must be sent
-    //     max: number, // the maximum amount of CUR1 that must be sent
-    //   }[],
-    // }>
     async getMarketInfo() {
-        const uri = `${this.API_URI}market-info/fixed-rate/`;
-
+        const url = `${this.API_URL}market-info/fixed-rate/`;
+        
         const [serverError, temp] = await Utils.to(
-            axios.get(uri)
+            axios.get(url)
         );
         const response = temp.data;
         const errorMessage = this.errorMessage(serverError, temp);
@@ -60,120 +31,54 @@ class ChangeAPIWorker {
         return { error: null, response };
     }
 
-    async getOffer({ pair, amount }) {
-        const params = { pair };
-
-        if (amount) params.amount = amount;
-
-        const uri = this.buildUrl({ url: `${this.API_URI}offer`, params });
-
-        const [serverError, response] = await Utils.to(
-            Http.get({
-                url: uri
-            })
-        );
-
-        const errorMessage = this.errorMessage(serverError, response);
-
-        if (errorMessage) return { error: errorMessage };
-
-        return { error: null, response };
+    async getOrderStatus({ orderId, chainName }) {    
+        let url;
+        let config;
+        
+        if (chainName==="StealthEx") {
+            url = 'https://api.stealthex.io/api/v2/exchange/'+orderId+'?api_key='
+        } else if (chainName==="Swapzone") {            
+            url = `https://api.swapzone.io/v1/exchange/tx?id=${orderId}`;
+            config = {
+                method: 'get',
+                url: url,
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'dHDar8ZIx'
+                }
+            };
+            const [serverError, temp] = await Utils.to(
+                axios(config)
+            );
+            const response = temp.data.transaction;
+            const errorMessage = this.errorMessage(serverError, temp);
+    
+            if (errorMessage) return { error: errorMessage };
+    
+            return { error: null, response };
+        } else {            
+            url = `${this.API_URL}transactions/${orderId}/`;
+            config = {
+                method: 'get',
+                url: url,
+                headers: { 
+                    'Content-Type': 'application/json'
+                }
+            };
+            const [serverError, temp] = await Utils.to(
+                axios(config)
+            );
+            const response = temp.data;
+            const errorMessage = this.errorMessage(serverError, temp);
+    
+            if (errorMessage) return { error: errorMessage };
+    
+            return { error: null, response };
+        }             
     }
-
-    // async getOrderStatus({ orderId }) {
-    //     const uri = `${this.API_URI}order/${orderId}`;
-
-    //     const [serverError, response] = await Utils.to(
-    //         Http.get({
-    //             url: uri
-    //         })
-    //     );
-
-    //     const errorMessage = this.errorMessage(serverError, response);
-
-    //     if (errorMessage) return { error: errorMessage };
-
-    //     return { error: null, response };
-    // }
-
-    async getOrderStatus({ orderId }) {
-        const uri = `${this.API_URI}transactions/${orderId}/`;
-
-        const [serverError, temp] = await Utils.to(
-            //Http.get({ url: uri })
-            axios.get(uri)
-        );
-        const response = temp.data;
-        const errorMessage = this.errorMessage(serverError, temp);
-
-        if (errorMessage) return { error: errorMessage };
-
-        return { error: null, response };
-    }
-
-    async getOrdersInfo({ limit, page, sort }) {
-        const params = {};
-
-        if (limit) params.limit = limit;
-        if (page) params.page = page;
-        if (sort) params.sort = sort;
-
-        const uri = buildUrl({ url: `${this.API_URI}ordersinfo/`, params });
-
-        const [serverError, response] = await Utils.to(
-            Http.get({
-                url: uri
-            })
-        );
-        const errorMessage = this.errorMessage(serverError, response);
-
-        if (errorMessage) return { error: errorMessage };
-
-        return { error: null, response };
-    }
-
-    // async postOrder({ toAddress, refundAddress, pair, fromAmount, toAmount, signature, userIP }) {
-    //     const uri = `${this.API_URI}order/`;
-
-    //     const body = {
-    //         toAddress,
-    //         refundAddress,
-    //         pair
-    //     };
-
-    //     if (fromAmount) {
-    //         body.fromAmount = fromAmount;
-    //     } else if (toAmount) {
-    //         body.toAmount = toAmount;
-    //     } else {
-    //         console.log('switchainApiClient.postOrder.error.requiredFromAmountOrToAmountField');
-    //     }
-
-    //     if (signature) body.signature = signature;
-
-    //     const headers = {};
-
-    //     if (userIP) headers['x-user-ip'] = userIP;
-
-    //     const [serverError, response] = await Utils.to(
-    //         Http.post({
-    //             url: uri,
-    //             headers,
-    //             options: {
-    //                 data: JSON.stringify(body)
-    //             }
-    //         })
-    //     );
-
-    //     const errorMessage = this.errorMessage(serverError, response);
-
-    //     if (errorMessage) return { error: errorMessage };
-
-    //     return { error: null, response };
-    // }
 
     async postOrder({ from, to, address, amount, extraId, refundAddress, refundExtraId, userId, payload, contactEmail }) {
-        const uri = `${this.API_URI}transactions/fixed-rate/`;
+        const url = `${this.API_URL}transactions/fixed-rate/`;
 
         const body = {
             from,
@@ -195,18 +100,8 @@ class ChangeAPIWorker {
             body.contactEmail = contactEmail;
         }
         
-        const headers = {};
-        headers['Content-Type'] = "application/json";
-
         const [serverError, temp] = await Utils.to(
-            // Http.post({
-            //     url: uri,
-            //     headers,
-            //     options: {
-            //         data: JSON.stringify(body)
-            //     }
-            // })  
-            axios.post(uri, body)
+            axios.post(url, body)
         );
         const response = temp.data;
         const errorMessage = this.errorMessage(serverError, temp);

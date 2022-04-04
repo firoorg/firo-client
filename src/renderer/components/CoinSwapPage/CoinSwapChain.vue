@@ -52,7 +52,6 @@ export default {
     },
 
     props: {
-        // This must be a src/store/modules/CoinSwap.ts:CoinSwapRecord
         chainOptions: {
             type: Array,
             required: true
