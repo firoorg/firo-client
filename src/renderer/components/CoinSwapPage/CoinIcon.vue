@@ -7,7 +7,7 @@
     <svg :width="width" :height="height" v-else-if="coin === 'XLM'"><XLMIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'BCHABC'"><BCHABCIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'BNB'|| coin === 'BNBBSC'"><BNBIcon /></svg>
-    <svg :width="width" :height="height" v-else-if="coin === 'USDT'|| coin ==='USDTBSC'"><USDTIcon /></svg>
+    <svg :width="width" :height="height" v-else-if="coin === 'USDT'|| coin ==='USDTBSC'|| coin ==='USDTERC20'"><USDTIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'USDC'"><USDCIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'DAI'"><DAIIcon /></svg>
     <svg :width="width" :height="height" v-else-if="coin === 'DASH'"><DASHIcon /></svg>

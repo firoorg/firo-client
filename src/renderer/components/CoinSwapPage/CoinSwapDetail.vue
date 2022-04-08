@@ -2,8 +2,28 @@
     <section class="coin-swap-detail detail">
         <div class="inner">
             <div class="top">
-                <div class="chain-icon" @click="chainSelect">
-                    {{ chainName }}
+                <div class="field pseudo-input-frame">
+                    <label>Exchange</label>
+                    <vue-select
+                        class="select"
+                        label="chain"
+                        v-model="selectedChain"
+                        :options="remoteChains"
+                        :placeholder="'Select exchange'"
+                        @change="chainSelect"
+                    >
+                        <template v-slot:option="option">
+                            <div class="coin-option">
+                                <div class="coin-short-name">{{ option.chain }}</div>
+                            </div>
+                        </template>
+
+                        <template v-slot:selected-option="option">
+                            <div class="coin-option" v-if="option">
+                                <div class="coin-short-name">{{ option.chain }}</div>
+                            </div>
+                        </template>
+                    </vue-select>
                 </div>
                 <div class="field checkbox-field">
                     <input type="radio" v-model="isSwapFrom" :value="true" />
@@ -26,7 +46,7 @@
                         :loading="!isSwitchainUnavailable && !doesSwitchainNotSupportFiro && !isMarketInfoLoaded"
                         :disabled="isSwitchainUnavailable || doesSwitchainNotSupportFiro || !isMarketInfoLoaded"
                         :options="remoteCoins"
-                        :placeholder="(isSwitchainUnavailable && 'The chain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
+                        :placeholder="(!selectedChain && 'Please select the exchange') || (isSwitchainUnavailable && 'The chain is unavailable') || (!isMarketInfoLoaded && 'Loading coins...') || (doesSwitchainNotSupportFiro && 'Firo swaps are unavailable') || 'Select coin'"
                     >
                         <template v-slot:option="option">
                             <div class="coin-option">
@@ -100,7 +120,7 @@
                         </div>
                     </div>
 
-                    <div v-if="selectedCoin && chainName !== 'StealthEx' && chainName !=='Swapzone' " class="total-field">
+                    <div v-if="selectedCoin && chainName !== 'StealthEx' && chainName !=='Swapzone'" class="total-field">
                         <label>{{ CoinNames[selectedCoin] }} Transaction Fee:</label>
 
                         <div class="value">
@@ -166,18 +186,6 @@
                 </div>
             </div>
         </div>
-        <Popup v-if="show !== 'button'" :margin="show !== 'wait'">
-            <CoinSwapChain
-                ref="modalRef"
-                v-if="show === 'info'"
-                :selected-chain="chainName"
-                :chain-options="ChainOptions"
-                :show-cancel="true"
-                @cancel="cancel()"
-                @confirm="changeChain()" 
-            />
-            <WaitOverlay v-if="show === 'wait'" />
-        </Popup>
     </section>    
 </template>
 
@@ -217,6 +225,7 @@ const AllowedPairs = [
     "FIRO-BNBBSC",
     "FIRO-USDT",
     "FIRO-USDTBSC",
+    "FIRO-USDTERC20",
     "FIRO-USDC",
     "FIRO-DAI",
     "FIRO-DASH",
@@ -234,6 +243,7 @@ const AllowedPairs = [
     "BNBBSC-FIRO",
     "USDT-FIRO",
     "USDTBSC-FIRO",
+    "USDTERC20-FIRO",
     "USDC-FIRO",
     "DAI-FIRO",
     "DASH-FIRO",
@@ -255,6 +265,7 @@ const CoinNames = {
     BNBBSC: "BNB Smart Chain",
     USDT: "Tether",
     USDTBSC: "BSC Tether",
+    USDTERC20: "Tether",
     USDC: "USD Coin",
     DAI: "Dai",
     DASH: "Dash",
@@ -271,10 +282,10 @@ const ChainOptions = [
 ];
 
 const AddressValidations = {};
-for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'BNBBSC','USDT', 'USDTBSC', 'USDC', 'DASH', 'DCR', 'PAX', 'KMD', 'BCH']) {
+for (const coin of ['BTC', 'ETH', 'ZEC', 'LTC', 'XRP', 'XLM', 'BNB', 'BNBBSC','USDT', 'USDTBSC', 'USDTERC20', 'USDC', 'DASH', 'DCR', 'PAX', 'KMD', 'BCH']) {
     AddressValidations[coin] = (address) => {
         try {
-            if (coin == "BNBBSC" || coin == "USDTBSC") coin = 'ETH';
+            if (coin == "BNBBSC" || coin == "USDTBSC" || coin == "USDTERC20") coin = 'ETH';
             return CryptoAddressValidator.validate(address, coin);
         } catch {
             // This case should never occur unless the library is updated to remove functionality or such, but it's
@@ -313,8 +324,8 @@ export default {
         return {
             changeAPI: null, 
             stealthAPI: null,
-            swapzonAPI: null,
-            chainName: "ChangeNow",
+            swapzoneAPI: null,
+            chainName: "",
             quotaId: null,
             show:"button",
             ChainOptions,
@@ -329,6 +340,7 @@ export default {
             refreshOffersIntervalId: null,
             feeMap: {},
             selectedCoin: null,
+            selectedChain: null,
             amount: '',
             address: ''
         };
@@ -550,7 +562,7 @@ export default {
                         this.$log.error("Swapzone doesn't seem to support FIRO now.");
                         return {_switchainDoesntSupportFiro: true};
                     }
-                }
+                }     
 
                 return marketInfo
             }
@@ -625,7 +637,8 @@ export default {
                     const result = {from:from, to:to, min:min, max:max, rate:response1.amountTo/amount, minerFee:0, quotaId:response1.quotaId}
                     this._isLoading = false;
                     return result;
-                }else {  
+                } else {  
+                    this._isLoading = false;
                     return this.marketInfo[this.xzcPair];
                 } 
             }
@@ -739,8 +752,12 @@ export default {
                 .sort();
         },
 
+        remoteChains() {
+            return ChainOptions    
+        },
+
         remoteCoins() {
-            return this.isSwapFrom ? this.coinsFromFiro : this.coinsToFiro;            
+            return this.selectedChain&&this.isSwapFrom ? this.coinsFromFiro : this.coinsToFiro;            
             //return this.marketInfo;
         },
 
@@ -827,22 +844,8 @@ export default {
 
         chainSelect() {
             this.cleanupForm(true);
-            this.show = 'info';
+            this.chainName = this.selectedChain && this.selectedChain.chain;            
         }, 
-
-        changeChain() {
-            let temp = this.$refs['modalRef'].selectedValue;                
-            this.show = 'button';             
-            if (temp.chain === undefined){ 
-                this.chainName = temp;
-            } else {
-                this.chainName = temp.chain;
-            }
-        },
-
-        cancel() {
-            this.show = 'button';
-        },
     }
 };
 </script>

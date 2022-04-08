@@ -1,5 +1,6 @@
 import Utils from './coinswap-utils';
 import axios from 'axios';
+import { ipcRenderer } from 'electron'
 
 class ChangeAPIWorker {
     API_URL = 'https://api.changenow.io/v1/';
@@ -36,7 +37,8 @@ class ChangeAPIWorker {
         let config;
         
         if (chainName==="StealthEx") {
-            url = 'https://api.stealthex.io/api/v2/exchange/'+orderId+'?api_key='
+            const data = await ipcRenderer.invoke('stealth-status', orderId);
+            return data;
         } else if (chainName==="Swapzone") {            
             url = `https://api.swapzone.io/v1/exchange/tx?id=${orderId}`;
             config = {
@@ -51,6 +53,25 @@ class ChangeAPIWorker {
                 axios(config)
             );
             const response = temp.data.transaction;
+            const errorMessage = this.errorMessage(serverError, temp);
+    
+            if (errorMessage) return { error: errorMessage };
+    
+            return { error: null, response };
+        } else if (chainName==="Exolix") {            
+            url = `https:///exolix.com/api/exchange/${orderId}`;
+            config = {
+                method: 'get',
+                url: url,
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': ''
+                }
+            };
+            const [serverError, temp] = await Utils.to(
+                axios(config)
+            );
+            const response = temp.data;
             const errorMessage = this.errorMessage(serverError, temp);
     
             if (errorMessage) return { error: errorMessage };

@@ -33,6 +33,7 @@ import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
+import ExolixAPIWorker from 'lib/exolix-api';
 import {convertToCoin} from "lib/convert";
 import {mapActions} from "vuex";
 
@@ -51,6 +52,7 @@ export default {
             change: null,
             stealth: null, 
             swapzone: null,
+            exolix: null,
             orderId: '',
             exchangeAddress: '',
             error: null,
@@ -111,6 +113,7 @@ export default {
         this.change = new ChangeAPIWorker();
         this.stealth = new StealthAPIWorker();
         this.swapzone = new SwapzoneAPIWorker();
+        this.exolix = new ExolixAPIWorker();
     },
 
     methods: {
@@ -141,7 +144,7 @@ export default {
             const walletAddress = await $daemon.getUnusedAddress();
 
             let latestError = null;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 1; i++) {
                 if (this.chainName=="ChangeNow"){
                     const order ={
                         from:this.remoteCurrency.toLowerCase(),
@@ -208,6 +211,75 @@ export default {
                         exchangeAddress: response.payinAddress,
                         refundAddress: this.refundAddress,
                         receiveAddress: walletAddress,
+                        expectedRate: this.expectedRate,
+                        _response: response
+                    };
+                } else if (this.chainName === "StealthEx"){
+                    const order = {
+                        currency_from:this.remoteCurrency.toLowerCase(),
+                        currency_to:"firo",
+                        address_to: walletAddress,
+                        amount_from: this.remoteAmount,
+                        refund_address: this.refundAddress,
+                    };
+
+                    this.$log.info("Posting order: %O", order);
+
+                    let r;
+                    try {
+                        r = await this.stealth.postOrder(order);
+                    } catch (e) {
+                        latestError = `Error posting order: ${e}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    if (r.error || !r.response) {
+                        latestError = `Got error posting order: ${r.error}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    const response = r.response;
+
+                    // Sanity check response
+                    if (
+                        response.refund_address !== this.refundAddress ||
+                        response.address_to !== walletAddress
+                    ) {
+                        latestError = `Invalid Response from StealthEx: ${JSON.stringify(response)}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    const receiveAddressBookData = {
+                        address: walletAddress,
+                        label: `${pair} Swap (Order ${response.id})`,
+                        purpose: 'StealthExReceive'
+                    };
+                    $store.commit('AddressBook/updateAddress', receiveAddressBookData);
+                    try {
+                        await $daemon.addAddressBookItem(receiveAddressBookData);
+                    } catch (e) {
+                        this.$log.error(`Failed to add address book item: ${e}`);
+                        this.error = `Failed to add address book item: ${e}`;
+                        return;
+                    }
+
+                    this.coinSwapRecord =  {
+                        chainName: this.chainName,
+                        orderId: response.id,
+                        fromCoin: this.remoteCurrency,
+                        toCoin: 'FIRO',
+                        sendAmount: this.remoteAmount,
+                        expectedAmountToReceive: response.amount_to,
+                        fromFee: null,
+                        expectedToFee: this.firoTransactionFee,
+                        status: 'waiting',
+                        date: Date.now(),
+                        exchangeAddress: response.address_from,
+                        refundAddress: this.refundAddress,
+                        receiveAddress: response.address_to,
                         expectedRate: this.expectedRate,
                         _response: response
                     };
@@ -281,7 +353,76 @@ export default {
                         expectedRate: this.expectedRate,
                         _response: response
                     };
-                }                
+                } else if (this.chainName === "Exolix"){
+                    const order = {
+                        coin_from:this.remoteCurrency,
+                        coin_to:"FIRO",
+                        destination_address: walletAddress,
+                        deposit_amount: this.remoteAmount,
+                        refund_address: this.refundAddress
+                    };
+
+                    this.$log.info("Posting order: %O", order);
+
+                    let r;
+                    try {
+                        r = await this.exolix.postOrder(order);
+                    } catch (e) {
+                        latestError = `Error posting order: ${e}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    if (r.error || !r.response) {
+                        latestError = `Got error posting order: ${r.error}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    const response = r.response;
+
+                    // Sanity check response
+                    if (
+                        response.refund_address !== this.refundAddress ||
+                        response.destination_address !== walletAddress
+                    ) {
+                        latestError = `Invalid Response from Exolix: ${JSON.stringify(response)}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    const receiveAddressBookData = {
+                        address: walletAddress,
+                        label: `${pair} Swap (Order ${response.id})`,
+                        purpose: 'ExolixReceive'
+                    };
+                    $store.commit('AddressBook/updateAddress', receiveAddressBookData);
+                    try {
+                        await $daemon.addAddressBookItem(receiveAddressBookData);
+                    } catch (e) {
+                        this.$log.error(`Failed to add address book item: ${e}`);
+                        this.error = `Failed to add address book item: ${e}`;
+                        return;
+                    }
+
+                    this.coinSwapRecord =  {
+                        chainName: this.chainName,
+                        orderId: response.id,
+                        fromCoin: this.remoteCurrency,
+                        toCoin: 'FIRO',
+                        sendAmount: this.remoteAmount,
+                        expectedAmountToReceive: response.amount_to,
+                        fromFee: null,
+                        expectedToFee: this.firoTransactionFee,
+                        status: 'waiting',
+                        date: Date.now(),
+                        exchangeAddress: response.deposit_address,
+                        refundAddress: response.refund_address,
+                        receiveAddress: response.destination_address,
+                        expectedRate: this.expectedRate,
+                        _response: response
+                    };
+                }                 
 
                 try {
                     await this.addCoinSwapRecords([this.coinSwapRecord]);
@@ -298,7 +439,7 @@ export default {
 
             this.show = 'error';
             this.error = latestError || 'Uh oh, something went wrong :(';
-            this.$log.error(`Gave up sending to Switchain after 10 errors.`);
+            this.$log.error(`Gave up sending the request after 10 errors.`);
         }
     }
 };

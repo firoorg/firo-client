@@ -36,6 +36,7 @@ import WaitOverlay from 'renderer/components/shared/WaitOverlay';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
+import ExolixAPIWorker from 'lib/exolix-api';
 import {convertToCoin} from "lib/convert";
 import {mapActions, mapGetters} from "vuex";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
@@ -56,6 +57,7 @@ export default {
             change: null,
             stealth: null, 
             swapzone: null,
+            exolix:null,
             orderID: '',
             exchangeAddress: '',
             error: null,
@@ -131,6 +133,7 @@ export default {
         this.change = new ChangeAPIWorker();
         this.stealth = new StealthAPIWorker();
         this.swapzone = new SwapzoneAPIWorker();
+        this.exolix = new ExolixAPIWorker();
     },
 
     methods: {
@@ -151,7 +154,7 @@ export default {
             const walletAddress = await $daemon.getUnusedAddress();
 
             let latestError = null;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 1; i++) {
                 if (this.chainName === "ChangeNow"){
                     const order = {
                         from:"firo",
@@ -311,6 +314,84 @@ export default {
                         receiveAddress: response.addressReceive,
                         _response: response
                     };
+                } else if (this.chainName === "Exolix"){
+                    const order = {
+                        coin_from:"FIRO",
+                        coin_to:this.remoteCurrency,
+                        destination_address: this.receiveAddress,
+                        deposit_amount: convertToCoin(this.firoAmount),
+                        refund_address: walletAddress
+                    };
+
+                    this.$log.info("Posting order: %O", order);
+
+                    let r;
+                    try {
+                        r = await this.exolix.postOrder(order);
+                    } catch (e) {
+                        latestError = `Error posting order: ${e}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    if (r.error || !r.response) {
+                        latestError = `Got error posting order: ${r.error}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    const response = r.response;
+                    // Sanity check response
+                    if (
+                        response.refund_address !== walletAddress || response.destination_address !== this.receiveAddress
+                    ) {
+                        latestError = `Invalid Response from Exolix: ${JSON.stringify(response)}`;
+                        this.$log.error(latestError);
+                        continue;
+                    }
+
+                    // We do this here instead of attemptSend so that the user won't receive to this address again, even if
+                    // they don't swap.
+                    const refundAddressBookData = {
+                        address: walletAddress,
+                        label: `${pair} Swap Refund (Order ${response.id})`,
+                        purpose: 'ExolixRefund'
+                    };
+
+                    const sendAddressBookData = {
+                        address: response.deposit_address,
+                        label: `${pair} Swap (Order ${response.id})`,
+                        purpose: 'ExolixSend'
+                    };
+
+                    for (const data of [refundAddressBookData, sendAddressBookData]) {
+                        $store.commit('AddressBook/updateAddress', data);
+                        try {
+                            await $daemon.addAddressBookItem(data);
+                        } catch (e) {
+                            this.$log.error(`Failed to add address book item: ${e}`);
+                            this.error = `Failed to add address book item: ${e && e.message ? e.message : e}`;
+                            this.show = 'error';
+                            return;
+                        }
+                    }
+                    this.coinSwapRecord = {
+                        chainName:this.chainName,
+                        orderId: response.id,
+                        fromCoin: 'FIRO',
+                        toCoin: this.remoteCurrency,
+                        sendAmount: convertToCoin(this.firoAmount),
+                        expectedAmountToReceive: response.amount_to,
+                        expectedRate: this.expectedRate,
+                        fromFee: convertToCoin(this.firoTransactionFee),
+                        expectedToFee: this.remoteTransactionFee,
+                        status: 'waiting',
+                        date: Date.now(),
+                        exchangeAddress: response.deposit_address,
+                        refundAddress: response.refund_address,
+                        receiveAddress: response.destination_address,
+                        _response: response
+                    };
                 } else { //StealthEx
                     const order = {
                         currency_from:"firo",
@@ -380,7 +461,7 @@ export default {
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
                         sendAmount: convertToCoin(this.firoAmount),
-                        expectedAmountToReceive: response.expected_amount,
+                        expectedAmountToReceive: response.amount_to,
                         expectedRate: this.expectedRate,
                         fromFee: convertToCoin(this.firoTransactionFee),
                         expectedToFee: this.remoteTransactionFee,

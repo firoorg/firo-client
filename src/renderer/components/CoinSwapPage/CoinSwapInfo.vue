@@ -15,7 +15,7 @@
                 </tr>
 
                 <tr>
-                    <td>Chain</td>
+                    <td>API Service</td>
                     <td>{{ coinSwapData.chainName }}</td>
                 </tr>
 
@@ -112,13 +112,19 @@
             </table>
 
             <div v-if="showQrCode" class="footer guidance">
-                Please send the exact amount shown. If you send a different amount, you will need to contact ChangeNow
-                support at <a href="mailto:support@changenow.io">support.changenow.io</a> to recover your funds.
+                Please send the exact amount shown. If you send a different amount, you will need to contact {{coinSwapData.chainName}} support at 
+                <span v-if="coinSwapData.chainName==='ChangeNow'"><a href="mailto:support@changenow.io">support.changenow.io</a></span>
+                <span v-if="coinSwapData.chainName==='StealthEx'"><a href="mailto:support@stealthex.io">stealthex.io/contacts</a></span>
+                <span v-if="coinSwapData.chainName==='Swapzone'"><a href="mailto:support@swapzone.io">swapzone.io</a></span>
+                <span v-if="coinSwapData.chainName==='Exolix'"><a href="mailto:support@exolix.com">exolix.com/contact</a></span> to recover your funds.
             </div>
 
             <div v-else class="footer guidance">
-                If you need assistance or funds fail to arrive in a timely fashion, you can contact ChangeNow at
-                <a href="mailto:support@changenow.io">support.changenow.io</a>.
+                If you need assistance or funds fail to arrive in a timely fashion, you can contact {{coinSwapData.chainName}} at
+                <span v-if="coinSwapData.chainName==='ChangeNow'"><a href="mailto:support@changenow.io">support.changenow.io</a></span>
+                <span v-if="coinSwapData.chainName==='StealthEx'"><a href="mailto:support@stealthex.io">stealthex.io/contacts</a></span>
+                <span v-if="coinSwapData.chainName==='Swapzone'"><a href="mailto:support@swapzone.io">swapzone.io</a></span>
+                <span v-if="coinSwapData.chainName==='Exolix'"><a href="mailto:support@exolix.com">exolix.com/contact</a></span>.
             </div>
         </div>
 
@@ -175,7 +181,7 @@ export default {
 
     computed: {
         showQrCode() {
-            return this.coinSwapData.toCoin === 'FIRO' && this.coinSwapData.status === 'waiting';
+            return this.coinSwapData.toCoin === 'FIRO' && (this.coinSwapData.status === 'waiting' || this.coinSwapData.status === 'wait');
         }
     },
 

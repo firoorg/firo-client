@@ -3,6 +3,10 @@ import axios from 'axios';
 
 class SwapzoneAPIWorker {
     API_URL = 'https://api.swapzone.io/v1/exchange/';
+    headers =  { 
+        'Content-Type': 'application/json',
+        'x-api-key': 'dHDar8ZIx'
+    }
 
     errorMessage(serverError, response) {
         if (serverError) {
@@ -22,10 +26,7 @@ class SwapzoneAPIWorker {
         const config = {
             method: 'get',
             url: url,
-            headers: { 
-                'Content-Type': 'application/json',
-                'x-api-key': 'dHDar8ZIx'
-            }
+            headers: this.headers
         };
 
         const [serverError, temp] = await Utils.to(
@@ -45,10 +46,7 @@ class SwapzoneAPIWorker {
         const config = {
             method: 'get',
             url: url,
-            headers: { 
-                'Content-Type': 'application/json',
-                'x-api-key': 'dHDar8ZIx'
-            }
+            headers: this.headers
         };
         const result = await axios(config)
         return result.data;
@@ -69,10 +67,7 @@ class SwapzoneAPIWorker {
         const config = {
             method: 'post',
             url: url,
-            headers: { 
-                'Content-Type': 'application/json',
-                'x-api-key': 'dHDar8ZIx'
-            },
+            headers: this.headers,
             data:body
         };
 

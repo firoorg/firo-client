@@ -18,7 +18,7 @@ import PaymentRequest from "store/modules/PaymentRequest";
 import Settings from "store/modules/Settings";
 import Transactions from "store/modules/Transactions";
 import Window from "store/modules/Window";
-
+import Utils from '../lib/coinswap-utils';
 import { createLogger } from 'lib/logger';
 
 const logger = createLogger('firo:store:main')
@@ -109,14 +109,14 @@ ipcMain.handle('stealth-rate', async (event, from, to, amount) => {
 })
 
 ipcMain.handle('stealth-post', async (event, currency_from, currency_to, address_to, amount_from, refund_address) => {
-    const url = 'https://api.stealthex.io/api/v2/exchange?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643'     
-    const body = JSON.stringify({
+    const url = 'https://api.stealthex.io/api/v2/exchange?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643'    
+    const body = {
         "currency_from":currency_from,
         "currency_to":currency_to,
         "address_to":address_to,
         "amount_from":amount_from,
         "refund_address":refund_address,
-    });
+    };
     
     const config = {
         method: 'post',
@@ -127,9 +127,40 @@ ipcMain.handle('stealth-post', async (event, currency_from, currency_to, address
         data : body
     };
     
-    const result = await axios(config)
-    return JSON.stringify(result.data);
+    const [serverError, temp] = await Utils.to(
+        axios(config)
+    );
+    
+    if (serverError) {
+        return {error: serverError.message};
+    }
+
+    if (temp.error){
+        console.log(`${temp.error}: ${temp.reason}`);
+        return {error: temp.reason};
+    }
+    
+    const response = temp.data;
+    return { error: null, response };
 })
 
+ipcMain.handle('stealth-status', async (event, orderId) => {
+    const url = `https://api.stealthex.io/api/v2/exchange/${orderId}?api_key=c0092729-17aa-42f7-9e2e-6b9ff2387643`
+    const [serverError, temp] = await Utils.to(
+        axios.get(url)
+    );
+    
+    if (serverError) {
+        return {error: serverError.message};
+    }
+
+    if (temp.error){
+        console.log(`${temp.error}: ${temp.reason}`);
+        return {error: temp.reason};
+    }
+    
+    const response = temp.data;
+    return { error: null, response };
+})
 
 export default store

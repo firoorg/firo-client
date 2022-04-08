@@ -6,19 +6,19 @@
             &#xef1b;
         </div>
 
-        <div v-else-if="rowData.status === 'failed'">
+        <div v-else-if="rowData.status === 'failed' || rowData.status === 'overdue'">
             &#xef1b;
         </div>
 
-        <div v-else-if="rowData.status === 'waiting'">
+        <div v-else-if="rowData.status === 'waiting' || rowData.status === 'wait'">
             <div class="spin">&#xeffa;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'received' || rowData.status === 'exchanging' || rowData.status === 'sending' || rowData.status === 'confirming'">
+        <div v-else-if="rowData.status === 'received' || rowData.status === 'confirming' || rowData.status === 'confirmation' || rowData.status === 'exchanging' || rowData.status === 'sending' ">
             <div class="spin">&#xe819;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'confirmed' || rowData.status === 'finished' ">
+        <div v-else-if="rowData.status === 'confirmed' || rowData.status === 'finished' || rowData.status === 'success'">
             &#xeed6;
         </div>
 

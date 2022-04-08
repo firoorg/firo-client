@@ -211,7 +211,7 @@ const actions = {
                     if (response.rate)
                         // So response.rate is mislabelled, and does not contain the actual rate, but the amount that
                         // was sent out. Therefore we need to calculate the actual rate ourselves.
-                        newRecord.actualAmountToReceive = response.rate;
+                        // newRecord.actualAmountToReceive = response.rate;
                     if (response.toTx)
                         newRecord.outputTxId = response.toTx;
 
