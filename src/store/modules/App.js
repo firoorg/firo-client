@@ -23,7 +23,7 @@ const state = {
 
 const mutations = {
     setFiroClientNetwork(state, network) {
-        if (!["test", "mainnet", "regtest"].includes(network)) {
+        if (!["test", "mainnet", "regtest", "regtest-ql"].includes(network)) {
             throw `unknown network type: ${network}`;
         }
 
@@ -165,6 +165,10 @@ const getters = {
 
         case "regtest":
             dataDir = path.join(getters.blockchainLocation, "regtest");
+            break;
+
+        case "regtest-ql":
+            dataDir = path.join(getters.blockchainLocation, "regtest-ql");
             break;
 
         case "test":

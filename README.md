@@ -72,8 +72,8 @@ startup regardless of whether it has already been initialized.
 ### Setting Network from the Command Line
 
 You can set `NETWORK` and `BLOCKCHAIN_LOCATION` environment variables to change the blockchain location temporarily.
-`NETWORK` can be `main`, `regtest`, or `test`; `BLOCKCHAIN_LOCATION` should be the fully qualified path of the
-blockchain *excluding* the `regtest` or `testnet3` parts.
+`NETWORK` can be `main`, `regtest-ql`, or `test`; `BLOCKCHAIN_LOCATION` should be the fully qualified path of the
+blockchain *excluding* the `regtest-ql` or `testnet3` parts.
 
 ### Connecting to an Existing Firod
 

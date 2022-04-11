@@ -145,15 +145,15 @@ export class FirodAlreadyShutdown extends FirodError {
     }
 }
 
-type Network = 'mainnet' | 'regtest' | 'test';
+export type Network = 'mainnet' | 'regtest' | 'regtest-ql' | 'test';
 export class InvalidNetwork extends FirodError {
     constructor() {
-        super("valid network types are 'mainnet', 'regtest', and 'test'");
+        super("valid network types are 'mainnet', 'regtest', 'reqtest-ql', and 'test'");
         this.name = 'InvalidNetwork';
     }
 }
 function assertValidNetwork(x: any): x is Network {
-    if (!['mainnet', 'regtest', 'test'].includes(x)) {
+    if (!['mainnet', 'regtest', 'regtest-ql', 'test'].includes(x)) {
         throw new InvalidNetwork();
     }
 
@@ -529,7 +529,7 @@ export class Firod {
     // These are the functions that will be called after awaitApiIsReady() resolves.
     private readonly initializers: FirodInitializationFunction[];
     // This is the network we will tell firod to connect to.
-    readonly firodNetwork: 'mainnet' | 'test' | 'regtest';
+    readonly firodNetwork: Network;
     // The location of the firod binary, or null to use the default location.
     readonly firodLocation: string | null;
     // The directory that firod will use to store its data. This must already exist.
@@ -558,7 +558,7 @@ export class Firod {
     //
     // We will automatically register for all the eventNames in eventHandler, except for 'apiStatus', which is a special
     // key that will be called when an apiStatus event is receives.
-    constructor(network: 'mainnet' | 'test' | 'regtest', firodLocation: string, firodDataDir: string | null,
+    constructor(network: Network, firodLocation: string, firodDataDir: string | null,
                 initializers: FirodInitializationFunction[], eventHandlers: {[eventName: string]: FirodEventHandler}) {
         assertValidNetwork(network);
         this.firodNetwork = network;
@@ -608,8 +608,12 @@ export class Firod {
                     walletLocation = path.join(this.firodDataDir, "testnet3", "wallet.dat");
                     break;
 
-                case "regtest":
+                case "regtest-ql":
                     walletLocation = path.join(this.firodDataDir, "regtest-ql", "wallet.dat");
+                    break
+
+                case "regtest":
+                    walletLocation = path.join(this.firodDataDir, "regtest", "wallet.dat");
                     break
 
                 default:
@@ -776,6 +780,11 @@ export class Firod {
                     break;
 
                 case 'regtest':
+                    args.push("-regtest=1");
+                    args.push("-dandelion=0");
+                    break;
+
+                case 'regtest-ql':
                     args.push("-regtest-ql=1");
                     // dandelion=0 needs to be set for mining to actually include transactions on regtest.
                     args.push("-dandelion=0");

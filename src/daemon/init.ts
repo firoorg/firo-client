@@ -1,11 +1,11 @@
 // Initialization routines for firod.
 
-import { Firod, MnemonicSettings } from './firod';
+import { Firod, MnemonicSettings, Network } from './firod';
 
 /// Start up firod, connect to it, and return a Firod instance. If allowMultipleFirodInstances is true, instead of
 // giving an error if there is an existing firod instance running OR the wallet is unlocked, we will connect to it
 // without running initializers.
-async function firod(store: any, network: 'mainnet' | 'test' | 'regtest', firodLocation: string, firodDataDir: string,
+async function firod(store: any, network: Network, firodLocation: string, firodDataDir: string,
                      mnemonicSettings?: MnemonicSettings, allowMultipleFirodInstances?: boolean,
                      runInitializersIfFirodIsRunning?: boolean, connectionTimeout?: number,
                      extraArgs?: []): Promise<Firod> {

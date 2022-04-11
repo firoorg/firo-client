@@ -54,6 +54,7 @@ export const getters = {
                 // Oct 10, 2018 3:19:09 PM
                 return 1539159549;
 
+            case 'regtest-ql':
             case 'regtest':
                 return 0;
         }

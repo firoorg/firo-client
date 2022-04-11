@@ -1,4 +1,4 @@
-import { ApiStatusData, ApiStatus } from "../../daemon/firod";
+import { ApiStatusData, ApiStatus, Network } from "../../daemon/firod";
 import { isEqual } from 'lodash';
 
 const state = {
@@ -27,7 +27,7 @@ const getters = {
     currentBlockHeight: (state, getters): number => getters.apiStatusData.blocks || 0,
     lastestBlockTimestamp: (state, getters): number => getters.apiStatusData.latestBlockTimestamp || 0,
     block1: (state, getters): string => getters.apiStatusData.block1,
-    network: (state, getters): 'main' | 'test' | 'regtest' => getters.apiStatusData.network,
+    network: (state, getters): Network => getters.apiStatusData.network,
     // Do we have an apiStatus?
     hasApiStatus: (state, getters): boolean => !!getters.network,
     // Can our wallet be recovered from a mnemonic?

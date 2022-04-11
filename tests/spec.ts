@@ -34,7 +34,7 @@ function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
             args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
             env: {
                 FIRO_CLIENT_TEST: 'true',
-                NETWORK: 'regtest',
+                NETWORK: 'regtest-ql',
                 IS_INITIALIZED: String(!reinitializeFiroClient),
                 ALLOW_EXISTING_FIROD: '1'
             }
@@ -85,7 +85,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
     it('allows selecting blockchain location and network', async function (this: This) {
         this.slow(1e3);
 
-        await (await this.app.client.$('#datadir-selector')).selectByAttribute('value', 'regtest');
+        await (await this.app.client.$('#datadir-selector')).selectByAttribute('value', 'regtest-ql');
 
         const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
         // os.tmpdir() isn't actually unique. :-/
@@ -274,7 +274,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await paymentStatusElement.waitForExist({timeout: 100e3});
     });
 
-    this.beforeAll('is using regtest', async function (this: This) {
+    this.beforeAll('is using regtest-ql', async function (this: This) {
         const badge = await this.app.client.$('.network-badge');
         assert.isTrue(await badge.isExisting());
         assert.equal(await badge.getText(), 'Regtest');

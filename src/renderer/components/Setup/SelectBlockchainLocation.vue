@@ -22,7 +22,7 @@
                 <select class="selector" id="datadir-selector" v-model="network">
                     <option value="mainnet">Mainnet (default)</option>
                     <option value="test">Testnet</option>
-                    <option value="regtest">Regtest</option>
+                    <option value="regtest-ql">Regtest</option>
                 </select>
             </div>
         </div>
@@ -66,7 +66,7 @@ export default {
                 dataSubDir = this.dataDir;
                 break;
 
-            case "regtest":
+            case "regtest-ql":
                 dataSubDir = path.join(this.dataDir, "regtest-ql");
                 break;
 
@@ -123,7 +123,7 @@ export default {
                 return;
             }
 
-            if (["testnet3", "regtest"].includes(path.basename(this.dataDir))) {
+            if (["testnet3", "regtest", "regtest-ql"].includes(path.basename(this.dataDir))) {
                 if (!confirm(`Your wallet will be on the ${this.network} network, and will be located at ` +
                             `"${this.walletLocation}". You probably meant to select the parent directory ` +
                             `(${path.dirname(this.dataDir)}) instead. Are you sure you want to continue?`)) {
