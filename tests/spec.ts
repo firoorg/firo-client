@@ -352,7 +352,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         const pendingBalanceElement = await this.app.client.$('.balance.pending .amount-value');
         let originalPendingBalance = 0;
-        if (pendingBalanceElement.isExisting()) originalPendingBalance = convertToSatoshi(await pendingBalanceElement.getText());
+        if (await pendingBalanceElement.isExisting()) originalPendingBalance = convertToSatoshi(await pendingBalanceElement.getText());
 
         await (await this.app.client.$('#anonymize-firo-link')).click();
         await (await this.app.client.$('.passphrase-input')).waitForExist();
@@ -374,7 +374,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             {timeoutMsg: "public balance should be below 0.001 FIRO"}
         );
         await this.app.client.waitUntil(async () =>
-            convertToSatoshi(await pendingBalanceElement.getText()) > originalPublicBalance + originalPendingBalance - 0.1e8,
+            convertToSatoshi(await pendingBalanceElement.getText()) > originalPublicBalance - 0.1e8,
             {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds"}
         );
     });

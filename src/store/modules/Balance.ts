@@ -37,8 +37,8 @@ const getters = {
     // This includes unconfirmed and immature locked funds.
     locked: (state, getters) => getters.balances.locked,
     immature: (state, getters) => getters.balances.immature,
-    pendingChange: (state, getters) => getters.balances.unconfirmedPrivateChange + getters.balances.unconfirmedPublicChange,
-    incoming: (dtate, getters) => getters.balances.unconfirmedPrivate + getters.balances.unconfirmedPublic
+    pendingChange: (state, getters) => getters.balances.unconfirmedPrivateChange + getters.balances.unconfirmedPrivate + getters.balances.unconfirmedPublicChange,
+    incoming: (dtate, getters) =>  getters.balances.unconfirmedPublic
 }
 
 export default {
