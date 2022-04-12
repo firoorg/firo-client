@@ -1,11 +1,11 @@
 import Utils from './coinswap-utils';
 import axios from 'axios';
 
-class SwapzoneAPIWorker {
-    API_URL = 'https://api.swapzone.io/v1/exchange/';
+class ExolixAPIWorker {
+    API_URL = 'https:///exolix.com/api/';
     headers =  { 
         'Content-Type': 'application/json',
-        'x-api-key': ''
+        'Authorization': ''
     }
 
     errorMessage(serverError, response) {
@@ -22,7 +22,7 @@ class SwapzoneAPIWorker {
     }
 
     async getMarketInfo() {
-        const url = `${this.API_URL}currencies`;
+        const url = `${this.API_URL}currency`;
         const config = {
             method: 'get',
             url: url,
@@ -40,30 +40,34 @@ class SwapzoneAPIWorker {
         return { error: null, response };
     }
 
-    async getRate(from, to, amount) {       
-        const url = `${this.API_URL}get-rate?from=${from}&to=${to}&amount=${amount}&rateType=fixed`
-        
+    async getRate(from, to, deposit_amount) {       
+        const url = `${this.API_URL}rate`
+        const body = JSON.stringify({
+            "coin_from": from,
+            "coin_to": to,
+            "deposit_amount": deposit_amount
+        });
         const config = {
-            method: 'get',
+            method: 'post',
             url: url,
-            headers: this.headers
+            headers: this.headers,
+            data:body
         };
         const result = await axios(config)
         return result.data;
     }
 
-    async postOrder({ from, to, addressReceive, amountDeposit, quotaId, refundAddress }) {
-        const url = `${this.API_URL}create`;
-
+    async postOrder({ coin_from, coin_to, deposit_amount, destination_address, refund_address }) {
+        const url = `${this.API_URL}exchange`;
         const body = JSON.stringify({
-            "from": from,
-            "to": to,
-            "addressReceive": addressReceive,
-            "amountDeposit": amountDeposit,
-            "refundAddress": refundAddress,
-            "quotaId": quotaId
+            "coin_from": coin_from,
+            "coin_to": coin_to,
+            "deposit_amount": deposit_amount,
+            "destination_address": destination_address,
+            "refund_address": refund_address,
+            "destination_extra": "121212",
         });
-
+        console.log("1-----------"+body)
         const config = {
             method: 'post',
             url: url,
@@ -74,7 +78,8 @@ class SwapzoneAPIWorker {
         const [serverError, temp] = await Utils.to(
             axios(config)
         );
-        const response = temp.data.transaction;
+        const response = temp.data;
+        console.log("2-----------"+response)
         const errorMessage = this.errorMessage(serverError, temp);
 
         if (errorMessage) return { error: errorMessage };
@@ -83,4 +88,4 @@ class SwapzoneAPIWorker {
     }
 }
 
-export default SwapzoneAPIWorker;
+export default ExolixAPIWorker;
