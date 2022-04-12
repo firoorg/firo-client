@@ -12,7 +12,8 @@ interface This extends Mocha.Context {
     app: Application
 }
 
-if (!process.env.NO_BUILD) {
+const BUILD = !(process.env.NO_BUILD && JSON.parse(process.env.NO_BUILD));
+if (BUILD) {
     before(async function () {
         this.timeout(1000e3); // Make sure we have enough time to build our app.
         await require('../electron-vue/build');
