@@ -15,7 +15,12 @@
                 </tr>
 
                 <tr>
-                    <td>Switchain Swap ID</td>
+                    <td>API Service</td>
+                    <td>{{ coinSwapData.chainName }}</td>
+                </tr>
+
+                <tr>
+                    <td>Swap ID</td>
                     <td>{{ coinSwapData.orderId }}</td>
                 </tr>
 
@@ -39,7 +44,7 @@
                     <td class="value">
                         <Amount amount="1" :ticker="coinSwapData.fromCoin" />
                         =
-                        <Amount :amount="coinSwapData.expectedRate" :ticker="coinSwapData.toCoin" />
+                        <Amount :amount="String(coinSwapData.expectedRate)" :ticker="coinSwapData.toCoin" />
                     </td>
                 </tr>
 
@@ -55,12 +60,12 @@
 
                 <tr>
                     <td>Expected {{ coinSwapData.toCoin }} Fee</td>
-                    <td><Amount :amount="coinSwapData.expectedToFee" :ticker="coinSwapData.toCoin" /></td>
+                    <td><Amount :amount="String(coinSwapData.expectedToFee)" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr>
                     <td>Estimated Total to Receive</td>
-                    <td><Amount :amount="coinSwapData.expectedAmountToReceive" :ticker="coinSwapData.toCoin" /></td>
+                    <td><Amount :amount="String(coinSwapData.expectedAmountToReceive)" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr v-if="coinSwapData.actualAmountToReceive">
@@ -107,13 +112,19 @@
             </table>
 
             <div v-if="showQrCode" class="footer guidance">
-                Please send the exact amount shown. If you send a different amount, you will need to contact Switchain
-                support at <a href="mailto:help@switchain.com">help@switchain.com</a> to recover your funds.
+                Please send the exact amount shown. If you send a different amount, you will need to contact {{coinSwapData.chainName}} support at 
+                <span v-if="coinSwapData.chainName==='ChangeNow'"><a href="mailto:support@changenow.io">support.changenow.io</a></span>
+                <span v-if="coinSwapData.chainName==='StealthEx'"><a href="mailto:support@stealthex.io">stealthex.io/contacts</a></span>
+                <span v-if="coinSwapData.chainName==='Swapzone'"><a href="mailto:support@swapzone.io">swapzone.io</a></span>
+                <span v-if="coinSwapData.chainName==='Exolix'"><a href="mailto:support@exolix.com">exolix.com/contact</a></span> to recover your funds.
             </div>
 
             <div v-else class="footer guidance">
-                If you need assistance or funds fail to arrive in a timely fashion, you can contact Switchain at
-                <a href="mailto:help@switchain.com">help@switchain.com</a>.
+                If you need assistance or funds fail to arrive in a timely fashion, you can contact {{coinSwapData.chainName}} at
+                <span v-if="coinSwapData.chainName==='ChangeNow'"><a href="mailto:support@changenow.io">support.changenow.io</a></span>
+                <span v-if="coinSwapData.chainName==='StealthEx'"><a href="mailto:support@stealthex.io">stealthex.io/contacts</a></span>
+                <span v-if="coinSwapData.chainName==='Swapzone'"><a href="mailto:support@swapzone.io">swapzone.io</a></span>
+                <span v-if="coinSwapData.chainName==='Exolix'"><a href="mailto:support@exolix.com">exolix.com/contact</a></span>.
             </div>
         </div>
 
@@ -170,7 +181,7 @@ export default {
 
     computed: {
         showQrCode() {
-            return this.coinSwapData.toCoin === 'FIRO' && this.coinSwapData.status === 'waiting';
+            return this.coinSwapData.toCoin === 'FIRO' && (this.coinSwapData.status === 'waiting' || this.coinSwapData.status === 'wait');
         }
     },
 

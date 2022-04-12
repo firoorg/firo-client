@@ -19,6 +19,10 @@ import { setupLocales } from 'lib/i18n'
 import menuTemplate from './lib/menuTemplate';
 import store from '../store/main'
 
+import { ipcMain } from 'electron'
+
+
+
 const logger = createLogger('firo:main')
 
 // We don't want multiple copies of our application running.
@@ -46,7 +50,17 @@ if (!app.isDefaultProtocolClient('firo')) {
     app.setAsDefaultProtocolClient('firo');
 }
 
+async function handleFileOpen() {
+    const { canceled, filePaths } = await dialog.showOpenDialog()
+    if (canceled) {
+      return
+    } else {
+      return filePaths[0]
+    }
+  }
+
 app.once('ready', async () => {
+
     setupLocales({ store })
     await populateStoreWithAppSettings({ store })
 
@@ -102,4 +116,16 @@ app.once('ready', async () => {
         logger.error("NODE_ENV must be set for us to determine where to load our content from.");
         app.exit(1);
     }
+
+    //ipcMain.on('stealthpair', handleSetTitle);
+    // function handleSetTitle (event, title) {
+    //     console.log();
+    // }
+    
+
+
 });
+
+
+
+
