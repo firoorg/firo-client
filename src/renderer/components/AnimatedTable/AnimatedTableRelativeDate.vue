@@ -6,6 +6,7 @@
     >
         Date
     </th>
+    <td v-else-if="!rowData.blockHeight && !rowData.isInstantSendLocked" class="unconfirmed">Unconfirmed</td>
     <td v-else-if="rowData.date" class="confirmed">{{createDate}}</td>
     <td
         v-else

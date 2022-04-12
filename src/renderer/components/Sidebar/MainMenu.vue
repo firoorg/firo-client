@@ -12,7 +12,7 @@
             Transactions
         </router-link>
 
-        <router-link v-if="network === 'main'" to="/coinswap">
+        <router-link v-if="showCoinswap" to="/coinswap">
             Coin Swap
         </router-link>
 
@@ -37,6 +37,7 @@ export default {
     name: 'MainMenu',
 
     computed: mapGetters({
+        showCoinswap: 'App/showCoinswap',
         network: 'ApiStatus/network'
     })
 }
