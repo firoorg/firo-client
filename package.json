@@ -87,7 +87,7 @@
     "@types/webpack-env": "^1.15.3",
     "@types/zeromq": "^4.6.3",
     "ajv": "^6.12.5",
-    "async": "^2.6.3",
+    "async": "^3.2.2",
     "await-mutex": "^1.0.2",
     "axios": "^0.21.1",
     "big.js": "^5.2.2",
