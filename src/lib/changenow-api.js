@@ -18,7 +18,8 @@ class ChangeAPIWorker {
     }
 
     async getMarketInfo() {
-        const url = `${this.API_URL}market-info/fixed-rate/${keys.CHANGENOW_TOKEN}`;
+        const url = `${this.API_URL}market-info/fixed-rate/${keys.CHANGENOW_API_KEY}`;
+        
         const [serverError, temp] = await Utils.to(
             axios.get(url)
         );
@@ -44,7 +45,7 @@ class ChangeAPIWorker {
                 url: url,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'x-api-key': keys.CHANGENOW_API_KEY
+                    'x-api-key': keys.SWAPZONE_API_KEY
                 }
             };
             const [serverError, temp] = await Utils.to(
@@ -63,7 +64,7 @@ class ChangeAPIWorker {
                 url: url,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': this.AUTHORIZATION
+                    'Authorization': keys.EXOLIX_AUTHORIZATION
                 }
             };
             const [serverError, temp] = await Utils.to(
@@ -76,7 +77,7 @@ class ChangeAPIWorker {
     
             return { error: null, response };
         } else {            
-            url = `${this.API_URL}transactions/${orderId}/${keys.CHANGENOW_TOKEN}`;
+            url = `${this.API_URL}transactions/${orderId}/${keys.CHANGENOW_API_KEY}`;
             config = {
                 method: 'get',
                 url: url,
@@ -97,7 +98,7 @@ class ChangeAPIWorker {
     }
 
     async postOrder({ from, to, address, amount, extraId, refundAddress, refundExtraId, userId, payload, contactEmail }) {
-        const url = `${this.API_URL}transactions/fixed-rate//${keys.CHANGENOW_TOKEN}`;
+        const url = `${this.API_URL}transactions/fixed-rate//${keys.CHANGENOW_API_KEY}`;
 
         const body = {
             from,
