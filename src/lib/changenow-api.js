@@ -1,6 +1,7 @@
 import Utils from './coinswap-utils';
 import axios from 'axios';
 import { ipcRenderer } from 'electron'
+import keys from '../keys';
 
 class ChangeAPIWorker {
     API_URL = 'https://api.changenow.io/v1/';
@@ -14,12 +15,10 @@ class ChangeAPIWorker {
             console.log(`${response.error}: ${response.reason}`);
             return response.reason;
         }
-
-        return;
     }
 
     async getMarketInfo() {
-        const url = `${this.API_URL}market-info/fixed-rate/`;
+        const url = `${this.API_URL}market-info/fixed-rate/${keys.CHANGENOW_TOKEN}`;
         
         const [serverError, temp] = await Utils.to(
             axios.get(url)
@@ -46,7 +45,7 @@ class ChangeAPIWorker {
                 url: url,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'x-api-key': 'dHDar8ZIx'
+                    'x-api-key': keys.CHANGENOW_API_KEY
                 }
             };
             const [serverError, temp] = await Utils.to(
@@ -65,7 +64,7 @@ class ChangeAPIWorker {
                 url: url,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': ''
+                    'Authorization': this.AUTHORIZATION
                 }
             };
             const [serverError, temp] = await Utils.to(
@@ -78,7 +77,7 @@ class ChangeAPIWorker {
     
             return { error: null, response };
         } else {            
-            url = `${this.API_URL}transactions/${orderId}/`;
+            url = `${this.API_URL}transactions/${orderId}/${keys.CHANGENOW_TOKEN}`;
             config = {
                 method: 'get',
                 url: url,
@@ -99,7 +98,7 @@ class ChangeAPIWorker {
     }
 
     async postOrder({ from, to, address, amount, extraId, refundAddress, refundExtraId, userId, payload, contactEmail }) {
-        const url = `${this.API_URL}transactions/fixed-rate/`;
+        const url = `${this.API_URL}transactions/fixed-rate//${keys.CHANGENOW_TOKEN}`;
 
         const body = {
             from,
@@ -117,8 +116,6 @@ class ChangeAPIWorker {
             body.userId = userId;
         } else if (payload) {
             body.payload = payload;
-        } else if (refundExtraId) {
-            body.contactEmail = contactEmail;
         }
         
         const [serverError, temp] = await Utils.to(

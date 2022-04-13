@@ -1,11 +1,13 @@
 import Utils from './coinswap-utils';
 import axios from 'axios';
+import keys from '../keys';
 
 class ExolixAPIWorker {
     API_URL = 'https:///exolix.com/api/';
-    headers =  { 
+
+    headers =  {
         'Content-Type': 'application/json',
-        'Authorization': ''
+        'Authorization': keys.EXOLIX_AUTHORIZATIONL
     }
 
     errorMessage(serverError, response) {

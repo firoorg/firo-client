@@ -4,6 +4,7 @@ import {homedir} from 'os'
 import * as types from '../types/App'
 import { getAppSettings, getApp } from 'lib/utils'
 import { createLogger } from 'lib/logger'
+import keys from "../../keys";
 
 const logger = createLogger('firo:store:app')
 
@@ -179,7 +180,8 @@ const getters = {
     // overlay.
     waitingReason: (state) => state.waitingReason,
     cachedMnemonic: (state) => state.cachedMnemonic,
-    colorTheme: (state) => state.colorTheme || 'system'
+    colorTheme: (state) => state.colorTheme || 'system',
+    showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && keys.HAS_KEYS
 }
 
 export default {

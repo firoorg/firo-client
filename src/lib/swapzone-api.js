@@ -1,11 +1,13 @@
 import Utils from './coinswap-utils';
 import axios from 'axios';
+import keys from '../keys';
 
 class SwapzoneAPIWorker {
     API_URL = 'https://api.swapzone.io/v1/exchange/';
+
     headers =  { 
         'Content-Type': 'application/json',
-        'x-api-key': ''
+        'x-api-key': keys.SWAPZONE_API_KEY
     }
 
     errorMessage(serverError, response) {
