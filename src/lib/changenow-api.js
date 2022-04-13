@@ -19,7 +19,6 @@ class ChangeAPIWorker {
 
     async getMarketInfo() {
         const url = `${this.API_URL}market-info/fixed-rate/${keys.CHANGENOW_TOKEN}`;
-        console.log(this.API_URL);
         const [serverError, temp] = await Utils.to(
             axios.get(url)
         );
