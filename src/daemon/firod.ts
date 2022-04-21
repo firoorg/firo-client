@@ -1580,6 +1580,7 @@ export class Firod {
                 // 40 XZC output from block 1.
                 return "aEF2p3jepoWF2yRYZjb6EACCP4CaP41doV";
 
+            case "regtest-ql":
             case "regtest":
             case "test":
                 // 40 XZC output from testnet block 1. testnet and regtest use the same addresses
