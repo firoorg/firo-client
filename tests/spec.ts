@@ -244,6 +244,12 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await (await this.app.client.$('.transactions-page')).waitForExist({timeout: 60e3});
     });
 
+    it('is using regtest-ql', async function (this: This) {
+        const badge = await this.app.client.$('.network-badge');
+        assert.isTrue(await badge.isExisting());
+        assert.equal(await badge.getText(), 'Regtest');
+    });
+
     it('generates FIRO from the debug console', async function (this: This) {
         this.timeout(500e3);
         this.slow(100e3);
@@ -649,7 +655,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const amountToReceive = convertToCoin(txOut.amount);
 
             // The type signature of timeout on waitUntilTextExists is incorrect.
-            await this.app.client.waitUntilTextExists('.vuetable-td-component-amount .incoming-outgoing', amountToReceive, <any>{timeout: 10e3});
+            await this.app.client.waitUntilTextExists('.incoming-outgoing .amount-value', amountToReceive, <any>{timeout: 10e3});
 
             // Wait to make sure coin control entries are updated.
             await new Promise(r => setTimeout(r, 1e3));
