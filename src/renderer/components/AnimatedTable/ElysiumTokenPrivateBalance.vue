@@ -1,7 +1,7 @@
 <template>
     <th v-if="isHeader">Private Balance</th>
     <td v-else>
-        <Amount :amount="rowData.privateBalance" />
+        <Amount class="elysium-private-balance" :amount="rowData.privateBalance" />
     </td>
 </template>
 

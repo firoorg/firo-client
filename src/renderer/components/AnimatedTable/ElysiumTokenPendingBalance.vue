@@ -1,7 +1,7 @@
 <template>
     <th v-if="isHeader">Pending Balance</th>
     <td v-else>
-        <Amount :amount="rowData.pendingBalance" />
+        <Amount class="elysium-pending-balance" :amount="rowData.pendingBalance" />
     </td>
 </template>
 

@@ -268,6 +268,10 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
     });
 });
 
+function randstr(): string {
+    return Array(10).fill(0).map(_ => String.fromCharCode(97+Math.random()*26)).join('');
+}
+
 describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
@@ -423,7 +427,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const addressLabels: [string, string][] = [];
 
         for (let x = 0; x < 5; x++) {
-            const label = Array.from({length: 10}, () => String.fromCharCode(97+Math.random()*26)).join('');
+            const label = randstr();
             const address = await (await this.app.client.$('#receive-address')).getValue();
             await (await this.app.client.$('#receive-address-label')).setValue(label);
             await (await this.app.client.$('#receive-address')).click();
@@ -770,6 +774,55 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
         };
     }
+
+    it('allows creating an Elysium token', async function (this: This) {
+        // Make sure our token will be the first in the list so tests work.
+        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+
+        await enableElysium.bind(this)();
+
+        await (await this.app.client.$('a[href="#/elysium"')).click();
+        await (await this.app.client.$('#createToken')).click();
+
+        const name = randstr();
+        const ticker = randstr().toUpperCase().slice(0, 3);
+        const category = randstr();
+        const description = randstr();
+        const url = `https://example.com/${randstr()}/`;
+        const issuanceAmount = String(Math.floor(Math.random() * 1e6) + 1);
+
+        await (await this.app.client.$('input[name="name"]')).setValue(name);
+        await (await this.app.client.$('input[name="ticker"]')).setValue(ticker);
+        await (await this.app.client.$('input[name="category"]')).setValue(category);
+        await (await this.app.client.$('textarea[name="description"]')).setValue(description);
+        await (await this.app.client.$('input[name="url"]')).setValue(url);
+        await (await this.app.client.$('input[name="issuanceAmount"]')).setValue(issuanceAmount);
+
+        await (await this.app.client.$('#ok')).click();
+
+        const passphraseInput = await this.app.client.$('input[type="password"]');
+        await passphraseInput.waitForExist();
+        await passphraseInput.setValue(passphrase);
+        await (await this.app.client.$('.passphrase-input button.recommended')).click();
+
+        await this.app.client.waitUntilTextExists('.elysium-id', "0");
+        await this.app.client.waitUntilTextExists('.elysium-name', name);
+        await this.app.client.waitUntilTextExists('.elysium-ticker', ticker);
+        await this.app.client.waitUntilTextExists('.elysium-private-balance', "0");
+        await this.app.client.waitUntilTextExists('.elysium-pending-balance', issuanceAmount);
+
+        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+
+        await this.app.client.waitUntil(async () =>
+            !(await Promise.all(
+                (await this.app.client.$$('.elysium-id'))
+                .map(async (e) => await e.getText() == "0")
+            )).find(e => e)
+        );
+
+        await (await this.app.client.$('a[href="#/transactions"]')).click();
+        assert(!!(await Promise.all((await this.app.client.$$('.ticker')).map(async (e) => (await e.getText()).slice(1) === ticker))).find(x=>x));
+    });
 
     it('has private coin control entries that sum to the correct amount', hasCorrectBalance('private'));
     it('has public coin control entries that sum to the correct amount', hasCorrectBalance('public'));

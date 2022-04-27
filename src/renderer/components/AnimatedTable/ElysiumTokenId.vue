@@ -1,6 +1,6 @@
 <template>
     <th v-if="isHeader">ID</th>
-    <td v-else>{{ rowData.id }}</td>
+    <td v-else class="elysium-id">{{ rowData.id }}</td>
 </template>
 
 <script>

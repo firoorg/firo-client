@@ -12,7 +12,7 @@
             <div class="right-element action-element">
                 <div class="checkbox-field">
                     <PlusButton />
-                    <label @click="showPopup = 'createToken'">Create Token</label>
+                    <label id="createToken" @click="showPopup = 'createToken'">Create Token</label>
                 </div>
 
                 <Popup v-if="showPopup == 'createToken'">

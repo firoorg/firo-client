@@ -30,6 +30,7 @@
                     class="smooth-input"
                     type="text"
                     placeholder="Category"
+                    name="category"
                     v-model="category"
                 >
 
@@ -61,7 +62,7 @@
                 </div>
             </div>
 
-            <textarea class="smooth-input" placeholder="Description" v-model="description" />
+            <textarea name="description" class="smooth-input" placeholder="Description" v-model="description" />
 
             <input
                 class="url smooth-input"
@@ -76,7 +77,7 @@
 
         <div class="buttons">
             <button class="solid-button unrecommended" @click="$emit('cancel')">Cancel</button>
-            <button class="solid-button recommended" @click="submit">OK</button>
+            <button id="ok" class="solid-button recommended" @click="submit">OK</button>
         </div>
     </div>
 </template>

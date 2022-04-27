@@ -1,6 +1,6 @@
 <template>
     <th v-if="isHeader">Ticker</th>
-    <td v-else>{{ rowData.ticker }}</td>
+    <td v-else class="elysium-ticker">{{ rowData.ticker }}</td>
 </template>
 
 <script>
