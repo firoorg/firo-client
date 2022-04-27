@@ -287,6 +287,18 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         assert.equal(await badge.getText(), 'Regtest');
     });
 
+    async function enableElysium(this: This) {
+        if (await (await this.app.client.$('a[href="#/elysium"]')).isExisting()) return;
+        await (await this.app.client.$('a[href="#/settings"]')).click();
+        await (await this.app.client.$('#enable-elysium-checkbox')).click();
+    }
+
+    async function disableElysium(this: This) {
+        if (!await (await this.app.client.$('a[href="#/elysium"]')).isExisting()) return;
+        await (await this.app.client.$('a[href="#/settings"]')).click();
+        await (await this.app.client.$('#enable-elysium-checkbox')).click();
+    }
+
     async function generateSufficientFiro(this: This) {
         this.timeout(200e3);
         this.slow(100e3);
@@ -452,10 +464,14 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         subtractTransactionFee: boolean,
         customTransactionFee: boolean,
         coinControl: boolean,
-        checkValidations: boolean = false
+        checkValidations: boolean = false,
+        elysium: boolean = false
     ): (this: This) => Promise<void> {
         return async function (this: This) {
             this.timeout(100e3);
+
+            if (elysium) await enableElysium.bind(this)();
+            else await disableElysium.bind(this)();
 
             // This is required so that the new transactions will be the first elements on the transactions list.
             await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', ['generate 1']);
@@ -693,6 +709,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     }
 
     it('checks send validations', sendsAndReceivesPayment('private', false, false, false, true));
+    it('sends and checks validations with Elysium enabled', sendsAndReceivesPayment('private', false, false, false, true, true));
     it('sends and receives a private payment', sendsAndReceivesPayment('private', false, false, false));
     it('sends and receives a public payment', sendsAndReceivesPayment('public', false, false, false));
     it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true, false, false));
