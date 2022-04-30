@@ -782,6 +782,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await enableElysium.bind(this)();
 
         await (await this.app.client.$('a[href="#/elysium"')).click();
+        await (await this.app.client.$('.elysium-page')).waitForExist();
         await (await this.app.client.$('#createToken')).click();
 
         const name = randstr();
@@ -822,10 +823,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     }
     it('allows creating an Elysium token', testCreateElysiumToken);
 
-    it('anonymizes Elysium tokens', async function (this: This) {
+    async function testAnonymizesElysiumTokens(this: This): Promise<string> {
         await testCreateElysiumToken.bind(this)();
 
         await (await this.app.client.$('a[href="#/transactions"')).click();
+        await (await this.app.client.$('.transactions-page')).waitForExist();
         await (await this.app.client.$('tr:nth-child(2)')).click();
 
         const id = await (await this.app.client.$('.elysium-property-creation-tx .txid')).getText();
@@ -853,6 +855,75 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 await this.app.client.executeScript('return $store.getters["Elysium/aggregatedBalances"][arguments[0]]', [id]);
             return afterBalances.priv === creationAmount && afterBalances.pending === 0;
         });
+
+        return id;
+    }
+    it('anonymizes Elysium tokens', testAnonymizesElysiumTokens);
+
+    async function testSendsElysiumTokens(this: This, id: string) {
+        const ticker = await this.app.client.executeScript('return $store.getters["Elysium/tokenData"][arguments[0]].ticker', [id]);
+
+        await (await this.app.client.$('a[href="#/send"]')).click();
+        await (await this.app.client.$('.send-page')).waitForExist();
+        await this.app.client.executeScript('setSelectedAsset(arguments[0]);', [id]);
+
+        const recipient = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
+        const satoshiAmountToSend = 1e8 + Math.floor(1e8 * Math.random());
+        const amountToSend = convertToCoin(satoshiAmountToSend);
+
+        await (await this.app.client.$('#address')).setValue(recipient);
+        await (await this.app.client.$('#amount')).setValue(amountToSend);
+
+        const sendButton = await this.app.client.$('#send-button');
+        await sendButton.waitForEnabled();
+        await sendButton.click();
+
+        const confirmButton = await this.app.client.$('.confirm-step button.recommended');
+        await confirmButton.waitForExist();
+        await confirmButton.click();
+
+        const passphraseInput = await this.app.client.$('input[type="password"]');
+        await passphraseInput.waitForExist();
+        await passphraseInput.setValue(passphrase);
+        await (await this.app.client.$('.passphrase-input button.recommended')).click();
+
+        const waitOverlay = await this.app.client.$('.wait-overlay');
+        await waitOverlay.waitForExist();
+        await waitOverlay.waitForExist({reverse: true, timeout: 20e3});
+
+        const errorElement = await this.app.client.$('.error-step .content');
+        if (await errorElement.isExisting()) {
+            const error = await errorElement.getText();
+
+            const closeErrorStep = await this.app.client.$('.error-step button.recommended');
+            await closeErrorStep.click();
+            await closeErrorStep.waitForExist({reverse: true});
+
+            assert.fail(`sending transaction failed: ${error}`);
+        }
+
+        await (await this.app.client.$('a[href="#/transactions')).click();
+
+        let txOut: TXO;
+        await this.app.client.waitUntil(async () => {
+            txOut = await this.app.client.executeScript(
+                "return Object.values($store.getters['Transactions/TXOs']).find(tx => " +
+                "tx.elysium?.amount === arguments[0] && " +
+                "!tx.amount && " +
+                "!tx.isChange" +
+                ")",
+                [satoshiAmountToSend]
+            );
+            return !!txOut;
+        });
+        assert(!!txOut);
+
+        await this.app.client.waitUntilTextExists('table .amount-value', amountToSend, <any>{timeout: 10e3});
+        await this.app.client.waitUntilTextExists('table .ticker', ticker, <any>{timeout: 10e3});
+    }
+    it('sends Elysium tokens', async function () {
+        const id = await testAnonymizesElysiumTokens.bind(this)();
+        await testSendsElysiumTokens.bind(this)(id);
     });
 
     it('has private coin control entries that sum to the correct amount', hasCorrectBalance('private'));

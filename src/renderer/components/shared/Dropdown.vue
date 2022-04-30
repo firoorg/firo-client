@@ -14,14 +14,14 @@
                 <template v-slot:option="option">
                     <div class="option">
                         <img v-if="option.icon" :src="option.icon" class="option-icon" />
-                        <div class="name">{{ option.name }}</div>
+                        <div class="name" :id="`elysium-option-${option.id}`">{{ option.name }}</div>
                     </div>
                 </template>
 
                 <template v-slot:selected-option="option">
                     <div class="option" v-if="option">
                         <img v-if="option.icon" :src="option.icon" class="option-icon" />
-                        <div class="name">{{ option.name }}</div>
+                        <div class="name" :id="`elysium-option-${option.id}`">{{ option.name }}</div>
                     </div>
                 </template>
             </vue-select>
@@ -55,6 +55,10 @@ export default {
     },
 
     watch: {
+        value() {
+            this.selectedOption = this.options.find(o => o.id === this.value);
+        },
+
         selectedOption() {
             this.$emit('input', this.selectedOption.id);
         }

@@ -419,6 +419,8 @@ export default {
     },
 
     beforeMount () {
+        window.setSelectedAsset = (id) => this.setSelectedAsset(id);
+
         // Set up VeeValidator rules.
 
         this.$validator.extend('firoAddress', {
@@ -472,6 +474,10 @@ export default {
 
     methods: {
         convertToCoin,
+
+        setSelectedAsset(id) {
+            this.selectedAsset = id;
+        },
 
         async addToAddressBook() {
             if (!isValidAddress(this.address, this.network) || !this.label) return;
