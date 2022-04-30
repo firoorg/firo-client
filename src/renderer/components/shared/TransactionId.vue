@@ -1,6 +1,6 @@
 <template>
-    <div class="txid">
-        {{ txid }}<a v-if="showOpenInBlockExplorer" href="#" @click="openInBlockExplorer">👁</a>
+    <div class="transaction-id-component">
+        <span class="txid">{{ txid }}</span><a v-if="showOpenInBlockExplorer" href="#" @click="openInBlockExplorer">👁</a>
     </div>
 </template>
 

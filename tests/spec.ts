@@ -775,7 +775,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         };
     }
 
-    it('allows creating an Elysium token', async function (this: This) {
+    async function testCreateElysiumToken(this: This) {
         // Make sure our token will be the first in the list so tests work.
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
 
@@ -814,14 +814,45 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
 
         await this.app.client.waitUntil(async () =>
-            !(await Promise.all(
-                (await this.app.client.$$('.elysium-id'))
-                .map(async (e) => await e.getText() == "0")
-            )).find(e => e)
+            await (await this.app.client.$('.elysium-id')).getText() !== "0"
         );
 
         await (await this.app.client.$('a[href="#/transactions"]')).click();
-        assert(!!(await Promise.all((await this.app.client.$$('.ticker')).map(async (e) => (await e.getText()).slice(1) === ticker))).find(x=>x));
+        await this.app.client.waitUntilTextExists('tr:nth-child(2) .ticker', ticker);
+    }
+    it('allows creating an Elysium token', testCreateElysiumToken);
+
+    it('anonymizes Elysium tokens', async function (this: This) {
+        await testCreateElysiumToken.bind(this)();
+
+        await (await this.app.client.$('a[href="#/transactions"')).click();
+        await (await this.app.client.$('tr:nth-child(2)')).click();
+
+        const id = await (await this.app.client.$('.elysium-property-creation-tx .txid')).getText();
+        const creationAmount = Number(await (await this.app.client.$('.received-amount .amount-value')).getText()) * 1e8;
+        await (await this.app.client.$('button.recommended')).click();
+
+        const beforeBalances: {priv: number, pending: number} =
+            await this.app.client.executeScript('return $store.getters["Elysium/aggregatedBalances"][arguments[0]]', [id]);
+        assert.equal(beforeBalances.priv, 0);
+        assert.equal(beforeBalances.pending, creationAmount);
+
+        await (await this.app.client.$('#anonymize-firo-link')).click();
+        await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase);
+        await (await this.app.client.$('.passphrase-input button.confirm')).click();
+        await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
+
+        // Transactions haven't been confirmed yet.
+        assert.equal(beforeBalances.priv, 0);
+        assert.equal(beforeBalances.pending, creationAmount);
+
+        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+
+        await this.app.client.waitUntil(async () => {
+            const afterBalances: {priv: number, pending: number} =
+                await this.app.client.executeScript('return $store.getters["Elysium/aggregatedBalances"][arguments[0]]', [id]);
+            return afterBalances.priv === creationAmount && afterBalances.pending === 0;
+        });
     });
 
     it('has private coin control entries that sum to the correct amount', hasCorrectBalance('private'));

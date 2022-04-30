@@ -107,7 +107,12 @@
             <template v-if="tx.elysium && tx.elysium.property">
                 <tr>
                     <td>Property ID</td>
-                    <td>{{ tx.elysium.property.id }}</td>
+                    <td class="elysium-property-id">{{ tx.elysium.property.id }}</td>
+                </tr>
+
+                <tr>
+                    <td>Property Creation Tx</td>
+                    <td class="elysium-property-creation-tx"><TransactionId :txid="tx.elysium.property.creationTx"/></td>
                 </tr>
 
                 <tr>
@@ -129,8 +134,8 @@
 
             <tr>
                 <td>Received Amount</td>
-                <td v-if="tx.elysium"><ElysiumAmount :tx="tx" /></td>
-                <td v-else><Amount :amount="tx.amount" ticker="FIRO" /></td>
+                <td v-if="tx.elysium" class="received-amount"><ElysiumAmount :tx="tx" /></td>
+                <td v-else class="received-amount"><Amount :amount="tx.amount" ticker="FIRO" /></td>
             </tr>
         </table>
 
