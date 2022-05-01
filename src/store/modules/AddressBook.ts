@@ -32,7 +32,12 @@ const getters = {
     receiveAddresses: (state) =>
         (<AddressBookItem[]>Object.values(state.addressBook))
             .filter(a => a.purpose === 'receive')
-            .sort((a, b) => b.createdAt - a.createdAt)
+            .sort((a, b) => b.createdAt - a.createdAt),
+
+    rapReceiveAddresses: (state) =>
+        (<AddressBookItem[]>Object.values(state.addressBook))
+            .filter(a => a.purpose === 'rap-receive')
+            .sort((a, b) => a.label.localeCompare(b.label)),
 };
 
 export default {

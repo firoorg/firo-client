@@ -1,10 +1,6 @@
-button.solid-button {
+button.solid-button, button.small-solid-button {
     border: none;
     outline: none;
-
-    min-width: 145px;
-    height: 30px;
-    border-radius: 20px;
 
     cursor: pointer;
     &:disabled {
@@ -36,6 +32,18 @@ button.solid-button {
             color: var(--color-text-disabled);
         }
     }
+}
+
+button.solid-button {
+    min-width: 145px;
+    height: 30px;
+    border-radius: 20px;
+}
+
+button.small-solid-button {
+    min-width: 80px;
+    height: 17px;
+    border-radius: 14px;
 }
 
 .two-button-holder {

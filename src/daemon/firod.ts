@@ -278,8 +278,8 @@ export interface TransactionInput {
 export interface AddressBookItem {
     address: string;
     label: string;
-    createdAt: number; // UNIX timestamp in milliseconds
-    purpose: 'send' | 'receive';
+    createdAt?: number; // UNIX timestamp in milliseconds
+    purpose: 'send' | 'receive' | 'rap-receive';
 }
 
 function isValidAddressBookItem(x: any): x is AddressBookItem {

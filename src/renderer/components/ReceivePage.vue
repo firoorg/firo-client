@@ -6,21 +6,45 @@
                     Scan this QR code to receive Firo
                 </div>
 
+                <div class="regular-or-rap">
+                    <div class="radio-field">
+                        <input type="radio" v-model="useRap" :value="false" />
+                        <label>Regular Address</label>
+                    </div>
+
+                    <div class="radio-field">
+                        <input type="radio" v-model="useRap" :value="true" />
+                        <label>RAP Address</label>
+                    </div>
+                </div>
+
                 <div class="receiving-address">
                     <InputFrame label="Receiving Address">
                         <input id="receive-address" type="text" disabled="true" :value="address" />
                     </InputFrame>
 
-                    <CopyAddressIcon :address="address" />
-                    <RefreshAddressIcon :onclick="createNewAddress" />
+                    <div class="action-buttons">
+                        <CopyAddressIcon :address="address" />
+                        <RefreshAddressIcon :onclick="createNewAddress" />
+                    </div>
                 </div>
 
-                <InputFrame label="Label">
-                    <input id="receive-address-label" type="text" placeholder="Unlabelled" v-model.lazy="label" />
-                </InputFrame>
+                <div>
+                    <InputFrame label="Label">
+                        <input id="receive-address-label" type="text" placeholder="Unlabelled" v-model.lazy="label" />
+                    </InputFrame>
+                    <button v-if="useRap && !address" class="solid-button recommended create-rap-button">
+                        Create
+                    </button>
+                </div>
+
+                <div v-if="useRap" class="rap-guidance">
+                    RAP Addresses provide additional privacy when receiving FIRO as these addresses cannot be looked up
+                    on a blockchain explorer.
+                </div>
             </div>
 
-            <div class="qr-code-container">
+            <div class="qr-code-container" :class="{'no-display': !address}">
                 <div ref="qrCode" class="qr-code" />
             </div>
         </div>
@@ -68,6 +92,7 @@ export default {
             address: ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address,
             qrCode: null,
             isDefaultAddress: true,
+            useRap: false,
 
             tableFields: [
                 {name: CurrentAddressIndicator},
@@ -81,6 +106,7 @@ export default {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
+            rapReceiveAddresses: 'AddressBook/rapReceiveAddresses',
             txos: 'Transactions/TXOs',
         }),
 
@@ -102,7 +128,11 @@ export default {
 
         tableData() {
             this.$nextTick(() => this.$refs.animatedTable.reload());
-            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
+            if (this.useRap) {
+                return this.rapReceiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
+            } else {
+                return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
+            }
         }
     },
 
@@ -151,10 +181,18 @@ export default {
                         height: 200,
                         width: 200,
                         colorDark: 'black',
-                        colorLight: '#EBF0F5'
+                        colorLight: '#EBF0F5',
+                        drawer: 'svg'
                     });
                 }
+
+                document.querySelector('.qr-code img').style = 'width: 200px; height: 200px';
             }
+        },
+
+        useRap() {
+            if (this.useRap) this.address = ($store.getters['AddressBook/rapReceiveAddresses'][0] || {address: null}).address;
+            else this.address = ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address;
         }
     },
 
@@ -228,15 +266,40 @@ export default {
                 }
             }
 
+            $input-right-space: 100px;
+            $input-right-space-interior: calc(#{$input-right-space} - 4px - var(--padding-base));
+
+            .framed-input, .rap-guidance {
+                width: calc(100% - #{$input-right-space});
+            }
+
             .framed-input {
-                width: 580px;
+                display: inline-block;
+            }
+
+            .action-buttons {
+                vertical-align: top;
+                display: inline;
+                margin-left: calc(var(--padding-base) - 2px);
+                width: $input-right-space-interior;
+            }
+
+            .create-rap-button {
+                margin-top: 7px;
+                margin-left: var(--padding-base);
+                vertical-align: top;
+                display: inline-block;
+                min-width: $input-right-space-interior;
+                width: $input-right-space-interior;
+            }
+
+            .rap-guidance {
+                font-weight: bold;
+                margin-top: var(--padding-base);
+                text-align: center;
             }
 
             .receiving-address {
-                .framed-input {
-                    display: inline-block;
-                }
-
                 svg {
                     cursor: pointer;
                     display: inline-block;
@@ -259,6 +322,10 @@ export default {
             border-radius: var(--padding-base);
             background-color: #EBF0F5;
 
+            &.no-display {
+                opacity: 0;
+            }
+
             .qr-code {
                 width: 200px;
                 height: 200px;
@@ -268,6 +335,11 @@ export default {
 
     .bottom {
         flex-grow: 1;
+
+        td.address, th.address {
+            width: 100px;
+            color: red;
+        }
 
         .animated-table {
             height: 100%;

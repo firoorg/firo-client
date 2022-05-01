@@ -55,3 +55,43 @@ export function isValidAddress(address: string, network: 'test' | 'main' | 'regt
 
     return [0, 1, 2, 3].every((i) => checksum[i] === calculatedChecksum[i]);
 }
+
+export function isValidPaymentCode(address: string, network: 'test' | 'main' | 'regtest'): boolean {
+    // Payment codes do not have a network identifier.
+
+    let paymentCodeData;
+
+    try {
+        paymentCodeData = bs58.decode(address);
+    } catch(e) {
+        return false;
+    }
+
+    const contentData = paymentCodeData.slice(0, -4);
+    const checksum = paymentCodeData.slice(-4);
+    // calculatedChecksum is the first four bytes of the sha256^2 of contentData
+    const calculatedChecksum = shajs('sha256')
+        .update(
+            shajs('sha256')
+                .update(contentData)
+                .digest()
+        )
+        .digest()
+        .slice(0, 4);
+    if (![0, 1, 2, 3].every((i) => checksum[i] === calculatedChecksum[i])) return false;
+
+    if (contentData.length != 81) return false;
+    if (contentData[0] != 71) return false;
+    if (![2, 3, 4, 6, 7].includes(contentData[3])) return false;
+
+    let foundNonZero = false;
+    for (let i = 36; i++; i < 68) {
+        if (contentData[i] != 0) {
+            foundNonZero = true;
+            break;
+        }
+    }
+    if (!foundNonZero) return false;
+
+    return true;
+}
