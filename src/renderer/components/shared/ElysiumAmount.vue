@@ -21,11 +21,11 @@ export default {
         }),
 
         amount() {
-            return this.tx.elysium.property.isDivisible ? this.tx.elysium.amount : this.tx.elysium.amount * 1e8;
+            return this.tx?.elysium?.property?.isDivisible ? this.tx.elysium.amount : this.tx.elysium.amount * 1e8;
         },
 
         ticker() {
-            return (this.tokenData[this.tx.elysium.property.creationTx] || {ticker: ''}).ticker;
+            return this.tokenData[this.tx?.elysium?.property?.creationTx]?.ticker || '';
         }
     }
 }

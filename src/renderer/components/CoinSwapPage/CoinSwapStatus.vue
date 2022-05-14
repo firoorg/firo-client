@@ -1,33 +1,24 @@
 <template>
-    <th v-if="isHeader" class="vuetable-th-component-status" @click="$emit('click', rowField, $event)">
-    </th>
+    <th v-if="isHeader" class="vuetable-th-component-status" @click="$emit('click', rowField, $event)">Status</th>
 
     <td v-else class="vuetable-td-component-coinswap-status" :title="rowData.status">
         <div v-if="rowData.status === 'expired'">
             &#xef1b;
         </div>
 
-        <div v-else-if="rowData.status === 'failed'">
+        <div v-else-if="rowData.status === 'failed' || rowData.status === 'overdue'">
             &#xef1b;
         </div>
 
-        <div v-else-if="rowData.status === 'waiting'">
+        <div v-else-if="rowData.status === 'waiting' || rowData.status === 'wait'">
             <div class="spin">&#xeffa;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'received'">
+        <div v-else-if="rowData.status === 'received' || rowData.status === 'confirming' || rowData.status === 'confirmation' || rowData.status === 'exchanging' || rowData.status === 'sending' ">
             <div class="spin">&#xe819;</div>
         </div>
 
-        <div v-else-if="rowData.status === 'exchanging'">
-            <div class="spin">&#xe819;</div>
-        </div>
-
-        <div v-else-if="rowData.status === 'confirming'">
-            <div class="spin">&#xe819;</div>
-        </div>
-
-        <div v-else-if="rowData.status === 'confirmed'">
+        <div v-else-if="rowData.status === 'confirmed' || rowData.status === 'finished' || rowData.status === 'success'">
             &#xeed6;
         </div>
 

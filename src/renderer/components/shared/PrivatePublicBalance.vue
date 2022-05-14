@@ -52,15 +52,15 @@ export default {
         }),
 
         ticker() {
-            return this.asset == 'FIRO' ? 'FIRO' : this.tokenData[this.asset].ticker;
+            return this.asset == 'FIRO' ? 'FIRO' : this.tokenData[this.asset]?.ticker;
         },
 
         availablePrivate() {
-            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePrivateFiro : (this.elysiumBalances[this.asset] || {priv: 0}).priv);
+            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePrivateFiro : this.elysiumBalances[this.asset]?.priv || 0);
         },
 
         availablePublic() {
-            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePublicFiro : (this.elysiumBalances[this.asset] || {pending: 0}).pending);
+            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePublicFiro : this.elysiumBalances[this.asset]?.pending || 0);
         }
     },
 
@@ -78,7 +78,7 @@ export default {
         convertToCoin,
 
         adjustAmount(amount) {
-            return this.asset == 'FIRO' || this.tokenData[this.asset].isDivisible ? amount : `${amount}`;
+            return this.asset == 'FIRO' || this.tokenData[this.asset]?.isDivisible ? amount : `${amount}`;
         },
 
         toggle() {

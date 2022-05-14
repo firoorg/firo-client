@@ -1,6 +1,6 @@
 {
   "name": "firo-client",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "author": {
     "name": "Firo Foundation",
     "email": "team@firo.io",
@@ -10,10 +10,10 @@
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
-    "build": "node electron-vue/build.js && electron-builder build -w",
+    "build": "node electron-vue/build.js && electron-builder build -wlm",
     "dev": "node electron-vue/dev-runner.js",
     "test": "mocha --bail -r ts-node/register 'tests/**/*.ts'",
-    "rebuild-zeromq": "VERSION=$(echo $npm_package_devDependencies_electron | sed 's/\\^//g'); npm rebuild zeromq --runtime=electron --target=${VERSION}"
+    "rebuild-zeromq": "npm rebuild zeromq --runtime=electron --target=11.1.1"
   },
   "build": {
     "productName": "Firo Client",

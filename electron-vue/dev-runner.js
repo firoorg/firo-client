@@ -6,7 +6,6 @@ const WebpackDevServer = require('webpack-dev-server');
 
 const rendererConfig = require('./webpack.renderer.config');
 rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer);
-
 const mainConfig = require('./webpack.main.config');
 
 (async () => {

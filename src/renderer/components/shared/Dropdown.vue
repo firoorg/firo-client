@@ -3,6 +3,7 @@
         <div class="pseudo-input-frame">
             <label class="pseudo-input-frame-label">{{ labelText }}</label>
             <vue-select
+                ref="vueSelect"
                 class="select"
                 label="name"
                 v-model="selectedOption"
@@ -14,14 +15,14 @@
                 <template v-slot:option="option">
                     <div class="option">
                         <img v-if="option.icon" :src="option.icon" class="option-icon" />
-                        <div class="name" :id="`elysium-option-${option.id}`">{{ option.name }}</div>
+                        <div class="name" :id="`option-${option.id}`">{{ option.name }}</div>
                     </div>
                 </template>
 
                 <template v-slot:selected-option="option">
                     <div class="option" v-if="option">
                         <img v-if="option.icon" :src="option.icon" class="option-icon" />
-                        <div class="name" :id="`elysium-option-${option.id}`">{{ option.name }}</div>
+                        <div class="name" :id="`option-${option.id}`">{{ option.name }}</div>
                     </div>
                 </template>
             </vue-select>
@@ -56,11 +57,12 @@ export default {
 
     watch: {
         value() {
-            this.selectedOption = this.options.find(o => o.id === this.value);
+            this.selectedOption = this.options.find(o => o.id === this.value) || null;
+            if (!this.selectedOption) this.$refs.vueSelect.clearSelection();
         },
 
         selectedOption() {
-            this.$emit('input', this.selectedOption.id);
+            this.$emit('input', this.selectedOption?.id);
         }
     }
 }
@@ -100,8 +102,21 @@ export default {
             color: var(--color-secondary-tag-background);
         }
 
+        i {
+            background-color: inherit !important;
+
+            &::before {
+                border-color: var(--color-text-primary) !important;
+            }
+        }
+
         button.clear {
+            color: var(--color-text-primary) !important;
             display: none;
+        }
+
+        .selected-tag {
+            color: inherit !important;
         }
 
         &, input {
@@ -111,11 +126,20 @@ export default {
             }
         }
 
-        .dropdown-menu > .highlight > a {
-            background: var(--color-secondary-tag-background);
+        .dropdown-menu {
+            background: var(--color-background-tag) !important;
+
+            li {
+                background-color: inherit !important;
+            }
+
+            a {
+                color: var(--color-text-primary) !important;
+            }
         }
 
         .dropdown-toggle {
+            color: var(--color-text-primary) !important;
             font-weight: bold;
             height: 100%;
             width: 100%;
@@ -125,9 +149,13 @@ export default {
                 left: 6px;
                 right: 6px;
             }
-            background-color: inherit;
+            background-color: inherit !important;
             border: none;
             outline: none;
+
+            input {
+                background-color: inherit !important;
+            }
         }
 
         .option {

@@ -7,6 +7,7 @@
         Date
     </th>
     <td v-else-if="!rowData.blockHeight && !rowData.isInstantSendLocked" class="unconfirmed">Unconfirmed</td>
+    <td v-else-if="rowData.date" class="confirmed">{{createDate}}</td>
     <td
         v-else
         class="vuetable-td-component-relative-date"
@@ -30,6 +31,9 @@ export default {
     computed: {
         absoluteDate () {
             return format(new Date(this.rowData.firstSeenAt * 1000), "HH:MM, D MMM YYYY")
+        },
+        createDate () {
+            return format(new Date(this.rowData.date), "HH:MM, D MMM YYYY")
         }
     }
 }

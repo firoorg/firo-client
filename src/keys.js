@@ -1,2 +1,0 @@
-const KEYS = {"HAS_KEYS":false,"SWAPZONE_API_KEY":"","EXOLIX_AUTHORIZATION":"","CHANGENOW_TOKEN":"","CHANGENOW_API_KEY":""};
-export default KEYS;
