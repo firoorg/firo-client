@@ -52,7 +52,7 @@
 
         <div class="buttons">
             <button class="solid-button unrecommended" @click="$emit('cancel')">Cancel</button>
-            <button :disabled="!property.id" class="solid-button recommended" @click="$emit('submit', property.creationTx)">OK</button>
+            <button :disabled="!property.id" class="solid-button recommended" @click="ok">OK</button>
         </div>
     </div>
 </template>
@@ -60,6 +60,7 @@
 <script>
 import SearchInput from "renderer/components/shared/SearchInput";
 import electron from "electron";
+import {mapMutations} from "vuex";
 
 export default {
     name: "AddTokenForm",
@@ -104,7 +105,15 @@ export default {
     },
 
     methods: {
-        openExternal: electron.shell.openExternal
+        openExternal: electron.shell.openExternal,
+        ...mapMutations({
+            addTokenData: 'Elysium/addTokenData'
+        }),
+
+        ok() {
+            this.addTokenData(this.property);
+            this.$emit('submit', this.property.creationTx);
+        }
     }
 }
 </script>
