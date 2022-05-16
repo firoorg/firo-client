@@ -30,7 +30,7 @@ function txosFromTx(tx: Transaction): TXO[] {
         index += 1;
 
         // This is for txouts of multi-recipient transactions that we've received funds from that go to other wallets.
-        if (!tx.isFromMe && !txout.isToMe) continue;
+        if (!tx.isFromMe && !txout.isToMe && !tx.elysium.isToMe) continue;
 
         let spendSize = undefined;
         switch (txout.scriptType) {
