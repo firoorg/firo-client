@@ -10,9 +10,9 @@
             </div>
 
             <div class="right-element action-element">
-                <div class="checkbox-field">
+                <div class="checkbox-field" @click="showPopup = 'createToken'">
                     <PlusButton />
-                    <label id="createToken" @click="showPopup = 'createToken'">Create Token</label>
+                    <label id="createToken">Create Token</label>
                 </div>
 
                 <Popup v-if="showPopup == 'createToken'">
@@ -21,9 +21,9 @@
             </div>
 
             <div class="right-element action-element">
-                <div class="checkbox-field">
+                <div class="checkbox-field" @click="showPopup = 'addExistingToken'">
                     <PlusButton />
-                    <label @click="showPopup = 'addExistingToken'">Add Existing Token</label>
+                    <label>Add Existing Token</label>
                 </div>
 
                 <Popup v-if="showPopup == 'addExistingToken'">
