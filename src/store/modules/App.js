@@ -19,7 +19,8 @@ const state = {
     allowBreakingMasternodes: false,
     temporaryFirodArguments: [],
     enableElysium: false,
-    colorTheme: 'system'
+    colorTheme: 'system',
+    logMessages: []
 }
 
 const mutations = {
@@ -81,6 +82,10 @@ const mutations = {
             throw "unknown color theme value";
         }
         state.colorTheme = value;
+    },
+
+    appendLogMessage(state, msg) {
+        state.logMessages.push(msg);
     }
 }
 
@@ -199,7 +204,8 @@ const getters = {
     cachedMnemonic: (state) => state.cachedMnemonic,
     enableElysium: (state) => state.enableElysium || false,
     colorTheme: (state) => state.colorTheme || 'system',
-    showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && keys.HAS_KEYS
+    showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && keys.HAS_KEYS,
+    logMessages: (state) => state.logMessages
 }
 
 export default {

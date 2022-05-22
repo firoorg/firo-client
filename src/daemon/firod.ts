@@ -9,6 +9,7 @@ import EventWaitHandle from "./eventWaitHandle";
 import * as constants from './constants';
 import { createLogger } from '../lib/logger';
 import * as net from "net";
+import tail from "./tail";
 
 const logger = createLogger('firo:daemon');
 
@@ -595,31 +596,32 @@ export class Firod {
         }
         this.hasStarted = true;
 
+        let datadir;
+        switch (this.firodNetwork) {
+            case "mainnet":
+                datadir = path.join(this.firodDataDir);
+                break;
+
+            case "test":
+                datadir = path.join(this.firodDataDir, "testnet3");
+                break;
+
+            case "regtest-ql":
+                datadir = path.join(this.firodDataDir, "regtest-ql");
+                break
+
+            case "regtest":
+                datadir = path.join(this.firodDataDir, "regtest");
+                break
+
+            default:
+                throw new InvalidNetwork();
+        }
+
         if (mnemonicSettings) {
             assertValidMnemonicSettings(mnemonicSettings);
 
-            let walletLocation;
-            switch (this.firodNetwork) {
-                case "mainnet":
-                    walletLocation = path.join(this.firodDataDir, "wallet.dat");
-                    break;
-
-                case "test":
-                    walletLocation = path.join(this.firodDataDir, "testnet3", "wallet.dat");
-                    break;
-
-                case "regtest-ql":
-                    walletLocation = path.join(this.firodDataDir, "regtest-ql", "wallet.dat");
-                    break
-
-                case "regtest":
-                    walletLocation = path.join(this.firodDataDir, "regtest", "wallet.dat");
-                    break
-
-                default:
-                    throw new InvalidNetwork();
-            }
-
+            const walletLocation = path.join(datadir, "wallet.dat");
             if (fs.existsSync(walletLocation)) {
                 throw new InvalidMnemonic("Firod.start() called with mnemonicSettings set, but wallet.dat already exists");
             }
@@ -632,6 +634,13 @@ export class Firod {
         if (isFirodListening && !this.allowMultipleFirodInstances) {
             throw new FirodAlreadyRunning();
         }
+
+        const debugFile = path.join(datadir, "debug.log");
+        new Promise(async () => {
+            for await (const msg of tail(debugFile)) {
+                await this.eventHandlers['logMessage'](this, msg);
+            }
+        });
 
         if (!isFirodListening) {
             await this.launchDaemon(mnemonicSettings);

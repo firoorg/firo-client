@@ -89,6 +89,11 @@ export default new Router({
                 {
                     path: '/debugconsole',
                     component: require('renderer/components/DebugConsolePage.vue').default
+                },
+
+                {
+                    path: '/logconsole',
+                    component: require('renderer/components/LogConsolePage.vue').default
                 }
             ]
         }

@@ -31,6 +31,10 @@
         <router-link to="/debugconsole">
             Debug Console
         </router-link>
+
+        <router-link to="/logconsole">
+            Log Console
+        </router-link>
     </nav>
 </template>
 
