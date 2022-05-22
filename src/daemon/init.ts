@@ -51,7 +51,7 @@ async function firod(store: any, network: Network, firodLocation: string, firodD
         }
     }
     const firod = new Firod(network, firodLocation, firodDataDir, initializers, eventHandlers);
-    firod.extraFirodArgs = ['-elysium=1', ...extraArgs];
+    firod.extraFirodArgs = extraArgs;
     firod.allowMultipleFirodInstances = !!allowMultipleFirodInstances;
     firod.runInitializersIfFirodIsRunning = !!runInitializersIfFirodIsRunning;
     if (connectionTimeout) firod.connectionTimeout = connectionTimeout;

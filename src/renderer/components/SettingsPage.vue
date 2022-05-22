@@ -112,6 +112,12 @@ export default {
 
             set(value) {
                 this.setEnableElysium(value);
+                this.$nextTick(async () => {
+                    $setWaitingReason("Restarting daemon...");
+                    await $daemon.stopDaemon();
+                    await $startDaemon();
+                    await $addElysiumTokenData();
+                });
             }
         },
 

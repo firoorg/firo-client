@@ -75,11 +75,8 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
     }, 60e3);
 });
 
-$store.watch(() => $store.getters['Elysium/selectedAndOwnedTokens'], async (selectedAndOwnedTokens, oldValue) => {
-    if (isEqual(selectedAndOwnedTokens, oldValue)) return;
-    while (!window.$daemon || !$store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
-
-    const tokensNeedingData = selectedAndOwnedTokens.filter(token => !$store.getters['Elysium/tokenData'][token]);
+window.$addElysiumTokenData = async () => {
+    const tokensNeedingData = $store.getters['Elysium/selectedAndOwnedTokens'].filter(token => !$store.getters['Elysium/tokenData'][token]);
     if (!tokensNeedingData.length) return;
 
     const tokenData = (await Promise.all(tokensNeedingData.map(async token => {
@@ -91,6 +88,12 @@ $store.watch(() => $store.getters['Elysium/selectedAndOwnedTokens'], async (sele
     }))).filter(x => x);
 
     $store.commit('Elysium/addTokenData', tokenData);
+};
+
+$store.watch(() => $store.getters['Elysium/selectedAndOwnedTokens'], async (selectedAndOwnedTokens, oldValue) => {
+    if (isEqual(selectedAndOwnedTokens, oldValue)) return;
+    while (!window.$daemon || !$store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
+    await $addElysiumTokenData();
 });
 
 $store.watch(() => $store.getters['Elysium/selectedTokens'], async (newValue, oldValue) => {
@@ -251,12 +254,14 @@ window.$startDaemon = () => new Promise(resolve => {
     // Checking for firodHasStarted allows us to work properly with hot reloading.
 
     $setWaitingReason("Starting up firod...");
-    firod(store, store.getters['App/firoClientNetwork'], store.getters['App/firodLocation'],
-        store.getters['App/blockchainLocation'] || null, undefined,
-        store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
-        !store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
+    const args = $store.getters['App/temporaryFirodArguments'].map(x => x) || [];
+    if ($store.getters['App/enableElysium']) args.push('-elysium');
+    firod(store, $store.getters['App/firoClientNetwork'], $store.getters['App/firodLocation'],
+        $store.getters['App/blockchainLocation'] || null, undefined,
+        $store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
+        !$store.getters['App/firodHasStarted'] && process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
         process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined,
-        store.getters['App/temporaryFirodArguments'] || [])
+        args)
         .then(async z => {
             // Make $daemon globally accessible.
             window.$daemon = z;
@@ -305,7 +310,7 @@ window.$startDaemon = () => new Promise(resolve => {
 
                 logger.info("firod has started.");
                 $setWaitingReason(undefined);
-                store.commit('App/setFirodHasStarted', true);
+                $store.commit('App/setFirodHasStarted', true);
                 if (!$store.getters['App/isInitialized']) await store.dispatch('App/setIsInitialized', true);
                 resolve();
             } else {
