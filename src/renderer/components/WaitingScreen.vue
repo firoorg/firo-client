@@ -1,10 +1,6 @@
 <template>
     <div class="waiting-screen">
-        <div class="inner">
-            <div class="header-text">
-                Just a Moment...
-            </div>
-
+        <div class="top">
             <FiroSymbolWhite />
 
             <DotDotDot />
@@ -13,10 +9,13 @@
                 {{ reason }}
             </div>
         </div>
+
+        <div ref="log" class="log">{{ log }}</div>
     </div>
 </template>
 
 <script>
+import {mapGetters} from "vuex";
 import FiroSymbolWhite from "renderer/assets/FiroSymbolWhite.svg";
 import DotDotDot from "renderer/components/shared/DotDotDot";
 
@@ -33,6 +32,28 @@ export default {
             type: String,
             required: true
         }
+    },
+
+    watch: {
+        log: {
+            immediate: true,
+            handler() {
+                this.$nextTick(() => {
+                    this.$refs.log.scrollTop = this.$refs.log.scrollHeight;
+                    this.$refs.log.scrollLeft = 0;
+                })
+            }
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            logMessages: 'App/logMessages'
+        }),
+
+        log() {
+            return this.logMessages.slice(-200).join("\n");
+        }
     }
 }
 </script>
@@ -45,20 +66,23 @@ $speed: 2.5s;
     height: 100vh;
     width: 100vw;
     z-index: var(--z-waiting-screen);
-    text-align: center;
     background-color: var(--color-background-detail);
 
-    .inner {
-        // Center .inner horizontally and vertically.
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+
+    .top {
+        text-align: center;
+
+        margin: {
+            top: 10vh;
+            left: auto;
+            right: auto;
+        };
 
         svg {
             width: 80px;
             margin: {
-                top: var(--padding-base);
                 bottom: var(--padding-base);
                 left: auto;
                 right: auto;
@@ -71,7 +95,24 @@ $speed: 2.5s;
 
         .reason {
             margin-top: var(--padding-base);
+            opacity: 0.7;
         }
+    }
+
+    .log {
+        flex-grow: 1;
+        width: 80vw;
+        margin: {
+            top: 10vh;
+            bottom: 10vh;
+            left: auto;
+            right: auto;
+        }
+        white-space: pre;
+        text-align: left;
+        opacity: 0.5;
+        font-family: "Robot Mono", monospace;
+        overflow: scroll;
     }
 }
 </style>
