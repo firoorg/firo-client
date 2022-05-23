@@ -74,7 +74,7 @@ export default {
 
             try {
                 const r = await $daemon.mintAllLelantus(passphrase);
-                $store.commit('Transactions/markSpentTransaction', r.inputs);
+                $store.commit('Transactions/markSpentTransaction', r?.inputs || []);
             } catch (e) {
                 if (e instanceof FirodErrorResponse) {
                     errors.unshift(e.errorMessage);
