@@ -415,7 +415,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntil(async () => (await receiveAddressElement.getValue()) !== originalReceiveAddress);
     });
 
-    it('adds, edits, and properly orders receive addresses', async function (this: This) {
+    it.skip('adds, edits, and properly orders receive addresses', async function (this: This) {
         this.timeout(30e3);
 
         await (await this.app.client.$('a[href="#/receive"]')).click();
