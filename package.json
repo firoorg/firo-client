@@ -3,8 +3,8 @@
   "version": "2.2.1",
   "author": {
     "name": "Firo Foundation",
-    "email": "team@firo.io",
-    "url": "https://firo.io/"
+    "email": "team@firo.org",
+    "url": "https://firo.org/"
   },
   "description": "Firo Client",
   "license": "MIT",
