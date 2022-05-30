@@ -8,6 +8,7 @@ const getters = {
 
         for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
             if (!txo.isToMe || txo.isSpent) continue;
+            else if (txo.isElysiumReferenceOutput) locked += txo.amount;
             else if (txo.isLocked) locked += txo.amount;
             else if (txo.inputPrivacy == 'mined' && txo.validAt > nextHeight) immature += txo.amount;
             else if (txo.isPrivate && txo.validAt <= nextHeight) availablePrivate += txo.amount;

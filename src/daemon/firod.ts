@@ -209,6 +209,7 @@ export interface TxOut {
     isLocked: boolean;
     isSpent: boolean;
     isToMe: boolean;
+    isElysiumReferenceOutput: boolean;
     destination?: string;
 }
 
