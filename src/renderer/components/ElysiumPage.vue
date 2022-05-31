@@ -100,7 +100,8 @@ export default {
             selectedAndOwnedTokens: 'Elysium/selectedAndOwnedTokens',
             selectedTokens: 'Elysium/selectedTokens',
             tokenData: 'Elysium/tokenData',
-            aggregatedBalances: 'Elysium/aggregatedBalances'
+            aggregatedBalances: 'Elysium/aggregatedBalances',
+            availableUTXOs: 'Transactions/availableUTXOs'
         }),
 
         myTokensTableData() {
@@ -142,10 +143,16 @@ export default {
         },
 
         async completeCreateToken() {
+            const fromAddress = this.availableUTXOs.find(txo => txo.amount >= 0.002e8 && txo.destination && !txo.isPrivate)?.destination;
+            if (!fromAddress) {
+                this.passphraseError = 'Creating an Elysium property requires having a single non-locked transaction output with a value >= 0.002 FIRO. Try sending FIRO to yourself first and then try again.';
+                return;
+            }
+
             const d = this.newTokenData;
             try {
-                const r = await $daemon.createElysiumProperty(this.passphrase, d.isFixed, d.isDivisible,
-                    (d.isFixed || undefined) && (d.isDivisible ? `${d.issuanceAmount}00000000` : d.issuanceAmount),
+                const r = await $daemon.createElysiumProperty(this.passphrase, fromAddress, d.isFixed,
+                    d.isDivisible, (d.isFixed || undefined) && (d.isDivisible ? `${d.issuanceAmount}00000000` : d.issuanceAmount),
                     d.name, d.category, d.subcategory, d.description, d.url);
 
                 $store.commit('Transactions/markSpentTransaction', r.inputs);
