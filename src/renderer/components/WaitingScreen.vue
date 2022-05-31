@@ -10,7 +10,11 @@
             </div>
         </div>
 
-        <div ref="log" class="log">{{ log }}</div>
+        <div ref="log" class="log">
+            <div v-for="msg of logMessages" class="message">
+                {{ msg }}
+            </div>
+        </div>
     </div>
 </template>
 
@@ -49,11 +53,7 @@ export default {
     computed: {
         ...mapGetters({
             logMessages: 'App/logMessages'
-        }),
-
-        log() {
-            return this.logMessages.slice(-200).join("\n");
-        }
+        })
     }
 }
 </script>
@@ -108,7 +108,6 @@ $speed: 2.5s;
             left: auto;
             right: auto;
         }
-        white-space: pre;
         text-align: left;
         opacity: 0.5;
         font-family: "Robot Mono", monospace;
