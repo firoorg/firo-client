@@ -188,13 +188,13 @@ const getters = {
         .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
         // Hide Elysium notification transactions. These shouldn't be spent normally because a TXO outputting to a given
         // Elysium address is required to mint or spend publicly from that address.
-        .filter(txo => !(txo.elysium && !txo.isChange && txo.scriptType !== 'elysium' && txo.amount == 100e3 && txo.index == 1)),
+        .filter(txo => !txo.isElysiumReferenceOutput),
     TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.TXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
     UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) => !txo.isSpent),
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
         txo.isToMe &&
         // Elysium has reference outputs that we should not allow the user to spend.
-        !(txo.elysium && !txo.isChange) &&
+        !txo.isElysiumReferenceOutput &&
         (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
         txo.spendSize &&
         txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
