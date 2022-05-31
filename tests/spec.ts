@@ -291,16 +291,19 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         assert.equal(await badge.getText(), 'Regtest');
     });
 
-    async function enableElysium(this: This) {
-        if (await (await this.app.client.$('a[href="#/elysium"]')).isExisting()) return;
+    async function setElysium(this: This, status: boolean) {
+        if (await (await this.app.client.$('a[href="#/elysium"]')).isExisting() == status) return;
         await (await this.app.client.$('a[href="#/settings"]')).click();
         await (await this.app.client.$('#enable-elysium-checkbox')).click();
+        await (await this.app.client.$('.waiting-screen')).waitForExist();
+        await (await this.app.client.$('.waiting-screen')).waitForExist({reverse: true, timeout: 100e3});
     }
 
-    async function disableElysium(this: This) {
-        if (!await (await this.app.client.$('a[href="#/elysium"]')).isExisting()) return;
-        await (await this.app.client.$('a[href="#/settings"]')).click();
-        await (await this.app.client.$('#enable-elysium-checkbox')).click();
+    async function mintAllLelantus(this: This) {
+        await this.app.client.executeAsyncScript(
+            `$daemon.mintAllLelantus(arguments[0]).then(r => {$store.commit('Transactions/markSpentTransaction', r?.inputs || []); arguments[1]()})`,
+            [passphrase]
+        );
     }
 
     async function generateSufficientFiro(this: This) {
@@ -317,12 +320,15 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
         }
 
-        if (Number(await privateBalanceElement.getText()) < 20) {
-            // At least 2 coins are required in the anonymity set before we can spend.
-            for (const cmd of [`walletpassphrase ${passphrase} 5`, 'mintlelantus 10', 'mintlelantus 10', 'generate 2']) {
-                await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', [cmd]);
+        while (Number(await privateBalanceElement.getText()) < 20) {
+            await mintAllLelantus.bind(this)();
+
+            while (!await publicBalanceElement.isExisting()) {
+                await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
             }
-            await this.app.client.waitUntil(async () => Number(await privateBalanceElement.getText()) >= 20, {timeout: 1e3});
+            await mintAllLelantus.bind(this)();
+
+            await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
         }
     }
     this.beforeEach('generates Firo if not enough is available', generateSufficientFiro);
@@ -394,11 +400,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         await this.app.client.waitUntil(async () =>
             !await publicBalanceElement.isExisting() || convertToSatoshi(await publicBalanceElement.getText()) < 0.001e8,
-            {timeoutMsg: "public balance should be below 0.001 FIRO"}
+            {timeoutMsg: "public balance should be below 0.001 FIRO", timeout: 5e3}
         );
         await this.app.client.waitUntil(async () =>
             convertToSatoshi(await pendingBalanceElement.getText()) > originalPublicBalance - 0.1e8,
-            {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds"}
+            {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds", timeout: 5e3}
         );
     });
 
@@ -412,7 +418,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         let originalReceiveAddress = await receiveAddressElement.getValue();
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generatetoaddress 1 ${originalReceiveAddress}').then(arguments[0])`, []);
-        await this.app.client.waitUntil(async () => (await receiveAddressElement.getValue()) !== originalReceiveAddress);
+        await this.app.client.waitUntil(async () => (await receiveAddressElement.getValue()) !== originalReceiveAddress, {timeout: 5e3});
     });
 
     it.skip('adds, edits, and properly orders receive addresses', async function (this: This) {
@@ -474,8 +480,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         return async function (this: This) {
             this.timeout(100e3);
 
-            if (elysium) await enableElysium.bind(this)();
-            else await disableElysium.bind(this)();
+            await setElysium.bind(this)(elysium);
 
             // This is required so that the new transactions will be the first elements on the transactions list.
             await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', ['generate 1']);
@@ -666,7 +671,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                     [satoshiAmountToSend, paymentType === 'private', subtractTransactionFee]
                 );
                 return !!txOut;
-            })
+            }, {timeout: 5e3});
             assert.exists(txOut);
 
             const txinfo = (await this.app.client.executeAsyncScript('$daemon.legacyRpc(`getrawtransaction ${arguments[0]} true`).then(arguments[1])', [txOut.txid])).result;
@@ -779,7 +784,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         // Make sure our token will be the first in the list so tests work.
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
 
-        await enableElysium.bind(this)();
+        await setElysium.bind(this)(true);
 
         await (await this.app.client.$('a[href="#/elysium"')).click();
         await (await this.app.client.$('.elysium-page')).waitForExist();
@@ -806,7 +811,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await passphraseInput.setValue(passphrase);
         await (await this.app.client.$('.passphrase-input button.recommended')).click();
 
-        await this.app.client.waitUntilTextExists('.elysium-id', "0");
+        await this.app.client.waitUntilTextExists('.elysium-id', "\ueffa");
         await this.app.client.waitUntilTextExists('.elysium-name', name);
         await this.app.client.waitUntilTextExists('.elysium-ticker', ticker);
         await this.app.client.waitUntilTextExists('.elysium-private-balance', "0");
@@ -815,7 +820,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
 
         await this.app.client.waitUntil(async () =>
-            await (await this.app.client.$('.elysium-id')).getText() !== "0"
+            await (await this.app.client.$('.elysium-id')).getText() !== "\ueffa"
         );
 
         await (await this.app.client.$('a[href="#/transactions"]')).click();
@@ -854,7 +859,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const afterBalances: {priv: number, pending: number} =
                 await this.app.client.executeScript('return $store.getters["Elysium/aggregatedBalances"][arguments[0]]', [id]);
             return afterBalances.priv === creationAmount && afterBalances.pending === 0;
-        });
+        }, {timeout: 5e3});
 
         return id;
     }
@@ -915,7 +920,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                 [satoshiAmountToSend]
             );
             return !!txOut;
-        });
+        }, {timeout: 5e3});
         assert(!!txOut);
 
         await this.app.client.waitUntilTextExists('table .amount-value', amountToSend, <any>{timeout: 10e3});
