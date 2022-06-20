@@ -20,7 +20,7 @@
 
                 <div class="receiving-address">
                     <InputFrame label="Receiving Address">
-                        <input id="receive-address" type="text" disabled="true" :value="address" />
+                        <input id="receive-address" type="text" disabled="false" :value="address" />
                     </InputFrame>
 
                     <div class="action-buttons">
