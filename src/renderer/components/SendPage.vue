@@ -52,6 +52,39 @@
                         <label @click="addToAddressBook">Add to address book</label>
                     </div>
 
+                    <div v-if="firstTimeRap" class="first-time-rap">
+                    <!-- <div class="first-time-rap"> -->
+                        <div class="title">Initial RAP Send</div>
+                        <div class="guidance">
+                            Before sending to an RAP address for the first time, you must send a connecting transaction.
+                        </div>
+                        <div class="connect-section">
+                            <div class="status-section" :class="{'ready-to-connect': !connectionTransaction}">
+                                <label>Status:</label>
+                                <div v-if="!connectionTransaction" class="status">
+                                    Ready to Connect
+                                </div>
+                                <div v-else-if="!connectionTransaction.blockHeight" class="status">
+                                    Connecting
+                                </div>
+                                <div v-else class="status">
+                                    Connected
+                                </div>
+                            </div>
+                            <button v-if="!connectionTransaction" class="small-solid-button recommended">Connect</button>
+                        </div>
+                        <div v-if="connectionTransaction" class="connection-transaction-section">
+                            <label>Connection Transaction:</label>
+                            <div class="connection-transaction" @click="showConnectionTransaction = true">
+                                <template v-if="connectionTransaction.blockHeight">Confirmed</template>
+                                <template v-else>Pending</template>
+                            </div>
+                            <Popup v-if="showConnectionTransaction">
+                                <TransactionInfo :tx="connectionTransaction" @ok="showConnectionTransaction = false" />
+                            </Popup>
+                        </div>
+                    </div>
+
                     <InputFrame class="input-frame-amount" label="Amount">
                         <input
                             id="amount"
@@ -169,7 +202,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
-import {isValidAddress} from 'lib/isValidAddress';
+import {isValidAddress, isValidPaymentCode} from 'lib/isValidAddress';
 import {convertToSatoshi, convertToCoin} from 'lib/convert';
 import Amount from "renderer/components/shared/Amount";
 import InputSelection from "renderer/components/SendPage/InputSelection";
@@ -182,6 +215,7 @@ import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalanc
 import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
+import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo";
 
 export default {
     name: 'SendPage',
@@ -195,7 +229,8 @@ export default {
         InputSelection,
         Popup,
         InputFrame,
-        SearchInput
+        SearchInput,
+        TransactionInfo
     },
 
     inject: [
@@ -220,7 +255,9 @@ export default {
                 {name: AddressBookItemAddress}
             ],
             // This is the search term to filter addresses by.
-            filter: ''
+            filter: '',
+            showConnectionTransaction: false,
+            connectionTransaction: null
         }
     },
 
@@ -237,6 +274,15 @@ export default {
             calculateTransactionFee: 'Transactions/calculateTransactionFee'
         }),
 
+        isRapAddress() {
+            return isValidPaymentCode(this.address, this.network);
+        },
+
+        firstTimeRap() {
+            // fixme: actually implement logic to detect if it's the first time we're sending to a payment code
+            return this.isRapAddress;
+        },
+
         transactionFee() {
             if (!this.satoshiAmount) return undefined;
             return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
@@ -251,14 +297,20 @@ export default {
         },
 
         filteredSendAddresses () {
-            this.$nextTick(() => this.$refs.animatedTable.reload());
+            this.$nextTick(() => this.$refs.animatedTable && this.$refs.animatedTable.reload());
             return this.sendAddresses
                 .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
                 .map(address => ({isSelected: address.address === this.address, ...address}));
         },
 
         showAddToAddressBook () {
-            return !this.formDisabled && isValidAddress(this.address, this.network) && !this.addressBook[this.address];
+            console.log("====================>", this.address, this.network)
+            console.log("isValidAddress", isValidAddress(this.address, this.network))
+            // return !this.formDisabled;
+            if (this.isRapAddress){
+                return this.isRapAddress && this.checkAddressExist(this.addressBook, this.address);
+            }
+            return !this.formDisabled && isValidAddress(this.address, this.network) && this.checkAddressExist(this.addressBook, this.address);
         },
 
         coinControl () {
@@ -379,7 +431,7 @@ export default {
 
         this.$validator.extend('firoAddress', {
             getMessage: () => 'The Firo address you entered is invalid',
-            validate: (value) => isValidAddress(value, this.network)
+            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network)
         });
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
@@ -415,10 +467,24 @@ export default {
         convertToCoin,
 
         async addToAddressBook() {
-            if (!isValidAddress(this.address, this.network) || !this.label) return;
-
-            if (this.addressBook[this.address]) {
+            // if (!isValidAddress(this.address, this.network) || !this.label){
+            //     console.log("wrong address")
+            //     return;
+            // } 
+            
+            if (this.isRapAddress) {
+                const item = {
+                    address: this.address,
+                    label: this.label,
+                    purpose: 'send'
+                };
+                console.log("this create new item", item)
+                $store.commit('AddressBook/updateAddress', {...item, createdAt: Date.now()});
+                await $daemon.addAddressBookItem(item);
+            }
+            else if (this.addressBook[this.address].label != "") {
                 const item = this.addressBook[this.address]
+                console.log("this update exist item", item)
                 await $daemon.updateAddressBookItem(item, this.label);
                 $store.commit('AddressBook/updateAddress', {...item, label: this.label});
                 this.$refs.animatedTable.reload();
@@ -428,8 +494,18 @@ export default {
                     label: this.label,
                     purpose: 'send'
                 };
+                console.log("this create new item", item)
                 $store.commit('AddressBook/updateAddress', {...item, createdAt: Date.now()});
                 await $daemon.addAddressBookItem(item);
+            }
+        },
+
+        checkAddressExist (c_addressBook, c_address) {
+            if(c_addressBook[c_address]){
+                console.log(c_addressBook[c_address].label)
+                if(c_addressBook[c_address].label=="")
+                return true
+                else return false
             }
         },
 
@@ -513,6 +589,76 @@ export default {
                     }
                 }
 
+                .first-time-rap {
+                    margin-bottom: 10px;
+                    padding: var(--padding-base);
+                    border: {
+                        style: solid;
+                        width: 1px;
+                        color: var(--color-text-subtle-border);
+                    }
+
+                    label {
+                        color: var(--color-text-secondary);
+                        font-weight: bold;
+                    }
+
+                    .title {
+                        text-align: center;
+                        margin-bottom: 4px;
+                        font: {
+                            size: 1.1em;
+                            weight: bold;
+                        }
+                    }
+
+                    .guidance {
+                        margin-bottom: var(--padding-base);
+
+                        text-align: justify;
+                        text-align-last: center;
+
+                        font: {
+                            size: 0.9em;
+                            style: italic;
+                        }
+                    }
+
+                    .connect-section {
+                        .status-section {
+                            &, label, .status {
+                                display: inline-block;
+                            }
+
+                            .status {
+                                color: var(--color-secondary);
+                            }
+
+
+                            &.ready-to-connect {
+                                padding-right: var(--padding-base);
+                                border-right: {
+                                    style: solid;
+                                    width: 1px;
+                                    color: var(--color-text-subtle-border);
+                                }
+                            }
+                        }
+
+                        button {
+                            margin-left: var(--padding-base);
+                            display: inline-block;
+                        }
+                    }
+
+                    .connection-transaction {
+                        display: inline-block;
+                        cursor: pointer;
+                        text-decoration: underline;
+                        margin-top: var(--padding-base);
+                    }
+                }
+
                 .input-frame-amount {
                     margin-bottom: 20px;
                 }
@@ -562,3 +708,4 @@ export default {
     }
 }
 </style>
+
