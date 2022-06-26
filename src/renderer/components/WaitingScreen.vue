@@ -11,7 +11,7 @@
         </div>
 
         <div ref="log" class="log">
-            <div v-for="msg of logMessages" class="message">
+            <div v-for="(msg, i) in logMessages" class="message" :key="i">
                 {{ msg }}
             </div>
         </div>
@@ -39,7 +39,7 @@ export default {
     },
 
     watch: {
-        log: {
+        logMessages: {
             immediate: true,
             handler() {
                 this.$nextTick(() => {

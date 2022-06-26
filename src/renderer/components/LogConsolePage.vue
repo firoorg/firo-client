@@ -1,7 +1,7 @@
 <template>
     <section ref="console" class="log-console-page">
         <div class="log-console">
-            <div v-for="msg of logMessages" class="message">
+            <div v-for="(msg, i) in logMessages" class="message" :key="i">
                 {{ msg }}
             </div>
         </div>
