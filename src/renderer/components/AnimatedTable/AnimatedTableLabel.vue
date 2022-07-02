@@ -35,6 +35,7 @@ export default {
             if (this.rowData.label) return this.rowData.label;
             const address = this.rowData.elysium ? this.rowData.elysium.receiver || this.rowData.elysium.sender : this.rowData.address;
             if (this.addressBook[address] && this.addressBook[address].label) return this.addressBook[address].label;
+            if (!address) return "Unknown Address";
             return address;
         }
     }
