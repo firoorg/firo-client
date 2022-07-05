@@ -111,7 +111,7 @@ export default {
         }),
 
         ok() {
-            this.addTokenData(this.property);
+            this.addTokenData([this.property]);
             this.$emit('submit', this.property.creationTx);
         }
     }
