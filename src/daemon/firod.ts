@@ -639,6 +639,7 @@ export class Firod {
         const debugFile = path.join(datadir, "debug.log");
         new Promise(async () => {
             for await (const msg of tail(debugFile)) {
+                if (this.hasShutdown) return;
                 await this.eventHandlers['logMessage'](this, msg);
             }
         });
