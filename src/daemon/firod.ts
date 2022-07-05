@@ -639,7 +639,11 @@ export class Firod {
         const debugFile = path.join(datadir, "debug.log");
         new Promise(async () => {
             for await (const msg of tail(debugFile)) {
-                if (this.hasShutdown) return;
+                if (this.hasShutdown) {
+                    console.log(`Closing debug log ${debugFile}...`);
+                    return;
+                }
+
                 await this.eventHandlers['logMessage'](this, msg);
             }
         });
