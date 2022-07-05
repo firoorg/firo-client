@@ -214,23 +214,18 @@ const getters = {
     // 4) unconfirmed but InstantSend-locked Elysium transactions to us
     // 5) Elysium reference outputs
     // 6) Elysium Lelantus Mint transactions
-    userVisibleTransactions: (state, getters, rootState, rootGetters): TXO[] => getters.TXOs
+    userVisibleTransactions: (state, getters, rootState, rootGetters): TXO[] => getters.allTXOs
         .filter((txo: TXO) =>
                 !txo.isChange &&
                 !(txo.inputPrivacy === 'mined' && !txo.blockHeight) &&
-                (
-                    (
-                        rootGetters['App/enableElysium'] &&
-                        txo.scriptType === 'elysium' &&
-                        txo.elysium &&
-                        txo.elysium.property &&
-                        ((txo.isFromMe && !txo.blockHeight) || txo.elysium.valid) &&
-                        txo.elysium.type !== 'Lelantus Mint' &&
-                        rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)
-                    )
-                        ||
-                    (!txo.elysium && txo.destination && (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe))
-                )
+                !(txo.elysium && !txo.isElysiumReferenceOutput) &&
+                !(txo.isElysiumReferenceOutput && !rootGetters['App/enableElysium']) &&
+                !(txo.isElysiumReferenceOutput && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium?.property?.creationTx)) &&
+                !((txo.blockHeight || !txo.isFromMe) && txo.elysium?.valid === false) &&
+                !(txo.elysium?.type === 'Lelantus Mint') &&
+                (txo.isElysiumReferenceOutput || txo.destination) &&
+                (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
+                (txo.isFromMe || txo.isToMe || txo.elysium?.isToMe)
         )
         .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 
