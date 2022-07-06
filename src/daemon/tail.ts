@@ -3,15 +3,18 @@ const {promises: {open}} = require("electron").remote.require("fs");
 // Opens a file, seeks to the end, and then yields on each new line.
 export default async function* tail(file: string): AsyncIterable<string> {
     let fd;
+    let i = 0;
     while (true) {
         try {
             fd = await open(file, "r");
         } catch (e) {
-            if (e?.code == 'ENOENT') {
-                await new Promise(r => setTimeout(r, 500));
-                continue;
+            if (e?.code != 'ENOENT') {
+                console.error(`Error opening ${file}: ${e.message}`);
+            } else if (i++ % 100 == 0) {
+                console.warn(`Still waiting to open ${file}...`);
             }
-            throw e;
+            await new Promise(r => setTimeout(r, 500));
+            continue;
         }
 
         // Seek to the end of the file.
