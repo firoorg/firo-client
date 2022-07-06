@@ -120,7 +120,16 @@ export default {
             try {
                 if (this.asset != 'FIRO') {
                     const id = this.tokenData[this.asset].id;
-                    const r = await $daemon.sendElysium(passphrase, id, this.address, this.amount);
+
+                    let r;
+                    try {
+                        r = await $daemon.sendElysium(passphrase, id, this.address, this.amount);
+                    } catch (e) {
+                        if (!e.message.includes('Insufficient funds')) throw e;
+
+                        await $daemon.recoverElysium(passphrase);
+                        r = await $daemon.sendElysium(passphrase, id, this.address, this.amount);
+                    }
                     $store.commit('Transactions/markSpentTransaction', r.inputs);
                 } else if (this.isPrivate) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic

@@ -1557,6 +1557,12 @@ export class Firod {
         });
     }
 
+    // This recovers Elysium-Lelantus mints that were sent by other instances of this mnemonic (e.g. after restoring
+    // from a mnemonic).
+    async recoverElysium(auth: string) {
+        await this.send(auth, null, 'recoverElysium', null);
+    }
+
     // Create an Elysium property, returning the ID of the create property transaction. This will throw if we don't have
     // more than 0.002 public FIRO in a single address.
     async createElysiumProperty(auth: string, fromAddress: string, isFixed: boolean, isDivisible: boolean,
