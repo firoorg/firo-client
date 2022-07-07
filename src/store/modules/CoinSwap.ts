@@ -178,7 +178,7 @@ const actions = {
     async updateOutdatedRecords({getters, dispatch}): Promise<void> {
         const potentiallyOutdatedRecords = (<CoinSwapRecord[]>Object.values(getters.records))
             .filter(record =>
-                !['expired', 'confirmed', 'refunded', 'failed'].includes(record.status) ||
+                !['expired', 'confirmed', 'refunded', 'failed', 'finished'].includes(record.status) ||
                 // Despite failed and expired being documented as permanent states in the Switchain API docs, they can
                 // in fact be updated. Therefore we check for updates for 24 hours after they're made.
                 (['failed', 'expired'].includes(record.status) && record.date > Date.now() - 60e3 * 60 * 24)
@@ -188,7 +188,7 @@ const actions = {
             logger.debug(`Fetching status for CoinSwap record ${record.orderId}...`);
 
             try {
-                const{error, response} = await apiWorker.getOrderStatus(record);
+                const {error, response} = await apiWorker.getOrderStatus(record);
                 
                 if (error) throw error;
                 if (response.status !== record.status) {
