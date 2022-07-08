@@ -7,6 +7,7 @@ export interface TXO extends TxOut {
     blockHeight?: number;
     blockTime?: number;
     isInstantSendLocked: boolean;
+    publicInputs: CoinControl;
 
     txid: string;
     index: number;
@@ -85,6 +86,7 @@ function txosFromTx(tx: Transaction): TXO[] {
             fee: tx.fee,
             isInstantSendLocked: tx.isInstantSendLocked,
             elysium: tx.elysium,
+            publicInputs: tx.publicInputs,
             ...txout
         });
     }
