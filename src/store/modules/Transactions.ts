@@ -191,7 +191,7 @@ const getters = {
         // Hide Elysium notification transactions. These shouldn't be spent normally because a TXO outputting to a given
         // Elysium address is required to mint or spend publicly from that address.
         .filter(txo => !txo.isElysiumReferenceOutput),
-    TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.TXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
+    TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.allTXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
     UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) => !txo.isSpent),
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
         txo.isToMe &&
