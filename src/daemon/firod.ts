@@ -1518,6 +1518,13 @@ export class Firod {
         throw new UnexpectedFirodResponse('none/paymentRequestAddress', data);
     }
 
+    // Create a new RAP address. `label` be unique.
+    async createRapAddress(auth: string, label: string): Promise<string> {
+        const data = await this.send(auth, null, 'createRapAddress', {label});
+        if (typeof data !== 'string') throw new UnexpectedFirodResponse('createRapAddress', data);
+        return data;
+    }
+
     // Mint Sigma in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10', '25',
     // or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200 Sigma). We
     // resolve() with the generated txid, or reject() with an error if something went wrong.
