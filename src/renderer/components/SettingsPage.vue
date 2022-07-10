@@ -39,7 +39,7 @@
             </div>
 
             <div class="checkbox-option" @click="enableElysium = !enableElysium">
-                <label>Enable Elysium (Experimental)</label>
+                <label>Enable Experimental Elysium Features (Requires Rescan)</label>
                 <input id="enable-elysium-checkbox" type="checkbox" :checked="enableElysium" />
             </div>
 
