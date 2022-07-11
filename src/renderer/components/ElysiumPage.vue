@@ -145,7 +145,7 @@ export default {
         async completeCreateToken() {
             const fromAddress = this.availableUTXOs.find(txo => txo.amount >= 0.002e8 && txo.destination && !txo.isPrivate)?.destination;
             if (!fromAddress) {
-                this.passphraseError = 'Creating an Elysium property requires having a single non-locked transaction output with a value >= 0.002 FIRO. Try sending FIRO to yourself first and then try again.';
+                this.passphraseError = 'Creating an Elysium property requires having a single non-locked transparent transaction output with a value >= 0.002 FIRO. Try sending FIRO to yourself first and then try again.';
                 return;
             }
 
