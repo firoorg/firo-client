@@ -24,23 +24,24 @@
             </div>
 
             <div class="mnemonic">
-                <template v-for="(_, i) in newWords.length">
+                <div v-for="(_, n) in newWords.length">
+                    <span class="n">{{ n < 9 ? `0${n + 1}` : n + 1 }}</span>
                     <input
                        ref="newWords"
-                       :id="`mnemonic-word-${i}`"
-                       :key="i"
+                       :id="`mnemonic-word-${n}`"
+                       :key="n"
                        :class="['mnemonic-word', 'hidden', isMnemonicValid ? 'verified' : 'unverified']"
                        type="text"
-                       v-model="newWords[i]"
+                       v-model="newWords[n]"
                        spellcheck="false"
-                       :tabindex="i + 1"
+                       :tabindex="n + 1"
                        @keydown="preventInvalidCharInput"
-                       @keydown.enter="(ev) => onWhitespace(ev, i)"
-                       @keydown.space="(ev) => onWhitespace(ev, i)"
-                       @keydown.tab="(ev) => onWhitespace(ev, i)"
-                       @beforeinput="(ev) => onWordInput(ev, i)"
+                       @keydown.enter="(ev) => onWhitespace(ev, n)"
+                       @keydown.space="(ev) => onWhitespace(ev, n)"
+                       @keydown.tab="(ev) => onWhitespace(ev, n)"
+                       @beforeinput="(ev) => onWordInput(ev, n)"
                     />
-                </template>
+                </div>
             </div>
 
             <div class="protective-passphrase">

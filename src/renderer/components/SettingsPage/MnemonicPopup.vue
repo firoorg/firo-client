@@ -6,7 +6,7 @@
 
         <div class="content">
             <span v-for="(_, n) in 24" class="mnemonic-word">
-                {{ words[n] }}
+                <span class="n">{{ n < 9 ? `0${n+1}` : n+1 }}</span>{{ words[n] }}
             </span>
         </div>
 
