@@ -3,6 +3,15 @@
     user-select: text;
     grid-template-columns: 1fr 1fr 1fr max-content;
 
+    .n {
+        user-select: none;
+        font-family: "Robot Mono";
+        opacity: 0.3;
+        width: 2em;
+        text-align: right;
+        margin-right: var(--padding-base);
+    }
+
     .mnemonic-word {
         -webkit-appearance: none;
         border: none;
