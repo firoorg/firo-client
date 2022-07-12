@@ -218,9 +218,10 @@ const getters = {
     // 6) Elysium Lelantus Mint transactions
     userVisibleTransactions: (state, getters, rootState, rootGetters): TXO[] => getters.allTXOs
         .filter((txo: TXO) =>
-                !txo.isChange &&
+                !(txo.isChange && !txo.isElysiumReferenceOutput) &&
                 !(txo.inputPrivacy === 'mined' && !txo.blockHeight) &&
                 !(txo.elysium && !txo.isElysiumReferenceOutput) &&
+                !(txo.isElysiumReferenceOutput && txo.index !== 1) &&
                 !(txo.isElysiumReferenceOutput && !rootGetters['App/enableElysium']) &&
                 !(txo.isElysiumReferenceOutput && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium?.property?.creationTx)) &&
                 !((txo.blockHeight || !txo.isFromMe) && txo.elysium?.valid === false) &&
