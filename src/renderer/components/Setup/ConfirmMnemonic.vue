@@ -6,17 +6,20 @@
 
         <div class="content">
             <template v-for="(_, n) in 24">
-                <input v-if="hiddenWordPositions.includes(n)"
-                    :class="['mnemonic-word', 'hidden', isVerified ? 'verified' : 'unverified']"
-                    :id="`hidden-word-${n}`"
-                    type="text"
-                    v-model="newWords[n]"
-                    spellcheck="false"
-                    :tabindex="hiddenWordPositions.indexOf(n) + 1"
-                />
-                <span v-else class="mnemonic-word visible" :id="`visible-word-${n}`">
-                    {{ newWords[n] }}
-                </span>
+                <div class="mnemonic-word">
+                    <span class="n">{{ n < 9 ? `0${n + 1}` : n + 1 }}</span>
+                    <input v-if="hiddenWordPositions.includes(n)"
+                        :class="['word', 'hidden', isVerified ? 'verified' : 'unverified']"
+                        :id="`hidden-word-${n}`"
+                        type="text"
+                        v-model="newWords[n]"
+                        spellcheck="false"
+                        :tabindex="hiddenWordPositions.indexOf(n) + 1"
+                    />
+                    <span v-else class="word visible" :id="`visible-word-${n}`">
+                        {{ newWords[n] }}
+                    </span>
+                </div>
             </template>
         </div>
 

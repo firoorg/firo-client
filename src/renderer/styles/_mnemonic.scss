@@ -13,6 +13,7 @@
     }
 
     .mnemonic-word {
+        height: 1.2em;
         -webkit-appearance: none;
         border: none;
         padding: 0 !important;
@@ -27,8 +28,16 @@
 
         background-color: inherit;
 
-        &.hidden {
+        .hidden {
             width: 80px;
+
+            border: none;
+            outline: none;
+            -webkit-appearance: none;
+            font: {
+                family: sans-serif;
+                weight: bold;
+            }
 
             border-bottom: {
                 style: dashed;
