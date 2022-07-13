@@ -40,11 +40,11 @@ const mutations = {
 };
 
 const actions = {
-    addSelectedTokens({commit, rootGetters}, tokens: number[]) {
+    addSelectedTokens({commit, rootGetters}, tokens: string[]) {
         commit('addSelectedTokens', [rootGetters['ApiStatus/block1'], tokens]);
     },
 
-    removeSelectedTokens({commit, rootGetters}, tokens: number[]) {
+    removeSelectedTokens({commit, rootGetters}, tokens: string[]) {
         commit('removeSelectedTokens', [rootGetters['ApiStatus/block1'], tokens]);
     }
 };
