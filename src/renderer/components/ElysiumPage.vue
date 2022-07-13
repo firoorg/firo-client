@@ -47,7 +47,7 @@
         />
 
         <Popup v-if="showPopup == 'propertyInfo'">
-            <PropertyInfo :creationtx="selectedProperty.creationTx" @ok="showPopup = ''" />
+            <PropertyInfo :creationtx="selectedProperty && selectedProperty.creationTx" @delete="deleteProperty" @ok="showPopup = ''" />
         </Popup>
     </div>
 </template>
@@ -143,7 +143,8 @@ export default {
 
     methods: {
         ...mapActions({
-            addSelectedTokens: 'Elysium/addSelectedTokens'
+            addSelectedTokens: 'Elysium/addSelectedTokens',
+            removeSelectedTokens: 'Elysium/removeSelectedTokens'
         }),
 
         async beginCreateToken(tokenData) {
@@ -178,6 +179,14 @@ export default {
         addToken(tokenId) {
             this.showPopup = '';
             this.addSelectedTokens([tokenId]);
+        },
+
+        deleteProperty() {
+            if (!this.selectedProperty?.creationTx) return;
+            if (!confirm("Are you sure you want to delete this property? You can always add it back later without losing your balance.")) return;
+            this.removeSelectedTokens([this.selectedProperty.creationTx]);
+            this.selectedProperty = null;
+            this.showPopup = '';
         }
     }
 }

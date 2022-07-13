@@ -64,6 +64,10 @@
         </table>
 
         <div class="buttons">
+            <button class="solid-button unrecommended" @click="$emit('delete')">
+                Delete Property
+            </button>
+
             <button class="solid-button recommended" @click="$emit('ok')">
                 OK
             </button>
