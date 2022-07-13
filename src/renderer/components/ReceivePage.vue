@@ -20,22 +20,25 @@
 
                 <div class="receiving-address">
                     <InputFrame label="Receiving Address">
-                        <input id="receive-address" type="text" disabled="true" :value="address" />
+                        <input id="receive-address" type="text" :disabled="true" :value="address" :placeholder="useRap ? 'Enter a label before creating a RAP address' : ''" />
                     </InputFrame>
 
                     <div class="action-buttons">
                         <CopyAddressIcon :address="address" />
-                        <RefreshAddressIcon :onclick="createNewAddress" />
+                        <RefreshAddressIcon :onclick="refreshAddress" />
                     </div>
                 </div>
 
                 <div>
                     <InputFrame label="Label">
-                        <input id="receive-address-label" type="text" placeholder="Unlabelled" v-model.lazy="label" />
+                        <input ref="label" id="receive-address-label" type="text" placeholder="Unlabelled" v-model="label" @change="changeLabel" />
                     </InputFrame>
-                    <button v-if="useRap && !address" class="solid-button recommended create-rap-button">
+                    <button v-if="useRap && !address" class="solid-button recommended create-rap-button" :disabled="!label" @click="createAddressRap">
                         Create
                     </button>
+                    <Popup v-if="show == 'passphrase'">
+                        <PassphraseInput v-model="passphrase" :error="error" @cancel="abortCreateAddressRap" @confirm="createAddressRap2" />
+                    </Popup>
                 </div>
 
                 <div v-if="useRap" class="rap-guidance">
@@ -74,8 +77,9 @@ import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAd
 import InputFrame from "renderer/components/shared/InputFrame";
 import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon";
 import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon";
-
-const FiroSymbol = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyNC4yLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCA1MjAgNTIwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MjAgNTIwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojRkVGRUZFO30NCgkuc3Qxe2ZpbGw6IzlCMUMyRTt9DQo8L3N0eWxlPg0KPGc+DQoJPGc+DQoJCTxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjI2MCIgY3k9IjI2MCIgcj0iMjUyLjciLz4NCgk8L2c+DQoJPGc+DQoJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xNTUuNiwzNzAuN2M1LjksMCwxMS4yLTMuMiwxNC04LjRsMzcuMy03MC42aC01Ny41Yy04LjcsMC0xNS44LTcuMS0xNS44LTE1Ljh2LTMxLjYNCgkJCWMwLTguNyw3LjEtMTUuOCwxNS44LTE1LjhoOTAuOWw3MC42LTEzMy45YzIuNy01LjIsOC4xLTguNCwxNC04LjRoMTE4LjhDMzk3LjUsMzcuNCwzMzIuMyw3LDI2MCw3QzEyMC4zLDcsNywxMjAuMyw3LDI2MA0KCQkJYzAsMzkuNyw5LjIsNzcuMywyNS41LDExMC43SDE1NS42eiIvPg0KCQk8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMzY0LjQsMTQ5LjNjLTUuOSwwLTExLjIsMy4yLTE0LDguNGwtMzcuMyw3MC42aDU3LjVjOC43LDAsMTUuOCw3LjEsMTUuOCwxNS44djMxLjYNCgkJCWMwLDguNy03LjEsMTUuOC0xNS44LDE1LjhoLTkwLjlsLTcwLjYsMTMzLjljLTIuNyw1LjItOC4xLDguNC0xNCw4LjRINzYuNEMxMjIuNSw0ODIuNiwxODcuNyw1MTMsMjYwLDUxMw0KCQkJYzEzOS43LDAsMjUzLTExMy4zLDI1My0yNTNjMC0zOS43LTkuMi03Ny4zLTI1LjUtMTEwLjdIMzY0LjR6Ii8+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=";
+import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import Popup from "renderer/components/shared/Popup";
+import {IncorrectPassphrase} from "daemon/firod";
 
 export default {
     name: "ReceivePage",
@@ -84,15 +88,22 @@ export default {
         InputFrame,
         CopyAddressIcon,
         RefreshAddressIcon,
-        AnimatedTable
+        AnimatedTable,
+        PassphraseInput,
+        Popup
     },
 
     data() {
         return {
             address: ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address,
+            label: '',
+            _quickLabel: null,
             qrCode: null,
             isDefaultAddress: true,
             useRap: false,
+            show: '',
+            error: '',
+            passphrase: '',
 
             tableFields: [
                 {name: CurrentAddressIndicator},
@@ -109,22 +120,6 @@ export default {
             rapReceiveAddresses: 'AddressBook/rapReceiveAddresses',
             txos: 'Transactions/TXOs',
         }),
-
-        label: {
-            get() {
-                return (this.addressBook[this.address] || {label: ''}).label;
-            },
-
-            async set(newLabel) {
-                if (!this.address) return;
-                if (newLabel) {
-                    this.isDefaultAddress = false;
-
-                    await $daemon.updateAddressBookItem(this.addressBook[this.address], newLabel);
-                    this.setAddressBook(await $daemon.readAddressBook());
-                }
-            }
-        },
 
         tableData() {
             this.$nextTick(() => this.$refs.animatedTable.reload());
@@ -157,7 +152,7 @@ export default {
                 }
 
                 if (!this.address || (this.isDefaultAddress && this.txos.find(txo => txo.destination === this.address))) {
-                    await this.createNewAddress(true);
+                    await this.refreshAddress(true);
                 }
             }
         },
@@ -167,6 +162,9 @@ export default {
             immediate: true,
             async handler() {
                 if (!this.address) return;
+
+                this.label = this.addressBook[this.address]?.label || this._quickLabel || '';
+                this._quickLabel = null;
 
                 // Don't throw errors during reload.
                 while (!this.$refs.qrCode) {
@@ -191,8 +189,8 @@ export default {
         },
 
         useRap() {
-            if (this.useRap) this.address = ($store.getters['AddressBook/rapReceiveAddresses'][0] || {address: null}).address;
-            else this.address = ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address;
+            if (this.useRap) this.address = $store.getters['AddressBook/rapReceiveAddresses'][0]?.address || '';
+            else this.address = $store.getters['AddressBook/receiveAddresses'][0]?.address || '';
         }
     },
 
@@ -201,11 +199,72 @@ export default {
             setAddressBook: 'AddressBook/setAddressBook'
         }),
 
+        async changeLabel(ev) {
+            if (!this.address) return;
+            if (this.useRap) {
+                alert('Changing RAP address labels is not yet supported.');
+                this.label = this.addressBook[this.address]?.label || '';
+                return;
+            }
+
+            if (this.label && this.label !== this.addressBook[this.address].label) {
+                this.isDefaultAddress = false;
+
+                await $daemon.updateAddressBookItem(this.addressBook[this.address], this.label);
+                this.setAddressBook(await $daemon.readAddressBook());
+            }
+        },
+
         copyAddress() {
             clipboard.writeText(this.address);
         },
 
-        async createNewAddress() {
+        abortCreateAddressRap() {
+            this.error = '';
+            this.show = '';
+        },
+
+        async createAddressRap() {
+            if (!this.label) return;
+            this.error = '';
+            this.show = 'passphrase';
+        },
+        async createAddressRap2() {
+            let newAddress;
+            try {
+                newAddress = await $daemon.createRapAddress(this.passphrase, this.label);
+            } catch (e) {
+                if (e instanceof IncorrectPassphrase) {
+                    this.error = 'Incorrect Passphrase';
+                    this.passphrase = '';
+                } else {
+                    this.error = `${e?.message ?? e}`;
+                }
+                return;
+            }
+
+            // This is used because the mutation that sets the address book happens at some unpredicatable future time
+            // so we can't use it in the watcher for address.
+            this._quickLabel = this.label;
+
+            this.setAddressBook(await $daemon.readAddressBook());
+            this.address = newAddress;
+
+            this.error = '';
+            this.show = '';
+        },
+
+        async refreshAddress() {
+            if (this.useRap) this.refreshAddressRap();
+            else await this.refreshAddressNormal();
+        },
+
+        refreshAddressRap() {
+            this.address = '';
+            this.label = '';
+        },
+
+        async refreshAddressNormal() {
             const address = await $daemon.getUnusedAddress();
 
             await $daemon.addAddressBookItem({
@@ -218,7 +277,7 @@ export default {
 
             this.label = '';
             this.isDefaultAddress = true;
-            // We have to replicated the sorting of this.receiveAddresses here due to timing issues. $nextTick doesn't
+            // We have to replicate the sorting of this.receiveAddresses here due to timing issues. $nextTick doesn't
             // work either. :(
             this.address = addressBook
                 .filter(a => a.purpose === 'receive')
