@@ -43,7 +43,12 @@
             no-data-message="You haven't added any tokens yet."
             :data="filteredMyTokensTableData"
             :fields="myTokensTableFields"
+            :on-row-select="(rowData) => {selectedProperty = rowData; showPopup = 'propertyInfo'}"
         />
+
+        <Popup v-if="showPopup == 'propertyInfo'">
+            <PropertyInfo :creationtx="selectedProperty.creationTx" @ok="showPopup = ''" />
+        </Popup>
     </div>
 </template>
 
@@ -61,6 +66,7 @@ import ElysiumTokenName from "renderer/components/AnimatedTable/ElysiumTokenName
 import ElysiumTokenPrivateBalance from "renderer/components/AnimatedTable/ElysiumTokenPrivateBalance";
 import ElysiumTokenPendingBalance from "renderer/components/AnimatedTable/ElysiumTokenPendingBalance";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import PropertyInfo from "renderer/components/ElysiumPage/PropertyInfo";
 
 const myTokensTableFields = [
     {name: ElysiumTokenId},
@@ -80,7 +86,8 @@ export default {
         CreateTokenForm,
         AddTokenForm,
         PlusButton,
-        AnimatedTable
+        AnimatedTable,
+        PropertyInfo
     },
 
     data() {
@@ -91,7 +98,8 @@ export default {
             passphrase: '',
             passphraseError: null,
             newTokenData: null,
-            showUnknownTokens: false
+            showUnknownTokens: false,
+            selectedProperty: null
         };
     },
 
@@ -113,6 +121,7 @@ export default {
                     const b = this.aggregatedBalances[tk.creationTx] || {priv: 0, pending: 0};
 
                     return {
+                        creationTx: tk.creationTx,
                         id: tk.id,
                         name: tk.nameMinusTicker,
                         ticker: tk.ticker,

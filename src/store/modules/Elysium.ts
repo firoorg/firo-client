@@ -3,10 +3,15 @@ import {ElysiumData, ElysiumPropertyData} from "../../daemon/firod";
 import {cloneDeep} from "lodash";
 import {TXO} from "./Transactions";
 
+export interface ExtendedElysiumPropertyData extends ElysiumPropertyData {
+    nameMinusTicker: string;
+    ticker: string;
+}
+
 const state = {
     hasModifiedSelectedTokens: false,
     allSelectedTokens: <{[block1: string]: string[]}>{},
-    tokenData: <{[id: number]: ElysiumPropertyData}>{}
+    tokenData: <{[id: number]: ExtendedElysiumPropertyData}>{}
 };
 
 const mutations = {
