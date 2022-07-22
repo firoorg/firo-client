@@ -183,13 +183,13 @@ export default {
             await $startDaemon();
 
             if (!this.isExistingWallet) {
-                $setWaitingReason("Sanity checking mnemonic...");
+                $setWaitingReason("Sanity checking recovery seed phrase...");
                 const mnemonicSanityCheck = (await $daemon.showMnemonics(this.passphrase)).join(' ');
                 if (mnemonicSanityCheck !== this.mnemonic.mnemonic) {
                     // This should never happen.
-                    await $quitApp("Mnemonic sanity check failed. This is a bug. Seek help from the Firo team; do not try to use the client again.");
+                    await $quitApp("Recovery seed phrase sanity check failed. This is a bug. Seek help from the Firo team; do not try to use the client again.");
                 }
-                this.$log.info("Mnemonic sanity check passed.");
+                this.$log.info("Recovery seed phrase sanity check passed.");
             }
 
             $setWaitingReason(undefined);

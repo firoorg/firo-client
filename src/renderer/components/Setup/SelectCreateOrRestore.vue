@@ -1,6 +1,6 @@
 <template>
     <div class="info-popup select-create-or-restore">
-        <div class="content">Do you want to create a new wallet or restore with a mnemonic?</div>
+        <div class="content">Do you want to create a new wallet or recover with a seed phrase?</div>
 
         <div class="buttons">
             <button id="back-button" class="solid-button unrecommended" @click="goBack">
@@ -12,7 +12,7 @@
             </button>
 
             <button id="recover-from-mnemonic" class="solid-button recommended" @click="recoverFromMnemonic">
-                Restore with a Mnemonic
+                Recover from a Seed Phrase
             </button>
         </div>
     </div>
