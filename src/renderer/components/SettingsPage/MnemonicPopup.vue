@@ -1,7 +1,7 @@
 <template>
     <div v-if="words" class="info-popup">
         <div class="title">
-            Mnemonic Recovery Phrase
+            Recovery Seed Phrase
         </div>
 
         <div class="content">

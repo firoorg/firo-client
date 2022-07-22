@@ -8,7 +8,7 @@
             <div class="mnemonic-length">
                 <div class="mnemonic-length-question">
                     <span class="question">
-                        Does your mnemonic have 12 or 24 words?
+                        Does your recovery seed phrase have 12 or 24 words?
                     </span>
 
                     <span class="input">
