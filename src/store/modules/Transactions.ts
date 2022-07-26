@@ -185,6 +185,7 @@ const getters = {
         txo.spendSize &&
         txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
     ),
+    lockedUTXOs: (state, getters) => getters.UTXOs.filter((txo: TXO) => txo.isLocked),
 
     userVisibleTransactions: (state, getters): TXO[] => getters.TXOs
         .filter((txo: TXO) => !txo.isChange && txo.destination)

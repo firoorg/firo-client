@@ -6,7 +6,7 @@ const getters = {
              unconfirmedPublicChange, locked, immature] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
-        for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
+        for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
             if (!txo.isToMe || txo.isSpent) continue;
             else if (txo.isLocked) locked += txo.amount;
             else if (txo.inputPrivacy == 'mined' && txo.validAt > nextHeight) immature += txo.amount;

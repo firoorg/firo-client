@@ -74,7 +74,7 @@ export default {
     computed: {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
-            lockedTransactions: 'Transactions/lockedTransactions',
+            lockedUTXOs: 'Transactions/lockedUTXOs',
             allowBreakingMasternodes: 'App/allowBreakingMasternodes',
             selectInputs: 'Transactions/selectInputs'
         }),
@@ -116,9 +116,9 @@ export default {
                 } else {
                     if (this.coinControl && this.allowBreakingMasternodes) {
                         const lockedCoins = this.coinControl.filter(coin =>
-                            this.lockedTransactions.find(tx => tx.txid === coin[0] && tx.txIndex === coin[1])
+                            this.lockedUTXOs.find(tx => tx.txid === coin[0] && tx.index === coin[1])
                         );
-                        await $daemon.updateCoinLocks(passphrase, [], lockedCoins);
+                        if (lockedCoins.length) await $daemon.updateCoinLocks(passphrase, [], lockedCoins);
                     }
 
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic

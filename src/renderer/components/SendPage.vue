@@ -238,7 +238,7 @@ export default {
         }),
 
         transactionFee() {
-            if (!this.satoshiAmount) return undefined;
+            if (!this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
             return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
         },
 
@@ -270,7 +270,9 @@ export default {
         },
 
         available () {
-            return this.isPrivate ? this.availablePrivate : this.availablePublic;
+            if (this.coinControl) return this.coinControlSelectedAmount;
+            else if (this.isPrivate) return this.availablePrivate;
+            else return this.availablePublic;
         },
 
         // This is the amount the user entered in satoshis.
@@ -290,7 +292,7 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && this.transactionFee > 0 && !this.totalAmountExceedsBalance;
+            return this.isValidated && this.transactionFee > 0 && (this.available >= this.totalAmount);
         },
 
         isValidated () {
