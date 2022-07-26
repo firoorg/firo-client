@@ -201,6 +201,7 @@ const getters = {
         txo.spendSize &&
         txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
     ),
+    lockedUTXOs: (state, getters) => getters.UTXOs.filter((txo: TXO) => txo.isLocked),
 
     // This will display:
     // 1) valid Elysium non-Lelantus Mint transactions

@@ -309,7 +309,7 @@ export default {
         },
 
         transactionFee() {
-            if (this.selectedAsset != 'FIRO' || !this.satoshiAmount) return undefined;
+            if (this.selectedAsset != 'FIRO' || !this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
             return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
         },
 
@@ -342,6 +342,7 @@ export default {
 
         available () {
             if (this.selectedAsset != 'FIRO') return this.aggregatedElysiumBalances[this.selectedAsset].priv;
+            else if (this.coinControl) return this.coinControlSelectedAmount;
             else if (this.isPrivate) return this.availablePrivate;
             else return this.availablePublic;
         },
@@ -368,7 +369,7 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0 && !this.totalAmountExceedsBalance));
+            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0 && this.available >= this.totalAmount));
         },
 
         isValidated () {
