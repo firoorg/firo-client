@@ -164,7 +164,9 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
     let gathered = 0;
 
     const selectedUTXOs = [];
-    for (const utxo of utxos) {
+    while (utxos.length) {
+        const utxo = utxos.length % 2 ? utxos.shift() : utxos.pop();
+
         gathered += utxo.amount;
         totalSize += utxo.spendSize;
         selectedUTXOs.push(utxo);
