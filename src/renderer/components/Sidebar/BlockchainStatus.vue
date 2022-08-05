@@ -17,7 +17,8 @@
             </div>
 
             <div class="details">
-                {{currentBlockHeight}}/~{{estimatedBlockHeight}} blocks, {{connections}} connections
+                {{currentBlockHeight}} (<timeago :datetime="latestBlockTimestamp * 1000" />),
+                {{connections}} connections
             </div>
         </div>
     </div>
@@ -39,8 +40,8 @@ export default {
             network: 'ApiStatus/network',
             connections: 'ApiStatus/connections',
             currentBlockHeight: 'ApiStatus/currentBlockHeight',
-            estimatedBlockHeight: 'ApiStatus/estimatedBlockHeight',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
+            latestBlockTimestamp: 'ApiStatus/latestBlockTimestamp'
         })
     }
 }

@@ -25,7 +25,7 @@ const getters = {
     apiStatusData: (state): ApiStatusData | {} => (state.apiStatus && state.apiStatus.data) || {},
     version: (state, getters) => getters.apiStatusData.version || '(unknown)',
     currentBlockHeight: (state, getters): number => getters.apiStatusData.blocks || 0,
-    lastestBlockTimestamp: (state, getters): number => getters.apiStatusData.latestBlockTimestamp || 0,
+    latestBlockTimestamp: (state, getters): number => getters.apiStatusData.latestBlockTimestamp || 0,
     block1: (state, getters): string => getters.apiStatusData.block1,
     network: (state, getters): Network => getters.apiStatusData.network,
     // Do we have an apiStatus?
@@ -45,7 +45,6 @@ const getters = {
     enabledZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).enabledCount || 0,
     // This is the recommended fee per kb, or 1000 if it is undefined or lower than that.
     smartFeePerKb: (state, getters): number => Math.max(1000, getters.apiStatusData.smartFeePerKb || 1000),
-    estimatedBlockHeight: (state, getters): number => Math.floor((Date.now() / 1000 - getters.lastestBlockTimestamp) / 300) + getters.currentBlockHeight,
     isBlockchainSynced: (state, getters): boolean => ['regtest', 'regtest-ql'].includes(getters.network) || getters.apiStatusData.synced,
     connections: (state, getters): number => getters.apiStatusData.connections
 };

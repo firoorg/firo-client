@@ -7,7 +7,7 @@
         <div class="content">
             <div class="guidance">
                 Your wallet will be encrypted with your chosen passphrase. It is <span class="emphasis">IMPOSSIBLE</span> to
-                recover your funds if you forget your passphrase and mnemonic.
+                recover your funds if you forget your passphrase and seed phrase.
             </div>
 
             <div class="passphrase-input">
