@@ -84,8 +84,8 @@ const mutations = {
         state.colorTheme = value;
     },
 
-    appendLogMessage(state, msg) {
-        state.logMessages.push(msg);
+    appendLogMessages(state, msgs) {
+        state.logMessages = [...state.logMessages, ...msgs];
     }
 }
 

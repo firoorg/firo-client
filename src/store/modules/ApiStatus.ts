@@ -12,7 +12,13 @@ const mutations = {
 };
 
 const actions = {
-    setApiStatus({state, commit}, apiStatus) {
+    setApiStatus({state, commit, dispatch}, apiStatus) {
+        const msgs = apiStatus?.data?.newLogMessages;
+        if (msgs && msgs.length) {
+            commit('App/appendLogMessages', msgs, {root: true});
+            delete apiStatus.data.newLogMessages;
+        }
+
         // We first check if apiStatus has changed so we don't have to draw updates when it hasn't.
         if (!isEqual(state.apiStatus, apiStatus)) {
             commit('setApiStatus', apiStatus);

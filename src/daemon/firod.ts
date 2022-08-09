@@ -9,7 +9,6 @@ import EventWaitHandle from "./eventWaitHandle";
 import * as constants from './constants';
 import { createLogger } from '../lib/logger';
 import * as net from "net";
-import tail from "./tail";
 
 const logger = createLogger('firo:daemon');
 
@@ -636,18 +635,6 @@ export class Firod {
         if (isFirodListening && !this.allowMultipleFirodInstances) {
             throw new FirodAlreadyRunning();
         }
-
-        const debugFile = path.join(datadir, "debug.log");
-        new Promise(async () => {
-            for await (const msg of tail(debugFile)) {
-                if (this.hasShutdown) {
-                    console.log(`Closing debug log ${debugFile}...`);
-                    return;
-                }
-
-                await this.eventHandlers['logMessage'](this, msg);
-            }
-        });
 
         if (!isFirodListening) {
             await this.launchDaemon(mnemonicSettings);
