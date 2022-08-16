@@ -906,7 +906,9 @@ export class Firod {
             for await (const [topicBuffer, msgBuffer] of this.statusPublisherSocket) {
                 try {
                     await this.gotApiStatus(msgBuffer.toString());
-                } catch {}
+                } catch (e) {
+                    console.log(e);
+                }
             }
         });
 
@@ -969,7 +971,12 @@ export class Firod {
         if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
             // release() returns true if we are the first to lock the release/poison the EventWaitHandle.
             if (await this.apiIsReadyEWH.release(undefined)) {
-                await this.initializeWithApiStatus(apiStatus);
+                try {
+                    await this.initializeWithApiStatus(apiStatus);
+                } catch (e) {
+                    this.apiIsReadyEWH.reset();
+                    throw e;
+                }
             }
         }
 

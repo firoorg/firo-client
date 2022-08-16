@@ -10,6 +10,15 @@ export default class EventWaitHandle<ReturnValue> {
     private _rejectedValue?: unknown;
 
     constructor() {
+        this.reset();
+    }
+
+    // Reset us to a pristine state. Be very careful with considering the order of execution here.
+    reset() {
+        this._resolved = false;
+        this._rejected = false;
+        this._resolvedValue = undefined;
+        this._rejectedValue = undefined;
         this._promise = new Promise(release => {
             this._release = release;
         });
