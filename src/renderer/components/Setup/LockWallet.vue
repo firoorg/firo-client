@@ -67,6 +67,12 @@ import {Firod} from "daemon/firod";
 import {mapGetters} from "vuex";
 import InputFrame from "renderer/components/shared/InputFrame";
 
+function apiStatus(daemon, eventData) {
+    if (eventData?.data?.newLogMessages?.length) {
+        $store.commit('App/appendLogMessages', eventData.data.newLogMessages);
+    }
+}
+
 export default {
     name: "LockWallet",
     components: {InputFrame},
@@ -160,7 +166,7 @@ export default {
             let initialDaemon;
             if (!this.isExistingWallet) {
                 try {
-                    initialDaemon = new Firod(this.firoClientNetwork, this.firodLocation, this.blockchainLocation, [], {});
+                    initialDaemon = new Firod(this.firoClientNetwork, this.firodLocation, this.blockchainLocation, [], {apiStatus});
                     await initialDaemon.start(this.mnemonic);
                 } catch (e) {
                     await $quitApp(`Failed to start firod with mnemonic: ${e}`);
