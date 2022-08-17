@@ -122,13 +122,13 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await (await this.app.client.$('#create-new-wallet')).click();
         await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
 
-        mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word')).map(e => e.getText()));
+        mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word .word')).map(e => e.getText()));
         assert.equal(mnemonicWords.length, 24);
 
         await (await this.app.client.$('#confirm-button')).click();
         await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
 
-        const wordElements = await this.app.client.$$('.mnemonic-word');
+        const wordElements = await this.app.client.$$('.mnemonic-word .word');
         const okButton = await this.app.client.$('#ok-button');
         let lastHiddenIndex: number;
 
@@ -161,7 +161,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await (await this.app.client.$('#back-button')).click();
         await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
 
-        const wordElementsAgain = await this.app.client.$$('.mnemonic-word');
+        const wordElementsAgain = await this.app.client.$$('.mnemonic-word .word');
         for (const [n, wordElement] of wordElementsAgain.entries()) {
             const classNames = <string>await wordElement.getAttribute('class');
             if (!classNames.includes('hidden')) {
@@ -172,7 +172,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await (await this.app.client.$('#back-button')).click();
         await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
 
-        const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word');
+        const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word .word');
         for (const [n, wordElement] of nonHiddenWordElementsAgain.entries()) {
             assert.equal(await wordElement.getText(), mnemonicWords[n]);
         }
