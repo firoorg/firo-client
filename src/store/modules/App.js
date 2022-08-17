@@ -85,7 +85,7 @@ const mutations = {
     },
 
     appendLogMessages(state, msgs) {
-        state.logMessages = [...state.logMessages, ...msgs];
+        state.logMessages = [...state.logMessages, ...msgs].slice(-10000);
     }
 }
 
