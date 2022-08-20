@@ -547,6 +547,8 @@ export class Firod {
     connectionTimeout: number = 30;
     // Extra arguments to be passed to firod
     extraFirodArgs: string[] = [];
+    // The process ID firod is running as. undefined if firod is not yet started.
+    pid?: number;
 
     // firodLocation is the location of the firod binary.
     //
@@ -586,9 +588,7 @@ export class Firod {
     // and passphrase. These are not passed in the constructor because we don't want to pass them again if we restart.
     // wallet.dat MUST NOT exist if this option is passed; we will check for it and throw if it does.
     //
-    // If firod is already listening, we will reject(). If you would like to wait for an existing firod instance to
-    // stop before calling us (assuming that it was invoked with -clientapi), you can await awaitFirodNotListening()
-    // prior to invoking us.
+    // If firod is already listening, we will reject().
     //
     // We may be called only once.
     async start(mnemonicSettings?: MnemonicSettings) {
@@ -700,13 +700,20 @@ export class Firod {
         await this.initializersCompletedEWH.block();
     }
 
-    // Resolve when we determine that firod isn't listening by attempting a connection every 1s.
-    async awaitFirodNotListening() {
-        while (true) {
-            if (!await this.isFirodListening()) {
-                break;
-            }
+    // Checks if a firod that we have gotten an apiStatus from is running.
+    isFirodRunning(): boolean {
+        if (!this.pid) throw new FirodError("firod not running");
+        try {
+            process.kill(this.pid, 0);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
 
+    async awaitFirodStopped(): Promise<void> {
+        while (true) {
+            if (this.pid && !this.isFirodRunning()) return;
             await new Promise(r => setTimeout(r, 1000));
         }
     }
@@ -723,7 +730,7 @@ export class Firod {
     }
 
     // Await firod shutting down. If the shutdown is clean, we will resolve(); if it is unclean, we will reject().
-    awaitShutdown(): Promise<void> {
+    async awaitShutdown(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             if (await this.firodHasShutdown.block()) {
                 resolve();
@@ -887,7 +894,7 @@ export class Firod {
             });
         });
 
-        this.awaitFirodNotListening().then(async () => {
+        this.awaitFirodStopped().then(async () => {
             // This will be set if firod shutdown cleanly.
             if (this.hasShutdown) {
                 logger.debug("firod has closed its ports after a clean shutdown");
@@ -966,6 +973,10 @@ export class Firod {
 
         this.latestApiStatus = apiStatus;
         await this.gotAPIResponseEWH.release(undefined);
+
+        if (apiStatus?.data?.pid) {
+            this.pid = apiStatus.data.pid;
+        }
 
         // modules.API will be set once it is valid to connect to the API.
         if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
@@ -1218,8 +1229,8 @@ export class Firod {
 
         await this.requesterSocketSend(Firod.formatSend(auth, type, collection, data), true);
 
-        logger.info("Waiting for firod to close its ports.");
-        await this.awaitFirodNotListening();
+        logger.info("Waiting for firod to shutdown.");
+        await this.awaitFirodStopped();
 
         this.statusPublisherSocket.close();
         this.publisherSocket.close();

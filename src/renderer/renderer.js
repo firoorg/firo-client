@@ -159,18 +159,17 @@ window.$quitApp = async (message=undefined) => {
         if (!shutDownSuccessful) {
             $setWaitingReason("Forcibly killing firod...", true);
 
-            const pid = (await $daemon.apiStatus()).data.pid;
             // Windows doesn't support signals, so this is equivalent to SIGKILL there.
-            logger.info(`Killing firod (pid ${pid}) with SIGTERM...`);
-            process.kill(pid, 'SIGTERM');
+            logger.info(`Killing firod (pid ${$daemon.pid}) with SIGTERM...`);
+            process.kill($daemon.pid, 'SIGTERM');
 
             const killSuccessful = !!await Promise.any([
-                (async () => {await $daemon.awaitFirodNotListening(); return true;})(),
-                new Promise(r => setTimeout(r, 5e3))
+                (async () => {await $daemon.awaitFirodStopped(); return true;})(),
+                new Promise(r => setTimeout(r, 20e3))
             ]);
 
             if (!killSuccessful) {
-                logger.info(`Killing firod (pid ${pid}) with SIGKILL...`);
+                logger.info(`Killing firod (pid ${$daemon.pid}) with SIGKILL...`);
                 process.kill(pid, 'SIGKILL');
             }
         }
