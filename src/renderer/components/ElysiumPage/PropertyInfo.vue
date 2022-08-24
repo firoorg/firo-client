@@ -96,15 +96,15 @@ export default {
         },
 
         balance() {
-            return this.balances[this.creationtx];
+            return this.balances[this.creationtx] || {priv: 0, privUnconfirmed: 0, pub: {}};
         },
 
         publicBalance() {
-            return Object.values(this.balances[this.creationtx].pub).reduce((a, x) => a + x, 0);
+            return Object.values(this.balance.pub).reduce((a, x) => a + x, 0);
         },
 
         nPublicHolders() {
-            return Object.values(this.balances[this.creationtx].pub).filter(x => x > 0).length;
+            return Object.values(this.balance.pub).filter(x => x > 0).length;
         }
     }
 }
