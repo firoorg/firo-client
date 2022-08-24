@@ -281,7 +281,7 @@ export interface AddressBookItem {
     address: string;
     label: string;
     createdAt?: number; // UNIX timestamp in milliseconds
-    purpose: 'send' | 'receive' | 'rap-receive';
+    purpose: 'send' | 'receive';
 }
 
 function isValidAddressBookItem(x: any): x is AddressBookItem {
@@ -1521,13 +1521,6 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('none/paymentRequestAddress', data);
-    }
-
-    // Create a new RAP address. `label` be unique.
-    async createRapAddress(auth: string, label: string): Promise<string> {
-        const data = await this.send(auth, null, 'createRapAddress', {label});
-        if (typeof data !== 'string') throw new UnexpectedFirodResponse('createRapAddress', data);
-        return data;
     }
 
     // Mint Sigma in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10', '25',

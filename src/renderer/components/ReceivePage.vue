@@ -6,21 +6,9 @@
                     Scan this QR code to receive Firo
                 </div>
 
-                <div class="regular-or-rap">
-                    <div class="radio-field">
-                        <input type="radio" v-model="useRap" :value="false" />
-                        <label>Regular Address</label>
-                    </div>
-
-                    <div class="radio-field">
-                        <input type="radio" v-model="useRap" :value="true" />
-                        <label>RAP Address</label>
-                    </div>
-                </div>
-
                 <div class="receiving-address">
                     <InputFrame label="Receiving Address">
-                        <input id="receive-address" type="text" :disabled="true" :value="address" :placeholder="useRap ? 'Enter a label before creating a RAP address' : ''" />
+                        <input id="receive-address" type="text" :disabled="true" :value="address" />
                     </InputFrame>
 
                     <div class="action-buttons">
@@ -33,17 +21,6 @@
                     <InputFrame label="Label">
                         <input ref="label" id="receive-address-label" type="text" placeholder="Unlabelled" v-model="label" @change="changeLabel" />
                     </InputFrame>
-                    <button v-if="useRap && !address" class="solid-button recommended create-rap-button" :disabled="!label" @click="createAddressRap">
-                        Create
-                    </button>
-                    <Popup v-if="show == 'passphrase'">
-                        <PassphraseInput v-model="passphrase" :error="error" @cancel="abortCreateAddressRap" @confirm="createAddressRap2" />
-                    </Popup>
-                </div>
-
-                <div v-if="useRap" class="rap-guidance">
-                    RAP Addresses provide additional privacy when receiving FIRO as these addresses cannot be looked up
-                    on a blockchain explorer.
                 </div>
             </div>
 
@@ -77,7 +54,6 @@ import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAd
 import InputFrame from "renderer/components/shared/InputFrame";
 import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon";
 import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon";
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
 import Popup from "renderer/components/shared/Popup";
 import {IncorrectPassphrase} from "daemon/firod";
 
@@ -89,7 +65,6 @@ export default {
         CopyAddressIcon,
         RefreshAddressIcon,
         AnimatedTable,
-        PassphraseInput,
         Popup
     },
 
@@ -100,7 +75,6 @@ export default {
             _quickLabel: null,
             qrCode: null,
             isDefaultAddress: true,
-            useRap: false,
             show: '',
             error: '',
             passphrase: '',
@@ -117,17 +91,12 @@ export default {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
-            rapReceiveAddresses: 'AddressBook/rapReceiveAddresses',
             txos: 'Transactions/TXOs',
         }),
 
         tableData() {
             this.$nextTick(() => this.$refs.animatedTable.reload());
-            if (this.useRap) {
-                return this.rapReceiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
-            } else {
-                return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
-            }
+            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
         }
     },
 
@@ -186,11 +155,6 @@ export default {
 
                 document.querySelector('.qr-code img').style = 'width: 200px; height: 200px';
             }
-        },
-
-        useRap() {
-            if (this.useRap) this.address = $store.getters['AddressBook/rapReceiveAddresses'][0]?.address || '';
-            else this.address = $store.getters['AddressBook/receiveAddresses'][0]?.address || '';
         }
     },
 
@@ -201,11 +165,6 @@ export default {
 
         async changeLabel(ev) {
             if (!this.address) return;
-            if (this.useRap) {
-                alert('Changing RAP address labels is not yet supported.');
-                this.label = this.addressBook[this.address]?.label || '';
-                return;
-            }
 
             if (this.label && this.label !== this.addressBook[this.address].label) {
                 this.isDefaultAddress = false;
@@ -219,52 +178,7 @@ export default {
             clipboard.writeText(this.address);
         },
 
-        abortCreateAddressRap() {
-            this.error = '';
-            this.show = '';
-        },
-
-        async createAddressRap() {
-            if (!this.label) return;
-            this.error = '';
-            this.show = 'passphrase';
-        },
-        async createAddressRap2() {
-            let newAddress;
-            try {
-                newAddress = await $daemon.createRapAddress(this.passphrase, this.label);
-            } catch (e) {
-                if (e instanceof IncorrectPassphrase) {
-                    this.error = 'Incorrect Passphrase';
-                    this.passphrase = '';
-                } else {
-                    this.error = `${e?.message ?? e}`;
-                }
-                return;
-            }
-
-            // This is used because the mutation that sets the address book happens at some unpredicatable future time
-            // so we can't use it in the watcher for address.
-            this._quickLabel = this.label;
-
-            this.setAddressBook(await $daemon.readAddressBook());
-            this.address = newAddress;
-
-            this.error = '';
-            this.show = '';
-        },
-
         async refreshAddress() {
-            if (this.useRap) this.refreshAddressRap();
-            else await this.refreshAddressNormal();
-        },
-
-        refreshAddressRap() {
-            this.address = '';
-            this.label = '';
-        },
-
-        async refreshAddressNormal() {
             const address = await $daemon.getUnusedAddress();
 
             await $daemon.addAddressBookItem({
@@ -306,22 +220,12 @@ export default {
         .left {
             flex-grow: 1;
 
-            .title, .regular-or-rap {
+            .title {
                 vertical-align: center;
                 margin-bottom: var(--padding-base);
                 font: {
                     weight: bold;
                     size: 14px;
-                }
-            }
-
-            .regular-or-rap {
-                .radio-field {
-                    display: inline-block;
-
-                    &:not(:first-child) {
-                        margin-left: var(--padding-base);
-                    }
                 }
             }
 
@@ -341,21 +245,6 @@ export default {
                 display: inline;
                 margin-left: calc(var(--padding-base) - 2px);
                 width: $input-right-space-interior;
-            }
-
-            .create-rap-button {
-                margin-top: 7px;
-                margin-left: var(--padding-base);
-                vertical-align: top;
-                display: inline-block;
-                min-width: $input-right-space-interior;
-                width: $input-right-space-interior;
-            }
-
-            .rap-guidance {
-                font-weight: bold;
-                margin-top: var(--padding-base);
-                text-align: center;
             }
 
             .receiving-address {

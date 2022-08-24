@@ -21,7 +21,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-// Truncate RAP addresses.
 td {
     width: available;
     max-width: 1px; // (╯°Д°）╯
