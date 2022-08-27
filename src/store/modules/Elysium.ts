@@ -110,7 +110,8 @@ const getters = {
         for (const [token, data] of Object.entries(<ElysiumBalances>getters.balances)) {
             r[token] = {
                 priv: data.priv,
-                pending: Object.values(data.pub).reduce((a, x) => a + x, 0) + data.privUnconfirmed
+                pub: Object.values(data.pub).reduce((a, x) => a + x, 0),
+                pending: data.privUnconfirmed
             };
         }
 

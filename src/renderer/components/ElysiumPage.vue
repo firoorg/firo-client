@@ -64,8 +64,9 @@ import ElysiumTokenId from "renderer/components/AnimatedTable/ElysiumTokenId";
 import ElysiumTokenTicker from "renderer/components/AnimatedTable/ElysiumTokenTicker";
 import ElysiumTokenName from "renderer/components/AnimatedTable/ElysiumTokenName";
 import ElysiumTokenPrivateBalance from "renderer/components/AnimatedTable/ElysiumTokenPrivateBalance";
+import ElysiumTokenPublicBalance from "renderer/components/AnimatedTable/ElysiumTokenPublicBalance";
 import ElysiumTokenPendingBalance from "renderer/components/AnimatedTable/ElysiumTokenPendingBalance";
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 import PropertyInfo from "renderer/components/ElysiumPage/PropertyInfo";
 
 const myTokensTableFields = [
@@ -73,6 +74,7 @@ const myTokensTableFields = [
     {name: ElysiumTokenTicker},
     {name: ElysiumTokenName},
     {name: ElysiumTokenPrivateBalance},
+    {name: ElysiumTokenPublicBalance},
     {name: ElysiumTokenPendingBalance}
 ];
 
@@ -118,7 +120,7 @@ export default {
                 .filter(tk => tk)
                 .sort((a, b) => a.id - b.id)
                 .map(tk => {
-                    const b = this.aggregatedBalances[tk.creationTx] || {priv: 0, pending: 0};
+                    const b = this.aggregatedBalances[tk.creationTx] || {priv: 0, pub: 0, pending: 0};
 
                     return {
                         creationTx: tk.creationTx,
@@ -126,7 +128,8 @@ export default {
                         name: tk.nameMinusTicker,
                         ticker: tk.ticker,
                         privateBalance: tk.isDivisible ? b.priv : `${b.priv}`,
-                        pendingBalance: tk.isDivisible ? b.pending : `${b.pending}`
+                        pendingBalance: tk.isDivisible ? b.pending : `${b.pending}`,
+                        publicBalance: tk.isDivisible ? b.pub : `${b.pub}`
                     };
                 });
         },
