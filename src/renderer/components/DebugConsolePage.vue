@@ -10,7 +10,9 @@
             <div class="output">
                 <div class="info">
                     Hello, welcome to the Firo Client debug console. Here you can interact with firod directly. Write
-                    <b>help</b> and see the list of commands, or <b>clear</b> to clear the console.
+                    <b>help</b> and see the list of commands, or <b>clear</b> to clear the console. Please be aware that
+                    some commands may cause the client state to become corrupted. If this happens, restarting the client
+                    will fix the issue.
                 </div>
 
                 <div
