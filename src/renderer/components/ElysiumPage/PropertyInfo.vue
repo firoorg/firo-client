@@ -1,76 +1,141 @@
 <template>
     <div class="info-popup">
-        <div class="title">
-            Property {{ property.id }} - {{ property.nameMinusTicker }}
+        <div v-if="show == 'main'">
+            <div class="title">
+                Property {{ property.id }} - {{ property.nameMinusTicker }}
+            </div>
+
+            <table>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ property.id }}</td>
+                </tr>
+
+                <tr>
+                    <td>Name</td>
+                    <td>{{ property.name }}</td>
+                </tr>
+
+                <tr>
+                    <td>Category</td>
+                    <td>{{ property.category }}</td>
+                </tr>
+
+                <tr>
+                    <td>URL</td>
+                    <td>{{ property.url }}</td>
+                </tr>
+
+                <tr>
+                    <td>Divisible</td>
+                    <td>{{ property.isDivisible }}</td>
+                </tr>
+
+                <tr>
+                    <td>Managed</td>
+                    <td>{{ property.isManaged }}</td>
+                </tr>
+
+                <tr>
+                    <td>Issuer</td>
+                    <td>{{ property.issuer }}</td>
+                </tr>
+
+                <tr>
+                    <td>Creation Transaction</td>
+                    <td><TransactionId :txid="property.creationTx" /></td>
+                </tr>
+
+                <tr>
+                    <td>Private Balance</td>
+                    <td><Amount :amount="balance.priv" /></td>
+                </tr>
+
+                <tr>
+                    <td>Unconfirmed Private Balance</td>
+                    <td><Amount :amount="balance.privUnconfirmed" /></td>
+                </tr>
+
+                <tr>
+                    <td>Public Balance</td>
+                    <td v-if="nPublicHolders > 1"><Amount :amount="publicBalance" /> in <b>{{ nPublicHolders }}</b> addresses</td>
+                    <td v-else-if="nPublicHolders"><Amount :amount="publicBalance" /> in 1 address</td>
+                    <td v-else><Amount :amount="0" /></td>
+                </tr>
+            </table>
+
+            <div class="buttons">
+                <button class="solid-button unrecommended" @click="$emit('delete')">
+                    Delete Property
+                </button>
+
+                <button v-if="isMine && property.isManaged" class="solid-button" @click="show = 'grantPrompt'">
+                    Grant Tokens
+                </button>
+
+                <button class="solid-button recommended" @click="$emit('ok')">
+                    OK
+                </button>
+            </div>
         </div>
+        <div v-else-if="show == 'grantPrompt'" class="popup">
+            <div class="title">
+                Grant Tokens
+            </div>
 
-        <table>
-            <tr>
-                <td>ID</td>
-                <td>{{ property.id }}</td>
-            </tr>
+            <div class="content">
+                <InputFrame label="Grantee">
+                    <input
+                        type="text"
+                        name="grantee"
+                        v-model="grantee"
+                        v-validate="'firoAddress'"
+                        v-tooltip="getValidationTooltip('grantee')"
+                    />
+                </InputFrame>
 
-            <tr>
-                <td>Name</td>
-                <td>{{ property.name }}</td>
-            </tr>
+                <InputFrame label="Amount">
+                    <input
+                        type="text"
+                        name="amount"
+                        v-model="amount"
+                        v-validate="{
+                            numeric: true,
+                            required: true,
+                            min_value: property.isDivisible ? 1e-8 : 1,
+                            max_value: property.isDivisible ? 92233720368 : 9223372036854775807
+                        }"
+                        v-tooltip="getValidationTooltip('amount')"
+                    />
 
-            <tr>
-                <td>Category</td>
-                <td>{{ property.category }}</td>
-            </tr>
+                </InputFrame>
+            </div>
 
-            <tr>
-                <td>URL</td>
-                <td>{{ property.url }}</td>
-            </tr>
+            <div class="buttons">
+                <button class="solid-button unrecommended" @click="goToMain">
+                    Cancel
+                </button>
 
-            <tr>
-                <td>Divisible</td>
-                <td>{{ property.isDivisible }}</td>
-            </tr>
+                <button class="solid-button recommended" @click="show = 'passphrase'">
+                    Grant Tokens
+                </button>
+            </div>
+        </div>
+        <PassphraseInput v-else-if="show == 'passphrase'" v-model="passphrase" :error="error" @cancel="goToMain" @confirm="attemptGrant" />
+        <div v-else-if="show == 'grantSuccess'" class="popup">
+            <div class="title">
+                Success!
+            </div>
 
-            <tr>
-                <td>Managed</td>
-                <td>{{ property.isManaged }}</td>
-            </tr>
+            <div class="content">
+                Granted <Amount :amount="amount" :ticker="property.ticker" /> to <span class="address">{{ grantee }}</span>
+            </div>
 
-            <tr>
-                <td>Issuer</td>
-                <td>{{ property.issuer }}</td>
-            </tr>
-
-            <tr>
-                <td>Creation Transaction</td>
-                <td><TransactionId :txid="property.creationTx" /></td>
-            </tr>
-
-            <tr>
-                <td>Private Balance</td>
-                <td><Amount :amount="balance.priv" /></td>
-            </tr>
-
-            <tr>
-                <td>Unconfirmed Private Balance</td>
-                <td><Amount :amount="balance.privUnconfirmed" /></td>
-            </tr>
-
-            <tr>
-                <td>Public Balance</td>
-                <td v-if="nPublicHolders > 1"><Amount :amount="publicBalance" /> in <b>{{ nPublicHolders }}</b> addresses</td>
-                <td v-if="nPublicHolders"><Amount :amount="publicBalance" /> in 1 address</td>
-                <td v-else><Amount :amount="0" /></td>
-            </tr>
-        </table>
-
-        <div class="buttons">
-            <button class="solid-button unrecommended" @click="$emit('delete')">
-                Delete Property
-            </button>
-
-            <button class="solid-button recommended" @click="$emit('ok')">
-                OK
-            </button>
+            <div class="buttons">
+                <button class="solid-button recommended" @click="goToMain">
+                    OK
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -79,16 +144,43 @@
 import {mapGetters} from "vuex";
 import TransactionId from "renderer/components/shared/TransactionId";
 import Amount from "renderer/components/shared/Amount";
+import InputFrame from "renderer/components/shared/InputFrame";
+import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import {isValidAddress} from "lib/isValidAddress";
 
 export default {
     name: "PropertyInfo",
-    components: {Amount, TransactionId},
+    components: {PassphraseInput, InputFrame, Amount, TransactionId},
     props: ['creationtx'],
+
+    data() {
+        return {
+            show: 'main',
+            grantee: '',
+            amount: '',
+            passphrase: '',
+            error: ''
+        };
+    },
+
+    inject: [
+        '$validator'
+    ],
+
+    beforeMount() {
+        this.$validator.extend('firoAddress', {
+            getMessage: () => 'The Firo address you entered is invalid',
+            validate: (value) => isValidAddress(value, this.network)
+        });
+    },
 
     computed: {
         ...mapGetters({
+            network: 'ApiStatus/network',
             tokenData: 'Elysium/tokenData',
-            balances: 'Elysium/balances'
+            balances: 'Elysium/balances',
+            TXOMap: 'Transactions/TXOMap',
+            availableUTXOs: 'Transactions/availableUTXOs'
         }),
 
         property() {
@@ -105,6 +197,53 @@ export default {
 
         nPublicHolders() {
             return Object.values(this.balance.pub).filter(x => x > 0).length;
+        },
+
+        isMine() {
+            return !!this.TXOMap[`${this.creationtx}-0`];
+        },
+
+        getValidationTooltip() {
+            return (fieldName) => ({
+                content: this.validationErrors.first(fieldName),
+                trigger: 'manual',
+                boundariesElement: 'body',
+                offset: 8,
+                placement: 'right',
+                classes: 'error popup-tooltip right-tooltip',
+                show: true
+            })
+        }
+    },
+
+    methods: {
+        goToMain() {
+            this.show = 'main';
+            this.grantee = '';
+            this.amount = '';
+            this.passphrase = '';
+            this.error = '';
+        },
+
+        async attemptGrant() {
+            const canGrant = !!this.availableUTXOs.find(txo => txo.amount >= 0.002e8 && txo.destination == this.property.issuer && !txo.isPrivate);
+            if (!canGrant) {
+                this.error = `To grant, send at least 0.003 FIRO to ${this.property.issuer} first.`;
+                return;
+            }
+
+            const amount = this.property.isDivisible ? Number(this.amount)*1e8 : Number(this.amount);
+            let r;
+            try {
+                r = await $daemon.grantElysium(this.passphrase, this.property.id, this.grantee, amount);
+            } catch (e) {
+                this.error = `${e.message}`;
+                return;
+            }
+
+            $store.commit('Transactions/markSpentTransaction', r.inputs);
+
+            this.show = 'grantSuccess';
         }
     }
 }

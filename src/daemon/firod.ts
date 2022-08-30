@@ -1563,6 +1563,14 @@ export class Firod {
         });
     }
 
+    async grantElysium(auth: string, propertyId: number, address: string, amount: number): Promise<string> {
+        return <string | null>await this.send(auth, null, 'grantElysium', {
+            propertyId,
+            address,
+            amount
+        });
+    }
+
     // This recovers Elysium-Lelantus mints that were sent by other instances of this mnemonic (e.g. after restoring
     // from a mnemonic).
     async recoverElysium(auth: string) {
