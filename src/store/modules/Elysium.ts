@@ -129,6 +129,27 @@ const getters = {
         return r;
     },
 
+    // This is the total issued amount of property tokens created by us. Note that it is possible to change the manager
+    // of an Elysium token, and if this is done, the data returned here will be wrong. It's not possible to do that from
+    // our UI.
+    totalIssued: (state, getters, rootState, rootGetters): {[property: number]: number} => {
+        const r: {[property: string]: number} = {};
+        for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
+            const p = txo?.elysium?.property?.creationTx;
+            if (
+                txo.scriptType != "elysium" ||
+                !txo.isFromMe ||
+                (!txo?.elysium?.valid && txo.blockHeight) ||
+                txo?.elysium?.type != "Grant Property Tokens" ||
+                !p
+            ) continue;
+            console.log(txo);
+
+            r[p] = (r[p] || 0) + txo?.elysium?.amount;
+        }
+        return r;
+    },
+
     allSelectedTokens: (state) => state.allSelectedTokens,
     hasModifiedSelectedTokens: (state) => state.hasModifiedSelectedTokens,
     selectedTokens: (state, getters, rootState, rootGetters) => getters.allSelectedTokens[rootGetters['ApiStatus/block1']] || [],

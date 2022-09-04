@@ -62,6 +62,11 @@
                     <td v-else-if="nPublicHolders"><Amount :amount="publicBalance" /> in 1 address</td>
                     <td v-else><Amount :amount="0" /></td>
                 </tr>
+
+                <tr v-if="isMine && property.isManaged">
+                    <td>Total Issued</td>
+                    <td><Amount :amount="totalIssued" /></td>
+                </tr>
             </table>
 
             <div class="buttons">
@@ -103,7 +108,7 @@
                             numeric: true,
                             required: true,
                             min_value: property.isDivisible ? 1e-8 : 1,
-                            max_value: property.isDivisible ? 92233720368 : 9223372036854775807
+                            max_value: maxIssue
                         }"
                         v-tooltip="getValidationTooltip('amount')"
                     />
@@ -180,7 +185,8 @@ export default {
             tokenData: 'Elysium/tokenData',
             balances: 'Elysium/balances',
             TXOMap: 'Transactions/TXOMap',
-            availableUTXOs: 'Transactions/availableUTXOs'
+            availableUTXOs: 'Transactions/availableUTXOs',
+            allTotalIssued: 'Elysium/totalIssued'
         }),
 
         property() {
@@ -201,6 +207,15 @@ export default {
 
         isMine() {
             return !!this.TXOMap[`${this.creationtx}-0`];
+        },
+
+        totalIssued() {
+            return this.allTotalIssued[this.creationtx];
+        },
+
+        maxIssue() {
+            // We need to switch to bigints to make this exact.
+            return Math.max(0, (this.property.isDivisible ? (2**63-1)/1e8 : 2**63-1) - this.totalIssued);
         },
 
         getValidationTooltip() {
@@ -232,7 +247,6 @@ export default {
                 return;
             }
 
-            const amount = this.property.isDivisible ? Number(this.amount)*1e8 : Number(this.amount);
             let r;
             try {
                 r = await $daemon.grantElysium(this.passphrase, this.property.id, this.grantee, amount);
