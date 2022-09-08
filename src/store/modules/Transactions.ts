@@ -11,6 +11,10 @@ export interface TXO extends TxOut {
 
     txid: string;
     index: number;
+    // This indicates whether the TXO was spent AT THE TIME IT WAS SENT. If we have sent a transaction using it as an
+    // input after that, it will still be false. You therefore need to additionally check against our spentSerialHashes
+    // and spentPublicInputs getters to determine whether the TXO has actually been spent.
+    isSpent: boolean;
     // This indicates whether this input should be used for new private transactions.
     isPrivate: boolean;
     // This indicates whether the transaction as a whole was private.
@@ -21,9 +25,10 @@ export interface TXO extends TxOut {
     fee: number;
     spendSize?: number; // undefined if unknown
     elysium?: ElysiumData;
+    lelantusInputSerialHashes?: string[];
 }
 
-function txosFromTx(tx: Transaction): TXO[] {
+function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
     const txos: TXO[] = [];
 
     let index = -1;
@@ -87,6 +92,8 @@ function txosFromTx(tx: Transaction): TXO[] {
             isInstantSendLocked: tx.isInstantSendLocked,
             elysium: tx.elysium,
             publicInputs: tx.publicInputs,
+            lelantusInputSerialHashes: (<any>tx).lelantusInputSerialHashes,
+            isSpent: txout.isSpent || (isPrivate ? spentSerialHashes.has(txout.lelantusSerialHash) : spentPublicInputs.has(`${tx.txid}-${index}`)),
             ...txout
         });
     }
@@ -124,13 +131,6 @@ const mutations = {
                 upcomingTransactionsLastUpdated = Infinity;
                 state.transactions = cloneDeep(upcomingTransactions);
             }, 500);
-        }
-    },
-
-    markSpentTransaction(state, inputs: CoinControl) {
-        for (const input of inputs) {
-            upcomingTransactions[input[0]].outputs[input[1]].isSpent = true;
-            upcomingTransactionsLastUpdated = Date.now();
         }
     }
 };
@@ -185,8 +185,12 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
 
 const getters = {
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
+    spentSerialHashes: (state, getters): Set<string> =>
+        new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.lelantusInputSerialHashes], [])),
+    spentPublicInputs: (state, getters): Set<string> =>
+        new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.publicInputs], []).map(i => `${i[0]}-${i[1]}`)),
     allTXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
-        .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx)), []),
+        .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx, getters.spentSerialHashes, getters.spentPublicInputs)), []),
     TXOs: (state, getters): TXO[] => getters.allTXOs
         // Don't display orphaned mining transactions.
         .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
@@ -194,7 +198,11 @@ const getters = {
         // Elysium address is required to mint or spend publicly from that address.
         .filter(txo => !txo.isElysiumReferenceOutput),
     TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.allTXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
-    UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) => !txo.isSpent),
+    UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) =>
+        !txo.isSpent &&
+        !getters.spentSerialHashes.has(txo.lelantusSerialHash) &&
+        !getters.spentPublicInputs.has(`${txo.txid}-${txo.index}`)
+    ),
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
         txo.isToMe &&
         // Elysium has reference outputs that we should not allow the user to spend.

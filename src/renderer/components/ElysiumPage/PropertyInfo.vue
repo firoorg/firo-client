@@ -247,15 +247,12 @@ export default {
                 return;
             }
 
-            let r;
             try {
-                r = await $daemon.grantElysium(this.passphrase, this.property.id, this.grantee, amount);
+                await $daemon.grantElysium(this.passphrase, this.property.id, this.grantee, amount);
             } catch (e) {
                 this.error = `${e.message}`;
                 return;
             }
-
-            $store.commit('Transactions/markSpentTransaction', r.inputs);
 
             this.show = 'grantSuccess';
         }

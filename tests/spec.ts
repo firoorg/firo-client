@@ -301,7 +301,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
     async function mintAllLelantus(this: This) {
         await this.app.client.executeAsyncScript(
-            `$daemon.mintAllLelantus(arguments[0]).then(r => {$store.commit('Transactions/markSpentTransaction', r?.inputs || []); arguments[1]()})`,
+            `$daemon.mintAllLelantus(arguments[0]).then(arguments[1])`,
             [passphrase]
         );
     }

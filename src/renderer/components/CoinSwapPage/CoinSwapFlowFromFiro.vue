@@ -499,15 +499,11 @@ export default {
 
             try {
                 if (this.isPrivate) {
-                    const r = await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress,
-                        this.firoAmount, this.txFeePerKb, false);
-
-                    $store.commit('Transactions/markSpentTransaction', r.inputs);
+                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount,
+                        this.txFeePerKb, false);
                 } else {
-                    const r = await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
+                    await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
                         this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb, false);
-
-                    $store.commit('Transactions/markSpentTransaction', r.inputs);
                 }
 
                 try {

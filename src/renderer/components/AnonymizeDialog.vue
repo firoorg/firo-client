@@ -57,8 +57,7 @@ export default {
             for (const [token, address] of this.tokensNeedingAnonymization) {
                 try {
                     const id = this.tokenData[token].id;
-                    const r = await $daemon.mintElysium(passphrase, address, id);
-                    $store.commit('Transactions/markSpentTransaction', r.inputs);
+                    await $daemon.mintElysium(passphrase, address, id);
                 } catch (e) {
                     if (e instanceof IncorrectPassphrase) {
                         this.error = 'Incorrect Passphrase';
@@ -73,8 +72,7 @@ export default {
             }
 
             try {
-                const r = await $daemon.mintAllLelantus(passphrase);
-                $store.commit('Transactions/markSpentTransaction', r?.inputs || []);
+                await $daemon.mintAllLelantus(passphrase);
             } catch (e) {
                 if (e instanceof FirodErrorResponse) {
                     errors.unshift(e.errorMessage);

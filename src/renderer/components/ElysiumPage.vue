@@ -168,10 +168,8 @@ export default {
                     d.isDivisible, (d.isFixed || undefined) && (d.isDivisible ? `${d.issuanceAmount}00000000` : d.issuanceAmount),
                     d.name, d.category, d.subcategory, d.description, d.url);
 
-                $store.commit('Transactions/markSpentTransaction', r.inputs);
                 this.addSelectedTokens([r.txid]);
 
-                $store.commit('Transactions/markSpentTransaction', r.inputs);
                 this.showPopup = '';
                 this.newTokenData = null;
             } catch (e) {

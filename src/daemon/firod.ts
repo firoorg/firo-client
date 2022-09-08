@@ -210,6 +210,7 @@ export interface TxOut {
     isToMe: boolean;
     isElysiumReferenceOutput: boolean;
     destination?: string;
+    lelantusSerialHash?: string;
 }
 
 type ElysiumPropertyLelantusStatus = "SoftDisabled" | "SoftEnabled" | "HardDisabled" | "HardEnabled";
@@ -259,6 +260,7 @@ export interface Transaction {
     fee: number;
     outputs: TxOut[];
     publicInputs: CoinControl;
+    lelantusInputSerialHashes: string[];
     elysium?: ElysiumData;
 
     // blockHash MAY be set without blockHeight or blockTime, in which case the transaction is from an orphaned block.
@@ -1352,7 +1354,7 @@ export class Firod {
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
     // this transaction.
     async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
-                     subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string, inputs: CoinControl}> {
+                     subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
         const data = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
                 [recipient]: {
@@ -1367,8 +1369,8 @@ export class Firod {
             }
         });
 
-        function isValidResponse(x: any): x is {txid: string, inputs: CoinControl} {
-            return x !== null && typeof x === 'object' && typeof x.txid === 'string' && isValidCoinControl(x.inputs);
+        function isValidResponse(x: any): x is {txid: string} {
+            return x !== null && typeof x === 'object' && typeof x.txid === 'string';
         }
 
         if (isValidResponse(data)) {
@@ -1428,7 +1430,7 @@ export class Firod {
     //
     // resolve()s with the txid and list of , or reject()s if we have insufficient funds or the call fails for some other reason.
     async sendLelantus(auth: string, recipient: string, amount: number, feePerKb: number,
-                       subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string, inputs: CoinControl}> {
+                       subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
         const data = await this.send(auth, 'create', 'sendLelantus', {
             recipient,
             amount,
@@ -1439,8 +1441,8 @@ export class Firod {
             }
         });
 
-        if (typeof data === 'object' && typeof data['txid'] === 'string' && isValidCoinControl(data['inputs'])) {
-            return <{txid: string, inputs: CoinControl}>data;
+        if (typeof data === 'object' && typeof data['txid'] === 'string') {
+            return <{txid: string}>data;
         } else {
             throw new UnexpectedFirodResponse('create/sendLelantus', data);
         }
@@ -1548,7 +1550,7 @@ export class Firod {
         return <string[]>data;
     }
 
-    async mintElysium(auth: string, address: string, propertyId: number): Promise<{inputs: string[], txids: string[]}> {
+    async mintElysium(auth: string, address: string, propertyId: number): Promise<{txids: string[]}> {
         return <any>await this.send(auth, null, 'mintElysium', {
             address,
             propertyId
@@ -1581,7 +1583,7 @@ export class Firod {
     // more than 0.002 public FIRO in a single address.
     async createElysiumProperty(auth: string, fromAddress: string, isFixed: boolean, isDivisible: boolean,
                                 amount: string | undefined, name: string, category: string, subcategory: string,
-                                data: string, url: string): Promise<{inputs: string[], txid: string}> {
+                                data: string, url: string): Promise<{txid: string}> {
         if (!isFixed && amount) throw 'managed properties should not put in an amount';
 
         return <any>await this.send(auth, null, 'createElysiumProperty', {
