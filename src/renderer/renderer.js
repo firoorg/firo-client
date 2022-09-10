@@ -9,8 +9,6 @@ import {isEqual} from 'lodash';
 import Big from 'big.js';
 import {existsSync} from 'fs';
 
-import i18n from 'lib/i18n'
-
 const electron = require('electron');
 const remote = electron.remote;
 const app = electron.remote.app;
@@ -45,12 +43,7 @@ Vue.use(VTooltip, {
 Vue.use(AsyncComputed);
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
-    locale: i18n.getLocale({ app, store }), // Default locale
-    locales: {
-        // 'zh-CN': require('date-fns/locale/zh_cn'),
-        'en': require('date-fns/locale/en')
-    }
-})
+});
 Vue.use(VeeValidate, {
     errorBagName: 'validationErrors',
     fieldsBagName: 'validationFields',
@@ -242,7 +235,6 @@ function startVue() {
         components: {App},
         router,
         store,
-        i18n: i18n.getModule({app, store}),
         template: '<App/>'
     }).$mount('#app');
 }

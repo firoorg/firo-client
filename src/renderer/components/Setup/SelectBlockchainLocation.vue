@@ -109,7 +109,7 @@ export default {
                     'promptToCreate',
                     'showHiddenFiles'
                 ],
-                buttonLabel: this.$t('onboarding.set-blockchain-location.button__select-location--primary')
+                buttonLabel: 'Select Data Directory'
             });
             if (!selection.filePaths.length) return;
 

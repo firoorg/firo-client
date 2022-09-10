@@ -4,7 +4,7 @@
             <vuetable
                 ref="vuetable"
                 :api-mode="false"
-                :fields="getFieldsWithLocalizedTitle"
+                :fields="fields"
                 :per-page="perPage"
                 :track-by="trackBy"
                 :data-manager="dataManager"
@@ -106,17 +106,6 @@ export default {
             rowTransition: 'fade',
             perPage: 0,
             resizeListener: () => this.setPerPage()
-        }
-    },
-
-    computed: {
-        getFieldsWithLocalizedTitle () {
-            return this.fields.map((field) => {
-                return {
-                    ...field,
-                    title: this.$t(field.title)
-                }
-            })
         }
     },
 
