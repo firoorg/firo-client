@@ -54,7 +54,7 @@ app.once('ready', async () => {
 
     // The window will be shown by the renderer process when firod is connected.
     const ourWindow = new BrowserWindow({
-        show: true,
+        show: process.env.NODE_ENV === 'development',
         frame: process.platform !== 'darwin',
         useContentSize: true,
         titleBarStyle: 'hiddenInset',
