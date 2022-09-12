@@ -42,7 +42,7 @@ import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativ
 import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
 import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
 import Popup from "renderer/components/shared/Popup";
-import { convertToCoin } from "lib/convert";
+import { bigintToString } from "lib/convert";
 import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
@@ -113,7 +113,7 @@ export default {
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
                     label: (this.addressBook[txo.destination] || {}).label || txo.destination,
                     extraSearchText:
-                        `${txo.isFromMe ? '-' : '+'}${convertToCoin(txo.amount)}` + '\0' +
+                        `${txo.isFromMe ? '-' : '+'}${bigintToString(txo.amount)}` + '\0' +
                         (txo.elysium ? ` elysium ${txo.elysium.sender} ${txo.elysium.receiver} ${txo.elysium.amount} ${txo.elysium.property && txo.elysium.property.name}` : '') + '\0' +
                         `${txo.blockHeight || 'Unconfirmed'}`,
                     ...txo

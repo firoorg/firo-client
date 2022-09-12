@@ -13,7 +13,7 @@ const mutations = {
 
 const actions = {
     setApiStatus({state, commit, dispatch}, apiStatus) {
-        const msgs = apiStatus?.data?.newLogMessages;
+        const msgs = apiStatus.data.newLogMessages;
         if (msgs && msgs.length) {
             commit('App/appendLogMessages', msgs, {root: true});
             delete apiStatus.data.newLogMessages;
@@ -49,8 +49,7 @@ const getters = {
     totalZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).totalCount || 0,
     // We will return 0 if apiStatus hasn't yet loaded.
     enabledZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).enabledCount || 0,
-    // This is the recommended fee per kb, or 1000 if it is undefined or lower than that.
-    smartFeePerKb: (state, getters): number => Math.max(1000, getters.apiStatusData.smartFeePerKb || 1000),
+    smartFeePerKb: (state, getters): bigint => getters.apiStatusData.smartFeePerKb,
     isBlockchainSynced: (state, getters): boolean => ['regtest', 'regtest-ql'].includes(getters.network) || getters.apiStatusData.synced,
     connections: (state, getters): number => getters.apiStatusData.connections
 };

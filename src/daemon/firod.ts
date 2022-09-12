@@ -12,6 +12,16 @@ import * as net from "net";
 
 const logger = createLogger('firo:daemon');
 
+export const bigIntTransform = (_, x) =>
+    (
+        x &&
+        typeof x === 'object' &&
+        typeof x.bigint === 'string' &&
+        Object.keys(x).length == 1 &&
+        isFinite(x.bigint)
+    ) ? BigInt(x.bigint) : x;
+export const bigIntSerializeTransform = (_, x) => typeof x === 'bigint' ? `${x}` : x;
+
 // The base class for all our errors.
 export class FirodError extends Error {
     constructor(message: string) {
@@ -108,7 +118,7 @@ export class UnexpectedFirodResponse extends FirodError {
         this.call = call;
         this.response = response;
 
-        logger.error(`Unexpected response to call ${call}: ${JSON.stringify(response)}`);
+        logger.error(`Unexpected response to call ${call}: ${JSON.stringify(response, bigIntSerializeTransform)}`);
     }
 }
 
@@ -186,9 +196,10 @@ export interface ApiStatusData {
         enabledCount: number;
     };
     hasMnemonic: boolean;
-    smartFeePerKb: number;
+    smartFeePerKb: bigint;
     hasSentInitialStateWallet: boolean;
     latestBlockTimestamp: number;
+    newLogMessages: string[];
 }
 
 export interface ApiStatus {
@@ -203,7 +214,7 @@ export interface TxOut {
     scriptType: 'pay-to-public-key' | 'pay-to-public-key-hash' | 'pay-to-script-hash' | 'pay-to-witness-script-hash' |
         'zerocoin-mint' | 'zerocoin-remint' | 'zerocoin-spend' | 'sigma-spend' | 'sigma-mint' | 'lelantus-mint' |
         'lelantus-jmint' | 'lelantus-joinsplit' | 'elysium' | 'unknown';
-    amount: number;
+    amount: bigint;
     isChange: boolean;
     isLocked: boolean;
     isSpent: boolean;
@@ -245,10 +256,10 @@ export interface ElysiumData {
     valid: boolean;
     // This will be present only the transaction is confirmed and not valid.
     invalidReason?: string;
-    amount?: number;
+    amount?: bigint;
     // This will only be present on Lelantus JoinSplit transactions. Its value is the change amount minted. It will be
     // -1 if there was an error retrieving the relevant data; that shouldn't normally happen.
-    joinmintAmount?: number;
+    joinmintAmount?: bigint;
     property?: ElysiumPropertyData;
 }
 
@@ -257,7 +268,7 @@ export interface Transaction {
     inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus';
     isFromMe: boolean;
     firstSeenAt: number;
-    fee: number;
+    fee: bigint;
     outputs: TxOut[];
     publicInputs: CoinControl;
     lelantusInputSerialHashes: string[];
@@ -446,7 +457,7 @@ export class InvalidCertificateFile extends FirodError {
 function readCert(path: string): [string, string] {
     let parsed;
     try {
-        parsed = JSON.parse(fs.readFileSync(path).toString());
+        parsed = JSON.parse(fs.readFileSync(path).toString(), bigIntTransform);
     } catch(e) {
         throw new InvalidCertificateFile(path);
     }
@@ -957,7 +968,7 @@ export class Firod {
     private async gotApiStatus(apiStatusMessage: string) {
         let apiStatus: ApiStatus;
         try {
-            apiStatus = JSON.parse(apiStatusMessage);
+            apiStatus = JSON.parse(apiStatusMessage, bigIntTransform);
         } catch (e) {
             logger.error("Failed to parse API status %O", apiStatusMessage);
             throw new FirodError(`Failed to parse apiStatus: ${e}`);
@@ -976,9 +987,7 @@ export class Firod {
         this.latestApiStatus = apiStatus;
         await this.gotAPIResponseEWH.release(undefined);
 
-        if (apiStatus?.data?.pid) {
-            this.pid = apiStatus.data.pid;
-        }
+        this.pid = apiStatus.data.pid;
 
         // modules.API will be set once it is valid to connect to the API.
         if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
@@ -1080,14 +1089,14 @@ export class Firod {
     private handleSubscriptionEvent(topic: string, message: string) {
         let parsedMessage;
         try {
-            parsedMessage = JSON.parse(message);
+            parsedMessage = JSON.parse(message, bigIntTransform);
         } catch(e) {
             logger.error("firod sent us invalid JSON data on a subscription for %s: %O", topic, message);
             return;
         }
 
         if (logger.isSillyEnabled()) {
-            logger.silly("firod sent us a subscription event for topic %s: %s", topic, JSON.stringify(parsedMessage, null, 2));
+            logger.silly("firod sent us a subscription event for topic %s: %s", topic, JSON.stringify(parsedMessage, bigIntSerializeTransform, 2));
         }
 
         if (parsedMessage.meta.status !== 200) {
@@ -1163,7 +1172,7 @@ export class Firod {
             }
 
             try {
-                await this.requesterSocket.send(JSON.stringify(message));
+                await this.requesterSocket.send(JSON.stringify(message, bigIntSerializeTransform));
             } catch (e) {
                 try {
                     await this.sendError(e);
@@ -1179,7 +1188,7 @@ export class Firod {
 
                 let message;
                 try {
-                    message = JSON.parse(messageString);
+                    message = JSON.parse(messageString, bigIntTransform);
                 } catch (e) {
                     logger.error("firod sent us invalid JSON: %O", messageString);
                     release();
@@ -1191,9 +1200,9 @@ export class Firod {
                     // Don't log anything about rpc or mnemonic requests.
                 } else if (messageString.length > 1024) {
                     logger.debug(`received reply from firod for ${callName}: <%d bytes>`, messageString.length);
-                    logger.silly(`content of ${messageString.length} byte reply to ${callName}: ${JSON.stringify(message, undefined, 2)}`);
+                    logger.silly(`content of ${messageString.length} byte reply to ${callName}: ${JSON.stringify(message, bigIntSerializeTransform, 2)}`);
                 } else {
-                    logger.debug(`received reply from firod for ${callName}: ${JSON.stringify(message, undefined, 2)}`);
+                    logger.debug(`received reply from firod for ${callName}: ${JSON.stringify(message, bigIntSerializeTransform, 2)}`);
                 }
 
                 if (isFirodResponseMessage(message)) {

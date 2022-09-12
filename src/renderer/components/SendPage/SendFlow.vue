@@ -74,9 +74,9 @@ export default {
         disabled: Boolean,
         label: String,
         address: String,
-        amount: Number,
-        txFeePerKb: Number,
-        computedTxFee: Number,
+        amount: BigInt,
+        txFeePerKb: BigInt,
+        computedTxFee: BigInt,
         subtractFeeFromAmount: Boolean,
         isPrivate: Boolean,
         coinControl: Array,
@@ -122,18 +122,18 @@ export default {
                     const id = this.tokenData[this.asset].id;
 
                     try {
-                        await $daemon.sendElysium(passphrase, id, this.address, this.amount);
+                        await $daemon.sendElysium(passphrase, id, this.address, Number(this.amount));
                     } catch (e) {
                         if (!e.message.includes('Insufficient funds')) throw e;
 
                         await $daemon.recoverElysium(passphrase);
-                        await $daemon.sendElysium(passphrase, id, this.address, this.amount);
+                        await $daemon.sendElysium(passphrase, id, this.address, Number(this.amount));
                     }
                 } else if (this.isPrivate) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
                     const coinControl = this.coinControl || this.selectInputs(true, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
+                    await $daemon.sendLelantus(passphrase, this.address, Number(this.amount), Number(this.txFeePerKb),
                         this.subtractFeeFromAmount, coinControl);
                 } else {
                     if (this.coinControl && this.allowBreakingMasternodes) {
@@ -146,7 +146,7 @@ export default {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
                     const coinControl = this.coinControl || this.selectInputs(false, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                    await $daemon.publicSend(passphrase, this.label, this.address, Number(this.amount), Number(this.txFeePerKb),
                         this.subtractFeeFromAmount, coinControl);
                 }
             } catch (e) {

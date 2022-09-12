@@ -215,7 +215,7 @@ export default {
 
         maxIssue() {
             // We need to switch to bigints to make this exact.
-            return Math.max(0, (this.property.isDivisible ? (2**63-1)/1e8 : 2**63-1) - this.totalIssued);
+            return (this.property.isDivisible ? (2n**63n-1n)/10n**8n : 2n**63n-1n) - this.totalIssued;
         },
 
         getValidationTooltip() {

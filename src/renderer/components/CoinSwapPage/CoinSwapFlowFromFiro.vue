@@ -37,7 +37,7 @@ import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
 import ExolixAPIWorker from 'lib/exolix-api';
-import {convertToCoin} from "lib/convert";
+import {bigintToString} from "lib/convert";
 import {mapActions, mapGetters} from "vuex";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
@@ -137,7 +137,7 @@ export default {
             addCoinSwapRecords: 'CoinSwap/addOrUpdateRecords'
         }),
 
-        convertToCoin,
+        bigintToString,
 
         async showInfo() {
             if (this.show !== 'button') return;
@@ -157,7 +157,7 @@ export default {
                         to:this.remoteCurrency.toLowerCase(),
                         address: this.receiveAddress,
                         refundAddress: walletAddress,
-                        amount: convertToCoin(this.firoAmount)
+                        amount: bigintToString(this.firoAmount)
                     };
 
                     this.$log.info("Posting order: %O", order);
@@ -218,10 +218,10 @@ export default {
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
-                        sendAmount: convertToCoin(this.firoAmount),
+                        sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amount,
                         expectedRate: this.expectedRate,
-                        fromFee: convertToCoin(this.firoTransactionFee),
+                        fromFee: bigintToString(this.firoTransactionFee),
                         expectedToFee: this.remoteTransactionFee,
                         status: 'waiting',
                         date: Date.now(),
@@ -236,7 +236,7 @@ export default {
                         to:this.remoteCurrency.toLowerCase(),
                         addressReceive: this.receiveAddress,
                         refundAddress: walletAddress,
-                        amountDeposit: convertToCoin(this.firoAmount),
+                        amountDeposit: bigintToString(this.firoAmount),
                         quotaId: this.quotaId
                     };
 
@@ -298,10 +298,10 @@ export default {
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
-                        sendAmount: convertToCoin(this.firoAmount),
+                        sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amountEstimated,
                         expectedRate: this.expectedRate,
-                        fromFee: convertToCoin(this.firoTransactionFee),
+                        fromFee: bigintToString(this.firoTransactionFee),
                         expectedToFee: this.remoteTransactionFee,
                         status: 'waiting',
                         date: Date.now(),
@@ -315,7 +315,7 @@ export default {
                         coin_from:"FIRO",
                         coin_to:this.remoteCurrency,
                         destination_address: this.receiveAddress,
-                        deposit_amount: convertToCoin(this.firoAmount),
+                        deposit_amount: bigintToString(this.firoAmount),
                         refund_address: walletAddress
                     };
 
@@ -376,10 +376,10 @@ export default {
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
-                        sendAmount: convertToCoin(this.firoAmount),
+                        sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amount_to,
                         expectedRate: this.expectedRate,
-                        fromFee: convertToCoin(this.firoTransactionFee),
+                        fromFee: bigintToString(this.firoTransactionFee),
                         expectedToFee: this.remoteTransactionFee,
                         status: 'waiting',
                         date: Date.now(),
@@ -393,7 +393,7 @@ export default {
                         currency_from:"firo",
                         currency_to:this.remoteCurrency.toLowerCase(),
                         address_to: this.receiveAddress,
-                        amount_from: convertToCoin(this.firoAmount),
+                        amount_from: bigintToString(this.firoAmount),
                         refund_address: walletAddress,
                     };
 
@@ -417,7 +417,6 @@ export default {
                     const response = r.response;
                     // Sanity check response
                     if (
-                        //response.amount !== convertToCoin(this.firoAmount) ||
                         response.refund_address !== walletAddress ||
                         response.address_to !== this.receiveAddress
                     ) {
@@ -456,10 +455,10 @@ export default {
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
-                        sendAmount: convertToCoin(this.firoAmount),
+                        sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amount_to,
                         expectedRate: this.expectedRate,
-                        fromFee: convertToCoin(this.firoTransactionFee),
+                        fromFee: bigintToString(this.firoTransactionFee),
                         expectedToFee: this.remoteTransactionFee,
                         status: 'waiting',
                         date: Date.now(),

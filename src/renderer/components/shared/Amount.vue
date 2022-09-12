@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import {convertToCoin} from "lib/convert";
+import {bigintToString} from "lib/convert";
 
 export default {
     name: "Amount",
     props: {
         // value in satoshis or as a String whole coin value
         amount: {
-            type: Number | String,
+            type: BigInt | String,
             required: true
         },
 
@@ -24,7 +24,7 @@ export default {
 
     computed: {
         formattedAmount () {
-            if (typeof this.amount === "number") return convertToCoin(this.amount)
+            if (typeof this.amount === "bigint") return bigintToString(this.amount)
             else return this.amount;
         }
     }

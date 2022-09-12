@@ -3,11 +3,11 @@
         <div class="warning-header">
             <div>
                 <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
-                    {{ convertToCoin(availablePublic) }} FIRO and {{ nTokensNeedingAnonymization }} Elysium tokens
+                    {{ bigintToString(availablePublic) }} FIRO and {{ nTokensNeedingAnonymization }} Elysium tokens
                     awaiting anonymization.
                 </span>
                 <span v-else-if="availablePublic && nTokensNeedingAnonymization">
-                    {{ convertToCoin(availablePublic) }} FIRO and 1 Elysium token awaiting anonymization.
+                    {{ bigintToString(availablePublic) }} FIRO and 1 Elysium token awaiting anonymization.
                 </span>
                 <span v-else-if="nTokensNeedingAnonymization > 1">
                     {{ nTokensNeedingAnonymization }} Elysium tokens awaiting anonymization.
@@ -16,7 +16,7 @@
                     1 Elysium token awaiting anonymization.
                 </span>
                 <span v-else-if="availablePublic">
-                    {{ convertToCoin(availablePublic) }} FIRO awaiting anonymization.
+                    {{ bigintToString(availablePublic) }} FIRO awaiting anonymization.
                 </span>
                 <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure
                 {{ nTokensNeedingAnonymization > 1 || availablePublic ? "them" : "it" }}.
@@ -34,7 +34,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import {convertToCoin} from "lib/convert";
+import {bigintToString} from "lib/convert";
 import Popup from "renderer/components/shared/Popup";
 import AnonymizeDialog from "renderer/components/AnonymizeDialog";
 
@@ -66,7 +66,7 @@ export default {
     },
 
     methods: {
-        convertToCoin,
+        bigintToString,
 
         closeDialog() {
             this.showAnonymizeDialog = false;

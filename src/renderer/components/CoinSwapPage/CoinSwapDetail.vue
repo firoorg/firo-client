@@ -78,7 +78,7 @@
 
                         <div class="value">
                             <div v-if="firoTransactionFee">
-                                <span class="amount">{{ convertToCoin(firoTransactionFee) }}</span>
+                                <span class="amount">{{ bigintToString(firoTransactionFee) }}</span>
                                 <span class="ticker">FIRO</span>
                             </div>
                         </div>
@@ -157,7 +157,7 @@ import lodash from 'lodash';
 import { mapGetters } from 'vuex';
 import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro';
 import CoinSwapFlowToFiro from "renderer/components/CoinSwapPage/CoinSwapFlowToFiro";
-import { convertToSatoshi, convertToCoin } from 'lib/convert';
+import { bigintToString, stringToBigint } from 'lib/convert';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
@@ -360,37 +360,16 @@ export default {
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
             // this.availablefiro will still be reactively updated.
-            getMessage: () => `Amount is over your available balance of ${convertToCoin(this.available)} FIRO`,
+            getMessage: () => `Amount is over your available balance of ${bigintToString(this.available)} FIRO`,
 
-            validate: (value) => convertToSatoshi(value) <= this.available
-        });
-
-        this.$validator.extend('privateAmountIsValid', {
-            getMessage: () => 'Amount for private send must be a multiple of 0.05',
-            validate: (value) => {
-                const v = convertToSatoshi(value);
-                return (v % 5e6 === 0) && (v > 0);
-            }
-        });
-
-        this.$validator.extend('privateAmountIsWithinBounds', {
-            getMessage: () => 'Amount for private send may not exceed 500 FIRO',
-            validate: (value) => Number(value) <= 500
+            validate: (value) => stringToBigint(value) <= this.available
         });
 
         this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
             getMessage: () =>
                 `Due to private transaction spend limits, you may not spend more than 1001 FIRO (including fees) in one transaction`,
 
-            validate: (value) => this.subtractFeeFromAmount ? convertToSatoshi(value) <= 1001e8 : convertToSatoshi(value) <= 1000.99e8
-        });
-
-        this.$validator.extend('privateAmountDoesntViolateInputLimits', {
-            getMessage: () =>
-                `Due to private transaction input limits, you can currently spend no more than ` +
-                `${convertToCoin(this.maxPrivateSend)} FIRO in one transaction. Try minting a larger denomination.`,
-
-            validate: (value) => convertToSatoshi(value) <= this.maxPrivateSend
+            validate: (value) => this.subtractFeeFromAmount ? stringToBigint(value) <= 100100000000n : bigintToString(value) <= 100099000000n
         });
 
         for (const [currency, name] of Object.entries(CoinNames)) {
@@ -666,7 +645,7 @@ export default {
         },
 
         satoshiAmount () {
-            return convertToSatoshi(this.amount);
+            return stringToBigint(this.amount);
         },
 
         // We return a string equal to whatever whole-coin amount we expect to receive (either in FIRO or in selectedCoin).
@@ -717,7 +696,7 @@ export default {
     },
 
     methods: {
-        convertToCoin,
+        bigintToString,
 
         cleanupForm(enablePrivate=true) {
             if (enablePrivate) this.isPrivate = true;

@@ -34,7 +34,6 @@ import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
 import ExolixAPIWorker from 'lib/exolix-api';
-import {convertToCoin} from "lib/convert";
 import {mapActions} from "vuex";
 
 export default {
@@ -120,8 +119,6 @@ export default {
         ...mapActions({
             addCoinSwapRecords: 'CoinSwap/addOrUpdateRecords'
         }),
-
-        convertToCoin,
 
         cleanup(emitSuccess=true) {
             this.orderId = '';

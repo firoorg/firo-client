@@ -5,7 +5,7 @@ import fs from 'fs';
 import {assert} from 'chai';
 import {Application} from 'spectron';
 import electron from 'electron';
-import {convertToCoin, convertToSatoshi} from "../src/lib/convert";
+import {bigintToString, stringToBigint} from "../src/lib/convert";
 import {TXO} from "../src/store/modules/Transactions";
 
 interface This extends Mocha.Context {
@@ -377,11 +377,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         const publicBalanceElement = await this.app.client.$('.balance.public .amount-value');
         assert.isTrue(await publicBalanceElement.isExisting());
-        const originalPublicBalance = convertToSatoshi(await publicBalanceElement.getText());
+        const originalPublicBalance = stringToBigint(await publicBalanceElement.getText());
 
         const pendingBalanceElement = await this.app.client.$('.balance.pending .amount-value');
-        let originalPendingBalance = 0;
-        if (await pendingBalanceElement.isExisting()) originalPendingBalance = convertToSatoshi(await pendingBalanceElement.getText());
+        let originalPendingBalance = 0n;
+        if (await pendingBalanceElement.isExisting()) originalPendingBalance = stringToBigint(await pendingBalanceElement.getText());
 
         await (await this.app.client.$('#anonymize-firo-link')).click();
         await (await this.app.client.$('.passphrase-input')).waitForExist();
@@ -399,11 +399,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
 
         await this.app.client.waitUntil(async () =>
-            !await publicBalanceElement.isExisting() || convertToSatoshi(await publicBalanceElement.getText()) < 0.001e8,
+            !await publicBalanceElement.isExisting() || stringToBigint(await publicBalanceElement.getText()) < 100000n,
             {timeoutMsg: "public balance should be below 0.001 FIRO", timeout: 5e3}
         );
         await this.app.client.waitUntil(async () =>
-            convertToSatoshi(await pendingBalanceElement.getText()) > originalPublicBalance - 0.1e8,
+                stringToBigint(await pendingBalanceElement.getText()) > originalPublicBalance - 10000000n,
             {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds", timeout: 5e3}
         );
     });
@@ -486,8 +486,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', ['generate 1']);
 
             const sendAddress = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
-            const satoshiAmountToSend = 1e8 + Math.floor(1e8 * Math.random());
-            const amountToSend = convertToCoin(satoshiAmountToSend);
+            const satoshiAmountToSend = 100000000n + BigInt(Math.floor(1e8 * Math.random()));
+            const amountToSend = bigintToString(satoshiAmountToSend);
 
             await (await this.app.client.$('a[href="#/send')).click();
             await (await this.app.client.$('.send-page')).waitForExist();
@@ -549,11 +549,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             const availableUTXOs = lodash.shuffle(
                 <TXO[]>await this.app.client.execute((isPrivate) => {
                     return (<any>window).$store.getters['Transactions/availableUTXOs']
-                        .filter(tx => tx.isPrivate === isPrivate);
+                        .filter(tx => tx.isPrivate === isPrivate)
+                        .map(tx => ({...tx, amount: String(tx.amount)}));
                 }, paymentType === 'private')
-            );
+            ).map(tx => ({...tx, amount: BigInt(tx.amount)}));
             const selectedUTXOs = [];
-            let selectedUTXOsAmount = 0;
+            let selectedUTXOsAmount = 0n;
             for (const utxo of availableUTXOs) {
                 if (selectedUTXOsAmount >= satoshiAmountToSend) break;
                 selectedUTXOsAmount += utxo.amount;
@@ -595,13 +596,13 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             assert.isAtLeast(txFeePerKb, 1);
             if (customTransactionFee) {
                 assert(computedTxFeeElement.isExisting);
-                const originalFee = convertToSatoshi(await computedTxFeeElement.getText());
+                const originalFee = stringToBigint(await computedTxFeeElement.getText());
 
                 txFeePerKb = Math.min(999999, txFeePerKb*2);
                 await txFeeInput.setValue(txFeePerKb);
-                await sendButton.waitUntil(async () => convertToSatoshi(await computedTxFeeElement.getText()) > originalFee);
+                await sendButton.waitUntil(async () => stringToBigint(await computedTxFeeElement.getText()) > originalFee);
             }
-            const satoshiExpectedFee = convertToSatoshi(await computedTxFeeElement.getText());
+            const satoshiExpectedFee = stringToBigint(await computedTxFeeElement.getText());
 
             await sendButton.waitForEnabled();
             await sendButton.click();
@@ -659,31 +660,20 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             await (await this.app.client.$('a[href="#/transactions')).click();
 
-            let txOut: TXO;
-            await this.app.client.waitUntil(async () => {
-                txOut = await this.app.client.executeScript(
-                    "return Object.values($store.getters['Transactions/TXOs']).find(tx => " +
-                        "(arguments[2] ? tx.amount + tx.fee : tx.amount) === arguments[0] && " +
-                        "tx.inputPrivacy === (arguments[1] ? 'lelantus' : 'public') && " +
-                        "tx.scriptType === 'pay-to-public-key-hash' && " +
-                        "!tx.isChange" +
-                    ")",
-                    [satoshiAmountToSend, paymentType === 'private', subtractTransactionFee]
-                );
-                return !!txOut;
-            }, {timeout: 5e3});
-            assert.exists(txOut);
+            await (await this.app.client.$('.unconfirmed')).waitForExist({timeout: 5e3});
 
-            const txinfo = (await this.app.client.executeAsyncScript('$daemon.legacyRpc(`getrawtransaction ${arguments[0]} true`).then(arguments[1])', [txOut.txid])).result;
-            assert.equal(txOut.fee, satoshiExpectedFee, `actual fee was not equal to calculated fee (size ${txinfo.size}, vsize ${txinfo.vsize}, expected fee/kb ${txFeePerKb}, txid ${txOut.txid})`);
+            await (await this.app.client.$('td')).click();
+            await (await this.app.client.$('.info-popup')).waitForExist();
 
-            const amountToReceive = convertToCoin(txOut.amount);
+            const txid = await (await this.app.client.$('.txid')).getText();
+            const fee = stringToBigint(await (await this.app.client.$('.fee .amount-value')).getText());
+            const amountReceived = stringToBigint(await (await this.app.client.$('.received-amount .amount-value')).getText());
 
-            // The type signature of timeout on waitUntilTextExists is incorrect.
-            await this.app.client.waitUntilTextExists('.incoming-outgoing .amount-value', amountToReceive, <any>{timeout: 10e3});
+            await (await this.app.client.$('.txinfo-ok')).click();
+            await (await this.app.client.$('.info-popup')).waitForExist({reverse: true});
 
-            // Wait to make sure coin control entries are updated.
-            await new Promise(r => setTimeout(r, 1e3));
+            assert.equal(fee, satoshiExpectedFee, `actual fee was not equal to calculated fee (expected fee/kb ${txFeePerKb}, txid ${txid})`);
+            assert.equal(amountReceived, subtractTransactionFee ? satoshiAmountToSend - fee : satoshiAmountToSend, 'amount received not equal to expected value');
 
             if (coinControl) {
                 await (await this.app.client.$('a[href="#/send"]')).click();
@@ -736,9 +726,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await (await this.app.client.$('a[href="#/send"]')).click();
 
             const balanceElement = await this.app.client.$(`.balance .${balanceType} .amount`);
-            let balance = 0;
+            let balance = 0n;
             if (await balanceElement.isExisting()) {
-                balance = convertToSatoshi(await balanceElement.getText());
+                balance = stringToBigint(await balanceElement.getText());
             }
 
             if (balanceType === 'public') {
@@ -757,11 +747,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             await (await this.app.client.$('#custom-inputs-button')).click();
             await (await this.app.client.$('#popup .animated-table')).waitForExist();
-            let sumOfInputs = 0;
+            let sumOfInputs = 0n;
             while (true) {
                 sumOfInputs = (await Promise.all(
                     (await this.app.client.$$('#popup .amount-value')).map(async e =>
-                        convertToSatoshi(await e.getText())
+                        stringToBigint(await e.getText())
                     )
                 )).reduce((a, x) => a + x, sumOfInputs);
 
@@ -771,7 +761,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
 
             try {
-                assert.equal(convertToCoin(sumOfInputs), convertToCoin(balance), `expected - actual == ${convertToCoin(balance - sumOfInputs)}`);
+                assert.equal(bigintToString(sumOfInputs), bigintToString(balance), `expected - actual == ${bigintToString(balance - sumOfInputs)}`);
             } finally {
                 const closePopupButton = await this.app.client.$('#popup button.recommended');
                 await closePopupButton.click();
@@ -781,6 +771,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     }
 
     async function testCreateElysiumToken(this: This) {
+        this.timeout(100e3);
+
         // Make sure our token will be the first in the list so tests work.
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
 
@@ -829,6 +821,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('allows creating an Elysium token', testCreateElysiumToken);
 
     async function testAnonymizesElysiumTokens(this: This): Promise<string> {
+        this.timeout(60e3);
+
         await testCreateElysiumToken.bind(this)();
 
         await (await this.app.client.$('a[href="#/transactions"')).click();
@@ -836,30 +830,35 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await (await this.app.client.$('tr:nth-child(2)')).click();
 
         const id = await (await this.app.client.$('.elysium-property-creation-tx .txid')).getText();
-        const creationAmount = Number(await (await this.app.client.$('.received-amount .amount-value')).getText()) * 1e8;
+        const creationAmount = stringToBigint(await (await this.app.client.$('.received-amount .amount-value')).getText());
         await (await this.app.client.$('button.recommended')).click();
 
-        const beforeBalances: {priv: number, pending: number} =
-            await this.app.client.executeScript('return $store.getters["Elysium/aggregatedBalances"][arguments[0]]', [id]);
-        assert.equal(beforeBalances.priv, 0);
-        assert.equal(beforeBalances.pending, creationAmount);
+        const getABScript =
+            'const ab = $store.getters["Elysium/aggregatedBalances"][arguments[0]];' +
+            'return {priv: `${ab.priv}`, pub: `${ab.pub}`, pending: `${ab.pending}`}';
+        const transformAB = (bbS: any) : {priv: bigint, pub: bigint, pending: bigint} => ({
+            priv: BigInt(bbS.priv),
+            pub: BigInt(bbS.pub),
+            pending: BigInt(bbS.pending)
+        });
+        const getBalances = async (id: string) => transformAB(await this.app.client.executeScript(getABScript, [id]));
+        const waitForBalance = async (priv: bigint, pub: bigint, pending: bigint) => {
+            await this.app.client.waitUntil(async () => {
+                const balances = await getBalances(id);
+                return balances.priv === priv && balances.pub === pub && balances.pending === pending;
+            }, {timeout: 5e3});
+        }
+
+        await waitForBalance(0n, creationAmount, 0n);
 
         await (await this.app.client.$('#anonymize-firo-link')).click();
         await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase);
         await (await this.app.client.$('.passphrase-input button.confirm')).click();
         await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
 
-        // Transactions haven't been confirmed yet.
-        assert.equal(beforeBalances.priv, 0);
-        assert.equal(beforeBalances.pending, creationAmount);
-
+        await waitForBalance(0n, 0n, creationAmount);
         await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
-
-        await this.app.client.waitUntil(async () => {
-            const afterBalances: {priv: number, pending: number} =
-                await this.app.client.executeScript('return $store.getters["Elysium/aggregatedBalances"][arguments[0]]', [id]);
-            return afterBalances.priv === creationAmount && afterBalances.pending === 0;
-        }, {timeout: 5e3});
+        await waitForBalance(creationAmount, 0n, 0n);
 
         return id;
     }
@@ -873,8 +872,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.executeScript('setSelectedAsset(arguments[0]);', [id]);
 
         const recipient = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
-        const satoshiAmountToSend = 1e8 + Math.floor(1e8 * Math.random());
-        const amountToSend = convertToCoin(satoshiAmountToSend);
+        const satoshiAmountToSend = 100000000n + BigInt(Math.floor(1e8 * Math.random()));
+        const amountToSend = bigintToString(satoshiAmountToSend);
 
         await (await this.app.client.$('#address')).setValue(recipient);
         await (await this.app.client.$('#amount')).setValue(amountToSend);
@@ -913,11 +912,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.app.client.waitUntil(async () => {
             txOut = await this.app.client.executeScript(
                 "return Object.values($store.getters['Transactions/TXOs']).find(tx => " +
-                "tx.elysium?.amount === arguments[0] && " +
+                "tx.elysium && tx.elysium.amount === BigInt(arguments[0]) && " +
                 "!tx.amount && " +
                 "!tx.isChange" +
                 ")",
-                [satoshiAmountToSend]
+                [String(satoshiAmountToSend)]
             );
             return !!txOut;
         }, {timeout: 5e3});

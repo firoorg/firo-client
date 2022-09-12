@@ -158,7 +158,7 @@
                         :address="address"
                         :amount="satoshiAmount"
                         :tx-fee-per-kb="txFeePerKb"
-                        :computed-tx-fee="transactionFee || 0"
+                        :computed-tx-fee="transactionFee"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
                         @success="() => (feeMap = {}) && cleanupForm()"
@@ -178,7 +178,7 @@
 import { mapGetters } from 'vuex';
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress, isValidPaymentCode} from 'lib/isValidAddress';
-import {convertToSatoshi, convertToCoin} from 'lib/convert';
+import {bigintToString, stringToBigint} from 'lib/convert';
 import Dropdown from "renderer/components/shared/Dropdown";
 import Amount from "renderer/components/shared/Amount";
 import InputSelection from "renderer/components/SendPage/InputSelection";
@@ -269,7 +269,7 @@ export default {
 
         transactionFee() {
             if (this.selectedAsset != 'FIRO' || !this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
-            return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined);
+            return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
         },
 
         formDisabled() {
@@ -277,7 +277,7 @@ export default {
         },
 
         txFeePerKb() {
-            return Number(this.userTxFeePerKb) || this.smartFeePerKb;
+            return BigInt(this.userTxFeePerKb) || this.smartFeePerKb;
         },
 
         filteredSendAddresses () {
@@ -296,7 +296,7 @@ export default {
         },
 
         coinControlSelectedAmount () {
-            return this.customInputs.reduce((a, txo) => a + txo.amount, 0);
+            return this.customInputs.reduce((a, txo) => a + txo.amount, 0n);
         },
 
         available () {
@@ -313,7 +313,7 @@ export default {
 
         // This is the amount the user entered in satoshis.
         satoshiAmount () {
-            return (this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ? convertToSatoshi(this.amount) : Number(this.amount);
+            return (this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ? stringToBigint(this.amount) : BigInt(this.amount);
         },
 
         // This is the amount the user will receive. It may be less than satoshiAmount.
@@ -328,7 +328,7 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0 && this.available >= this.totalAmount));
+            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount));
         },
 
         isValidated () {
@@ -437,11 +437,11 @@ export default {
             // this.availableXzc will still be reactively updated.
             getMessage: () => {
                 if (this.useCustomInputs)
-                    return `Amount (including fees) is over the sum of your selected coins, ${convertToCoin(this.coinControlSelectedAmount)} FIRO`;
+                    return `Amount (including fees) is over the sum of your selected coins, ${bigintToString(this.coinControlSelectedAmount)} FIRO`;
                 else if (this.selectedAsset == 'FIRO')
-                    return `Amount (including fees) is over your available balance of ${convertToCoin(this.available)} FIRO`;
+                    return `Amount (including fees) is over your available balance of ${bigintToString(this.available)} FIRO`;
                 else if (this.tokenData[this.selectedAsset].isDivisible)
-                    return `Amount (including fees) is over your available balance of ${convertToCoin(this.available)} ${this.ticker}`;
+                    return `Amount (including fees) is over your available balance of ${bigintToString(this.available)} ${this.ticker}`;
                 else
                     return `Amount (including fees) is over your available balance of ${this.available} ${this.ticker}`;
             },
@@ -478,8 +478,6 @@ export default {
     },
 
     methods: {
-        convertToCoin,
-
         setSelectedAsset(id) {
             this.selectedAsset = id;
         },

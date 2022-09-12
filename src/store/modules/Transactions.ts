@@ -1,5 +1,4 @@
 import {Transaction, TxOut, CoinControl, ElysiumData} from '../../daemon/firod';
-import Vue from "vue";
 import {cloneDeep, fromPairs} from "lodash";
 
 export interface TXO extends TxOut {
@@ -22,7 +21,7 @@ export interface TXO extends TxOut {
     validAt: number;
     firstSeenAt: number;
     isFromMe: boolean;
-    fee: number;
+    fee: bigint;
     spendSize?: number; // undefined if unknown
     elysium?: ElysiumData;
     lelantusInputSerialHashes?: string[];
@@ -135,18 +134,18 @@ const mutations = {
     }
 };
 
-function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [number, TXO[]] {
-    const constantSize = isPrivate ? 1234 : 78;
+function selectUTXOs(isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
+    const constantSize = isPrivate ? 1234n : 78n;
 
     if (coinControl) {
         if (availableUTXOs.find(utxo => utxo.isPrivate != isPrivate)) return undefined;
 
         // assume 5000 as the signature size for unknown outputs.
-        const totalSize = constantSize + availableUTXOs.reduce((a, utxo) => a + utxo.spendSize || 5000, 0);
-        const gathered = availableUTXOs.reduce((a, utxo) => a + utxo.amount, 0);
+        const totalSize = constantSize + availableUTXOs.reduce((a, utxo) => a + BigInt(utxo.spendSize) || 5000n, 0n);
+        const gathered = availableUTXOs.reduce((a, utxo) => a + utxo.amount, 0n);
 
-        let fee = Math.floor(totalSize / 1000 * feePerKb);
-        if (fee === 0) fee = 1;
+        let fee = (totalSize * feePerKb) / 1000n ;
+        if (fee === 0n) fee = 1n;
 
         if (subtractFeeFromAmount && fee >= amount) return undefined;
         if (gathered < (subtractFeeFromAmount ? amount : amount + fee)) {
@@ -158,21 +157,21 @@ function selectUTXOs(isPrivate: boolean, amount: number, feePerKb: number, subtr
 
     const utxos = availableUTXOs
         .filter(utxo => utxo.isPrivate == isPrivate)
-        .sort((a, b) => b.amount - a.amount);
+        .sort((a, b) => Number(b.amount - a.amount));
 
     let totalSize = constantSize;
-    let gathered = 0;
+    let gathered = 0n;
 
     const selectedUTXOs = [];
     while (utxos.length) {
         const utxo = utxos.length % 2 ? utxos.shift() : utxos.pop();
 
         gathered += utxo.amount;
-        totalSize += utxo.spendSize;
+        totalSize += BigInt(utxo.spendSize);
         selectedUTXOs.push(utxo);
 
-        let fee = Math.floor(totalSize / 1000 * feePerKb);
-        if (fee === 0) fee = 1;
+        let fee = (totalSize * feePerKb) / 1000n;
+        if (fee === 0n) fee = 1n;
 
         if (subtractFeeFromAmount && amount <= fee) continue;
         if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) {
@@ -234,25 +233,25 @@ const getters = {
                 !(txo.elysium && !txo.isElysiumReferenceOutput) &&
                 !(txo.isElysiumReferenceOutput && txo.index !== 1) &&
                 !(txo.isElysiumReferenceOutput && !rootGetters['App/enableElysium']) &&
-                !(txo.isElysiumReferenceOutput && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium?.property?.creationTx)) &&
-                !((txo.blockHeight || !txo.isFromMe) && txo.elysium?.valid === false) &&
-                !(txo.elysium?.type === 'Lelantus Mint') &&
+                !(txo.isElysiumReferenceOutput && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
+                !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
+                !(txo.elysium.type === 'Lelantus Mint') &&
                 (txo.isElysiumReferenceOutput || txo.destination) &&
                 (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
-                (txo.isFromMe || txo.isToMe || txo.elysium?.isToMe)
+                (txo.isFromMe || txo.isToMe || txo.elysium.isToMe)
         )
         .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 
-    selectInputs: (state, getters): (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean) => CoinControl => {
+    selectInputs: (state, getters): (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean) => CoinControl => {
         getters.availableUTXOs;
-        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean): CoinControl => {
+        return (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean): CoinControl => {
             return selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs, false)[1].map(utxo => [utxo.txid, utxo.index]);
         }
     },
 
-    calculateTransactionFee: (state, getters): (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => number => {
+    calculateTransactionFee: (state, getters): (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => bigint => {
         getters.availableUTXOs;
-        return (isPrivate: boolean, amount: number, feePerKb: number, subtractFeeFromAmount: boolean, coinControl?: TXO[]): number => {
+        return (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => {
             const x = selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
             return x && x[0];
         };

@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import {convertToCoin} from "lib/convert";
 import {mapGetters} from "vuex";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
@@ -37,8 +36,6 @@ export default {
     }),
 
     methods: {
-        convertToCoin,
-
         cancel() {
             this.passphrase = '';
             this.error = null;

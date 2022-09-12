@@ -76,7 +76,7 @@ export default {
         ourUnspentUTXOs() {
             return this.availableUTXOs
                 .filter(tx => tx.isPrivate === this.isPrivate)
-                .sort((a, b) => (b.amount - a.amount) || a.txid.localeCompare(b.txid));
+                .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index);
         }
     },
 

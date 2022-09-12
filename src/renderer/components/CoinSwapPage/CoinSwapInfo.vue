@@ -142,7 +142,6 @@
 
 <script>
 // $emits: cancel, confirm
-import { convertToCoin } from 'lib/convert'
 import Amount from "renderer/components/shared/Amount";
 import QRCode from "easyqrcodejs";
 import TransactionId from "renderer/components/shared/TransactionId";
@@ -186,8 +185,6 @@ export default {
     },
 
     methods: {
-        convertToCoin,
-
         displayQrCode() {
             if (!this.showQrCode) return;
 

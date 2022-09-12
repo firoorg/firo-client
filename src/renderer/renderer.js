@@ -6,7 +6,6 @@ import AsyncComputed from "vue-async-computed";
 import Focus from 'renderer/directives/focus'
 
 import {isEqual} from 'lodash';
-import Big from 'big.js';
 import {existsSync} from 'fs';
 
 const electron = require('electron');
@@ -22,7 +21,7 @@ import store from '../store/renderer'
 
 import firod from '../daemon/init'
 import {getAppSettings} from "lib/utils";
-import {convertToCoin} from "lib/convert";
+import {bigintToString, stringToBigint} from "lib/convert";
 
 import { createLogger } from 'lib/logger';
 import process from "process";
@@ -69,6 +68,7 @@ store.dispatch('CoinSwap/readRecordsFromFile').then(() => {
 });
 
 window.$addElysiumTokenData = async () => {
+    if (!$store.getters['App/enableElysium']) return;
     const tokensNeedingData = $store.getters['Elysium/selectedAndOwnedTokens'].filter(token => !$store.getters['Elysium/tokenData'][token]);
     if (!tokensNeedingData.length) return;
 
@@ -216,14 +216,14 @@ app.on('open-url', (event, url) => {
     const m = (pattern) => (url.match(pattern) || [])[1];
 
     const address = m(/^firo:\/\/(\w+)/);
-    const amount = m(/[?&]amount=([0-9]+)/);
+    const amount = m(/[?&]amount=([0-9\.]+)/);
     const label = m(/[?&]message=([^&]+)/);
 
     router.push({
         path: '/send',
         query: {
             address: address,
-            amount: amount && convertToCoin(amount),
+            amount: amount && bigintToString(stringToBigint(amount)),
             label: decodeURI(label || '')
         }
     });
@@ -268,7 +268,7 @@ window.$startDaemon = () => new Promise(resolve => {
                 const action = (await $daemon.isReindexing()) ? 'reindex' : 'rescan';
 
                 let interval = setInterval(async () => {
-                    const progress = Big(((await $daemon.apiStatus()).data.reindexingProgress || 0) * 100).round(3).toString();
+                    const progress = (((await $daemon.apiStatus()).data.reindexingProgress || 0) * 100).round(3).toString();
                     $setWaitingReason(`(${progress}%) Waiting for firod to ${action}. This may take an extremely long time...`);
                 }, 500);
 

@@ -129,7 +129,7 @@
 
             <tr>
                 <td>Fee</td>
-                <td><Amount :amount="tx.fee" ticker="FIRO" /></td>
+                <td class="fee"><Amount :amount="tx.fee" ticker="FIRO" /></td>
             </tr>
 
             <tr>
@@ -140,7 +140,7 @@
         </table>
 
         <div class="buttons">
-            <button class="solid-button recommended" @click="$emit('ok')">
+            <button class="solid-button recommended txinfo-ok" @click="$emit('ok')">
                 OK
             </button>
         </div>

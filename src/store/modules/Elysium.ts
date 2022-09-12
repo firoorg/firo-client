@@ -51,10 +51,10 @@ const actions = {
 
 interface ElysiumBalances {
     [id: string]: {
-        priv: number,
-        privUnconfirmed: number,
+        priv: bigint,
+        privUnconfirmed: bigint,
         pub: {
-            [address: string]: number
+            [address: string]: bigint
         };
     };
 }
@@ -67,9 +67,9 @@ const getters = {
             if (!e || (txo.blockHeight && !e.valid) || txo.scriptType !== 'elysium' || !e.property || !e.amount) continue;
 
             const id = e.property.creationTx;
-            r[id] = r[id] || {priv: 0, privUnconfirmed: 0, pub: {}};
-            if (e.sender && txo.isFromMe && !r[id].pub[e.sender]) r[id].pub[e.sender] = 0;
-            if (e.isToMe && !r[id].pub[e.receiver]) r[id].pub[e.receiver] = 0;
+            r[id] = r[id] || {priv: 0n, privUnconfirmed: 0n, pub: {}};
+            if (e.sender && txo.isFromMe && !r[id].pub[e.sender]) r[id].pub[e.sender] = 0n;
+            if (e.isToMe && !r[id].pub[e.receiver]) r[id].pub[e.receiver] = 0n;
 
             if (e.type == "Lelantus Mint" && txo.isFromMe) {
                 if (e.valid) r[id].priv += e.amount;
@@ -82,7 +82,7 @@ const getters = {
             } else if (e.type == "Lelantus JoinSplit") {
                 if (txo.isFromMe && (e.valid || !txo.blockHeight)) r[id].priv -= e.amount;
                 if (txo.isFromMe && !txo.blockHeight) {
-                    if (e.joinmintAmount >= 0) {
+                    if (e.joinmintAmount >= 0n) {
                         r[id].priv -= e.joinmintAmount;
                         r[id].privUnconfirmed += e.joinmintAmount;
                     } else {
@@ -110,7 +110,7 @@ const getters = {
         for (const [token, data] of Object.entries(<ElysiumBalances>getters.balances)) {
             r[token] = {
                 priv: data.priv,
-                pub: Object.values(data.pub).reduce((a, x) => a + x, 0),
+                pub: Object.values(data.pub).reduce((a, x) => a + x, 0n),
                 pending: data.privUnconfirmed
             };
         }
@@ -132,20 +132,19 @@ const getters = {
     // This is the total issued amount of property tokens created by us. Note that it is possible to change the manager
     // of an Elysium token, and if this is done, the data returned here will be wrong. It's not possible to do that from
     // our UI.
-    totalIssued: (state, getters, rootState, rootGetters): {[property: number]: number} => {
-        const r: {[property: string]: number} = {};
+    totalIssued: (state, getters, rootState, rootGetters): {[property: number]: bigint} => {
+        const r: {[property: string]: bigint} = {};
         for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
-            const p = txo?.elysium?.property?.creationTx;
+            const p = txo.elysium && txo.elysium.property && txo.elysium.property.creationTx;
             if (
+                !p ||
                 txo.scriptType != "elysium" ||
                 !txo.isFromMe ||
-                (!txo?.elysium?.valid && txo.blockHeight) ||
-                txo?.elysium?.type != "Grant Property Tokens" ||
-                !p
+                (!txo.elysium.valid && txo.blockHeight) ||
+                txo.elysium.type != "Grant Property Tokens"
             ) continue;
-            console.log(txo);
 
-            r[p] = (r[p] || 0) + txo?.elysium?.amount;
+            r[p] = (r[p] || 0n) + (txo.elysium.amount || 0n);
         }
         return r;
     },

@@ -3,7 +3,7 @@ import {TXO} from "./Transactions";
 const getters = {
     balances: (state, getters, rootState, rootGetters) => {
         let [availablePrivate, unconfirmedPrivate, unconfirmedPrivateChange, availablePublic, unconfirmedPublic,
-             unconfirmedPublicChange, locked, immature] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+             unconfirmedPublicChange, locked, immature] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {

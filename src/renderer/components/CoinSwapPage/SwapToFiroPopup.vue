@@ -72,7 +72,6 @@
 
 <script>
 // $emits: cancel, confirm
-import { convertToCoin } from 'lib/convert'
 import Amount from "renderer/components/shared/Amount";
 import QRCode from "easyqrcodejs";
 
@@ -122,8 +121,6 @@ export default {
     },
 
     methods: {
-        convertToCoin,
-
         makeQrCode() {
             if (this.qrCode) {
                 this.qrCode.makeCode(this.exchangeAddress);

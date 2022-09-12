@@ -25,7 +25,6 @@
 <script>
 // $emits: toggle (isPrivate)
 import {mapGetters} from "vuex";
-import {convertToCoin} from "lib/convert";
 import Amount from "renderer/components/shared/Amount";
 
 export default {
@@ -75,8 +74,6 @@ export default {
     },
 
     methods: {
-        convertToCoin,
-
         adjustAmount(amount) {
             return this.asset == 'FIRO' || this.tokenData[this.asset]?.isDivisible ? amount : `${amount}`;
         },

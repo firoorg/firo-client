@@ -38,7 +38,6 @@
 
 <script>
 // $emits: cancel, confirm
-import { convertToCoin } from 'lib/convert'
 import Amount from "renderer/components/shared/Amount";
 import { VueSelect } from 'vue-select';
 
@@ -46,7 +45,7 @@ export default {
     name: 'CoinSwapChain',
 
     components: {
-        
+
         VueSelect,
         Amount
     },
@@ -74,18 +73,17 @@ export default {
     },
 
     mounted() {
-        
-        
+
+
     },
 
     computed: {
-        
+
     },
 
     methods: {
-        convertToCoin,
 
-        
+
     }
 }
 </script>
