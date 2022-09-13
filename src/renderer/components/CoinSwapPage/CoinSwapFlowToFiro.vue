@@ -35,6 +35,7 @@ import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
 import ExolixAPIWorker from 'lib/exolix-api';
 import {mapActions} from "vuex";
+import {bigintToString} from "lib/convert";
 
 export default {
     name: 'CoinSwapFlowToFiro',
@@ -57,55 +58,20 @@ export default {
             error: null,
             show: 'button',
             passphrase: '',
-            conversionRate: '',
             coinSwapRecord: null
         };
     },
 
     props: {
-        disabled: {
-            required: true,
-            type: Boolean
-        },
-
-        //This is the name of the chain(ex: ChangeNow or StealthEx) that is selected on Swap page
-        chainName: {
-            type: String
-        },
-
-        // e.g. "USDT"
-        remoteCurrency: {
-            type: String,
-        },
-
-        // This is a decimal STRING representing a whole coin amount of FIRO that you are expected to receive.
-        firoAmount: {
-            type: String,
-        },
-
-        // This is a decimal STRING representing a whole coin amount (NOT satoshi) AFTER all fees are calculated.
-        remoteAmount: {
-            type: String,
-        },
-
-        // This is a decimal STRING representing a whole coin amount of FIRO that will be charged as a fee.
-        firoTransactionFee: {
-            type: String,
-        },
-
-        // The address that funds will be refunded at if the trade fails for some reason.
-        refundAddress: {
-            type: String
-        },
-
-        // The expected amount of FIRO we will receive for each remoteCurrency, as a string whole-coin amount.
-        expectedRate: {
-            type: String
-        },
-
-        quotaId: {
-            type: String,
-        },
+        disabled: Boolean,
+        chainName: String,
+        remoteCurrency: String,
+        firoAmount: BigInt,
+        remoteAmount: BigInt,
+        firoTransactionFee: BigInt,
+        refundAddress: String,
+        expectedRate: BigInt,
+        quotaId: String
     },
 
     created() {
@@ -148,7 +114,7 @@ export default {
                         to:"firo",
                         address: walletAddress,
                         refundAddress: this.refundAddress,
-                        amount: this.remoteAmount
+                        amount: bigintToString(this.remoteAmount)
                     };
 
                     this.$log.info("Posting order: %O", order);
@@ -199,16 +165,16 @@ export default {
                         orderId: response.id,
                         fromCoin: this.remoteCurrency,
                         toCoin: 'FIRO',
-                        sendAmount: this.remoteAmount,
-                        expectedAmountToReceive: this.firoAmount,
+                        sendAmount: bigintToString(this.remoteAmount),
+                        expectedAmountToReceive: bigintToString(this.firoAmount),
                         fromFee: null,
-                        expectedToFee: this.firoTransactionFee,
+                        expectedToFee: bigintToString(this.firoTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.payinAddress,
                         refundAddress: this.refundAddress,
                         receiveAddress: walletAddress,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         _response: response
                     };
                 } else if (this.chainName === "StealthEx"){
@@ -216,7 +182,7 @@ export default {
                         currency_from:this.remoteCurrency.toLowerCase(),
                         currency_to:"firo",
                         address_to: walletAddress,
-                        amount_from: this.remoteAmount,
+                        amount_from: bigintToString(this.remoteAmount),
                         refund_address: this.refundAddress,
                     };
 
@@ -268,16 +234,16 @@ export default {
                         orderId: response.id,
                         fromCoin: this.remoteCurrency,
                         toCoin: 'FIRO',
-                        sendAmount: this.remoteAmount,
+                        sendAmount: bigintToString(this.remoteAmount),
                         expectedAmountToReceive: response.amount_to,
                         fromFee: null,
-                        expectedToFee: this.firoTransactionFee,
+                        expectedToFee: bigintToString(this.firoTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.address_from,
                         refundAddress: this.refundAddress,
                         receiveAddress: response.address_to,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         _response: response
                     };
                 } else if (this.chainName === "Swapzone"){
@@ -286,7 +252,7 @@ export default {
                         to:"firo",
                         addressReceive: walletAddress,
                         refundAddress: this.refundAddress,
-                        amountDeposit: this.remoteAmount,
+                        amountDeposit: bigintToString(this.remoteAmount),
                         quotaId: this.quotaId
                     };
 
@@ -338,16 +304,16 @@ export default {
                         orderId: response.id,
                         fromCoin: this.remoteCurrency,
                         toCoin: 'FIRO',
-                        sendAmount: this.remoteAmount,
+                        sendAmount: bigintToString(this.remoteAmount),
                         expectedAmountToReceive: response.amountEstimated,
                         fromFee: null,
-                        expectedToFee: this.firoTransactionFee,
+                        expectedToFee:bigintToString( this.firoTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.addressDeposit,
                         refundAddress: this.refundAddress,
                         receiveAddress: response.addressReceive,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         _response: response
                     };
                 } else if (this.chainName === "Exolix"){
@@ -355,7 +321,7 @@ export default {
                         coin_from:this.remoteCurrency,
                         coin_to:"FIRO",
                         destination_address: walletAddress,
-                        deposit_amount: this.remoteAmount,
+                        deposit_amount: bigintToString(this.remoteAmount),
                         refund_address: this.refundAddress
                     };
 
@@ -407,16 +373,16 @@ export default {
                         orderId: response.id,
                         fromCoin: this.remoteCurrency,
                         toCoin: 'FIRO',
-                        sendAmount: this.remoteAmount,
+                        sendAmount: bigintToString(this.remoteAmount),
                         expectedAmountToReceive: response.amount_to,
                         fromFee: null,
-                        expectedToFee: this.firoTransactionFee,
+                        expectedToFee: bigintToString(this.firoTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.deposit_address,
                         refundAddress: response.refund_address,
                         receiveAddress: response.destination_address,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         _response: response
                     };
                 }                 

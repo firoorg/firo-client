@@ -68,61 +68,19 @@ export default {
     },
 
     props: {
-        disabled: {
-            required: true,
-            type: Boolean
-        },
-
-        isPrivate: {
-            type: Boolean
-        },
-
-        //This is the name of the chain(ex: ChangeNow or StealthEx) that is selected on Swap page
-        chainName: {
-            type: String
-        },
-
-        txFeePerKb: {
-            type: Number
-        },
-
+        disabled: Boolean,
+        isPrivate: Boolean,
+        chainName: String,
+        txFeePerKb: BigInt,
         // e.g. "USDT"
-        remoteCurrency: {
-            type: String,
-        },
-
-        // This is a normal satoshi amount of FIRO.
-        firoAmount: {
-            type: Number,
-        },
-
-        // This is a decimal STRING representing a whole coin amount (NOT satoshi) AFTER all fees are calculated.
-        remoteAmount: {
-            type: String,
-        },
-
-        // This is a normal satoshi amount of FIRO.
-        firoTransactionFee: {
-            type: Number,
-        },
-
-        // This is a decimal STRING representing a whole coin amount, NOT satoshi
-        remoteTransactionFee: {
-            type: String,
-        },
-
-        // The address that funds will be received at.
-        receiveAddress: {
-            type: String,
-        },
-
-        expectedRate: {
-            type: String,
-        },
-
-        quotaId: {
-            type: String,
-        }
+        remoteCurrency: String,
+        firoAmount: BigInt,
+        remoteAmount: BigInt,
+        firoTransactionFee: BigInt,
+        remoteTransactionFee: BigInt,
+        receiveAddress: String,
+        expectedRate: BigInt,
+        quotaId: String
     },
 
     created() {
@@ -220,9 +178,9 @@ export default {
                         toCoin: this.remoteCurrency,
                         sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amount,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         fromFee: bigintToString(this.firoTransactionFee),
-                        expectedToFee: this.remoteTransactionFee,
+                        expectedToFee: bigintToString(this.remoteTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.payinAddress,
@@ -300,9 +258,9 @@ export default {
                         toCoin: this.remoteCurrency,
                         sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amountEstimated,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         fromFee: bigintToString(this.firoTransactionFee),
-                        expectedToFee: this.remoteTransactionFee,
+                        expectedToFee: bigintToString(this.remoteTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.addressDeposit,
@@ -378,9 +336,9 @@ export default {
                         toCoin: this.remoteCurrency,
                         sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amount_to,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         fromFee: bigintToString(this.firoTransactionFee),
-                        expectedToFee: this.remoteTransactionFee,
+                        expectedToFee: bigintToString(this.remoteTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.deposit_address,
@@ -457,9 +415,9 @@ export default {
                         toCoin: this.remoteCurrency,
                         sendAmount: bigintToString(this.firoAmount),
                         expectedAmountToReceive: response.amount_to,
-                        expectedRate: this.expectedRate,
+                        expectedRate: bigintToString(this.expectedRate),
                         fromFee: bigintToString(this.firoTransactionFee),
-                        expectedToFee: this.remoteTransactionFee,
+                        expectedToFee: bigintToString(this.remoteTransactionFee),
                         status: 'waiting',
                         date: Date.now(),
                         exchangeAddress: response.address_from,
@@ -498,11 +456,11 @@ export default {
 
             try {
                 if (this.isPrivate) {
-                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount,
-                        this.txFeePerKb, false);
+                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, Number(this.firoAmount),
+                        Number(this.txFeePerKb), false);
                 } else {
                     await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
-                        this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb, false);
+                        this.coinSwapRecord.exchangeAddress, Number(this.firoAmount), Number(this.txFeePerKb), false);
                 }
 
                 try {

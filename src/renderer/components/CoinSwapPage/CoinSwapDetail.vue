@@ -55,7 +55,7 @@
                         type="text"
                         name="address"
                         tabindex="2"
-                        :disabled="formDisabled || !selectedCoin"
+                        :disabled="formDisabled || !selectedCoin || !isCurrentMarketInfoLoaded"
                         spellcheck="false"
                     />
                 </InputFrame>
@@ -68,7 +68,7 @@
                             <span class="amount">1</span>
                             <span class="ticker">{{ isSwapFrom ? "FIRO" : selectedCoin }}</span>
                             =
-                            <span class="amount">{{ conversionRate }}</span>
+                            <span class="amount">{{ bigintToString(conversionRate) }}</span>
                             <span class="ticker">{{ isSwapFrom ? selectedCoin : "FIRO" }}</span>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                         <label>{{ CoinNames[selectedCoin] }} Transaction Fee:</label>
 
                         <div class="value">
-                            <span class="amount">{{ remoteTransactionFee }}</span>
+                            <span class="amount">{{ bigintToString(remoteTransactionFee) }}</span>
                             <span class="ticker">{{ isSwapFrom ? selectedCoin : "FIRO" }}</span>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
 
                         <div  v-if="amountToReceive" class="value">
                             ~
-                            <span class="amount">{{ amountToReceive }}</span>
+                            <span class="amount">{{ bigintToString(amountToReceive) }}</span>
                             <span class="ticker">{{ isSwapFrom ? selectedCoin : 'FIRO' }}</span>
                         </div>
                     </div>
@@ -130,7 +130,7 @@
                     :disabled="formDisabled || !canBeginSwapToFiro"
                     :chain-name="chainName"
                     :remote-currency="selectedCoin"
-                    :remote-amount="amount"
+                    :remote-amount="stringToBigint(amount)"
                     :firo-amount="amountToReceive"
                     :firo-transaction-fee="remoteTransactionFee"
                     :refund-address="address"
@@ -152,7 +152,6 @@
 import Popup from 'renderer/components/shared/Popup';
 import CoinSwapChain from 'renderer/components/CoinSwapPage/CoinSwapChain';
 import CryptoAddressValidator from '@swyftx/api-crypto-address-validator';
-import Big from 'big.js';
 import lodash from 'lodash';
 import { mapGetters } from 'vuex';
 import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro';
@@ -369,7 +368,7 @@ export default {
             getMessage: () =>
                 `Due to private transaction spend limits, you may not spend more than 1001 FIRO (including fees) in one transaction`,
 
-            validate: (value) => this.subtractFeeFromAmount ? stringToBigint(value) <= 100100000000n : bigintToString(value) <= 100099000000n
+            validate: (value) => this.subtractFeeFromAmount ? stringToBigint(value) <= 100100000000n : stringToBigint(value) <= 100099000000n
         });
 
         for (const [currency, name] of Object.entries(CoinNames)) {
@@ -395,13 +394,11 @@ export default {
                 this.$validator.extend(`${pair}AmountDoesntViolateAPILimits`, {
                     getMessage: () => `Amount must be between ${info.min} and ${info.max}`,
                     validate: (value) => {
-                        let v;
-                        try {
-                            v = new Big(value);
-                        } catch {
-                            return false;
-                        }
-                        return v.gte(info.min) && v.lte(info.max);
+                        const v = stringToBigint(value);
+                        const min = stringToBigint(String(info.min));
+                        const max = stringToBigint(String(info.max));
+                        console.log([v, min, max]);
+                        return v >= stringToBigint(String(info.min)) && v <= stringToBigint(String(info.max));
                     }
                 })
             }
@@ -548,7 +545,7 @@ export default {
         }),
 
         firoTransactionFee() {
-            if (!this.isSwapFrom || !this.satoshiAmount) return 0;
+            if (!this.isSwapFrom || !this.satoshiAmount) return 0n;
             return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.smartFeePerKb, false);
         },
 
@@ -574,9 +571,9 @@ export default {
             }
         },
 
-        // This is a string representation of the whole-coin amount of the remote currency taken as a transaction fee.
+        // This is a bigint representation of the whole-coin amount of the remote currency taken as a transaction fee.
         remoteTransactionFee() {
-            return (new Big(this.currentMarketInfo?.minerFee || 0)).toPrecision(8);
+            return stringToBigint(String(this.currentMarketInfo?.minerFee) || "0");
         },
 
         isMarketInfoLoaded() {
@@ -627,9 +624,8 @@ export default {
             return this.isSwapFrom ? `FIRO-${this.selectedCoin}` : `${this.selectedCoin}-FIRO`;
         },
 
-        // We return a decimal-formatted string (or undefined).
         conversionRate() {
-            return this.currentMarketInfo && (new Big(this.currentMarketInfo?.rate || 0)).toPrecision(8);
+            return stringToBigint(String(this.currentMarketInfo?.rate) || "0");
         },
 
         getValidationTooltip() {
@@ -648,30 +644,15 @@ export default {
             return stringToBigint(this.amount);
         },
 
-        // We return a string equal to whatever whole-coin amount we expect to receive (either in FIRO or in selectedCoin).
         amountToReceive() {
             if (!this.currentMarketInfo) return;
             if (!this.satoshiAmount) return;
+            if (this.isSwapFrom && !this.firoTransactionFee) return;
 
-            if (this.isSwapFrom) {
-                if (!this.firoTransactionFee) return;
-                const conversionRate = new Big(this.conversionRate);
-                const firoAmount = new Big(this.satoshiAmount) / 1e8;
-                const firoTxFee = new Big(this.firoTransactionFee) / 1e8;
-                const remoteTransactionFee = new Big(this.remoteTransactionFee);
-
-                const amountToReceive = (firoAmount - firoTxFee) * conversionRate - remoteTransactionFee;
-                return amountToReceive.toPrecision(8);
-            } else {
-                const conversionRate = new Big(this.conversionRate);
-                // We use amount directly instead of satoshiAmount because the remote currency may have >8 decimal
-                // places of precision.
-                const remoteAmount = new Big(this.amount);
-                const remoteTxFee = new Big(this.remoteTransactionFee);
-
-                const amountToReceive = remoteAmount * conversionRate - remoteTxFee;
-                return amountToReceive.toPrecision(8);
-            }
+            return this.isSwapFrom ?
+                ((this.satoshiAmount - this.firoTransactionFee) * this.conversionRate - this.remoteTransactionFee) / 100000000n
+                :
+                (stringToBigint(this.amount) * this.conversionRate - this.remoteTransactionFee) / 100000000n;
         },
 
         canBeginSwapFromFiro() {
@@ -697,6 +678,7 @@ export default {
 
     methods: {
         bigintToString,
+        stringToBigint,
 
         cleanupForm(enablePrivate=true) {
             if (enablePrivate) this.isPrivate = true;
