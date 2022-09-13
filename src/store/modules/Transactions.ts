@@ -233,7 +233,7 @@ const getters = {
                 !(txo.elysium && !txo.isElysiumReferenceOutput) &&
                 !(txo.isElysiumReferenceOutput && txo.index !== 1) &&
                 !(txo.isElysiumReferenceOutput && !rootGetters['App/enableElysium']) &&
-                !(txo.isElysiumReferenceOutput && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
+                !(txo.isElysiumReferenceOutput && txo.elysium.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
                 !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
                 !(txo.elysium.type === 'Lelantus Mint') &&
                 (txo.isElysiumReferenceOutput || txo.destination) &&
