@@ -1362,7 +1362,7 @@ export class Firod {
     //
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
     // this transaction.
-    async publicSend(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
+    async publicSend(auth: string, label: string, recipient: string, amount: bigint, feePerKb: bigint,
                      subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
         const data = await this.send(auth, 'create', 'sendZcoin', {
             addresses: {
@@ -1566,7 +1566,7 @@ export class Firod {
         });
     }
 
-    async sendElysium(auth: string, propertyId: number, address: string, amount: number): Promise<string> {
+    async sendElysium(auth: string, propertyId: number, address: string, amount: bigint): Promise<string> {
         return <string | null>await this.send(auth, null, 'sendElysium', {
             address,
             amount,
@@ -1574,7 +1574,7 @@ export class Firod {
         });
     }
 
-    async grantElysium(auth: string, propertyId: number, address: string, amount: number): Promise<string> {
+    async grantElysium(auth: string, propertyId: number, address: string, amount: bigint): Promise<string> {
         return <string | null>await this.send(auth, null, 'grantElysium', {
             propertyId,
             address,

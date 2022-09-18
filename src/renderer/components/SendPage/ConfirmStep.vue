@@ -43,7 +43,7 @@
 import Amount from "renderer/components/shared/Amount";
 
 export default {
-    name: 'SendStepConfirm',
+    name: 'ConfirmStep',
 
     components: {
         Amount
@@ -53,9 +53,9 @@ export default {
         isPrivate: Boolean,
         label: String,
         address: String,
-        amount: Number, // amount to receive
-        fee: Number,
-        total: Number // total to send
+        amount: BigInt, // amount to receive
+        fee: BigInt,
+        total: BigInt // total to send
     }
 }
 </script>

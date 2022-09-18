@@ -14,6 +14,7 @@ export function stringToBigint(coin: string, decimals: number=8): bigint {
     if (!m) return;
 
     let [_, whole, part] = m;
+    if (part.length > decimals) return;
     part = part.substr(0, decimals);
     if (!whole && !part) return;
 

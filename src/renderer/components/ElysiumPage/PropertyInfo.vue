@@ -104,12 +104,7 @@
                         type="text"
                         name="amount"
                         v-model="amount"
-                        v-validate="{
-                            numeric: true,
-                            required: true,
-                            min_value: property.isDivisible ? 1e-8 : 1,
-                            max_value: maxIssue
-                        }"
+                        v-validate="'isBelowMaxIssue'"
                         v-tooltip="getValidationTooltip('amount')"
                     />
 
@@ -152,6 +147,7 @@ import Amount from "renderer/components/shared/Amount";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
 import {isValidAddress} from "lib/isValidAddress";
+import {bigintToString, stringToBigint} from "lib/convert";
 
 export default {
     name: "PropertyInfo",
@@ -177,6 +173,11 @@ export default {
             getMessage: () => 'The Firo address you entered is invalid',
             validate: (value) => isValidAddress(value, this.network)
         });
+
+        this.$validator.extend('isBelowMaxIssue', {
+            getMessage: () => `Only ${bigintToString(this.maxIssue)} tokens are available to mint.`,
+            validate: (value) => stringToBigint(value, this.property.isDivisible ? 8 : 0) <= this.maxIssue
+        });
     },
 
     computed: {
@@ -198,11 +199,11 @@ export default {
         },
 
         publicBalance() {
-            return Object.values(this.balance.pub).reduce((a, x) => a + x, 0);
+            return Object.values(this.balance.pub).reduce((a, x) => a + x, 0n);
         },
 
         nPublicHolders() {
-            return Object.values(this.balance.pub).filter(x => x > 0).length;
+            return Object.values(this.balance.pub).filter(x => x > 0n).length;
         },
 
         isMine() {
@@ -210,12 +211,11 @@ export default {
         },
 
         totalIssued() {
-            return this.allTotalIssued[this.creationtx];
+            return this.allTotalIssued[this.creationtx] || 0n;
         },
 
         maxIssue() {
-            // We need to switch to bigints to make this exact.
-            return (this.property.isDivisible ? (2n**63n-1n)/10n**8n : 2n**63n-1n) - this.totalIssued;
+            return 9223372036854775807n - this.totalIssued;
         },
 
         getValidationTooltip() {
@@ -241,14 +241,14 @@ export default {
         },
 
         async attemptGrant() {
-            const canGrant = !!this.availableUTXOs.find(txo => txo.amount >= 0.002e8 && txo.destination == this.property.issuer && !txo.isPrivate);
+            const canGrant = !!this.availableUTXOs.find(txo => txo.amount >= 300000n && txo.destination == this.property.issuer && !txo.isPrivate);
             if (!canGrant) {
                 this.error = `To grant, send at least 0.003 FIRO to ${this.property.issuer} first.`;
                 return;
             }
 
             try {
-                await $daemon.grantElysium(this.passphrase, this.property.id, this.grantee, amount);
+                await $daemon.grantElysium(this.passphrase, this.property.id, this.grantee, stringToBigint(this.amount));
             } catch (e) {
                 this.error = `${e.message}`;
                 return;

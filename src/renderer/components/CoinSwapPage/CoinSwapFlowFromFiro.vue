@@ -456,11 +456,11 @@ export default {
 
             try {
                 if (this.isPrivate) {
-                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, Number(this.firoAmount),
-                        Number(this.txFeePerKb), false);
+                    await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.firoAmount,
+                        this.txFeePerKb, false);
                 } else {
                     await $daemon.publicSend(passphrase, `Coin Swap FIRO-${this.remoteCurrency}`,
-                        this.coinSwapRecord.exchangeAddress, Number(this.firoAmount), Number(this.txFeePerKb), false);
+                        this.coinSwapRecord.exchangeAddress, this.firoAmount, this.txFeePerKb, false);
                 }
 
                 try {
