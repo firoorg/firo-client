@@ -1,4 +1,6 @@
 export function bigintToString(satoshi: bigint, decimals: number=8): string {
+    if (typeof satoshi !== 'bigint') return;
+
     const whole = satoshi / 10n**BigInt(decimals);
     const part = satoshi % 10n**BigInt(decimals);
 
@@ -10,11 +12,11 @@ export function bigintToString(satoshi: bigint, decimals: number=8): string {
 
 export function stringToBigint(coin: string, decimals: number=8): bigint {
     if (typeof coin !== 'string') return;
+
     const m = coin.match(/^(\d*)\.?(\d*)$/);
     if (!m) return;
 
     let [_, whole, part] = m;
-    if (part.length > decimals) return;
     part = part.substr(0, decimals);
     if (!whole && !part) return;
 
