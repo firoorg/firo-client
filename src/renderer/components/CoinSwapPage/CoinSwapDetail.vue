@@ -397,7 +397,6 @@ export default {
                         const v = stringToBigint(value);
                         const min = stringToBigint(String(info.min));
                         const max = stringToBigint(String(info.max));
-                        console.log([v, min, max]);
                         return v >= stringToBigint(String(info.min)) && v <= stringToBigint(String(info.max));
                     }
                 })
