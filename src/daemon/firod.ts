@@ -1610,12 +1610,11 @@ export class Firod {
     }
 
     // Get information about an Elysium property from its property id or from the tx that created it.
-    async getElysiumPropertyInfo(property: number | string): Promise<ElysiumPropertyData> {
-        if (typeof property == 'number') {
-            return <ElysiumPropertyData>(await this.send(null, null, 'getElysiumPropertyInfo', {propertyId: property}));
-        } else {
-            return <ElysiumPropertyData>(await this.send(null, null, 'getElysiumPropertyInfo', {propertyCreationTxid: property}));
-        }
+    async getElysiumPropertyInfo(properties: [number | string][]): Promise<ElysiumPropertyData[]> {
+        return <ElysiumPropertyData[]>(await this.send(null, null, 'getElysiumPropertyInfo', {
+            propertyIds: properties.filter(p => typeof p == 'number'),
+            propertyCreationTxids: properties.filter(p => typeof p == 'string')
+        }));
     }
 
     // calcPublicTxFee and calcPrivateTxFee require an address as input despite the fact that the response is the same

@@ -71,16 +71,7 @@ window.$addElysiumTokenData = async () => {
     if (!$store.getters['App/enableElysium']) return;
     const tokensNeedingData = $store.getters['Elysium/selectedAndOwnedTokens'].filter(token => !$store.getters['Elysium/tokenData'][token]);
     if (!tokensNeedingData.length) return;
-
-    const tokenData = (await Promise.all(tokensNeedingData.map(async token => {
-        try {
-            return await $daemon.getElysiumPropertyInfo(token);
-        } catch (e) {
-            console.warn(`Failed to get elysium property info for ${token}: ${e}`);
-        }
-    }))).filter(x => x);
-
-    $store.commit('Elysium/addTokenData', tokenData);
+    $store.commit('Elysium/addTokenData', await $daemon.getElysiumPropertyInfo(tokensNeedingData));
 };
 
 $store.watch(() => $store.getters['Elysium/selectedAndOwnedTokens'], async (selectedAndOwnedTokens, oldValue) => {
@@ -99,9 +90,8 @@ $store.watch(() => $store.getters['ApiStatus/currentBlockHeight'], async (newVal
     if (newValue == oldValue) return;
 
     const tokenData = $store.getters['Elysium/tokenData'];
-    const coinsNeedingData = Object.values(tokenData).filter(td => !td.id).map(td => td.creationTx);
-    const coinData = await Promise.all(coinsNeedingData.map(coin => $daemon.getElysiumPropertyInfo(coin)));
-    $store.commit('Elysium/addTokenData', coinData);
+    const tokensNeedingData = Object.values(tokenData).filter(td => !td.id).map(td => td.creationTx);
+    $store.commit('Elysium/addTokenData', await $daemon.getElysiumPropertyInfo(tokensNeedingData));
 })
 
 // Show the waiting screen with reason, or, if reason may be undefined, close it.

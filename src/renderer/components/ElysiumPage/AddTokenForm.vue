@@ -79,8 +79,13 @@ export default {
     watch: {
         async query() {
             try {
-                const p = await $daemon.getElysiumPropertyInfo(Number(this.query) || this.query);
-                this.property = p.creationTx != "0000000000000000000000000000000000000000000000000000000000000000" ? p : {notFound: true};
+                const p = (await $daemon.getElysiumPropertyInfo([Number(this.query) || this.query]))[0];
+                if (!p || p.creationTx == "0000000000000000000000000000000000000000000000000000000000000000") {
+                    this.property = {notFound: true};
+                    return;
+                }
+
+                this.property = p;
             } catch (e) {
                 if (e.name != 'FirodErrorResponse') throw e;
                 this.property = {notFound: true};
