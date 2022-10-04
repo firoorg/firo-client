@@ -22,8 +22,10 @@ const actions = {
             delete apiStatus.newLogMessages;
         }
 
-        // We first check if apiStatus has changed so we don't have to draw updates when it hasn't.
-        if (!isEqual(state.apiStatus, apiStatus)) {
+        // We first check if apiStatus has changed so we don't have to draw updates when it hasn't. Also make sure not
+        // to update to apiStatuses oldest than the latest. (This is possible due to the asynchronous nature of the
+        // updates.)
+        if (!isEqual(state.apiStatus, apiStatus) && apiStatus.blocks >= state.apiStatus.blocks) {
             commit('setApiStatus', apiStatus);
         }
     }
