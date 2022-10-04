@@ -1328,35 +1328,6 @@ export class Firod {
         return helpEntries.map(x => x.split(' ')[0]);
     }
 
-    // Create a new payment request (to be stored on the daemon-side).
-    //
-    // If address is not specified, a new address will be created.
-    //
-    // NOTE: firod doesn't send out a subscription event when a new payment request is created, so the caller is
-    //       responsible for any updating of state that might be required.
-    async createPaymentRequest(amount: number | undefined, label: string, message: string, address?: string): Promise<PaymentRequestData> {
-        return <any>await this.send(null, 'create', 'paymentRequest', {
-            amount,
-            label,
-            address,
-            message
-        });
-    }
-
-    // Update an existing payment request.
-    //
-    // NOTE: firod doesn't send out a subscription event when a payment request is updated, so the caller is
-    //       responsible for any updating of state that might be required.
-    async updatePaymentRequest(address: string, amount: number | undefined, label: string, message: string, state: PaymentRequestState): Promise<PaymentRequestData> {
-        return <any>await this.send(null, 'update', 'paymentRequest', {
-            id: address,
-            amount,
-            label,
-            message,
-            state
-        });
-    }
-
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
     //
@@ -1403,35 +1374,6 @@ export class Firod {
         }
     }
 
-    // Send amount satoshi XZC to recipient using Sigma, optionally subtracting the fee from the amount.
-    //
-    // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
-    // this transaction.
-    //
-    // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async sendSigma(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
-                    coinControl?: CoinControl): Promise<string> {
-        const data = await this.send(auth, 'create', 'sendSigma', {
-            outputs: [
-                {
-                    address: recipient,
-                    amount
-                }
-            ],
-            label,
-            subtractFeeFromAmount,
-            coinControl: {
-                selected: coinControlToString(coinControl)
-            }
-        });
-
-        if (typeof data === 'string') {
-            return data;
-        } else {
-            throw new UnexpectedFirodResponse('create/sendSigma', data);
-        }
-    }
-
     // Send amount satoshi XZC to recipient using Lelantus, optionally subtracting the fee from the amount.
     //
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
@@ -1464,10 +1406,6 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('create/showMnemonics', data);
-    }
-
-    async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<void> {
-        await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
     }
 
     async getMasternodeList() : Promise<Object> {
@@ -1532,20 +1470,6 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('none/paymentRequestAddress', data);
-    }
-
-    // Mint Sigma in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10', '25',
-    // or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200 Sigma). We
-    // resolve() with the generated txid, or reject() with an error if something went wrong.
-    async mintSigma(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string> {
-        const data = await this.send(auth, 'create', 'sigmaMint', {
-            denominations: mints
-        });
-        if (typeof data === 'string') {
-            return data;
-        }
-
-        throw new UnexpectedFirodResponse('create/mint', data);
     }
 
     // Turn all of our non-Lelantus coins into Lelantus coins. Should be preferred to mintSigma if Lelantus is
@@ -1637,88 +1561,6 @@ export class Firod {
         }
     }
 
-    // Calculate a transaction fee for a public transaction.
-    // feePerKb is the satoshi fee per kilobyte for the generated transaction.
-    //
-    // We resolve() with the calculated fee in satoshi.
-    // We reject() the promise if the firod call fails or received data is invalid.
-    async calcPublicTxFee(amount: number, subtractFeeFromAmount: boolean, feePerKb: number,
-                          coinControl?: CoinControl): Promise<number> {
-        let data = await this.send(null, 'get', 'txFee', {
-            addresses: {
-                [this.defaultAddress()]: amount
-            },
-            feePerKb,
-            subtractFeeFromAmount,
-            coinControl: {
-                selected: coinControlToString(coinControl)
-            }
-        });
-
-        function isValidResponse(x: any): x is {fee: number} {
-            return x !== null &&
-                typeof x === 'object' &&
-                typeof x.fee === 'number';
-        }
-
-        if (isValidResponse(data)) {
-            return data.fee
-        }
-
-        throw new UnexpectedFirodResponse('get/txFee', data);
-    }
-
-    // Calculate a transaction fee for a sigma transaction. You may not specify custom transaction fees for sigma
-    // transactions.
-    //
-    // We resolve() with the calculated fee in satoshi.
-    // We reject() the promise if the firod call fails or received data is invalid.
-    async calcSigmaTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
-        let data = await this.send(null, 'none', 'sigmaTxFee', {
-            outputs: [
-                {
-                    address: this.defaultAddress(),
-                    amount
-                }
-            ],
-            // The response is the same no matter what label we use.
-            label: '',
-            subtractFeeFromAmount
-        });
-
-        function isValidResponse(x: any): x is {fee: number} {
-            return x !== null &&
-                typeof x === 'object' &&
-                typeof x.fee === 'number';
-        }
-
-        if (isValidResponse(data)) {
-            return data.fee
-        }
-
-        throw new UnexpectedFirodResponse('get/privateTxFee', data);
-    }
-
-    // Calculate a transaction fee for a lelantus transaction. You may not specify custom transaction fees for lelantus
-    // transactions.
-    //
-    // We resolve() with the calculated fee in satoshi.
-    // We reject() the promise if the firod call fails or received data is invalid.
-    async calcLelantusTxFee(amount: number, feePerKb: number, subtractFeeFromAmount: boolean,
-                            coinControl?: CoinControl): Promise<number> {
-        const fee = await this.send(null, 'none', 'lelantusTxFee', {
-            amount,
-            feePerKb,
-            subtractFeeFromAmount,
-            coinControl: {
-                selected: coinControlToString(coinControl)
-            }
-        });
-
-        if (typeof fee === 'number') return fee;
-        throw new UnexpectedFirodResponse('none/lelantusTxFee', fee);
-    }
-
 
     // Backup wallet.dat into backupDirectory. We will reject() the problem if the backup fails for some reason;
     // otherwise we return void.
@@ -1750,47 +1592,6 @@ export class Firod {
             throw new RebroadcastError(data.error);
         } else {
             throw new UnexpectedFirodResponse('create/rebroadcast', data);
-        }
-    }
-
-    // Start a Znode by alias. If the call fails, we reject() with the cause.
-    async startZnode(auth: string, znodeAlias: string): Promise<void> {
-        const data = await this.send(auth, 'update', 'znodeControl', {
-            method: 'start-alias',
-            alias: znodeAlias
-        });
-
-        function isValidResponse(x: any): x is {
-            overall: {
-                total: 1
-            },
-            detail: {
-                status: {
-                    success: boolean,
-                    info?: string
-                }
-            }
-        } {
-            return x !== null &&
-                typeof x === 'object' &&
-                x.overall !== null &&
-                typeof x.overall === 'object' &&
-                x.overall.total === 1 &&
-                x.detail !== null &&
-                typeof x.detail === 'object' &&
-                x.detail.status !== null &&
-                typeof x.detail.status.success === 'boolean' &&
-                (!x.detail.status.success !== !!x.detail.status.info) &&
-                (!x.detail.status.info || typeof x.detail.status.info === 'string')
-        }
-
-        if (!isValidResponse(data)) {
-            throw new UnexpectedFirodResponse('update/znodeControl', data);
-        }
-
-        // If the call failed, r.detail[0].info will be the error message; otherwise, it will be blank.
-        if (!data.detail.status.success) {
-            throw new ZnodeStartupError(data.detail.status.info);
         }
     }
 
