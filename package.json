@@ -18,6 +18,7 @@
   "build": {
     "productName": "Firo Client",
     "appId": "com.firo.client",
+    "artifactName": "Firo-Client-${version}.${ext}",
     "asar": true,
     "protocols": {
       "name": "firo",
