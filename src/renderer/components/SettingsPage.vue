@@ -138,7 +138,9 @@ export default {
             useTor: $store.getters['Settings/isConnectedViaTor'],
             show: null, // 'change-passphrase' | 'mnemonic'
             successMessage: null,
-            errorMessage: null
+            errorMessage: null,
+            messageTitle: '',
+            message: ''
         };
     },
 
