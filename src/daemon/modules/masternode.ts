@@ -4,9 +4,7 @@ import { createLogger } from '../../lib/logger';
 const logger = createLogger('firo:daemon:settings');
 
 export function handleEvent(store, firo: Firod, eventData: any) {
-    let key = Object.keys(eventData)[0];
-    let mn = eventData[key];
-    store.dispatch('Masternode/updateMasternode', mn);
+    store.dispatch('Masternode/updateMasternodeList', Object.values(eventData));
 }
 
 export async function initialize(store: any, firod: Firod) {
