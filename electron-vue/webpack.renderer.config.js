@@ -55,10 +55,6 @@ let rendererConfig = {
                 use: 'ts-loader'
             },
             {
-                test: /\.ya?ml$/,
-                use: ['json-loader', 'yaml-loader']
-            },
-            {
                 test: /\.node$/,
                 use: 'node-loader'
             },
