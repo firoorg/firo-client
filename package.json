@@ -97,7 +97,7 @@
     "lodash": "^4.17.20",
     "node-gyp": "^9.0.0",
     "normalize-scss": "^7.0.1",
-    "resolve-url-loader": "^3.1.2",
+    "resolve-url-loader": "^3.1.5",
     "sha.js": "^2.4.11",
     "simple-plist": "^1.1.0",
     "typeface-overpass-mono": "0.0.71",
