@@ -87,7 +87,7 @@
     "@types/lodash": "^4.14.168",
     "@types/webpack-env": "^1.15.3",
     "@types/zeromq": "^4.6.3",
-    "async": "^2.6.3",
+    "async": "^2.6.4",
     "await-mutex": "^1.0.2",
     "axios": "^0.21.1",
     "bip39": "^3.0.2",
