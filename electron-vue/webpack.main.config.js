@@ -39,7 +39,7 @@ let mainConfig = {
             },
             {
                 test: /\.js$/,
-                use: 'babel-loader',
+                use: 'val-loader',
                 exclude: /node_modules/
             },
             {
