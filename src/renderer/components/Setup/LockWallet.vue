@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import zxcvbn from 'zxcvbn';
 import {Firod} from "daemon/firod";
 import {mapGetters} from "vuex";
 import InputFrame from "renderer/components/shared/InputFrame";
@@ -81,7 +80,6 @@ export default {
             passphrase: '',
             confirmPassphrase: '',
             hasConfirmedExistingWallet: false,
-            passphraseStrength: 0,
             passphraseInputIsFocused: false
         }
     },
@@ -99,15 +97,6 @@ export default {
     // // Are we going to lock a preexisting wallet.dat? If this is set, onStart MUST be set, mnemonic MUST NOT be, and
     // // window.$daemon MUST be set (and already started).
     // isExistingWallet?: boolean
-
-    watch: {
-        passphrase: {
-            immediate: true,
-            handler() {
-                this.passphraseStrength = zxcvbn(this.passphrase).score;
-            }
-        }
-    },
 
     computed: {
         ...mapGetters({
