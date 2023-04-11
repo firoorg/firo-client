@@ -29,6 +29,7 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
 import TxIdIndex from "renderer/components/AnimatedTable/TxId";
 import TxAmount from "renderer/components/AnimatedTable/TxAmount";
+import UTXOLocker from 'renderer/components/AnimatedTable/UTXOLocker';
 
 export default {
     name: "InputSelection",
@@ -38,6 +39,7 @@ export default {
         UTXOSelector,
         TxIdIndex,
         TxAmount,
+        UTXOLocker
     },
 
     props: {
@@ -52,7 +54,8 @@ export default {
             fields: [
                 {name: UTXOSelector},
                 {name: TxIdIndex},
-                {name: TxAmount}
+                {name: TxAmount},
+                { name: UTXOLocker }
             ]
         }
     },
@@ -60,7 +63,7 @@ export default {
     computed: {
         ...mapGetters({
             TXOMap: 'Transactions/TXOMap',
-            availableUTXOs: 'Transactions/availableUTXOs'
+            availableUTXOsWithLock: 'Transactions/availableUTXOsWithLock',
         }),
 
         showBreakingMasternodeWarning() {
@@ -74,10 +77,11 @@ export default {
         },
 
         ourUnspentUTXOs() {
-            return this.availableUTXOs
+            return this.availableUTXOsWithLock
                 .filter(tx => tx.isPrivate === this.isPrivate)
                 .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index);
-        }
+        },
+
     },
 
     methods: {

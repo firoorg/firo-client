@@ -31,6 +31,13 @@
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
+            <!-- <GoPrivate
+                v-else-if="show === 'confirm'"
+                :label="label"
+                :is-private="isPrivate"
+                @cancel="cancel()"
+                @confirm="cancel()"
+            /> -->
             <PassphraseInput v-else-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
             <WaitOverlay v-else-if="show === 'wait'" />
             <ErrorStep v-else-if="show === 'error'" :error="error" @ok="cancel()" />
@@ -49,6 +56,7 @@ import ConfirmStep from "./ConfirmStep";
 import PassphraseInput from "../shared/PassphraseInput";
 import ErrorStep from "./ErrorStep";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
+import GoPrivate from "./GoPrivate";
 
 export default {
     name: "SendFlow",
@@ -59,7 +67,8 @@ export default {
         ConfirmStep,
         PassphraseInput,
         ErrorStep,
-        WaitOverlay
+        WaitOverlay,
+        GoPrivate
     },
 
     data() {

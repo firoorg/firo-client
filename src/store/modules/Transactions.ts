@@ -17,7 +17,7 @@ export interface TXO extends TxOut {
     // This indicates whether this input should be used for new private transactions.
     isPrivate: boolean;
     // This indicates whether the transaction as a whole was private.
-    inputPrivacy: 'public' | 'zerocoin' | 'sigma' | 'lelantus' | 'mined';
+    inputPrivacy: 'public' | 'zerocoin' | 'sigma' | 'lelantus' | 'mined' | 'spark';
     validAt: number;
     firstSeenAt: number;
     isFromMe: boolean;
@@ -39,6 +39,9 @@ function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentPublic
 
         let spendSize = undefined;
         switch (txout.scriptType) {
+            case "spark-mint":
+            case "spark-smint":
+            case "spark-spend":
             case "lelantus-mint":
             case "lelantus-jmint":
             case "lelantus-joinsplit":
@@ -67,7 +70,7 @@ function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentPublic
                 console.warn(`${tx.txid}-${index} has an unknown scriptType`);
         }
 
-        const isPrivate = ['lelantus-mint', 'lelantus-jmint', 'sigma-mint'].includes(txout.scriptType)
+        const isPrivate = ['lelantus-mint', 'lelantus-jmint', 'sigma-mint', "spark-mint", "spark-smint", "spark-spend"].includes(txout.scriptType)
 
         let validAt = Infinity;
         if (!tx.blockHeight && !tx.isInstantSendLocked) validAt = Infinity;
@@ -208,10 +211,19 @@ const getters = {
         !txo.isElysiumReferenceOutput &&
         (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
         txo.spendSize &&
-        txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1
+        txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
+        txo.amount > 0
     ),
     lockedUTXOs: (state, getters) => getters.UTXOs.filter((txo: TXO) => txo.isLocked),
 
+    availableUTXOsWithLock: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
+        txo.isToMe &&
+        // Elysium has reference outputs that we should not allow the user to spend.
+        !txo.isElysiumReferenceOutput &&
+        txo.spendSize &&
+        txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
+        txo.amount > 0
+    ),
     // This will display:
     // 1) valid Elysium non-Lelantus Mint transactions
     // 2) unconfirmed Elysium non-Lelantus Mint from us

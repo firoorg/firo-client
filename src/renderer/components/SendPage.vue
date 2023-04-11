@@ -3,6 +3,13 @@
         <div class="send-primary">
             <SearchInput v-model="filter" placeholder="Search by label or address" />
 
+            <div class="select-option" style="margin-top:12px">
+                <select class="selector" v-model="selectOption">
+                    <option value="Spark">Spark</option>
+                    <option value="Transparent">Transparent</option>
+                </select>
+            </div>
+
             <AnimatedTable
                 ref="animatedTable"
                 :fields="tableFields"
@@ -53,6 +60,21 @@
                             :disabled="formDisabled"
                         />
                     </InputFrame>
+
+                    <div class="warning-text">
+                        <div class="warning-item">
+                            <Warning class="warning-icon" />
+                            <label>
+                                You are using a transparent transaction, please go private.
+                            </label>
+                        </div>
+                        <div class="warning-item warning-item-text">
+                            <Warning class="warning-icon" />
+                            <label>
+                                If this is a masternode transaction, you do not have to go private
+                            </label>
+                        </div>
+                    </div>   
 
                     <div class="checkbox-field add-to-address-book" :class="{disabled: !showAddToAddressBook}">
                         <PlusButton :disabled="!showAddToAddressBook" />
@@ -193,6 +215,8 @@ import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
 import FiroSymbol from "renderer/assets/CoinIcons/FIRO.svg.data";
+import AddressBookItemAddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
+import Warning from "renderer/assets/Warning.svg";
 
 export default {
     name: 'SendPage',
@@ -208,7 +232,8 @@ export default {
         Popup,
         InputFrame,
         SearchInput,
-        TransactionInfo
+        TransactionInfo,
+        Warning
     },
 
     inject: [
@@ -230,13 +255,15 @@ export default {
             tableFields: [
                 {name: CurrentAddressIndicator},
                 {name: AddressBookItemLabel},
-                {name: AddressBookItemAddress}
+                {name: AddressBookItemAddress},
+                { name: AddressBookItemAddressType }
             ],
             // This is the search term to filter addresses by.
             filter: '',
             selectedAsset: 'FIRO',
             showConnectionTransaction: false,
-            connectionTransaction: null
+            connectionTransaction: null,
+            selectOption: 'Spark',
         }
     },
 
@@ -280,11 +307,11 @@ export default {
             return BigInt(this.userTxFeePerKb) || this.smartFeePerKb;
         },
 
-        filteredSendAddresses () {
+        filteredSendAddresses() {
             this.$nextTick(() => this.$refs.animatedTable && this.$refs.animatedTable.reload());
             return this.sendAddresses
                 .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
-                .map(address => ({isSelected: address.address === this.address, ...address}));
+                .map(address => ({ isSelected: address.address === this.address, ...address })).filter(address => address.addressType === this.selectOption);
         },
 
         showAddToAddressBook () {
@@ -430,7 +457,7 @@ export default {
 
         this.$validator.extend('firoAddress', {
             getMessage: () => 'The Firo address you entered is invalid',
-            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network)
+            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress(value)
         });
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
@@ -483,21 +510,34 @@ export default {
         },
 
         async addToAddressBook() {
-            if (!isValidAddress(this.address, this.network) || !this.label) return;
+            if ((!isValidAddress(this.address, this.network) && !this.validateSparkAddress(this.address)) || !this.label) return;
 
             if (this.addressBook[this.address]) {
-                const item = this.addressBook[this.address]
+                const item = this.addressBook[this.address];
                 await $daemon.updateAddressBookItem(item, this.label);
-                $store.commit('AddressBook/updateAddress', {...item, label: this.label});
+                $store.commit('AddressBook/updateAddress', { ...item, label: this.label });
                 this.$refs.animatedTable.reload();
             } else {
-                const item = {
+                if(isValidAddress(this.address, this.network)){
+                    const item = {
+                    addressType: "Transparent",
                     address: this.address,
                     label: this.label,
                     purpose: 'send'
-                };
-                $store.commit('AddressBook/updateAddress', {...item, createdAt: Date.now()});
-                await $daemon.addAddressBookItem(item);
+                    };
+                    $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
+                    await $daemon.addAddressBookItem(item);
+                } else {
+                    const item = {
+                    addressType: "Spark",
+                    address: this.address,
+                    label: this.label,
+                    purpose: 'send'
+                    };
+                    $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
+                    await $daemon.addAddressBookItem(item);
+                }
+
             }
         },
 
@@ -514,7 +554,12 @@ export default {
             this.label = '';
             this.amount = '';
             this.address = '';
-        }
+        },
+
+        async validateSparkAddress(address) {
+            let res = await $daemon.validateSparkAddress(address);
+            return res;
+        },
     }
 }
 </script>
@@ -615,6 +660,27 @@ export default {
                     .total-field {
                         display: flex;
                         justify-content: space-between;
+                    }
+                }
+                
+                .warning-text {
+                    margin-bottom: 6px;
+                    color: #FFA800;
+                    font-size: 10px;
+
+                    .warning-item {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .warning-icon {
+                        height: 12px;
+                        width: 12px;
+                        margin-right: 5px;
+                    }
+
+                    .warning-item-text {
+                        margin-top: 8px;
                     }
                 }
             }

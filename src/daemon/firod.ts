@@ -213,7 +213,7 @@ export interface ApiStatus {
 export interface TxOut {
     scriptType: 'pay-to-public-key' | 'pay-to-public-key-hash' | 'pay-to-script-hash' | 'pay-to-witness-script-hash' |
         'zerocoin-mint' | 'zerocoin-remint' | 'zerocoin-spend' | 'sigma-spend' | 'sigma-mint' | 'lelantus-mint' |
-        'lelantus-jmint' | 'lelantus-joinsplit' | 'elysium' | 'unknown';
+        'lelantus-jmint' | 'lelantus-joinsplit' | 'elysium' | 'spark-mint'| 'spark-smint' | 'spark-spend' | 'unknown';
     amount: bigint;
     isChange: boolean;
     isLocked: boolean;
@@ -265,7 +265,7 @@ export interface ElysiumData {
 
 export interface Transaction {
     txid: string;
-    inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus';
+    inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus' | 'spark';
     isFromMe: boolean;
     firstSeenAt: number;
     fee: bigint;
@@ -291,6 +291,7 @@ export interface TransactionInput {
 }
 
 export interface AddressBookItem {
+    addressType: string;
     address: string;
     label: string;
     createdAt?: number; // UNIX timestamp in milliseconds
@@ -300,6 +301,7 @@ export interface AddressBookItem {
 function isValidAddressBookItem(x: any): x is AddressBookItem {
     const r = x !== null &&
         typeof x === 'object' &&
+        typeof x.addressType === 'string' &&
         typeof x.address === 'string' &&
         typeof x.label === 'string' &&
         typeof x.purpose === 'string';
@@ -1485,6 +1487,7 @@ export class Firod {
 
     async addAddressBookItem(item: AddressBookItem): Promise<void> {
         await this.send('', 'create', 'editAddressBook', {
+            addresstype: item.addressType,
             address: item.address,
             label: item.label,
             purpose: item.purpose,
@@ -1496,6 +1499,7 @@ export class Firod {
 
     async updateAddressBookItem(item: AddressBookItem, newLabel: string) : Promise<AddressBookItem> {
         await this.send('', 'create', 'editAddressBook', {
+            addresstype: item.addressType,
             address: item.address,
             label: item.label,
             purpose: item.purpose,
@@ -1508,7 +1512,8 @@ export class Firod {
             createdAt: item.createdAt,
             address: item.address,
             purpose: item.purpose,
-            label: newLabel
+            label: newLabel,
+            addressType: item.addressType,
         };
     }
 
@@ -1524,8 +1529,8 @@ export class Firod {
     }
 
     // Get an unused address with no associated label.
-    async getUnusedAddress(): Promise<string> {
-        const data = await this.send(null, 'none', 'paymentRequestAddress', null);
+    async getUnusedAddress(addresstype: string): Promise<string> {
+        const data = await this.send(null, 'none', 'paymentRequestAddress', {addressType: addresstype});
 
         if (typeof data === 'object' && typeof data['address'] === 'string') {
             return data['address'];
@@ -1871,5 +1876,65 @@ export class Firod {
     async isLelantusAllowed(): Promise<boolean> {
         const d = (await this.apiStatus()).data;
         return d.disabledSporks && !d.disabledSporks.includes("lelantus");
+    }
+
+    async mintSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
+        subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
+        const data = await this.send(auth, 'create', 'mintSpark', {
+            addresses: {
+                [recipient]: {
+                    label,
+                    amount
+                }
+            },
+        amount,
+        subtractFeeFromAmount,
+        feePerKb,
+        coinControl: {
+            selected: coinControlToString(coinControl)
+        }
+        });
+        function isValidResponse(x: any): x is {txid: string} {
+            return x !== null && typeof x === 'object' && typeof x.txid === 'string';
+        }
+        if (isValidResponse(data)) {
+            return data;
+        } else {
+            throw new UnexpectedFirodResponse('create/mintSpark', data);
+        }
+    }
+
+    async spendSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
+        subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
+        const data = await this.send(auth, 'create', 'spendSpark', {
+        label,
+        recipient,
+        amount,
+        subtractFeeFromAmount,
+        feePerKb,
+        coinControl: {
+            selected: coinControlToString(coinControl)
+        }
+        });
+        function isValidResponse(x: any): x is {txid: string} {
+            return x !== null && typeof x === 'object' && typeof x.txid === 'string';
+        }
+        if (isValidResponse(data)) {
+            return data;
+        } else {
+            throw new UnexpectedFirodResponse('create/spendSpark', data);
+        }
+    }
+
+    async validateSparkAddress(address: string): Promise<{valid: boolean}> {
+        const data = await this.send('', 'create', 'validatesparkaddress', {address});
+        function isValidResponse(x: any): x is {valid: boolean} {
+            return x !== null && typeof x === 'object' && typeof x.valid === 'boolean';
+        }
+        if (isValidResponse(data)) {
+            return data;
+        } else {
+            throw new UnexpectedFirodResponse('create/validatesparkaddress', data);
+        }
     }
 }

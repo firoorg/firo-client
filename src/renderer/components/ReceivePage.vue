@@ -22,6 +22,12 @@
                         <input ref="label" id="receive-address-label" type="text" placeholder="Unlabelled" v-model="label" @change="changeLabel" />
                     </InputFrame>
                 </div>
+                <div class="select-option" style="margin-top:12px">
+                    <select class="selector" v-model="selectOption">
+                        <option value="Spark">Spark</option>
+                        <option value="Transparent">Transparent</option>
+                    </select>
+                </div>
             </div>
 
             <div class="qr-code-container" :class="{'no-display': !address}">
@@ -56,6 +62,7 @@ import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon";
 import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon";
 import Popup from "renderer/components/shared/Popup";
 import {IncorrectPassphrase} from "daemon/firod";
+import AddressBookItemAddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
 
 export default {
     name: "ReceivePage",
@@ -69,8 +76,10 @@ export default {
     },
 
     data() {
+        let check = this.selectOption?this.selectOption:'Spark';
+        let addr = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0];
         return {
-            address: ($store.getters['AddressBook/receiveAddresses'][0] || {address: null}).address,
+            address: ( addr || {address: null}).address,
             label: '',
             _quickLabel: null,
             qrCode: null,
@@ -78,11 +87,13 @@ export default {
             show: '',
             error: '',
             passphrase: '',
+            selectOption: 'Spark',
 
             tableFields: [
                 {name: CurrentAddressIndicator},
                 {name: AddressBookItemLabel},
-                {name: AddressBookItemAddress}
+                {name: AddressBookItemAddress},
+                {name: AddressBookItemAddressType}
             ]
         };
     },
@@ -96,7 +107,7 @@ export default {
 
         tableData() {
             this.$nextTick(() => this.$refs.animatedTable.reload());
-            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
+            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr})).filter(a => a.addressType === this.selectOption);
         }
     },
 
@@ -179,9 +190,11 @@ export default {
         },
 
         async refreshAddress() {
-            const address = await $daemon.getUnusedAddress();
+            const addresstype = this.selectOption;
+            const address = await $daemon.getUnusedAddress(addresstype);
 
             await $daemon.addAddressBookItem({
+                addressType: addresstype,
                 address,
                 label: '',
                 purpose: 'receive'
