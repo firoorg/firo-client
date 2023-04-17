@@ -1881,12 +1881,8 @@ export class Firod {
     async mintSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
         subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
         const data = await this.send(auth, 'create', 'mintSpark', {
-            addresses: {
-                [recipient]: {
-                    label,
-                    amount
-                }
-            },
+        label,
+        recipient,
         amount,
         subtractFeeFromAmount,
         feePerKb,
@@ -1926,15 +1922,44 @@ export class Firod {
         }
     }
 
+    async lelantusToSpark(auth: string) {
+        await this.send(auth, 'create', 'lelantusToSpark', {});
+    }
+
     async validateSparkAddress(address: string): Promise<{valid: boolean}> {
-        const data = await this.send('', 'create', 'validatesparkaddress', {address});
+        const data = await this.send('', 'create', 'validateSparkAddress', {address});
         function isValidResponse(x: any): x is {valid: boolean} {
             return x !== null && typeof x === 'object' && typeof x.valid === 'boolean';
         }
         if (isValidResponse(data)) {
             return data;
         } else {
-            throw new UnexpectedFirodResponse('create/validatesparkaddress', data);
+            throw new UnexpectedFirodResponse('create/validateSparkAddress', data);
+        }
+    }
+
+    async getAvailableSparkBalance(): Promise<{amount: number}> {
+        const data = await this.send('', 'create', 'getAvailableSparkBalance', {});
+        function isValidResponse(x: any): x is {amount: number} {
+            return x !== null && typeof x === 'object' && typeof x.amount === 'number';
+        }
+        if (isValidResponse(data)) {
+            return data;
+        } else {
+            throw new UnexpectedFirodResponse('create/validateSparkAddress', data);
+        }
+    }
+    
+    async getUncomfirmedSparkBalance(): Promise<{amount: number}> {
+        const data = await this.send('', 'create', 'getUncomfirmedSparkBalance', {});
+        function isValidResponse(x: any): x is {amount: number} {
+            return x !== null && typeof x === 'object' && typeof x.amount === 'number';
+        }
+        if (isValidResponse(data)) {
+            return data;
+        } else {
+            throw new UnexpectedFirodResponse('create/validateSparkAddress', data);
         }
     }
 }
+

@@ -1,18 +1,17 @@
 <template>
     <div class="info-popup confirm-step" style="width: 500px; height: 250px;">
         <div class="title" style="margin-bottom:30px">
-            Make this a private transaction
+            Migrate funds from Lelantus to Spark
         </div>
-        <div class="info-item">
-            <Info class="info-icon" />
-            <label>
-                You are using a transparent transaction, please go private. If this is a masternode transaction, you do not have to go private
+        <div class="info">
+            <Info class="info-icon info-item" />
+            <label class="info-item">
+                Firo is switching to Spark. Please migrate your funds.
             </label>
         </div>
 
         <div class="buttons"  style="width: 500px; height: 60px;margin-top: 35px;margin-left: -15px">
-            <button class="solid-button unrecommended" @click="$emit('ignore')">Ignore</button>
-            <button class="solid-button recommended" @click="$emit('go_private')">Go Private</button>
+            <button class="solid-button recommended" @click="$emit('migrate')">Migrate</button>
         </div>
     </div>
 </template>
@@ -21,7 +20,7 @@
 import Info from "renderer/assets/Info.svg";
 
 export default {
-    name: 'GoPrivate',
+    name: 'LelantusToSpark',
 
     components: {
         Info
@@ -35,7 +34,7 @@ export default {
 
 <style scoped lang="scss">
 @import "src/renderer/styles/info-popup";
-.info-item {
+.info {
     word-wrap: break-word;
     background-color: #FEF3C7;
     width: 500px;
@@ -45,13 +44,18 @@ export default {
     margin-left: -15px;
     color: #92400E;
     display: flex;
-
-    .info-icon {
-        height: 28px;
-        width: 28px;
-        margin-right: 5px;
-        margin-top: -8px;
+    align-items: center;
+}
+    .info-item {
+        margin-right: 45px;
+        // margin-left: 5px;
     }
 
-}
+    .info-icon {
+        height: 18px;
+        width: 18px;
+        margin-left: 40px;
+        margin-right: 5px;
+        margin-top: -4px;
+    }
 </style>

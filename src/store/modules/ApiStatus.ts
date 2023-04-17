@@ -42,6 +42,7 @@ const getters = {
     isLocked: (state, getters): boolean | undefined => getters.apiStatusData.walletLock,
     isReindexing: (state, getters): boolean => getters.apiStatusData.reindexing,
     isLelantusAllowed: (state, getters): boolean => !(getters.apiStatusData.disabledSporks || []).includes("lelantus"),
+    isSparkAllowed: (state, getters): boolean => (getters.apiStatusData.blocks >= 1000),
     API: (state, getters): boolean => (getters.apiStatusData.modules || {}).API,
     // We will return 0 if apiStatus hasn't yet loaded.
     localZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).localCount || 0,

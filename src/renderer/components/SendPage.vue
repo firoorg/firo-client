@@ -256,7 +256,7 @@ export default {
                 {name: CurrentAddressIndicator},
                 {name: AddressBookItemLabel},
                 {name: AddressBookItemAddress},
-                { name: AddressBookItemAddressType }
+                {name: AddressBookItemAddressType}
             ],
             // This is the search term to filter addresses by.
             filter: '',
@@ -264,6 +264,8 @@ export default {
             showConnectionTransaction: false,
             connectionTransaction: null,
             selectOption: 'Spark',
+            availableSparkFiro: null,
+            isSparkAddress: null
         }
     },
 
@@ -272,6 +274,7 @@ export default {
             enableElysium: 'App/enableElysium',
             network: 'ApiStatus/network',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             availablePrivate: 'Balance/availablePrivate',
             availablePublic: 'Balance/availablePublic',
@@ -318,6 +321,11 @@ export default {
             return !this.formDisabled && isValidAddress(this.address, this.network) && !this.addressBook[this.address];
         },
 
+        isSparkAddress () {
+            this.validateSparkAddress();
+            return this.isSparkAddress;
+        },
+
         coinControl () {
             return this.customInputs.length ? this.customInputs.map(txo => [txo.txid, txo.index]) : undefined;
         },
@@ -327,9 +335,10 @@ export default {
         },
 
         available () {
+            if(this.isSparkAllowed) this.getAvailableSparkBalance();
             if (this.selectedAsset != 'FIRO') return this.aggregatedElysiumBalances[this.selectedAsset].priv;
             else if (this.coinControl) return this.coinControlSelectedAmount;
-            else if (this.isPrivate) return this.availablePrivate;
+            else if (this.isPrivate) return this.isSparkAllowed ? BigInt(this.availableSparkFiro) : this.availablePrivate;
             else return this.availablePublic;
         },
 
@@ -558,7 +567,12 @@ export default {
 
         async validateSparkAddress(address) {
             let res = await $daemon.validateSparkAddress(address);
-            return res;
+            this.isSparkAddress = res.valid;
+        },
+
+        async getAvailableSparkBalance() {
+            let res = await $daemon.getAvailableSparkBalance();
+            this.availableSparkFiro = res.amount;
         },
     }
 }

@@ -38,7 +38,8 @@ export default {
 
     data() {
         return {
-            isPrivate: true
+            isPrivate: true,
+            availableSparkFiro: null
         };
     },
 
@@ -47,7 +48,8 @@ export default {
             availablePrivateFiro: "Balance/availablePrivate",
             availablePublicFiro: "Balance/availablePublic",
             elysiumBalances: "Elysium/aggregatedBalances",
-            tokenData: "Elysium/tokenData"
+            tokenData: "Elysium/tokenData",
+            isSparkAllowed: 'ApiStatus/isSparkAllowed',
         }),
 
         ticker() {
@@ -55,7 +57,8 @@ export default {
         },
 
         availablePrivate() {
-            return this.adjustAmount(this.asset == 'FIRO' ? this.availablePrivateFiro : this.elysiumBalances[this.asset]?.priv || 0);
+            if(this.isSparkAllowed) this.getAvailableSparkBalance();
+            return this.adjustAmount(this.asset == 'FIRO' ? (this.isSparkAllowed ? this.availableSparkFiro: this.availablePrivateFiro) : this.elysiumBalances[this.asset]?.priv || 0);
         },
 
         availablePublic() {
@@ -82,7 +85,12 @@ export default {
             if (this.disabled || this.asset != 'FIRO') return;
             this.isPrivate = !this.isPrivate;
             this.$emit('input', this.isPrivate);
-        }
+        },
+        
+        async getAvailableSparkBalance() {
+            let res = await $daemon.getAvailableSparkBalance();
+            this.availableSparkFiro = res.amount
+        },
     }
 }
 </script>
