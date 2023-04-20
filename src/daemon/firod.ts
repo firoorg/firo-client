@@ -200,6 +200,7 @@ export interface ApiStatusData {
     hasSentInitialStateWallet: boolean;
     latestBlockTimestamp: number;
     newLogMessages: string[];
+    isSpark: boolean;
 }
 
 export interface ApiStatus {
@@ -1876,6 +1877,11 @@ export class Firod {
     async isLelantusAllowed(): Promise<boolean> {
         const d = (await this.apiStatus()).data;
         return d.disabledSporks && !d.disabledSporks.includes("lelantus");
+    }
+
+    async isSparkAllowed(): Promise<boolean> {
+        const d = (await this.apiStatus()).data;
+        return d.isSpark;
     }
 
     async mintSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
