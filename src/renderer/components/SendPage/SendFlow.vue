@@ -9,7 +9,7 @@
                 Send
             </button>
 
-            <button v-else-if= "!isPrivate && !$parent.validateSparkAddress" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'goprivate'">
+            <button v-else-if= "!isPrivate && !this.$parent.isSparkAddr" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'goprivate'">
                 Send
             </button>
 
@@ -171,7 +171,7 @@ export default {
                     await $daemon.spendSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 } 
-                else if (!this.isPrivate && this.$parent.isSparkAllowed && this.$parent.validateSparkAddress) {
+                else if (!this.isPrivate && this.$parent.isSparkAllowed && this.$parent.isSparkAddr) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
                     const coinControl = this.coinControl || this.selectInputs(false, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);

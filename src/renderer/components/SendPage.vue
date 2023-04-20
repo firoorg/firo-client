@@ -444,7 +444,7 @@ export default {
                 this.addToAddressBook();
             }
 
-            this.validateSparkAddress(this.address);
+            this.validateSparkAddress();
         },
 
         selectedAsset() {
@@ -466,7 +466,7 @@ export default {
 
         this.$validator.extend('firoAddress', {
             getMessage: () => 'The Firo address you entered is invalid',
-            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress(this.address)
+            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress()
         });
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
@@ -519,7 +519,7 @@ export default {
         },
 
         async addToAddressBook() {
-            this.validateSparkAddress(this.address);
+            this.validateSparkAddress();
             if ((!isValidAddress(this.address, this.network) && !this.isSparkAddr) || !this.label) return;
 
             if (this.addressBook[this.address]) {
@@ -566,8 +566,8 @@ export default {
             this.address = '';
         },
 
-        async validateSparkAddress(address) {
-            let res = await $daemon.validateSparkAddress(address);
+        async validateSparkAddress() {
+            let res = await $daemon.validateSparkAddress(this.address);
             this.isSparkAddr = res.valid;
             return this.isSparkAddr;
         },
