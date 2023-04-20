@@ -43,6 +43,12 @@ export default {
         Amount
     },
 
+    data () {
+        return {
+            availableSparkFiro: 0
+        }
+    },
+
     computed: {
         ...mapGetters({
             availablePrivate: 'Balance/availablePrivate',
@@ -50,8 +56,16 @@ export default {
             availablePublic: 'Balance/availablePublic',
             incoming: 'Balance/incoming',
             pendingChange: 'Balance/pendingChange',
-            immature: 'Balance/immature'
-        })
+            immature: 'Balance/immature',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed'
+        }),
+    },
+
+    methods: {
+        async getAvailableSparkBalance() {
+            let res = await $daemon.getAvailableSparkBalance();
+            this.availableSparkFiro = res.amount
+        },
     }
 }
 </script>

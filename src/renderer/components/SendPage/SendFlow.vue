@@ -5,11 +5,11 @@
                 Reset
             </button>
 
-            <button v-if= "true" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'lelantustospark'">
+            <button v-if= "this.$parent.isSparkAllowed && this.$parent.availablePrivate > 0" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'lelantustospark'">
                 Send
             </button>
 
-            <button v-else-if= "!isPrivate && !$parent.isSparkAddress" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'goprivate'">
+            <button v-else-if= "!isPrivate && !$parent.validateSparkAddress" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'goprivate'">
                 Send
             </button>
 
@@ -166,11 +166,12 @@ export default {
                 } else if (this.isPrivate && this.$parent.isSparkAllowed) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(false, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                    // const coinControl = this.coinControl || this.selectInputs(true, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                    const coinControl = this.coinControl;
                     await $daemon.spendSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 } 
-                else if (!this.isPrivate && this.$parent.isSparkAllowed && this.$parent.isSparkAddress) {
+                else if (!this.isPrivate && this.$parent.isSparkAllowed && this.$parent.validateSparkAddress) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
                     const coinControl = this.coinControl || this.selectInputs(false, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);

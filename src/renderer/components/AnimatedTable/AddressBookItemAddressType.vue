@@ -1,8 +1,8 @@
 <template>
     <th v-if="isHeader">
-        Address Type
+        Type
     </th>
-
+    
     <td v-else class="address-book-item-label">
         {{ rowData.inputPrivacy || rowData.addressType.toLowerCase() }}
     </td>

@@ -3,7 +3,8 @@ import {TXO} from "./Transactions";
 const getters = {
     balances: (state, getters, rootState, rootGetters) => {
         let [availablePrivate, unconfirmedPrivate, unconfirmedPrivateChange, availablePublic, unconfirmedPublic,
-             unconfirmedPublicChange, locked, immature] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
+             unconfirmedPublicChange, locked, immature] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
+
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
@@ -39,7 +40,7 @@ const getters = {
     locked: (state, getters) => getters.balances.locked,
     immature: (state, getters) => getters.balances.immature,
     pendingChange: (state, getters) => getters.balances.unconfirmedPrivateChange + getters.balances.unconfirmedPrivate + getters.balances.unconfirmedPublicChange,
-    incoming: (dtate, getters) =>  getters.balances.unconfirmedPublic
+    incoming: (dtate, getters) =>  getters.balances.unconfirmedPublic,
 }
 
 export default {

@@ -1946,7 +1946,7 @@ export class Firod {
         if (isValidResponse(data)) {
             return data;
         } else {
-            throw new UnexpectedFirodResponse('create/validateSparkAddress', data);
+            throw new UnexpectedFirodResponse('create/getAvailableSparkBalance', data);
         }
     }
     
@@ -1958,7 +1958,7 @@ export class Firod {
         if (isValidResponse(data)) {
             return data;
         } else {
-            throw new UnexpectedFirodResponse('create/validateSparkAddress', data);
+            throw new UnexpectedFirodResponse('create/getUncomfirmedSparkBalance', data);
         }
     }
 }

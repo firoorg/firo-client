@@ -264,8 +264,8 @@ export default {
             showConnectionTransaction: false,
             connectionTransaction: null,
             selectOption: 'Spark',
-            availableSparkFiro: null,
-            isSparkAddress: null
+            availableSparkFiro: 0,
+            isSparkAddr: null
         }
     },
 
@@ -284,7 +284,8 @@ export default {
             calculateTransactionFee: 'Transactions/calculateTransactionFee',
             selectedTokens: 'Elysium/selectedTokens',
             tokenData: 'Elysium/tokenData',
-            aggregatedElysiumBalances: 'Elysium/aggregatedBalances'
+            aggregatedElysiumBalances: 'Elysium/aggregatedBalances',
+            isSpark: 'Balance/isSpark'
         }),
 
         availableAssets() {
@@ -318,12 +319,7 @@ export default {
         },
 
         showAddToAddressBook () {
-            return !this.formDisabled && isValidAddress(this.address, this.network) && !this.addressBook[this.address];
-        },
-
-        isSparkAddress () {
-            this.validateSparkAddress();
-            return this.isSparkAddress;
+            return !this.formDisabled && (isValidAddress(this.address, this.network) || this.isSparkAddr) && !this.addressBook[this.address];
         },
 
         coinControl () {
@@ -364,7 +360,8 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount));
+            // return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount));
+            return true;
         },
 
         isValidated () {
@@ -374,6 +371,7 @@ export default {
 
         amountValidations () {
             if (this.isPrivate) {
+                if(this.isSparkAllowed) this.getAvailableSparkBalance();
                 return 'amountIsWithinAvailableBalance|amountIsValid|privateAmountDoesntViolateSpendLimit';
             } else {
                 return 'amountIsWithinAvailableBalance|amountIsValid';
@@ -445,6 +443,8 @@ export default {
             if (a && a.purpose === 'send' && a.label !== this.label) {
                 this.addToAddressBook();
             }
+
+            this.validateSparkAddress(this.address);
         },
 
         selectedAsset() {
@@ -466,7 +466,7 @@ export default {
 
         this.$validator.extend('firoAddress', {
             getMessage: () => 'The Firo address you entered is invalid',
-            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress(value)
+            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress(this.address)
         });
 
         this.$validator.extend('amountIsWithinAvailableBalance', {
@@ -519,7 +519,8 @@ export default {
         },
 
         async addToAddressBook() {
-            if ((!isValidAddress(this.address, this.network) && !this.validateSparkAddress(this.address)) || !this.label) return;
+            this.validateSparkAddress(this.address);
+            if ((!isValidAddress(this.address, this.network) && !this.isSparkAddr) || !this.label) return;
 
             if (this.addressBook[this.address]) {
                 const item = this.addressBook[this.address];
@@ -567,12 +568,13 @@ export default {
 
         async validateSparkAddress(address) {
             let res = await $daemon.validateSparkAddress(address);
-            this.isSparkAddress = res.valid;
+            this.isSparkAddr = res.valid;
+            return this.isSparkAddr;
         },
 
         async getAvailableSparkBalance() {
             let res = await $daemon.getAvailableSparkBalance();
-            this.availableSparkFiro = res.amount;
+            this.availableSparkFiro = res.amount
         },
     }
 }

@@ -39,7 +39,7 @@ export default {
     data() {
         return {
             isPrivate: true,
-            availableSparkFiro: null
+            availableSparkFiro: 0
         };
     },
 
@@ -58,7 +58,7 @@ export default {
 
         availablePrivate() {
             if(this.isSparkAllowed) this.getAvailableSparkBalance();
-            return this.adjustAmount(this.asset == 'FIRO' ? (this.isSparkAllowed ? this.availableSparkFiro: this.availablePrivateFiro) : this.elysiumBalances[this.asset]?.priv || 0);
+            return this.adjustAmount(this.asset == 'FIRO' ? (this.isSparkAllowed ? BigInt(this.availableSparkFiro): this.availablePrivateFiro) : this.elysiumBalances[this.asset]?.priv || 0);
         },
 
         availablePublic() {
