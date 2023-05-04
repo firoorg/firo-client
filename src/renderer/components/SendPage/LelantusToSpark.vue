@@ -48,7 +48,6 @@ export default {
 }
     .info-item {
         margin-right: 45px;
-        // margin-left: 5px;
     }
 
     .info-icon {

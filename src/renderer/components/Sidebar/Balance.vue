@@ -58,14 +58,7 @@ export default {
             pendingChange: 'Balance/pendingChange',
             immature: 'Balance/immature',
             isSparkAllowed: 'ApiStatus/isSparkAllowed'
-        }),
-    },
-
-    methods: {
-        async getAvailableSparkBalance() {
-            let res = await $daemon.getAvailableSparkBalance();
-            this.availableSparkFiro = res.amount
-        },
+        })
     }
 }
 </script>

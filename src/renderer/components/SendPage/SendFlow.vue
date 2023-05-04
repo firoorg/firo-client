@@ -16,7 +16,6 @@
             <button v-else= "" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'confirm'">
                 Send
             </button>
-
         </div>
 
         <Popup v-if="show !== 'button'" :margin="show !== 'wait'">

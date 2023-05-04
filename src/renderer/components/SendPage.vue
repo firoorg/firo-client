@@ -311,7 +311,7 @@ export default {
             return BigInt(this.userTxFeePerKb) || this.smartFeePerKb;
         },
 
-        filteredSendAddresses() {
+        filteredSendAddresses () {
             this.$nextTick(() => this.$refs.animatedTable && this.$refs.animatedTable.reload());
             return this.sendAddresses
                 .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
@@ -331,10 +331,9 @@ export default {
         },
 
         available () {
-            if(this.isSparkAllowed) this.getAvailableSparkBalance();
             if (this.selectedAsset != 'FIRO') return this.aggregatedElysiumBalances[this.selectedAsset].priv;
             else if (this.coinControl) return this.coinControlSelectedAmount;
-            else if (this.isPrivate) return this.isSparkAllowed ? BigInt(this.availableSparkFiro) : this.availablePrivate;
+            else if (this.isPrivate) return this.availablePrivate;
             else return this.availablePublic;
         },
 
@@ -371,7 +370,6 @@ export default {
 
         amountValidations () {
             if (this.isPrivate) {
-                if(this.isSparkAllowed) this.getAvailableSparkBalance();
                 return 'amountIsWithinAvailableBalance|amountIsValid|privateAmountDoesntViolateSpendLimit';
             } else {
                 return 'amountIsWithinAvailableBalance|amountIsValid';
@@ -443,7 +441,6 @@ export default {
             if (a && a.purpose === 'send' && a.label !== this.label) {
                 this.addToAddressBook();
             }
-
             this.validateSparkAddress();
         },
 
@@ -525,7 +522,7 @@ export default {
             if (this.addressBook[this.address]) {
                 const item = this.addressBook[this.address];
                 await $daemon.updateAddressBookItem(item, this.label);
-                $store.commit('AddressBook/updateAddress', { ...item, label: this.label });
+                $store.commit('AddressBook/updateAddress', {...item, label: this.label});
                 this.$refs.animatedTable.reload();
             } else {
                 if(isValidAddress(this.address, this.network)){
@@ -547,7 +544,6 @@ export default {
                     $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
                     await $daemon.addAddressBookItem(item);
                 }
-
             }
         },
 
@@ -570,11 +566,6 @@ export default {
             let res = await $daemon.validateSparkAddress(this.address);
             this.isSparkAddr = res.valid;
             return this.isSparkAddr;
-        },
-
-        async getAvailableSparkBalance() {
-            let res = await $daemon.getAvailableSparkBalance();
-            this.availableSparkFiro = res.amount
         },
     }
 }
@@ -678,7 +669,7 @@ export default {
                         justify-content: space-between;
                     }
                 }
-                
+
                 .warning-text {
                     margin-bottom: 6px;
                     color: #FFA800;

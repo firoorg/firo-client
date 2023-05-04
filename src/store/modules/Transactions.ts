@@ -27,7 +27,7 @@ export interface TXO extends TxOut {
     lelantusInputSerialHashes?: string[];
 }
 
-function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
+function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentLTagHashes: Set<string>, spentPublicInputs: Set<string>, isSparkAllowed: boolean): TXO[] {
     const txos: TXO[] = [];
 
     let index = -1;
@@ -70,7 +70,7 @@ function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentPublic
                 console.warn(`${tx.txid}-${index} has an unknown scriptType`);
         }
 
-        const isPrivate = ['lelantus-mint', 'lelantus-jmint', 'sigma-mint', "spark-mint", "spark-smint", "spark-spend"].includes(txout.scriptType)
+        const isPrivate = ['lelantus-mint', 'lelantus-jmint', 'sigma-mint', "spark-mint", "spark-smint"].includes(txout.scriptType)
 
         let validAt = Infinity;
         if (!tx.blockHeight && !tx.isInstantSendLocked) validAt = Infinity;
@@ -95,7 +95,7 @@ function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentPublic
             elysium: tx.elysium,
             publicInputs: tx.publicInputs,
             lelantusInputSerialHashes: (<any>tx).lelantusInputSerialHashes,
-            isSpent: txout.isSpent || (isPrivate ? spentSerialHashes.has(txout.lelantusSerialHash) : spentPublicInputs.has(`${tx.txid}-${index}`)),
+            isSpent: txout.isSpent || (isPrivate ? (isSparkAllowed? spentLTagHashes.has(txout.sparkInputLTagHashes) : spentSerialHashes.has(txout.lelantusSerialHash)) : spentPublicInputs.has(`${tx.txid}-${index}`)),
             ...txout
         });
     }
@@ -186,13 +186,16 @@ function selectUTXOs(isPrivate: boolean, amount: bigint, feePerKb: bigint, subtr
 }
 
 const getters = {
+    isSparkAllowed: (state, rootGetters): boolean => rootGetters['ApiStatus/isSparkAllowed'],
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
     spentSerialHashes: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.lelantusInputSerialHashes], [])),
-    spentPublicInputs: (state, getters): Set<string> =>
+        spentLTagHashes: (state, getters): Set<string> =>
+        new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.sparkInputLTagHashes], [])),
+        spentPublicInputs: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.publicInputs], []).map(i => `${i[0]}-${i[1]}`)),
     allTXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
-        .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx, getters.spentSerialHashes, getters.spentPublicInputs)), []),
+    .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx, getters.spentSerialHashes, getters.spentLTagHashes, getters.spentPublicInputs, getters.isSparkAllowed)), []),
     TXOs: (state, getters): TXO[] => getters.allTXOs
         // Don't display orphaned mining transactions.
         .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
@@ -203,6 +206,7 @@ const getters = {
     UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) =>
         !txo.isSpent &&
         !getters.spentSerialHashes.has(txo.lelantusSerialHash) &&
+        !getters.spentLTagHashes.has(txo.sparkInputLTagHashes) &&
         !getters.spentPublicInputs.has(`${txo.txid}-${txo.index}`)
     ),
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
@@ -224,6 +228,7 @@ const getters = {
         txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
         txo.amount > 0
     ),
+
     // This will display:
     // 1) valid Elysium non-Lelantus Mint transactions
     // 2) unconfirmed Elysium non-Lelantus Mint from us

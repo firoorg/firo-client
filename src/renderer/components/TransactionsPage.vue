@@ -61,7 +61,7 @@ const tableFields = [
     {name: RelativeDate, width: '160pt'},
     {name: Label},
     {name: AddressType},
-    {name: Amount, width: '160pt'}
+    {name: Amount, width: '160pt'},
 ];
 
 export default {

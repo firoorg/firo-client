@@ -223,6 +223,7 @@ export interface TxOut {
     isElysiumReferenceOutput: boolean;
     destination?: string;
     lelantusSerialHash?: string;
+    sparkInputLTagHashes?: string;
 }
 
 type ElysiumPropertyLelantusStatus = "SoftDisabled" | "SoftEnabled" | "HardDisabled" | "HardEnabled";
@@ -273,6 +274,7 @@ export interface Transaction {
     outputs: TxOut[];
     publicInputs: CoinControl;
     lelantusInputSerialHashes: string[];
+    sparkInputLTagHashes: string[];
     elysium?: ElysiumData;
 
     // blockHash MAY be set without blockHeight or blockTime, in which case the transaction is from an orphaned block.
@@ -1968,4 +1970,3 @@ export class Firod {
         }
     }
 }
-

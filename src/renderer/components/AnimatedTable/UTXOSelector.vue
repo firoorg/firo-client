@@ -1,6 +1,6 @@
 <template>
     <th v-if="isHeader"></th>
-    <td v-else> 
+    <td v-else>
         <input v-if="!rowData.isLocked"  :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" ref="checkbox" type="checkbox" @input="toggle" />
         <input v-else :disabled="true" :id="`utxo-selector-${this.txidIndex}`" class="disable-checkbox" ref="checkbox" type="checkbox" @input="toggle" :checked="false"/>
     </td>
@@ -42,7 +42,6 @@ export default {
 td {
     padding-right: var(--padding-base);
 }
-
 input[type=checkbox].disable-checkbox {
     background-color: rgba(0,0,0,0.1);
     border: 1px solid rgba(0,0,0,0.1);

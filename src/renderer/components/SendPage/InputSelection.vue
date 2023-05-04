@@ -55,7 +55,7 @@ export default {
                 {name: UTXOSelector},
                 {name: TxIdIndex},
                 {name: TxAmount},
-                { name: UTXOLocker }
+                {name: UTXOLocker}
             ]
         }
     },
@@ -80,8 +80,7 @@ export default {
             return this.availableUTXOsWithLock
                 .filter(tx => tx.isPrivate === this.isPrivate)
                 .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index);
-        },
-
+        }
     },
 
     methods: {

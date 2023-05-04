@@ -1,8 +1,7 @@
 <template>
     <th v-if="isHeader">Transaction ID/Index</th>
     <td v-else-if="!rowData.isLocked" class="txid-index">
-        {{ rowData.txid }}-{{ rowData.index }}
-         
+        {{ rowData.txid }}-{{ rowData.index }}  
     </td>
     <td v-else class="disable-txt">
         {{ rowData.txid }}-{{ rowData.index }}

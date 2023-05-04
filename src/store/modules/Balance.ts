@@ -3,11 +3,11 @@ import {TXO} from "./Transactions";
 const getters = {
     balances: (state, getters, rootState, rootGetters) => {
         let [availablePrivate, unconfirmedPrivate, unconfirmedPrivateChange, availablePublic, unconfirmedPublic,
-             unconfirmedPublicChange, locked, immature] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
-
+            unconfirmedPublicChange, locked, immature, availableSpark] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
+            if ((txo.scriptType == "spark-mint" || txo.scriptType == "spark-smint")) {availableSpark += txo.amount; console.log("aaaaaaaaaaaaaaaaaaaaa",txo)}
             if (!txo.isToMe || txo.isSpent) continue;
             else if (txo.isElysiumReferenceOutput) locked += txo.amount;
             else if (txo.isLocked) locked += txo.amount;
@@ -19,7 +19,7 @@ const getters = {
             else if (txo.isChange) unconfirmedPublicChange += txo.amount;
             else unconfirmedPublic += txo.amount;
         }
-
+        console.log("availableSpark", availableSpark);
         return {
             availablePrivate,
             unconfirmedPrivate,

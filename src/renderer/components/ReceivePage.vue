@@ -22,12 +22,12 @@
                         <input ref="label" id="receive-address-label" type="text" placeholder="Unlabelled" v-model="label" @change="changeLabel" />
                     </InputFrame>
                 </div>
-                <div class="select-option" style="margin-top:12px">
-                    <select class="selector" v-model="selectOption">
-                        <option value="Spark">Spark</option>
-                        <option value="Transparent">Transparent</option>
-                    </select>
-                </div>
+            </div>
+            <div class="select-option" style="margin-top:12px">
+                <select class="selector" v-model="selectOption">
+                    <option value="Spark">Spark</option>
+                    <option value="Transparent">Transparent</option>
+                </select>
             </div>
 
             <div class="qr-code-container" :class="{'no-display': !address}">
@@ -79,7 +79,7 @@ export default {
         let check = this.selectOption?this.selectOption:'Spark';
         let addr = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0];
         return {
-            address: ( addr || {address: null}).address,
+            address: (addr || {address: null}).address,
             label: '',
             _quickLabel: null,
             qrCode: null,
