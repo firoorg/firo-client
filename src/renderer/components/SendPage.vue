@@ -61,7 +61,7 @@
                         />
                     </InputFrame>
 
-                    <div class="warning-text">
+                    <div v-if="!isPrivate" class="warning-text">
                         <div class="warning-item">
                             <Warning class="warning-icon" />
                             <label>
@@ -277,6 +277,7 @@ export default {
             isSparkAllowed: 'ApiStatus/isSparkAllowed',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             availablePrivate: 'Balance/availablePrivate',
+            availableLelantus: 'Balance/availableLelantus',
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
@@ -300,7 +301,7 @@ export default {
 
         transactionFee() {
             if (this.selectedAsset != 'FIRO' || !this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
-            return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
+            return this.calculateTransactionFee(this.isPrivate, this.isSparkAllowed[0], !isValidAddress(this.address, this.network), this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
         },
 
         formDisabled() {
@@ -359,8 +360,7 @@ export default {
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            // return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount));
-            return true;
+            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount));
         },
 
         isValidated () {

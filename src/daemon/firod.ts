@@ -267,7 +267,7 @@ export interface ElysiumData {
 
 export interface Transaction {
     txid: string;
-    inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus' | 'spark';
+    inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus' | 'sparkmint' | 'sparkspend';
     isFromMe: boolean;
     firstSeenAt: number;
     fee: bigint;

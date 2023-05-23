@@ -48,8 +48,7 @@ export default {
             availablePrivateFiro: "Balance/availablePrivate",
             availablePublicFiro: "Balance/availablePublic",
             elysiumBalances: "Elysium/aggregatedBalances",
-            tokenData: "Elysium/tokenData",
-            isSparkAllowed: 'ApiStatus/isSparkAllowed',
+            tokenData: "Elysium/tokenData"
         }),
 
         ticker() {

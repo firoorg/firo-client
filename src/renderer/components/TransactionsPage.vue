@@ -6,7 +6,8 @@
 
                 <div class="select-option" style="margin-top:12px;margin-bottom:12px">
                     <select class="selector" v-model="selectOption">
-                        <option value="spark">Spark</option>
+                        <option value="sparkmint">SparkMint</option>
+                        <option value="sparkspend">SparkSpend</option>
                         <option value="public">Public</option>
                         <option value="mined">Mined</option>
                         <option value="zerocoin">Zerocoin</option>
@@ -82,7 +83,7 @@ export default {
             newTableData: [],
             currentPage: 1,
             selectedTx: null,
-            selectOption: 'spark'
+            selectOption: 'sparkmint'
         }
     },
 

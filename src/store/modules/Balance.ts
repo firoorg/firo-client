@@ -3,11 +3,11 @@ import {TXO} from "./Transactions";
 const getters = {
     balances: (state, getters, rootState, rootGetters) => {
         let [availablePrivate, unconfirmedPrivate, unconfirmedPrivateChange, availablePublic, unconfirmedPublic,
-            unconfirmedPublicChange, locked, immature, availableSpark] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
+            unconfirmedPublicChange, locked, immature, availableLelantus] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
-            if ((txo.scriptType == "spark-mint" || txo.scriptType == "spark-smint")) {availableSpark += txo.amount; console.log("aaaaaaaaaaaaaaaaaaaaa",txo)}
+            if (txo.isPrivate && txo.validAt <= nextHeight && (txo.scriptType === 'lelantus-mint' || txo.scriptType === 'lelantus-jmint')) availableLelantus += txo.amount;
             if (!txo.isToMe || txo.isSpent) continue;
             else if (txo.isElysiumReferenceOutput) locked += txo.amount;
             else if (txo.isLocked) locked += txo.amount;
@@ -19,9 +19,10 @@ const getters = {
             else if (txo.isChange) unconfirmedPublicChange += txo.amount;
             else unconfirmedPublic += txo.amount;
         }
-        console.log("availableSpark", availableSpark);
+
         return {
             availablePrivate,
+            availableLelantus,
             unconfirmedPrivate,
             unconfirmedPrivateChange,
             availablePublic,
@@ -33,6 +34,7 @@ const getters = {
     },
 
     availablePrivate: (state, getters) => getters.balances.availablePrivate,
+    availableLelantus: (state, getters) => getters.balances.availableLelantus,
     unconfirmedPrivate: (state, getters) => getters.balances.unconfirmedPrivate,
     availablePublic: (state, getters) => getters.balances.availablePublic,
     unconfirmedPublic: (state, getters) => getters.balances.unconfirmedPublic,

@@ -56,8 +56,7 @@ export default {
             availablePublic: 'Balance/availablePublic',
             incoming: 'Balance/incoming',
             pendingChange: 'Balance/pendingChange',
-            immature: 'Balance/immature',
-            isSparkAllowed: 'ApiStatus/isSparkAllowed'
+            immature: 'Balance/immature'
         })
     }
 }

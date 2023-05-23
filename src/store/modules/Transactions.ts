@@ -17,7 +17,7 @@ export interface TXO extends TxOut {
     // This indicates whether this input should be used for new private transactions.
     isPrivate: boolean;
     // This indicates whether the transaction as a whole was private.
-    inputPrivacy: 'public' | 'zerocoin' | 'sigma' | 'lelantus' | 'mined' | 'spark';
+    inputPrivacy: 'public' | 'zerocoin' | 'sigma' | 'lelantus' | 'mined' | 'sparkmint' | 'sparkspend';
     validAt: number;
     firstSeenAt: number;
     isFromMe: boolean;
@@ -27,7 +27,7 @@ export interface TXO extends TxOut {
     lelantusInputSerialHashes?: string[];
 }
 
-function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentLTagHashes: Set<string>, spentPublicInputs: Set<string>, isSparkAllowed: boolean): TXO[] {
+function txosFromTx(tx: Transaction, spentLTagHashes: Set<string>, spentSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
     const txos: TXO[] = [];
 
     let index = -1;
@@ -42,6 +42,8 @@ function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentLTagHa
             case "spark-mint":
             case "spark-smint":
             case "spark-spend":
+                spendSize = 2535;
+                break;
             case "lelantus-mint":
             case "lelantus-jmint":
             case "lelantus-joinsplit":
@@ -95,7 +97,8 @@ function txosFromTx(tx: Transaction, spentSerialHashes: Set<string>, spentLTagHa
             elysium: tx.elysium,
             publicInputs: tx.publicInputs,
             lelantusInputSerialHashes: (<any>tx).lelantusInputSerialHashes,
-            isSpent: txout.isSpent || (isPrivate ? (isSparkAllowed? spentLTagHashes.has(txout.sparkInputLTagHashes) : spentSerialHashes.has(txout.lelantusSerialHash)) : spentPublicInputs.has(`${tx.txid}-${index}`)),
+            sparkInputLTagHashes: (<any>tx).sparkInputLTagHashes,
+            isSpent: txout.isSpent || (isPrivate ? (["spark-mint", "spark-smint"].includes(txout.scriptType) ? spentLTagHashes.has(txout.sparkInputLTagHashes) : spentSerialHashes.has(txout.lelantusSerialHash)) : spentPublicInputs.has(`${tx.txid}-${index}`)),
             ...txout
         });
     }
@@ -137,9 +140,20 @@ const mutations = {
     }
 };
 
-function selectUTXOs(isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
-    const constantSize = isPrivate ? 1234n : 78n;
-
+function selectUTXOs(isPrivate: boolean, isSpark: boolean, issparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
+    let constantSize;
+    //  = isPrivate ? (isSpark ? 1281n : 1234n) : 78n;
+    if(!isPrivate && !issparkaddress) {
+        constantSize = 78n;
+    } else if (isPrivate && !isSpark) {
+        constantSize = 1234n;
+    } else if(isPrivate && isSpark && issparkaddress) {
+        constantSize = 1281n;
+    } else if(isPrivate && isSpark && !issparkaddress) {
+        constantSize = 1068n;
+    } else if (!isPrivate && isSpark && issparkaddress) {
+        constantSize = 348n;
+    }
     if (coinControl) {
         if (availableUTXOs.find(utxo => utxo.isPrivate != isPrivate)) return undefined;
 
@@ -190,12 +204,12 @@ const getters = {
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
     spentSerialHashes: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.lelantusInputSerialHashes], [])),
-        spentLTagHashes: (state, getters): Set<string> =>
+    spentLTagHashes: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.sparkInputLTagHashes], [])),
-        spentPublicInputs: (state, getters): Set<string> =>
+    spentPublicInputs: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.publicInputs], []).map(i => `${i[0]}-${i[1]}`)),
     allTXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions))
-    .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx, getters.spentSerialHashes, getters.spentLTagHashes, getters.spentPublicInputs, getters.isSparkAllowed)), []),
+    .reduce((a: TXO[], tx: Transaction): TXO[] => a.concat(txosFromTx(tx, getters.spentLTagHashes, getters.spentSerialHashes, getters.spentPublicInputs)), []),
     TXOs: (state, getters): TXO[] => getters.allTXOs
         // Don't display orphaned mining transactions.
         .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
@@ -205,8 +219,8 @@ const getters = {
     TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.allTXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
     UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) =>
         !txo.isSpent &&
-        !getters.spentSerialHashes.has(txo.lelantusSerialHash) &&
         !getters.spentLTagHashes.has(txo.sparkInputLTagHashes) &&
+        !getters.spentSerialHashes.has(txo.lelantusSerialHash) &&
         !getters.spentPublicInputs.has(`${txo.txid}-${txo.index}`)
     ),
     availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
@@ -253,23 +267,23 @@ const getters = {
                 !(txo.isElysiumReferenceOutput && txo.elysium.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
                 !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
                 !(txo.elysium.type === 'Lelantus Mint') &&
-                (txo.isElysiumReferenceOutput || txo.destination || txo.inputPrivacy === 'spark') &&
+                (txo.isElysiumReferenceOutput || txo.destination || (txo.inputPrivacy === 'sparkmint' || (txo.inputPrivacy === 'sparkspend' && txo.index === 0))) &&
                 (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
                 (txo.isFromMe || txo.isToMe || txo.elysium.isToMe)
         )
         .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 
-    selectInputs: (state, getters): (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean) => CoinControl => {
+    selectInputs: (state, getters): (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean) => CoinControl => {
         getters.availableUTXOs;
-        return (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean): CoinControl => {
-            return selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs, false)[1].map(utxo => [utxo.txid, utxo.index]);
+        return (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean): CoinControl => {
+            return selectUTXOs(isPrivate, isSpark, isparkaddress, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs, false)[1].map(utxo => [utxo.txid, utxo.index]);
         }
     },
 
-    calculateTransactionFee: (state, getters): (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => bigint => {
+    calculateTransactionFee: (state, getters): (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => bigint => {
         getters.availableUTXOs;
-        return (isPrivate: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => {
-            const x = selectUTXOs(isPrivate, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
+        return (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => {
+            const x = selectUTXOs(isPrivate, isSpark, isparkaddress, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
             return x && x[0];
         };
     }
