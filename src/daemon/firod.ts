@@ -1567,6 +1567,15 @@ export class Firod {
         return <string[]>data;
     }
 
+    async mintAllSpark(auth: string): Promise<string[]> {
+        const data = await this.send(auth, 'create', 'autoMintSpark', null);
+        if (typeof data !== 'object') throw new UnexpectedFirodResponse('create/mint', data);
+        for (const x in data) {
+            if (typeof x !== 'string') throw new UnexpectedFirodResponse('create/mint', data);
+        }
+        return <string[]>data;
+    }
+    
     async mintElysium(auth: string, address: string, propertyId: number): Promise<{txids: string[]}> {
         return <any>await this.send(auth, null, 'mintElysium', {
             address,

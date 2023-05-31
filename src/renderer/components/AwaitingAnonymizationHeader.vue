@@ -91,6 +91,7 @@ export default {
             if (!this.enableElysium) return 0;
             return this.tokensNeedingAnonymization.map(x=>x[0]).sort().reduce((a, x) => a[a.length-1] == x ? a : [...a, x], []).length;
         },
+        
         isSpark() {
             return this.isSparkAllowed[0]
         }

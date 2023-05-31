@@ -29,11 +29,18 @@ export default {
         };
     },
 
-    computed: mapGetters({
-        availablePublic: 'Balance/availablePublic',
-        tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
-        tokenData: 'Elysium/tokenData'
-    }),
+    computed: {
+        ...mapGetters({
+            availablePublic: 'Balance/availablePublic',
+            tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
+            tokenData: 'Elysium/tokenData',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed'
+        }),
+
+        isSpark() {
+            return this.isSparkAllowed[0]
+        }
+    },
 
     methods: {
         cancel() {
@@ -69,7 +76,11 @@ export default {
             }
 
             try {
-                await $daemon.mintAllLelantus(passphrase);
+                if(this.isSpark) {
+                    await $daemon.mintAllSpark(passphrase);
+                } else {
+                    await $daemon.mintAllLelantus(passphrase);
+                }
             } catch (e) {
                 if (e instanceof FirodErrorResponse) {
                     errors.unshift(e.errorMessage);
