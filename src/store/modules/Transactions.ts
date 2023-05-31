@@ -142,7 +142,6 @@ const mutations = {
 
 function selectUTXOs(isPrivate: boolean, isSpark: boolean, issparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
     let constantSize;
-    //  = isPrivate ? (isSpark ? 1281n : 1234n) : 78n;
     if(!isPrivate && !issparkaddress) {
         constantSize = 78n;
     } else if (isPrivate && !isSpark) {
@@ -267,7 +266,7 @@ const getters = {
                 !(txo.isElysiumReferenceOutput && txo.elysium.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
                 !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
                 !(txo.elysium.type === 'Lelantus Mint') &&
-                (txo.isElysiumReferenceOutput || txo.destination || (txo.inputPrivacy === 'sparkmint' || (txo.inputPrivacy === 'sparkspend' && txo.index === 0))) &&
+                (txo.isElysiumReferenceOutput || txo.destination || (txo.inputPrivacy === 'sparkmint' || (txo.inputPrivacy === 'sparkspend'))) &&
                 (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
                 (txo.isFromMe || txo.isToMe || txo.elysium.isToMe)
         )
