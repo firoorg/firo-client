@@ -2,7 +2,8 @@
     <div>
         <div class="warning-header">
             <div v-if="isSpark && availableLelantus > 0">
-                <a id="anonymize-firo-link" href="#" @click="show = 'lelantustospark'">Click here</a> to migrate funds from Lelantus to Spark.
+                Firo is switching to Spark. Please
+                <a id="anonymize-firo-link" href="#" @click="show = 'lelantustospark'">click here</a> to migrate your funds..
             </div>
             <div v-else>
                 <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
@@ -33,11 +34,8 @@
         </Popup>
 
         <Popup v-if="show === 'passphrase'" >
-            <PassphraseInput :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
-        </Popup>
-
-        <Popup v-if="show === 'wait'" >
-            <WaitOverlay />
+            <WaitOverlay v-if="waiting" />
+            <PassphraseInput v-else-if = "!waiting" v-model="passphrase" :error="error" @cancel="cancel()" @confirm="attemptSend" />
         </Popup>
 
         <Popup v-if="showAnonymizeDialog" >
@@ -74,7 +72,9 @@ export default {
         return {
             showAnonymizeDialog: false,
             passphrase: '',
-            show: 'button'
+            show: 'button',
+            waiting: false,
+            error: null,
         };
     },
 
@@ -117,22 +117,28 @@ export default {
         },
 
         async attemptSend () {
-            this.show = 'wait';
             const passphrase = this.passphrase;
             this.passphrase = '';
+            this.waiting = true;
             try {
                 await $daemon.lelantusToSpark(passphrase);
             } catch (e) {
-                    if (e instanceof IncorrectPassphrase) {
-                        this.error = 'Incorrect Passphrase';
-                        this.waiting = false;
-                        return;
-                    } else if (e instanceof FirodErrorResponse) {
-                        errors.push(e.errorMessage);
-                    } else {
-                        errors.push(`${e}`);
-                    }
+                if (e instanceof IncorrectPassphrase) {
+                    this.error = 'Incorrect Passphrase';
+                } else if (e instanceof FirodErrorResponse) {
+                    this.error = e.errorMessage;
+                } else {
+                    this.error = `${e}`;
                 }
+                this.waiting = false;
+                this.show = 'passphrase';
+                return;
+            }
+
+            this.error = null;
+            this.waiting = false;
+            this.show = 'button';
+            this.$emit('success');
         }
     }
 }
