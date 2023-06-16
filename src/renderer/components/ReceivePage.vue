@@ -76,7 +76,7 @@ export default {
     },
 
     data() {
-        let check = this.selectOption?this.selectOption:'Spark';
+        let check = this.selectOption ? this.selectOption : 'Spark';
         let addr = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0];
         return {
             address: (addr || {address: null}).address,
@@ -88,6 +88,7 @@ export default {
             error: '',
             passphrase: '',
             selectOption: 'Spark',
+            option: '',
 
             tableFields: [
                 {name: CurrentAddressIndicator},
@@ -107,8 +108,9 @@ export default {
 
         tableData() {
             this.$nextTick(() => this.$refs.animatedTable.reload());
+            this.selectOptionChange()
             return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr})).filter(a => a.addressType === this.selectOption);
-        }
+        },
     },
 
     destroyed() {
@@ -173,6 +175,14 @@ export default {
         ...mapMutations({
             setAddressBook: 'AddressBook/setAddressBook'
         }),
+
+        selectOptionChange() {
+            if(this.option !== this.selectOption) {
+                let check = this.selectOption ? this.selectOption : 'Spark';
+                this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0].address;
+                this.option = this.selectOption;
+            } 
+        },
 
         async changeLabel(ev) {
             if (!this.address) return;

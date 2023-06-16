@@ -6,11 +6,12 @@
         <div class="info">
             <Info class="info-icon info-item" />
             <label class="info-item">
-                Firo is switching to Spark. Please migrate your funds.
+                Firo is migrating to Spark. Please migrate your funds.
             </label>
         </div>
 
         <div class="buttons"  style="width: 500px; height: 60px;margin-top: 35px;margin-left: -15px">
+            <button class="solid-button unrecommended" @click="$emit('ignore')">Ignore</button>
             <button class="solid-button recommended" @click="$emit('migrate')">Migrate</button>
         </div>
     </div>

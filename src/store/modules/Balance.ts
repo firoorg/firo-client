@@ -3,22 +3,30 @@ import {TXO} from "./Transactions";
 const getters = {
     balances: (state, getters, rootState, rootGetters) => {
         let [availablePrivate, unconfirmedPrivate, unconfirmedPrivateChange, availablePublic, unconfirmedPublic,
-            unconfirmedPublicChange, locked, immature, availableLelantus] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
+            unconfirmedPublicChange, locked, immature, availableLelantus, unconfirmedLelantus, unconfirmedLelantusChange, 
+            availableSpark, unconfirmedSpark, unconfirmedSparkChange] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
+        let isSparkAllowed: boolean = rootGetters['ApiStatus/isSparkAllowed'];
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
-            if (txo.isPrivate && txo.validAt <= nextHeight && (txo.scriptType === 'lelantus-mint' || txo.scriptType === 'lelantus-jmint')) availableLelantus += txo.amount;
             if (!txo.isToMe || txo.isSpent) continue;
             else if (txo.isElysiumReferenceOutput) locked += txo.amount;
             else if (txo.isLocked) locked += txo.amount;
             else if (txo.inputPrivacy == 'mined' && txo.validAt > nextHeight) immature += txo.amount;
-            else if (txo.isPrivate && txo.validAt <= nextHeight) availablePrivate += txo.amount;
-            else if (txo.isPrivate && txo.isChange) unconfirmedPrivateChange += txo.amount;
-            else if (txo.isPrivate) unconfirmedPrivate += txo.amount;
+            else if (txo.isPrivate && txo.validAt <= nextHeight && (txo.scriptType === 'lelantus-mint' || txo.scriptType === 'lelantus-jmint')) availableLelantus += txo.amount;
+            else if (txo.isPrivate && txo.validAt <= nextHeight && (txo.scriptType === 'spark-mint' || txo.scriptType === 'spark-smint')) availableSpark += txo.amount;
+            else if (txo.isPrivate && txo.isChange && (txo.scriptType === 'lelantus-mint' || txo.scriptType === 'lelantus-jmint')) unconfirmedLelantusChange += txo.amount;
+            else if (txo.isPrivate && txo.isChange && (txo.scriptType === 'spark-mint' || txo.scriptType === 'spark-smint')) unconfirmedSparkChange += txo.amount;
+            else if (txo.isPrivate && (txo.scriptType === 'lelantus-mint' || txo.scriptType === 'lelantus-jmint')) unconfirmedLelantus += txo.amount;
+            else if (txo.isPrivate && (txo.scriptType === 'spark-mint' || txo.scriptType === 'spark-smint')) unconfirmedSpark += txo.amount;
             else if (txo.validAt <= nextHeight) availablePublic += txo.amount;
             else if (txo.isChange) unconfirmedPublicChange += txo.amount;
             else unconfirmedPublic += txo.amount;
         }
+
+        availablePrivate = isSparkAllowed ? availableSpark : availableLelantus;
+        unconfirmedPrivate = isSparkAllowed ? unconfirmedSpark : unconfirmedLelantus;
+        unconfirmedPrivateChange = isSparkAllowed ? unconfirmedSparkChange : unconfirmedLelantusChange;
 
         return {
             availablePrivate,

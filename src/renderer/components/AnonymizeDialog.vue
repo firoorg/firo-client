@@ -35,11 +35,7 @@ export default {
             tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
             tokenData: 'Elysium/tokenData',
             isSparkAllowed: 'ApiStatus/isSparkAllowed'
-        }),
-
-        isSpark() {
-            return this.isSparkAllowed[0]
-        }
+        })
     },
 
     methods: {
@@ -76,7 +72,7 @@ export default {
             }
 
             try {
-                if(this.isSpark) {
+                if(this.isSparkAllowed) {
                     await $daemon.mintAllSpark(passphrase);
                 } else {
                     await $daemon.mintAllLelantus(passphrase);

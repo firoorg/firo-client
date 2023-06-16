@@ -140,19 +140,20 @@ const mutations = {
     }
 };
 
-function selectUTXOs(isPrivate: boolean, isSpark: boolean, issparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
+function selectUTXOs(isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
     let constantSize;
-    if(!isPrivate && !issparkaddress) {
+    if(!isPrivate) {
         constantSize = 78n;
     } else if (isPrivate && !isSpark) {
         constantSize = 1234n;
-    } else if(isPrivate && isSpark && issparkaddress) {
+    } else if(isPrivate && isSpark && !istransparentaddress) {
         constantSize = 1281n;
-    } else if(isPrivate && isSpark && !issparkaddress) {
+    } else if(isPrivate && isSpark && istransparentaddress) {
         constantSize = 1068n;
-    } else if (!isPrivate && isSpark && issparkaddress) {
+    } else if (!isPrivate && isSpark && !istransparentaddress) {
         constantSize = 348n;
     }
+
     if (coinControl) {
         if (availableUTXOs.find(utxo => utxo.isPrivate != isPrivate)) return undefined;
 
@@ -199,7 +200,6 @@ function selectUTXOs(isPrivate: boolean, isSpark: boolean, issparkaddress: boole
 }
 
 const getters = {
-    isSparkAllowed: (state, rootGetters): boolean => rootGetters['ApiStatus/isSparkAllowed'],
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
     spentSerialHashes: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.lelantusInputSerialHashes], [])),
@@ -222,25 +222,33 @@ const getters = {
         !getters.spentSerialHashes.has(txo.lelantusSerialHash) &&
         !getters.spentPublicInputs.has(`${txo.txid}-${txo.index}`)
     ),
-    availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
-        txo.isToMe &&
-        // Elysium has reference outputs that we should not allow the user to spend.
-        !txo.isElysiumReferenceOutput &&
-        (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
-        txo.spendSize &&
-        txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
-        txo.amount > 0
-    ),
+    availableUTXOs: (state, getters, rootState, rootGetters): TXO[] => {
+        let isSparkAllowed: boolean = rootGetters['ApiStatus/isSparkAllowed'];
+        return getters.UTXOs.filter((txo: TXO) =>
+            txo.isToMe &&
+            // Elysium has reference outputs that we should not allow the user to spend.
+            !txo.isElysiumReferenceOutput &&
+            (rootGetters['App/allowBreakingMasternodes'] || !txo.isLocked) &&
+            txo.spendSize &&
+            txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
+            txo.amount > 0 &&
+            (txo.isPrivate ? (isSparkAllowed ? ["spark-mint", "spark-smint"].includes(txo.scriptType) : ["lelantus-mint", "lelantus-jmint"].includes(txo.scriptType)) : true)
+        )
+    },
     lockedUTXOs: (state, getters) => getters.UTXOs.filter((txo: TXO) => txo.isLocked),
 
-    availableUTXOsWithLock: (state, getters, rootState, rootGetters): TXO[] => getters.UTXOs.filter((txo: TXO) =>
-        txo.isToMe &&
-        // Elysium has reference outputs that we should not allow the user to spend.
-        !txo.isElysiumReferenceOutput &&
-        txo.spendSize &&
-        txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
-        txo.amount > 0
-    ),
+    availableUTXOsWithLock: (state, getters, rootState, rootGetters): TXO[] => {
+        let isSparkAllowed: boolean = rootGetters['ApiStatus/isSparkAllowed'];
+        return getters.UTXOs.filter((txo: TXO) =>
+            txo.isToMe &&
+            // Elysium has reference outputs that we should not allow the user to spend.
+            !txo.isElysiumReferenceOutput &&
+            txo.spendSize &&
+            txo.validAt <= rootGetters['ApiStatus/currentBlockHeight'] + 1 &&
+            txo.amount > 0 &&
+            (txo.isPrivate ? (isSparkAllowed ? ["spark-mint", "spark-smint"].includes(txo.scriptType) : ["lelantus-mint", "lelantus-jmint"].includes(txo.scriptType)) : true)
+        )
+    },
 
     // This will display:
     // 1) valid Elysium non-Lelantus Mint transactions
@@ -272,17 +280,17 @@ const getters = {
         )
         .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 
-    selectInputs: (state, getters): (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean) => CoinControl => {
+    selectInputs: (state, getters): (isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean) => CoinControl => {
         getters.availableUTXOs;
-        return (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean): CoinControl => {
-            return selectUTXOs(isPrivate, isSpark, isparkaddress, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs, false)[1].map(utxo => [utxo.txid, utxo.index]);
+        return (isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean): CoinControl => {
+            return selectUTXOs(isPrivate, isSpark, istransparentaddress, amount, feePerKb, subtractFeeFromAmount, getters.availableUTXOs, false)[1].map(utxo => [utxo.txid, utxo.index]);
         }
     },
 
-    calculateTransactionFee: (state, getters): (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => bigint => {
+    calculateTransactionFee: (state, getters): (isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]) => bigint => {
         getters.availableUTXOs;
-        return (isPrivate: boolean, isSpark: boolean, isparkaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => {
-            const x = selectUTXOs(isPrivate, isSpark, isparkaddress, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
+        return (isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => {
+            const x = selectUTXOs(isPrivate, isSpark, istransparentaddress, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
             return x && x[0];
         };
     }

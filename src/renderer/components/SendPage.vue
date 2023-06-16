@@ -285,8 +285,7 @@ export default {
             calculateTransactionFee: 'Transactions/calculateTransactionFee',
             selectedTokens: 'Elysium/selectedTokens',
             tokenData: 'Elysium/tokenData',
-            aggregatedElysiumBalances: 'Elysium/aggregatedBalances',
-            isSpark: 'Balance/isSpark'
+            aggregatedElysiumBalances: 'Elysium/aggregatedBalances'
         }),
 
         availableAssets() {
@@ -301,7 +300,7 @@ export default {
 
         transactionFee() {
             if (this.selectedAsset != 'FIRO' || !this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
-            return this.calculateTransactionFee(this.isPrivate, this.isSparkAllowed[0], !isValidAddress(this.address, this.network), this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
+            return this.calculateTransactionFee(this.isPrivate, this.isSparkAllowed, isValidAddress(this.address, this.network), this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
         },
 
         formDisabled() {

@@ -64,6 +64,7 @@ export default {
         ...mapGetters({
             TXOMap: 'Transactions/TXOMap',
             availableUTXOsWithLock: 'Transactions/availableUTXOsWithLock',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed'
         }),
 
         showBreakingMasternodeWarning() {

@@ -201,6 +201,7 @@ export interface ApiStatusData {
     latestBlockTimestamp: number;
     newLogMessages: string[];
     isSpark: boolean;
+    lelantusGracefulPeriod: number;
 }
 
 export interface ApiStatus {

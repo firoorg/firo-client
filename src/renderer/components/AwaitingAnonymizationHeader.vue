@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="warning-header">
-            <div v-if="isSpark && availableLelantus > 0">
-                Firo is switching to Spark. Please
-                <a id="anonymize-firo-link" href="#" @click="show = 'lelantustospark'">click here</a> to migrate your funds..
+            <div v-if="this.isSparkAllowed && availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod">
+                Firo is migrating to Spark. Redemption of coins in Lelantus will be disabled at block {{ lelantusGracefulPeriod }}. Current block is {{ currentBlockHeight }}.
+                <a id="anonymize-firo-link" href="#" @click="show = 'lelantustospark'">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
             </div>
             <div v-else>
                 <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
@@ -30,6 +30,7 @@
         <Popup v-if="show === 'lelantustospark'" >
              <LelantusToSpark
                 @migrate="goToPassphraseStep()"
+                @ignore="cancel()"
             />
         </Popup>
 
@@ -85,15 +86,13 @@ export default {
             tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
             isSparkAllowed: 'ApiStatus/isSparkAllowed',
             availableLelantus: 'Balance/availableLelantus',
+            currentBlockHeight: 'ApiStatus/currentBlockHeight',
+            lelantusGracefulPeriod: 'ApiStatus/lelantusGracefulPeriod',
         }),
 
         nTokensNeedingAnonymization() {
             if (!this.enableElysium) return 0;
             return this.tokensNeedingAnonymization.map(x=>x[0]).sort().reduce((a, x) => a[a.length-1] == x ? a : [...a, x], []).length;
-        },
-        
-        isSpark() {
-            return this.isSparkAllowed[0]
         }
     },
 
