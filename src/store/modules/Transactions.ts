@@ -142,7 +142,7 @@ const mutations = {
 
 function selectUTXOs(isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
     let constantSize;
-    if(!isPrivate) {
+    if(!isPrivate && istransparentaddress) {
         constantSize = 78n;
     } else if (isPrivate && !isSpark) {
         constantSize = 1234n;
