@@ -190,19 +190,19 @@ export default {
                 } else if (this.isPrivate && !this.isSpark) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(true, false, this.$parent.isSparkAddr, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                    const coinControl = this.coinControl || this.selectInputs(true, false, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
                     await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 } else if (this.isPrivate && this.isSpark) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(true, true, this.$parent.isSparkAddr, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                    const coinControl = this.coinControl || this.selectInputs(true, true, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
                     await $daemon.spendSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 } else if (!this.isPrivate && this.isSpark && this.$parent.isSparkAddr) {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(false, true, this.$parent.isSparkAddr, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                    const coinControl = this.coinControl || this.selectInputs(false, true, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
                     await $daemon.mintSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 } else {
@@ -215,7 +215,7 @@ export default {
 
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(false, false, this.$parent.isSparkAddr, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                    const coinControl = this.coinControl || this.selectInputs(false, false, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
                     await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 }

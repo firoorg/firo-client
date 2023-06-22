@@ -561,6 +561,10 @@ export default {
             this.address = '';
         },
 
+        isTransparentAddress() {
+            return isValidAddress(this.address, this.network);
+        },
+
         async validateSparkAddress() {
             let res = await $daemon.validateSparkAddress(this.address);
             this.isSparkAddr = res.valid;

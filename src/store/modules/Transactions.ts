@@ -155,13 +155,31 @@ function selectUTXOs(isPrivate: boolean, isSpark: boolean, istransparentaddress:
     }
 
     if (coinControl) {
+        let totalSize = 0n;
+        let gathered = 0n;
+        let fee = 0n;
         if (availableUTXOs.find(utxo => utxo.isPrivate != isPrivate)) return undefined;
 
-        // assume 5000 as the signature size for unknown outputs.
-        const totalSize = constantSize + availableUTXOs.reduce((a, utxo) => a + BigInt(utxo.spendSize) || 5000n, 0n);
-        const gathered = availableUTXOs.reduce((a, utxo) => a + utxo.amount, 0n);
+        if (!isPrivate && isSpark && !istransparentaddress) {
+            let destinations = [];
+            for (const utxo of availableUTXOs) {
+                if(!destinations.includes(utxo.destination)) {
+                    totalSize+= constantSize + BigInt(utxo.spendSize) || 5000n;
+                    destinations.push(utxo.destination);
+                } else {
+                    totalSize += BigInt(utxo.spendSize) || 5000n;
+                }
+                gathered += utxo.amount;
+                if (gathered >= (subtractFeeFromAmount ? amount : amount + fee))
+                    break;
+            }
+        } else {
+            // assume 5000 as the signature size for unknown outputs.
+            totalSize = constantSize + availableUTXOs.reduce((a, utxo) => a + BigInt(utxo.spendSize) || 5000n, 0n);
+            gathered = availableUTXOs.reduce((a, utxo) => a + utxo.amount, 0n);
+        }
 
-        let fee = (totalSize * feePerKb) / 1000n ;
+        fee = (totalSize * feePerKb) / 1000n ;
         if (fee === 0n) fee = 1n;
 
         if (subtractFeeFromAmount && fee >= amount) return undefined;
@@ -176,23 +194,47 @@ function selectUTXOs(isPrivate: boolean, isSpark: boolean, istransparentaddress:
         .filter(utxo => utxo.isPrivate == isPrivate)
         .sort((a, b) => Number(b.amount - a.amount));
 
-    let totalSize = constantSize;
     let gathered = 0n;
 
     const selectedUTXOs = [];
-    while (utxos.length) {
-        const utxo = utxos.length % 2 ? utxos.shift() : utxos.pop();
+    if (!isPrivate && isSpark && !istransparentaddress) {
+        let destinations = [];
+        let totalSize = 0n;
+        while (utxos.length) {
+            const utxo = utxos.length % 2 ? utxos.shift() : utxos.pop();
+            if(!destinations.includes(utxo.destination)) {
+                totalSize+= constantSize + BigInt(utxo.spendSize);
+                destinations.push(utxo.destination);
+            } else {
+                totalSize += BigInt(utxo.spendSize);
+            }
 
-        gathered += utxo.amount;
-        totalSize += BigInt(utxo.spendSize);
-        selectedUTXOs.push(utxo);
+            gathered += utxo.amount;
+            selectedUTXOs.push(utxo);
 
-        let fee = (totalSize * feePerKb) / 1000n;
-        if (fee === 0n) fee = 1n;
+            let fee = (totalSize * feePerKb) / 1000n;
+            if (fee === 0n) fee = 1n;
 
-        if (subtractFeeFromAmount && amount <= fee) continue;
-        if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) {
-            return [fee, selectedUTXOs];
+            if (subtractFeeFromAmount && amount <= fee) continue;
+            if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) {
+                return [fee, selectedUTXOs];
+            }
+        }
+    } else {
+        let totalSize = constantSize;
+        while (utxos.length) {
+            const utxo = utxos.length % 2 ? utxos.shift() : utxos.pop();
+            gathered += utxo.amount;
+            totalSize += BigInt(utxo.spendSize);
+            selectedUTXOs.push(utxo);
+
+            let fee = (totalSize * feePerKb) / 1000n;
+            if (fee === 0n) fee = 1n;
+
+            if (subtractFeeFromAmount && amount <= fee) continue;
+            if (gathered >= (subtractFeeFromAmount ? amount : amount + fee)) {
+                return [fee, selectedUTXOs];
+            }
         }
     }
 
