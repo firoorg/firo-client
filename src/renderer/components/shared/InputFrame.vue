@@ -24,7 +24,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .framed-input {
     position: relative;
     height: 50px;

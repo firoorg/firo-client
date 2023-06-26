@@ -1,7 +1,7 @@
 <template>
     <div class="waiting-screen">
         <div class="top">
-            <FiroSymbolWhite />
+            <FiroSymbol />
 
             <DotDotDot />
 
@@ -20,7 +20,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import FiroSymbolWhite from "renderer/assets/FiroSymbolWhite.svg";
+import FiroSymbol from "renderer/assets/FiroSymbol";
 import DotDotDot from "renderer/components/shared/DotDotDot";
 
 export default {
@@ -28,7 +28,7 @@ export default {
 
     components: {
         DotDotDot,
-        FiroSymbolWhite
+        FiroSymbol
     },
 
     props: {
@@ -58,7 +58,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 $speed: 2.5s;
 
 .waiting-screen {
@@ -80,16 +80,12 @@ $speed: 2.5s;
             right: auto;
         };
 
-        svg {
+        .firo-symbol-svg {
             width: 80px;
             margin: {
                 bottom: var(--padding-base);
                 left: auto;
                 right: auto;
-            }
-
-            g {
-                fill: var(--color-primary);
             }
         }
 

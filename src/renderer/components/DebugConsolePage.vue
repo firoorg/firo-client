@@ -65,10 +65,8 @@
 </template>
 
 <script>
-const {app} = require('electron').remote;
-
 export default {
-    name: "DebugPage",
+    name: "DebugConsolePage",
 
     data () {
         return {
@@ -146,7 +144,7 @@ export default {
 
     async activated() {
         this.scrollToBottom();
-        this.focusInput();
+        this.moveCursorToEndOfInput();
     },
 
     methods: {
@@ -237,10 +235,12 @@ export default {
 
         moveCursorToEndOfInput() {
             this.focusInput();
-            // select all the content in the element
-            document.execCommand('selectAll', false, null);
-            // collapse selection to the end
-            document.getSelection().collapseToEnd();
+
+            const range = document.createRange();
+            range.selectNodeContents(document.querySelector("#current-input"));
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            window.getSelection().collapseToEnd();
         },
 
         onInput(event) {
@@ -463,7 +463,14 @@ export default {
             word-break: break-word;
 
             .suggestion {
+                color: var(--color-text-disabled);
+
+                &:not(:last-child) {
+                    margin-right: 8px;
+                }
+
                 &.selected {
+                    color: var(--color-text-secondary);
                     font-weight: bold;
                 }
             }

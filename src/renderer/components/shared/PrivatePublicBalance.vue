@@ -12,7 +12,7 @@
             <amount :amount="availablePublic" :ticker="ticker" />
         </div>
 
-        <div class="toggle" :class="[isPrivate ? 'is-private' : 'is-public', (asset != 'FIRO' || disabled) ? 'toggle-disabled' : 'toggle-enabled']">
+        <div class="toggle" :class="[modelValue ? 'is-private' : 'is-public', (asset != 'FIRO' || disabled) ? 'toggle-disabled' : 'toggle-enabled']">
             <label class="toggle-label-private">Private</label>
             <div class="toggle-switch" @click="toggle()">
                 <div class="inner" />
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-// $emits: toggle (isPrivate)
+// $emits: update:modelValue
 import {mapGetters} from "vuex";
 import Amount from "renderer/components/shared/Amount";
 
@@ -34,13 +34,7 @@ export default {
         Amount
     },
 
-    props: ['asset', 'value', 'disabled'],
-
-    data() {
-        return {
-            isPrivate: true
-        };
-    },
+    props: ['asset', 'modelValue', 'disabled'],
 
     computed: {
         ...mapGetters({
@@ -63,16 +57,6 @@ export default {
         }
     },
 
-    watch: {
-        value: {
-            immediate: true,
-            handler(v) {
-                if (this.isPrivate === v) return;
-                this.isPrivate = v;
-            }
-        }
-    },
-
     methods: {
         adjustAmount(amount) {
             return this.asset == 'FIRO' || this.tokenData[this.asset]?.isDivisible ? amount : `${amount}`;
@@ -80,8 +64,7 @@ export default {
 
         toggle() {
             if (this.disabled || this.asset != 'FIRO') return;
-            this.isPrivate = !this.isPrivate;
-            this.$emit('input', this.isPrivate);
+            this.$emit('update:modelValue', !this.modelValue);
         }
     }
 }

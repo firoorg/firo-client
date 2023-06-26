@@ -29,19 +29,14 @@
 </template>
 
 <script>
-import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
-import ExpiredIcon from 'renderer/assets/ExpiredIcon.svg'
+import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 
 export default {
     name: 'CoinSwapSentAmount',
 
     mixins: [
         VuetableFieldMixin
-    ],
-
-    components: {
-        ExpiredIcon
-    }
+    ]
 }
 </script>
 

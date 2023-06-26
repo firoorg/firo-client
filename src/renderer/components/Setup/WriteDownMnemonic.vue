@@ -28,7 +28,7 @@ export default {
 
     computed: {
         words() {
-            return this.$store.getters['App/cachedMnemonic'].mnemonic.split(' ');
+            return this.$store.getters['App/cachedMnemonic'].mnemonicPhrase.split(' ');
         }
     },
 

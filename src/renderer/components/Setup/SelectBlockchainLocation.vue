@@ -11,8 +11,8 @@
                     <div id="datadir-value">{{ dataDir }}</div>
 
                     <div class="datadir-actions">
-                        <a href="#" @click="changeDataDir">Change</a>
-                        <a href="#" id="reset-data-dir" @click="resetDataDir">Reset</a>
+                        <a @click="changeDataDir">Change</a>
+                        <a id="reset-data-dir" @click="resetDataDir">Reset</a>
                     </div>
                 </div>
             </div>
@@ -135,9 +135,9 @@ export default {
             if (!fs.existsSync(this.dataDir) && this.dataDir === this.defaultFiroRootDirectory) {
                 try {
                     fs.mkdirSync(this.dataDir);
-                    this.$log.info(`Created default firo dataDir ${this.dataDir}`);
+                    console.info(`Created default firo dataDir ${this.dataDir}`);
                 } catch(e) {
-                    this.$log.warn(`Failed to create default firo dataDir ${this.dataDir}`);
+                    console.warn(`Failed to create default firo dataDir ${this.dataDir}`);
                     alert("dataDir didn't exist and we weren't able to create it");
                     return;
                 }
@@ -151,10 +151,10 @@ export default {
                 return;
             }
 
-            this.$log.info(`Setting firoClientNetwork: ${this.network}`);
+            console.info(`Setting firoClientNetwork: ${this.network}`);
             await this.$store.dispatch('App/setFiroClientNetwork', this.network);
 
-            this.$log.info(`Setting blockchain location: ${this.dataDir}`);
+            console.info(`Setting blockchain location: ${this.dataDir}`);
             await this.$store.dispatch('App/setBlockchainLocation', this.dataDir);
 
             // Wait for our updates to propagate to the store so it can be used by $startDaemon. sigh.

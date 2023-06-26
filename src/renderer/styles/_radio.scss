@@ -12,7 +12,7 @@ input[type="radio"] {
 
     border: {
         style: solid;
-        radius: $radio-size / 2;
+        radius: calc($radio-size / 2);
         width: $outer-border-width;
         color: var(--color-text-primary);
     }
@@ -30,8 +30,8 @@ input[type="radio"] {
 
             height: $inner-radio-size;
             width: $inner-radio-size;
-            margin: ($radio-size - $outer-border-width * 2 - $inner-radio-size) / 2;
-            border-radius: $inner-radio-size / 2;
+            margin: calc(($radio-size - $outer-border-width * 2 - $inner-radio-size) / 2);
+            border-radius: calc($inner-radio-size / 2);
             background-color: var(--color-secondary);
         }
     }

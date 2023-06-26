@@ -18,7 +18,7 @@
                 <span v-else-if="availablePublic">
                     {{ bigintToString(availablePublic) }} FIRO awaiting anonymization.
                 </span>
-                <a id="anonymize-firo-link" href="#" @click="showAnonymizeDialog = true">Click here</a> to secure
+                <a id="anonymize-firo-link" @click="showAnonymizeDialog = true">Click here</a> to secure
                 {{ nTokensNeedingAnonymization > 1 || availablePublic ? "them" : "it" }}.
             </div>
         </div>

@@ -11,7 +11,6 @@
                 pagination-path="pagination"
                 :row-transition-name="rowTransition"
                 :no-data-template="noDataMessage"
-                v-bind="{ scopedSlots: $scopedSlots }"
                 :row-class="rowClass"
                 @vuetable:pagination-data="onPaginationData"
                 @vuetable:row-clicked="onRowClick"
@@ -30,75 +29,36 @@
 </template>
 
 <script>
-import { Vuetable } from 'vuetable-2'
+import Vuetable from 'vue3-vuetable'
 import AnimatedTablePagination from './AnimatedTablePagination'
 import _ from 'lodash'
 
 export default {
     name: 'AnimatedTable',
+
     components: {
         Vuetable,
         AnimatedTablePagination
     },
-    props: {
-        fields: {
-            type: Array,
-            required: true
-        },
-        data: {
-            type: Array,
-            required: true
-        },
-        trackBy: {
-            type: String,
-            default: 'id'
-        },
-        sortOrder: {
-            type: Array,
-            default: () => [
-                {
-                    field: 'createdAt',
-                    direction: 'desc'
-                }
-            ]
-        },
-        noDataMessage: {
-            type: String,
-            default: ''
-        },
-        selectedRow: {
-            type: String,
-            default: null
-        },
-        onRowSelect: {
-            type: Function,
-            default: null
-        },
-        onPageChange: {
-            type: Function,
-            default: (newPage) => null
-        },
-        theme: {
-            type: String,
-            default: ''
-        },
+
+    props: [
+        'fields',
+        'data',
+        'trackBy',
+        'noDataMessage',
+        'selectedRow',
+        'onRowSelect',
+        'theme',
+        'rowClass',
+        'globalData',
+        'sortOrder',
+        'onPageChange',
         // This is used to check if data has changed and we need to refresh the table. Yes, it's really needed, despite
         // the reactive nature of Vue, as oftentimes data gets recalculated without actually changing the result, and we
         // don't want the user to get sent back to page 1 unless the table itself actually changes, even if some of the
         // things that went into calculating it did.
-        compareElements: {
-            type: Function,
-            default: (a, b) => a === b
-        },
-        rowClass: {
-            type: Function | String,
-            default: ''
-        },
-        globalData: {
-            type: Object,
-            required: false
-        }
-    },
+        'compareElements'
+    ],
 
     data () {
         return {
@@ -115,7 +75,7 @@ export default {
 
             if (newVal.length === oldVal.length) {
                 for (const i in newVal) {
-                    if (!this.compareElements(newVal[i], oldVal[i])) {
+                    if (!(this.compareElements || ((x, y) => x==y))(newVal[i], oldVal[i])) {
                         isEqual = false
                         break
                     }
@@ -131,7 +91,12 @@ export default {
     },
 
     mounted() {
-        window.addEventListener("resize", this.resizeListener);
+        // There is an issue with Playwright that causes it to randomly resize the viewport for a brief moment, which
+        // will cause the table to be resized and the pagination to be reset.
+        //
+        // See https://github.com/microsoft/playwright/issues/12733
+        if (!process.env.FIRO_CLIENT_TEST)
+            window.addEventListener("resize", this.resizeListener);
 
         this.$nextTick(() => {
             if (!this.$refs.vuetable) return;
@@ -141,6 +106,9 @@ export default {
     },
 
     destroyed() {
+        if (process.env.FIRO_CLIENT_TEST)
+            return;
+
         window.removeEventListener("resize", this.resizeListener);
     },
 
@@ -151,7 +119,7 @@ export default {
 
         refresh() {
             this.$refs.vuetable.refresh()
-            this.onPageChange(1);
+            this.onPageChange?.(1);
             this.$nextTick(() => this.resizeListener());
         },
 
@@ -159,6 +127,7 @@ export default {
             this.perPage = 1;
             this.$nextTick(() => {
                 const tableContainer = this.$refs.tableContainer;
+                if (!tableContainer) return;
                 const tableHeader = tableContainer.querySelector('th');
                 const tableRow = tableContainer.querySelector('td');
                 if (tableContainer && tableHeader && tableRow) {
@@ -184,7 +153,7 @@ export default {
             this.rowTransition = ''
             this.$refs.vuetable.changePage(page)
             this.rowTransition = 'fade'
-            this.onPageChange(page);
+            this.onPageChange?.(page);
         },
 
         dataManager (sortOrder, pagination) {
@@ -198,7 +167,10 @@ export default {
 
             // see if we got a sort order passed in into the call if not,
             // fall back to the optional prop
-            const orderBy = sortOrder.length ? sortOrder : this.sortOrder
+            const orderBy = sortOrder.length ? sortOrder : this.sortOrder || {
+                field: 'createdAt',
+                direction: 'desc'
+            };
 
             // sortOrder can still be empty, so we have to check for that as well
             if (orderBy.length > 0) {

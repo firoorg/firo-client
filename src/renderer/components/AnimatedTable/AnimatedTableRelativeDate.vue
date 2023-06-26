@@ -13,13 +13,14 @@
         class="vuetable-td-component-relative-date"
         :title="absoluteDate || 'Pending'"
     >
-        <timeago :datetime="rowData.firstSeenAt * 1000"  :auto-update="30" />
+        {{ relativeDate }}
     </td>
 </template>
 
 <script>
-import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 import { format } from 'date-fns'
+import {ago} from "time-ago";
 
 export default {
     name: 'RelativeDate',
@@ -28,12 +29,33 @@ export default {
         VuetableFieldMixin
     ],
 
+    data() {
+        return {
+            tick: 0,
+            timer: null
+        };
+    },
+
+    mounted() {
+        this.timer = setInterval(() => this.tick++, 30e3);
+    },
+
+    unmounted() {
+        clearInterval(this.timer);
+    },
+
     computed: {
-        absoluteDate () {
-            return format(new Date(this.rowData.firstSeenAt * 1000), "HH:MM, D MMM YYYY")
+        relativeDate() {
+            this.tick;
+            return ago(this.rowData.firstSeenAt * 1000);
         },
+
+        absoluteDate () {
+            return format(new Date(this.rowData.firstSeenAt * 1000), "HH:MM, d MMM yyyy")
+        },
+
         createDate () {
-            return format(new Date(this.rowData.date), "HH:MM, D MMM YYYY")
+            return format(new Date(this.rowData.date), "HH:MM, d MMM yyyy")
         }
     }
 }

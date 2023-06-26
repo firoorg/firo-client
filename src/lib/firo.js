@@ -1,9 +1,7 @@
 import shajs from 'sha.js'
 import bs58 from 'bs58'
 
-import { createLogger } from 'lib/logger'
 
-const logger = createLogger('firo:lib:firo')
 
 /*
  * Returns true if the given address is a valid with the given prefixes
@@ -12,7 +10,7 @@ export const isFiroAddress = function (address, b58Prefixes) {
     let data = null
 
     if (!b58Prefixes || !b58Prefixes['pubkeyAddress'] || !b58Prefixes['pubkeyAddress']) {
-        logger.warn('no b58 prefixes given to firo address validation')
+        console.warn('no b58 prefixes given to firo address validation')
         return false
     }
 

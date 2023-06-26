@@ -16,7 +16,7 @@ class ExolixAPIWorker {
         }
 
         if (response.error){
-            console.log(`${response.error}: ${response.reason}`);
+            console.error(`${response.error}: ${response.reason}`);
             return response.reason;
         }
 
@@ -69,7 +69,7 @@ class ExolixAPIWorker {
             "refund_address": refund_address,
             "destination_extra": "121212",
         });
-        console.log("1-----------"+body)
+        console.debug("1-----------"+body)
         const config = {
             method: 'post',
             url: url,
@@ -81,7 +81,7 @@ class ExolixAPIWorker {
             axios(config)
         );
         const response = temp.data;
-        console.log("2-----------"+response)
+        console.debug("2-----------"+response)
         const errorMessage = this.errorMessage(serverError, temp);
 
         if (errorMessage) return { error: errorMessage };

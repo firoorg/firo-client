@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import zxcvbn from 'zxcvbn';
 import {Firod} from "daemon/firod";
 import {mapGetters} from "vuex";
 import InputFrame from "renderer/components/shared/InputFrame";
@@ -81,33 +80,21 @@ export default {
             passphrase: '',
             confirmPassphrase: '',
             hasConfirmedExistingWallet: false,
-            passphraseStrength: 0,
             passphraseInputIsFocused: false
         }
     },
-
-    // route params:
     //
     // // Information about the mnemonic we should initialize the wallet with. It MAY be empty is isExistingWallet and
     // // resolve are set.
-    // mnemonic?: {
-    //   mnemonic: string;
-    //   mnemonicPassphrase: string | null;
-    //   isNewMnemonic: boolean;
-    // }
+    // mnemonicPhrase: string;
+    // mnemonicPassphrase: string | null;
+    // isNewMnemonic: "true" | "false"
     //
     // // Are we going to lock a preexisting wallet.dat? If this is set, onStart MUST be set, mnemonic MUST NOT be, and
     // // window.$daemon MUST be set (and already started).
-    // isExistingWallet?: boolean
+    // isExistingWallet?: "true" | "false"
 
-    watch: {
-        passphrase: {
-            immediate: true,
-            handler() {
-                this.passphraseStrength = zxcvbn(this.passphrase).score;
-            }
-        }
-    },
+    props: ['mnemonicPhrase', 'mnemonicPassphrase', 'isNewMnemonic', 'isExistingWallet', 'onStart'],
 
     computed: {
         ...mapGetters({
@@ -116,19 +103,16 @@ export default {
             blockchainLocation: 'App/blockchainLocation'
         }),
 
-        // isExistingWallet is passed through a route query. If it is true, $daemon MUST already be initialised.
-        isExistingWallet() {
-            return !!this.$route.query.isExistingWallet;
-        },
-
         mnemonic() {
-            return this.$route.query.mnemonic;
+            return {
+                mnemonic: this.mnemonicPhrase,
+                mnemonicPassphrase: this.mnemonicPassphrase,
+                isNewMnemonic: JSON.parse(this.isNewMnemonic)
+            };
         },
 
-        // A callback to be called when we're finished setting everything up. This is passed so as to allow $startDaemon
-        // in router/main.js to resolve.
-        onStart() {
-            return this.$route.query.onStart;
+        _isExistingWallet() {
+            return JSON.parse(this.isExistingWallet || "false");
         },
 
         hasMismatchedPassphrase() {
@@ -136,7 +120,7 @@ export default {
         },
 
         canProceed() {
-            return this.passphrase && this.passphrase === this.confirmPassphrase && (!this.isExistingWallet || this.hasConfirmedExistingWallet);
+            return this.passphrase && this.passphrase === this.confirmPassphrase && (!this._isExistingWallet || this.hasConfirmedExistingWallet);
         }
     },
 
@@ -150,12 +134,12 @@ export default {
         },
 
         async lockWallet() {
-            if ((this.isExistingWallet && (this.mnemonic || !$daemon)) ||
-                (!this.mnemonic && !this.isExistingWallet)) {
+            if ((this._isExistingWallet && (this.mnemonic || !$daemon)) ||
+                (!this.mnemonic && !this._isExistingWallet)) {
                 await $quitApp("Firo Client failed an internal sanity check. Report this to the Firo team.");
             }
 
-            if (this.isExistingWallet) {
+            if (this._isExistingWallet) {
                 $setWaitingReason("Preparing to lock your wallet...");
             } else if (this.mnemonic.isNewMnemonic) {
                 $setWaitingReason("Initializing firod with our mnemonic...");
@@ -164,7 +148,7 @@ export default {
             }
 
             let initialDaemon;
-            if (!this.isExistingWallet) {
+            if (!this._isExistingWallet) {
                 try {
                     initialDaemon = new Firod(this.firoClientNetwork, this.firodLocation, this.blockchainLocation, [], {apiStatus});
                     await initialDaemon.start(this.mnemonic);
@@ -188,19 +172,19 @@ export default {
 
             await $startDaemon();
 
-            if (!this.isExistingWallet) {
+            if (!this._isExistingWallet) {
                 $setWaitingReason("Sanity checking recovery seed phrase...");
                 const mnemonicSanityCheck = (await $daemon.showMnemonics(this.passphrase)).join(' ');
                 if (mnemonicSanityCheck !== this.mnemonic.mnemonic) {
                     // This should never happen.
                     await $quitApp("Recovery seed phrase sanity check failed. This is a bug. Seek help from the Firo team; do not try to use the client again.");
                 }
-                this.$log.info("Recovery seed phrase sanity check passed.");
+                console.info("Recovery seed phrase sanity check passed.");
             }
 
             $setWaitingReason(undefined);
 
-            this.$log.info("Marking app as initialized...");
+            console.info("Marking app as initialized...");
             await this.$store.dispatch('App/setIsInitialized', true);
 
             await this.$router.push('/main');

@@ -1,9 +1,7 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import {createRouter, createWebHashHistory} from 'vue-router'
 
-Vue.use(Router)
-
-export default new Router({
+export default new createRouter({
+    history: createWebHashHistory(),
     routes: [
         {
             path: '/setup',
@@ -41,7 +39,8 @@ export default new Router({
 
                 {
                     path: 'lock-wallet',
-                    component: require('renderer/components/Setup/LockWallet').default
+                    component: require('renderer/components/Setup/LockWallet').default,
+                    props: (route) => route.query
                 }
             ]
         },

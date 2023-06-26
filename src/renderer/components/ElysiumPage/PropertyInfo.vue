@@ -83,29 +83,28 @@
                 </button>
             </div>
         </div>
-        <div v-else-if="show == 'grantPrompt'" class="popup">
+
+        <Form v-else-if="show == 'grantPrompt'" class="popup" as="div" ref="grantTokenForm" :validation-schema="validationSchema" v-slot="{errors, meta}">
             <div class="title">
                 Grant Tokens
             </div>
 
             <div class="content">
                 <InputFrame label="Grantee">
-                    <input
+                    <Field
                         type="text"
                         name="grantee"
                         v-model="grantee"
-                        v-validate="'firoAddress'"
-                        v-tooltip="getValidationTooltip('grantee')"
+                        v-tooltip="errors.grantee"
                     />
                 </InputFrame>
 
                 <InputFrame label="Amount">
-                    <input
+                    <Field
                         type="text"
                         name="amount"
                         v-model="amount"
-                        v-validate="'isBelowMaxIssue'"
-                        v-tooltip="getValidationTooltip('amount')"
+                        v-tooltip="errors.amount"
                     />
 
                 </InputFrame>
@@ -116,12 +115,14 @@
                     Cancel
                 </button>
 
-                <button class="solid-button recommended" @click="show = 'passphrase'">
+                <button class="solid-button recommended" :disabled="!meta.valid" @click="show = 'passphrase'">
                     Grant Tokens
                 </button>
             </div>
-        </div>
+        </Form>
+
         <PassphraseInput v-else-if="show == 'passphrase'" v-model="passphrase" :error="error" @cancel="goToMain" @confirm="attemptGrant" />
+
         <div v-else-if="show == 'grantSuccess'" class="popup">
             <div class="title">
                 Success!
@@ -142,6 +143,7 @@
 
 <script>
 import {mapGetters} from "vuex";
+import {Form, Field} from "vee-validate";
 import TransactionId from "renderer/components/shared/TransactionId";
 import Amount from "renderer/components/shared/Amount";
 import InputFrame from "renderer/components/shared/InputFrame";
@@ -151,7 +153,7 @@ import {bigintToString, stringToBigint} from "lib/convert";
 
 export default {
     name: "PropertyInfo",
-    components: {PassphraseInput, InputFrame, Amount, TransactionId},
+    components: {Form, Field, PassphraseInput, InputFrame, Amount, TransactionId},
     props: ['creationtx'],
 
     data() {
@@ -164,22 +166,6 @@ export default {
         };
     },
 
-    inject: [
-        '$validator'
-    ],
-
-    beforeMount() {
-        this.$validator.extend('firoAddress', {
-            getMessage: () => 'The Firo address you entered is invalid',
-            validate: (value) => isValidAddress(value, this.network)
-        });
-
-        this.$validator.extend('isBelowMaxIssue', {
-            getMessage: () => `Only ${bigintToString(this.maxIssue)} tokens are available to mint.`,
-            validate: (value) => stringToBigint(value, this.property.isDivisible ? 8 : 0) <= this.maxIssue
-        });
-    },
-
     computed: {
         ...mapGetters({
             network: 'ApiStatus/network',
@@ -189,6 +175,15 @@ export default {
             availableUTXOs: 'Transactions/availableUTXOs',
             allTotalIssued: 'Elysium/totalIssued'
         }),
+
+        validationSchema() {
+            [this.network, this.maxIssue, this.property.isDivisible];
+
+            return {
+                grantee: (value) => isValidAddress(value, this.network) || 'The Firo address you entered is invalid',
+                amount: (value) => stringToBigint(value, this.property.isDivisible ? 8 : 0) <= this.maxIssue || `Only ${bigintToString(this.maxIssue)} tokens are available to mint.`
+            }
+        },
 
         property() {
             return this.tokenData[this.creationtx];
@@ -216,18 +211,6 @@ export default {
 
         maxIssue() {
             return 9223372036854775807n - this.totalIssued;
-        },
-
-        getValidationTooltip() {
-            return (fieldName) => ({
-                content: this.validationErrors.first(fieldName),
-                trigger: 'manual',
-                boundariesElement: 'body',
-                offset: 8,
-                placement: 'right',
-                classes: 'error popup-tooltip right-tooltip',
-                show: true
-            })
         }
     },
 

@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
 import Popup from 'renderer/components/shared/Popup';
@@ -36,10 +37,10 @@ import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo";
 import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
-    {name: CoinSwapStatus, width: '60pt'},
-    {name: AnimatedTableRelativeDate, width: '150pt'},
-    {name: CoinSwapSendAmount},
-    {name: CoinSwapReceivedAmount, width: '150pt'}
+    {name: markRaw(CoinSwapStatus), width: '60pt'},
+    {name: markRaw(AnimatedTableRelativeDate), width: '150pt'},
+    {name: markRaw(CoinSwapSendAmount)},
+    {name: markRaw(CoinSwapReceivedAmount), width: '150pt'}
 ];
 
 export default {

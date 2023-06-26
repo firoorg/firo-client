@@ -1,12 +1,13 @@
 <template>
-    <div v-if="words" class="info-popup">
+    <div v-if="words" class="mnemonic-popup info-popup">
         <div class="title">
             Recovery Seed Phrase
         </div>
 
         <div class="content">
             <span v-for="(_, n) in 24" class="mnemonic-word">
-                <span class="n">{{ n < 9 ? `0${n+1}` : n+1 }}</span>{{ words[n] }}
+                <span class="n">{{ n < 9 ? `0${n+1}` : n+1 }}</span>
+                <span class="actual-word">{{ words[n] }}</span>
             </span>
         </div>
 
@@ -26,6 +27,15 @@ export default {
 
     components: {
         PassphraseInput
+    },
+
+    mounted() {
+        document.querySelector('body').classList.add('temporarily-disable-selection');
+    },
+
+    unmounted() {
+        document.querySelector('body').classList.remove('temporarily-disable-selection');
+        document.getSelection().removeAllRanges();
     },
 
     data() {
@@ -60,11 +70,21 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import "src/renderer/styles/info-popup";
 @import "src/renderer/styles/mnemonic";
 
-.content {
-    @include mnemonic();
+.mnemonic-popup {
+    .content {
+        @include mnemonic();
+    }
+}
+
+.actual-word {
+    user-select: text;
+}
+
+.temporarily-disable-selection *:not(.actual-word) {
+    user-select: none !important;
 }
 </style>

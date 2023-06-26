@@ -34,9 +34,9 @@ export default {
             if (!this.$store.getters['App/cachedMnemonic']) {
                 this.$store.commit('App/setCachedMnemonic', {
                     // 256 bits of entropy translates into a 24 word mnemonic.
-                    mnemonic: generateMnemonic(256),
+                    mnemonicPhrase: generateMnemonic(256),
                     mnemonicPassphrase: null,
-                    isNewMnemonic: true
+                    isNewMnemonic: 1
                 });
 
                 // Wait for cachedMnemonic to propagate.

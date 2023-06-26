@@ -3,9 +3,14 @@ const { dependencies } = require('../package.json')
 
 let mainConfig = {
     mode: 'development',
+    devtool: false,
 
     entry: {
-        main: path.join(__dirname, '../src/main/main.js')
+        main: path.join(__dirname, '../src/main/main.ts')
+    },
+
+    optimization: {
+        minimize: process.env.NODE_ENV == 'production' && !process.env.FIRO_CLIENT_TEST
     },
 
     externals: Object.keys(dependencies),
@@ -14,12 +19,11 @@ let mainConfig = {
         rules: [
             {
                 test: /\.(js|vue)$/,
-                enforce: 'pre',
                 exclude: /node_modules/
             },
             {
                 test: /\.scss$/,
-                use: ['vue-style-loader', 'css-loader', 'sass-loader?data=@import "./src/renderer/styles";']
+                use: ['vue-style-loader', 'css-loader', 'sass-loader?data=@use "./src/renderer/styles";']
             },
             {
                 test: /\.sass$/,
@@ -35,12 +39,7 @@ let mainConfig = {
             },
             {
                 test: /\.html$/,
-                use: 'vue-html-loader'
-            },
-            {
-                test: /\.js$/,
-                use: 'babel-loader',
-                exclude: /node_modules/
+                use: 'html-loader'
             },
             {
                 test: /\.ts$/,
@@ -48,7 +47,7 @@ let mainConfig = {
             },
             {
                 test: /\.ya?ml$/,
-                use: ['json-loader', 'yaml-loader']
+                use: ['json-loader']
             },
             {
                 test: /\.node$/,
@@ -59,8 +58,6 @@ let mainConfig = {
                 use: {
                     loader: 'vue-loader',
                     options: {
-                        extractCSS: process.env.NODE_ENV === 'production',
-                        whitespace: 'condense',
                         loaders: {
                             sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
                             scss: 'vue-style-loader!css-loader!sass-loader',
@@ -71,13 +68,7 @@ let mainConfig = {
             },
             {
                 test: /\.(png|jpe?g|gif)(\?.*)?$/,
-                use: {
-                    loader: 'url-loader',
-                    query: {
-                        limit: 10000,
-                        name: 'imgs/[name]--[folder].[ext]'
-                    }
-                }
+                use: 'url-loader'
             },
             {
                 test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
@@ -89,24 +80,7 @@ let mainConfig = {
             },
             {
                 test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                use: {
-                    loader: 'url-loader',
-                    query: {
-                        limit: 10000,
-                        name: 'fonts/[name]--[folder].[ext]'
-                    }
-                }
-            },
-            {
-                test: /\.svg$/,
-                loader: 'vue-svg-loader',
-                options: {
-                    svgo: {
-                        plugins: [
-                            {removeDimensions: true},
-                        ]
-                    }
-                }
+                use:  'url-loader'
             }
         ]
     },

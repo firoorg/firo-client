@@ -13,7 +13,7 @@ const mutations = {
 
     // This must be called *in addition to* $daemon.editAddressBook.
     updateAddress(state, addressBookItem: AddressBookItem) {
-        Vue.set(state.addressBook, addressBookItem.address, addressBookItem);
+        state.addressBook[addressBookItem.address] = addressBookItem;
     },
 
     deleteAddress(state, addressBookItem: AddressBookItem) {

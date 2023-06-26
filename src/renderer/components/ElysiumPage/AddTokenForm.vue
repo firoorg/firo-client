@@ -37,10 +37,7 @@
 
                 <div class="token-url">
                     <label>URL</label>
-                    <div class="value">
-                        <a v-if="isValidUrl" @click="openExternal(property.url)" href="#">{{ property.url }}</a>
-                        <template v-else>{{ property.url }}</template>
-                    </div>
+                    <div class="value">{{ property.url }}</div>
                 </div>
 
                 <div class="token-creation-tx">
@@ -59,8 +56,9 @@
 
 <script>
 import SearchInput from "renderer/components/shared/SearchInput";
-import electron from "electron";
-import {mapMutations} from "vuex";
+import {mapMutations, mapGetters} from "vuex";
+import {bigintToString} from "lib/convert";
+import {markRaw} from "vue";
 
 export default {
     name: "AddTokenForm",
@@ -94,29 +92,24 @@ export default {
     },
 
     computed: {
-        isValidUrl() {
-            if (!this.property.url) return false;
-            try {
-                const parsed = new URL(this.property.url);
-                return parsed.protocol === 'https:';
-            } catch {
-                return false;
-            }
-        },
+        ...mapGetters({
+            aggregatedBalances: 'Elysium/aggregatedBalances'
+        }),
 
         totalBalance() {
-            return '';
+            const b = this.aggregatedBalances[this.property.creationTx];
+            if (!b) return '';
+            return bigintToString(b.priv + b.pub + b.pending, this.property.isDivisible ? 8 : 0);
         }
     },
 
     methods: {
-        openExternal: electron.shell.openExternal,
         ...mapMutations({
             addTokenData: 'Elysium/addTokenData'
         }),
 
         ok() {
-            this.addTokenData([this.property]);
+            this.addTokenData([{...this.property}]);
             this.$emit('submit', this.property.creationTx);
         }
     }

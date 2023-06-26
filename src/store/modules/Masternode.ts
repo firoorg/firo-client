@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import {cloneDeep} from 'lodash';
 import {MasternodeEvent} from '../../daemon/firod';
-import { createLogger } from '../../lib/logger'
-const logger = createLogger('firo:store:Masternode');
 
 const state = {
     masternodes: <{[proTxHash: string]: MasternodeEvent}>{},
@@ -10,7 +8,7 @@ const state = {
 
 const mutations = {
     updateMasternode(state, mn: MasternodeEvent) {
-        Vue.set(state.masternodes, mn.proTxHash, mn);
+        state.masternodes[mn.proTxHash] = mn;
     },
     updateMasternodeList(state, mnList: Array<MasternodeEvent>) {
         const masternodes = cloneDeep(state.masternodes);

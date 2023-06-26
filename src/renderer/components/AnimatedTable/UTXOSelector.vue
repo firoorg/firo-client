@@ -1,13 +1,12 @@
 <template>
     <th v-if="isHeader"></th>
     <td v-else>
-        <input :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" ref="checkbox" type="checkbox" @input="toggle" />
+        <input :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" type="checkbox" v-model="checkbox" />
     </td>
 </template>
 
 <script>
-import Vue from 'vue';
-import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 
 export default {
     name: 'UTXOSelector',
@@ -15,6 +14,12 @@ export default {
     mixins: [
         VuetableFieldMixin
     ],
+
+    data() {
+        return {
+            checkbox: false
+        }
+    },
 
     computed: {
         txidIndex() {
@@ -24,13 +29,11 @@ export default {
 
     watch: {
         rowData() {
-            this.$refs.checkbox.checked = !!this.vuetable.globalData[this.txidIndex];
-        }
-    },
+            this.checkbox = !!this.vuetable.globalData[this.txidIndex];
+        },
 
-    methods: {
-        toggle(ev) {
-            Vue.set(this.vuetable.globalData, this.txidIndex, ev.target.checked);
+        checkbox() {
+            this.vuetable.globalData[this.txidIndex] = this.checkbox;
         }
     }
 }

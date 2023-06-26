@@ -65,7 +65,7 @@
 
             <tr v-else>
                 <td>Status</td>
-                <td>Unconfirmed <a href="#" class="rebroadcast" @click="rebroadcast">(rebroadcast)</a></td>
+                <td>Unconfirmed <a class="rebroadcast" @click="rebroadcast">(rebroadcast)</a></td>
             </tr>
 
             <tr>
@@ -122,7 +122,7 @@
 
                 <tr v-if="tx.elysium.property.url">
                     <td>Property URL</td>
-                    <td v-if="isValidUrl"><a @click="openExternal(tx.elysium.property.url)" href="#">{{ tx.elysium.property.url }}</a></td>
+                    <td v-if="isValidUrl"><a @click="openExternal(tx.elysium.property.url)">{{ tx.elysium.property.url }}</a></td>
                     <td v-else>{{ tx.elysium.property.url }}</td>
                 </tr>
             </template>
@@ -197,7 +197,7 @@ export default {
         },
 
         formattedBlockTime() {
-            return format(this.tx.blockTime * 1000, "hh:mm:ss, D MMM YYYY");
+            return format(this.tx.blockTime * 1000, "hh:mm:ss, d MMM yyyy");
         },
 
         isValidUrl() {

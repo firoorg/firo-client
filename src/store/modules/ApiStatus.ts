@@ -1,8 +1,11 @@
-import { ApiStatusData, ApiStatus, Network } from "../../daemon/firod";
+import { ApiStatusData, Network } from "../../daemon/firod";
 import { isEqual } from 'lodash';
 
 const state = {
-    apiStatus: {}
+    apiStatus: {
+        disabledSporks: [],
+        blocks: 0
+    }
 };
 
 const mutations = {
@@ -12,46 +15,38 @@ const mutations = {
 };
 
 const actions = {
-    setApiStatus({state, commit, dispatch}, apiStatus) {
-        const msgs = apiStatus.data.newLogMessages;
-        if (msgs && msgs.length) {
+    setApiStatus({state, commit, dispatch}, {data: apiStatus}) {
+        const msgs = apiStatus.newLogMessages;
+        if (msgs.length) {
             commit('App/appendLogMessages', msgs, {root: true});
-            delete apiStatus.data.newLogMessages;
+            delete apiStatus.newLogMessages;
         }
 
-        // We first check if apiStatus has changed so we don't have to draw updates when it hasn't.
-        if (!isEqual(state.apiStatus, apiStatus)) {
+        // We first check if apiStatus has changed so we don't have to draw updates when it hasn't. Also make sure not
+        // to update to apiStatuses oldest than the latest. (This is possible due to the asynchronous nature of the
+        // updates.)
+        if (!isEqual(state.apiStatus, apiStatus) && apiStatus.blocks >= state.apiStatus.blocks) {
             commit('setApiStatus', apiStatus);
         }
     }
 };
 
 const getters = {
-    apiStatus: (state): ApiStatus | {} => state.apiStatus,
-    apiStatusData: (state): ApiStatusData | {} => (state.apiStatus && state.apiStatus.data) || {},
-    version: (state, getters) => getters.apiStatusData.version || '(unknown)',
-    currentBlockHeight: (state, getters): number => getters.apiStatusData.blocks || 0,
-    latestBlockTimestamp: (state, getters): number => getters.apiStatusData.latestBlockTimestamp || 0,
-    block1: (state, getters): string => getters.apiStatusData.block1,
-    network: (state, getters): Network => getters.apiStatusData.network,
-    // Do we have an apiStatus?
-    hasApiStatus: (state, getters): boolean => !!getters.network,
+    apiStatus: (state): ApiStatusData => state.apiStatus,
+    version: (state) => state.apiStatus.version,
+    currentBlockHeight: (state): number => state.apiStatus.blocks,
+    latestBlockTimestamp: (state): number => state.apiStatus.latestBlockTimestamp,
+    block1: (state): string => state.apiStatus.block1,
+    network: (state): Network => state.apiStatus.network,
     // Can our wallet be recovered from a mnemonic?
-    hasMnemonic: (state, getters): boolean => getters.apiStatusData.hasMnemonic,
+    hasMnemonic: (state): boolean => state.apiStatus.hasMnemonic,
     // Is the wallet locked? Returns undefined if not yet loaded.
-    isLocked: (state, getters): boolean | undefined => getters.apiStatusData.walletLock,
-    isReindexing: (state, getters): boolean => getters.apiStatusData.reindexing,
-    isLelantusAllowed: (state, getters): boolean => !(getters.apiStatusData.disabledSporks || []).includes("lelantus"),
-    API: (state, getters): boolean => (getters.apiStatusData.modules || {}).API,
-    // We will return 0 if apiStatus hasn't yet loaded.
-    localZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).localCount || 0,
-    // We will return 0 if apiStatus hasn't yet loaded.
-    totalZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).totalCount || 0,
-    // We will return 0 if apiStatus hasn't yet loaded.
-    enabledZnodeCount: (state, getters): number => (getters.apiStatusData.Znode || {}).enabledCount || 0,
-    smartFeePerKb: (state, getters): bigint => getters.apiStatusData.smartFeePerKb,
-    isBlockchainSynced: (state, getters): boolean => ['regtest', 'regtest-ql'].includes(getters.network) || getters.apiStatusData.synced,
-    connections: (state, getters): number => getters.apiStatusData.connections
+    isLocked: (state): boolean | undefined => state.apiStatus.walletLock,
+    isReindexing: (state): boolean => state.apiStatus.reindexing,
+    isLelantusAllowed: (state): boolean => !state.apiStatus.disabledSporks.includes("lelantus"),
+    smartFeePerKb: (state): bigint => state.apiStatus.smartFeePerKb,
+    isBlockchainSynced: (state): boolean => ['regtest', 'regtest-ql'].includes(state.apiStatus.network) || state.apiStatus.synced,
+    connections: (state): number => state.apiStatus.connections
 };
 
 export default {

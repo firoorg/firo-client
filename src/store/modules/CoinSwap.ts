@@ -3,10 +3,7 @@ import Mutex from 'await-mutex';
 import {promises as fs} from 'fs';
 import {cloneDeep} from 'lodash';
 import path from "path";
-import {getApp} from '../../lib/utils';
 import ChangeAPIWorker from '../../lib/changenow-api';
-import {createLogger} from '../../lib/logger';
-const logger = createLogger('firo:store:CoinSwap');
 
 // Used to communicate with the CoinSwap API.
 
@@ -37,7 +34,7 @@ interface CoinSwapRecord {
     // the status of the order
     status: CoinSwapStatus,
     // the name of the chain that the order is made
-    chainName: ChainName,
+    provider: ChainName,
     // a UUID representing the order
     orderId: OrderId,
     // the currency code for the coin to be sent to the exchange
@@ -99,7 +96,7 @@ const state = {
 const mutations = {
     updateCoinSwapRecords(state: { records: object; }, records: CoinSwapRecord[]) {
         for (const record of records) {
-            Vue.set(state.records, record.orderId, record);
+            state.records[record.orderId] = record;
         }
     }
 };
@@ -115,7 +112,7 @@ const actions = {
             data = (await fs.readFile(getters.coinSwapFileLocation, {encoding: 'utf8'})).toString();
         } catch (err) {
             if (err.code === 'ENOENT') return;
-            logger.error(`Failed to read CoinSwap data: ${err}`);
+            console.error(`Failed to read CoinSwap data: ${err}`);
             throw err;
         } finally {
             release();
@@ -133,7 +130,7 @@ const actions = {
                 try {
                     return JSON.parse(r);
                 } catch {
-                    logger.error(`Failed to parse CoinSwap record: ${r}`)
+                    console.error(`Failed to parse CoinSwap record: ${r}`)
                     return undefined;
                 }
             })
@@ -151,7 +148,7 @@ const actions = {
             handle = await fs.open(getters.coinSwapFileLocation, 'a');
         } catch (err) {
             release();
-            logger.error(`Failed to open CoinSwap file: ${err}`);
+            console.error(`Failed to open CoinSwap file: ${err}`);
             throw err;
         }
 
@@ -160,7 +157,7 @@ const actions = {
         try {
             await handle.write(data, null, 'utf8');
         } catch (err) {
-            logger.error(`Failed to write CoinSwap records ${data}: ${err}`);
+            console.error(`Failed to write CoinSwap records ${data}: ${err}`);
             throw err;
         } finally {
             await handle.close();
@@ -185,14 +182,14 @@ const actions = {
             );
 
         const updatePromises = potentiallyOutdatedRecords.map(async (record): Promise<CoinSwapRecord | undefined> => {
-            logger.debug(`Fetching status for CoinSwap record ${record.orderId}...`);
+            console.debug(`Fetching status for CoinSwap record ${record.orderId}...`);
 
             try {
                 const {error, response} = await apiWorker.getOrderStatus(record);
                 
                 if (error) throw error;
                 if (response.status !== record.status) {
-                    logger.info(`Updating status of CoinSwap record ${record.orderId} to '${response.status}...`);
+                    console.info(`Updating status of CoinSwap record ${record.orderId} to '${response.status}...`);
 
                     const newRecord = cloneDeep(record);
 
@@ -218,7 +215,7 @@ const actions = {
                     return newRecord;
                 }
             } catch(e) {
-                logger.error(`Failed to fetch status for CoinSwap record ${record.orderId}: ${e}`);
+                console.error(`Failed to fetch status for CoinSwap record ${record.orderId}: ${e}`);
             }
         });
 
@@ -231,10 +228,10 @@ const actions = {
 };
 
 const getters = {
-    coinSwapFileLocation: () => process.env.FIRO_CLIENT_TEST ?
+    coinSwapFileLocation: (state, getters, rootState, rootGetters) => process.env.FIRO_CLIENT_TEST ?
         path.join(process.cwd(), 'coin-swap-test.jsonl')
         :
-        path.join(getApp().getPath('userData'), 'coin-swap.jsonl'),
+        path.join(rootGetters['App/userDataPath'], 'coin-swap.jsonl'),
 
     records: (state: { records: any; }) => state.records
 };

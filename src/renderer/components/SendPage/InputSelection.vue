@@ -22,8 +22,8 @@
 </template>
 
 <script>
-// $emits: input, cancel, ok
-import {fromPairs, isEqual} from "lodash";
+// $emits: update:modelValue, cancel, ok
+import {markRaw} from "vue";
 import {mapGetters} from "vuex";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
@@ -50,9 +50,9 @@ export default {
             allowSendingLockedCoins: false,
             selectionData: {},
             fields: [
-                {name: UTXOSelector},
-                {name: TxIdIndex},
-                {name: TxAmount}
+                {name: markRaw(UTXOSelector)},
+                {name: markRaw(TxIdIndex)},
+                {name: markRaw(TxAmount)}
             ]
         }
     },
@@ -76,7 +76,8 @@ export default {
         ourUnspentUTXOs() {
             return this.availableUTXOs
                 .filter(tx => tx.isPrivate === this.isPrivate)
-                .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index);
+                .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index)
+                .map(tx => ({...tx, uniqId: `${tx.txid}-${tx.index}`}));
         }
     },
 
@@ -97,7 +98,7 @@ export default {
 
     watch: {
         selectedCoins() {
-            this.$emit('input', this.selectedCoins);
+            this.$emit('update:modelValue', this.selectedCoins);
         }
     }
 }

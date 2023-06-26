@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo";
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
@@ -46,9 +47,9 @@ import { bigintToString } from "lib/convert";
 import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
-    {name: RelativeDate, width: '160pt'},
-    {name: Label},
-    {name: Amount, width: '160pt'}
+    {name: markRaw(RelativeDate), width: '160pt'},
+    {name: markRaw(Label)},
+    {name: markRaw(Amount), width: '160pt'}
 ];
 
 export default {

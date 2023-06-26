@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import {markRaw} from "vue";
 import {mapActions, mapGetters} from "vuex";
 import SearchInput from "renderer/components/shared/SearchInput";
 import PlusButton from "renderer/components/shared/PlusButton";
@@ -70,12 +71,12 @@ import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 import PropertyInfo from "renderer/components/ElysiumPage/PropertyInfo";
 
 const myTokensTableFields = [
-    {name: ElysiumTokenId},
-    {name: ElysiumTokenTicker},
-    {name: ElysiumTokenName},
-    {name: ElysiumTokenPrivateBalance},
-    {name: ElysiumTokenPublicBalance},
-    {name: ElysiumTokenPendingBalance}
+    {name: markRaw(ElysiumTokenId)},
+    {name: markRaw(ElysiumTokenTicker)},
+    {name: markRaw(ElysiumTokenName)},
+    {name: markRaw(ElysiumTokenPrivateBalance)},
+    {name: markRaw(ElysiumTokenPublicBalance)},
+    {name: markRaw(ElysiumTokenPendingBalance)}
 ];
 
 export default {

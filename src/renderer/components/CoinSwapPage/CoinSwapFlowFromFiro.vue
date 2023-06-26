@@ -38,7 +38,7 @@ import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
 import ExolixAPIWorker from 'lib/exolix-api';
 import {bigintToString} from "lib/convert";
-import {mapActions, mapGetters} from "vuex";
+import {mapActions} from "vuex";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
 
 export default {
@@ -70,7 +70,7 @@ export default {
     props: {
         disabled: Boolean,
         isPrivate: Boolean,
-        chainName: String,
+        provider: String,
         txFeePerKb: BigInt,
         // e.g. "USDT"
         remoteCurrency: String,
@@ -109,7 +109,7 @@ export default {
 
             let latestError = null;
             for (let i = 0; i < 1; i++) {
-                if (this.chainName === "ChangeNow"){
+                if (this.provider === "ChangeNow"){
                     const order = {
                         from:"firo",
                         to:this.remoteCurrency.toLowerCase(),
@@ -118,20 +118,20 @@ export default {
                         amount: bigintToString(this.firoAmount)
                     };
 
-                    this.$log.info("Posting order: %O", order);
+                    console.info(`Posting order: ${JSON.stringify(order)}`);
 
                     let r;
                     try {
                         r = await this.change.postOrder(order);
                     } catch (e) {
                         latestError = `Error posting order: ${e}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
                     if (r.error || !r.response) {
                         latestError = `Got error posting order: ${r.error}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
@@ -142,9 +142,11 @@ export default {
                         response.payoutAddress !== this.receiveAddress
                     ) {
                         latestError = `Invalid Response from ChangeNow: ${JSON.stringify(response)}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
+
+                    console.debug(`Got response from ChangeNow: ${JSON.stringify(response)}`);
 
                     // We do this here instead of attemptSend so that the user won't receive to this address again, even if
                     // they don't swap.
@@ -165,14 +167,14 @@ export default {
                         try {
                             await $daemon.addAddressBookItem(data);
                         } catch (e) {
-                            this.$log.error(`Failed to add address book item: ${e}`);
+                            console.error(`Failed to add address book item: ${e}`);
                             this.error = `Failed to add address book item: ${e && e.message ? e.message : e}`;
                             this.show = 'error';
                             return;
                         }
                     }
                     this.coinSwapRecord = {
-                        chainName:this.chainName,
+                        provider:this.provider,
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
@@ -188,7 +190,7 @@ export default {
                         receiveAddress: response.payoutAddress,
                         _response: response
                     };
-                } else if (this.chainName === "Swapzone"){
+                } else if (this.provider === "Swapzone"){
                     const order = {
                         from:"firo",
                         to:this.remoteCurrency.toLowerCase(),
@@ -198,20 +200,20 @@ export default {
                         quotaId: this.quotaId
                     };
 
-                    this.$log.info("Posting order: %O", order);
+                    console.info(`Posting order: ${JSON.stringify(order)}`);
 
                     let r;
                     try {
                         r = await this.swapzone.postOrder(order);
                     } catch (e) {
                         latestError = `Error posting order: ${e}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
                     if (r.error || !r.response) {
                         latestError = `Got error posting order: ${r.error}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
@@ -222,9 +224,11 @@ export default {
                         response.addressReceive !== this.receiveAddress
                     ) {
                         latestError = `Invalid Response from Swapzone: ${JSON.stringify(response)}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
+
+                    console.debug(`Got response from Swapzone: ${JSON.stringify(response)}`);
 
                     // We do this here instead of attemptSend so that the user won't receive to this address again, even if
                     // they don't swap.
@@ -245,14 +249,14 @@ export default {
                         try {
                             await $daemon.addAddressBookItem(data);
                         } catch (e) {
-                            this.$log.error(`Failed to add address book item: ${e}`);
+                            console.error(`Failed to add address book item: ${e}`);
                             this.error = `Failed to add address book item: ${e && e.message ? e.message : e}`;
                             this.show = 'error';
                             return;
                         }
                     }
                     this.coinSwapRecord = {
-                        chainName:this.chainName,
+                        provider:this.provider,
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
@@ -268,7 +272,7 @@ export default {
                         receiveAddress: response.addressReceive,
                         _response: response
                     };
-                } else if (this.chainName === "Exolix"){
+                } else if (this.provider === "Exolix"){
                     const order = {
                         coin_from:"FIRO",
                         coin_to:this.remoteCurrency,
@@ -277,20 +281,20 @@ export default {
                         refund_address: walletAddress
                     };
 
-                    this.$log.info("Posting order: %O", order);
+                    console.info(`Posting order: ${JSON.stringify(order)}`);
 
                     let r;
                     try {
                         r = await this.exolix.postOrder(order);
                     } catch (e) {
                         latestError = `Error posting order: ${e}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
                     if (r.error || !r.response) {
                         latestError = `Got error posting order: ${r.error}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
@@ -300,9 +304,11 @@ export default {
                         response.refund_address !== walletAddress || response.destination_address !== this.receiveAddress
                     ) {
                         latestError = `Invalid Response from Exolix: ${JSON.stringify(response)}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
+
+                    console.debug(`Got response from Exolix: ${JSON.stringify(response)}`);
 
                     // We do this here instead of attemptSend so that the user won't receive to this address again, even if
                     // they don't swap.
@@ -323,14 +329,14 @@ export default {
                         try {
                             await $daemon.addAddressBookItem(data);
                         } catch (e) {
-                            this.$log.error(`Failed to add address book item: ${e}`);
+                            console.error(`Failed to add address book item: ${e}`);
                             this.error = `Failed to add address book item: ${e && e.message ? e.message : e}`;
                             this.show = 'error';
                             return;
                         }
                     }
                     this.coinSwapRecord = {
-                        chainName:this.chainName,
+                        provider:this.provider,
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
@@ -346,7 +352,7 @@ export default {
                         receiveAddress: response.destination_address,
                         _response: response
                     };
-                } else { //StealthEx
+                } else if (this.provider == "StealthEx") {
                     const order = {
                         currency_from:"firo",
                         currency_to:this.remoteCurrency.toLowerCase(),
@@ -355,20 +361,20 @@ export default {
                         refund_address: walletAddress,
                     };
 
-                    this.$log.info("Posting order: %O", order);
+                    console.info(`Posting order: ${JSON.stringify(order)}`);
 
                     let r;
                     try {
                         r = await this.stealth.postOrder(order);
                     } catch (e) {
                         latestError = `Error posting order: ${e}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
                     if (r.error || !r.response) {
                         latestError = `Got error posting order: ${r.error}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
 
@@ -379,9 +385,11 @@ export default {
                         response.address_to !== this.receiveAddress
                     ) {
                         latestError = `Invalid Response from StealthEx: ${JSON.stringify(response)}`;
-                        this.$log.error(latestError);
+                        console.error(latestError);
                         continue;
                     }
+
+                    console.debug(`Got response from StealthEx: ${JSON.stringify(response)}`);
 
                     // We do this here instead of attemptSend so that the user won't receive to this address again, even if
                     // they don't swap.
@@ -402,14 +410,14 @@ export default {
                         try {
                             await $daemon.addAddressBookItem(data);
                         } catch (e) {
-                            this.$log.error(`Failed to add address book item: ${e}`);
+                            console.error(`Failed to add address book item: ${e}`);
                             this.error = `Failed to add address book item: ${e && e.message ? e.message : e}`;
                             this.show = 'error';
                             return;
                         }
                     }
                     this.coinSwapRecord = {
-                        chainName:this.chainName,
+                        provider:this.provider,
                         orderId: response.id,
                         fromCoin: 'FIRO',
                         toCoin: this.remoteCurrency,
@@ -425,7 +433,12 @@ export default {
                         receiveAddress: response.address_to,
                         _response: response
                     };
-                } 
+                } else {
+                    console.error(`Unknown provider: ${this.provider}`);
+                    this.error = `Unknown provider: ${this.provider}`;
+                    this.show = 'error';
+                    return;
+                }
 
                 this.show = 'info';
                 return;
@@ -433,7 +446,7 @@ export default {
 
             this.show = 'error';
             this.error = latestError || 'Uh oh, something went wrong :(';
-            this.$log.error(`Gave up sending to ChangeNow after 10 errors.`);
+            console.error(`Gave up sending to ChangeNow after 10 errors.`);
         },
 
         goToPassphraseStep() {
@@ -466,7 +479,7 @@ export default {
                 try {
                     await this.addCoinSwapRecords([this.coinSwapRecord]);
                 } catch(e) {
-                    this.$log.error(`Failed to add CoinSwap record: ${e}`);
+                    console.error(`Failed to add CoinSwap record: ${e}`);
                     this.show = 'error';
                     this.error = e;
                     return;

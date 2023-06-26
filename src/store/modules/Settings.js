@@ -1,7 +1,5 @@
 import { format } from 'util'
-import { createLogger } from 'lib/logger'
 
-const logger = createLogger('firo:store:settings')
 
 const state = {
     b58Prefixes: {
@@ -44,8 +42,6 @@ const mutations = {
 
 const actions = {
     SET_INITIAL_STATE({ state, commit, getters }, initialState) {
-        logger.info('got initial settings state %o', initialState)
-
         if (!initialState) return;
 
         commit.setDaemonSettings({ state, commit, getters }, {

@@ -13,20 +13,21 @@ const mainConfig = require('./webpack.main.config');
     const rendererCompiler = await compileWrapper(rendererConfig);
 
     const server = new WebpackDevServer(
-        rendererCompiler,
         {
-            contentBase: path.join(__dirname, '..', 'dist', 'electron'),
-            hot: true
-        }
+            static: path.join(__dirname, '..', 'dist', 'electron'),
+            hot: true,
+            port: 9080
+        },
+        rendererCompiler
     );
-    server.listen(9080);
+    await server.start();
 
-    const electronProcess = child_process.spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
+    const electronProcess = child_process.spawn('npx', ['electron', '--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
     electronProcess.stdout.on('data', (data) => {
-        console.log(data.toString().replace(/\n$/, ''));
+        console.info(data.toString().replace(/\n$/, ''));
     });
     electronProcess.stderr.on('data', (data) => {
-        console.log(data.toString().replace(/\n$/, ''));
+        console.error(data.toString().replace(/\n$/, ''));
     });
     electronProcess.on('exit', () => process.exit());
 })();

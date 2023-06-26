@@ -31,7 +31,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import './styles';
+@import "./styles/main";
 
 #app {
     position: fixed;
