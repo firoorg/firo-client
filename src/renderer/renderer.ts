@@ -1,5 +1,4 @@
 import {createApp} from 'vue';
-// @ts-ignore
 import Tooltip from '../renderer/directives/tooltip';
 import Focus from '../renderer/directives/focus';
 
@@ -13,7 +12,6 @@ import router from './router'
 import store from '../store/renderer'
 
 import firod from '../daemon/init'
-import populateStoreWithAppSettings from '../lib/appSettings';
 import {getAppSettings} from "../lib/utils";
 import {bigintToString, stringToBigint} from "../lib/convert";
 
@@ -31,7 +29,55 @@ declare let $daemon: Firod;
     window.$store = store;
     window.$router = router;
 
-    await populateStoreWithAppSettings(store);
+    const appSettings = getAppSettings();
+    const settings = await appSettings.getAll();
+
+    if (!settings.isInitialized && settings['app.SET_IS_INITIALIZED']) {
+        settings.isInitialized = settings['app.SET_IS_INITIALIZED'];
+        settings.network = settings['app.SET_ZCOIN_CLIENT_NETWORK'];
+        settings.blockchainLocation = settings['app.SET_BLOCKCHAIN_LOCATION'];
+
+        await appSettings.set('app.SET_IS_INITIALIZED', false);
+        await appSettings.set('app.SET_ZCOIN_CLIENT_NETWORK', false);
+        await appSettings.set('app.SET_BLOCKCHAIN_LOCATION', false);
+
+        await appSettings.set('isInitialized', settings.isInitialized);
+        await appSettings.set('network', settings.network);
+        await appSettings.set('blockchainLocation', settings.blockchainLocation);
+    }
+
+    if (process.env.NETWORK) settings.network = process.env.NETWORK;
+    if (process.env.BLOCKCHAIN_LOCATION) settings.blockchainLocation = process.env.BLOCKCHAIN_LOCATION;
+    if (process.env.FIROD_ARGS) settings.temporaryFirodArguments = process.env.FIROD_ARGS.split(' ');
+    if (process.env.ELYSIUM) settings.enableElysium = !!JSON.parse(process.env.ELYSIUM);
+    if (process.env.IS_INITIALIZED) {
+        settings.isInitialized = !!JSON.parse(process.env.IS_INITIALIZED);
+    } else if (process.env.NETWORK && process.env.BLOCKCHAIN_LOCATION) {
+        settings.isInitialized = true;
+    }
+
+    if (settings.temporaryFirodArguments) {
+        await appSettings.set('temporaryFirodArguments', false);
+        store.commit('App/setTemporaryFirodArguments', settings.temporaryFirodArguments)
+    }
+
+    if (settings.isInitialized) {
+        store.commit('App/setFiroClientNetwork', settings.network);
+        store.commit('App/setBlockchainLocation', settings.blockchainLocation);
+        store.commit('App/setIsInitialized', settings.isInitialized);
+    }
+
+    if (settings.colorTheme) {
+        store.commit('App/setColorTheme', settings.colorTheme);
+    }
+
+    if (settings.enableElysium) {
+        store.commit('App/setEnableElysium', settings.enableElysium);
+    }
+
+    if (settings.selectedElysiumTokens) {
+        store.commit('Elysium/initSelectedTokens', settings.selectedElysiumTokens);
+    }
 
     store.commit('App/setAppPath', await ipcRenderer.invoke('get-path', 'app'));
     store.commit('App/setUserDataPath', await ipcRenderer.invoke('get-path', 'userData'));
@@ -184,12 +230,12 @@ declare let $daemon: Firod;
         // Checking for firodHasStarted allows us to work properly with hot reloading.
 
         window.$setWaitingReason("Starting up firod...");
-        const args = store.getters['App/temporaryFirodArguments'].map(x => x) || [];
+        const args = [...store.getters['App/temporaryFirodArguments']];
         if (store.getters['App/enableElysium']) args.push('-elysium');
         console.info(`Starting ${store.getters['App/firodLocation']} with wallet ${store.getters['App/walletLocation']}...`);
         firod(store, store.getters['App/firoClientNetwork'], store.getters['App/firodLocation'],
             store.getters['App/blockchainLocation'] || null, undefined,
-            store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD),
+            !!(store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD)),
             true, process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined,
             args)
             .then(async z => {
