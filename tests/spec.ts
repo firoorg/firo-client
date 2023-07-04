@@ -250,10 +250,15 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     scaffold.bind(this)(false);
 
     this.beforeAll('waits to load our wallet', async function (this: This) {
-        this.timeout(60e3);
-        this.slow(20e3);
-
-        await this.page.waitForSelector('td', {timeout: 60e3});
+        if (process.env.FIROD_ARGS?.includes('-wait-for-usr1')) {
+            this.timeout(Number.MAX_VALUE);
+            this.slow(Number.MAX_VALUE);
+            await this.page.waitForSelector('td', {timeout: 0});
+        } else {
+            this.timeout(60e3);
+            this.slow(20e3);
+            await this.page.waitForSelector('td', {timeout: 60e3});
+        }
     });
 
     this.beforeAll('is using regtest-ql', async function (this: This) {
