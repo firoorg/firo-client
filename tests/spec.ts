@@ -644,7 +644,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
             await this.page.locator('a[href="#/transactions"]').click();
 
-            await this.page.locator('.unconfirmed').waitFor();
+            const expectedAmountToReceive = subtractTransactionFee ? satoshiAmountToSend - satoshiExpectedFee : satoshiAmountToSend;
+            await this.page.locator('td .amount', {hasText: bigintToString(expectedAmountToReceive)}).waitFor();
 
             await this.page.locator('td').first().click();
             await this.page.locator('.info-popup').waitFor();
