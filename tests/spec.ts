@@ -485,7 +485,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             // This is required so that the new transactions will be the first elements on the transactions list.
             await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
 
-            const sendAddress: string = await this.page.evaluate(() => $daemon.getUnusedAddress('Transparent'));
+            const sendAddress: string = await this.page.evaluate(() => $daemon.getUnusedAddress());
             const satoshiAmountToSend = 100000000n + BigInt(Math.floor(1e8 * Math.random()));
             const amountToSend = bigintToString(satoshiAmountToSend);
 
@@ -872,7 +872,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         let setSelectedAsset: (id: string) => void;
         await this.page.evaluate(([id]) => setSelectedAsset(id), [id]);
 
-        const recipient = await this.page.evaluate(() => $daemon.getUnusedAddress('Transparent'));
+        const recipient = await this.page.evaluate(() => $daemon.getUnusedAddress());
         const satoshiAmountToSend = 100000000n + BigInt(Math.floor(1e8 * Math.random()));
         const amountToSend = bigintToString(satoshiAmountToSend);
 

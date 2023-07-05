@@ -1517,7 +1517,7 @@ export class Firod {
     }
 
     // Get an unused address with no associated label.
-    async getUnusedAddress(addresstype: string): Promise<string> {
+    async getUnusedAddress(addresstype: string = 'Transparent'): Promise<string> {
         const data = await this.send(null, 'none', 'paymentRequestAddress', {addressType: addresstype});
 
         if (typeof data === 'object' && typeof data['address'] === 'string') {
