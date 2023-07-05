@@ -26,7 +26,7 @@ class APIWorker {
         }
 
         if (response.error){
-            console.log(`${response.error}: ${response.reason}`);
+            console.error(`${response.error}: ${response.reason}`);
             return response.reason;
         }
 
@@ -132,7 +132,7 @@ class APIWorker {
         } else if (toAmount) {
             body.toAmount = toAmount;
         } else {
-            console.log('switchainApiClient.postOrder.error.requiredFromAmountOrToAmountField');
+            console.error('switchainApiClient.postOrder.error.requiredFromAmountOrToAmountField');
         }
 
         if (signature) body.signature = signature;

@@ -9,18 +9,8 @@ import {bigintToString} from "lib/convert";
 
 export default {
     name: "Amount",
-    props: {
-        // value in satoshis or as a String whole coin value
-        amount: {
-            type: BigInt | String,
-            required: true
-        },
 
-        ticker: {
-            type: String,
-            required: false
-        }
-    },
+    props: ['amount', 'ticker'],
 
     computed: {
         formattedAmount () {

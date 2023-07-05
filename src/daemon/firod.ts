@@ -7,10 +7,8 @@ import Mutex from "await-mutex";
 import EventWaitHandle from "./eventWaitHandle";
 
 import * as constants from './constants';
-import { createLogger } from '../lib/logger';
 import * as net from "net";
 
-const logger = createLogger('firo:daemon');
 
 export const bigIntTransform = (_, x) =>
     (
@@ -118,7 +116,7 @@ export class UnexpectedFirodResponse extends FirodError {
         this.call = call;
         this.response = response;
 
-        logger.error(`Unexpected response to call ${call}: ${JSON.stringify(response, bigIntSerializeTransform)}`);
+        console.error(`Unexpected response to call ${call}: ${JSON.stringify(response, bigIntSerializeTransform)}`);
     }
 }
 
@@ -309,10 +307,6 @@ function isValidAddressBookItem(x: any): x is AddressBookItem {
         typeof x.address === 'string' &&
         typeof x.label === 'string' &&
         typeof x.purpose === 'string';
-
-    if (!r) {
-        logger.error("Invalid address book item: %O", x);
-    }
 
     return r;
 }
@@ -562,12 +556,16 @@ export class Firod {
     allowMultipleFirodInstances: boolean = false;
     // If this is set to true, when we connect to a running firod instance, we WILL run initializers.
     runInitializersIfFirodIsRunning: boolean = false;
+    // If this is set to true, we will try to kill an existing firod process with the same data directory.
+    killOldFirod: boolean = false;
     // This is the number of seconds to wait before signalling firod as unresponsive.
     connectionTimeout: number = 30;
     // Extra arguments to be passed to firod
     extraFirodArgs: string[] = [];
     // The process ID firod is running as. undefined if firod is not yet started.
     pid?: number;
+    // This is used to prevent us JSON-encoding large subscription events when it's unnecessary.
+    logSubscriptionEvents: boolean = process.env.LOG == "debug";
 
     // firodLocation is the location of the firod binary.
     //
@@ -647,8 +645,56 @@ export class Firod {
             }
         }
 
+        if (this.killOldFirod) {
+            const pidFile = path.join(datadir, "firod.pid");
+            console.info(`Attempting to read old firo pid from ${pidFile}`);
+
+            let pidFileContent: string;
+            try {
+                pidFileContent = await fs.promises.readFile(pidFile, "ascii");
+            } catch (e) {
+                if (e?.code != 'ENOENT')
+                    throw new FirodError(`Error reading ${pidFile}: ${e}`);
+            }
+
+            let oldPid;
+            if (pidFileContent) oldPid = Number(pidFileContent.trim());
+            else console.debug("No pid file found.");
+
+            if (pidFileContent && !oldPid) {
+                console.info(`Old pid ${pidFileContent} is not a number, ignoring`);
+            } else if (oldPid) {
+                console.info(`Found old process ${oldPid}, attempting to kill it...`);
+
+                try {
+                    process.kill(oldPid);
+                } catch (e) {
+                    if (e?.code == 'ESRCH')
+                        console.info(`Old process ${oldPid} not found, continuing`);
+                    else if (e?.code == 'EPERM')
+                        console.info(`We don't have permission to kill old process ${oldPid}`);
+                    else
+                        throw new FirodError(`Error killing old process ${oldPid}: ${e}`);
+                }
+
+                for (let i = 0; i < 180; i++) {
+                    try {
+                        process.kill(oldPid, 0);
+                    } catch (e) {
+                        if (e?.code == 'ESRCH')
+                            break;
+                    }
+
+                    if (i == 39)
+                        throw new FirodError(`Old process ${oldPid} is still running after 45 seconds`);
+
+                    await new Promise(r => setTimeout(r, 250));
+                }
+            }
+        }
+
         // There is potential for a race condition here, but it's hard to fix, only occurs on improper shutdown, and has
-        // a fairly small  window anyway,
+        // a fairly small window anyway.
         const isFirodListening = await this.isFirodListening();
 
         if (isFirodListening && !this.allowMultipleFirodInstances) {
@@ -823,7 +869,7 @@ export class Firod {
                     throw 'unreachable';
             }
 
-            logger.info("Starting daemon...");
+            console.info("Starting daemon...");
             if (process.platform === "win32") {
                 let hasResolved = false;
 
@@ -831,7 +877,7 @@ export class Firod {
                     if (hasResolved) return;
 
                     if (error) {
-                        logger.error(`Error starting daemon (${error}): ${stderr}`);
+                        console.error(`Error starting daemon (${error}): ${stderr}`);
                         hasResolved = true;
                         reject(new FirodStartupError(error, stderr));
                     }
@@ -840,7 +886,7 @@ export class Firod {
                 this.awaitFirodListening().then(() => {
                     if (hasResolved) return;
 
-                    logger.info("firod is listening. Inferring that we've successfully started the daemon.");
+                    console.info("firod is listening. Inferring that we've successfully started the daemon.");
                     hasResolved = true;
                     resolve();
                 })
@@ -850,10 +896,10 @@ export class Firod {
                     {timeout: 10_000},
                     (error, stdout, stderr) => {
                         if (error) {
-                            logger.error(`Error starting daemon (${error}): ${stderr}`);
+                            console.error(`Error starting daemon (${error}): ${stderr}`);
                             reject(new FirodStartupError(error, stderr));
                         } else {
-                            logger.info(`Successfully started daemon: ${stdout}`);
+                            console.info(`Successfully started daemon: ${stdout}`);
                             resolve();
                         }
                     }
@@ -891,12 +937,12 @@ export class Firod {
     // is made successfully. We will continue to try reconnecting to the firod statusPort until a connection is made.
     private async connectAndReact() {
         let finished = false;
-        logger.info("Waiting for firod to open its ports...");
+        console.info("Waiting for firod to open its ports...");
         // We need to do this because ZMQ will just hang if the socket is unavailable.
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             setTimeout(() => {
                 if (!finished) {
-                    logger.error("firod has not opened it ports after %s seconds", this.connectionTimeout);
+                    console.error(`firod has not opened it ports after ${this.connectionTimeout} seconds`);
                     finished = true;
                 }
 
@@ -905,7 +951,7 @@ export class Firod {
 
             this.awaitFirodListening().then(() => {
                 if (!finished) {
-                    logger.info("firod's ports are open.");
+                    console.info("firod's ports are open.");
                     finished = true;
                 }
 
@@ -916,16 +962,16 @@ export class Firod {
         this.awaitFirodStopped().then(async () => {
             // This will be set if firod shutdown cleanly.
             if (this.hasShutdown) {
-                logger.debug("firod has closed its ports after a clean shutdown");
+                console.debug("firod has closed its ports after a clean shutdown");
                 return;
             }
 
             this.hasShutdown = true;
-            logger.error("firod has died unexpectedly");
+            console.error("firod has died unexpectedly");
             await this.firodHasShutdown.release(false);
         });
 
-        logger.info("Connecting to firod...")
+        console.info("Connecting to firod...")
         this.statusPublisherSocket = new zmq.Subscriber();
 
         new Promise(async () => {
@@ -933,7 +979,7 @@ export class Firod {
                 try {
                     await this.gotApiStatus(msgBuffer.toString());
                 } catch (e) {
-                    console.log(e);
+                    console.error(e);
                 }
             }
         });
@@ -976,17 +1022,17 @@ export class Firod {
         try {
             apiStatus = JSON.parse(apiStatusMessage, bigIntTransform);
         } catch (e) {
-            logger.error("Failed to parse API status %O", apiStatusMessage);
+            console.error(`Failed to parse API status "${apiStatusMessage}"`);
             throw new FirodError(`Failed to parse apiStatus: ${e}`);
         }
 
         if (apiStatus.error) {
-            logger.error("Error retrieving API status: %O", apiStatus);
+            console.error(`Error retrieving API status: ${JSON.stringify(apiStatus, bigIntSerializeTransform)}`);
             throw new UnexpectedFirodResponse('apiStatus', apiStatus);
         }
 
         if (apiStatus.meta.status < 200 || apiStatus.meta.status >= 400) {
-            logger.error("Received API status with bad status %d: %O", apiStatus.meta.status, apiStatus);
+            console.error(`Received API status with bad status ${apiStatus.meta.status}: ${JSON.stringify(apiStatus, bigIntSerializeTransform)}`);
             throw new UnexpectedFirodResponse('apiStatus', apiStatus);
         }
 
@@ -1025,7 +1071,7 @@ export class Firod {
     // before initialization. It is called after an apiStatus with modules.API set to true is sent. It MUST NOT be
     // called multiple times.
     private async initializeWithApiStatus(apiStatus: ApiStatus) {
-        logger.info("Initializing with apiStatus: %O", apiStatus);
+        console.info('Received initial apiStatus.');
 
         this.requesterSocket = new zmq.Request();
         this.publisherSocket = new zmq.Subscriber();
@@ -1050,7 +1096,7 @@ export class Firod {
                 break;
 
             default:
-                logger.error("Connected to unknown network type %O", apiStatus.data.network);
+                console.error(`Connected to unknown network type ${apiStatus.data.network}`);
                 throw new UnexpectedFirodResponse('apiStatus', apiStatus);
         }
 
@@ -1064,7 +1110,7 @@ export class Firod {
             s.curveSecretKey = clientPrivkey;
         }
 
-        logger.info("Connecting to firod controller ports...");
+        console.info("Connecting to firod controller ports...");
 
         // These calls give no indication of failure.
         this.requesterSocket.connect(`tcp://${constants.firodAddress.host}:${reqPort}`);
@@ -1077,7 +1123,7 @@ export class Firod {
                 continue;
             }
 
-            logger.debug("Subscribing to %s events", topic);
+            console.debug(`Subscribing to ${topic} events`);
             this.publisherSocket.subscribe(topic);
         }
 
@@ -1097,23 +1143,23 @@ export class Firod {
         try {
             parsedMessage = JSON.parse(message, bigIntTransform);
         } catch(e) {
-            logger.error("firod sent us invalid JSON data on a subscription for %s: %O", topic, message);
+            console.error(`firod sent us invalid JSON data on a subscription for ${topic}: ${message}`);
             return;
         }
 
-        if (logger.isSillyEnabled()) {
-            logger.silly("firod sent us a subscription event for topic %s: %s", topic, JSON.stringify(parsedMessage, bigIntSerializeTransform, 2));
+        if (this.logSubscriptionEvents) {
+            console.debug(`firod sent us a subscription event for topic ${topic}:${JSON.stringify(parsedMessage, bigIntSerializeTransform, 2)}`);
         }
 
         if (parsedMessage.meta.status !== 200) {
-            logger.error("firod sent us an event for topic %s with a non-200 status: %O", topic, parsedMessage);
+            console.error(`firod sent us an event for topic ${topic} with a non-200 status: ${JSON.stringify(parsedMessage, bigIntSerializeTransform)}`);
             return;
         }
 
         if (this.eventHandlers[topic]) {
             this.eventHandlers[topic](this, parsedMessage.data);
         } else {
-            logger.warn("Received subscription event with topic '%s', but no handler exists.", topic);
+            console.warn(`Received subscription event with topic '${topic}', but no handler exists.`);
         }
     }
 
@@ -1129,7 +1175,7 @@ export class Firod {
     // If firod has been shutdown intentionally (but not crashed) this method will throw.
     async send(auth: string | null, type: string, collection: string, data: unknown): Promise<unknown> {
         if (collection !== 'rpc') {
-            logger.debug("Sending request to firod: type: %O, collection: %O, data: %O", type, collection, data);
+            console.debug(`Sending request to firod: type: ${type}, collection: ${collection}, data: ${JSON.stringify(data, bigIntSerializeTransform, 2)}`);
         }
 
         return await this.requesterSocketSend(Firod.formatSend(auth, type, collection, data));
@@ -1160,14 +1206,14 @@ export class Firod {
             callName = message.type ? `${message.type}/${message.collection}` : message.collection;
         }
 
-        logger.silly(`Trying to acquire requestMutex for ${callName}...`);
+        console.debug(`Trying to acquire requestMutex for ${callName}...`);
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
         let releaseLock = await this.requestMutex.lock();
-        logger.silly(`Acquired requestMutex for ${callName}`);
+        console.debug(`Acquired requestMutex for ${callName}`);
 
         const release = () => {
-            logger.silly(`Releasing requestMutex for ${callName}...`)
+            console.debug(`Releasing requestMutex for ${callName}...`)
             releaseLock();
         };
 
@@ -1196,7 +1242,7 @@ export class Firod {
                 try {
                     message = JSON.parse(messageString, bigIntTransform);
                 } catch (e) {
-                    logger.error("firod sent us invalid JSON: %O", messageString);
+                    console.error(`firod sent us invalid JSON: ${messageString}`);
                     release();
                     reject(new UnexpectedFirodResponse(callName, e));
                     return;
@@ -1205,10 +1251,10 @@ export class Firod {
                 if (callName === 'create/rpc' || callName === 'create/showMnemonics') {
                     // Don't log anything about rpc or mnemonic requests.
                 } else if (messageString.length > 1024) {
-                    logger.debug(`received reply from firod for ${callName}: <%d bytes>`, messageString.length);
-                    logger.silly(`content of ${messageString.length} byte reply to ${callName}: ${JSON.stringify(message, bigIntSerializeTransform, 2)}`);
+                    console.debug(`received reply from firod for ${callName}: <${messageString.length} bytes>`);
+                    console.debug(`content of ${messageString.length} byte reply to ${callName}: ${JSON.stringify(message, bigIntSerializeTransform, 2)}`);
                 } else {
-                    logger.debug(`received reply from firod for ${callName}: ${JSON.stringify(message, bigIntSerializeTransform, 2)}`);
+                    console.debug(`received reply from firod for ${callName}: ${JSON.stringify(message, bigIntSerializeTransform, 2)}`);
                 }
 
                 if (isFirodResponseMessage(message)) {
@@ -1246,7 +1292,7 @@ export class Firod {
 
         await this.requesterSocketSend(Firod.formatSend(auth, type, collection, data), true);
 
-        logger.info("Waiting for firod to shutdown.");
+        console.info("Waiting for firod to shutdown.");
         await this.awaitFirodStopped();
 
         this.statusPublisherSocket.close();
@@ -1258,7 +1304,7 @@ export class Firod {
 
     // This is called when an error sending to firod has occurred.
     async sendError(error: any) {
-        logger.error("Error sending data to firod: %O", error);
+        console.error(`Error sending data to firod: ${error}`);
     }
 
     // Actions
@@ -1334,35 +1380,6 @@ export class Firod {
         return helpEntries.map(x => x.split(' ')[0]);
     }
 
-    // Create a new payment request (to be stored on the daemon-side).
-    //
-    // If address is not specified, a new address will be created.
-    //
-    // NOTE: firod doesn't send out a subscription event when a new payment request is created, so the caller is
-    //       responsible for any updating of state that might be required.
-    async createPaymentRequest(amount: number | undefined, label: string, message: string, address?: string): Promise<PaymentRequestData> {
-        return <any>await this.send(null, 'create', 'paymentRequest', {
-            amount,
-            label,
-            address,
-            message
-        });
-    }
-
-    // Update an existing payment request.
-    //
-    // NOTE: firod doesn't send out a subscription event when a payment request is updated, so the caller is
-    //       responsible for any updating of state that might be required.
-    async updatePaymentRequest(address: string, amount: number | undefined, label: string, message: string, state: PaymentRequestState): Promise<PaymentRequestData> {
-        return <any>await this.send(null, 'update', 'paymentRequest', {
-            id: address,
-            amount,
-            label,
-            message,
-            state
-        });
-    }
-
     // Publicly send amount satoshi XZC to recipient. resolve()s with txid, or reject()s if we have insufficient funds
     // or the call fails for some other reason.
     //
@@ -1409,35 +1426,6 @@ export class Firod {
         }
     }
 
-    // Send amount satoshi XZC to recipient using Sigma, optionally subtracting the fee from the amount.
-    //
-    // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
-    // this transaction.
-    //
-    // resolve()s with txid, or reject()s if we have insufficient funds or the call fails for some other reason.
-    async sendSigma(auth: string, label: string, recipient: string, amount: number, subtractFeeFromAmount: boolean,
-                    coinControl?: CoinControl): Promise<string> {
-        const data = await this.send(auth, 'create', 'sendSigma', {
-            outputs: [
-                {
-                    address: recipient,
-                    amount
-                }
-            ],
-            label,
-            subtractFeeFromAmount,
-            coinControl: {
-                selected: coinControlToString(coinControl)
-            }
-        });
-
-        if (typeof data === 'string') {
-            return data;
-        } else {
-            throw new UnexpectedFirodResponse('create/sendSigma', data);
-        }
-    }
-
     // Send amount satoshi XZC to recipient using Lelantus, optionally subtracting the fee from the amount.
     //
     // If coinControl is specified, it should be a list of [txid, txindex] pairs specifying the inputs to be used for
@@ -1470,10 +1458,6 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('create/showMnemonics', data);
-    }
-
-    async writeShowMnemonicWarning(auth: string, dontShowMnemonicWarning: boolean) : Promise<void> {
-        await this.send(auth, 'create', 'writeShowMnemonicWarning', {dontShowMnemonicWarning});
     }
 
     async getMasternodeList() : Promise<Object> {
@@ -1541,20 +1525,6 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('none/paymentRequestAddress', data);
-    }
-
-    // Mint Sigma in the given denominations. zerocoinDenomination must be one of '0.05', '0.1', '0.5', '1', '10', '25',
-    // or '100'; values are how many to mint of each type. (e.g. passing mints: {'100': 2} will mint 200 Sigma). We
-    // resolve() with the generated txid, or reject() with an error if something went wrong.
-    async mintSigma(auth: string, mints: {[zerocoinDenomination: string]: number}): Promise<string> {
-        const data = await this.send(auth, 'create', 'sigmaMint', {
-            denominations: mints
-        });
-        if (typeof data === 'string') {
-            return data;
-        }
-
-        throw new UnexpectedFirodResponse('create/mint', data);
     }
 
     // Turn all of our non-Lelantus coins into Lelantus coins. Should be preferred to mintSigma if Lelantus is
@@ -1628,7 +1598,7 @@ export class Firod {
     }
 
     // Get information about an Elysium property from its property id or from the tx that created it.
-    async getElysiumPropertyInfo(properties: [number | string][]): Promise<ElysiumPropertyData[]> {
+    async getElysiumPropertyInfo(properties: (number | string)[]): Promise<ElysiumPropertyData[]> {
         return <ElysiumPropertyData[]>(await this.send(null, null, 'getElysiumPropertyInfo', {
             propertyIds: properties.filter(p => typeof p == 'number'),
             propertyCreationTxids: properties.filter(p => typeof p == 'string')
@@ -1653,88 +1623,6 @@ export class Firod {
             default:
                 throw "unreachable";
         }
-    }
-
-    // Calculate a transaction fee for a public transaction.
-    // feePerKb is the satoshi fee per kilobyte for the generated transaction.
-    //
-    // We resolve() with the calculated fee in satoshi.
-    // We reject() the promise if the firod call fails or received data is invalid.
-    async calcPublicTxFee(amount: number, subtractFeeFromAmount: boolean, feePerKb: number,
-                          coinControl?: CoinControl): Promise<number> {
-        let data = await this.send(null, 'get', 'txFee', {
-            addresses: {
-                [this.defaultAddress()]: amount
-            },
-            feePerKb,
-            subtractFeeFromAmount,
-            coinControl: {
-                selected: coinControlToString(coinControl)
-            }
-        });
-
-        function isValidResponse(x: any): x is {fee: number} {
-            return x !== null &&
-                typeof x === 'object' &&
-                typeof x.fee === 'number';
-        }
-
-        if (isValidResponse(data)) {
-            return data.fee
-        }
-
-        throw new UnexpectedFirodResponse('get/txFee', data);
-    }
-
-    // Calculate a transaction fee for a sigma transaction. You may not specify custom transaction fees for sigma
-    // transactions.
-    //
-    // We resolve() with the calculated fee in satoshi.
-    // We reject() the promise if the firod call fails or received data is invalid.
-    async calcSigmaTxFee(amount: number, subtractFeeFromAmount: boolean): Promise<number> {
-        let data = await this.send(null, 'none', 'sigmaTxFee', {
-            outputs: [
-                {
-                    address: this.defaultAddress(),
-                    amount
-                }
-            ],
-            // The response is the same no matter what label we use.
-            label: '',
-            subtractFeeFromAmount
-        });
-
-        function isValidResponse(x: any): x is {fee: number} {
-            return x !== null &&
-                typeof x === 'object' &&
-                typeof x.fee === 'number';
-        }
-
-        if (isValidResponse(data)) {
-            return data.fee
-        }
-
-        throw new UnexpectedFirodResponse('get/privateTxFee', data);
-    }
-
-    // Calculate a transaction fee for a lelantus transaction. You may not specify custom transaction fees for lelantus
-    // transactions.
-    //
-    // We resolve() with the calculated fee in satoshi.
-    // We reject() the promise if the firod call fails or received data is invalid.
-    async calcLelantusTxFee(amount: number, feePerKb: number, subtractFeeFromAmount: boolean,
-                            coinControl?: CoinControl): Promise<number> {
-        const fee = await this.send(null, 'none', 'lelantusTxFee', {
-            amount,
-            feePerKb,
-            subtractFeeFromAmount,
-            coinControl: {
-                selected: coinControlToString(coinControl)
-            }
-        });
-
-        if (typeof fee === 'number') return fee;
-        throw new UnexpectedFirodResponse('none/lelantusTxFee', fee);
     }
 
 
@@ -1768,47 +1656,6 @@ export class Firod {
             throw new RebroadcastError(data.error);
         } else {
             throw new UnexpectedFirodResponse('create/rebroadcast', data);
-        }
-    }
-
-    // Start a Znode by alias. If the call fails, we reject() with the cause.
-    async startZnode(auth: string, znodeAlias: string): Promise<void> {
-        const data = await this.send(auth, 'update', 'znodeControl', {
-            method: 'start-alias',
-            alias: znodeAlias
-        });
-
-        function isValidResponse(x: any): x is {
-            overall: {
-                total: 1
-            },
-            detail: {
-                status: {
-                    success: boolean,
-                    info?: string
-                }
-            }
-        } {
-            return x !== null &&
-                typeof x === 'object' &&
-                x.overall !== null &&
-                typeof x.overall === 'object' &&
-                x.overall.total === 1 &&
-                x.detail !== null &&
-                typeof x.detail === 'object' &&
-                x.detail.status !== null &&
-                typeof x.detail.status.success === 'boolean' &&
-                (!x.detail.status.success !== !!x.detail.status.info) &&
-                (!x.detail.status.info || typeof x.detail.status.info === 'string')
-        }
-
-        if (!isValidResponse(data)) {
-            throw new UnexpectedFirodResponse('update/znodeControl', data);
-        }
-
-        // If the call failed, r.detail[0].info will be the error message; otherwise, it will be blank.
-        if (!data.detail.status.success) {
-            throw new ZnodeStartupError(data.detail.status.info);
         }
     }
 

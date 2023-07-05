@@ -1,14 +1,13 @@
 <template>
     <th v-if="isHeader"></th>
     <td v-else>
-        <input v-if="!rowData.isLocked"  :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" ref="checkbox" type="checkbox" @input="toggle" />
-        <input v-else :disabled="true" :id="`utxo-selector-${this.txidIndex}`" class="disable-checkbox" ref="checkbox" type="checkbox" @input="toggle" :checked="false"/>
+        <input v-if="!rowData.isLocked"  :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" type="checkbox" v-model="checkbox"/>
+        <input v-else :disabled="true" :id="`utxo-selector-${this.txidIndex}`" class="disable-checkbox" type="checkbox" v-model="checkbox" :checked="false"/>
     </td>
 </template>
 
 <script>
-import Vue from 'vue';
-import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 
 export default {
     name: 'UTXOSelector',
@@ -16,6 +15,12 @@ export default {
     mixins: [
         VuetableFieldMixin
     ],
+
+    data() {
+        return {
+            checkbox: false
+        }
+    },
 
     computed: {
         txidIndex() {
@@ -25,13 +30,11 @@ export default {
 
     watch: {
         rowData() {
-            this.$refs.checkbox.checked = !!this.vuetable.globalData[this.txidIndex];
-        }
-    },
+            this.checkbox = !!this.vuetable.globalData[this.txidIndex];
+        },
 
-    methods: {
-        toggle(ev) {
-            Vue.set(this.vuetable.globalData, this.txidIndex, ev.target.checked);
+        checkbox() {
+            this.vuetable.globalData[this.txidIndex] = this.checkbox;
         }
     }
 }

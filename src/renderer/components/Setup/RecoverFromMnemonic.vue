@@ -126,7 +126,7 @@ export default {
             }
 
             return {
-                mnemonic: this.newWords.join(' '),
+                mnemonicPhrase: this.newWords.join(' '),
                 mnemonicPassphrase: this.hasProtectivePassphrase ? this.protectivePassphrase : null,
                 isNewMnemonic: false
             };
@@ -170,7 +170,7 @@ export default {
 
             // If we reach this point, the user is pasting in multiple words.
 
-            this.$set(this.newWords, newWordIndex, '');
+            this.newWords[newWordIndex] = '';
             event.preventDefault();
 
             // If the user is pasting in a complete passphrase, pretend that we're in the first newWord so the user can
@@ -183,7 +183,7 @@ export default {
             for (const word of newWordEntrySplit) {
                 i++;
 
-                this.$set(this.newWords, i, word);
+                this.newWords[i] = word;
 
                 if (i >= this.$refs.newWords.length - 1) {
                     break;
@@ -213,9 +213,7 @@ export default {
 
             this.$router.push({
                 path: '/setup/lock-wallet',
-                query: {
-                    mnemonic: this.mnemonic
-                }
+                query: this.mnemonic
             })
         }
     }

@@ -4,7 +4,7 @@
             Make this a private transaction
         </div>
         <div class="info-item">
-            <Info class="info-icon" />
+            <FiroInfo class="info-icon" />
             <label>
                 You are using a transparent transaction, please go private. If this is a masternode transaction, you do not have to go private
             </label>
@@ -18,13 +18,13 @@
 </template>
 
 <script>
-import Info from "renderer/assets/Info.svg";
+import FiroInfo from 'renderer/assets/FiroInfo';
 
 export default {
     name: 'GoPrivate',
 
     components: {
-        Info
+        FiroInfo
     },
 
     props: {

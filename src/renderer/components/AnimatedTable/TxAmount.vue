@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue'
+import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 import {bigintToString} from "lib/convert";
 
 export default {

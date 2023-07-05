@@ -6,10 +6,12 @@
         <div id="main-content" :class="{'has-header': hasHeader}">
             <Sidebar id="sidebar" />
 
-            <main ref="main" id="primary">
-                <keep-alive include="DebugPage">
-                    <router-view />
-                </keep-alive>
+            <main id="primary">
+                <router-view v-slot="{Component}">
+                    <keep-alive include="DebugConsolePage">
+                        <component :is="Component" />
+                    </keep-alive>
+                </router-view>
             </main>
         </div>
     </div>

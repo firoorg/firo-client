@@ -3,11 +3,11 @@
         <div class="search-icon">🔍</div>
         <input
             type="text"
-            :value="value"
+            v-model="searchValue"
             :placeholder="placeholder"
             spellcheck="false"
-            @input="!lazy && $emit('input', $event.target.value)"
-            @change="lazy && $emit('input', $event.target.value)"
+            @input="!lazy && $emit('update:modelValue', $event.target.value)"
+            @change="lazy && $emit('update:modelValue', $event.target.value)"
         >
     </div>
 </template>
@@ -16,7 +16,13 @@
 export default {
     name: "SearchInput",
 
-    props: ['value', 'placeholder', 'lazy']
+    props: ['modelValue', 'placeholder', 'lazy'],
+
+    data() {
+        return {
+            searchValue: this.modelValue
+        };
+    }
 }
 </script>
 

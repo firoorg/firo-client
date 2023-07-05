@@ -49,7 +49,7 @@ export default {
     },
 
     created() {
-        this.newWords = this.cachedMnemonic.mnemonic.split(' ');
+        this.newWords = this.cachedMnemonic.mnemonicPhrase.split(' ');
         this.hiddenWordPositions = [];
 
         // Fill hiddenWordPositions with 4 unique, random integers 0..24 and set the corresponding position of newWords
@@ -73,7 +73,7 @@ export default {
         }),
 
         isVerified() {
-            return this.newWords.join(' ') === this.cachedMnemonic.mnemonic;
+            return this.newWords.join(' ') === this.cachedMnemonic.mnemonicPhrase;
         }
     },
 
@@ -85,9 +85,7 @@ export default {
         goToConfirmLockWallet() {
             this.$router.push({
                 path: '/setup/lock-wallet',
-                query: {
-                    mnemonic: this.cachedMnemonic
-                }
+                query: this.cachedMnemonic
             });
         }
     }

@@ -1,8 +1,10 @@
 dist/
 build/
 node_modules/
-.DS_Store
 .idea/
+traces/
+videos/
+.DS_Store
 firo-client-test.log
 .env
 coin-swap-pairs.json

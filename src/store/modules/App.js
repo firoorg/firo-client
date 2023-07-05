@@ -1,10 +1,7 @@
 import path from 'path'
 import {homedir} from 'os'
-import { getAppSettings, getApp } from 'lib/utils'
-import { createLogger } from 'lib/logger'
+import { getAppSettings } from 'lib/utils'
 import keys from "../../keys";
-
-const logger = createLogger('firo:store:app')
 
 const state = {
     isInitialized: false,
@@ -20,6 +17,8 @@ const state = {
     temporaryFirodArguments: [],
     enableElysium: false,
     colorTheme: 'system',
+    appPath: '',
+    userDataPath: '',
     logMessages: []
 }
 
@@ -84,6 +83,14 @@ const mutations = {
         state.colorTheme = value;
     },
 
+    setAppPath(state, value) {
+        state.appPath = value;
+    },
+
+    setUserDataPath(state, value) {
+        state.userDataPath = value;
+    },
+
     appendLogMessages(state, msgs) {
         state.logMessages = [...state.logMessages, ...msgs].slice(-10000);
     }
@@ -143,14 +150,14 @@ const getters = {
             throw "unknown platform";
         }
     },
-    firodLocation: () => {
+    firodLocation: (state, getters) => {
         const firodName = process.platform === 'win32' ? 'firod.exe' : 'firod';
 
         let appDirectory;
         if (process.env.NODE_ENV === "development" || process.env.FIRO_CLIENT_TEST) {
             appDirectory = process.cwd();
         } else {
-            appDirectory = getApp().getAppPath().replace('app.asar', 'app.asar.unpacked');
+            appDirectory = getters.appPath.replace('app.asar', 'app.asar.unpacked');
         }
 
         return path.resolve(appDirectory, 'assets', 'core', process.platform, firodName);
@@ -205,6 +212,8 @@ const getters = {
     enableElysium: (state) => state.enableElysium || false,
     colorTheme: (state) => state.colorTheme || 'system',
     showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && keys.HAS_KEYS,
+    appPath: (state) => state.appPath,
+    userDataPath: (state) => state.userDataPath,
     logMessages: (state) => state.logMessages
 }
 

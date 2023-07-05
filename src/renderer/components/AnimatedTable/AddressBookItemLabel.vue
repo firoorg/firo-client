@@ -3,13 +3,15 @@
         Label
     </th>
 
-    <td v-else class="address-book-item-label">
-        {{ rowData.label || 'Unlabelled' }}
+    <td v-else class="label">
+        <div class="inner-label">
+            {{ rowData.label || 'Unlabelled' }}
+        </div>
     </td>
 </template>
 
 <script>
-import VuetableFieldMixin from 'vuetable-2/src/components/VuetableFieldMixin.vue';
+import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
 
 export default {
     name: "AddressBookItemLabel",
@@ -21,10 +23,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
-td.address-book-item-label {
+td.label {
     width: 180px;
     max-width: 180px;
-    overflow: hidden;
-    white-space: nowrap;
+
+    .inner-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 5px;
+    }
 }
 </style>

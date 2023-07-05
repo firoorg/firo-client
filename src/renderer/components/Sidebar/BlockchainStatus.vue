@@ -17,7 +17,7 @@
             </div>
 
             <div class="details">
-                {{currentBlockHeight}} (<timeago :datetime="latestBlockTimestamp * 1000" />),
+                {{currentBlockHeight}} ({{ latestBlockRelativeDate }}),
                 {{connections}} connections
             </div>
         </div>
@@ -27,12 +27,28 @@
 <script>
 import {mapGetters} from "vuex";
 import LoadingBounce from "../Icons/LoadingBounce";
+import {ago} from "time-ago";
 
 export default {
     name: "BlockchainStatus",
 
     components: {
         LoadingBounce
+    },
+
+    data() {
+        return {
+            tick: 0,
+            timer: null
+        };
+    },
+
+    mounted() {
+        this.timer = setInterval(() => this.tick++, 30e3);
+    },
+
+    unmounted() {
+        clearInterval(this.timer);
     },
 
     computed: {
@@ -42,7 +58,12 @@ export default {
             currentBlockHeight: 'ApiStatus/currentBlockHeight',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             latestBlockTimestamp: 'ApiStatus/latestBlockTimestamp'
-        })
+        }),
+
+        latestBlockRelativeDate() {
+            this.tick;
+            return ago(this.latestBlockTimestamp * 1000)
+        }
     }
 }
 </script>

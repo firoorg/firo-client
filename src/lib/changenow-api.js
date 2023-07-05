@@ -12,7 +12,7 @@ class ChangeAPIWorker {
         }
 
         if (response.error){
-            console.log(`${response.error}: ${response.reason}`);
+            console.error(`${response.error}: ${response.reason}`);
             return response.reason;
         }
     }

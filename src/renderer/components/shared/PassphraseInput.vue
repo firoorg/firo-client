@@ -8,10 +8,10 @@
             <input
                 v-focus
                 type="password"
-                :value="value"
+                v-model="passphrase"
                 name="passphrase"
                 placeholder="Enter Your Passphrase"
-                @input="$emit('input', $event.target.value)"
+                @input="$emit('update:modelValue', $event.target.value)"
                 @keyup.enter="$emit('confirm')"
             />
 
@@ -25,7 +25,7 @@
                 Cancel
             </button>
 
-            <button class="solid-button recommended confirm" :disabled="!value" @click="$emit('confirm')">
+            <button class="solid-button recommended confirm" :disabled="!passphrase" @click="$emit('confirm')">
                 Confirm
             </button>
         </div>
@@ -39,6 +39,12 @@ export default {
     props: {
         value: String,
         error: String
+    },
+
+    data() {
+        return {
+            passphrase: this.value
+        };
     }
 }
 </script>

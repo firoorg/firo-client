@@ -4,7 +4,7 @@
             Migrate funds from Lelantus to Spark
         </div>
         <div class="info">
-            <Info class="info-icon info-item" />
+            <FiroInfo class="info-icon info-item" />
             <label class="info-item">
                 Firo is migrating to Spark. Please migrate your funds.
             </label>
@@ -18,13 +18,13 @@
 </template>
 
 <script>
-import Info from "renderer/assets/Info.svg";
+import FiroInfo from 'renderer/assets/FiroInfo';
 
 export default {
     name: 'LelantusToSpark',
 
     components: {
-        Info
+        FiroInfo
     },
 
     props: {

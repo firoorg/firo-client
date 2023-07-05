@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {markRaw} from "vue";
 import Popup from "renderer/components/shared/Popup";
 import MasternodeInfo from "renderer/components/MasternodesPage/MasternodeInfo";
 import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
@@ -49,9 +49,9 @@ import MasternodeIP from "renderer/components/AnimatedTable/MasternodeIP";
 import SearchInput from "renderer/components/shared/SearchInput";
 
 const tableFields = [
-    {name: MasternodeIP, width: "160pt"},
-    {name: MasternodeCollateralAddress},
-    {name: MasternodeNextPaymentBlock, width: "160pt"}
+    {name: markRaw(MasternodeIP), width: "160pt"},
+    {name: markRaw(MasternodeCollateralAddress)},
+    {name: markRaw(MasternodeNextPaymentBlock), width: "160pt"}
 ];
 
 export default {

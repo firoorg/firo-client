@@ -29,9 +29,9 @@ module.exports = function (config) {
         writeFileSync(join(__dirname, '..', 'src', 'keys.js'), `const KEYS = ${JSON.stringify(keys)};\nexport default KEYS;`);
 
         let compiler = webpack(config, (err, stats) => {
-            const errors = [...(err ? [err] : []), ...stats.compilation.errors, ...stats.compilation.warnings];
+            const errors = [...(err ? [err] : []), ...(stats?.compilation.getErrors()||[]), ...(stats?.compilation.getWarnings()||[])];
 
-            if (errors.length > 1) {
+            if (errors.length >= 1) {
                 console.error(`${config.target} failed to build:`);
 
                 for (const e of errors) {

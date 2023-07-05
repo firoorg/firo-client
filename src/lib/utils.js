@@ -1,4 +1,3 @@
-import { app, remote } from 'electron'
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
@@ -180,10 +179,6 @@ class AppSettings {
             throw 'unsupported platform';
         }
     }
-}
-
-export const getApp = function () {
-    return process.type === 'renderer' ? remote.app : app
 }
 
 const appSettings = new AppSettings();

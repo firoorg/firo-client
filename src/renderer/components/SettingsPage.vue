@@ -116,7 +116,6 @@ export default {
                     $setWaitingReason("Restarting daemon...");
                     await $daemon.stopDaemon();
                     await $startDaemon();
-                    await $addElysiumTokenData();
                 });
             }
         },
@@ -138,7 +137,9 @@ export default {
             useTor: $store.getters['Settings/isConnectedViaTor'],
             show: null, // 'change-passphrase' | 'mnemonic'
             successMessage: null,
-            errorMessage: null
+            errorMessage: null,
+            messageTitle: '',
+            message: ''
         };
     },
 

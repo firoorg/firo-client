@@ -1,4 +1,3 @@
-import Vue from "vue";
 import {ElysiumData, ElysiumPropertyData} from "../../daemon/firod";
 import {cloneDeep} from "lodash";
 import {TXO} from "./Transactions";
@@ -18,7 +17,7 @@ const mutations = {
     addTokenData(state, tokenData: ElysiumPropertyData[]) {
         for (const token of tokenData) {
             const m = token.name.match(/^(.*) \(([A-Z0-9]{1,4})\)$/);
-            Vue.set(state.tokenData, token.creationTx, {...token, nameMinusTicker: m ? m[1] : token.name, ticker: m ? m[2] : `E:${token.id || '...'}`});
+            state.tokenData[token.creationTx] = {...token, nameMinusTicker: m ? m[1] : token.name, ticker: m ? m[2] : `E:${token.id || '...'}`};
         }
     },
 
@@ -30,12 +29,12 @@ const mutations = {
         const b = [...(state.allSelectedTokens[block1]||[])];
         for (const token of tokens) if (!b.includes(token)) b.push(token);
         state.hasModifiedSelectedTokens = true;
-        Vue.set(state.allSelectedTokens, block1, b.sort());
+        state.allSelectedTokens[block1] = b.sort();
     },
 
     removeSelectedTokens(state, [block1, tokens]: [string, number[]]) {
         state.hasModifiedSelectedTokens = true;
-        Vue.set(state.allSelectedTokens, block1, (state.allSelectedTokens[block1] || []).filter(tk => !tokens.includes(tk)));
+        state.allSelectedTokens[block1] = (state.allSelectedTokens[block1] || []).filter(tk => !tokens.includes(tk));
     }
 };
 

@@ -22,7 +22,7 @@
         </div>
 
         <div class="send-detail detail" :class="{disabled: formDisabled}">
-            <div class="inner">
+            <Form ref="form" as="div" class="inner" :validation-schema="validationSchema" v-slot="{errors, meta}">
                 <div class="top">
                     <Dropdown
                         v-if="enableElysium"
@@ -32,7 +32,7 @@
                     />
 
                     <InputFrame label="Label">
-                        <input
+                        <Field
                             id="label"
                             ref="label"
                             v-model.trim.lazy="label"
@@ -46,12 +46,11 @@
                     </InputFrame>
 
                     <InputFrame label="Address">
-                        <input
+                        <Field
                             id="address"
                             ref="address"
                             v-model="address"
-                            v-validate.initial="'firoAddress'"
-                            v-tooltip="getValidationTooltip('address')"
+                            v-tooltip="errors.address"
                             type="text"
                             name="address"
                             tabindex="2"
@@ -63,13 +62,13 @@
 
                     <div v-if="!isPrivate" class="warning-text">
                         <div class="warning-item">
-                            <Warning class="warning-icon" />
+                            <FiroWarning class="warning-icon" />
                             <label>
                                 You are using a transparent transaction, please go private.
                             </label>
                         </div>
                         <div class="warning-item warning-item-text">
-                            <Warning class="warning-icon" />
+                            <FiroWarning class="warning-icon" />
                             <label>
                                 If this is a masternode transaction, you do not have to go private
                             </label>
@@ -82,12 +81,11 @@
                     </div>
 
                     <InputFrame class="input-frame-amount" label="Amount">
-                        <input
+                        <Field
                             id="amount"
                             ref="amount"
                             v-model="amount"
-                            v-validate.initial="amountValidations"
-                            v-tooltip="getValidationTooltip('amount')"
+                            v-tooltip="errors.amount"
                             type="text"
                             name="amount"
                             class="amount"
@@ -98,15 +96,15 @@
 
                     <div v-show="selectedAsset == 'FIRO'" class="checkbox-field">
                         <input type="checkbox" v-model="useCustomInputs" :disabled="formDisabled"/>
-                        <label><a id="custom-inputs-button" href="#" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
+                        <label><a id="custom-inputs-button" @click="useCustomInputs = showCustomInputSelector = true">Custom Inputs (Coin Control)</a></label>
 
                         <Popup v-if="showCustomInputSelector">
-                            <InputSelection v-model="customInputs" :is-private="isPrivate" @cancel="useCustomInputs = showCustomInputSelector = false" @ok="showCustomInputSelector = false" />
+                            <InputSelection v-model="customInputs" :is-private="isPrivate" @cancel="showCustomInputSelector = false" @ok="showCustomInputSelector = false" />
                         </Popup>
                     </div>
 
-                    <div v-show="selectedAsset == 'FIRO'" v-if="useCustomInputs" class="max-send">
-                        <label>Max Send:</label>
+                    <div v-if="selectedAsset == 'FIRO' && useCustomInputs" class="max-send">
+                        <label>Max Send: </label>
                         <amount :amount="coinControlSelectedAmount" ticker="FIRO" />
                     </div>
 
@@ -120,13 +118,12 @@
                         <label>Custom Transaction Fee</label>
                     </div>
 
-                    <InputFrame v-show="selectedAsset == 'FIRO'" v-if="useCustomFee" class="input-frame-tx-fee" unit="sat/kb">
-                        <input
+                    <InputFrame v-show="selectedAsset == 'FIRO' && useCustomFee" class="input-frame-tx-fee" unit="sat/kb">
+                        <Field
                             id="txFeePerKb"
                             ref="txFeePerKb"
                             v-model="userTxFeePerKb"
-                            v-validate.initial="'txFeeIsValid'"
-                            v-tooltip="getValidationTooltip('txFeePerKb')"
+                            v-tooltip="errors.txFeePerKb"
                             :placeholder="smartFeePerKb"
                             type="text"
                             name="txFeePerKb"
@@ -173,7 +170,7 @@
 
                 <div class="bottom">
                     <SendFlow
-                        :disabled="!canBeginSend"
+                        :disabled="!canBeginSend || meta.valid != true"
                         :asset="selectedAsset"
                         :is-private="isPrivate"
                         :label="label"
@@ -183,21 +180,23 @@
                         :computed-tx-fee="transactionFee"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
-                        @success="() => (feeMap = {}) && cleanupForm()"
-                        @reset="() => (feeMap = {}) && cleanupForm(false)"
+                        @success="() => cleanupForm()"
+                        @reset="() => cleanupForm()"
                     />
 
                     <div class="footer">
                         <PrivatePublicBalance :asset="selectedAsset" :disabled="!isBlockchainSynced" v-model="isPrivate" />
                     </div>
                 </div>
-            </div>
+            </Form>
         </div>
     </div>
 </template>
 
 <script>
+import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
+import {Form, Field} from "vee-validate";
 import SendFlow from "renderer/components/SendPage/SendFlow";
 import {isValidAddress, isValidPaymentCode} from 'lib/isValidAddress';
 import {bigintToString, stringToBigint} from 'lib/convert';
@@ -216,12 +215,14 @@ import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
 import FiroSymbol from "renderer/assets/CoinIcons/FIRO.svg.data";
 import AddressBookItemAddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
-import Warning from "renderer/assets/Warning.svg";
+import FiroWarning from 'renderer/assets/FiroWarning';
 
 export default {
     name: 'SendPage',
 
     components: {
+        Form,
+        Field,
         Dropdown,
         PlusButton,
         PrivatePublicBalance,
@@ -233,12 +234,8 @@ export default {
         InputFrame,
         SearchInput,
         TransactionInfo,
-        Warning
+        FiroWarning
     },
-
-    inject: [
-        '$validator'
-    ],
 
     data () {
         return {
@@ -247,16 +244,16 @@ export default {
             address: this.$route.query.address || '',
             subtractFeeFromAmount: false,
             useCustomFee: false,
-            userTxFeePerKb: '',
+            userTxFeePerKb: String($store.getters['ApiStatus/smartFeePerKb']),
             isPrivate: true,
             showCustomInputSelector: false,
             useCustomInputs: false,
             customInputs: [],
             tableFields: [
-                {name: CurrentAddressIndicator},
-                {name: AddressBookItemLabel},
-                {name: AddressBookItemAddress},
-                {name: AddressBookItemAddressType}
+                {name: markRaw(CurrentAddressIndicator)},
+                {name: markRaw(AddressBookItemLabel)},
+                {name: markRaw(AddressBookItemAddress)},
+                {name: markRaw(AddressBookItemAddressType)}
             ],
             // This is the search term to filter addresses by.
             filter: '',
@@ -288,13 +285,119 @@ export default {
             aggregatedElysiumBalances: 'Elysium/aggregatedBalances'
         }),
 
+        validationSchema() {
+            [this.amountIsWithinAvailableBalance, this.amountIsValid, this.isPrivate, this.privateAmountDoesntViolateSpendLimit];
+
+            return {
+                address: this.firoAddress,
+                amount: (value) => {
+                    if (!value) return true;
+
+                    for (const err of [
+                        this.amountIsWithinAvailableBalance(value),
+                        this.amountIsValid(value),
+                        this.isPrivate && this.privateAmountDoesntViolateSpendLimit(value)
+                    ]) {
+                        if (err) return err;
+                    }
+
+                    return true;
+                },
+                txFeePerKb: this.txFeeIsValid
+            }
+        },
+
+        amountIsValid() {
+            [this.selectedAsset, this.tokenData];
+
+            return (value) => {
+                if (
+                    Number(value) !== 0 &&
+                    ((this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ?
+                            !!value.match(/^\d+(\.\d{1,8})?$/)
+                            :
+                            !!value.match(/^\d+$/)
+                    )
+                ) return true;
+
+                return `Amount must be a multiple of ${(this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ? '0.00000001' : '1'}`;
+            };
+        },
+
+        privateAmountDoesntViolateSpendLimit() {
+            [this.selectedAsset, this.totalAmount];
+
+            return () => {
+                if (this.selectedAsset != 'FIRO' || this.totalAmount <= 5001e8)
+                    return true;
+
+                return 'Due to private transaction spend limits, you may not spend more than 5001 FIRO (including fees) in one transaction';
+            };
+        },
+
+        txFeeIsValid() {
+            return (value_) => {
+                let value;
+                try {
+                    value = BigInt(value_);
+                } catch {
+                    value = NaN;
+                }
+
+                if (value > 0n && value <= 1000000n)
+                    return true;
+
+                return 'Transaction fee must be an integer between 1 and 1,000,000';
+            };
+        },
+
+        firoAddress() {
+            this.network;
+
+            return (value) => {
+                if (!value) return '';
+
+                if (isValidAddress(value, this.network) || isValidPaymentCode(value, this.network))
+                    return true;
+
+                return 'The Firo address you entered is invalid';
+            };
+        },
+
+        amountIsWithinAvailableBalance() {
+            [
+                this.selectedAsset, this.transactionFee, this.aggregatedElysiumBalances, this.satoshiAmount,
+                this.coinControlSelectedAmount, this.useCustomInputs, this.available, this.ticker
+            ];
+
+            return () => {
+                if (
+                    this.selectedAsset == 'FIRO' ?
+                        !!this.transactionFee
+                        :
+                        this.aggregatedElysiumBalances[this.selectedAsset].priv >= this.satoshiAmount
+                ) return true;
+
+                if (this.useCustomInputs)
+                    return `Amount (including fees) is over the sum of your selected coins, ${bigintToString(this.coinControlSelectedAmount)} FIRO`;
+                else if (this.selectedAsset == 'FIRO')
+                    return `Amount (including fees) is over your available balance of ${bigintToString(this.available)} FIRO`;
+                else if (this.tokenData[this.selectedAsset].isDivisible)
+                    return `Amount (including fees) is over your available balance of ${bigintToString(this.available)} ${this.ticker}`;
+                else
+                    return `Amount (including fees) is over your available balance of ${this.available} ${this.ticker}`;
+            };
+        },
+
         availableAssets() {
-            const assets = [{id: 'FIRO', name: 'Firo', icon: FiroSymbol}];
+            let assets = [];
             for (const tk of this.selectedTokens) {
                 const token = this.tokenData[tk];
                 if (!token) continue;
                 assets.push({id: token.creationTx, name: token.name});
             }
+            assets = assets.sort((a, b) => a.name.localeCompare(b.name));
+            assets.unshift({id: 'FIRO', name: 'Firo', icon: FiroSymbol});
             return assets;
         },
 
@@ -308,7 +411,11 @@ export default {
         },
 
         txFeePerKb() {
-            return BigInt(this.userTxFeePerKb) || this.smartFeePerKb;
+            try {
+                return BigInt(this.userTxFeePerKb);
+            } catch (e) {
+                return this.smartFeePerKb;
+            }
         },
 
         filteredSendAddresses () {
@@ -354,37 +461,13 @@ export default {
 
         // This is the total amount that will be sent, including transaction fee.
         totalAmount () {
+            if (!this.transactionFee) return this.satoshiAmount;
             return this.subtractFeeFromAmount ? this.satoshiAmount : this.satoshiAmount + this.transactionFee;
         },
 
         // We can begin the send if the fee has been shown and the form is valid.
         canBeginSend () {
-            return this.isValidated && (this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount));
-        },
-
-        isValidated () {
-            // this.errors was already calculated when amount and address were entered.
-            return !!(this.amount && this.address && (this.selectedAsset != 'FIRO' || this.transactionFee) && !this.validationErrors.items.length);
-        },
-
-        amountValidations () {
-            if (this.isPrivate) {
-                return 'amountIsWithinAvailableBalance|amountIsValid|privateAmountDoesntViolateSpendLimit';
-            } else {
-                return 'amountIsWithinAvailableBalance|amountIsValid';
-            }
-        },
-
-        getValidationTooltip () {
-            return (fieldName) => ({
-                content: this.validationErrors.first(fieldName),
-                trigger: 'manual',
-                boundariesElement: 'body',
-                offset: 8,
-                placement: 'left',
-                classes: 'error',
-                show: true
-            })
+            return this.selectedAsset != 'FIRO' || (this.transactionFee > 0n && this.available >= this.totalAmount && this.amount);
         }
     },
 
@@ -396,32 +479,24 @@ export default {
         },
 
         useCustomFee() {
-            if (!this.useCustomFee) {
-                // Make sure the validation warning goes away.
-                this.userTxFeePerKb = '';
-            }
+            if (!this.useCustomFee)
+                this.userTxFeePerKb = this.smartFeePerKb;
         },
 
         subtractFeeFromAmount() {
-            this.$validator.validate('amount');
+            this.$refs.form.validate();
         },
 
         useCustomInputs() {
-            if (this.useCustomInputs) {
-                this.showCustomInputSelector = true;
-            } else {
-                this.customInputs = [];
-            }
-
-            this.$validator.validateAll();
+            this.$refs.form.validate();
         },
 
         coinControlSelectedAmount() {
-            this.$validator.validateAll();
+            this.$refs.form.validate();
         },
 
         userTxFeePerKb() {
-            this.$validator.validateAll();
+            this.$refs.form.validate();
         },
 
         isPrivate() {
@@ -451,62 +526,12 @@ export default {
                 this.subtractFeeFromAmount = false;
             }
 
-            this.$validator.validateAll();
+            this.$refs.form.validate();
         }
     },
 
     beforeMount () {
         window.setSelectedAsset = (id) => this.setSelectedAsset(id);
-
-        // Set up VeeValidator rules.
-
-        this.$validator.extend('firoAddress', {
-            getMessage: () => 'The Firo address you entered is invalid',
-            validate: (value) => isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress()
-        });
-
-        this.$validator.extend('amountIsWithinAvailableBalance', {
-            // this.availableXzc will still be reactively updated.
-            getMessage: () => {
-                if (this.useCustomInputs)
-                    return `Amount (including fees) is over the sum of your selected coins, ${bigintToString(this.coinControlSelectedAmount)} FIRO`;
-                else if (this.selectedAsset == 'FIRO')
-                    return `Amount (including fees) is over your available balance of ${bigintToString(this.available)} FIRO`;
-                else if (this.tokenData[this.selectedAsset].isDivisible)
-                    return `Amount (including fees) is over your available balance of ${bigintToString(this.available)} ${this.ticker}`;
-                else
-                    return `Amount (including fees) is over your available balance of ${this.available} ${this.ticker}`;
-            },
-
-
-            validate: (value) => {
-                return this.selectedAsset == 'FIRO' ? !!this.transactionFee : this.aggregatedElysiumBalances[this.selectedAsset].priv >= this.satoshiAmount
-            }
-        });
-
-        this.$validator.extend('amountIsValid', {
-            getMessage: () => `Amount must be a multiple of ${(this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ? '0.00000001' : '1'}`,
-            // We use a regex here so as to not to have to deal with floating point issues.
-            validate: (value) =>
-                Number(value) !== 0 &&
-                ((this.selectedAsset == 'FIRO' || this.tokenData[this.selectedAsset].isDivisible) ?
-                     !!value.match(/^\d+(\.\d{1,8})?$/)
-                    :
-                    !!value.match(/^\d+$/)
-                )
-        });
-
-        this.$validator.extend('privateAmountDoesntViolateSpendLimit', {
-            getMessage: () =>
-                `Due to private transaction spend limits, you may not spend more than 5001 FIRO (including fees) in one transaction`,
-
-            validate: (value) => this.selectedAsset != 'FIRO' || this.totalAmount <= 5001e8
-        });
-
-        this.$validator.extend('txFeeIsValid', {
-            getMessage: () => 'Transaction fee must be an integer between 1 and 1,000,000',
-            validate: (value) => value > 0 && value <= 1_000_000 && (value % 1 === 0)
-        })
     },
 
     methods: {
@@ -644,10 +669,19 @@ export default {
                     margin-bottom: 6px;
                 }
 
+                #custom-inputs-button {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+
                 .max-send {
                     margin-bottom: 10px;
                     opacity: 0.5;
                     font-weight: bold;
+
+                    label {
+                        white-space: pre;
+                    }
 
                     label, .amount {
                         display: inline-block;

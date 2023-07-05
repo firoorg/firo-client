@@ -117,7 +117,7 @@ let ticker;
 const mutations = {
     setWalletState(state, walletState: Transaction[]) {
         if (!Object.keys(upcomingTransactions).length) {
-            console.log('resetting upcomingTransactions');
+            console.debug('resetting upcomingTransactions');
             upcomingTransactions = cloneDeep(state.transactions);
         }
 
@@ -127,12 +127,12 @@ const mutations = {
         upcomingTransactionsLastUpdated = Date.now();
 
         if (!ticker) {
-            console.log('updating transaction data');
+            console.debug('updating transaction data');
             state.transactions = cloneDeep(upcomingTransactions)
             upcomingTransactionsLastUpdated = Infinity;
             ticker = setInterval(() => {
                 if (upcomingTransactionsLastUpdated > Date.now() - 1000) return;
-                console.log('updating transaction data');
+                console.debug('updating transaction data');
                 upcomingTransactionsLastUpdated = Infinity;
                 state.transactions = cloneDeep(upcomingTransactions);
             }, 500);
@@ -333,7 +333,7 @@ const getters = {
         getters.availableUTXOs;
         return (isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => {
             const x = selectUTXOs(isPrivate, isSpark, istransparentaddress, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl);
-            return x && x[0];
+            return x?.[0];
         };
     }
 };

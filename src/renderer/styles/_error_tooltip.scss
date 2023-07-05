@@ -1,5 +1,15 @@
 $tooltip-size: 7px;
 
+.empty-tooltip {
+    display: none;
+}
+
+.tooltip.error.right .tooltip-arrow {
+    transform: scaleX(-1);
+    right: unset !important;
+    left: -$tooltip-size;
+}
+
 .tooltip.error {
     z-index: var(--z-tooltip);
 
@@ -21,14 +31,4 @@ $tooltip-size: 7px;
         border-right-color: transparent !important;
         border-bottom-color: transparent !important;
     }
-}
-
-.popup-tooltip {
-    z-index: var(--z-popup-tooltip) !important;
-}
-
-.right-tooltip .tooltip-arrow {
-    transform: scaleX(-1);
-    right: unset !important;
-    left: -$tooltip-size;
 }

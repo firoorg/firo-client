@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import FiroLogoWhite from 'renderer/assets/FiroLogoWhite.svg';
-import FiroLogoDark from 'renderer/assets/FiroLogoDark.svg';
+import FiroLogoWhite from 'renderer/assets/FiroLogoWhite';
+import FiroLogoDark from 'renderer/assets/FiroLogoDark';
 
 export default {
     name: "SetupLayout",

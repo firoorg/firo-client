@@ -8,7 +8,7 @@ import { Firod, MnemonicSettings, Network } from './firod';
 async function firod(store: any, network: Network, firodLocation: string, firodDataDir: string,
                      mnemonicSettings?: MnemonicSettings, allowMultipleFirodInstances?: boolean,
                      runInitializersIfFirodIsRunning?: boolean, connectionTimeout?: number,
-                     extraArgs?: []): Promise<Firod> {
+                     extraArgs?: string[]): Promise<Firod> {
     // For each component in src/lib/daemon/modules, we register the exported function handleEvent() as an event handler for
     // the event with the name of the module, and also call the exported initialize() function.
     //
@@ -51,6 +51,7 @@ async function firod(store: any, network: Network, firodLocation: string, firodD
         }
     }
     const firod = new Firod(network, firodLocation, firodDataDir, initializers, eventHandlers);
+    firod.killOldFirod = !allowMultipleFirodInstances;
     firod.extraFirodArgs = extraArgs;
     firod.allowMultipleFirodInstances = !!allowMultipleFirodInstances;
     firod.runInitializersIfFirodIsRunning = !!runInitializersIfFirodIsRunning;

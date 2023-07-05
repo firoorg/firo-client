@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import {markRaw} from "vue";
 import {clipboard} from "electron";
 import {mapGetters, mapMutations} from "vuex";
 import QRCode from "easyqrcodejs";
@@ -91,10 +92,10 @@ export default {
             option: '',
 
             tableFields: [
-                {name: CurrentAddressIndicator},
-                {name: AddressBookItemLabel},
-                {name: AddressBookItemAddress},
-                {name: AddressBookItemAddressType}
+                {name: markRaw(CurrentAddressIndicator)},
+                {name: markRaw(AddressBookItemLabel)},
+                {name: markRaw(AddressBookItemAddress)},
+                {name: markRaw(AddressBookItemAddressType)}
             ]
         };
     },
@@ -166,7 +167,8 @@ export default {
                     });
                 }
 
-                document.querySelector('.qr-code img').style = 'width: 200px; height: 200px';
+                const img = document?.querySelector('.qr-code img');
+                if (img) img.style = 'width: 200px; height: 200px';
             }
         }
     },

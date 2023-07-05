@@ -1,0 +1,38 @@
+@import 'reset';
+@import 'fonts';
+@import 'colors';
+@import 'z';
+@import 'buttons';
+@import 'checkbox';
+@import 'radio';
+@import 'error_tooltip';
+@import 'selector';
+@import 'smooth-input';
+@import 'info-popup';
+
+:root {
+    --padding-base: 15px;
+    --width-detail: 360px;
+}
+
+#app {
+    color: var(--color-text-primary);
+    font: {
+        family: "Rubik";
+        size: 14px;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+input {
+    color: var(--color-text-primary);
+}

@@ -1,15 +1,25 @@
+process.env.FIRO_CLIENT_TEST = 'true';
+process.env.DEBUG = "pw:browser";
+
+import {_electron as electron, ElectronApplication, Page} from "playwright";
 import lodash from 'lodash';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import {assert} from 'chai';
-import {Application} from 'spectron';
-import electron from 'electron';
 import {bigintToString, stringToBigint} from "../src/lib/convert";
 import {TXO} from "../src/store/modules/Transactions";
 
+// References to $daemon and $store are evaluated in the context of the renderer process; $daemon is not a valid
+// reference in the context of the test process.
+import type {Firod} from "../src/daemon/firod";
+import type {Store} from "vuex";
+declare const $daemon: Firod;
+declare const $store: Store<any>;
+
 interface This extends Mocha.Context {
-    app: Application
+    app: ElectronApplication;
+    page: Page;
 }
 
 const BUILD = !(process.env.NO_BUILD && JSON.parse(process.env.NO_BUILD));
@@ -23,248 +33,211 @@ if (BUILD) {
 const passphrase = 'sloth';
 let mnemonicWords: string[];
 
-function scaffold(this: Mocha.Suite, reinitializeFiroClient: boolean) {
+function scaffold(this: Mocha.Suite, reinitialize: boolean) {
     this.timeout(20e3);
     this.slow(5e3);
 
-    this.beforeAll(async function (this: This) {
-        this.timeout(10e3);
+    this.beforeAll('starts the wallet with tracing', async function (this: This) {
+        process.env.IS_INITIALIZED = JSON.stringify(!reinitialize);
 
-        this.app = new Application({
-            path: <any>electron, // the type annotation for path is incorrect
-            args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js'), '--test-print'],
-            env: {
-                FIRO_CLIENT_TEST: 'true',
-                NETWORK: 'regtest-ql',
-                IS_INITIALIZED: String(!reinitializeFiroClient),
-                ALLOW_EXISTING_FIROD: '1'
-            }
+        this.app = await electron.launch({
+            args: [path.join(__dirname, '..', 'dist', 'electron', 'main.js')]
+        });
+        await this.app.context().tracing.start({
+            title: `Firo Client Test - ${new Date()}`,
+            screenshots: true,
+            snapshots: true
         });
 
-        console.info('Starting Firo Client...');
-        await this.app.start();
-        await this.app.client.waitUntilWindowLoaded();
-        console.info('Firo Client started.');
-
-        // implicit: 0 is required due to a Spectron bug: https://github.com/electron-userland/spectron/issues/763
-        // script: 200e3 is because we may call "generate 100"
-        this.app.client.setTimeout({implicit: 0, script: 200e3});
+        this.page = await this.app.firstWindow();
+        this.page.setDefaultTimeout(5e3);
     });
 
-    this.beforeEach(async function (this: This) {
-        console.log(`started: ${(new Date()).toISOString()}`);
-    });
-
-    this.afterEach(async function (this: This) {
-        console.log(`finished: ${(new Date()).toISOString()}`);
-    });
-
-    this.afterAll(async function (this: This) {
-        this.timeout(10e3);
-        // Wait for a small bit to make sure we won't trigger a race condition in the daemon.
-        await new Promise(r => setTimeout(r, 1e3));
-        console.log((await this.app.client.getMainProcessLogs()).join('\n') + '\n');
-        await this.app.stop();
+    this.afterAll('closes the wallet and stops tracing', async function (this: This) {
+        await this.app.context().tracing.stop({path: path.join(__dirname, '..', 'traces', `${Date.now()}.zip`)});
+        await this.app.close();
     });
 }
 
 describe('Regtest Setup', function (this: Mocha.Suite) {
     scaffold.bind(this)(true);
-
-    it('opens a window', async function (this: This) {
-        assert.equal(await this.app.client.getWindowCount(), 1);
-    });
+    this.bail(true);
 
     it('starts', async function (this: This) {
-        const startButton = await this.app.client.$('button');
-        await startButton.waitForExist();
-        await startButton.click();
-
-        await (await this.app.client.$('select')).waitForExist();
+        await this.page.locator('button').click();
+        await this.page.locator('select').waitFor();
     });
 
     it('allows selecting blockchain location and network', async function (this: This) {
-        this.slow(1e3);
+        await this.page.locator('#datadir-selector').selectOption('regtest-ql');
 
-        await (await this.app.client.$('#datadir-selector')).selectByAttribute('value', 'regtest-ql');
+        const defaultDataDirLocation = await this.page.locator('#datadir-value').innerText();
+        const testDataDirLocation = path.join(os.tmpdir(), `firo-client-test-${Math.floor(Math.random() * 1e16)}`);
 
-        const defaultDataDirLocation = await (await this.app.client.$('#datadir-value')).getText();
-        // os.tmpdir() isn't actually unique. :-/
-        const dataDirLocation = path.join(os.tmpdir(), `firo-client-test-${Math.floor(Math.random() * 1e16)}`);
-
-        fs.mkdirSync(dataDirLocation);
+        fs.mkdirSync(testDataDirLocation);
 
         // Creating a new directory is in normal usage taken care of by the file selection dialog, which can't be automated.
-        const setDataDirJS = `e = new Event('set-data-dir'); e.dataDir = ${JSON.stringify(dataDirLocation)}; document.dispatchEvent(e)`;
+        const setDataDir = async (dataDirLocation: string) => await this.page.evaluate(([ddl]) => {
+            const ev = new Event('set-data-dir');
+            ev['dataDir'] = ddl;
+            document.dispatchEvent(ev);
+        },[dataDirLocation]);
 
-        // Set the data dir to the test location.
-        await this.app.webContents.executeJavaScript(setDataDirJS);
-        await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+        await setDataDir(testDataDirLocation);
+        await this.page.locator('#datadir-value', {hasText: testDataDirLocation}).waitFor();
 
-        // Test resetting the data dir.
-        await (await this.app.client.$('#reset-data-dir')).click();
-        await this.app.client.waitUntilTextExists('#datadir-value', defaultDataDirLocation);
-
-
-        // Set it back to the real (test) location.
-        await this.app.webContents.executeJavaScript(setDataDirJS);
-        await this.app.client.waitUntilTextExists('#datadir-value', dataDirLocation);
+        await this.page.locator('#reset-data-dir').click();
+        await this.page.locator('#datadir-value', {hasText: defaultDataDirLocation}).waitFor();
 
 
-        await (await this.app.client.$('button')).click();
-        await (await this.app.client.$('.select-create-or-restore')).waitForExist();
+        await setDataDir(testDataDirLocation);
+        await this.page.locator('#datadir-value', {hasText: testDataDirLocation}).waitFor();
+
+
+        await this.page.locator('button').click();
+        await this.page.locator('.select-create-or-restore').waitFor();
     });
 
     it('correctly displays and confirms mnemonic', async function (this: This) {
-        this.timeout(5000e3);
-        this.slow(5e3);
+        await this.page.locator('#create-new-wallet').click();
+        await this.page.locator('.write-down-mnemonic').waitFor();
 
-        await (await this.app.client.$('#create-new-wallet')).click();
-        await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
-
-        mnemonicWords = await Promise.all((await this.app.client.$$('.mnemonic-word .word')).map(e => e.getText()));
+        mnemonicWords = await this.page.locator('.mnemonic-word .word').allInnerTexts();
         assert.equal(mnemonicWords.length, 24);
 
-        await (await this.app.client.$('#confirm-button')).click();
-        await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
+        await this.page.locator('#confirm-button').click();
+        await this.page.locator('.confirm-mnemonic').waitFor();
 
-        const wordElements = await this.app.client.$$('.mnemonic-word .word');
-        const okButton = await this.app.client.$('#ok-button');
+        const wordElements = await this.page.locator('.mnemonic-word .word').all();
         let lastHiddenIndex: number;
 
-        for (const [n, wordElement] of wordElements.entries()) {
-            const classNames = <string>await wordElement.getAttribute('class');
+        for (const [n, wordElement] of Object.entries(wordElements)) {
+            const classNames = (await wordElement.getAttribute('class')).split(' ');
             if (classNames.includes('hidden')) {
-                lastHiddenIndex = n;
-                await wordElement.setValue(mnemonicWords[n]);
+                lastHiddenIndex = Number(n);
+                await wordElement.fill(mnemonicWords[n]);
             } else {
-                assert.equal(await wordElement.getText(), mnemonicWords[n]);
+                assert.equal(await wordElement.innerText(), mnemonicWords[n]);
             }
         }
 
-        await okButton.waitForClickable();
+        await this.page.locator('#ok-button:enabled').waitFor();
 
         // Test incorrect words.
-        await wordElements[lastHiddenIndex].setValue('invalid-word');
-        await okButton.waitForClickable({reverse: true});
+        await wordElements[lastHiddenIndex].fill('invalid-word');
+        await this.page.locator('#ok-button:disabled').waitFor();
 
         // Set it back to the valid word.
-        await wordElements[lastHiddenIndex].setValue(mnemonicWords[lastHiddenIndex]);
-        await okButton.waitForClickable();
+        await wordElements[lastHiddenIndex].fill(mnemonicWords[lastHiddenIndex]);
 
-        await okButton.click();
+        await this.page.locator('#ok-button').click()
 
-        await (await this.app.client.$('#passphrase')).waitForExist();
+        await this.page.locator('#passphrase').waitFor();
     });
 
     it('goes back from the passphrase step', async function (this: This) {
-        await (await this.app.client.$('#back-button')).click();
-        await (await this.app.client.$('.confirm-mnemonic')).waitForExist();
+        await this.page.locator('#back-button').click();
+        await this.page.locator('.confirm-mnemonic').waitFor();
 
-        const wordElementsAgain = await this.app.client.$$('.mnemonic-word .word');
-        for (const [n, wordElement] of wordElementsAgain.entries()) {
-            const classNames = <string>await wordElement.getAttribute('class');
-            if (!classNames.includes('hidden')) {
-                assert.equal(await wordElement.getText(), mnemonicWords[n]);
-            }
+        const wordElements = await this.page.locator('.mnemonic-word .word').all();
+        for (const [n, wordElement] of Object.entries(wordElements)) {
+            const classNames = (await wordElement.getAttribute('class')).split(' ');
+            if (!classNames.includes('hidden'))
+                assert.equal(await wordElement.innerText(), mnemonicWords[n]);
         }
 
-        await (await this.app.client.$('#back-button')).click();
-        await (await this.app.client.$('.write-down-mnemonic')).waitForExist();
+        await this.page.locator('#back-button').click();
+        await this.page.locator('.write-down-mnemonic').waitFor();
 
-        const nonHiddenWordElementsAgain = await this.app.client.$$('.mnemonic-word .word');
-        for (const [n, wordElement] of nonHiddenWordElementsAgain.entries()) {
-            assert.equal(await wordElement.getText(), mnemonicWords[n]);
+        const nonHiddenWordElements = await this.page.locator('.mnemonic-word .word').all();
+        for (const [n, wordElement] of Object.entries(nonHiddenWordElements)) {
+            assert.equal(await wordElement.innerText(), mnemonicWords[n]);
         }
 
-        await (await this.app.client.$('#back-button')).click();
-        await (await this.app.client.$('#recover-from-mnemonic')).waitForExist();
+        await this.page.locator('#back-button').click();
+        await this.page.locator('#recover-from-mnemonic').waitFor();
     });
 
     it('can recover from mnemonics', async function (this: This) {
-        this.timeout(1000e3);
+        let twelveMnemonicWords = ["nation", "tip", "mean", "govern", "tide", "comic", "figure", "gift", "upper", "love", "kitchen", "dolphin"];
 
-        let twelveMnemonicWords = ["nation","tip","mean","govern","tide","comic","figure","gift","upper","love","kitchen","dolphin"];
+        await this.page.locator('#recover-from-mnemonic').click();
 
-        await (await this.app.client.$('#recover-from-mnemonic')).click();
+        await this.page.locator('input[value="12"]').click();
+        await this.page.locator('#mnemonic-word-13').waitFor({state: 'hidden'});
 
-        const submitButton = await this.app.client.$('#ok-button');
-
-        await (await this.app.client.$('input[value="12"]')).click();
-        await (await this.app.client.$('#mnemonic-word-13')).waitForExist({reverse: true});
-
-        const twelveMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
+        const twelveMnemonicWordElements = await this.page.locator('input.mnemonic-word').all();
         for (const [n, word] of Object.entries(twelveMnemonicWords)) {
-            await twelveMnemonicWordElements[n].setValue(word);
+            await twelveMnemonicWordElements[n].fill(word);
         }
 
-        await submitButton.waitForClickable();
+        await this.page.locator('#ok-button:enabled').waitFor();
 
-        twelveMnemonicWordElements[0].setValue('invalid-word');
-        await submitButton.waitForClickable({reverse: true});
+        await twelveMnemonicWordElements[0].fill('invalid');
+        await this.page.locator('#ok-button:disabled').waitFor();
 
-        await (await this.app.client.$('input[value="24"]')).click();
-        await (await this.app.client.$('#mnemonic-word-13')).waitForExist();
+        await this.page.locator('input[value="24"]').click();
+        await this.page.locator('#mnemonic-word-13').waitFor();
 
-        const twentyFourMnemonicWordElements = await this.app.client.$$('input.mnemonic-word');
+        const twentyFourMnemonicWordElements = await this.page.locator('input.mnemonic-word').all();
         for (const [n, word] of Object.entries(mnemonicWords)) {
-            await twentyFourMnemonicWordElements[n].setValue(word);
+            await twentyFourMnemonicWordElements[n].fill(word);
         }
 
-        await submitButton.waitForClickable();
+        await this.page.locator('#ok-button:enabled').waitFor();
 
-        twentyFourMnemonicWordElements[0].setValue('invalid-word');
-        await submitButton.waitForClickable({reverse: true});
+        await twentyFourMnemonicWordElements[0].fill('invalid');
+        await this.page.locator('#ok-button:disabled').waitFor();
 
-        twentyFourMnemonicWordElements[0].setValue(mnemonicWords[0]);
-        await submitButton.waitForClickable();
+        await twentyFourMnemonicWordElements[0].fill(mnemonicWords[0]);
 
-        await submitButton.click();
-        await (await this.app.client.$('#passphrase')).waitForExist();
+        await this.page.locator('#ok-button').click();
+        await this.page.locator('#passphrase').waitFor();
     });
 
     it('locks the wallet', async function (this: This) {
         this.timeout(60e3);
         this.slow(20e3);
 
-        const submitButton = await this.app.client.$('#ok-button');
+        await this.page.locator('#passphrase').fill(passphrase);
+        await this.page.locator('#confirm-passphrase').fill(passphrase);
+        await this.page.locator('#ok-button:enabled').waitFor();
 
-        await (await this.app.client.$('#passphrase')).setValue(passphrase);
-        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
-        await submitButton.waitForClickable();
+        await this.page.locator('#confirm-passphrase').fill(passphrase + 'invalid');
+        await this.page.locator('#ok-button:disabled').waitFor();
 
-        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase + 'invalid');
-        await submitButton.waitForClickable({reverse: true})
+        await this.page.locator('#confirm-passphrase').fill(passphrase);
 
-        await (await this.app.client.$('#confirm-passphrase')).setValue(passphrase);
-        await submitButton.waitForClickable();
+        await this.page.locator('#ok-button').click();
 
-        await submitButton.click();
-
-        await (await this.app.client.$('.transactions-page')).waitForExist({timeout: 60e3});
+        await this.page.locator('.transactions-page').waitFor({timeout: 60e3});
     });
 
     it('is using regtest-ql', async function (this: This) {
-        const badge = await this.app.client.$('.network-badge');
-        assert.isTrue(await badge.isExisting());
-        assert.equal(await badge.getText(), 'Regtest');
+        const badge = await this.page.locator('.network-badge');
+        assert.isTrue(await badge.isVisible());
+        assert.equal(await badge.innerText(), 'Regtest');
     });
 
     it('generates FIRO from the debug console', async function (this: This) {
         this.timeout(500e3);
         this.slow(100e3);
 
-        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+        await this.page.locator('a[href="#/debugconsole"]').click();
 
-        await this.app.client.keys([..."generate 100".split(''), "Enter"]);
-        await this.app.client.waitUntil(
-            async () => (await (await this.app.client.$('#current-input')).getText()) === '',
-            {timeout: 500e3}
-        );
-    });
+        const currentInput = await this.page.locator('#current-input')
+        await currentInput.type('generate 100');
+        await currentInput.press('Enter');
 
-    it('has the correct balance after generating FIRO from the debug console', async function (this: This) {
-        await this.app.client.waitUntilTextExists('.balance.immature .amount', '4000');
+        let i = 0;
+        while (await currentInput.innerText() != '') {
+            if (i++ > 490)
+                assert.fail('Timed out waiting for the debug console to be ready');
+
+            await new Promise(r => setTimeout(r, 1e3));
+        }
+
+        await this.page.locator('.balance.immature .amount', {hasText: '4000'}).waitFor();
     });
 });
 
@@ -273,62 +246,62 @@ function randstr(): string {
 }
 
 describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
+    process.env.IS_INITIALIZED = 'true';
     scaffold.bind(this)(false);
 
     this.beforeAll('waits to load our wallet', async function (this: This) {
-        // Set this to 0 so we have time to inspect https://github.com/firoorg/firo-client/issues/159
-        this.timeout(0);
-        this.slow(20e3);
-
-        // Check that there are existing payments.
-        const paymentStatusElement = await this.app.client.$('td');
-        await paymentStatusElement.waitForExist({timeout: 100e3});
+        if (process.env.FIROD_ARGS?.includes('-wait-for-usr1')) {
+            this.timeout(Number.MAX_VALUE);
+            this.slow(Number.MAX_VALUE);
+            await this.page.waitForSelector('td', {timeout: 0});
+        } else {
+            this.timeout(60e3);
+            this.slow(20e3);
+            await this.page.waitForSelector('td', {timeout: 60e3});
+        }
     });
 
     this.beforeAll('is using regtest-ql', async function (this: This) {
-        const badge = await this.app.client.$('.network-badge');
-        assert.isTrue(await badge.isExisting());
-        assert.equal(await badge.getText(), 'Regtest');
+        await this.page.locator('.network-badge', {hasText: 'Regtest'}).waitFor();
     });
 
     async function setElysium(this: This, status: boolean) {
-        if (await (await this.app.client.$('a[href="#/elysium"]')).isExisting() == status) return;
-        await (await this.app.client.$('a[href="#/settings"]')).click();
-        await (await this.app.client.$('#enable-elysium-checkbox')).click();
-        await (await this.app.client.$('.waiting-screen')).waitForExist();
-        await (await this.app.client.$('.waiting-screen')).waitForExist({reverse: true, timeout: 100e3});
+        if (await this.page.locator('a[href="#/elysium"]').isVisible() == status)
+            return;
+
+        await this.page.locator('a[href="#/settings"]').click();
+        await this.page.locator('#enable-elysium-checkbox').click();
+        await this.page.locator('.waiting-screen').waitFor();
+        await this.page.locator('.waiting-screen').waitFor({state: 'detached', timeout: 60e3});
     }
 
     async function mintAllLelantus(this: This) {
-        await this.app.client.executeAsyncScript(
-            `$daemon.mintAllLelantus(arguments[0]).then(arguments[1])`,
-            [passphrase]
-        );
+        await this.page.evaluate(([pw]) => $daemon.mintAllLelantus(pw), [passphrase]);
+        // Wait so that new mints have time to get out from the upcoming transactions queue.
+        await new Promise(r => setTimeout(r, 1e3));
     }
 
     async function generateSufficientFiro(this: This) {
         this.timeout(200e3);
         this.slow(100e3);
 
-        // This value doesn't actually _have_ to be above 1 if we're testing with an existing firod, but in a test
-        // environment we've probably made some error and it's best to check for that now.
-        const privateBalanceElement = await this.app.client.$('.balance.private .amount-value');
-        const publicBalanceElement = await this.app.client.$('.balance.public .amount-value');
+        const privateBalanceElement = this.page.locator('.balance.private .amount-value');
+        const publicBalanceElement = this.page.locator('.balance.public .amount-value');
 
-        while (!await publicBalanceElement.isExisting() || Number(await publicBalanceElement.getText()) < 40) {
+        while (!await publicBalanceElement.isVisible() || Number(await publicBalanceElement.innerText()) < 40) {
             // Probably we're mining all the blocks ourselves.
-            await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+            await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
         }
 
-        while (Number(await privateBalanceElement.getText()) < 20) {
+        while (Number(await privateBalanceElement.innerText()) < 20) {
             await mintAllLelantus.bind(this)();
 
-            while (!await publicBalanceElement.isExisting()) {
-                await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+            while (!await publicBalanceElement.isVisible()) {
+                await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
             }
             await mintAllLelantus.bind(this)();
 
-            await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+            await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
         }
     }
     this.beforeEach('generates Firo if not enough is available', generateSufficientFiro);
@@ -336,136 +309,163 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('can change the passphrase', async function (this: This) {
         this.timeout(100e3);
 
-        await (await this.app.client.$('a[href="#/settings"]')).click();
+        await this.page.locator('a[href="#/settings"]').click();
 
-        await (await this.app.client.$('#change-passphrase-button')).click();
-        await (await this.app.client.$('.change-passphrase-popup')).waitForExist();
-        await (await this.app.client.$('#cancel-button')).click();
-        await (await this.app.client.$('.change-passphrase-popup')).waitForExist({reverse: true});
+        await this.page.locator('#change-passphrase-button').click();
+        await this.page.locator('.change-passphrase-popup').waitFor();
+        await this.page.locator('#cancel-button').click();
+        await this.page.locator('.change-passphrase-popup').waitFor({state: 'detached'});
 
-        await (await this.app.client.$('#change-passphrase-button')).click();
-        await (await this.app.client.$('.change-passphrase-popup')).waitForExist();
-        await (await this.app.client.$('#current-passphrase')).setValue('invalid-passphrase');
-        await (await this.app.client.$('#new-passphrase')).setValue('wont-be-our-passphrase');
-        await (await this.app.client.$('#confirm-new-passphrase')).setValue('wont-be-our-passphrase');
-        await (await this.app.client.$('#confirm-button')).waitForEnabled();
-        await (await this.app.client.$('#confirm-button')).click();
-        await (await this.app.client.$('.change-passphrase-popup .error')).waitForExist();
-        assert.equal(await (await this.app.client.$('.change-passphrase-popup .error')).getText(), 'Incorrect Passphrase');
+        await this.page.locator('#change-passphrase-button').click();
+        await this.page.locator('.change-passphrase-popup').waitFor();
+        await this.page.locator('#current-passphrase').fill('invalid-passphrase');
+        await this.page.locator('#new-passphrase').fill('wont-be-our-passphrase');
+        await this.page.locator('#confirm-new-passphrase').fill('wont-be-our-passphrase');
+        await this.page.locator('#confirm-button').click();
+        await this.page.locator('.change-passphrase-popup .error').waitFor();
+        assert.equal(await this.page.locator('.change-passphrase-popup .error').innerText(), 'Incorrect Passphrase');
 
-        await (await this.app.client.$('#current-passphrase')).setValue(passphrase);
-        await (await this.app.client.$('#new-passphrase')).setValue(passphrase + '_');
-        await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '_');
-        await (await this.app.client.$('#confirm-button')).waitForEnabled();
-        await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '__');
-        await (await this.app.client.$('#confirm-button')).waitForEnabled({reverse: true});
-        await (await this.app.client.$('#confirm-new-passphrase')).setValue(passphrase + '_');
-        await (await this.app.client.$('#confirm-button')).waitForEnabled();
-        await (await this.app.client.$('#confirm-button')).click();
-        await (await this.app.client.$('#ok-button')).waitForExist({timeout: 100e3});
-        await (await this.app.client.$('#ok-button')).click();
-        await (await this.app.client.$('.change-passphrase-popup')).waitForExist({reverse: true});
+        await this.page.locator('#current-passphrase').fill(passphrase);
+        await this.page.locator('#new-passphrase').fill(passphrase + '_');
+        await this.page.locator('#confirm-new-passphrase').fill(passphrase + '_');
+        await this.page.locator('#confirm-button:enabled').waitFor();
+        await this.page.locator('#confirm-new-passphrase').fill(passphrase + '__');
+        await this.page.locator('#confirm-button:disabled').waitFor();
+        await this.page.locator('#confirm-new-passphrase').fill(passphrase + '_');
+        await this.page.locator('#confirm-button').click();
+        await this.page.locator('#ok-button').click();
+        await this.page.locator('.change-passphrase-popup').waitFor({state: 'detached', timeout: 100e3});
 
         // Change the passphrase back, avoiding race conditions.
         await new Promise(r => setTimeout(r, 500));
-        await this.app.client.executeAsyncScript('$daemon.setPassphrase(arguments[0], arguments[1]).then(arguments[2])', [passphrase + '_', passphrase]);
+        await this.page.evaluate(
+            ([oldpw, newpw]) => $daemon.setPassphrase(oldpw, newpw),
+            [passphrase + '_', passphrase]
+        );
         await new Promise(r => setTimeout(r, 500));
     });
 
     it('anonymizes Firo', async function (this: This) {
         this.timeout(100e3);
 
-        const publicBalanceElement = await this.app.client.$('.balance.public .amount-value');
-        assert.isTrue(await publicBalanceElement.isExisting());
-        const originalPublicBalance = stringToBigint(await publicBalanceElement.getText());
+        const publicBalanceElement = this.page.locator('.balance.public .amount-value');
+        assert.isTrue(await publicBalanceElement.isVisible());
+        const originalPublicBalance = stringToBigint(await publicBalanceElement.innerText());
 
-        const pendingBalanceElement = await this.app.client.$('.balance.pending .amount-value');
-        let originalPendingBalance = 0n;
-        if (await pendingBalanceElement.isExisting()) originalPendingBalance = stringToBigint(await pendingBalanceElement.getText());
+        await this.page.locator('#anonymize-firo-link').click();
+        await this.page.locator('.passphrase-input').waitFor();
+        await this.page.locator('.passphrase-input button.cancel').click();
+        await this.page.locator('.passphrase-input').waitFor({state: "detached"});
 
-        await (await this.app.client.$('#anonymize-firo-link')).click();
-        await (await this.app.client.$('.passphrase-input')).waitForExist();
-        await (await this.app.client.$('.passphrase-input button.cancel')).click();
-        await (await this.app.client.$('.passphrase-input')).waitForExist({reverse: true});
+        await this.page.locator('#anonymize-firo-link').click();
+        await this.page.locator('.passphrase-input').waitFor();
+        await this.page.locator('.passphrase-input input[type="password"]').fill(passphrase + "-invalid");
+        await this.page.locator('.passphrase-input button.confirm').click();
+        await this.page.locator('.passphrase-input .error').waitFor();
 
-        await (await this.app.client.$('#anonymize-firo-link')).click();
-        await (await this.app.client.$('.passphrase-input')).waitForExist();
-        await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase + "-invalid");
-        await (await this.app.client.$('.passphrase-input button.confirm')).click();
-        await (await this.app.client.$('.passphrase-input .error')).waitForExist();
+        await this.page.locator('.passphrase-input input[type="password"]').fill(passphrase);
+        await this.page.locator('.passphrase-input button.confirm').click();
+        await this.page.locator('#popup').waitFor({state: "detached", timeout: 100e3});
 
-        await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase);
-        await (await this.app.client.$('.passphrase-input button.confirm')).click();
-        await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
+        let i = 0;
+        while (await publicBalanceElement.isVisible() && stringToBigint(await publicBalanceElement.innerText()) < 100000n) {
+            if (i++ > 100)
+                assert.fail("public balance should be below 0.001 FIRO");
 
-        await this.app.client.waitUntil(async () =>
-            !await publicBalanceElement.isExisting() || stringToBigint(await publicBalanceElement.getText()) < 100000n,
-            {timeoutMsg: "public balance should be below 0.001 FIRO", timeout: 5e3}
-        );
-        await this.app.client.waitUntil(async () =>
-                stringToBigint(await pendingBalanceElement.getText()) > originalPublicBalance - 10000000n,
-            {timeoutMsg: "new pending balance must be within 1 of original + newly anonymized funds", timeout: 5e3}
-        );
+            await new Promise(r => setTimeout(r, 1e3));
+        }
+
+        let j = 0;
+        while (stringToBigint(await this.page.locator('.balance.pending .amount-value').innerText()) < originalPublicBalance - 10000000n) {
+            if (j++ > 100)
+                assert.fail("pending balance should be above 0.1 FIRO");
+
+            await new Promise(r => setTimeout(r, 1e3));
+        }
     });
 
     it('displays and updates the receiving address', async function (this: This) {
         this.timeout(30e3);
 
-        await (await this.app.client.$('a[href="#/receive"]')).click();
+        await this.page.locator('a[href="#/receive"]').click();
 
-        const receiveAddressElement = await this.app.client.$('#receive-address');
-        await receiveAddressElement.waitForExist();
+        const receiveAddressElement = await this.page.locator('#receive-address');
 
-        let originalReceiveAddress = await receiveAddressElement.getValue();
-        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generatetoaddress 1 ${originalReceiveAddress}').then(arguments[0])`, []);
-        await this.app.client.waitUntil(async () => (await receiveAddressElement.getValue()) !== originalReceiveAddress, {timeout: 5e3});
+        let originalReceiveAddress = await receiveAddressElement.inputValue();
+        await this.page.evaluate(
+            ([addr]) => $daemon.legacyRpc(`generatetoaddress 1 ${addr}`),
+            [originalReceiveAddress]
+        );
+
+        let i = 0;
+        while (await receiveAddressElement.inputValue() == originalReceiveAddress) {
+            if (i++ > 10)
+                assert.fail("receive address should change");
+
+            await new Promise(r => setTimeout(r, 1e3));
+        }
     });
 
-    it.skip('adds, edits, and properly orders receive addresses', async function (this: This) {
+    it('adds, edits, and properly orders receive addresses', async function (this: This) {
         this.timeout(30e3);
 
-        await (await this.app.client.$('a[href="#/receive"]')).click();
+        await this.page.locator('a[href="#/receive"]').click();
+
+        const receiveAddress = this.page.locator('#receive-address');
+        const receiveAddressLabel = this.page.locator('#receive-address-label');
 
         // This is used to avoid a race condition that appears only when tests are sequentially executed.
-        const originalAddress = await (await this.app.client.$('#receive-address')).getValue();
-        await this.app.client.waitUntilTextExists('td.address-book-item-address', originalAddress);
+        const originalAddress = await receiveAddress.inputValue();
+        await this.page.locator('td.address', {hasText: originalAddress}).waitFor();
 
         const addressLabels: [string, string][] = [];
 
         for (let x = 0; x < 5; x++) {
             const label = randstr();
-            const address = await (await this.app.client.$('#receive-address')).getValue();
-            await (await this.app.client.$('#receive-address-label')).setValue(label);
-            await (await this.app.client.$('#receive-address')).click();
-            await this.app.client.waitUntilTextExists('tr:nth-child(2) td.address-book-item-label', label);
+            const address = await receiveAddress.inputValue();
+            await receiveAddressLabel.fill(label);
+            await receiveAddressLabel.blur();
+            await this.page.locator('tr:nth-child(2) td.label', {hasText: label}).waitFor();
             addressLabels.unshift([label, address]);
 
-            await (await this.app.client.$('tr:nth-child(1) td.address-book-item-label')).click();
-            await this.app.client.waitUntil(async () => await (await this.app.client.$('#receive-address')).getValue() != address);
-            assert.notEqual(await (await this.app.client.$('#receive-address-label')).getValue(), label);
+            await this.page.locator('tr:nth-child(1) td.label').click();
+
+            while (await receiveAddress.inputValue() == address) {
+                await new Promise(r => setTimeout(r, 1e3));
+            }
+
+            assert.notEqual(await receiveAddressLabel.inputValue(), label);
         }
 
         const i = 2;
-        await (await this.app.client.$$('tr'))[i+2].click();
-        await this.app.client.waitUntil(async () => await (await this.app.client.$('#receive-address')).getValue() == addressLabels[i][1]);
-        addressLabels[i][0] = Array.from({length: 10}, () => String.fromCharCode(97+Math.random()*26)).join('');
-        await (await this.app.client.$('#receive-address-label')).setValue(addressLabels[i][0]);
-        await (await this.app.client.$('#receive-address')).click();
-        await this.app.client.waitUntilTextExists(`tr:nth-child(${i+2}) .address-book-item-label`, addressLabels[i][0]);
+        await this.page.locator('tr').nth(i+2).click();
+        while (await receiveAddress.inputValue() != addressLabels[i][1])
+            await new Promise(r => setTimeout(r, 1e3));
 
-        await (await this.app.client.$('a[href="#/send"]')).click();
-        await (await this.app.client.$('.send-page')).waitForExist();
-        await (await this.app.client.$('a[href="#/receive"]')).click();
-        await (await this.app.client.$('#receive-address')).waitForExist();
+        addressLabels[i][0] = randstr();
+        await receiveAddressLabel.fill(addressLabels[i][0]);
+        await receiveAddressLabel.blur()
+        await this.page
+            .locator(`tr:nth-child(${i+2}) td.label`, {hasText: addressLabels[i][0]})
+            .waitFor();
 
-        const actualLabels = await this.app.client.$$('.address-book-item-label');
-        const actualAddresses = await this.app.client.$$('.address-book-item-address');
-        assert.isAtLeast(actualLabels.length, addressLabels.length);
-        assert.isAtLeast(actualAddresses.length, addressLabels.length);
-        for (const [i, [label, address]] of Object.entries(addressLabels)) {
-            if (!actualAddresses[i+1]) break;
-            assert.equal(await actualAddresses[i+1].getText(), address);
-            assert.equal(await actualLabels[i+1].getText(), label);
+        await this.page.locator('a[href="#/send"]').click();
+        await this.page.locator('.send-page').waitFor();
+        await this.page.locator('a[href="#/receive"]').click();
+        await receiveAddress.waitFor();
+
+        const actualLabels = this.page.locator('td.label');
+        const actualAddresses = this.page.locator('td.address');
+        assert.isAtLeast(await actualLabels.count(), addressLabels.length);
+        assert.isAtLeast(await actualAddresses.count(), addressLabels.length);
+        for (const [i_, [label, address]] of Object.entries(addressLabels)) {
+            const i = Number(i_);
+
+            if (await actualAddresses.count() < i+1)
+                break;
+
+            assert.equal(await actualAddresses.nth(i+1).innerText(), address);
+            assert.equal(await actualLabels.nth(i+1).innerText(), label);
         }
     });
 
@@ -483,76 +483,69 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await setElysium.bind(this)(elysium);
 
             // This is required so that the new transactions will be the first elements on the transactions list.
-            await this.app.client.executeAsyncScript('$daemon.legacyRpc(arguments[0]).then(arguments[1])', ['generate 1']);
+            await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
 
-            const sendAddress = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
+            const sendAddress: string = await this.page.evaluate(() => $daemon.getUnusedAddress('Transparent'));
             const satoshiAmountToSend = 100000000n + BigInt(Math.floor(1e8 * Math.random()));
             const amountToSend = bigintToString(satoshiAmountToSend);
 
-            await (await this.app.client.$('a[href="#/send')).click();
-            await (await this.app.client.$('.send-page')).waitForExist();
+            await this.page.locator('a[href="#/send"]').click();
+            await this.page.locator('.send-page').waitFor();
 
             if (paymentType === 'public') {
-                const toggleInPrivateMode = await this.app.client.$('.private-public-balance .toggle.is-private');
-                if (await toggleInPrivateMode.isExisting()) {
-                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-                    await toggleInPrivateMode.waitForExist({reverse: true});
+                const toggleInPrivateMode = await this.page.locator('.private-public-balance .toggle.is-private');
+                if (await toggleInPrivateMode.isVisible()) {
+                    await this.page.locator('.private-public-balance .toggle-switch').click();
+                    await toggleInPrivateMode.waitFor({state: 'hidden'})
                 }
             } else {
-                const toggleInPublicMode = await this.app.client.$('.private-public-balance .toggle.is-public');
-                if (await toggleInPublicMode.isExisting()) {
-                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-                    await toggleInPublicMode.waitForExist({reverse: true});
+                const toggleInPublicMode = await this.page.locator('.private-public-balance .toggle.is-public');
+                if (await toggleInPublicMode.isVisible()) {
+                    await this.page.locator('.private-public-balance .toggle-switch').click();
+                    await toggleInPublicMode.waitFor({state: 'hidden'});
                 }
             }
 
             if (subtractTransactionFee) {
-                await (await this.app.client.$('#subtract-fee-from-amount')).click();
+                await this.page.locator('#subtract-fee-from-amount').click();
             }
 
-            const sendButton = await this.app.client.$('#send-button');
-            const label = await this.app.client.$('#label')
-            const address = await this.app.client.$('#address');
-            const amount = await this.app.client.$('#amount');
+            const sendButton = this.page.locator('#send-button');
+            const label = this.page.locator('#label')
+            const address = this.page.locator('#address');
+            const amount = this.page.locator('#amount');
 
             // Set up a valid form.
 
-            await address.setValue(sendAddress);
-            await amount.setValue(amountToSend);
-            await sendButton.waitForEnabled();
+            await address.fill(sendAddress);
+            await amount.fill(amountToSend);
+            await this.page.locator('#send-button:enabled').waitFor();
 
             if (checkValidations) {
-                await amount.setValue('0.0000000001');
-                await sendButton.waitForEnabled({reverse: true});
-                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-                await amount.clearValue();
-                await amount.setValue(amountToSend);
-                await sendButton.waitForEnabled();
+                await amount.fill('0.0000000001');
+                await this.page.locator('#send-button:disabled').waitFor();
+                await amount.fill(amountToSend);
+                await this.page.locator('#send-button:enabled').waitFor();
 
-                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-                await amount.clearValue();
-                await amount.setValue('99999999999999');
-                await sendButton.waitForEnabled({reverse: true});
-                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-                await amount.clearValue();
-                await amount.setValue(amountToSend);
-                await sendButton.waitForEnabled();
+                await amount.fill('99999999999999');
+                await this.page.locator('#send-button:disabled').waitFor();
+                await amount.fill(amountToSend);
+                await this.page.locator('#send-button:enabled').waitFor();
 
-                await address.setValue('invalid-address');
-                await sendButton.waitForEnabled({reverse: true});
-                // There is a WebdriverIO bug where the old value is not cleared if we're changed too quickly.
-                await address.clearValue();
-                await address.setValue(sendAddress);
-                await sendButton.waitForEnabled();
+                await address.fill('invalid-address');
+                await this.page.locator('#send-button:disabled').waitFor();
+                await address.fill(sendAddress);
+                await this.page.locator('#send-button:enabled').waitFor();
             }
 
             const availableUTXOs = lodash.shuffle(
-                <TXO[]>await this.app.client.execute((isPrivate) => {
-                    return (<any>window).$store.getters['Transactions/availableUTXOs']
-                        .filter(tx => tx.isPrivate === isPrivate)
-                        .map(tx => ({...tx, amount: String(tx.amount)}));
-                }, paymentType === 'private')
+                <TXO[]>await this.page.evaluate(([isPrivate]) =>
+                        $store.getters['Transactions/availableUTXOs']
+                            .filter(tx => tx.isPrivate === isPrivate)
+                            .map(tx => ({...tx, amount: String(tx.amount)}))
+                    , [paymentType === 'private'])
             ).map(tx => ({...tx, amount: BigInt(tx.amount)}));
+
             const selectedUTXOs = [];
             let selectedUTXOsAmount = 0n;
             for (const utxo of availableUTXOs) {
@@ -563,145 +556,137 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             if (selectedUTXOsAmount < satoshiAmountToSend) assert.fail('insufficient utxos to cover send amount');
 
             if (coinControl) {
-                await (await this.app.client.$('#custom-inputs-button')).click();
+                await this.page.locator('#custom-inputs-button').click();
 
                 let selectorsClicked = 0;
                 while (true) {
                     for (const selectedUTXO of selectedUTXOs) {
-                        const selector = await this.app.client.$(`#utxo-selector-${selectedUTXO}`);
-                        if (await selector.isExisting()) {
+                        const selector = this.page.locator(`#utxo-selector-${selectedUTXO}`);
+                        if (await selector.isVisible()) {
                             await selector.click();
-                            selectorsClicked += 1;
+                            selectorsClicked++;
                         }
                     }
 
-                    const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
-                    if (!await nextPageLink.isExisting()) break;
+                    const nextPageLink = this.page.locator('#popup .next-page-link:not(.disabled)');
+                    if (!await nextPageLink.isVisible()) break;
                     await nextPageLink.click();
                 }
-                assert.equal(selectorsClicked, selectedUTXOs.length, "we clicked an incorrect number of selectors");
 
-                const button = await this.app.client.$('.input-selection-popup button.recommended');
-                await button.waitForExist();
-                await button.click();
-                await button.waitForExist({reverse: true});
+                try {
+                    assert.equal(selectorsClicked, selectedUTXOs.length, "we clicked an incorrect number of selectors");
+                } finally {
+                    await this.page.locator('.input-selection-popup button.recommended').click();
+                    await this.page.locator('.input-selection-popup button.recommended').waitFor({state: 'detached'});
+                }
             }
 
-            const computedTxFeeElement = await this.app.client.$('#computed-transaction-fee .amount-value');
-
-            await (await this.app.client.$('#use-custom-fee')).click();
-            const txFeeInput = await this.app.client.$('#txFeePerKb');
-            assert(txFeeInput.isExisting());
+            await this.page.locator('#use-custom-fee').click();
+            const computedTxFeeElement = this.page.locator('#computed-transaction-fee .amount-value');
+            const txFeeInput = this.page.locator('#txFeePerKb');
+            assert(txFeeInput.isVisible());
             let txFeePerKb = Number(await txFeeInput.getAttribute('placeholder'));
             assert.isAtLeast(txFeePerKb, 1);
             if (customTransactionFee) {
-                assert(computedTxFeeElement.isExisting);
-                const originalFee = stringToBigint(await computedTxFeeElement.getText());
+                assert(computedTxFeeElement.isVisible());
+                const originalFee = stringToBigint(await computedTxFeeElement.innerText());
 
                 txFeePerKb = Math.min(999999, txFeePerKb*2);
-                await txFeeInput.setValue(txFeePerKb);
-                await sendButton.waitUntil(async () => stringToBigint(await computedTxFeeElement.getText()) > originalFee);
+                await txFeeInput.fill(String(txFeePerKb));
+                while (stringToBigint(await computedTxFeeElement.innerText()) <= originalFee)
+                    await new Promise(r => setTimeout(r, 100));
             }
-            const satoshiExpectedFee = stringToBigint(await computedTxFeeElement.getText());
+            const satoshiExpectedFee = stringToBigint(await computedTxFeeElement.innerText());
 
-            await sendButton.waitForEnabled();
             await sendButton.click();
 
             if (checkValidations) {
-                const cancelButton = await this.app.client.$('.confirm-step button.unrecommended');
-                await cancelButton.waitForExist();
+                const cancelButton = this.page.locator('.confirm-step button.unrecommended');
                 await cancelButton.click();
-                await cancelButton.waitForExist({reverse: true});
+                await cancelButton.waitFor({state: 'detached'});
 
                 await sendButton.click();
             }
 
-            const confirmButton = await this.app.client.$('.confirm-step button.recommended');
-            await confirmButton.waitForExist();
-            await confirmButton.click();
+            await this.page.locator('.confirm-step button.recommended').click();
+
+            const passphraseInput = this.page.locator('.passphrase-input input[type="password"]');
+            const passphraseInputButton = this.page.locator('.passphrase-input button.recommended');
 
             if (checkValidations) {
-                const passphraseInput = await this.app.client.$('.passphrase-input input[type="password"]');
-                await passphraseInput.waitForExist();
-                await passphraseInput.setValue(passphrase + '-invalid');
+                await passphraseInput.fill(passphrase + '-invalid');
+                await passphraseInputButton.click()
 
-                const realSendButton = await this.app.client.$('.passphrase-input button.recommended');
-                await realSendButton.click();
-
-                await (await this.app.client.$('.passphrase-input .error')).waitForExist();
+                await this.page.locator('.passphrase-input .error').waitFor();
             }
 
-            const passphraseInput2 = await this.app.client.$('input[type="password"]');
-            await passphraseInput2.waitForExist();
-            await passphraseInput2.setValue(passphrase);
+            await passphraseInput.fill(passphrase);
+            await passphraseInputButton.click();
 
-            const realSendButton2 = await this.app.client.$('.passphrase-input button.recommended');
-            await realSendButton2.click();
+            const waitOverlay = this.page.locator('.wait-overlay');
+            await waitOverlay.waitFor();
+            await waitOverlay.waitFor({state: 'detached'});
 
-            const waitOverlay = await this.app.client.$('.wait-overlay');
-            await waitOverlay.waitForExist();
-            await waitOverlay.waitForExist({reverse: true, timeout: 20e3});
+            const errorElement = this.page.locator('.error-step .content');
+            if (await errorElement.isVisible()) {
+                const error = await errorElement.innerText();
 
-            const errorElement = await this.app.client.$('.error-step .content');
-            if (await errorElement.isExisting()) {
-                const error = await errorElement.getText();
-
-                const closeErrorStep = await this.app.client.$('.error-step button.recommended');
-                await closeErrorStep.click();
-                await closeErrorStep.waitForExist({reverse: true});
+                await this.page.locator('.error-step button.recommended').click();
+                await this.page.locator('.error-step').waitFor({state: 'detached'});
 
                 assert.fail(`sending transaction failed: ${error}`);
             }
 
             // Make sure fields are cleared.
-            await this.app.client.waitUntil(async () => await label.getValue() === '')
-            await this.app.client.waitUntil(async () => await address.getValue() === '')
-            await this.app.client.waitUntil(async () => await amount.getValue() === '')
+            while (await label.inputValue() || await address.inputValue() || await amount.inputValue()) {
+                await new Promise(r => setTimeout(r, 100));
+            }
 
-            await (await this.app.client.$('a[href="#/transactions')).click();
+            await this.page.locator('a[href="#/transactions"]').click();
 
-            await (await this.app.client.$('.unconfirmed')).waitForExist({timeout: 5e3});
+            const expectedAmountToReceive = subtractTransactionFee ? satoshiAmountToSend - satoshiExpectedFee : satoshiAmountToSend;
+            await this.page.locator('td .amount', {hasText: bigintToString(expectedAmountToReceive)}).waitFor();
 
-            await (await this.app.client.$('td')).click();
-            await (await this.app.client.$('.info-popup')).waitForExist();
+            await this.page.locator('td').first().click();
+            await this.page.locator('.info-popup').waitFor();
 
-            const txid = await (await this.app.client.$('.txid')).getText();
-            const fee = stringToBigint(await (await this.app.client.$('.fee .amount-value')).getText());
-            const amountReceived = stringToBigint(await (await this.app.client.$('.received-amount .amount-value')).getText());
+            const txid = await this.page.locator('.txid').innerText();
+            const fee = stringToBigint(await this.page.locator('.fee .amount-value').innerText());
+            const amountReceived = stringToBigint(await this.page.locator('.received-amount .amount-value').innerText());
 
-            await (await this.app.client.$('.txinfo-ok')).click();
-            await (await this.app.client.$('.info-popup')).waitForExist({reverse: true});
+            await this.page.locator('.txinfo-ok').click();
+            await this.page.locator('.info-popup').waitFor({state: 'detached'});
 
             assert.equal(fee, satoshiExpectedFee, `actual fee was not equal to calculated fee (expected fee/kb ${txFeePerKb}, txid ${txid})`);
             assert.equal(amountReceived, subtractTransactionFee ? satoshiAmountToSend - fee : satoshiAmountToSend, 'amount received not equal to expected value');
 
             if (coinControl) {
-                await (await this.app.client.$('a[href="#/send"]')).click();
+                await this.page.locator('a[href="#/send"]').click();
 
                 if (paymentType === 'public') {
-                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-                    await (await this.app.client.$('.private-public-balance .toggle.is-public')).waitForExist();
+                    await this.page.locator('.private-public-balance .toggle-switch').click();
+                    await this.page.locator('.private-public-balance .toggle.is-public').waitFor();
                 }
 
-                await (await this.app.client.$('#custom-inputs-button')).click();
+                await this.page.locator('#custom-inputs-button').click();
 
                 try {
+                    const nextPageLink = this.page.locator('#popup .next-page-link:not(.disabled)');
                     while (true) {
                         for (const selectedUTXO of selectedUTXOs) {
-                            const selector = await this.app.client.$(`#utxo-selector-${selectedUTXO}`);
-                            if (await selector.isExisting()) {
+                            if (await this.page.locator(`#utxo-selector-${selectedUTXO}`).isVisible())
                                 assert.fail(`utxo ${selectedUTXO} is still in our list despite an attempt to use it`);
-                            }
                         }
 
-                        const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
-                        if (!await nextPageLink.isExisting()) break;
+                        if (!await nextPageLink.isVisible())
+                            break;
+
                         await nextPageLink.click();
                     }
                 } finally {
-                    const closePopupButton = await this.app.client.$('#popup button.recommended');
+                    const closePopupButton = this.page.locator('#popup button.recommended');
                     await closePopupButton.click();
-                    await closePopupButton.waitForExist({reverse: true});
+                    await closePopupButton.waitFor({state: 'detached'});
                 }
             }
         };
@@ -723,49 +708,50 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         return async function (this: This) {
             this.timeout(100e3);
 
-            await (await this.app.client.$('a[href="#/send"]')).click();
+            await this.page.locator('a[href="#/send"]').click();
 
-            const balanceElement = await this.app.client.$(`.balance .${balanceType} .amount`);
+            const balanceElement = this.page.locator(`.balance .${balanceType} .amount`);
             let balance = 0n;
-            if (await balanceElement.isExisting()) {
-                balance = stringToBigint(await balanceElement.getText());
+            if (await balanceElement.isVisible()) {
+                balance = stringToBigint(await balanceElement.innerText());
             }
 
+            const toggleSwitch = this.page.locator('.private-public-balance .toggle-switch');
+            const toggleInPublicMode = this.page.locator('.private-public-balance .toggle.is-public');
+            const toggleInPrivateMode = this.page.locator('.private-public-balance .toggle.is-private');
             if (balanceType === 'public') {
-                const toggleInPrivateMode = await this.app.client.$('.private-public-balance .toggle.is-private');
-                if (await toggleInPrivateMode.isExisting()) {
-                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-                    await toggleInPrivateMode.waitForExist({reverse: true});
+                if (await toggleInPrivateMode.isVisible()) {
+                    await toggleSwitch.click();
+                    await toggleInPublicMode.waitFor();
                 }
             } else {
-                const toggleInPublicMode = await this.app.client.$('.private-public-balance .toggle.is-public');
-                if (await toggleInPublicMode.isExisting()) {
-                    await (await this.app.client.$('.private-public-balance .toggle-switch')).click();
-                    await toggleInPublicMode.waitForExist({reverse: true});
+                if (await toggleInPublicMode.isVisible()) {
+                    await toggleSwitch.click();
+                    await toggleInPrivateMode.waitFor();
                 }
             }
 
-            await (await this.app.client.$('#custom-inputs-button')).click();
-            await (await this.app.client.$('#popup .animated-table')).waitForExist();
+            await this.page.locator('#custom-inputs-button').click();
+            await this.page.locator('#popup .animated-table').waitFor();
             let sumOfInputs = 0n;
             while (true) {
                 sumOfInputs = (await Promise.all(
-                    (await this.app.client.$$('#popup .amount-value')).map(async e =>
-                        stringToBigint(await e.getText())
+                    (await this.page.locator('#popup .amount-value').all()).map(async l =>
+                        stringToBigint(await l.innerText())
                     )
                 )).reduce((a, x) => a + x, sumOfInputs);
 
-                const nextPageLink = await this.app.client.$('#popup .next-page-link:not(.disabled)');
-                if (!await nextPageLink.isExisting()) break;
+                const nextPageLink = this.page.locator('#popup .next-page-link:not(.disabled)');
+                if (!await nextPageLink.isVisible()) break;
                 await nextPageLink.click();
             }
 
             try {
                 assert.equal(bigintToString(sumOfInputs), bigintToString(balance), `expected - actual == ${bigintToString(balance - sumOfInputs)}`);
             } finally {
-                const closePopupButton = await this.app.client.$('#popup button.recommended');
+                const closePopupButton = this.page.locator('#popup button.recommended');
                 await closePopupButton.click();
-                await closePopupButton.waitForExist({reverse: true});
+                await closePopupButton.waitFor({state: 'detached'});
             }
         };
     }
@@ -774,13 +760,13 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         this.timeout(100e3);
 
         // Make sure our token will be the first in the list so tests work.
-        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+        await this.page.evaluate(() => $daemon.legacyRpc('generate 1'), []);
 
         await setElysium.bind(this)(true);
 
-        await (await this.app.client.$('a[href="#/elysium"')).click();
-        await (await this.app.client.$('.elysium-page')).waitForExist();
-        await (await this.app.client.$('#createToken')).click();
+        await this.page.locator('a[href="#/elysium"]').click();
+        await this.page.locator('.elysium-page').waitFor();
+        await this.page.locator('#createToken').click();
 
         const name = randstr();
         const ticker = randstr().toUpperCase().slice(0, 3);
@@ -789,75 +775,88 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         const url = `https://example.com/${randstr()}/`;
         const issuanceAmount = String(Math.floor(Math.random() * 1e6) + 1);
 
-        await (await this.app.client.$('input[name="name"]')).setValue(name);
-        await (await this.app.client.$('input[name="ticker"]')).setValue(ticker);
-        await (await this.app.client.$('input[name="category"]')).setValue(category);
-        await (await this.app.client.$('textarea[name="description"]')).setValue(description);
-        await (await this.app.client.$('input[name="url"]')).setValue(url);
-        await (await this.app.client.$('input[name="issuanceAmount"]')).setValue(issuanceAmount);
+        await this.page.locator('input[name="name"]').fill(name);
+        await this.page.locator('input[name="ticker"]').fill(ticker);
+        await this.page.locator('input[name="category"]').fill(category);
+        await this.page.locator('textarea[name="description"]').fill(description);
+        await this.page.locator('input[name="url"]').fill(url);
+        await this.page.locator('input[name="issuanceAmount"]').fill(issuanceAmount);
 
-        await (await this.app.client.$('#ok')).click();
+        await this.page.locator('#ok').click();
 
-        const passphraseInput = await this.app.client.$('input[type="password"]');
-        await passphraseInput.waitForExist();
-        await passphraseInput.setValue(passphrase);
-        await (await this.app.client.$('.passphrase-input button.recommended')).click();
+        await this.page.locator('input[type="password"]').fill(passphrase);
+        await this.page.locator('.passphrase-input button.recommended').click();
 
-        await this.app.client.waitUntilTextExists('.elysium-id', "\ueffa");
-        await this.app.client.waitUntilTextExists('.elysium-name', name);
-        await this.app.client.waitUntilTextExists('.elysium-ticker', ticker);
-        await this.app.client.waitUntilTextExists('.elysium-private-balance', "0");
-        await this.app.client.waitUntilTextExists('.elysium-pending-balance', issuanceAmount);
+        for (const [k, v] of [
+            ['.elysium-id', "\ueffa"],
+            ['.elysium-name', name],
+            ['.elysium-ticker', ticker],
+            ['.elysium-private-balance', "0"],
+            ['.elysium-pending-balance', issuanceAmount]
+        ]) {
+            await this.page.locator(`tr:nth-child(1) ${k}:has-text("${v}")`).waitFor({timeout: 5e3});
+        }
 
-        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+        await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
 
-        await this.app.client.waitUntil(async () =>
-            await (await this.app.client.$('.elysium-id')).getText() !== "\ueffa"
-        );
+        for (let i=0; i <= 20; i++) {
+            if (i == 20)
+                assert.fail('Timed out waiting for token to be confirmed');
 
-        await (await this.app.client.$('a[href="#/transactions"]')).click();
-        await this.app.client.waitUntilTextExists('tr:nth-child(2) .ticker', ticker);
+            if (await this.page.locator('.elysium-id').first().innerText() != "\ueffa")
+                break;
+
+            await new Promise(r => setTimeout(r, 250));
+        }
+
+        await this.page.locator('a[href="#/transactions"]').click();
+        await this.page.locator('tr:nth-child(2) .ticker', {hasText: ticker}).waitFor();
     }
     it('allows creating an Elysium token', testCreateElysiumToken);
 
     async function testAnonymizesElysiumTokens(this: This): Promise<string> {
-        this.timeout(60e3);
+        this.timeout(100e3);
 
         await testCreateElysiumToken.bind(this)();
 
-        await (await this.app.client.$('a[href="#/transactions"')).click();
-        await (await this.app.client.$('.transactions-page')).waitForExist();
-        await (await this.app.client.$('tr:nth-child(2)')).click();
+        await this.page.locator('a[href="#/transactions"]').click();
+        await this.page.locator('.transactions-page').waitFor();
+        await this.page.locator('tr:nth-child(2)').click();
 
-        const id = await (await this.app.client.$('.elysium-property-creation-tx .txid')).getText();
-        const creationAmount = stringToBigint(await (await this.app.client.$('.received-amount .amount-value')).getText());
-        await (await this.app.client.$('button.recommended')).click();
+        const id = await this.page.locator('.elysium-property-creation-tx .txid').innerText();
+        const creationAmount = stringToBigint(await this.page.locator('.received-amount .amount-value').innerText()) * BigInt(1e8);
+        await this.page.locator('button.recommended').click();
 
-        const getABScript =
-            'const ab = $store.getters["Elysium/aggregatedBalances"][arguments[0]];' +
-            'return {priv: `${ab.priv}`, pub: `${ab.pub}`, pending: `${ab.pending}`}';
-        const transformAB = (bbS: any) : {priv: bigint, pub: bigint, pending: bigint} => ({
-            priv: BigInt(bbS.priv),
-            pub: BigInt(bbS.pub),
-            pending: BigInt(bbS.pending)
-        });
-        const getBalances = async (id: string) => transformAB(await this.app.client.executeScript(getABScript, [id]));
         const waitForBalance = async (priv: bigint, pub: bigint, pending: bigint) => {
-            await this.app.client.waitUntil(async () => {
-                const balances = await getBalances(id);
-                return balances.priv === priv && balances.pub === pub && balances.pending === pending;
-            }, {timeout: 5e3});
+            for (let i = 0; i < 20; i++) {
+                const balances = {priv: 0n, pub: 0n, pending: 0n};
+                for (const [k, v] of await this.page.evaluate(
+                    ([propertyId]) =>
+                        Object.entries($store.getters["Elysium/aggregatedBalances"][propertyId])
+                            .map(([k, v]) => [k, String(v)]),
+                    [id]
+                )) {
+                    balances[k] = stringToBigint(v);
+                }
+
+                if (balances.priv === priv && balances.pub === pub && balances.pending === pending)
+                    return;
+                else
+                    await new Promise(r => setTimeout(r, 250));
+            }
+
+            assert.fail('Timed out waiting for balance');
         }
 
         await waitForBalance(0n, creationAmount, 0n);
 
-        await (await this.app.client.$('#anonymize-firo-link')).click();
-        await (await this.app.client.$('.passphrase-input input[type="password"]')).setValue(passphrase);
-        await (await this.app.client.$('.passphrase-input button.confirm')).click();
-        await (await this.app.client.$('#popup')).waitForExist({reverse: true, timeout: 100e3});
+        await this.page.locator('#anonymize-firo-link').click();
+        await this.page.locator('.passphrase-input input[type="password"]').fill(passphrase);
+        await this.page.locator('.passphrase-input button.confirm').click();
+        await this.page.locator('#popup').waitFor({state: 'hidden', timeout: 100e3});
 
         await waitForBalance(0n, 0n, creationAmount);
-        await this.app.client.executeAsyncScript(`$daemon.legacyRpc('generate 1').then(arguments[0])`, []);
+        await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
         await waitForBalance(creationAmount, 0n, 0n);
 
         return id;
@@ -865,65 +864,62 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('anonymizes Elysium tokens', testAnonymizesElysiumTokens);
 
     async function testSendsElysiumTokens(this: This, id: string) {
-        const ticker = await this.app.client.executeScript('return $store.getters["Elysium/tokenData"][arguments[0]].ticker', [id]);
+        const ticker = await this.page.evaluate(([id]) => $store.getters["Elysium/tokenData"][id].ticker, [id]);
 
-        await (await this.app.client.$('a[href="#/send"]')).click();
-        await (await this.app.client.$('.send-page')).waitForExist();
-        await this.app.client.executeScript('setSelectedAsset(arguments[0]);', [id]);
+        await this.page.locator('a[href="#/send"]').click();
+        await this.page.locator('.send-page').waitFor();
 
-        const recipient = await this.app.client.executeAsyncScript(`$daemon.getUnusedAddress().then(arguments[0])`, []);
+        let setSelectedAsset: (id: string) => void;
+        await this.page.evaluate(([id]) => setSelectedAsset(id), [id]);
+
+        const recipient = await this.page.evaluate(() => $daemon.getUnusedAddress('Transparent'));
         const satoshiAmountToSend = 100000000n + BigInt(Math.floor(1e8 * Math.random()));
         const amountToSend = bigintToString(satoshiAmountToSend);
 
-        await (await this.app.client.$('#address')).setValue(recipient);
-        await (await this.app.client.$('#amount')).setValue(amountToSend);
+        await this.page.locator('#address').fill(recipient);
+        await this.page.locator('#amount').fill(amountToSend);
 
-        const sendButton = await this.app.client.$('#send-button');
-        await sendButton.waitForEnabled();
-        await sendButton.click();
+        await this.page.locator('#send-button').click();
+        await this.page.locator('.confirm-step button.recommended').click();
 
-        const confirmButton = await this.app.client.$('.confirm-step button.recommended');
-        await confirmButton.waitForExist();
-        await confirmButton.click();
+        await this.page.locator('input[type="password"]').fill(passphrase);
+        await this.page.locator('.passphrase-input button.recommended').click();
 
-        const passphraseInput = await this.app.client.$('input[type="password"]');
-        await passphraseInput.waitForExist();
-        await passphraseInput.setValue(passphrase);
-        await (await this.app.client.$('.passphrase-input button.recommended')).click();
+        const waitOverlay = this.page.locator('.wait-overlay');
+        await waitOverlay.waitFor();
+        await waitOverlay.waitFor({state: 'hidden', timeout: 20e3});
 
-        const waitOverlay = await this.app.client.$('.wait-overlay');
-        await waitOverlay.waitForExist();
-        await waitOverlay.waitForExist({reverse: true, timeout: 20e3});
+        const errorElement = this.page.locator('.error-step .content');
+        if (await errorElement.isVisible()) {
+            const error = await errorElement.innerText();
 
-        const errorElement = await this.app.client.$('.error-step .content');
-        if (await errorElement.isExisting()) {
-            const error = await errorElement.getText();
-
-            const closeErrorStep = await this.app.client.$('.error-step button.recommended');
+            const closeErrorStep = this.page.locator('.error-step button.recommended');
             await closeErrorStep.click();
-            await closeErrorStep.waitForExist({reverse: true});
+            await closeErrorStep.waitFor({state: 'hidden'});
 
             assert.fail(`sending transaction failed: ${error}`);
         }
 
-        await (await this.app.client.$('a[href="#/transactions')).click();
+        await this.page.locator('a[href="#/transactions"]').click();
 
-        let txOut: TXO;
-        await this.app.client.waitUntil(async () => {
-            txOut = await this.app.client.executeScript(
-                "return Object.values($store.getters['Transactions/TXOs']).find(tx => " +
-                "tx.elysium && tx.elysium.amount === BigInt(arguments[0]) && " +
-                "!tx.amount && " +
-                "!tx.isChange" +
-                ")",
+        let txOut: TXO | undefined;
+        for (let i = 0; i < 20; i++) {
+            txOut = await this.page.evaluate(
+                ([satoshiAmountToSend]) => $store.getters['Transactions/allTXOs'].find(tx =>
+                    tx.elysium?.amount === BigInt(satoshiAmountToSend) &&
+                    !tx.amount &&
+                    !tx.isChange
+                ),
                 [String(satoshiAmountToSend)]
             );
-            return !!txOut;
-        }, {timeout: 5e3});
-        assert(!!txOut);
+            if (txOut) break;
 
-        await this.app.client.waitUntilTextExists('table .amount-value', amountToSend, <any>{timeout: 10e3});
-        await this.app.client.waitUntilTextExists('table .ticker', ticker, <any>{timeout: 10e3});
+            await new Promise(r => setTimeout(r, 250));
+        }
+        assert(!!txOut, "Timed out waiting for transaction to appear.");
+
+        await this.page.locator('tr:nth-child(1) .amount-value', {hasText: amountToSend}).waitFor();
+        await this.page.locator('tr:nth-child(1) .ticker', {hasText: ticker}).waitFor();
     }
     it('sends Elysium tokens', async function () {
         const id = await testAnonymizesElysiumTokens.bind(this)();
@@ -934,47 +930,52 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     it('has public coin control entries that sum to the correct amount', hasCorrectBalance('public'));
 
     it('navigates in the debug console', async function (this: This) {
-        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
+        await this.page.locator('a[href="#/debugconsole"]').click();
 
-        const currentInput = await this.app.client.$('#current-input')
+        const currentInput = await this.page.locator('#current-input')
 
-        await this.app.client.keys([..."garbage-input-1".split(''), "Enter"]);
-        await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+        await currentInput.type("garbage-input-1");
+        await currentInput.press("Enter");
+        while (await currentInput.innerText() !== '')
+            await new Promise(r => setTimeout(r, 100));
 
-        await this.app.client.keys([..."garbage-input-2".split(''), "Enter"]);
-        await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+        await currentInput.type("garbage-input-2");
+        await currentInput.press("Enter");
+        while (await currentInput.innerText() !== '')
+            await new Promise(r => setTimeout(r, 100));
 
-        await this.app.client.keys(["ArrowUp"]);
-        await this.app.client.waitUntil(async () => (await currentInput.getText()) === 'garbage-input-2');
+        await currentInput.press("ArrowUp");
+        while (await currentInput.innerText() !== 'garbage-input-2')
+            await new Promise(r => setTimeout(r, 100));
 
-        await this.app.client.keys(["ArrowUp"]);
-        await this.app.client.waitUntil(async () => (await currentInput.getText()) === 'garbage-input-1');
+        await currentInput.press("ArrowUp");
+        while (await currentInput.innerText() !== 'garbage-input-1')
+            await new Promise(r => setTimeout(r, 100));
 
-        await this.app.client.keys(["ArrowDown"]);
-        await this.app.client.waitUntil(async () => (await currentInput.getText()) === 'garbage-input-2');
+        await currentInput.press("ArrowDown");
+        while (await currentInput.innerText() !== 'garbage-input-2')
+            await new Promise(r => setTimeout(r, 100));
 
-        await this.app.client.keys(["ArrowDown"]);
-        await this.app.client.waitUntil(async () => (await currentInput.getText()) === '');
+        await currentInput.press("ArrowDown");
+        while (await currentInput.innerText() !== '')
+            await new Promise(r => setTimeout(r, 100));
     });
 
     it('properly sends debug commands', async function (this: This) {
-        // Due to bugs in WebdriverIO, we can't actually focus #current-input without this.
-        const currentInput = await this.app.client.$('#current-input');
-        await (await this.app.client.$('a[href="#/settings"]')).click();
-        await currentInput.waitForExist({reverse: true});
-        await (await this.app.client.$('a[href="#/debugconsole"]')).click();
-        await currentInput.waitForExist();
+        await this.page.locator('a[href="#/debugconsole"]').click();
 
+        const currentInput = await this.page.locator('#current-input');
         for (const [cmd, expectedOutput] of [['getinfo', '"relayfee"'], ['help move', 'Move 0.01 FIRO from the default account']]) {
-            await this.app.client.keys([...cmd.split(''), "Enter"]);
-            await this.app.client.waitUntil(async () => {
-                let hasResponse = false;
-                for (const e of await this.app.client.$$('.output')) {
-                    if ((await e.getText()).includes(expectedOutput)) {
-                        return true;
-                    }
-                }
-            }, {timeout: 10e3, timeoutMsg: `expected output of ${cmd} has not appeared in the debug console`, interval: 500});
+            await currentInput.type(cmd);
+            await currentInput.press("Enter");
+
+            let i = 0;
+            while (!(await this.page.locator('.output').allInnerTexts()).find(s => s.includes(expectedOutput))) {
+                if (i++ > 100)
+                    assert.fail(`expected output of ${cmd} has not appeared in the debug console`);
+
+                await new Promise(r => setTimeout(r, 100));
+            }
         }
     });
 });

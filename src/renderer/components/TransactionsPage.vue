@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo";
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
@@ -59,10 +60,10 @@ import SearchInput from "renderer/components/shared/SearchInput";
 import AddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
 
 const tableFields = [
-    {name: RelativeDate, width: '160pt'},
-    {name: Label},
-    {name: AddressType},
-    {name: Amount, width: '160pt'},
+    {name: markRaw(RelativeDate), width: '160pt'},
+    {name: markRaw(Label)},
+    {name: markRaw(AddressType)},
+    {name: markRaw(Amount), width: '160pt'},
 ];
 
 export default {

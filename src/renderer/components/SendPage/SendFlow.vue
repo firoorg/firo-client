@@ -206,8 +206,9 @@ export default {
                     await $daemon.mintSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                         this.subtractFeeFromAmount, coinControl);
                 } else {
+                    let lockedCoins = [];
                     if (this.coinControl && this.allowBreakingMasternodes) {
-                        const lockedCoins = this.coinControl.filter(coin =>
+                        lockedCoins = this.coinControl.filter(coin =>
                             this.lockedUTXOs.find(tx => tx.txid === coin[0] && tx.index === coin[1])
                         );
                         if (lockedCoins.length) await $daemon.updateCoinLocks(passphrase, [], lockedCoins);
@@ -216,8 +217,13 @@ export default {
                     // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
                     // algorithm that interferes with fee calculation.
                     const coinControl = this.coinControl || this.selectInputs(false, false, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, coinControl);
+                    try {
+                        await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                            this.subtractFeeFromAmount, coinControl);
+                    } catch (e) {
+                        await $daemon.updateCoinLocks(passphrase, lockedCoins, []);
+                        throw e;
+                    }
                 }
             } catch (e) {
                 if (e instanceof IncorrectPassphrase) {
