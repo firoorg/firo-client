@@ -1,5 +1,5 @@
 <template>
-    <section class="coin-swap-detail detail">
+    <section :class="['coin-swap-detail', 'detail', formDisabled ? 'disabled' : 'enabled']">
         <Form ref='form' as='div' class='inner' :validation-schema='validationSchema' v-slot='{errors, meta}'>
             <div class="top">
                 <div class="from-to-select">
@@ -623,6 +623,10 @@ export default {
     padding: var(--padding-base);
     height: 100%;
     background-color: var(--color-background-detail);
+
+    &.disabled {
+        opacity: 0.3;
+    }
 
     .inner {
         height: 100%;
