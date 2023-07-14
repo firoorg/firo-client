@@ -4,7 +4,7 @@
             <label class="pseudo-input-frame-label">{{ labelText }}</label>
             <VueSelect
                 ref="vueSelect"
-                class="select"
+                :class="{select: true, disabled}"
                 label="name"
                 v-model="selectedOption"
                 :clearable="false"
@@ -155,6 +155,10 @@ $menu-padding: 6px;
     }
 
     .v-select {
+        &.disabled * {
+            cursor: default !important;
+        }
+
         &.vs--open {
             z-index: var(--z-dropdown);
         }
