@@ -21,6 +21,6 @@ export function stringToBigint(coin: string, decimals: number=8): bigint {
     if (!whole && !part) return;
 
     const wholeB = BigInt(whole || 0) * 10n**BigInt(decimals);
-    const partB = BigInt(part + "0".repeat(decimals - part.length) || 0)
+    const partB = BigInt(part + "0".repeat(decimals - part.length))
     return wholeB + partB;
 }

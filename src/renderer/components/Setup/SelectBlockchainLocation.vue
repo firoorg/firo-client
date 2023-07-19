@@ -36,9 +36,9 @@
 <script>
 import fs from 'fs';
 import path from 'path';
-const remote = require('electron').remote;
 
 import { mapGetters, mapMutations } from 'vuex'
+import { ipcRenderer } from 'electron';
 
 export default {
     name: 'IntroScreenBlockchainLocation',
@@ -101,7 +101,7 @@ export default {
         },
 
         async changeDataDir() {
-            const selection = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+            const r = await ipcRenderer.invoke('select-directory', {
                 title: 'Select Firo Data Directory',
                 properties: [
                     'openDirectory',
@@ -111,9 +111,9 @@ export default {
                 ],
                 buttonLabel: 'Select Data Directory'
             });
-            if (!selection.filePaths.length) return;
+            if (r?.length !== 1) return;
 
-            this.dataDir = selection.filePaths[0];
+            this.dataDir = r[0];
         },
 
         async continueSetup() {

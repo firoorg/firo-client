@@ -44,6 +44,9 @@
     --color-warning-text: #FDFDFF;
 
     --color-popup-outside: rgba(0, 0, 0, 0.6);
+
+    --color-amount: var(--color-text-primary);
+    --color-ticker: var(--color-primary);
 }
 
 @mixin dark-theme {
@@ -92,6 +95,9 @@
     --color-warning-text: #FDFDFF;
 
     --color-popup-outside: rgba(0, 0, 0, 0.6);
+
+    --color-amount: var(--color-text-primary);
+    --color-ticker: var(--color-primary);
 }
 
 :root {

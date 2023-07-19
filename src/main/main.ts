@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
 import {SourceMapConsumer} from "source-map";
-import {app, ipcMain, BrowserWindow, Menu} from 'electron';
+import {app, ipcMain, BrowserWindow, Menu, dialog} from 'electron';
 import menuTemplate from './lib/menuTemplate';
+import OpenDialogOptions = Electron.OpenDialogOptions;
 
 process.on('unhandledRejection', (reason: Error | any, promise: Promise<any>) => {
     if (reason instanceof Error)
@@ -130,6 +131,12 @@ app.once('ready', async () => {
     ipcMain.handle('get-path', (ev, name) =>
         name == 'app' ? app.getAppPath() : app.getPath(name)
     );
+
+    ipcMain.handle('select-directory', async (ev, options: OpenDialogOptions): Promise<string[] | undefined> => {
+        const r = await dialog.showOpenDialog(ourWindow, options);
+        if (r.canceled) return;
+        return r.filePaths;
+    });
 
     app.on('open-url', async (ev, msg) => {
         ev.preventDefault();

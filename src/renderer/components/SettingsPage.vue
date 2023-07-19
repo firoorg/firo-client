@@ -66,7 +66,7 @@
 
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex'
-import {remote} from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import version from "../../version";
 import Popup from 'renderer/components/shared/Popup';
 import MnemonicPopup from "renderer/components/SettingsPage/MnemonicPopup";
@@ -163,7 +163,7 @@ export default {
         }),
 
         async openBackupDialog() {
-            const selected = await remote.dialog.showOpenDialog({
+            const r = await ipcRenderer.invoke('select-directory', {
                 title: "Select Backup File Directory",
                 buttonLabel: "Select Backup File Directory",
                 properties: [
@@ -171,9 +171,8 @@ export default {
                     'openDirectory'
                 ]
             });
-
-            const backupDirectory = selected.filePaths[0];
-            if (!backupDirectory) return;
+            if (r?.length !== 1) return;
+            const backupDirectory = r[0];
 
             this.show = 'wait';
 

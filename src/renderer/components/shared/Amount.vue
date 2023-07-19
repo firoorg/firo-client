@@ -24,5 +24,13 @@ export default {
 <style scoped lang="scss">
 .amount {
     font-weight: bold;
+
+    .amount-value {
+        color: var(--color-amount);
+    }
+
+    .ticker {
+        color: var(--color-ticker);
+    }
 }
 </style>
