@@ -74,6 +74,7 @@
     },
     "linux": {
       "category": "Network",
+      "target": ["AppImage", "snap", "tar.xz"],
       "icon": "assets/icons",
       "files": [
         "!assets/core/darwin",
