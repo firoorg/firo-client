@@ -1289,11 +1289,19 @@ export class Firod {
         console.info("Waiting for firod to shutdown.");
         await this.awaitFirodStopped();
 
+        await this.closeSockets();
+        await this.firodHasShutdown.release(true);
+    }
+
+    // Close our sockets, without stopping the daemon.
+    async closeSockets(): Promise<void> {
+        if (this.hasShutdown)
+            return;
+
         this.statusPublisherSocket.close();
         this.publisherSocket.close();
         this.requesterSocket.close();
 
-        await this.firodHasShutdown.release(true);
     }
 
     // This is called when an error sending to firod has occurred.

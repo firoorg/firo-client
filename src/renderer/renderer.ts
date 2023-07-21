@@ -22,6 +22,9 @@ import type {Firod} from "../daemon/firod";
 declare let window: ExtendedWindow;
 declare let $daemon: Firod;
 
+// On exit, close firod sockets.
+window.addEventListener('beforeunload', async () => await window.$daemon?.closeSockets());
+
 (async () => {
     console.debug("Beginning render...");
 
@@ -284,8 +287,10 @@ declare let $daemon: Firod;
 
                     console.info("firod has started.");
                     window.$setWaitingReason(undefined);
-                    store.commit('App/setFirodHasStarted', true);
-                    if (!store.getters['App/isInitialized']) await store.dispatch('App/setIsInitialized', true);
+
+                    if (!store.getters['App/isInitialized'])
+                        await store.dispatch('App/setIsInitialized', true);
+
                     resolve();
                 } else {
                     // Direct the user to the lock wallet screen. We will never resolve(), but that shouldn't matter.
