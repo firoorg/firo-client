@@ -117,6 +117,10 @@ app.once('ready', async () => {
         return r.filePaths;
     });
 
+    // This is used to check if we're reloading, so we can avoid restarting firod.
+    let count = 0;
+    ipcMain.handle('count', () => count++);
+
     app.on('open-url', async (ev, msg) => {
         ev.preventDefault();
         ourWindow.webContents.emit('open-url', msg);

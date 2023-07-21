@@ -12,7 +12,6 @@ const state = {
     // This is the value read from our configuration, not what is given to us in APIStatus.
     firoClientNetwork: null,
     waitingReason: 'Loading...',
-    firodHasStarted: false,
     allowBreakingMasternodes: false,
     temporaryFirodArguments: [],
     enableElysium: false,
@@ -58,10 +57,6 @@ const mutations = {
     // This determines whether WaitingScreen will be shown from MainLayout.
     setWaitingReason(state, value) {
         state.waitingReason = value;
-    },
-
-    setFirodHasStarted(state, value) {
-        state.firodHasStarted = value;
     },
 
     setCachedMnemonic(state, value) {
@@ -197,7 +192,6 @@ const getters = {
     firoClientNetwork: (state) => state.firoClientNetwork,
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
-    firodHasStarted: (state) => state.firodHasStarted,
     showPaymentPendingWarning: (state, getters, rootState, rootGetters) =>
         rootGetters['ApiStatus/isBlockchainSynced'] &&
         (
