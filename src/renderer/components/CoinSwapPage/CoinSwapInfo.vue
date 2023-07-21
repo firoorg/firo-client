@@ -43,7 +43,7 @@
                     <td>Expected Rate</td>
                     <td class="value">
                         <Amount amount="1" :ticker="coinSwapData.fromCoin" />
-                        =
+                        ~=
                         <Amount :amount="String(coinSwapData.expectedRate)" :ticker="coinSwapData.toCoin" />
                     </td>
                 </tr>
@@ -55,12 +55,12 @@
 
                 <tr v-if="coinSwapData.fromFee">
                     <td>{{ coinSwapData.fromCoin }} Fee</td>
-                    <td><Amount :amount="coinSwapData.fromFee" :ticker="coinSwapData.fromCoin" /></td>
+                    <td>~<Amount :amount="coinSwapData.fromFee" :ticker="coinSwapData.fromCoin" /></td>
                 </tr>
 
                 <tr>
                     <td>Expected {{ coinSwapData.toCoin }} Fee</td>
-                    <td><Amount :amount="String(coinSwapData.expectedToFee)" :ticker="coinSwapData.toCoin" /></td>
+                    <td>~<Amount :amount="String(coinSwapData.expectedToFee)" :ticker="coinSwapData.toCoin" /></td>
                 </tr>
 
                 <tr>
@@ -112,7 +112,7 @@
             </table>
 
             <div v-if="showQrCode" class="footer guidance">
-                Please send the exact amount shown. If you send a different amount, you will need to contact {{coinSwapData.chainName}} support at 
+                Please send the exact amount shown. If you send a different amount, you will need to contact {{coinSwapData.chainName}} support at
                 <span v-if="coinSwapData.chainName==='ChangeNow'"><a href="mailto:support@changenow.io">support.changenow.io</a></span>
                 <span v-if="coinSwapData.chainName==='StealthEx'"><a href="mailto:support@stealthex.io">stealthex.io/contacts</a></span>
                 <span v-if="coinSwapData.chainName==='Swapzone'"><a href="mailto:support@swapzone.io">swapzone.io</a></span>

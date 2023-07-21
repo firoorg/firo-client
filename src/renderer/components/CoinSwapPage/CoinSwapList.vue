@@ -30,7 +30,7 @@ import { mapGetters } from 'vuex';
 import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable.vue';
 import Popup from 'renderer/components/shared/Popup.vue';
 import AnimatedTableRelativeDate from "renderer/components/AnimatedTable/AnimatedTableRelativeDate.vue";
-import CoinSwapSendAmount from "renderer/components/AnimatedTable/CoinSwapSendAmount.vue";
+import CoinSwapSendAmount from "renderer/components/CoinSwapPage/CoinSwapSendAmount.vue";
 import CoinSwapReceivedAmount from "renderer/components/CoinSwapPage/CoinSwapReceivedAmount.vue";
 import CoinSwapStatus from "renderer/components/CoinSwapPage/CoinSwapStatus.vue";
 import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo.vue";

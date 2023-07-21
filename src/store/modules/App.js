@@ -217,7 +217,7 @@ const getters = {
     enableElysium: (state) => state.enableElysium || false,
     showMints: (state) => state.showMints,
     colorTheme: (state) => state.colorTheme || 'system',
-    showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && keys.HAS_KEYS,
+    showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && !!Object.keys(keys).length,
     appPath: (state) => state.appPath,
     userDataPath: (state) => state.userDataPath,
     logMessages: (state) => state.logMessages

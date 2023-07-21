@@ -13,12 +13,8 @@
         <Popup v-if="show !== 'button'" :margin="show !== 'wait'">
             <ErrorStep v-if="show === 'error'" :error="error" @ok="cleanup(false)" />
             <WaitOverlay v-else-if="show === 'wait'" />
-            <CoinSwapInfo
-                v-if="show === 'info'"
-                :coin-swap-data="coinSwapRecord"
-                :show-cancel="false"
-                @confirm="cleanup(true)"
-            />
+            <CoinSwapInfo v-if="show === 'info'" :coin-swap-data="coinSwapRecord" :show-cancel="false"
+                @confirm="cleanup(true)" />
         </Popup>
     </div>
 </template>
@@ -30,12 +26,10 @@ import Popup from 'renderer/components/shared/Popup.vue';
 import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo.vue';
 import ErrorStep from './ErrorStep.vue';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay.vue';
-import ChangeAPIWorker from 'lib/changenow-api';
-import StealthAPIWorker from 'lib/stealth-api';
-import SwapzoneAPIWorker from 'lib/swapzone-api';
-import ExolixAPIWorker from 'lib/exolix-api';
-import {mapActions} from "vuex";
 import {bigintToString} from "lib/convert";
+import {mapActions, mapMutations} from "vuex";
+import { CoinSwapApiWrapper } from 'lib/coinswap';
+import ApiKeys from 'keys';
 
 export default {
     name: 'CoinSwapFlowToFiro',
@@ -49,36 +43,24 @@ export default {
 
     data() {
         return {
-            change: null,
-            stealth: null, 
-            swapzone: null,
-            exolix: null,
-            orderId: '',
-            exchangeAddress: '',
+            coinSwapApi: null,
             error: null,
             show: 'button',
-            passphrase: '',
             coinSwapRecord: null
         };
     },
 
     props: {
-        disabled: Boolean,
-        provider: String,
-        remoteCurrency: String,
-        firoAmount: BigInt,
-        remoteAmount: BigInt,
-        firoTransactionFee: BigInt,
+        pairInfo: Object,
+        sendAmount: BigInt,
         refundAddress: String,
-        expectedRate: BigInt,
-        quotaId: String
+        disabled: Boolean,
+        isPrivate: Boolean,
+        txFeePerKb: BigInt
     },
 
     created() {
-        this.change = new ChangeAPIWorker();
-        this.stealth = new StealthAPIWorker();
-        this.swapzone = new SwapzoneAPIWorker();
-        this.exolix = new ExolixAPIWorker();
+        this.coinSwapApi = new CoinSwapApiWrapper(ApiKeys);
     },
 
     methods: {
@@ -86,7 +68,11 @@ export default {
             addCoinSwapRecords: 'CoinSwap/addOrUpdateRecords'
         }),
 
-        cleanup(emitSuccess=true) {
+        ...mapMutations({
+            updateAddress: 'AddressBook/updateAddress'
+        }),
+
+        cleanup(emitSuccess = true) {
             this.orderId = '';
             this.exchangeAddress = '';
             this.error = null;
@@ -97,312 +83,78 @@ export default {
 
 
         async showInfo() {
+            if (!this.pairInfo) return;
             if (this.show !== 'button') return;
             this.show = 'wait';
 
-            const pair = `${this.remoteCurrency}-FIRO`;
             while (!window.$daemon) {
                 await new Promise(r => setTimeout(r, 10));
             }
-            const walletAddress = await $daemon.getUnusedAddress();
 
-            let latestError = null;
-            for (let i = 0; i < 1; i++) {
-                if (this.provider=="ChangeNow"){
-                    const order ={
-                        from:this.remoteCurrency.toLowerCase(),
-                        to:"firo",
-                        address: walletAddress,
-                        refundAddress: this.refundAddress,
-                        amount: bigintToString(this.remoteAmount)
-                    };
+            const receiveAddress = await $daemon.getUnusedAddress();
+            const order = {
+                sendAmount: this.sendAmount,
+                refundAddress: this.refundAddress,
+                destinationAddress: receiveAddress,
+                pairInfo: this.pairInfo
+            };
 
-                    console.info(`Posting order: ${JSON.stringify(order)}`);
+            console.info(`Posting CoinSwap order:`);
+            console.info(order);
 
-                    let r;
-                    try {
-                        r = await this.change.postOrder(order);
-                    } catch (e) {
-                        latestError = `Error posting order: ${e}`;
-                        console.error(latestError);
-                        continue;
-                    }
+            let orderInfo;
+            try {
+                orderInfo = await this.coinSwapApi.makeOrder(order);
+            } catch (e) {
+                console.error('Error posting order:')
+                console.error(e);
 
-                    if (r.error || !r.response) {
-                        latestError = `Got error posting order: ${r.error}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const response = r.response;
-
-                    // Sanity check response
-                    if (
-                        response.refundAddress !== this.refundAddress ||
-                        response.payoutAddress !== walletAddress
-                    ) {
-                        latestError = `Invalid Response from ChangeNow: ${JSON.stringify(response)}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const receiveAddressBookData = {
-                        address: walletAddress,
-                        label: `${pair} Swap (Order ${response.id})`,
-                        purpose: 'ChangeNowReceive'
-                    };
-                    $store.commit('AddressBook/updateAddress', receiveAddressBookData);
-                    try {
-                        await $daemon.addAddressBookItem(receiveAddressBookData);
-                    } catch (e) {
-                        console.error(`Failed to add address book item: ${e}`);
-                        this.error = `Failed to add address book item: ${e}`;
-                        return;
-                    }
-
-                    this.coinSwapRecord =  {
-                        provider: this.provider,
-                        orderId: response.id,
-                        fromCoin: this.remoteCurrency,
-                        toCoin: 'FIRO',
-                        sendAmount: bigintToString(this.remoteAmount),
-                        expectedAmountToReceive: bigintToString(this.firoAmount),
-                        fromFee: null,
-                        expectedToFee: bigintToString(this.firoTransactionFee),
-                        status: 'waiting',
-                        date: Date.now(),
-                        exchangeAddress: response.payinAddress,
-                        refundAddress: this.refundAddress,
-                        receiveAddress: walletAddress,
-                        expectedRate: bigintToString(this.expectedRate),
-                        _response: response
-                    };
-                } else if (this.provider === "StealthEx"){
-                    const order = {
-                        currency_from:this.remoteCurrency.toLowerCase(),
-                        currency_to:"firo",
-                        address_to: walletAddress,
-                        amount_from: bigintToString(this.remoteAmount),
-                        refund_address: this.refundAddress,
-                    };
-
-                    console.info(`Posting order: ${JSON.stringify(order)}`);
-
-                    let r;
-                    try {
-                        r = await this.stealth.postOrder(order);
-                    } catch (e) {
-                        latestError = `Error posting order: ${e}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    if (r.error || !r.response) {
-                        latestError = `Got error posting order: ${r.error}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const response = r.response;
-
-                    // Sanity check response
-                    if (
-                        response.refund_address !== this.refundAddress ||
-                        response.address_to !== walletAddress
-                    ) {
-                        latestError = `Invalid Response from StealthEx: ${JSON.stringify(response)}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const receiveAddressBookData = {
-                        address: walletAddress,
-                        label: `${pair} Swap (Order ${response.id})`,
-                        purpose: 'StealthExReceive'
-                    };
-                    $store.commit('AddressBook/updateAddress', receiveAddressBookData);
-                    try {
-                        await $daemon.addAddressBookItem(receiveAddressBookData);
-                    } catch (e) {
-                        console.error(`Failed to add address book item: ${e}`);
-                        this.error = `Failed to add address book item: ${e}`;
-                        return;
-                    }
-
-                    this.coinSwapRecord =  {
-                        provider: this.provider,
-                        orderId: response.id,
-                        fromCoin: this.remoteCurrency,
-                        toCoin: 'FIRO',
-                        sendAmount: bigintToString(this.remoteAmount),
-                        expectedAmountToReceive: response.amount_to,
-                        fromFee: null,
-                        expectedToFee: bigintToString(this.firoTransactionFee),
-                        status: 'waiting',
-                        date: Date.now(),
-                        exchangeAddress: response.address_from,
-                        refundAddress: this.refundAddress,
-                        receiveAddress: response.address_to,
-                        expectedRate: bigintToString(this.expectedRate),
-                        _response: response
-                    };
-                } else if (this.provider === "Swapzone"){
-                    const order = {
-                        from:this.remoteCurrency.toLowerCase(),
-                        to:"firo",
-                        addressReceive: walletAddress,
-                        refundAddress: this.refundAddress,
-                        amountDeposit: bigintToString(this.remoteAmount),
-                        quotaId: this.quotaId
-                    };
-
-                    console.info(`Posting order: ${JSON.stringify(order)}`);
-
-                    let r;
-                    try {
-                        r = await this.swapzone.postOrder(order);
-                    } catch (e) {
-                        latestError = `Error posting order: ${e}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    if (r.error || !r.response) {
-                        latestError = `Got error posting order: ${r.error}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const response = r.response;
-
-                    // Sanity check response
-                    if (
-                        response.refundAddress !== this.refundAddress ||
-                        response.addressReceive !== walletAddress
-                    ) {
-                        latestError = `Invalid Response from Swapzone: ${JSON.stringify(response)}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const receiveAddressBookData = {
-                        address: walletAddress,
-                        label: `${pair} Swap (Order ${response.id})`,
-                        purpose: 'SwapzoneReceive'
-                    };
-                    $store.commit('AddressBook/updateAddress', receiveAddressBookData);
-                    try {
-                        await $daemon.addAddressBookItem(receiveAddressBookData);
-                    } catch (e) {
-                        console.error(`Failed to add address book item: ${e}`);
-                        this.error = `Failed to add address book item: ${e}`;
-                        return;
-                    }
-
-                    this.coinSwapRecord =  {
-                        provider: this.provider,
-                        orderId: response.id,
-                        fromCoin: this.remoteCurrency,
-                        toCoin: 'FIRO',
-                        sendAmount: bigintToString(this.remoteAmount),
-                        expectedAmountToReceive: response.amountEstimated,
-                        fromFee: null,
-                        expectedToFee:bigintToString( this.firoTransactionFee),
-                        status: 'waiting',
-                        date: Date.now(),
-                        exchangeAddress: response.addressDeposit,
-                        refundAddress: this.refundAddress,
-                        receiveAddress: response.addressReceive,
-                        expectedRate: bigintToString(this.expectedRate),
-                        _response: response
-                    };
-                } else if (this.provider === "Exolix"){
-                    const order = {
-                        coin_from:this.remoteCurrency,
-                        coin_to:"FIRO",
-                        destination_address: walletAddress,
-                        deposit_amount: bigintToString(this.remoteAmount),
-                        refund_address: this.refundAddress
-                    };
-
-                    console.info(`Posting order: ${JSON.stringify(order)}`);
-
-                    let r;
-                    try {
-                        r = await this.exolix.postOrder(order);
-                    } catch (e) {
-                        latestError = `Error posting order: ${e}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    if (r.error || !r.response) {
-                        latestError = `Got error posting order: ${r.error}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const response = r.response;
-
-                    // Sanity check response
-                    if (
-                        response.refund_address !== this.refundAddress ||
-                        response.destination_address !== walletAddress
-                    ) {
-                        latestError = `Invalid Response from Exolix: ${JSON.stringify(response)}`;
-                        console.error(latestError);
-                        continue;
-                    }
-
-                    const receiveAddressBookData = {
-                        address: walletAddress,
-                        label: `${pair} Swap (Order ${response.id})`,
-                        purpose: 'ExolixReceive'
-                    };
-                    $store.commit('AddressBook/updateAddress', receiveAddressBookData);
-                    try {
-                        await $daemon.addAddressBookItem(receiveAddressBookData);
-                    } catch (e) {
-                        console.error(`Failed to add address book item: ${e}`);
-                        this.error = `Failed to add address book item: ${e}`;
-                        return;
-                    }
-
-                    this.coinSwapRecord =  {
-                        provider: this.provider,
-                        orderId: response.id,
-                        fromCoin: this.remoteCurrency,
-                        toCoin: 'FIRO',
-                        sendAmount: bigintToString(this.remoteAmount),
-                        expectedAmountToReceive: response.amount_to,
-                        fromFee: null,
-                        expectedToFee: bigintToString(this.firoTransactionFee),
-                        status: 'waiting',
-                        date: Date.now(),
-                        exchangeAddress: response.deposit_address,
-                        refundAddress: response.refund_address,
-                        receiveAddress: response.destination_address,
-                        expectedRate: bigintToString(this.expectedRate),
-                        _response: response
-                    };
-                }                 
-
-                try {
-                    await this.addCoinSwapRecords([this.coinSwapRecord]);
-                } catch(e) {
-                    console.error(`Failed to add CoinSwap record: ${e}`);
-                    this.show = 'error';
-                    this.error = e;
-                    return;
-                }
-
-                this.show = 'info';
+                this.error = `Error posting order: ${e?.message || e}`;
+                this.show = 'error';
                 return;
             }
 
-            this.show = 'error';
-            this.error = latestError || 'Uh oh, something went wrong :(';
-            console.error(`Gave up sending the request after 10 errors.`);
+            console.info(`Posted CoinSwap order:`);
+            console.info(orderInfo);
+
+            const receiveAddressBookData = {
+                address: receiveAddress,
+                label: `${orderInfo.provider} ${orderInfo.from}-${orderInfo.to} Swap (Order ${orderInfo.orderId})`,
+                purpose: `coin-swap-receive-${orderInfo.provider}`
+            };
+
+            try {
+                await $daemon.addAddressBookItem(receiveAddressBookData);
+            } catch (e) {
+                console.error(`Failed to add address book item:`);
+                console.error(e);
+
+                this.error = `Failed to add address book item: ${e?.message || e}`;
+                this.show = 'error';
+                return;
+            }
+
+            await this.updateAddress(receiveAddressBookData);
+
+            this.coinSwapRecord = {
+                chainName: orderInfo.provider,
+                orderId: orderInfo.orderId,
+                fromCoin: orderInfo.from,
+                toCoin: orderInfo.to,
+                sendAmount: bigintToString(orderInfo.sendAmount),
+                expectedAmountToReceive: bigintToString(orderInfo.receiveAmount),
+                expectedRate: bigintToString(orderInfo.rate),
+                fromFee: bigintToString(this.firoTransactionFee),
+                expectedToFee: bigintToString(orderInfo.fee),
+                status: orderInfo.status,
+                date: Date.now(),
+                exchangeAddress: orderInfo.exchangeAddress,
+                refundAddress: orderInfo.refundAddress,
+                receiveAddress: orderInfo.destinationAddress
+            };
+            await this.addCoinSwapRecords([this.coinSwapRecord]);
+
+            this.show = 'info';
         }
     }
 };

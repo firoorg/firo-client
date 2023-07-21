@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
-import {app, ipcMain, BrowserWindow, Menu, MenuItem, dialog} from 'electron';
+import {app, session, ipcMain, BrowserWindow, Menu, MenuItem, dialog} from 'electron';
+
 import menuTemplate from './lib/menuTemplate';
 import OpenDialogOptions = Electron.OpenDialogOptions;
 
@@ -53,6 +54,15 @@ if (app) {
         const appMenu = Menu.buildFromTemplate(<any>menuTemplate); // FIXME
         Menu.setApplicationMenu(appMenu);
 
+        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+            callback({ responseHeaders: details.responseHeaders });
+
+            // Inject CORS headers
+            details.responseHeaders['Access-Control-Allow-Origin'] = ['*'];
+            details.responseHeaders['Access-Control-Allow-Methods'] = ['GET, POST, PUT, DELETE'];
+            details.responseHeaders['Access-Control-Allow-Headers'] = ['Authorization, Content-Type'];
+          });
+
         // The window will be shown by the renderer process when firod is connected.
         const ourWindow = new BrowserWindow({
             frame: process.platform !== 'darwin',
@@ -67,8 +77,15 @@ if (app) {
                 contextIsolation: false
             }
         });
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+        callback({ responseHeaders: details.responseHeaders });
 
-        const sourceMaps: {[sourceId: string]: any} = {};
+        // Inject CORS headers
+        details.responseHeaders['Access-Control-Allow-Origin'] = ['*'];
+        details.responseHeaders['Access-Control-Allow-Methods'] = ['GET, POST, PUT, DELETE'];
+        details.responseHeaders['Access-Control-Allow-Headers'] = ['Authorization, Content-Type'];
+      });
+
         const logPath = path.join(app.getPath('userData'), 'firo-client.log');
         // This will overwrite the old log so as to reduce clutter.
         const logFile = await fs.promises.open(logPath, 'w');

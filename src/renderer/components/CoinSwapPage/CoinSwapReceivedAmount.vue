@@ -4,16 +4,20 @@
     </th>
 
     <td v-else class="vuetable-td-component-coinswap-received-amount">
-        <span class="amount">{{ rowData.expectedAmountToReceive }}</span>
-        <span class="ticker">{{ rowData.toCoin }}</span>
+        <Amount :amount='rowData.expectedAmountToReceive' :ticker='rowData.toCoin' />
     </td>
 </template>
 
 <script>
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
+import Amount from '../shared/Amount.vue';
 
 export default {
     name: 'CoinSwapSentAmount',
+
+    components: {
+        Amount
+    },
 
     mixins: [
         VuetableFieldMixin
