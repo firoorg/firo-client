@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  EXOLIX_AUTHORIZATION: ${{ secrets.EXOLIX_AUTHORIZATION }}
+  SWAPZONE_API_KEY: ${{ secrets.SWAPZONE_API_KEY }}
+  CHANGENOW_API_KEY: ${{ secrets.CHANGENOW_API_KEY }}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Extract version
+      id: pkg
+      run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
+    - name: Install electron-builder
+      run: npm install -g electron-builder
+
+    - name: Build
+      shell: bash
+      env:
+        USE_HARD_LINKS: "false"
+      run: |
+        node electron-vue/build.js
+        electron-builder build --publish=never
+
+    - name: Upload Artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: Firo-Client-${{ steps.pkg.outputs.version }}-${{ matrix.os }}
+        path: |
+          ./build/Firo-Client-${{ steps.pkg.outputs.version }}.exe
+          ./build/Firo-Client-${{ steps.pkg.outputs.version }}.AppImage
+          ./build/Firo-Client-${{ steps.pkg.outputs.version }}.tar.xz
+          ./build/Firo-Client-${{ steps.pkg.outputs.version }}.dmg
