@@ -36,9 +36,8 @@ export default {
                     // 256 bits of entropy translates into a 24 word mnemonic.
                     mnemonicPhrase: generateMnemonic(256),
                     mnemonicPassphrase: null,
-                    isNewMnemonic: 1
+                    isNewMnemonic: true
                 });
-
                 // Wait for cachedMnemonic to propagate.
                 while (!this.$store.getters['App/cachedMnemonic']) {
                     await new Promise(r => setTimeout(r, 5));
