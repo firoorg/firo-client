@@ -1,5 +1,8 @@
 import { Firod } from '../firod';
 
-export function handleEvent(store, firo: Firod, eventData: any) {
+export async function handleEvent(store, firod: Firod, eventData: any) {
     store.commit('Transactions/setWalletState', [eventData]);
+    if(eventData.inputType == "sparkspend") {
+        store.commit('Transactions/setWalletState', await firod.getStateWallet());
+    }
 }

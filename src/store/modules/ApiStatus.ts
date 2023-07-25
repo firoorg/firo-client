@@ -44,6 +44,7 @@ const getters = {
     isLocked: (state): boolean | undefined => state.apiStatus.walletLock,
     isReindexing: (state): boolean => state.apiStatus.reindexing,
     isLelantusAllowed: (state): boolean => !state.apiStatus.disabledSporks.includes("lelantus"),
+    isSparkAllowed: (state, getters): boolean => getters.apiStatus.isSpark,
     smartFeePerKb: (state): bigint => state.apiStatus.smartFeePerKb,
     isBlockchainSynced: (state): boolean => ['regtest', 'regtest-ql'].includes(state.apiStatus.network) || state.apiStatus.synced,
     connections: (state): number => state.apiStatus.connections
