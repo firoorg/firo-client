@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import {SourceMapConsumer} from "source-map";
 import {app, ipcMain, BrowserWindow, Menu, dialog} from 'electron';
 import menuTemplate from './lib/menuTemplate';
 import OpenDialogOptions = Electron.OpenDialogOptions;
@@ -69,36 +68,10 @@ app.once('ready', async () => {
     const logPath = path.join(app.getPath('userData'), 'firo-client.log');
     // This will overwrite the old log so as to reduce clutter.
     const logFile = await fs.promises.open(logPath, 'w');
-    ourWindow.webContents.on('console-message', async (event, level, msg, mangledLine, sourceId) => {
+    ourWindow.webContents.on('console-message', async (event, level, msg, line, source) => {
         if (level < LOG) return;
 
-        let map;
-        let sourceMapFile = undefined;
-        if (sourceMaps[sourceId]) {
-            map = sourceMaps[sourceId];
-        } else if (sourceMapFile) {
-            let rawMapData;
-            try {
-                rawMapData = (await fs.promises.readFile(sourceMapFile)).toString();
-            } catch (e) {}
-            if (rawMapData) {
-                try {
-                    let rawMap = JSON.parse(rawMapData);
-                    map = new SourceMapConsumer(rawMap);
-                    sourceMaps[sourceId] = map;
-                } catch (e) {
-                    console.info(e);
-                }
-            }
-        }
-
-        let location;
-        if (map) {
-            const {source, line} = map.originalPositionFor({line: mangledLine, column: 0});
-            location = `${source}:${line}`;
-        } else {
-            location = `${sourceId}:${mangledLine}`;
-        }
+        let location = `${source}:${line}`;
 
         const levelStrs = {
             0: 'debug',
@@ -108,9 +81,15 @@ app.once('ready', async () => {
         };
         const levelStr: 'debug' | 'info' | 'warn' | 'error' = levelStrs[level] || 'info';
 
-        const output = `${levelStr}: ${msg} (${location})`;
-        console[levelStr](output);
-        await logFile.write(output + "\n");
+        await logFile.write(`${levelStr}: ${msg} (${location})\n`);
+
+        const red = '\x1b[31m';
+        const reset = '\x1b[0m';
+        const log = console[levelStr];
+        if (level >= 2)
+            log(`${red}${levelStr}${reset}: ${msg} (${location})`);
+        else
+            log(`${levelStr}: ${msg} (${location})`);
     });
 
     // Fire the shutdown-requested listener in renderer/main.js when the user tries to close us.
@@ -137,6 +116,10 @@ app.once('ready', async () => {
         if (r.canceled) return;
         return r.filePaths;
     });
+
+    // This is used to check if we're reloading, so we can avoid restarting firod.
+    let count = 0;
+    ipcMain.handle('count', () => count++);
 
     app.on('open-url', async (ev, msg) => {
         ev.preventDefault();

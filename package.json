@@ -74,6 +74,7 @@
     },
     "linux": {
       "category": "Network",
+      "target": ["AppImage", "snap", "tar.xz"],
       "icon": "assets/icons",
       "files": [
         "!assets/core/darwin",
@@ -106,7 +107,6 @@
     "sass-embedded": "^1.57.1",
     "sha.js": "^2.4.11",
     "simple-plist": "^1.3.1",
-    "source-map": "^0.5.7",
     "time-ago": "^0.2.1",
     "typeface-overpass-mono": "^1.1.13",
     "vee-validate": "^4.7.3",

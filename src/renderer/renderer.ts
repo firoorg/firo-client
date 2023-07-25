@@ -22,6 +22,9 @@ import type {Firod} from "../daemon/firod";
 declare let window: ExtendedWindow;
 declare let $daemon: Firod;
 
+// On exit, close firod sockets.
+window.addEventListener('beforeunload', async () => await window.$daemon?.closeSockets());
+
 (async () => {
     console.debug("Beginning render...");
 
@@ -226,8 +229,9 @@ declare let $daemon: Firod;
 
     // Start the daemon, showing progress to the user and resolving when the daemon is fully started. App/isInitialized is
     // set to true if the daemon is started successfully and the wallet is locked.
-    window.$startDaemon = () => new Promise(resolve => {
-        // Checking for firodHasStarted allows us to work properly with hot reloading.
+    window.$startDaemon = () => new Promise(async resolve => {
+        // Don't restart firod when we refresh the page.
+        const isFirstStartup = (await ipcRenderer.invoke('count')) == 0;
 
         window.$setWaitingReason("Starting up firod...");
         const args = [...store.getters['App/temporaryFirodArguments']];
@@ -235,12 +239,10 @@ declare let $daemon: Firod;
         console.info(`Starting ${store.getters['App/firodLocation']} with wallet ${store.getters['App/walletLocation']}...`);
         firod(store, store.getters['App/firoClientNetwork'], store.getters['App/firodLocation'],
             store.getters['App/blockchainLocation'] || null, undefined,
-            !!(store.getters['App/firodHasStarted'] || process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD)),
+            !!(!isFirstStartup || (process.env.ALLOW_EXISTING_FIROD && JSON.parse(process.env.ALLOW_EXISTING_FIROD))),
             true, process.env.FIROD_CONNECTION_TIMEOUT ? Number(process.env.FIROD_CONNECTION_TIMEOUT) : undefined,
             args)
             .then(async z => {
-                // Don't restart firod when we reload.
-                process.env.ALLOW_EXISTING_FIROD = 'true';
 
                 // Make $daemon globally accessible.
                 window.$daemon = z;
@@ -283,16 +285,12 @@ declare let $daemon: Firod;
 
                     await addElysiumTokenData();
 
-                    // Do a fixed wait so that we have time to update to the state wallet entries that have been sent. It's
-                    // only required on first load, not any subsequent reloads.
-                    if (!store.getters['App/firodHasStarted']) {
-                        await new Promise(r => setTimeout(r, 2e3));
-                    }
-
                     console.info("firod has started.");
                     window.$setWaitingReason(undefined);
-                    store.commit('App/setFirodHasStarted', true);
-                    if (!store.getters['App/isInitialized']) await store.dispatch('App/setIsInitialized', true);
+
+                    if (!store.getters['App/isInitialized'])
+                        await store.dispatch('App/setIsInitialized', true);
+
                     resolve();
                 } else {
                     // Direct the user to the lock wallet screen. We will never resolve(), but that shouldn't matter.
