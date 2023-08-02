@@ -1,11 +1,11 @@
 <template>
-    <th v-if="isHeader" class="address">
-        Address
+    <th v-if="isHeader">
+        Type
     </th>
-
-    <td v-else class="address">
-        <div class="inner-address">
-            {{ rowData.address }}
+    
+    <td v-else class="input-privacy">
+        <div class="inner-input-privacy">
+            {{ rowData.inputPrivacy }}
         </div>
     </td>
 </template>
@@ -14,7 +14,7 @@
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
 
 export default {
-    name: "PaymentRequestAddress",
+    name: "AnimatedTableInputPrivacy",
 
     mixins: [
         VuetableFieldMixin
@@ -23,12 +23,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+td.input-privacy {
+    width: 180px;
+    max-width: 180px;
 
-td.address {
-    width: available;
-    max-width: 1px;
-
-    .inner-address {
+    .inner-input-privacy {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

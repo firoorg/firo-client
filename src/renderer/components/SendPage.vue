@@ -3,6 +3,13 @@
         <div class="send-primary">
             <SearchInput v-model="filter" placeholder="Search by label or address" />
 
+            <div class="select-option" style="margin-top:12px">
+                <select class="selector" v-model="selectOption">
+                    <option value="Spark">Spark</option>
+                    <option value="Transparent">Transparent</option>
+                </select>
+            </div>
+
             <AnimatedTable
                 ref="animatedTable"
                 :fields="tableFields"
@@ -52,6 +59,21 @@
                             :disabled="formDisabled"
                         />
                     </InputFrame>
+
+                    <div v-if="!isPrivate" class="warning-text">
+                        <div class="warning-item">
+                            <FiroWarning class="warning-icon" />
+                            <label>
+                                You are using a transparent transaction, please go private.
+                            </label>
+                        </div>
+                        <div class="warning-item warning-item-text">
+                            <FiroWarning class="warning-icon" />
+                            <label>
+                                If this is a masternode transaction, you do not have to go private
+                            </label>
+                        </div>
+                    </div>   
 
                     <div class="checkbox-field add-to-address-book" :class="{disabled: !showAddToAddressBook}">
                         <PlusButton :disabled="!showAddToAddressBook" />
@@ -158,6 +180,9 @@
                         :computed-tx-fee="transactionFee"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
+                        :isSparkAllowed="isSparkAllowed"
+                        :isSparkAddr="isSparkAddr"
+                        :isTransparentAddress="() => isTransparentAddress()"
                         @success="() => cleanupForm()"
                         @reset="() => cleanupForm()"
                     />
@@ -192,6 +217,8 @@ import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
 import FiroSymbol from "renderer/assets/CoinIcons/FIRO.svg.data";
+import AddressBookItemAddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
+import FiroWarning from 'renderer/assets/FiroWarning';
 
 export default {
     name: 'SendPage',
@@ -209,7 +236,8 @@ export default {
         Popup,
         InputFrame,
         SearchInput,
-        TransactionInfo
+        TransactionInfo,
+        FiroWarning
     },
 
     data () {
@@ -227,13 +255,16 @@ export default {
             tableFields: [
                 {name: markRaw(CurrentAddressIndicator)},
                 {name: markRaw(AddressBookItemLabel)},
-                {name: markRaw(AddressBookItemAddress)}
+                {name: markRaw(AddressBookItemAddress)},
+                {name: markRaw(AddressBookItemAddressType)}
             ],
             // This is the search term to filter addresses by.
             filter: '',
             selectedAsset: 'FIRO',
             showConnectionTransaction: false,
-            connectionTransaction: null
+            connectionTransaction: null,
+            selectOption: 'Spark',
+            isSparkAddr: null
         }
     },
 
@@ -242,6 +273,7 @@ export default {
             enableElysium: 'App/enableElysium',
             network: 'ApiStatus/network',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             availablePrivate: 'Balance/availablePrivate',
             availablePublic: 'Balance/availablePublic',
@@ -326,7 +358,7 @@ export default {
             return (value) => {
                 if (!value) return '';
 
-                if (isValidAddress(value, this.network) || isValidPaymentCode(value, this.network))
+                if (isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress())
                     return true;
 
                 return 'The Firo address you entered is invalid';
@@ -372,7 +404,7 @@ export default {
 
         transactionFee() {
             if (this.selectedAsset != 'FIRO' || !this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
-            return this.calculateTransactionFee(this.isPrivate, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
+            return this.calculateTransactionFee(this.isPrivate, this.isSparkAllowed, isValidAddress(this.address, this.network), this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
         },
 
         formDisabled() {
@@ -390,12 +422,12 @@ export default {
         filteredSendAddresses () {
             this.$nextTick(() => this.$refs.animatedTable && this.$refs.animatedTable.reload());
             return this.sendAddresses
-                .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
-                .map(address => ({isSelected: address.address === this.address, ...address}));
+                .filter(address => (address.label.includes(this.filter) || address.address.includes(this.filter)) && address.addressType === this.selectOption)
+                .map(address => ({ isSelected: address.address === this.address, ...address }));
         },
 
         showAddToAddressBook () {
-            return !this.formDisabled && isValidAddress(this.address, this.network) && !this.addressBook[this.address];
+            return !this.formDisabled && (isValidAddress(this.address, this.network) || this.isSparkAddr) && !this.addressBook[this.address];
         },
 
         coinControl () {
@@ -480,6 +512,7 @@ export default {
         },
 
         address() {
+            this.validateSparkAddress();
             const a = this.addressBook[this.address];
             if (a && a.purpose === 'send' && a.label !== this.label) {
                 this.addToAddressBook();
@@ -508,21 +541,34 @@ export default {
         },
 
         async addToAddressBook() {
-            if (!isValidAddress(this.address, this.network) || !this.label) return;
+            this.validateSparkAddress();
+            if ((!isValidAddress(this.address, this.network) && !this.isSparkAddr) || !this.label) return;
 
             if (this.addressBook[this.address]) {
-                const item = this.addressBook[this.address]
+                const item = this.addressBook[this.address];
                 await $daemon.updateAddressBookItem(item, this.label);
                 $store.commit('AddressBook/updateAddress', {...item, label: this.label});
                 this.$refs.animatedTable.reload();
             } else {
-                const item = {
+                if(isValidAddress(this.address, this.network)){
+                    const item = {
+                    addressType: "Transparent",
                     address: this.address,
                     label: this.label,
                     purpose: 'send'
-                };
-                $store.commit('AddressBook/updateAddress', {...item, createdAt: Date.now()});
-                await $daemon.addAddressBookItem(item);
+                    };
+                    $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
+                    await $daemon.addAddressBookItem(item);
+                } else {
+                    const item = {
+                    addressType: "Spark",
+                    address: this.address,
+                    label: this.label,
+                    purpose: 'send'
+                    };
+                    $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
+                    await $daemon.addAddressBookItem(item);
+                }
             }
         },
 
@@ -539,7 +585,17 @@ export default {
             this.label = '';
             this.amount = '';
             this.address = '';
-        }
+        },
+
+        isTransparentAddress() {
+            return isValidAddress(this.address, this.network);
+        },
+
+        async validateSparkAddress() {
+            let res = await $daemon.validateSparkAddress(this.address);
+            this.isSparkAddr = res.valid;
+            return this.isSparkAddr;
+        },
     }
 }
 </script>
@@ -649,6 +705,27 @@ export default {
                     .total-field {
                         display: flex;
                         justify-content: space-between;
+                    }
+                }
+
+                .warning-text {
+                    margin-bottom: 6px;
+                    color: #FFA800;
+                    font-size: 10px;
+
+                    .warning-item {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .warning-icon {
+                        height: 12px;
+                        width: 12px;
+                        margin-right: 5px;
+                    }
+
+                    .warning-item-text {
+                        margin-top: 8px;
                     }
                 }
             }

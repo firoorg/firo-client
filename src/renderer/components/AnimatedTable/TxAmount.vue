@@ -1,6 +1,9 @@
 <template>
     <th v-if="isHeader">Amount</th>
-    <td v-else class="amount">
+    <td v-else-if="!rowData.isLocked" class="amount">
+        {{ bigintToString(rowData.amount) }} 
+    </td>
+    <td v-else class="disable-txt">
         {{ bigintToString(rowData.amount) }}
     </td>
 </template>
@@ -10,7 +13,7 @@ import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.
 import {bigintToString} from "lib/convert";
 
 export default {
-    name: 'TxAmount',
+    name: 'Amount',
 
     mixins: [
         VuetableFieldMixin
@@ -24,4 +27,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.disable-txt {
+    color: rgba(0,0,0,0.3);
+}
 </style>

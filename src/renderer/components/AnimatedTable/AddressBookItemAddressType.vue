@@ -1,11 +1,11 @@
 <template>
-    <th v-if="isHeader" class="address">
-        Address
+    <th v-if="isHeader">
+        Type
     </th>
-
-    <td v-else class="address">
-        <div class="inner-address">
-            {{ rowData.address }}
+    
+    <td v-else class="address-type">
+        <div class="inner-address-type">
+            {{ rowData.addressType.toLowerCase() }}
         </div>
     </td>
 </template>
@@ -14,7 +14,7 @@
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
 
 export default {
-    name: "PaymentRequestAddress",
+    name: "AddressBookItemAddressType",
 
     mixins: [
         VuetableFieldMixin
@@ -23,12 +23,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+td.address-type {
+    width: 180px;
+    max-width: 180px;
 
-td.address {
-    width: available;
-    max-width: 1px;
-
-    .inner-address {
+    .inner-address-type {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

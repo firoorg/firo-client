@@ -1,7 +1,8 @@
 <template>
     <th v-if="isHeader"></th>
     <td v-else>
-        <input :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" type="checkbox" v-model="checkbox" />
+        <input v-if="!rowData.isLocked" :id="`utxo-selector-${this.txidIndex}`" class="utxo-selector" type="checkbox" v-model="vuetable.globalData[this.txidIndex]"/>
+        <input v-else :disabled="true" :id="`utxo-selector-${this.txidIndex}`" class="disable-checkbox" type="checkbox" v-model="vuetable.globalData[this.txidIndex]" :checked='false'/>
     </td>
 </template>
 
@@ -15,25 +16,9 @@ export default {
         VuetableFieldMixin
     ],
 
-    data() {
-        return {
-            checkbox: false
-        }
-    },
-
     computed: {
         txidIndex() {
             return `${this.rowData.txid}-${this.rowData.index}`;
-        }
-    },
-
-    watch: {
-        rowData() {
-            this.checkbox = !!this.vuetable.globalData[this.txidIndex];
-        },
-
-        checkbox() {
-            this.vuetable.globalData[this.txidIndex] = this.checkbox;
         }
     }
 }
@@ -43,5 +28,10 @@ export default {
 <style scoped lang="scss">
 td {
     padding-right: var(--padding-base);
+}
+input[type=checkbox].disable-checkbox {
+    padding-right: var(--padding-base);
+    background-color: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
 }
 </style>

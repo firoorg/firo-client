@@ -4,6 +4,19 @@
             <div class="top-section">
                 <SearchInput v-model="filter" placeholder="Filter by label or address" />
 
+                <div class="select-option" style="margin-top:12px;margin-bottom:12px">
+                    <select class="selector" v-model="selectOption">
+                        <option value="all">All</option>
+                        <option value="sparkmint">SparkMint</option>
+                        <option value="sparkspend">SparkSpend</option>
+                        <option value="public">Public</option>
+                        <option value="mined">Mined</option>
+                        <option value="zerocoin">Zerocoin</option>
+                        <option value="sigma">Sigma</option>
+                        <option value="lelantus">Lelantus</option>
+                    </select>
+                </div>
+
                 <div v-if="showUnsyncedWarning" class="show-unsynced-warning">
                     The blockchain is not yet synced. Payment information may be incomplete or inaccurate.
                 </div>
@@ -45,11 +58,13 @@ import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
 import Popup from "renderer/components/shared/Popup";
 import { bigintToString } from "lib/convert";
 import SearchInput from "renderer/components/shared/SearchInput";
+import InputPrivacy from "renderer/components/AnimatedTable/AnimatedTableInputPrivacy";
 
 const tableFields = [
     {name: markRaw(RelativeDate), width: '160pt'},
     {name: markRaw(Label)},
-    {name: markRaw(Amount), width: '160pt'}
+    {name: markRaw(InputPrivacy)},
+    {name: markRaw(Amount), width: '160pt'},
 ];
 
 export default {
@@ -69,7 +84,8 @@ export default {
             tableData: [],
             newTableData: [],
             currentPage: 1,
-            selectedTx: null
+            selectedTx: null,
+            selectOption: 'all'
         }
     },
 
@@ -108,8 +124,8 @@ export default {
 
         latestTableData () {
             const tableData = [];
-
-            for (const txo of this.userVisibleTransactions) {
+            let txos = this.userVisibleTransactions.filter(a => this.selectOption === 'all' ? true : a.inputPrivacy === this.selectOption);
+            for (const txo of txos) {
                 tableData.push({
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
                     label: (this.addressBook[txo.destination] || {}).label || txo.destination,

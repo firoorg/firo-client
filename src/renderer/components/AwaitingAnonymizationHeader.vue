@@ -1,7 +1,11 @@
 <template>
     <div>
         <div class="warning-header">
-            <div>
+            <div v-if="isSparkAllowed && availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod">
+                Firo is migrating to Spark. Redemption of coins in Lelantus will be disabled at block {{ lelantusGracefulPeriod }}. Current block is {{ currentBlockHeight }}.
+                <a id="anonymize-firo-link" @click="showLelantusToSparkDialog = true">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
+            </div>
+            <div v-else>
                 <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
                     {{ bigintToString(availablePublic) }} FIRO and {{ nTokensNeedingAnonymization }} Elysium tokens
                     awaiting anonymization.
@@ -23,7 +27,14 @@
             </div>
         </div>
 
-        <Popup v-if="showAnonymizeDialog">
+        <Popup v-if="showLelantusToSparkDialog" >
+             <LelantusToSparkDialog
+                @migrate="showLelantusToSparkDialog = false"
+                @ignore="showLelantusToSparkDialog = false"
+            />
+        </Popup>
+
+        <Popup v-if="showAnonymizeDialog" >
             <AnonymizeDialog
                 @cancel="showAnonymizeDialog = false"
                 @complete="showAnonymizeDialog = false"
@@ -37,18 +48,30 @@ import {mapGetters} from "vuex";
 import {bigintToString} from "lib/convert";
 import Popup from "renderer/components/shared/Popup";
 import AnonymizeDialog from "renderer/components/AnonymizeDialog";
+import LelantusToSparkDialog from "renderer/components/LelantusToSparkDialog";
+import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
+import WaitOverlay from "renderer/components/shared/WaitOverlay";
 
 export default {
     name: "AwaitingAnonymizationHeader",
 
     components: {
         Popup,
-        AnonymizeDialog
+        AnonymizeDialog,
+        LelantusToSparkDialog,
+        PassphraseInput,
+        WaitOverlay
     },
 
     data() {
         return {
-            showAnonymizeDialog: false
+            showAnonymizeDialog: false,
+            showLelantusToSparkDialog: false,
+            passphrase: '',
+            show: 'button',
+            waiting: false,
+            error: null,
         };
     },
 
@@ -56,7 +79,11 @@ export default {
         ...mapGetters({
             availablePublic: 'Balance/availablePublic',
             enableElysium: 'App/enableElysium',
-            tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization'
+            tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed',
+            availableLelantus: 'Balance/availableLelantus',
+            currentBlockHeight: 'ApiStatus/currentBlockHeight',
+            lelantusGracefulPeriod: 'ApiStatus/lelantusGracefulPeriod',
         }),
 
         nTokensNeedingAnonymization() {

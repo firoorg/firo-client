@@ -36,6 +36,12 @@ export default {
 
     props: ['asset', 'modelValue', 'disabled'],
 
+    data() {
+        return {
+            isPrivate: true
+        };
+    },
+
     computed: {
         ...mapGetters({
             availablePrivateFiro: "Balance/availablePrivate",
