@@ -43,12 +43,6 @@ export default {
         Amount
     },
 
-    data () {
-        return {
-            availableSparkFiro: 0
-        }
-    },
-
     computed: {
         ...mapGetters({
             availablePrivate: 'Balance/availablePrivate',

@@ -4,7 +4,9 @@
     </th>
 
     <td v-else class="address">
-        {{ rowData.address }}
+        <div class="inner-address">
+            {{ rowData.address }}
+        </div>
     </td>
 </template>
 
@@ -21,4 +23,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+td.address {
+    width: available;
+    max-width: 1px;
+
+    .inner-address {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 5px;
+    }
+}
 </style>

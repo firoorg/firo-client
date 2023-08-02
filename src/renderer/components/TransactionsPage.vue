@@ -6,6 +6,7 @@
 
                 <div class="select-option" style="margin-top:12px;margin-bottom:12px">
                     <select class="selector" v-model="selectOption">
+                        <option value="all">All</option>
                         <option value="sparkmint">SparkMint</option>
                         <option value="sparkspend">SparkSpend</option>
                         <option value="public">Public</option>
@@ -57,12 +58,12 @@ import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
 import Popup from "renderer/components/shared/Popup";
 import { bigintToString } from "lib/convert";
 import SearchInput from "renderer/components/shared/SearchInput";
-import AddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
+import InputPrivacy from "renderer/components/AnimatedTable/AnimatedTableInputPrivacy";
 
 const tableFields = [
     {name: markRaw(RelativeDate), width: '160pt'},
     {name: markRaw(Label)},
-    {name: markRaw(AddressType)},
+    {name: markRaw(InputPrivacy)},
     {name: markRaw(Amount), width: '160pt'},
 ];
 
@@ -84,7 +85,7 @@ export default {
             newTableData: [],
             currentPage: 1,
             selectedTx: null,
-            selectOption: 'sparkmint'
+            selectOption: 'all'
         }
     },
 
@@ -123,7 +124,7 @@ export default {
 
         latestTableData () {
             const tableData = [];
-            let txos = this.userVisibleTransactions.filter(a => a.inputPrivacy === this.selectOption);
+            let txos = this.userVisibleTransactions.filter(a => this.selectOption === 'all' ? true : a.inputPrivacy === this.selectOption);
             for (const txo of txos) {
                 tableData.push({
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,

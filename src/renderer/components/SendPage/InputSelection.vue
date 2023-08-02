@@ -80,8 +80,7 @@ export default {
         ourUnspentUTXOs() {
             return this.availableUTXOsWithLock
                 .filter(tx => tx.isPrivate === this.isPrivate)
-                .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index)
-                .map(tx => ({...tx, uniqId: `${tx.txid}-${tx.index}`}));
+                .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index);
         }
     },
 

@@ -6,7 +6,6 @@ const getters = {
             unconfirmedPublicChange, locked, immature, availableLelantus, unconfirmedLelantus, unconfirmedLelantusChange, 
             availableSpark, unconfirmedSpark, unconfirmedSparkChange] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
-        let isSparkAllowed: boolean = rootGetters['ApiStatus/isSparkAllowed'];
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
             if (!txo.isToMe || txo.isSpent) continue;
@@ -24,9 +23,9 @@ const getters = {
             else unconfirmedPublic += txo.amount;
         }
 
-        availablePrivate = isSparkAllowed ? availableSpark : availableLelantus;
-        unconfirmedPrivate = isSparkAllowed ? unconfirmedSpark : unconfirmedLelantus;
-        unconfirmedPrivateChange = isSparkAllowed ? unconfirmedSparkChange : unconfirmedLelantusChange;
+        availablePrivate = availableSpark + availableLelantus;
+        unconfirmedPrivate = unconfirmedSpark + unconfirmedLelantus;
+        unconfirmedPrivateChange = unconfirmedSparkChange + unconfirmedLelantusChange;
 
         return {
             availablePrivate,
@@ -50,7 +49,7 @@ const getters = {
     locked: (state, getters) => getters.balances.locked,
     immature: (state, getters) => getters.balances.immature,
     pendingChange: (state, getters) => getters.balances.unconfirmedPrivateChange + getters.balances.unconfirmedPrivate + getters.balances.unconfirmedPublicChange,
-    incoming: (dtate, getters) =>  getters.balances.unconfirmedPublic,
+    incoming: (state, getters) =>  getters.balances.unconfirmedPublic,
 }
 
 export default {

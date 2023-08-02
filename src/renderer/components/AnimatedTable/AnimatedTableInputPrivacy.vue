@@ -3,9 +3,9 @@
         Type
     </th>
     
-    <td v-else class="address-type">
-        <div class="inner-address-type">
-            {{ rowData.addressType.toLowerCase() }}
+    <td v-else class="input-privacy">
+        <div class="inner-input-privacy">
+            {{ rowData.inputPrivacy }}
         </div>
     </td>
 </template>
@@ -14,7 +14,7 @@
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
 
 export default {
-    name: "AddressBookItemAddressType",
+    name: "AnimatedTableInputPrivacy",
 
     mixins: [
         VuetableFieldMixin
@@ -23,11 +23,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
-td.address-type {
+td.input-privacy {
     width: 180px;
     max-width: 180px;
 
-    .inner-address-type {
+    .inner-input-privacy {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

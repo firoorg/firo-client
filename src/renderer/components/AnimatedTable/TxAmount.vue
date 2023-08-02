@@ -13,7 +13,7 @@ import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.
 import {bigintToString} from "lib/convert";
 
 export default {
-    name: 'TxAmount',
+    name: 'Amount',
 
     mixins: [
         VuetableFieldMixin

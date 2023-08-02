@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="warning-header">
-            <div v-if="this.isSparkAllowed && availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod">
+            <div v-if="isSparkAllowed && availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod">
                 Firo is migrating to Spark. Redemption of coins in Lelantus will be disabled at block {{ lelantusGracefulPeriod }}. Current block is {{ currentBlockHeight }}.
-                <a id="anonymize-firo-link" href="#" @click="show = 'lelantustospark'">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
+                <a id="anonymize-firo-link" @click="showLelantusToSparkDialog = true">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
             </div>
             <div v-else>
                 <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
@@ -27,16 +27,11 @@
             </div>
         </div>
 
-        <Popup v-if="show === 'lelantustospark'" >
-             <LelantusToSpark
-                @migrate="goToPassphraseStep()"
-                @ignore="cancel()"
+        <Popup v-if="showLelantusToSparkDialog" >
+             <LelantusToSparkDialog
+                @migrate="showLelantusToSparkDialog = false"
+                @ignore="showLelantusToSparkDialog = false"
             />
-        </Popup>
-
-        <Popup v-if="show === 'passphrase'" >
-            <WaitOverlay v-if="waiting" />
-            <PassphraseInput v-else-if = "!waiting" v-model="passphrase" :error="error" @cancel="cancel()" @confirm="attemptSend" />
         </Popup>
 
         <Popup v-if="showAnonymizeDialog" >
@@ -53,7 +48,7 @@ import {mapGetters} from "vuex";
 import {bigintToString} from "lib/convert";
 import Popup from "renderer/components/shared/Popup";
 import AnonymizeDialog from "renderer/components/AnonymizeDialog";
-import LelantusToSpark from "renderer/components/SendPage/LelantusToSpark";
+import LelantusToSparkDialog from "renderer/components/LelantusToSparkDialog";
 import PassphraseInput from "renderer/components/shared/PassphraseInput";
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import WaitOverlay from "renderer/components/shared/WaitOverlay";
@@ -64,7 +59,7 @@ export default {
     components: {
         Popup,
         AnonymizeDialog,
-        LelantusToSpark,
+        LelantusToSparkDialog,
         PassphraseInput,
         WaitOverlay
     },
@@ -72,6 +67,7 @@ export default {
     data() {
         return {
             showAnonymizeDialog: false,
+            showLelantusToSparkDialog: false,
             passphrase: '',
             show: 'button',
             waiting: false,
@@ -101,43 +97,6 @@ export default {
 
         closeDialog() {
             this.showAnonymizeDialog = false;
-        },
-
-        cancel() {
-            this.passphrase = '';
-            this.error = null;
-            this.lelantustospark = false;
-            this.show = 'button';
-            this.$emit('cancel')
-        },
-
-        goToPassphraseStep() {
-            this.show = 'passphrase';
-        },
-
-        async attemptSend () {
-            const passphrase = this.passphrase;
-            this.passphrase = '';
-            this.waiting = true;
-            try {
-                await $daemon.lelantusToSpark(passphrase);
-            } catch (e) {
-                if (e instanceof IncorrectPassphrase) {
-                    this.error = 'Incorrect Passphrase';
-                } else if (e instanceof FirodErrorResponse) {
-                    this.error = e.errorMessage;
-                } else {
-                    this.error = `${e}`;
-                }
-                this.waiting = false;
-                this.show = 'passphrase';
-                return;
-            }
-
-            this.error = null;
-            this.waiting = false;
-            this.show = 'button';
-            this.$emit('success');
         }
     }
 }

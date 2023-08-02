@@ -1,6 +1,6 @@
 <template>
-    <div class="info-popup confirm-step" style="width: 500px; height: 250px;">
-        <div class="title" style="margin-bottom:30px">
+    <div class="info-popup confirm-step lelantustospark-popup">
+        <div class="title lelantustospark-title">
             Migrate funds from Lelantus to Spark
         </div>
         <div class="info">
@@ -9,8 +9,7 @@
                 Firo is migrating to Spark. Please migrate your funds.
             </label>
         </div>
-
-        <div class="buttons"  style="width: 500px; height: 60px;margin-top: 35px;margin-left: -15px">
+        <div class="lelantustospark-buttons">
             <button class="solid-button unrecommended" @click="$emit('ignore')">Ignore</button>
             <button class="solid-button recommended" @click="$emit('migrate')">Migrate</button>
         </div>
@@ -35,6 +34,16 @@ export default {
 
 <style scoped lang="scss">
 @import "src/renderer/styles/info-popup";
+
+.lelantustospark-popup {
+    width: 500px;
+    height: 250px;
+}
+
+.lelantustospark-title {
+    margin-bottom: 30px;
+}
+
 .info {
     word-wrap: break-word;
     background-color: #FEF3C7;
@@ -47,15 +56,25 @@ export default {
     display: flex;
     align-items: center;
 }
-    .info-item {
-        margin-right: 45px;
-    }
 
-    .info-icon {
-        height: 18px;
-        width: 18px;
-        margin-left: 40px;
-        margin-right: 5px;
-        margin-top: -4px;
-    }
+.info-item {
+    margin-right: 45px;
+}
+
+.info-icon {
+    height: 18px;
+    width: 18px;
+    margin-left: 40px;
+    margin-right: 5px;
+    margin-top: -4px;
+}
+
+.lelantustospark-buttons {
+    width: 500px !important;
+    height: 60px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 35px;
+    margin-left: -15px;
+}
 </style>

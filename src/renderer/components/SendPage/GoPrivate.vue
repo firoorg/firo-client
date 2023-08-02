@@ -1,6 +1,6 @@
 <template>
-    <div class="info-popup confirm-step" style="width: 500px; height: 250px;">
-        <div class="title" style="margin-bottom:30px">
+    <div class="info-popup confirm-step goprivate-popup">
+        <div class="title goprivate-title">
             Make this a private transaction
         </div>
         <div class="info-item">
@@ -9,8 +9,7 @@
                 You are using a transparent transaction, please go private. If this is a masternode transaction, you do not have to go private
             </label>
         </div>
-
-        <div class="buttons"  style="width: 500px; height: 60px;margin-top: 35px;margin-left: -15px">
+        <div class="goprivate-buttons">
             <button class="solid-button unrecommended" @click="$emit('ignore')">Ignore</button>
             <button class="solid-button recommended" @click="$emit('go_private')">Go Private</button>
         </div>
@@ -35,6 +34,16 @@ export default {
 
 <style scoped lang="scss">
 @import "src/renderer/styles/info-popup";
+
+.goprivate-popup {
+    width: 500px;
+    height: 250px;
+}
+
+.goprivate-title{
+    margin-bottom:30px;
+}
+
 .info-item {
     word-wrap: break-word;
     background-color: #FEF3C7;
@@ -53,5 +62,14 @@ export default {
         margin-top: -8px;
     }
 
+}
+
+.goprivate-buttons{
+    width: 500px !important;
+    height: 60px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 35px;
+    margin-left: -15px;
 }
 </style>

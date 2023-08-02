@@ -38,8 +38,7 @@ export default {
 
     data() {
         return {
-            isPrivate: true,
-            availableSparkFiro: 0
+            isPrivate: true
         };
     },
 

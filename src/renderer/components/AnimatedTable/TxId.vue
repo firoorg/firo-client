@@ -13,7 +13,7 @@
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 
 export default {
-    name: 'UTXOSelector',
+    name: 'TxId',
 
     mixins: [
         VuetableFieldMixin

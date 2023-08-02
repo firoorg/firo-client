@@ -141,7 +141,7 @@ const mutations = {
 };
 
 function selectUTXOs(isPrivate: boolean, isSpark: boolean, istransparentaddress: boolean, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, availableUTXOs: TXO[], coinControl: boolean): [bigint, TXO[]] {
-    let constantSize;
+    let constantSize = 0n;
     if(!isPrivate && istransparentaddress) {
         constantSize = 78n;
     } else if (isPrivate && !isSpark) {
@@ -195,7 +195,6 @@ function selectUTXOs(isPrivate: boolean, isSpark: boolean, istransparentaddress:
         .sort((a, b) => Number(b.amount - a.amount));
 
     let gathered = 0n;
-
     const selectedUTXOs = [];
     if (!isPrivate && isSpark && !istransparentaddress) {
         let destinations = [];
@@ -278,7 +277,6 @@ const getters = {
         )
     },
     lockedUTXOs: (state, getters) => getters.UTXOs.filter((txo: TXO) => txo.isLocked),
-
     availableUTXOsWithLock: (state, getters, rootState, rootGetters): TXO[] => {
         let isSparkAllowed: boolean = rootGetters['ApiStatus/isSparkAllowed'];
         return getters.UTXOs.filter((txo: TXO) =>

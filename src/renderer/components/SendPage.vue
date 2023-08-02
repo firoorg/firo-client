@@ -180,6 +180,9 @@
                         :computed-tx-fee="transactionFee"
                         :subtract-fee-from-amount="subtractFeeFromAmount"
                         :coin-control="coinControl"
+                        :isSparkAllowed="isSparkAllowed"
+                        :isSparkAddr="isSparkAddr"
+                        :isTransparentAddress="() => isTransparentAddress()"
                         @success="() => cleanupForm()"
                         @reset="() => cleanupForm()"
                     />
@@ -261,7 +264,6 @@ export default {
             showConnectionTransaction: false,
             connectionTransaction: null,
             selectOption: 'Spark',
-            availableSparkFiro: 0,
             isSparkAddr: null
         }
     },
@@ -274,7 +276,6 @@ export default {
             isSparkAllowed: 'ApiStatus/isSparkAllowed',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             availablePrivate: 'Balance/availablePrivate',
-            availableLelantus: 'Balance/availableLelantus',
             availablePublic: 'Balance/availablePublic',
             sendAddresses: 'AddressBook/sendAddresses',
             addressBook: 'AddressBook/addressBook',
@@ -357,7 +358,7 @@ export default {
             return (value) => {
                 if (!value) return '';
 
-                if (isValidAddress(value, this.network) || isValidPaymentCode(value, this.network))
+                if (isValidAddress(value, this.network) || isValidPaymentCode(value, this.network) || this.validateSparkAddress())
                     return true;
 
                 return 'The Firo address you entered is invalid';
@@ -421,8 +422,8 @@ export default {
         filteredSendAddresses () {
             this.$nextTick(() => this.$refs.animatedTable && this.$refs.animatedTable.reload());
             return this.sendAddresses
-                .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
-                .map(address => ({ isSelected: address.address === this.address, ...address })).filter(address => address.addressType === this.selectOption);
+                .filter(address => (address.label.includes(this.filter) || address.address.includes(this.filter)) && address.addressType === this.selectOption)
+                .map(address => ({ isSelected: address.address === this.address, ...address }));
         },
 
         showAddToAddressBook () {
