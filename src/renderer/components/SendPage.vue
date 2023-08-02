@@ -512,11 +512,11 @@ export default {
         },
 
         address() {
+            this.validateSparkAddress();
             const a = this.addressBook[this.address];
             if (a && a.purpose === 'send' && a.label !== this.label) {
                 this.addToAddressBook();
             }
-            this.validateSparkAddress();
         },
 
         selectedAsset() {
