@@ -4,6 +4,12 @@
     "target": "es2022",
     "module": "commonjs",
     "sourceMap": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "paths": {
+      "@components/*": ["src/renderer/components/*"]
+    },
+    "isolatedModules": true,
+    "moduleResolution": "Node"
+  },
+  "include": ["src/vue-shim.d.ts"]
 }

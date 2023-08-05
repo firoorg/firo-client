@@ -3,6 +3,7 @@ const { dependencies } = require('../package.json')
 
 const {VueLoaderPlugin} = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 let rendererConfig = {
     mode: 'development',
@@ -87,7 +88,10 @@ let rendererConfig = {
             'fonts': path.resolve(__dirname, '..', 'assets', 'fonts')
         },
         modules: ['src', 'node_modules'].map(x => path.join(__dirname, '..', x)),
-        extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts']
+        extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts'],
+        plugins: [
+            new TsconfigPathsPlugin()
+        ]
     },
     target: 'electron-renderer'
 }
