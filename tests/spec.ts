@@ -9,13 +9,7 @@ import fs from 'fs';
 import {assert} from 'chai';
 import {bigintToString, stringToBigint} from "../src/lib/convert";
 import {TXO} from "../src/store/modules/Transactions";
-
-// References to $daemon and $store are evaluated in the context of the renderer process; $daemon is not a valid
-// reference in the context of the test process.
-import type {Firod} from "../src/daemon/firod";
-import type {Store} from "vuex";
-declare const $daemon: Firod;
-declare const $store: Store<any>;
+import "../src/globals";
 
 interface This extends Mocha.Context {
     app: ElectronApplication;

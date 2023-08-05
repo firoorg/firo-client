@@ -4,9 +4,6 @@ import Focus from '../renderer/directives/focus';
 
 import {isEqual} from 'lodash';
 import {existsSync} from 'fs';
-
-import {ExtendedWindow} from "./types/extended-window";
-
 const App = require('./App').default;
 import router from './router'
 import store from '../store/renderer'
@@ -17,20 +14,24 @@ import {bigintToString, stringToBigint} from "../lib/convert";
 
 import process from "process";
 import {ipcRenderer} from "electron";
-import type {Firod} from "../daemon/firod";
 
-declare let window: ExtendedWindow;
-declare let $daemon: Firod;
+
+window['$daemon'] = undefined;
+window['$store'] = undefined;
+window['$router'] = undefined;
+window['$setWaitingReason'] = undefined;
+window['$quitApp'] = undefined;
+window['$startDaemon'] = undefined;
 
 // On exit, close firod sockets.
-window.addEventListener('beforeunload', async () => await window.$daemon?.closeSockets());
+window.addEventListener('beforeunload', async () => await $daemon?.closeSockets());
 
 (async () => {
     console.debug("Beginning render...");
 
     // Allow global access to the store and router.
-    window.$store = store;
-    window.$router = router;
+    window['$store'] = store;
+    window['$router'] = router;
 
     const appSettings = getAppSettings();
     const settings = await appSettings.getAll();
@@ -102,7 +103,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
 
     store.watch(() => store.getters['Elysium/selectedAndOwnedTokens'], async (selectedAndOwnedTokens, oldValue) => {
         if (isEqual(selectedAndOwnedTokens, oldValue)) return;
-        while (!window.$daemon || !store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
+        while (!$daemon || !store.getters['ApiStatus/block1']) await new Promise(r => setTimeout(r, 1e3));
         await addElysiumTokenData();
     });
 
@@ -124,7 +125,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
     //
     // If final is true, subsequent messages not marked with final will not be displayed.
     let preventNonFinalMessages = false;
-    window.$setWaitingReason = (reason, final=false) => {
+    window['$setWaitingReason'] = (reason, final=false) => {
         if (reason) {
             console.info("Waiting: " + reason);
         }
@@ -137,7 +138,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
 
     // Quit the application, shutting down $daemon if it exists. If message is set, log it and show it to the user before
     // continuing. We never resolve.
-    window.$quitApp = async (message=undefined) => {
+    window['$quitApp'] = async (message=undefined) => {
         if (message) {
             console.error(message);
             if (!process.env.FIRO_CLIENT_TEST) {
@@ -146,8 +147,8 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
         }
 
         // $daemon will not be set if we are setting up.
-        if (window.$daemon) {
-            window.$setWaitingReason("Shutting down firod...", true);
+        if ($daemon) {
+            $setWaitingReason("Shutting down firod...", true);
 
             const shutDownSuccessful = !!await Promise.any([
                 (async () => {
@@ -163,7 +164,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
             ]);
 
             if (!shutDownSuccessful) {
-                window.$setWaitingReason("Forcibly killing firod...", true);
+                $setWaitingReason("Forcibly killing firod...", true);
 
                 // Windows doesn't support signals, so this is equivalent to SIGKILL there.
                 console.info(`Killing firod (pid ${$daemon.pid}) with SIGTERM...`);
@@ -188,7 +189,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
     }
 
     ipcRenderer.on('shutdown-requested', async () => {
-        await window.$quitApp();
+        await $quitApp();
     });
 
     // Actually handle deeplinks. open-url is emitted by our own code on Windows.
@@ -203,7 +204,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
         const m = (pattern) => (url.match(pattern) || [])[1];
 
         const address = m(/^firo:\/\/(\w+)/);
-        const amount = m(/[?&]amount=([0-9\.]+)/);
+        const amount = m(/[?&]amount=([0-9.]+)/);
         const label = m(/[?&]message=([^&]+)/);
 
         router.push({
@@ -229,11 +230,11 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
 
     // Start the daemon, showing progress to the user and resolving when the daemon is fully started. App/isInitialized is
     // set to true if the daemon is started successfully and the wallet is locked.
-    window.$startDaemon = () => new Promise(async resolve => {
+    window['$startDaemon'] = () => new Promise<void>(async resolve => {
         // Don't restart firod when we refresh the page.
         const isFirstStartup = (await ipcRenderer.invoke('count')) == 0;
 
-        window.$setWaitingReason("Starting up firod...");
+        $setWaitingReason("Starting up firod...");
         const args = [...store.getters['App/temporaryFirodArguments']];
         if (store.getters['App/enableElysium']) args.push('-elysium');
         console.info(`Starting ${store.getters['App/firodLocation']} with wallet ${store.getters['App/walletLocation']}...`);
@@ -245,13 +246,13 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
             .then(async z => {
 
                 // Make $daemon globally accessible.
-                window.$daemon = z;
+                window['$daemon'] = z;
 
                 $daemon.awaitShutdown().catch(() => {
-                    window.$quitApp("firod has shutdown unexpectedly. See firod's debug.log for details.");
+                    $quitApp("firod has shutdown unexpectedly. See firod's debug.log for details.");
                 });
 
-                window.$setWaitingReason("Waiting for firod to start the API...");
+                $setWaitingReason("Waiting for firod to start the API...");
                 await $daemon.awaitApiResponse();
 
                 if (await $daemon.isReindexing() || await $daemon.isRescanning()) {
@@ -259,34 +260,34 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
 
                     let interval = setInterval(async () => {
                         const progress = (((await $daemon.apiStatus()).data.reindexingProgress || 0) * 100).toPrecision(3);
-                        window.$setWaitingReason(`(${progress}%) Waiting for firod to ${action}. This may take an extremely long time...`);
+                        $setWaitingReason(`(${progress}%) Waiting for firod to ${action}. This may take an extremely long time...`);
                     }, 500);
 
                     await $daemon.awaitBlockchainLoaded();
                     clearInterval(interval);
                 }
 
-                window.$setWaitingReason("Waiting for the API to indicate it's ready to receive commands...");
+                $setWaitingReason("Waiting for the API to indicate it's ready to receive commands...");
                 await $daemon.awaitApiIsReady();
 
-                window.$setWaitingReason("Connecting to firod...")
+                $setWaitingReason("Connecting to firod...")
                 await $daemon.awaitHasConnected();
 
                 if (await $daemon.isWalletLocked()) {
                     // Start up the daemon.
 
-                    window.$setWaitingReason("Loading our state from firod...");
+                    $setWaitingReason("Loading our state from firod...");
                     try {
                         // Make sure our state is updated before proceeding.
                         await $daemon.awaitInitializersCompleted();
                     } catch (e) {
-                        await window.$quitApp(`An error occurred in our initializers: ${e}`);
+                        await $quitApp(`An error occurred in our initializers: ${e}`);
                     }
 
                     await addElysiumTokenData();
 
                     console.info("firod has started.");
-                    window.$setWaitingReason(undefined);
+                    $setWaitingReason(undefined);
 
                     if (!store.getters['App/isInitialized'])
                         await store.dispatch('App/setIsInitialized', true);
@@ -301,24 +302,24 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
                             isExistingWallet: true
                         }
                     }).then(() => {
-                        window.$setWaitingReason(undefined);
+                        $setWaitingReason(undefined);
                     });
                 }
             })
             .catch(async e => {
-                await window.$quitApp(`An error occured starting firod: ${e}`);
+                await $quitApp(`An error occured starting firod: ${e}`);
             });
     });
 
     if (process.env.FIRO_CLIENT_REPL === 'true') {
         // Allow shutting down.
-        window.$setWaitingReason(undefined);
-        window.Firod = require('../daemon/firod').Firod;
+        $setWaitingReason(undefined);
+        window['Firod'] = require('../daemon/firod').Firod;
     } else if (store.getters['App/isInitialized'] &&
                existsSync(store.getters['App/walletLocation'])) {
         startVue();
         try {
-            await window.$startDaemon()
+            await $startDaemon()
             await router.push("/main");
         } catch (e) {
             // We want to ignore NavigationDuplicated errors because they'll happen whenever we reload from the main
@@ -328,7 +329,7 @@ window.addEventListener('beforeunload', async () => await window.$daemon?.closeS
     } else {
         console.info("App is not yet initialized. Let's get 'er ready!");
 
-        window.$setWaitingReason(undefined);
+        $setWaitingReason(undefined);
         startVue();
         router.push("/setup/welcome");
     }

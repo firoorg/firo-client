@@ -88,7 +88,7 @@ let rendererConfig = {
             'fonts': path.resolve(__dirname, '..', 'assets', 'fonts')
         },
         modules: ['src', 'node_modules'].map(x => path.join(__dirname, '..', x)),
-        extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts'],
+        extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts', '.d.ts', '.vue'],
         plugins: [
             new TsconfigPathsPlugin()
         ]

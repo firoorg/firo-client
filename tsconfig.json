@@ -11,5 +11,5 @@
     "isolatedModules": true,
     "moduleResolution": "Node"
   },
-  "include": ["src/vue-shim.d.ts"]
+  "include": ["src/vue-shim.d.ts", "src/globals.d.ts"]
 }
