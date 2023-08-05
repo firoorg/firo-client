@@ -2,11 +2,15 @@
     <div id="app" :class="`${colorTheme}-color-theme`">
         <div id="app-drag-area" />
 
-        <div :v-show="waitingReason">
-            <WaitingScreen v-if="waitingReason" :reason="waitingReason" />
+        <div v-if="unlockRequested">
+            <PassphraseRequestOverlay />
         </div>
 
-        <div :v-show="!waitingReason">
+        <div v-else-if='waitingReason'>
+            <WaitingScreen v-if='waitingReason' :reason='waitingReason' />
+        </div>
+
+        <div v-else>
             <router-view />
         </div>
     </div>
@@ -15,18 +19,23 @@
 <script>
 import { mapGetters } from 'vuex'
 import WaitingScreen from "renderer/components/WaitingScreen";
+import PassphraseRequestOverlay from "./components/shared/PassphraseRequestOverlay.vue";
 
 export default {
     name: 'FiroClient',
 
     components: {
-        WaitingScreen
+        WaitingScreen,
+        PassphraseRequestOverlay
     },
 
     computed: mapGetters({
         waitingReason: 'App/waitingReason',
-        colorTheme: 'App/colorTheme'
-    })
+        colorTheme: 'App/colorTheme',
+        unlockRequested: 'ApiStatus/unlockRequested'
+    }),
+
+
 }
 </script>
 

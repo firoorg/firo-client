@@ -4,7 +4,8 @@ import { isEqual } from 'lodash';
 const state = {
     apiStatus: {
         disabledSporks: [],
-        blocks: 0
+        blocks: 0,
+        unlockRequested: false
     }
 };
 
@@ -47,7 +48,8 @@ const getters = {
     isSparkAllowed: (state, getters): boolean => getters.apiStatus.isSpark,
     smartFeePerKb: (state): bigint => state.apiStatus.smartFeePerKb,
     isBlockchainSynced: (state): boolean => ['regtest', 'regtest-ql'].includes(state.apiStatus.network) || state.apiStatus.synced,
-    connections: (state): number => state.apiStatus.connections
+    connections: (state): number => state.apiStatus.connections,
+    unlockRequested: (state): boolean => state.apiStatus.unlockRequested
 };
 
 export default {

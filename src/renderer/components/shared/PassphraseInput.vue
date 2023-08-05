@@ -21,7 +21,7 @@
         </div>
 
         <div class="buttons">
-            <button class="solid-button unrecommended cancel" @click="$emit('cancel')">
+            <button v-if="!noCancel" class="solid-button unrecommended cancel" @click="$emit('cancel')">
                 Cancel
             </button>
 
@@ -38,7 +38,8 @@ export default {
 
     props: {
         value: String,
-        error: String
+        error: String,
+        noCancel: Boolean
     },
 
     data() {

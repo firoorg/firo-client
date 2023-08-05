@@ -200,6 +200,7 @@ export interface ApiStatusData {
     newLogMessages: string[];
     isSpark: boolean;
     lelantusGracefulPeriod: number;
+    unlockRequested: boolean;
 }
 
 export interface ApiStatus {
@@ -1015,6 +1016,12 @@ export class Firod {
         setTimeout(() => this.subscribeToApiStatus(), 1500);
     }
 
+    // Unlock the wallet. If this unlock is in response to an unlock request, the wallet will automatically be locked
+    // again when the passphrase is no longer required.
+    async unlock(passphrase: string): Promise<void> {
+        await this.requesterSocketSend(Firod.formatSend(passphrase, null, 'unlockWallet', null), true);
+    }
+
     // This function is called when the API status is received. It initialises the (separate) sockets by which we'll
     // send and receive data from firod.
     private async gotApiStatus(apiStatusMessage: string) {
@@ -1040,6 +1047,9 @@ export class Firod {
         await this.gotAPIResponseEWH.release(undefined);
 
         this.pid = apiStatus.data.pid;
+
+        if (!this.requesterSocket)
+            await this.connectToSockets(apiStatus);
 
         // modules.API will be set once it is valid to connect to the API.
         if (apiStatus.data && apiStatus.data.modules && apiStatus.data.modules.API) {
@@ -1067,15 +1077,11 @@ export class Firod {
         }
     }
 
-    // This function contains the logic for connecting to proper sockets, registering for events, etc. that are required
-    // before initialization. It is called after an apiStatus with modules.API set to true is sent. It MUST NOT be
-    // called multiple times.
-    private async initializeWithApiStatus(apiStatus: ApiStatus) {
-        console.info('Received initial apiStatus.');
+    private async connectToSockets(apiStatus: ApiStatus) {
+        console.info("Connecting to firod sockets...");
 
         this.requesterSocket = new zmq.Request();
         this.publisherSocket = new zmq.Subscriber();
-
 
         let reqPort, pubPort;
         switch (apiStatus.data.network) {
@@ -1115,6 +1121,13 @@ export class Firod {
         // These calls give no indication of failure.
         this.requesterSocket.connect(`tcp://${constants.firodAddress.host}:${reqPort}`);
         this.publisherSocket.connect(`tcp://${constants.firodAddress.host}:${pubPort}`);
+    }
+
+    // This function contains the logic for connecting to proper sockets, registering for events, etc. that are required
+    // before initialization. It is called after an apiStatus with modules.API set to true is sent. It MUST NOT be
+    // called multiple times.
+    private async initializeWithApiStatus(apiStatus: ApiStatus) {
+        console.info('Initializing with API status...');
 
         // Subscribe to all events for which we've been given a handler.
         for (const topic of Object.keys(this.eventHandlers)) {
@@ -1181,7 +1194,7 @@ export class Firod {
         return await this.requesterSocketSend(Firod.formatSend(auth, type, collection, data));
     }
 
-    private static formatSend(auth: string | null, type: string, collection: string, data: unknown): unknown {
+    static formatSend(auth: string | null, type: string, collection: string, data: unknown): unknown {
         return {
             auth: {
                 passphrase: auth
@@ -1196,10 +1209,11 @@ export class Firod {
     // what we're actually doing. The reason this method is split off is that the setPassphrase() method is weird and
     // requires a special case.
     //
-    // allowAfterShutdown determines whether we are allowed to send after we're marked as having shutdown. This should
-    // only be set to true from sendToShutdown().
-    private async requesterSocketSend(message: unknown, allowAftersShutdown: boolean = false): Promise<unknown> {
-        await this.hasConnectedEWH.block();
+    // forceSend determines whether we are allowed to send after we're marked as having shutdown or before we have
+    // fully started up.
+    private async requesterSocketSend(message: unknown, forceSend: boolean = false): Promise<unknown> {
+        if (!forceSend)
+            await this.hasConnectedEWH.block();
 
         let callName = '<unknown>';
         if (isStandardFirodRequest(message)) {
@@ -1209,7 +1223,7 @@ export class Firod {
         console.debug(`Trying to acquire requestMutex for ${callName}...`);
         // We can't have multiple requests pending simultaneously because there is no guarantee that replies come back
         // in order, and also no tag information allowing us to associate a given request to a reply.
-        let releaseLock = await this.requestMutex.lock();
+        const releaseLock = forceSend ? () => null : await this.requestMutex.lock();
         console.debug(`Acquired requestMutex for ${callName}`);
 
         const release = () => {
@@ -1218,7 +1232,7 @@ export class Firod {
         };
 
         return new Promise(async (resolve, reject) => {
-            if (this.hasShutdown && !allowAftersShutdown) {
+            if (this.hasShutdown && !forceSend) {
                 reject(new FirodAlreadyShutdown());
                 return;
             }
