@@ -3,13 +3,6 @@
         <div class="send-primary">
             <SearchInput v-model="filter" placeholder="Search by label or address" />
 
-            <div class="select-option" style="margin-top:12px">
-                <select class="selector" v-model="selectOption">
-                    <option value="Spark">Spark</option>
-                    <option value="Transparent">Transparent</option>
-                </select>
-            </div>
-
             <AnimatedTable
                 ref="animatedTable"
                 :fields="tableFields"
@@ -214,7 +207,6 @@ import SearchInput from "renderer/components/shared/SearchInput";
 import InputFrame from "renderer/components/shared/InputFrame";
 import PlusButton from "renderer/components/shared/PlusButton";
 import FiroSymbol from "renderer/assets/CoinIcons/FIRO.svg.data";
-import AddressBookItemAddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
 import FiroWarning from 'renderer/assets/FiroWarning';
 
 export default {
@@ -253,14 +245,12 @@ export default {
                 {name: markRaw(CurrentAddressIndicator)},
                 {name: markRaw(AddressBookItemLabel)},
                 {name: markRaw(AddressBookItemAddress)},
-                {name: markRaw(AddressBookItemAddressType)}
             ],
             // This is the search term to filter addresses by.
             filter: '',
             selectedAsset: 'FIRO',
             showConnectionTransaction: false,
             connectionTransaction: null,
-            selectOption: 'Spark',
             availableSparkFiro: 0,
             isSparkAddr: null
         }
@@ -422,7 +412,7 @@ export default {
             this.$nextTick(() => this.$refs.animatedTable && this.$refs.animatedTable.reload());
             return this.sendAddresses
                 .filter(address => address.label.includes(this.filter) || address.address.includes(this.filter))
-                .map(address => ({ isSelected: address.address === this.address, ...address })).filter(address => address.addressType === this.selectOption);
+                .map(address => ({ isSelected: address.address === this.address, ...address }));
         },
 
         showAddToAddressBook () {
