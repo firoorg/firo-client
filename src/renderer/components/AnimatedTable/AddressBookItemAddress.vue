@@ -4,7 +4,9 @@
     </th>
 
     <td v-else class="address">
-        {{ rowData.address }}
+        <div class="inner">
+            {{ rowData.address }}
+        </div>
     </td>
 </template>
 
@@ -12,7 +14,7 @@
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
 
 export default {
-    name: "PaymentRequestAddress",
+    name: "Address",
 
     mixins: [
         VuetableFieldMixin
@@ -21,4 +23,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.address .inner {
+    max-width: 50vw;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 </style>

@@ -2,31 +2,24 @@
     <div class="receive-page">
         <div class="top">
             <div class="left">
-                <div class="title">
-                    Scan this QR code to receive Firo
-                </div>
-
-                <div class="receiving-address">
+                <div class="grid">
                     <InputFrame label="Receiving Address">
                         <input id="receive-address" type="text" :disabled="true" :value="address" />
                     </InputFrame>
 
-                    <div class="action-buttons">
-                        <CopyAddressIcon :address="address" />
-                        <RefreshAddressIcon :onclick="refreshAddress" />
+                    <div class="icons">
+                        <CopyAddressIcon :address='address' />
+                        <RefreshAddressIcon :onclick='refreshAddress' />
                     </div>
-                </div>
 
-                <div>
-                    <InputFrame label="Label">
-                        <input ref="label" id="receive-address-label" type="text" placeholder="Unlabelled" v-model="label" @change="changeLabel" />
+                    <InputFrame label='Label'>
+                        <input ref='label' id='receive-address-label' type='text' placeholder='Unlabelled'
+                               v-model='label' @change='changeLabel' />
                     </InputFrame>
-                </div>
-                <div class="select-option" style="margin-top:12px">
-                    <select class="selector" v-model="selectOption">
-                        <option value="Spark">Spark</option>
-                        <option value="Transparent">Transparent</option>
-                    </select>
+
+                    <InputFrame label='Address Type'>
+                        <Dropdown :options='addressOptions' v-model='addressType' />
+                    </InputFrame>
                 </div>
             </div>
 
@@ -62,13 +55,13 @@ import InputFrame from "renderer/components/shared/InputFrame";
 import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon";
 import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon";
 import Popup from "renderer/components/shared/Popup";
-import {IncorrectPassphrase} from "daemon/firod";
-import AddressBookItemAddressType from "renderer/components/AnimatedTable/AddressBookItemAddressType";
+import Dropdown from './shared/Dropdown.vue';
 
 export default {
     name: "ReceivePage",
 
     components: {
+        Dropdown,
         InputFrame,
         CopyAddressIcon,
         RefreshAddressIcon,
@@ -77,10 +70,9 @@ export default {
     },
 
     data() {
-        let check = this.selectOption ? this.selectOption : 'Spark';
-        let addr = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0];
+        let addr = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === 'Spark')[0];
         return {
-            address: (addr || {address: null}).address,
+            address: addr?.address,
             label: '',
             _quickLabel: null,
             qrCode: null,
@@ -88,14 +80,17 @@ export default {
             show: '',
             error: '',
             passphrase: '',
-            selectOption: 'Spark',
-            option: '',
+            addressType: 'Spark',
+
+            addressOptions: [
+                {id: 'Spark', name: 'Spark'},
+                {id: 'Transparent', name: 'Transparent'}
+            ],
 
             tableFields: [
                 {name: markRaw(CurrentAddressIndicator)},
                 {name: markRaw(AddressBookItemLabel)},
-                {name: markRaw(AddressBookItemAddress)},
-                {name: markRaw(AddressBookItemAddressType)}
+                {name: markRaw(AddressBookItemAddress)}
             ]
         };
     },
@@ -109,9 +104,8 @@ export default {
 
         tableData() {
             this.$nextTick(() => this.$refs.animatedTable.reload());
-            this.selectOptionChange()
-            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr})).filter(a => a.addressType === this.selectOption);
-        },
+            return this.receiveAddresses.map(addr => ({isSelected: addr.address === this.address, ...addr}));
+        }
     },
 
     destroyed() {
@@ -170,6 +164,10 @@ export default {
                 const img = document?.querySelector('.qr-code img');
                 if (img) img.style = 'width: 200px; height: 200px';
             }
+        },
+
+        addressType() {
+            this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0]?.address;
         }
     },
 
@@ -177,14 +175,6 @@ export default {
         ...mapMutations({
             setAddressBook: 'AddressBook/setAddressBook'
         }),
-
-        selectOptionChange() {
-            if(this.option !== this.selectOption) {
-                let check = this.selectOption ? this.selectOption : 'Spark';
-                this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0].address;
-                this.option = this.selectOption;
-            } 
-        },
 
         async changeLabel(ev) {
             if (!this.address) return;
@@ -202,11 +192,10 @@ export default {
         },
 
         async refreshAddress() {
-            const addresstype = this.selectOption;
-            const address = await $daemon.getUnusedAddress(addresstype);
+            const address = await $daemon.getUnusedAddress(this.addressType);
 
             await $daemon.addAddressBookItem({
-                addressType: addresstype,
+                addressType: this.addressType,
                 address,
                 label: '',
                 purpose: 'receive'
@@ -245,20 +234,27 @@ export default {
         .left {
             flex-grow: 1;
 
-            .title {
-                vertical-align: center;
-                margin-bottom: var(--padding-base);
-                font: {
-                    weight: bold;
-                    size: 14px;
-                }
-            }
-
             $input-right-space: 100px;
             $input-right-space-interior: calc(#{$input-right-space} - 4px - var(--padding-base));
 
-            .framed-input, .rap-guidance {
-                width: calc(100% - #{$input-right-space});
+            .grid {
+                margin: {
+                    right: var(--padding-base);
+                    top: var(--padding-base);
+                }
+
+                display: grid;
+                grid: 80% 20% / 80% 20%;
+                grid-column-gap: var(--padding-base);
+
+                .icons {
+                    margin-top: var(--padding-base);
+                    text-align: right;
+
+                    *:last-child {
+                        margin-left: var(--padding-base);
+                    }
+                }
             }
 
             .framed-input {
