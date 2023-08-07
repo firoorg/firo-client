@@ -239,6 +239,7 @@ export default {
         a, .checkbox-option, .select-option {
             cursor: pointer;
             font-weight: bold;
+            text-decoration: none;
 
             display: block;
 
