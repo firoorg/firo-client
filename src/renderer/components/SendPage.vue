@@ -53,21 +53,6 @@
                         />
                     </InputFrame>
 
-                    <div v-if="!isPrivate" class="warning-text">
-                        <div class="warning-item">
-                            <FiroWarning class="warning-icon" />
-                            <label>
-                                You are using a transparent transaction, please go private.
-                            </label>
-                        </div>
-                        <div class="warning-item warning-item-text">
-                            <FiroWarning class="warning-icon" />
-                            <label>
-                                If this is a masternode transaction, you do not have to go private
-                            </label>
-                        </div>
-                    </div>   
-
                     <div class="checkbox-field add-to-address-book" :class="{disabled: !showAddToAddressBook}">
                         <PlusButton :disabled="!showAddToAddressBook" />
                         <label @click="addToAddressBook">Add to address book</label>
@@ -694,27 +679,6 @@ export default {
                     .total-field {
                         display: flex;
                         justify-content: space-between;
-                    }
-                }
-
-                .warning-text {
-                    margin-bottom: 6px;
-                    color: #FFA800;
-                    font-size: 10px;
-
-                    .warning-item {
-                        display: flex;
-                        align-items: center;
-                    }
-
-                    .warning-icon {
-                        height: 12px;
-                        width: 12px;
-                        margin-right: 5px;
-                    }
-
-                    .warning-item-text {
-                        margin-top: 8px;
                     }
                 }
             }
