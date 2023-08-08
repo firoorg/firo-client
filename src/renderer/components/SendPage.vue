@@ -50,6 +50,7 @@
                             placeholder="Address"
                             spellcheck="false"
                             :disabled="formDisabled"
+                            :validate-on-input="true"
                         />
                     </InputFrame>
 
@@ -69,6 +70,7 @@
                             class="amount"
                             tabindex="3"
                             placeholder="Amount"
+                            :validate-on-input='true'
                         />
                     </InputFrame>
 
@@ -176,7 +178,7 @@ import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import {Form, Field} from "vee-validate";
 import SendFlow from "renderer/components/SendPage/SendFlow";
-import {isValidAddress, isValidPaymentCode} from 'lib/isValidAddress';
+import { isValidAddress, isValidLegacyAddress } from 'lib/isValidAddress';
 import {bigintToString, stringToBigint} from 'lib/convert';
 import Dropdown from "renderer/components/shared/Dropdown";
 import Amount from "renderer/components/shared/Amount";
@@ -236,8 +238,7 @@ export default {
             selectedAsset: 'FIRO',
             showConnectionTransaction: false,
             connectionTransaction: null,
-            availableSparkFiro: 0,
-            isSparkAddr: null
+            availableSparkFiro: 0
         }
     },
 
@@ -327,12 +328,12 @@ export default {
         },
 
         firoAddress() {
-            this.network;
+            [this.network, this.isPrivate];
 
             return (value) => {
                 if (!value) return '';
 
-                if (isValidAddress(value, this.network) || isValidPaymentCode(value, this.network))
+                if ((this.isPrivate && isValidAddress(value, this.network)) || (!this.isPrivate && isValidLegacyAddress(value, this.network)))
                     return true;
 
                 return 'The Firo address you entered is invalid';
@@ -401,7 +402,7 @@ export default {
         },
 
         showAddToAddressBook () {
-            return !this.formDisabled && (isValidAddress(this.address, this.network) || this.isSparkAddr) && !this.addressBook[this.address];
+            return !this.formDisabled && isValidAddress(this.address, this.network) && !this.addressBook[this.address];
         },
 
         coinControl () {
@@ -478,21 +479,6 @@ export default {
             this.cleanupForm(false);
         },
 
-        label() {
-            const a = this.addressBook[this.address];
-            if (a && a.purpose === 'send' && a.label !== this.label) {
-                this.addToAddressBook();
-            }
-        },
-
-        address() {
-            this.validateSparkAddress();
-            const a = this.addressBook[this.address];
-            if (a && a.purpose === 'send' && a.label !== this.label) {
-                this.addToAddressBook();
-            }
-        },
-
         selectedAsset() {
             if (this.selectedAsset != 'FIRO') {
                 this.isPrivate = true;
@@ -515,34 +501,31 @@ export default {
         },
 
         async addToAddressBook() {
-            this.validateSparkAddress();
-            if ((!isValidAddress(this.address, this.network) && !this.isSparkAddr) || !this.label) return;
-
             if (this.addressBook[this.address]) {
                 const item = this.addressBook[this.address];
                 await $daemon.updateAddressBookItem(item, this.label);
                 $store.commit('AddressBook/updateAddress', {...item, label: this.label});
                 this.$refs.animatedTable.reload();
-            } else {
-                if(isValidAddress(this.address, this.network)){
-                    const item = {
+            } else if (isValidLegacyAddress(this.address, this.network)) {
+                const item = {
                     addressType: "Transparent",
                     address: this.address,
                     label: this.label,
                     purpose: 'send'
-                    };
-                    $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
-                    await $daemon.addAddressBookItem(item);
-                } else {
-                    const item = {
+                };
+                $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
+                await $daemon.addAddressBookItem(item);
+            } else if (isValidSparkAddress(this.address, this.network)) {
+                const item = {
                     addressType: "Spark",
                     address: this.address,
                     label: this.label,
                     purpose: 'send'
-                    };
-                    $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
-                    await $daemon.addAddressBookItem(item);
-                }
+                };
+                $store.commit('AddressBook/updateAddress', { ...item, createdAt: Date.now() });
+                await $daemon.addAddressBookItem(item);
+            } else {
+                console.error(`trying to add invalid address to address book: ${this.address}`);
             }
         },
 
@@ -559,17 +542,7 @@ export default {
             this.label = '';
             this.amount = '';
             this.address = '';
-        },
-
-        isTransparentAddress() {
-            return isValidAddress(this.address, this.network);
-        },
-
-        async validateSparkAddress() {
-            let res = await $daemon.validateSparkAddress(this.address);
-            this.isSparkAddr = res.valid;
-            return this.isSparkAddr;
-        },
+        }
     }
 }
 </script>

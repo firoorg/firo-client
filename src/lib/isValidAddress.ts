@@ -1,8 +1,11 @@
+type Network = 'test' | 'main' | 'regtest' | 'regtest-ql';
+
 const shajs = require('sha.js');
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 const bs58 = require('base-x')(BASE58);
+const bech32 = require('bech32-buffer');
 
-const ADDRESS_PREFIXES = {
+const ADDRESS_PREFIXES: Record<Network, {pubkeyAddress: number, scriptAddress: number}> = {
     main: {
         pubkeyAddress: 82, // ['a', 'Z'],
         scriptAddress: 7 // ['3', '4']
@@ -21,8 +24,49 @@ const ADDRESS_PREFIXES = {
     }
 };
 
+export function isValidAddress(address: string, network: Network): boolean {
+    return isValidLegacyAddress(address, network) || isValidSparkAddress(address, network);
+}
+
+export function isValidSparkAddress(address: string, network: Network): boolean {
+    if (address.length != 144)
+        return false;
+
+    let addressData;
+
+    try {
+        addressData = bech32.decode(address);
+    } catch (e) {
+        return false;
+    }
+
+    if (addressData.encoding != 'bech32m')
+        return false;
+
+    if (addressData.prefix[0] != 's')
+        return false;
+
+    if (network == 'main') {
+        if (addressData.prefix[1] != 'm')
+            return false;
+    } else if (network == 'test') {
+        if (addressData.prefix[1] != 't')
+            return false;
+    } else if (network == 'regtest' || network == 'regtest-ql') {
+        if (addressData.prefix[1] != 'r')
+            return false;
+    } else if (network == 'devnet') {
+        if (addressData.prefix[1] != 'd')
+            return false;
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
 // Is address a valid address on the Firo {network} network?
-export function isValidAddress(address: string, network: 'test' | 'main' | 'regtest' | 'regtest-ql'): boolean {
+export function isValidLegacyAddress(address: string, network: 'test' | 'main' | 'regtest' | 'regtest-ql'): boolean {
     let addressData;
 
     try {

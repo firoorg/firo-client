@@ -1813,18 +1813,6 @@ export class Firod {
         await this.send(auth, 'create', 'lelantusToSpark', {});
     }
 
-    async validateSparkAddress(address: string): Promise<{valid: boolean}> {
-        const data = await this.send('', 'create', 'validateSparkAddress', {address});
-        function isValidResponse(x: any): x is {valid: boolean} {
-            return x !== null && typeof x === 'object' && typeof x.valid === 'boolean';
-        }
-        if (isValidResponse(data)) {
-            return data;
-        } else {
-            throw new UnexpectedFirodResponse('create/validateSparkAddress', data);
-        }
-    }
-
     async getAvailableSparkBalance(): Promise<{amount: number}> {
         const data = await this.send('', 'create', 'getAvailableSparkBalance', {});
         function isValidResponse(x: any): x is {amount: number} {

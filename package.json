@@ -97,6 +97,7 @@
     "async": "^3.2.4",
     "await-mutex": "^1.0.2",
     "axios": "^1.2.1",
+    "bech32-buffer": "github:sproxet/bech32-buffer",
     "bip39": "^3.0.4",
     "bs58": "^5.0.0",
     "date-fns": "^2.29.3",
