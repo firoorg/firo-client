@@ -3,7 +3,7 @@
         <div class="warning-header">
             <div v-if="this.isSparkAllowed && availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod">
                 Firo is migrating to Spark. Redemption of coins in Lelantus will be disabled at block {{ lelantusGracefulPeriod }}. Current block is {{ currentBlockHeight }}.
-                <a id="anonymize-firo-link" href="#" @click="show = 'lelantustospark'">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
+                <a id="anonymize-firo-link" @click="show = 'lelantustospark'">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
             </div>
             <div v-else>
                 <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
