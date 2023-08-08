@@ -10,7 +10,6 @@
             :data="ourUnspentUTXOs"
             :fields="fields"
             :global-data="selectionData"
-            :row-class="lockedClassOfRow"
             track-by="uniqId"
         />
 
@@ -29,7 +28,6 @@ import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
 import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
 import TxIdIndex from "renderer/components/AnimatedTable/TxId";
 import TxAmount from "renderer/components/AnimatedTable/TxAmount";
-import UTXOLocker from 'renderer/components/AnimatedTable/UTXOLocker';
 
 export default {
     name: "InputSelection",
@@ -38,8 +36,7 @@ export default {
         AnimatedTable,
         UTXOSelector,
         TxIdIndex,
-        TxAmount,
-        UTXOLocker
+        TxAmount
     },
 
     props: {
@@ -54,8 +51,7 @@ export default {
             fields: [
                 {name: markRaw(UTXOSelector)},
                 {name: markRaw(TxIdIndex)},
-                {name: markRaw(TxAmount)},
-                {name: markRaw(UTXOLocker)}
+                {name: markRaw(TxAmount)}
             ]
         }
     },
@@ -93,10 +89,6 @@ export default {
         cancel() {
             this.selectionData = {};
             this.$emit('cancel');
-        },
-
-        lockedClassOfRow(row) {
-            return row.locked ? 'locked' : 'unlocked';
         }
     },
 
