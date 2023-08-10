@@ -1766,25 +1766,28 @@ export class Firod {
     }
 
     async mintSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
-        subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
+                    subtractFeeFromAmount: boolean, coinControl?: CoinControl
+    ): Promise<string[]> {
         const data = await this.send(auth, 'create', 'mintSpark', {
-        label,
-        recipient,
-        amount,
-        subtractFeeFromAmount,
-        feePerKb,
-        coinControl: {
-            selected: coinControlToString(coinControl)
-        }
+            label,
+            recipient,
+            amount,
+            subtractFeeFromAmount,
+            feePerKb,
+            coinControl: {
+                selected: coinControlToString(coinControl)
+            }
         });
-        function isValidResponse(x: any): x is {txid: string} {
-            return x !== null && typeof x === 'object' && typeof x.txid === 'string';
+
+        function isValidResponse(x: any): x is {txids: string[]} {
+            return x !== null && typeof x === 'object' && typeof Array.isArray(x.txids) &&
+                x.txids.every((txid: any) => typeof txid === 'string');
         }
-        if (isValidResponse(data)) {
-            return data;
-        } else {
+
+        if (isValidResponse(data))
+            return data.txids;
+        else
             throw new UnexpectedFirodResponse('create/mintSpark', data);
-        }
     }
 
     async spendSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
