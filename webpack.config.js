@@ -1,16 +1,16 @@
 const path = require('path')
-const { dependencies } = require('../package.json')
+const { dependencies } = require('./package.json')
 
 const {VueLoaderPlugin} = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 let rendererConfig = {
-    mode: 'development',
-    devtool: false,
+    mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
 
     entry: {
-        renderer: path.join(__dirname, '../src/renderer/renderer.ts')
+        renderer: path.join(__dirname, 'src/renderer/renderer.ts'),
+        main: path.join(__dirname, 'src/main/main.ts')
     },
 
     optimization: {
@@ -73,21 +73,21 @@ let rendererConfig = {
         new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: path.resolve(__dirname, '../src/index.ejs'),
-            nodeModules: process.env.NODE_ENV === 'production' ? false : path.resolve(__dirname, '../node_modules')
+            template: path.resolve(__dirname, 'src/index.ejs'),
+            nodeModules: process.env.NODE_ENV === 'production' ? false : path.resolve(__dirname, 'node_modules')
         })
     ],
     output: {
         filename: '[name].js',
         libraryTarget: 'commonjs2',
-        path: path.join(__dirname, '../dist/electron')
+        path: path.join(__dirname, 'dist/electron')
     },
     resolve: {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
-            'fonts': path.resolve(__dirname, '..', 'assets', 'fonts')
+            'fonts': path.resolve(__dirname, 'assets', 'fonts')
         },
-        modules: ['src', 'node_modules'].map(x => path.join(__dirname, '..', x)),
+        modules: ['src', 'node_modules'].map(x => path.join(__dirname, x)),
         extensions: ['.js', '.vue', '.json', '.css', '.scss', '.node', '.ts', '.d.ts', '.vue'],
         plugins: [
             new TsconfigPathsPlugin()

@@ -4,13 +4,11 @@ const child_process = require('child_process');
 const compileWrapper = require('./compile-wrapper');
 const WebpackDevServer = require('webpack-dev-server');
 
-const rendererConfig = require('./webpack.renderer.config');
-rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer);
-const mainConfig = require('./webpack.main.config');
+const config = require('../webpack.config');
+config.entry.renderer = [path.join(__dirname, 'dev-client')].concat(config.entry.renderer);
 
 (async () => {
-    await compileWrapper(mainConfig);
-    const rendererCompiler = await compileWrapper(rendererConfig);
+    const compiler = await compileWrapper(config);
 
     const server = new WebpackDevServer(
         {
@@ -18,7 +16,7 @@ const mainConfig = require('./webpack.main.config');
             hot: true,
             port: 9080
         },
-        rendererCompiler
+        compiler
     );
     await server.start();
 
