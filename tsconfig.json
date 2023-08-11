@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "target": "es2022",
     "module": "commonjs",
     "sourceMap": true,
@@ -9,7 +9,8 @@
       "@components/*": ["src/renderer/components/*"]
     },
     "isolatedModules": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "allowJs": true
   },
-  "include": ["src/vue-shim.d.ts", "src/globals.d.ts"]
+  "include": ["src/vue-shim.d.ts", "src/globals.d.ts", "src/**/*.ts", "src/**/*.vue", "src/**/*.js"]
 }
