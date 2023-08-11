@@ -185,8 +185,8 @@ const actions = {
             console.debug(`Fetching status for CoinSwap record ${record.orderId}...`);
 
             try {
-                const {error, response} = await apiWorker.getOrderStatus(record);
-                
+                const {error, response} = await apiWorker.getOrderStatus(<any>record); // FIXME
+
                 if (error) throw error;
                 if (response.status !== record.status) {
                     console.info(`Updating status of CoinSwap record ${record.orderId} to '${response.status}...`);

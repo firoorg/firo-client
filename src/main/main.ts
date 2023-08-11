@@ -46,7 +46,7 @@ if (!app.isDefaultProtocolClient('firo')) {
 
 app.once('ready', async () => {
     // Set the application menu. This is required for keyboard shortcuts (including copy+paste) to work correctly.
-    const appMenu = Menu.buildFromTemplate(menuTemplate);
+    const appMenu = Menu.buildFromTemplate(<any>menuTemplate); // FIXME
     Menu.setApplicationMenu(appMenu);
 
     // The window will be shown by the renderer process when firod is connected.
