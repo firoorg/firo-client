@@ -1815,28 +1815,4 @@ export class Firod {
     async lelantusToSpark(auth: string) {
         await this.send(auth, 'create', 'lelantusToSpark', {});
     }
-
-    async getAvailableSparkBalance(): Promise<{amount: number}> {
-        const data = await this.send('', 'create', 'getAvailableSparkBalance', {});
-        function isValidResponse(x: any): x is {amount: number} {
-            return x !== null && typeof x === 'object' && typeof x.amount === 'number';
-        }
-        if (isValidResponse(data)) {
-            return data;
-        } else {
-            throw new UnexpectedFirodResponse('create/getAvailableSparkBalance', data);
-        }
-    }
-    
-    async getUncomfirmedSparkBalance(): Promise<{amount: number}> {
-        const data = await this.send('', 'create', 'getUncomfirmedSparkBalance', {});
-        function isValidResponse(x: any): x is {amount: number} {
-            return x !== null && typeof x === 'object' && typeof x.amount === 'number';
-        }
-        if (isValidResponse(data)) {
-            return data;
-        } else {
-            throw new UnexpectedFirodResponse('create/getUncomfirmedSparkBalance', data);
-        }
-    }
 }
