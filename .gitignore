@@ -10,3 +10,4 @@ firo-client-test.log
 coin-swap-pairs.json
 src/version.js
 src/keys.js
+.vscode/
