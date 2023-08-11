@@ -7,8 +7,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import CoinSwapList from 'renderer/components/CoinSwapPage/CoinSwapList';
-import CoinSwapDetail from 'renderer/components/CoinSwapPage/CoinSwapDetail';
+import CoinSwapList from 'renderer/components/CoinSwapPage/CoinSwapList.vue';
+import CoinSwapDetail from 'renderer/components/CoinSwapPage/CoinSwapDetail.vue';
 
 export default {
     name: 'CoinSwapPage',

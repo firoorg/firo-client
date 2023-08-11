@@ -24,10 +24,10 @@
 // $emits: update:modelValue, cancel, ok
 import {markRaw} from "vue";
 import {mapGetters} from "vuex";
-import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector";
-import TxIdIndex from "renderer/components/AnimatedTable/TxId";
-import TxAmount from "renderer/components/AnimatedTable/TxAmount";
+import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable.vue";
+import UTXOSelector from "renderer/components/AnimatedTable/UTXOSelector.vue";
+import TxIdIndex from "renderer/components/AnimatedTable/TxId.vue";
+import TxAmount from "renderer/components/AnimatedTable/TxAmount.vue";
 
 export default {
     name: "InputSelection",

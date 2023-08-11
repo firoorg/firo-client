@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import FiroInfo from 'renderer/assets/FiroInfo';
+import FiroInfo from 'renderer/assets/FiroInfo.vue';
 
 export default {
     name: 'GoPrivate',

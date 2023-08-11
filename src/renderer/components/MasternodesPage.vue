@@ -40,13 +40,13 @@
 
 <script>
 import {markRaw} from "vue";
-import Popup from "renderer/components/shared/Popup";
-import MasternodeInfo from "renderer/components/MasternodesPage/MasternodeInfo";
-import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import MasternodeCollateralAddress from "renderer/components/AnimatedTable/MasternodeCollateralAddress";
-import MasternodeNextPaymentBlock from "renderer/components/AnimatedTable/MasternodeNextPaymentBlock";
-import MasternodeIP from "renderer/components/AnimatedTable/MasternodeIP";
-import SearchInput from "renderer/components/shared/SearchInput";
+import Popup from "renderer/components/shared/Popup.vue";
+import MasternodeInfo from "renderer/components/MasternodesPage/MasternodeInfo.vue";
+import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable.vue";
+import MasternodeCollateralAddress from "renderer/components/AnimatedTable/MasternodeCollateralAddress.vue";
+import MasternodeNextPaymentBlock from "renderer/components/AnimatedTable/MasternodeNextPaymentBlock.vue";
+import MasternodeIP from "renderer/components/AnimatedTable/MasternodeIP.vue";
+import SearchInput from "renderer/components/shared/SearchInput.vue";
 
 const tableFields = [
     {name: markRaw(MasternodeIP), width: "160pt"},

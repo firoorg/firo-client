@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import FiroLogoWhite from 'renderer/assets/FiroLogoWhite';
-import FiroLogoDark from 'renderer/assets/FiroLogoDark';
+import FiroLogoWhite from 'renderer/assets/FiroLogoWhite.vue';
+import FiroLogoDark from 'renderer/assets/FiroLogoDark.vue';
 
 export default {
     name: "SetupLayout",

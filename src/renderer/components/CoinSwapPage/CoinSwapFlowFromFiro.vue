@@ -29,17 +29,17 @@
 // $emits: success
 
 import {FirodErrorResponse, IncorrectPassphrase} from 'daemon/firod';
-import Popup from 'renderer/components/shared/Popup';
-import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
-import ErrorStep from './ErrorStep';
-import WaitOverlay from 'renderer/components/shared/WaitOverlay';
+import Popup from 'renderer/components/shared/Popup.vue';
+import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo.vue';
+import ErrorStep from './ErrorStep.vue';
+import WaitOverlay from 'renderer/components/shared/WaitOverlay.vue';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
 import ExolixAPIWorker from 'lib/exolix-api';
 import {bigintToString} from "lib/convert";
 import {mapActions} from "vuex";
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 
 export default {
     name: 'CoinSwapFlowFromFiro',

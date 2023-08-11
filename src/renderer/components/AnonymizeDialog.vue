@@ -7,10 +7,10 @@
 
 <script>
 import {mapGetters} from "vuex";
-import WaitOverlay from "renderer/components/shared/WaitOverlay";
+import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
-import Amount from "renderer/components/shared/Amount";
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import Amount from "renderer/components/shared/Amount.vue";
+import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 
 export default {
     name: "AnonymizeDialog",

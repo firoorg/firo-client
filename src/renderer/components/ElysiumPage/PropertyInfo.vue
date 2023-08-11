@@ -144,10 +144,10 @@
 <script>
 import {mapGetters} from "vuex";
 import {Form, Field} from "vee-validate";
-import TransactionId from "renderer/components/shared/TransactionId";
-import Amount from "renderer/components/shared/Amount";
-import InputFrame from "renderer/components/shared/InputFrame";
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import TransactionId from "renderer/components/shared/TransactionId.vue";
+import Amount from "renderer/components/shared/Amount.vue";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
+import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 import {isValidAddress} from "lib/isValidAddress";
 import {bigintToString, stringToBigint} from "lib/convert";
 

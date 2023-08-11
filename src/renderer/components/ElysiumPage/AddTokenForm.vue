@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import SearchInput from "renderer/components/shared/SearchInput";
+import SearchInput from "renderer/components/shared/SearchInput.vue";
 import {mapMutations, mapGetters} from "vuex";
 import {bigintToString} from "lib/convert";
 import {markRaw} from "vue";

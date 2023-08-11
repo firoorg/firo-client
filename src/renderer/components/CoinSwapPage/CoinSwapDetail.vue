@@ -147,23 +147,23 @@
 
 <script>
 import {Form, Field} from 'vee-validate';
-import Popup from 'renderer/components/shared/Popup';
+import Popup from 'renderer/components/shared/Popup.vue';
 import CryptoAddressValidator from '@swyftx/api-crypto-address-validator';
 import lodash from 'lodash';
 import { mapGetters } from 'vuex';
-import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro';
-import CoinSwapFlowToFiro from "renderer/components/CoinSwapPage/CoinSwapFlowToFiro";
+import CoinSwapFlowFromFiro from 'renderer/components/CoinSwapPage/CoinSwapFlowFromFiro.vue';
+import CoinSwapFlowToFiro from "renderer/components/CoinSwapPage/CoinSwapFlowToFiro.vue";
 import { bigintToString, stringToBigint } from 'lib/convert';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';
 import ExolixAPIWorker from 'lib/exolix-api';
-import LoadingBounce from 'renderer/components/Icons/LoadingBounce';
-import SwitchainIcon from 'renderer/components/Icons/SwitchainIcon';
-import BackButtonIcon from 'renderer/components/Icons/BackButtonIcon';
-import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
-import InputFrame from "renderer/components/shared/InputFrame";
-import Dropdown from "renderer/components/shared/Dropdown";
+import LoadingBounce from 'renderer/components/Icons/LoadingBounce.vue';
+import SwitchainIcon from 'renderer/components/Icons/SwitchainIcon.vue';
+import BackButtonIcon from 'renderer/components/Icons/BackButtonIcon.vue';
+import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance.vue";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
+import Dropdown from "renderer/components/shared/Dropdown.vue";
 
 import FIROIcon from "renderer/assets/CoinIcons/FIRO.svg.data";
 import BCHIcon from "renderer/assets/CoinIcons/BCH.svg.data";

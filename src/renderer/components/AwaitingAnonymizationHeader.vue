@@ -51,12 +51,12 @@
 <script>
 import {mapGetters} from "vuex";
 import {bigintToString} from "lib/convert";
-import Popup from "renderer/components/shared/Popup";
-import AnonymizeDialog from "renderer/components/AnonymizeDialog";
-import LelantusToSpark from "renderer/components/SendPage/LelantusToSpark";
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import Popup from "renderer/components/shared/Popup.vue";
+import AnonymizeDialog from "renderer/components/AnonymizeDialog.vue";
+import LelantusToSpark from "renderer/components/SendPage/LelantusToSpark.vue";
+import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
-import WaitOverlay from "renderer/components/shared/WaitOverlay";
+import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
 
 export default {
     name: "AwaitingAnonymizationHeader",

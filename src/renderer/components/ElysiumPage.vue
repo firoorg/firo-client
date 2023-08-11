@@ -55,20 +55,20 @@
 <script>
 import {markRaw} from "vue";
 import {mapActions, mapGetters} from "vuex";
-import SearchInput from "renderer/components/shared/SearchInput";
-import PlusButton from "renderer/components/shared/PlusButton";
-import Popup from "renderer/components/shared/Popup";
-import CreateTokenForm from "renderer/components/ElysiumPage/CreateTokenForm";
-import AddTokenForm from "renderer/components/ElysiumPage/AddTokenForm";
-import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import ElysiumTokenId from "renderer/components/AnimatedTable/ElysiumTokenId";
-import ElysiumTokenTicker from "renderer/components/AnimatedTable/ElysiumTokenTicker";
-import ElysiumTokenName from "renderer/components/AnimatedTable/ElysiumTokenName";
-import ElysiumTokenPrivateBalance from "renderer/components/AnimatedTable/ElysiumTokenPrivateBalance";
-import ElysiumTokenPublicBalance from "renderer/components/AnimatedTable/ElysiumTokenPublicBalance";
-import ElysiumTokenPendingBalance from "renderer/components/AnimatedTable/ElysiumTokenPendingBalance";
+import SearchInput from "renderer/components/shared/SearchInput.vue";
+import PlusButton from "renderer/components/shared/PlusButton.vue";
+import Popup from "renderer/components/shared/Popup.vue";
+import CreateTokenForm from "renderer/components/ElysiumPage/CreateTokenForm.vue";
+import AddTokenForm from "renderer/components/ElysiumPage/AddTokenForm.vue";
+import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable.vue";
+import ElysiumTokenId from "renderer/components/AnimatedTable/ElysiumTokenId.vue";
+import ElysiumTokenTicker from "renderer/components/AnimatedTable/ElysiumTokenTicker.vue";
+import ElysiumTokenName from "renderer/components/AnimatedTable/ElysiumTokenName.vue";
+import ElysiumTokenPrivateBalance from "renderer/components/AnimatedTable/ElysiumTokenPrivateBalance.vue";
+import ElysiumTokenPublicBalance from "renderer/components/AnimatedTable/ElysiumTokenPublicBalance.vue";
+import ElysiumTokenPendingBalance from "renderer/components/AnimatedTable/ElysiumTokenPendingBalance.vue";
 import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
-import PropertyInfo from "renderer/components/ElysiumPage/PropertyInfo";
+import PropertyInfo from "renderer/components/ElysiumPage/PropertyInfo.vue";
 
 const myTokensTableFields = [
     {name: markRaw(ElysiumTokenId)},

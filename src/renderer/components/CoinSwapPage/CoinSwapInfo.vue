@@ -142,9 +142,9 @@
 
 <script>
 // $emits: cancel, confirm
-import Amount from "renderer/components/shared/Amount";
+import Amount from "renderer/components/shared/Amount.vue";
 import QRCode from "easyqrcodejs";
-import TransactionId from "renderer/components/shared/TransactionId";
+import TransactionId from "renderer/components/shared/TransactionId.vue";
 
 export default {
     name: 'CoinSwapInfo',

@@ -26,7 +26,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import LoadingBounce from "../Icons/LoadingBounce";
+import LoadingBounce from "../Icons/LoadingBounce.vue";
 import {ago} from "time-ago";
 
 export default {

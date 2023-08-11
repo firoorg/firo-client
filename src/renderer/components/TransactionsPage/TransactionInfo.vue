@@ -152,12 +152,12 @@
 import electron from "electron";
 import {mapGetters} from "vuex";
 import { format } from 'date-fns'
-import Popup from "renderer/components/shared/Popup";
-import Amount from "renderer/components/shared/Amount";
-import WaitOverlay from "renderer/components/shared/WaitOverlay";
-import TransactionId from "renderer/components/shared/TransactionId";
-import Copyable from "renderer/components/shared/Copyable";
-import ElysiumAmount from "renderer/components/shared/ElysiumAmount";
+import Popup from "renderer/components/shared/Popup.vue";
+import Amount from "renderer/components/shared/Amount.vue";
+import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
+import TransactionId from "renderer/components/shared/TransactionId.vue";
+import Copyable from "renderer/components/shared/Copyable.vue";
+import ElysiumAmount from "renderer/components/shared/ElysiumAmount.vue";
 
 export default {
     name: "TransactionInfo",

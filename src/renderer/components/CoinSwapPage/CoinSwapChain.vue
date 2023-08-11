@@ -38,7 +38,7 @@
 
 <script>
 // $emits: cancel, confirm
-import Amount from "renderer/components/shared/Amount";
+import Amount from "renderer/components/shared/Amount.vue";
 import { VueSelect } from 'vue-select';
 
 export default {

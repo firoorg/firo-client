@@ -7,7 +7,7 @@
 
 <script>
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
-import Amount from "renderer/components/shared/Amount";
+import Amount from "renderer/components/shared/Amount.vue";
 
 export default {
     name: "ElysiumTokenPrivateBalance",

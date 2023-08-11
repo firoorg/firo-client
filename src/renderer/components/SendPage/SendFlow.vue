@@ -61,14 +61,14 @@
 
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import {mapGetters} from "vuex";
-import Popup from "renderer/components/shared/Popup";
-import ElysiumConfirmStep from "./ElysiumConfirmStep";
-import ConfirmStep from "./ConfirmStep";
-import PassphraseInput from "../shared/PassphraseInput";
-import ErrorStep from "./ErrorStep";
-import WaitOverlay from "renderer/components/shared/WaitOverlay";
-import GoPrivate from "./GoPrivate";
-import LelantusToSpark from "./LelantusToSpark";
+import Popup from "renderer/components/shared/Popup.vue";
+import ElysiumConfirmStep from "./ElysiumConfirmStep.vue";
+import ConfirmStep from "./ConfirmStep.vue";
+import PassphraseInput from "../shared/PassphraseInput.vue";
+import ErrorStep from "./ErrorStep.vue";
+import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
+import GoPrivate from "./GoPrivate.vue";
+import LelantusToSpark from "./LelantusToSpark.vue";
 
 export default {
     name: "SendFlow",

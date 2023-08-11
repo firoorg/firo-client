@@ -27,14 +27,14 @@
 <script>
 import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
-import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
-import Popup from 'renderer/components/shared/Popup';
-import AnimatedTableRelativeDate from "renderer/components/AnimatedTable/AnimatedTableRelativeDate";
-import CoinSwapSendAmount from "renderer/components/AnimatedTable/CoinSwapSendAmount";
-import CoinSwapReceivedAmount from "renderer/components/CoinSwapPage/CoinSwapReceivedAmount";
-import CoinSwapStatus from "renderer/components/CoinSwapPage/CoinSwapStatus";
-import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo";
-import SearchInput from "renderer/components/shared/SearchInput";
+import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable.vue';
+import Popup from 'renderer/components/shared/Popup.vue';
+import AnimatedTableRelativeDate from "renderer/components/AnimatedTable/AnimatedTableRelativeDate.vue";
+import CoinSwapSendAmount from "renderer/components/AnimatedTable/CoinSwapSendAmount.vue";
+import CoinSwapReceivedAmount from "renderer/components/CoinSwapPage/CoinSwapReceivedAmount.vue";
+import CoinSwapStatus from "renderer/components/CoinSwapPage/CoinSwapStatus.vue";
+import CoinSwapInfo from "renderer/components/CoinSwapPage/CoinSwapInfo.vue";
+import SearchInput from "renderer/components/shared/SearchInput.vue";
 
 const tableFields = [
     {name: markRaw(CoinSwapStatus), width: '60pt'},

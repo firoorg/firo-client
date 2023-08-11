@@ -20,8 +20,8 @@
 <script>
 import {mapGetters} from "vuex";
 import Sidebar from 'renderer/components/Sidebar'
-import AwaitingAnonymizationHeader from "renderer/components/AwaitingAnonymizationHeader";
-import LelantusDisabledHeader from "renderer/components/LelantusDisabledHeader";
+import AwaitingAnonymizationHeader from "renderer/components/AwaitingAnonymizationHeader.vue";
+import LelantusDisabledHeader from "renderer/components/LelantusDisabledHeader.vue";
 
 export default {
     name: 'MainLayout',

@@ -7,7 +7,7 @@
 <script>
 import {mapGetters} from 'vuex';
 import {shell} from 'electron';
-import Copyable from "renderer/components/shared/Copyable";
+import Copyable from "renderer/components/shared/Copyable.vue";
 
 export default {
     name: "TransactionId",

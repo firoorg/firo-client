@@ -25,7 +25,7 @@
 <script>
 // $emits: update:modelValue
 import {mapGetters} from "vuex";
-import Amount from "renderer/components/shared/Amount";
+import Amount from "renderer/components/shared/Amount.vue";
 
 export default {
     name: "PrivatePublicBalance",

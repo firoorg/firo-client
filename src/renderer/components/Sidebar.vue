@@ -26,8 +26,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import FiroLogoWhite from 'renderer/assets/FiroLogoWhite';
-import FiroLogoDark from 'renderer/assets/FiroLogoDark';
+import FiroLogoWhite from 'renderer/assets/FiroLogoWhite.vue';
+import FiroLogoDark from 'renderer/assets/FiroLogoDark.vue';
 import Balance from 'renderer/components/Sidebar/Balance'
 import MainMenu from 'renderer/components/Sidebar/MainMenu'
 import BlockchainStatus from 'renderer/components/Sidebar/BlockchainStatus'

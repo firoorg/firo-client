@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import PassphraseInput from "renderer/components/shared/PassphraseInput";
+import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 
 export default {
     name: "MnemonicPopup",

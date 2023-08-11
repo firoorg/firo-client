@@ -68,11 +68,11 @@
 import {mapGetters, mapMutations, mapActions} from 'vuex'
 import { ipcRenderer, remote } from 'electron';
 import version from "../../version";
-import Popup from 'renderer/components/shared/Popup';
-import MnemonicPopup from "renderer/components/SettingsPage/MnemonicPopup";
-import ChangePassphrasePopup from "renderer/components/SettingsPage/ChangePassphrasePopup";
-import WaitOverlay from "renderer/components/shared/WaitOverlay";
-import InputFrame from "renderer/components/shared/InputFrame";
+import Popup from 'renderer/components/shared/Popup.vue';
+import MnemonicPopup from "renderer/components/SettingsPage/MnemonicPopup.vue";
+import ChangePassphrasePopup from "renderer/components/SettingsPage/ChangePassphrasePopup.vue";
+import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
 
 export default {
     name: 'SettingsPage',

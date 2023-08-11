@@ -47,14 +47,14 @@ import {markRaw} from "vue";
 import {clipboard} from "electron";
 import {mapGetters, mapMutations} from "vuex";
 import QRCode from "easyqrcodejs";
-import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
-import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
-import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator";
-import InputFrame from "renderer/components/shared/InputFrame";
-import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon";
-import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon";
-import Popup from "renderer/components/shared/Popup";
+import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable.vue";
+import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel.vue";
+import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress.vue";
+import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator.vue";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
+import RefreshAddressIcon from "renderer/components/Icons/RefreshAddressIcon.vue";
+import CopyAddressIcon from "renderer/components/Icons/CopyAddressIcon.vue";
+import Popup from "renderer/components/shared/Popup.vue";
 import Dropdown from './shared/Dropdown.vue';
 
 export default {

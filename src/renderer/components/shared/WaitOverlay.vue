@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import FiroSymbol from "renderer/assets/FiroSymbol";
-import DotDotDot from "renderer/components/shared/DotDotDot";
+import FiroSymbol from "renderer/assets/FiroSymbol.vue";
+import DotDotDot from "renderer/components/shared/DotDotDot.vue";
 
 export default {
     name: "WaitOverlay",

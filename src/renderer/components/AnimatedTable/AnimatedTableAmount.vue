@@ -14,8 +14,8 @@
 
 <script>
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
-import Amount from 'renderer/components/shared/Amount';
-import ElysiumAmount from "renderer/components/shared/ElysiumAmount";
+import Amount from 'renderer/components/shared/Amount.vue';
+import ElysiumAmount from "renderer/components/shared/ElysiumAmount.vue";
 
 export default {
     name: 'AnimatedTableAmount',

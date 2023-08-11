@@ -37,14 +37,14 @@
 <script>
 import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
-import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo";
-import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable';
-import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate';
-import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount';
-import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel';
-import Popup from "renderer/components/shared/Popup";
+import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo.vue";
+import AnimatedTable from 'renderer/components/AnimatedTable/AnimatedTable.vue';
+import RelativeDate from 'renderer/components/AnimatedTable/AnimatedTableRelativeDate.vue';
+import Amount from 'renderer/components/AnimatedTable/AnimatedTableAmount.vue';
+import Label from 'renderer/components/AnimatedTable/AnimatedTableLabel.vue';
+import Popup from "renderer/components/shared/Popup.vue";
 import { bigintToString } from "lib/convert";
-import SearchInput from "renderer/components/shared/SearchInput";
+import SearchInput from "renderer/components/shared/SearchInput.vue";
 
 const tableFields = [
     {name: markRaw(RelativeDate), width: '160pt'},

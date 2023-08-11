@@ -177,24 +177,24 @@
 import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import {Form, Field} from "vee-validate";
-import SendFlow from "renderer/components/SendPage/SendFlow";
+import SendFlow from "renderer/components/SendPage/SendFlow.vue";
 import { isValidAddress, isValidLegacyAddress } from 'lib/isValidAddress';
 import {bigintToString, stringToBigint} from 'lib/convert';
-import Dropdown from "renderer/components/shared/Dropdown";
-import Amount from "renderer/components/shared/Amount";
-import InputSelection from "renderer/components/SendPage/InputSelection";
-import Popup from "renderer/components/shared/Popup";
-import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable";
-import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator";
-import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel";
-import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress";
-import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance";
-import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo";
-import SearchInput from "renderer/components/shared/SearchInput";
-import InputFrame from "renderer/components/shared/InputFrame";
-import PlusButton from "renderer/components/shared/PlusButton";
+import Dropdown from "renderer/components/shared/Dropdown.vue";
+import Amount from "renderer/components/shared/Amount.vue";
+import InputSelection from "renderer/components/SendPage/InputSelection.vue";
+import Popup from "renderer/components/shared/Popup.vue";
+import AnimatedTable from "renderer/components/AnimatedTable/AnimatedTable.vue";
+import CurrentAddressIndicator from "renderer/components/AnimatedTable/CurrentAddressIndicator.vue";
+import AddressBookItemLabel from "renderer/components/AnimatedTable/AddressBookItemLabel.vue";
+import AddressBookItemAddress from "renderer/components/AnimatedTable/AddressBookItemAddress.vue";
+import PrivatePublicBalance from "renderer/components/shared/PrivatePublicBalance.vue";
+import TransactionInfo from "renderer/components/TransactionsPage/TransactionInfo.vue";
+import SearchInput from "renderer/components/shared/SearchInput.vue";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
+import PlusButton from "renderer/components/shared/PlusButton.vue";
 import FiroSymbol from "renderer/assets/CoinIcons/FIRO.svg.data";
-import FiroWarning from 'renderer/assets/FiroWarning';
+import FiroWarning from 'renderer/assets/FiroWarning.vue';
 
 export default {
     name: 'SendPage',

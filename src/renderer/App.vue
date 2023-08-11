@@ -18,7 +18,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import WaitingScreen from "renderer/components/WaitingScreen";
+import WaitingScreen from "renderer/components/WaitingScreen.vue";
 import PassphraseRequestOverlay from "./components/shared/PassphraseRequestOverlay.vue";
 
 export default {

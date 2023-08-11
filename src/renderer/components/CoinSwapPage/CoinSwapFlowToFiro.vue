@@ -26,10 +26,10 @@
 <script>
 // $emits: success
 
-import Popup from 'renderer/components/shared/Popup';
-import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo';
-import ErrorStep from './ErrorStep';
-import WaitOverlay from 'renderer/components/shared/WaitOverlay';
+import Popup from 'renderer/components/shared/Popup.vue';
+import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo.vue';
+import ErrorStep from './ErrorStep.vue';
+import WaitOverlay from 'renderer/components/shared/WaitOverlay.vue';
 import ChangeAPIWorker from 'lib/changenow-api';
 import StealthAPIWorker from 'lib/stealth-api';
 import SwapzoneAPIWorker from 'lib/swapzone-api';

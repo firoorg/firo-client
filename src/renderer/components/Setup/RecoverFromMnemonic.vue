@@ -78,7 +78,7 @@
 
 <script>
 import {validateMnemonic} from "daemon/firod";
-import InputFrame from "renderer/components/shared/InputFrame";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
 
 export default {
     name: "RecoverFromMnemonic",

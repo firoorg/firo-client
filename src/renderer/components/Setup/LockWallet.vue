@@ -64,7 +64,7 @@
 <script>
 import {Firod} from "daemon/firod";
 import {mapGetters} from "vuex";
-import InputFrame from "renderer/components/shared/InputFrame";
+import InputFrame from "renderer/components/shared/InputFrame.vue";
 
 function apiStatus(daemon, eventData) {
     if (eventData?.data?.newLogMessages?.length) {
