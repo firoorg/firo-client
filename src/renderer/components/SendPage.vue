@@ -178,7 +178,7 @@ import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import {Form, Field} from "vee-validate";
 import SendFlow from "renderer/components/SendPage/SendFlow.vue";
-import { isValidAddress, isValidLegacyAddress } from 'lib/isValidAddress';
+import {isValidSparkAddress, isValidAddress, isValidLegacyAddress} from 'lib/isValidAddress';
 import {bigintToString, stringToBigint} from 'lib/convert';
 import Dropdown from "renderer/components/shared/Dropdown.vue";
 import Amount from "renderer/components/shared/Amount.vue";
@@ -332,6 +332,9 @@ export default {
 
             return (value) => {
                 if (!value) return '';
+
+                if (isValidSparkAddress(value, this.network) && !this.isSparkAllowed)
+                    return 'Spark is not yet enabled.';
 
                 if ((this.isPrivate && isValidAddress(value, this.network)) || (!this.isPrivate && isValidLegacyAddress(value, this.network)))
                     return true;
