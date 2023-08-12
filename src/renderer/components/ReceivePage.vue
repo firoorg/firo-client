@@ -17,7 +17,7 @@
                                v-model='label' @change='changeLabel' />
                     </InputFrame>
 
-                    <InputFrame label='Address Type'>
+                    <InputFrame v-if='isSparkAllowed' label='Address Type'>
                         <Dropdown :options='addressOptions' v-model='addressType' />
                     </InputFrame>
                 </div>
@@ -70,9 +70,9 @@ export default {
     },
 
     data() {
-        let addr = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === 'Spark')[0];
+        const addressType = this.isSparkAllowed ? 'Spark' : 'Transparent';
         return {
-            address: addr?.address,
+            address: $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === addressType)[0]?.address,
             label: '',
             _quickLabel: null,
             qrCode: null,
@@ -80,7 +80,7 @@ export default {
             show: '',
             error: '',
             passphrase: '',
-            addressType: 'Spark',
+            addressType,
 
             addressOptions: [
                 {id: 'Spark', name: 'Spark'},
@@ -100,6 +100,7 @@ export default {
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
             txos: 'Transactions/TXOs',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed'
         }),
 
         tableData() {
