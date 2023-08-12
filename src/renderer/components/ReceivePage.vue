@@ -167,7 +167,7 @@ export default {
         },
 
         addressType() {
-            this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === check)[0]?.address;
+            this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === this.addressType)[0]?.address;
         }
     },
 
