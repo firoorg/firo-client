@@ -262,11 +262,8 @@ export default {
                 display: inline-block;
             }
 
-            .action-buttons {
-                vertical-align: top;
-                display: inline;
-                margin-left: calc(var(--padding-base) - 2px);
-                width: $input-right-space-interior;
+            .icons * {
+                cursor: pointer;
             }
 
             .receiving-address {
