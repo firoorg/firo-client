@@ -316,7 +316,7 @@ const getters = {
                 !(txo.isElysiumReferenceOutput && txo.elysium.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
                 !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
                 !(txo.elysium.type === 'Lelantus Mint') &&
-                (txo.isElysiumReferenceOutput || txo.destination || (txo.inputPrivacy === 'sparkmint' || (txo.inputPrivacy === 'sparkspend'))) &&
+                (txo.isElysiumReferenceOutput || txo.destination || (txo.inputPrivacy === 'sparkspend')) &&
                 (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
                 (txo.isFromMe || txo.isToMe || txo.elysium.isToMe)
         )
