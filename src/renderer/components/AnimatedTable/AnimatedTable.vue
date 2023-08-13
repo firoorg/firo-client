@@ -30,7 +30,7 @@
 
 <script>
 import Vuetable from 'vue3-vuetable'
-import AnimatedTablePagination from './AnimatedTablePagination'
+import AnimatedTablePagination from './AnimatedTablePagination.vue'
 import _ from 'lodash'
 
 export default {

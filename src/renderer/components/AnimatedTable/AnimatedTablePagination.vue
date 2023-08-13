@@ -95,6 +95,7 @@ a {
     display: inline-block;
     color: var(--color-text-primary);
     cursor: pointer;
+    text-decoration: none !important;
 }
 
 .icon {
