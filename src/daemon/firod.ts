@@ -223,7 +223,7 @@ export interface TxOut {
     isElysiumReferenceOutput: boolean;
     destination?: string;
     lelantusSerialHash?: string;
-    sparkInputLTagHashes?: string;
+    sparkSerialHash?: string;
 }
 
 type ElysiumPropertyLelantusStatus = "SoftDisabled" | "SoftEnabled" | "HardDisabled" | "HardEnabled";
@@ -274,7 +274,7 @@ export interface Transaction {
     outputs: TxOut[];
     publicInputs: CoinControl;
     lelantusInputSerialHashes: string[];
-    sparkInputLTagHashes: string[];
+    sparkInputSerialHashes: string[];
     elysium?: ElysiumData;
 
     // blockHash MAY be set without blockHeight or blockTime, in which case the transaction is from an orphaned block.
@@ -1485,7 +1485,7 @@ export class Firod {
     async getMasternodeList() : Promise<Object> {
         return await this.send('', 'initial', 'masternodeList', {});
     }
-    
+
     async readAddressBook() : Promise<AddressBookItem[]> {
         const data = await this.send('', 'create', 'readAddressBook', {});
         if (data instanceof Array && !data.find(e => !isValidAddressBookItem(e))) {
@@ -1568,7 +1568,14 @@ export class Firod {
         }
         return <string[]>data;
     }
-    
+
+    async mintAll(auth: string): Promise<string[]> {
+        if ((await this.apiStatus()).data.isSpark)
+            return this.mintAllSpark(auth);
+        else
+            return this.mintAllLelantus(auth);
+    }
+
     async mintElysium(auth: string, address: string, propertyId: number): Promise<{txids: string[]}> {
         return <any>await this.send(auth, null, 'mintElysium', {
             address,

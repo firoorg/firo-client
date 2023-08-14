@@ -270,8 +270,8 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.page.locator('.waiting-screen').waitFor({state: 'detached', timeout: 60e3});
     }
 
-    async function mintAllLelantus(this: This) {
-        await this.page.evaluate(([pw]) => $daemon.mintAllLelantus(pw), [passphrase]);
+    async function mintAll(this: This) {
+        await this.page.evaluate(([pw]) => $daemon.mintAll(pw), [passphrase]);
         // Wait so that new mints have time to get out from the upcoming transactions queue.
         await new Promise(r => setTimeout(r, 1e3));
     }
@@ -289,12 +289,12 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
 
         while (Number(await privateBalanceElement.innerText()) < 20) {
-            await mintAllLelantus.bind(this)();
+            await mintAll.bind(this)();
 
             while (!await publicBalanceElement.isVisible()) {
                 await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
             }
-            await mintAllLelantus.bind(this)();
+            await mintAll.bind(this)();
 
             await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
         }
