@@ -1,3 +1,5 @@
+/// <reference path="../src/globals.d.ts" />
+
 process.env.FIRO_CLIENT_TEST = 'true';
 process.env.DEBUG = "pw:browser";
 
@@ -9,7 +11,6 @@ import fs from 'fs';
 import {assert} from 'chai';
 import {bigintToString, stringToBigint} from "../src/lib/convert";
 import {TXO} from "../src/store/modules/Transactions";
-import "../src/globals";
 
 interface This extends Mocha.Context {
     app: ElectronApplication;

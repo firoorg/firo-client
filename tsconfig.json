@@ -12,5 +12,5 @@
     "moduleResolution": "Node",
     "allowJs": true
   },
-  "include": ["src/vue-shim.d.ts", "src/globals.d.ts", "src/**/*.ts", "src/**/*.vue", "src/**/*.js"]
+  "include": ["src/vue-shim.d.ts", "src/globals.d.ts", "src/**/*.ts", "src/**/*.vue", "src/**/*.js", "test/**/*.ts"]
 }
