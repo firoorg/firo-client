@@ -1552,19 +1552,19 @@ export class Firod {
     // Turn all of our non-Lelantus coins into Lelantus coins. Should be preferred to mintSigma if Lelantus is
     // available.
     async mintAllLelantus(auth: string): Promise<string[]> {
-        const data = await this.send(auth, 'create', 'autoMintLelantus', null);
-        if (typeof data !== 'object') throw new UnexpectedFirodResponse('create/mint', data);
+        const data = await this.send(auth, 'none', 'autoMintLelantus', null);
+        if (typeof data !== 'object') throw new UnexpectedFirodResponse('none/mint', data);
         for (const x in data) {
-            if (typeof x !== 'string') throw new UnexpectedFirodResponse('create/mint', data);
+            if (typeof x !== 'string') throw new UnexpectedFirodResponse('none/mint', data);
         }
         return <string[]>data;
     }
 
     async mintAllSpark(auth: string): Promise<string[]> {
-        const data = await this.send(auth, 'create', 'autoMintSpark', null);
-        if (typeof data !== 'object') throw new UnexpectedFirodResponse('create/mint', data);
+        const data = await this.send(auth, 'none', 'autoMintSpark', null);
+        if (typeof data !== 'object') throw new UnexpectedFirodResponse('none/mint', data);
         for (const x in data) {
-            if (typeof x !== 'string') throw new UnexpectedFirodResponse('create/mint', data);
+            if (typeof x !== 'string') throw new UnexpectedFirodResponse('none/mint', data);
         }
         return <string[]>data;
     }
