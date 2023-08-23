@@ -237,8 +237,7 @@ export default {
             filter: '',
             selectedAsset: 'FIRO',
             showConnectionTransaction: false,
-            connectionTransaction: null,
-            availableSparkFiro: 0
+            connectionTransaction: null
         }
     },
 

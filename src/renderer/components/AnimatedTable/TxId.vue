@@ -1,11 +1,7 @@
 <template>
     <th v-if="isHeader">Transaction ID/Index</th>
-    <td v-else-if="!rowData.isLocked" class="txid-index">
-        {{ rowData.txid }}-{{ rowData.index }}  
-    </td>
-    <td v-else class="disable-txt">
+    <td v-else class="txid-index">
         {{ rowData.txid }}-{{ rowData.index }}
-         
     </td>
 </template>
 
@@ -13,7 +9,7 @@
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue'
 
 export default {
-    name: 'UTXOSelector',
+    name: 'TxId',
 
     mixins: [
         VuetableFieldMixin
@@ -23,15 +19,6 @@ export default {
 
 <style scoped lang="scss">
 .txid-index {
-    user-select: text;
-    font: {
-        size: 0.8em;
-        family: "Robot Mono";
-    }
-}
-
-.disable-txt {
-    color: rgba(0,0,0,0.3);
     user-select: text;
     font: {
         size: 0.8em;

@@ -67,9 +67,7 @@ export default {
         return {
             error: null,
             show: 'button',
-            passphrase: '',
-            migrate: false,
-            goprivate: false
+            passphrase: ''
         }
     },
 
@@ -115,7 +113,6 @@ export default {
 
         cancel() {
             this.error = null;
-            this.goprivate = false;
             this.show = 'button';
         },
 
@@ -128,7 +125,6 @@ export default {
             this.show = 'wait';
             const passphrase = this.passphrase;
             this.passphrase = '';
-            this.goprivate = false;
 
             try {
                 // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic

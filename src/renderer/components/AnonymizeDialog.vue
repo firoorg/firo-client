@@ -29,15 +29,13 @@ export default {
         };
     },
 
-    computed: {
-        ...mapGetters({
-            availablePublic: 'Balance/availablePublic',
-            pendingConversion: 'Balance/pendingConversion',
-            tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
-            tokenData: 'Elysium/tokenData',
-            isSparkAllowed: 'ApiStatus/isSparkAllowed'
-        })
-    },
+    computed: mapGetters({
+        availablePublic: 'Balance/availablePublic',
+        pendingConversion: 'Balance/pendingConversion',
+        tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
+        tokenData: 'Elysium/tokenData',
+        isSparkAllowed: 'ApiStatus/isSparkAllowed'
+    }),
 
     methods: {
         ...mapActions({
@@ -78,12 +76,8 @@ export default {
 
             try {
                 if (this.isSparkAllowed) {
-                    if (this.pendingConversion > 0) {
+                    if (this.pendingConversion > 0)
                         await $daemon.lelantusToSpark(passphrase);
-
-                        // FIXME: This is a hack to update the wallet state after anonymization because lelantusToSpark doesn't send the proper events.
-                        await this.setWalletState(await firod.getStateWallet());
-                    }
 
                     await $daemon.mintAllSpark(passphrase);
                 } else {

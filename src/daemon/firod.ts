@@ -293,8 +293,9 @@ export interface TransactionInput {
     index: number;
 }
 
+type AddressType = 'Transparent' | 'Spark';
 export interface AddressBookItem {
-    addressType: string;
+    addressType: AddressType;
     address: string;
     label: string;
     createdAt?: number; // UNIX timestamp in milliseconds
@@ -304,7 +305,7 @@ export interface AddressBookItem {
 function isValidAddressBookItem(x: any): x is AddressBookItem {
     const r = x !== null &&
         typeof x === 'object' &&
-        typeof x.addressType === 'string' &&
+        ['Spark', 'Transparent'].includes(x.addressType) &&
         typeof x.address === 'string' &&
         typeof x.label === 'string' &&
         typeof x.purpose === 'string';
@@ -1539,7 +1540,7 @@ export class Firod {
     }
 
     // Get an unused address with no associated label.
-    async getUnusedAddress(addresstype: string = 'Transparent'): Promise<string> {
+    async getUnusedAddress(addresstype: AddressType = 'Transparent'): Promise<string> {
         const data = await this.send(null, 'none', 'paymentRequestAddress', {addressType: addresstype});
 
         if (typeof data === 'object' && typeof data['address'] === 'string') {
@@ -1798,20 +1799,22 @@ export class Firod {
     }
 
     async spendSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
-        subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
+                     subtractFeeFromAmount: boolean, coinControl?: CoinControl): Promise<{txid: string}> {
         const data = await this.send(auth, 'create', 'spendSpark', {
-        label,
-        recipient,
-        amount,
-        subtractFeeFromAmount,
-        feePerKb,
-        coinControl: {
-            selected: coinControlToString(coinControl)
-        }
+            label,
+            recipient,
+            amount,
+            subtractFeeFromAmount,
+            feePerKb,
+            coinControl: {
+                selected: coinControlToString(coinControl)
+            }
         });
+
         function isValidResponse(x: any): x is {txid: string} {
             return x !== null && typeof x === 'object' && typeof x.txid === 'string';
         }
+
         if (isValidResponse(data)) {
             return data;
         } else {

@@ -284,7 +284,7 @@ const getters = {
     ,
 
     calculateTransactionFee: (state, getters) =>
-        (privacy, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => selectUTXOs(privacy, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl)?.[0]
+        (privacy: PrivacyType, amount: bigint, feePerKb: bigint, subtractFeeFromAmount: boolean, coinControl?: TXO[]): bigint => selectUTXOs(privacy, amount, feePerKb, subtractFeeFromAmount, coinControl ? coinControl : getters.availableUTXOs, !!coinControl)?.[0]
 };
 
 export default {
