@@ -142,6 +142,7 @@ export default {
                 if (!this.address) return;
 
                 this.label = this.addressBook[this.address]?.label || this._quickLabel || '';
+                this.addressType = this.addressBook[this.address]?.addressType || 'Spark';
                 this._quickLabel = null;
 
                 // Don't throw errors during reload.
@@ -165,6 +166,10 @@ export default {
                 const img = document?.querySelector('.qr-code img');
                 if (img) img.style = 'width: 200px; height: 200px';
             }
+        },
+
+        addressType() {
+            this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === this.addressType)[0]?.address;
         }
     },
 
