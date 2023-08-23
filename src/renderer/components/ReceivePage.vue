@@ -70,7 +70,7 @@ export default {
     },
 
     data() {
-        const addressType = this.isSparkAllowed ? 'Spark' : 'Transparent';
+        const addressType = $store.getters['ApiStatus/isSparkAllowed'] ? 'Spark' : 'Transparent';
         return {
             address: $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === addressType)[0]?.address,
             label: '',
@@ -165,10 +165,6 @@ export default {
                 const img = document?.querySelector('.qr-code img');
                 if (img) img.style = 'width: 200px; height: 200px';
             }
-        },
-
-        addressType() {
-            this.address = $store.getters['AddressBook/receiveAddresses'].filter(a => a.addressType === this.addressType)[0]?.address;
         }
     },
 
@@ -204,13 +200,17 @@ export default {
             const addressBook = await $daemon.readAddressBook();
             this.setAddressBook(addressBook);
 
-            this.label = '';
-            this.isDefaultAddress = true;
+            // Spark addresses don't need to be automatically refreshed.
+            if (this.addressType == 'Transparent') {
+                this.label = '';
+                this.isDefaultAddress = true;
+            }
+
             // We have to replicate the sorting of this.receiveAddresses here due to timing issues. $nextTick doesn't
             // work either. :(
             this.address = addressBook
-                .filter(a => a.purpose === 'receive')
-                .sort((a, b) => b.createdAt - a.createdAt)[0].address;
+                .filter(a => a.purpose === 'receive' && a.addressType === this.addressType)
+                .sort((a, b) => b.createdAt - a.createdAt)[0]?.address;
         },
 
         navigateToAddressBookItem(item) {
