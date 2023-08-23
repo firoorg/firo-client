@@ -224,7 +224,7 @@ export default {
         },
 
         async attemptGrant() {
-            const canGrant = !!this.availableUTXOs.find(txo => txo.amount >= 300000n && txo.destination == this.property.issuer && !txo.isPrivate);
+            const canGrant = !!this.availableUTXOs.find(txo => txo.amount >= 300000n && txo.destination == this.property.issuer && txo.privacyUse == 'public');
             if (!canGrant) {
                 this.error = `To grant, send at least 0.003 FIRO to ${this.property.issuer} first.`;
                 return;

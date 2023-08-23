@@ -1,16 +1,12 @@
 <template>
     <div>
         <div class="warning-header">
-            <div v-if="this.isSparkAllowed && availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod">
-                Firo is migrating to Spark. Redemption of coins in Lelantus will be disabled at block {{ lelantusGracefulPeriod }}. Current block is {{ currentBlockHeight }}.
-                <a id="anonymize-firo-link" @click="show = 'lelantustospark'">Click here</a> to migrate {{ bigintToString(availableLelantus) }} FIRO from Lelantus.
-            </div>
-            <div v-else>
-                <span v-if="availablePublic && nTokensNeedingAnonymization > 1">
-                    {{ bigintToString(availablePublic) }} FIRO and {{ nTokensNeedingAnonymization }} Elysium tokens
+            <div>
+                <span v-if="toAnonymize && nTokensNeedingAnonymization > 1">
+                    {{ bigintToString(toAnonymize) }} FIRO and {{ nTokensNeedingAnonymization }} Elysium tokens
                     awaiting anonymization.
                 </span>
-                <span v-else-if="availablePublic && nTokensNeedingAnonymization">
+                <span v-else-if="toAnonymize && nTokensNeedingAnonymization">
                     {{ bigintToString(availablePublic) }} FIRO and 1 Elysium token awaiting anonymization.
                 </span>
                 <span v-else-if="nTokensNeedingAnonymization > 1">
@@ -19,25 +15,13 @@
                 <span v-else-if="nTokensNeedingAnonymization">
                     1 Elysium token awaiting anonymization.
                 </span>
-                <span v-else-if="availablePublic">
-                    {{ bigintToString(availablePublic) }} FIRO awaiting anonymization.
+                <span v-else-if="toAnonymize">
+                    {{ bigintToString(toAnonymize) }} FIRO awaiting anonymization.
                 </span>
                 <a id="anonymize-firo-link" @click="showAnonymizeDialog = true">Click here</a> to secure
-                {{ nTokensNeedingAnonymization > 1 || availablePublic ? "them" : "it" }}.
+                {{ nTokensNeedingAnonymization > 1 || toAnonymize ? "them" : "it" }}.
             </div>
         </div>
-
-        <Popup v-if="show === 'lelantustospark'" >
-             <LelantusToSpark
-                @migrate="goToPassphraseStep()"
-                @ignore="cancel()"
-            />
-        </Popup>
-
-        <Popup v-if="show === 'passphrase'" >
-            <WaitOverlay v-if="waiting" />
-            <PassphraseInput v-else-if = "!waiting" v-model="passphrase" :error="error" @cancel="cancel()" @confirm="attemptSend" />
-        </Popup>
 
         <Popup v-if="showAnonymizeDialog" >
             <AnonymizeDialog
@@ -53,9 +37,7 @@ import {mapGetters} from "vuex";
 import {bigintToString} from "lib/convert";
 import Popup from "renderer/components/shared/Popup.vue";
 import AnonymizeDialog from "renderer/components/AnonymizeDialog.vue";
-import LelantusToSpark from "renderer/components/SendPage/LelantusToSpark.vue";
 import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
-import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
 
 export default {
@@ -64,7 +46,6 @@ export default {
     components: {
         Popup,
         AnonymizeDialog,
-        LelantusToSpark,
         PassphraseInput,
         WaitOverlay
     },
@@ -84,11 +65,12 @@ export default {
             availablePublic: 'Balance/availablePublic',
             enableElysium: 'App/enableElysium',
             tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
-            isSparkAllowed: 'ApiStatus/isSparkAllowed',
-            availableLelantus: 'Balance/availableLelantus',
-            currentBlockHeight: 'ApiStatus/currentBlockHeight',
-            lelantusGracefulPeriod: 'ApiStatus/lelantusGracefulPeriod',
+            pendingConversion: 'Balance/pendingConversion'
         }),
+
+        toAnonymize() {
+            return this.availablePublic + this.pendingConversion;
+        },
 
         nTokensNeedingAnonymization() {
             if (!this.enableElysium) return 0;
@@ -97,48 +79,7 @@ export default {
     },
 
     methods: {
-        bigintToString,
-
-        closeDialog() {
-            this.showAnonymizeDialog = false;
-        },
-
-        cancel() {
-            this.passphrase = '';
-            this.error = null;
-            this.lelantustospark = false;
-            this.show = 'button';
-            this.$emit('cancel')
-        },
-
-        goToPassphraseStep() {
-            this.show = 'passphrase';
-        },
-
-        async attemptSend () {
-            const passphrase = this.passphrase;
-            this.passphrase = '';
-            this.waiting = true;
-            try {
-                await $daemon.lelantusToSpark(passphrase);
-            } catch (e) {
-                if (e instanceof IncorrectPassphrase) {
-                    this.error = 'Incorrect Passphrase';
-                } else if (e instanceof FirodErrorResponse) {
-                    this.error = e.errorMessage;
-                } else {
-                    this.error = `${e}`;
-                }
-                this.waiting = false;
-                this.show = 'passphrase';
-                return;
-            }
-
-            this.error = null;
-            this.waiting = false;
-            this.show = 'button';
-            this.$emit('success');
-        }
+        bigintToString
     }
 }
 </script>

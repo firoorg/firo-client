@@ -5,15 +5,7 @@
                 Reset
             </button>
 
-            <button v-if= "this.isSpark && this.$parent.availableLelantus > 0 && currentBlockHeight < lelantusGracefulPeriod" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'lelantustospark'">
-                Send
-            </button>
-
-            <button v-else-if= "!this.isPrivate && !this.$parent.isSparkAddr && this.isSpark && !this.goprivate" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'goprivate'">
-                Send
-            </button>
-
-            <button v-else= "" id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'confirm'">
+            <button id="send-button" class="solid-button recommended" :disabled="disabled" @click="show = 'confirm'">
                 Send
             </button>
         </div>
@@ -39,16 +31,6 @@
                 @cancel="cancel()"
                 @confirm="goToPassphraseStep()"
             />
-            <GoPrivate
-                v-else-if="show === 'goprivate'"
-                @ignore="goToConfirmStep()"
-                @go_private="goToPrivate()"
-            />
-            <LelantusToSpark
-                v-else-if="show === 'lelantustospark'"
-                @migrate="goToMigrateStep()"
-                @ignore="goToConfirmStepWithCheckingPrivate()"
-            />
             <PassphraseInput v-else-if="show === 'passphrase'" :error="error" v-model="passphrase" @cancel="cancel()" @confirm="attemptSend" />
             <WaitOverlay v-else-if="show === 'wait'" />
             <ErrorStep v-else-if="show === 'error'" :error="error" @ok="cancel()" />
@@ -67,8 +49,7 @@ import ConfirmStep from "./ConfirmStep.vue";
 import PassphraseInput from "../shared/PassphraseInput.vue";
 import ErrorStep from "./ErrorStep.vue";
 import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
-import GoPrivate from "./GoPrivate.vue";
-import LelantusToSpark from "./LelantusToSpark.vue";
+import { isValidSparkAddress } from "lib/isValidAddress";
 
 export default {
     name: "SendFlow",
@@ -80,8 +61,6 @@ export default {
         PassphraseInput,
         ErrorStep,
         WaitOverlay,
-        GoPrivate,
-        LelantusToSpark
     },
 
     data() {
@@ -116,34 +95,18 @@ export default {
             tokenData: 'Elysium/tokenData',
             currentBlockHeight: 'ApiStatus/currentBlockHeight',
             lelantusGracefulPeriod: 'ApiStatus/lelantusGracefulPeriod',
+            isSparkAllowed: 'ApiStatus/isSparkAllowed',
+            network: 'ApiStatus/network'
         }),
 
         totalAmount() {
             return this.subtractFeeFromAmount ? this.amount : this.amount + this.computedTxFee;
-        },
-
-        isSpark() {
-            return this.$parent.isSparkAllowed
         }
     },
 
     methods: {
         goToPassphraseStep() {
             this.show = 'passphrase';
-        },
-
-        goToMigrateStep() {
-            this.migrate = true;
-            this.show = 'passphrase';
-        },
-
-        goToConfirmStepWithCheckingPrivate() {
-            if(!this.isPrivate && !this.$parent.isSparkAddr && this.isSpark && !this.goprivate) {
-                this.show = 'goprivate';
-                this.goprivate = true;
-            } else {
-                this.show = 'confirm';
-            }
         },
 
         goToConfirmStep() {
@@ -156,27 +119,40 @@ export default {
             this.show = 'button';
         },
 
-        goToPrivate() {
-            this.$parent.cleanupForm();
-            this.cancel();
-        },
-
         reset() {
             this.cancel();
             this.$emit('reset');
         },
 
-        async attemptSend () {
+        async attemptSend() {
             this.show = 'wait';
             const passphrase = this.passphrase;
             this.passphrase = '';
             this.goprivate = false;
 
             try {
-                if (this.migrate) {
-                    await $daemon.lelantusToSpark(passphrase);
-                    this.migrate = false;
-                } else if (this.asset != 'FIRO') {
+                // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
+                // algorithm that interferes with fee calculation.
+                if (this.asset == 'FIRO') {
+                    if (!this.isPrivate) {
+                        const coinControl = this.coinControl || this.selectInputs('public', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+
+                        if (isValidSparkAddress(this.address, this.network))
+                            await $daemon.mintSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
+                        else
+                            await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                                this.subtractFeeFromAmount, coinControl);
+                    } else if (this.isSparkAllowed) {
+                        const coinControl = this.coinControl || this.selectInputs('spark', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                        await $daemon.spendSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                            this.subtractFeeFromAmount, coinControl);
+                    } else {
+                        const coinControl = this.coinControl || this.selectInputs('lelantus', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
+                        await $daemon.sendLelantus(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                            this.subtractFeeFromAmount, coinControl);
+
+                    }
+                } else {
                     const id = this.tokenData[this.asset].id;
 
                     try {
@@ -186,43 +162,6 @@ export default {
 
                         await $daemon.recoverElysium(passphrase);
                         await $daemon.sendElysium(passphrase, id, this.address, this.amount);
-                    }
-                } else if (this.isPrivate && !this.isSpark) {
-                    // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
-                    // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(true, false, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, coinControl);
-                } else if (this.isPrivate && this.isSpark) {
-                    // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
-                    // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(true, true, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    await $daemon.spendSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, coinControl);
-                } else if (!this.isPrivate && this.isSpark && this.$parent.isSparkAddr) {
-                    // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
-                    // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(false, true, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    await $daemon.mintSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
-                        this.subtractFeeFromAmount, coinControl);
-                } else {
-                    let lockedCoins = [];
-                    if (this.coinControl && this.allowBreakingMasternodes) {
-                        lockedCoins = this.coinControl.filter(coin =>
-                            this.lockedUTXOs.find(tx => tx.txid === coin[0] && tx.index === coin[1])
-                        );
-                        if (lockedCoins.length) await $daemon.updateCoinLocks(passphrase, [], lockedCoins);
-                    }
-
-                    // Under the hood we'll always use coin control because the daemon uses a very  complex stochastic
-                    // algorithm that interferes with fee calculation.
-                    const coinControl = this.coinControl || this.selectInputs(false, false, this.$parent.isTransparentAddress, this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                    try {
-                        await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
-                            this.subtractFeeFromAmount, coinControl);
-                    } catch (e) {
-                        await $daemon.updateCoinLocks(passphrase, lockedCoins, []);
-                        throw e;
                     }
                 }
             } catch (e) {

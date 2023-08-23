@@ -336,7 +336,7 @@ export default {
                 if (isValidSparkAddress(value, this.network) && !this.isSparkAllowed)
                     return 'Spark is not yet enabled.';
 
-                if ((this.isPrivate && isValidAddress(value, this.network)) || (!this.isPrivate && isValidLegacyAddress(value, this.network)))
+                if (isValidAddress(value, this.network))
                     return true;
 
                 return 'The Firo address you entered is invalid';
@@ -382,7 +382,12 @@ export default {
 
         transactionFee() {
             if (this.selectedAsset != 'FIRO' || !this.satoshiAmount || !this.available || this.available < this.satoshiAmount) return undefined;
-            return this.calculateTransactionFee(this.isPrivate, this.isSparkAllowed, isValidAddress(this.address, this.network), this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
+
+            let privacyType = 'public';
+            if (this.isPrivate)
+                privacyType = this.isSparkAllowed ? 'spark' : 'lelantus';
+
+            return this.calculateTransactionFee(privacyType, this.satoshiAmount, this.txFeePerKb, this.subtractFeeFromAmount, this.customInputs.length ? this.customInputs : undefined) || 0n;
         },
 
         formDisabled() {

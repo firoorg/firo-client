@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import WaitOverlay from "renderer/components/shared/WaitOverlay.vue";
 import {IncorrectPassphrase, FirodErrorResponse} from "daemon/firod";
 import Amount from "renderer/components/shared/Amount.vue";
@@ -32,6 +32,7 @@ export default {
     computed: {
         ...mapGetters({
             availablePublic: 'Balance/availablePublic',
+            pendingConversion: 'Balance/pendingConversion',
             tokensNeedingAnonymization: 'Elysium/tokensNeedingAnonymization',
             tokenData: 'Elysium/tokenData',
             isSparkAllowed: 'ApiStatus/isSparkAllowed'
@@ -39,6 +40,10 @@ export default {
     },
 
     methods: {
+        ...mapActions({
+            setWalletState: 'Transactions/setWalletState'
+        }),
+
         cancel() {
             this.passphrase = '';
             this.error = null;
@@ -72,7 +77,14 @@ export default {
             }
 
             try {
-                if(this.isSparkAllowed) {
+                if (this.isSparkAllowed) {
+                    if (this.pendingConversion > 0) {
+                        await $daemon.lelantusToSpark(passphrase);
+
+                        // FIXME: This is a hack to update the wallet state after anonymization because lelantusToSpark doesn't send the proper events.
+                        await this.setWalletState(await firod.getStateWallet());
+                    }
+
                     await $daemon.mintAllSpark(passphrase);
                 } else {
                     await $daemon.mintAllLelantus(passphrase);

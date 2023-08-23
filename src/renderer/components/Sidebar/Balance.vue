@@ -29,6 +29,11 @@
             <label>Immature:</label>
             <amount :amount="immature" ticker="FIRO" />
         </div>
+
+        <div v-if="pendingConversion > 0" class="balance pending-conversion">
+            <label>Pending Conversion:</label>
+            <amount :amount="pendingConversion" ticker="FIRO" />
+        </div>
     </section>
 </template>
 
@@ -56,7 +61,8 @@ export default {
             availablePublic: 'Balance/availablePublic',
             incoming: 'Balance/incoming',
             pendingChange: 'Balance/pendingChange',
-            immature: 'Balance/immature'
+            immature: 'Balance/immature',
+            pendingConversion: 'Balance/pendingConversion'
         })
     }
 }

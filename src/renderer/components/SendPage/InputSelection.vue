@@ -59,7 +59,7 @@ export default {
     computed: {
         ...mapGetters({
             TXOMap: 'Transactions/TXOMap',
-            availableUTXOsWithLock: 'Transactions/availableUTXOsWithLock',
+            availableUTXOs: 'Transactions/availableUTXOs',
             isSparkAllowed: 'ApiStatus/isSparkAllowed'
         }),
 
@@ -74,8 +74,9 @@ export default {
         },
 
         ourUnspentUTXOs() {
-            return this.availableUTXOsWithLock
-                .filter(tx => tx.isPrivate === this.isPrivate)
+            const privacyUse = this.isPrivate ? (this.isSparkAllowed ? 'spark' : 'lelantus') : 'public';
+            return this.availableUTXOs
+                .filter(tx => tx.privacyUse == privacyUse)
                 .sort((a, b) => Number(b.amount - a.amount) || a.txid.localeCompare(b.txid) || a.index - b.index)
                 .map(tx => ({...tx, uniqId: `${tx.txid}-${tx.index}`}));
         }

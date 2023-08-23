@@ -534,11 +534,11 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             }
 
             const availableUTXOs = lodash.shuffle(
-                <TXO[]>await this.page.evaluate(([isPrivate]) =>
+                <TXO[]>await this.page.evaluate(([privacyUse]) =>
                         $store.getters['Transactions/availableUTXOs']
-                            .filter(tx => tx.isPrivate === isPrivate)
+                            .filter(tx => tx.privacyUse === privacyUse)
                             .map(tx => ({...tx, amount: String(tx.amount)}))
-                    , [paymentType === 'private'])
+                    , [paymentType === 'private' ? 'spark' : 'public'])
             ).map(tx => ({...tx, amount: BigInt(tx.amount)}));
 
             const selectedUTXOs = [];
