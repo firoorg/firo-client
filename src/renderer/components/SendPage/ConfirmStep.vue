@@ -62,4 +62,8 @@ export default {
 
 <style scoped lang="scss">
 @import "src/renderer/styles/info-popup";
+
+.address.value {
+    max-width: 300px;
+}
 </style>
