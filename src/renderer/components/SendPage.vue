@@ -332,10 +332,11 @@ export default {
             return (value) => {
                 if (!value) return '';
 
-                if (isValidSparkAddress(value, this.network) && !this.isSparkAllowed)
-                    return 'Spark is not yet enabled.';
-
-                if (isValidAddress(value, this.network))
+                if (isValidSparkAddress(value, this.network)) {
+                    if (!this.isSparkAllowed) return 'Spark is not yet enabled.'
+                    else if (this.selectedAsset != 'FIRO') return 'Spark addresses cannot be used with Elysium.';
+                    else return true;
+                } else if (isValidLegacyAddress(value, this.network))
                     return true;
 
                 return 'The Firo address you entered is invalid';
