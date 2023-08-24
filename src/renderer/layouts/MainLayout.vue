@@ -49,7 +49,7 @@ export default {
         }),
 
         hasHeader() {
-            return this.showPaymentPendingWarning || !this.isLelantusAllowed;
+            return this.showAnonymizationHeader || !this.isLelantusAllowed;
         }
     }
 }
