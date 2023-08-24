@@ -192,12 +192,13 @@ const getters = {
     firoClientNetwork: (state) => state.firoClientNetwork,
     blockchainLocation: (state) => state.blockchainLocation,
     isInitialized: (state) => state.isInitialized,
-    showPaymentPendingWarning: (state, getters, rootState, rootGetters) =>
+    showAnonymizationHeader: (state, getters, rootState, rootGetters) =>
         rootGetters['ApiStatus/isBlockchainSynced'] &&
         (
             (getters.enableElysium && rootGetters['Elysium/tokensNeedingAnonymization'].length)
             ||
-            rootGetters['Balance/availablePublic'] > 0.01e8
+            rootGetters['Balance/availablePublic'] > 1000000n ||
+            rootGetters['Balance/pendingConversion'] > 0n
         ),
     // If waitingReason is not undefined, WaitingScreen (shown by MainLayout) will display that reason to the user as an
     // overlay.

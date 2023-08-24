@@ -1,7 +1,7 @@
 <template>
     <div id="main-layout">
         <LelantusDisabledHeader v-if="!isLelantusAllowed" />
-        <AwaitingAnonymizationHeader v-else-if="showPaymentPendingWarning" />
+        <AwaitingAnonymizationHeader v-else-if="showAnonymizationHeader" />
 
         <div id="main-content" :class="{'has-header': hasHeader}">
             <Sidebar id="sidebar" />
@@ -33,7 +33,7 @@ export default {
     },
 
     watch: {
-        showPaymentPendingWarning() {
+        showAnonymizationHeader() {
             window.dispatchEvent(new Event('resize'));
         },
 
@@ -44,7 +44,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            showPaymentPendingWarning: 'App/showPaymentPendingWarning',
+            showAnonymizationHeader: 'App/showAnonymizationHeader',
             isLelantusAllowed: 'ApiStatus/isLelantusAllowed'
         }),
 
