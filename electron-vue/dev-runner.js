@@ -1,4 +1,4 @@
-const electron = require('electron');
+ const electron = require('electron');
 const path = require('path');
 const child_process = require('child_process');
 const compileWrapper = require('./compile-wrapper');
@@ -20,7 +20,7 @@ config.entry.renderer = [path.join(__dirname, 'dev-client')].concat(config.entry
     );
     await server.start();
 
-    const electronProcess = child_process.spawn('npx', ['electron', '--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
+    const electronProcess = child_process.spawn(process.env.NPX_PATH || 'npx', ['electron', '--inspect=5858', path.join(__dirname, '../dist/electron/main.js')]);
     electronProcess.stdout.on('data', (data) => {
         console.info(data.toString().replace(/\n$/, ''));
     });
