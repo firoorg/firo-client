@@ -133,7 +133,7 @@
     "css-loader": "^6.7.3",
     "devtron": "^1.4.0",
     "electron": "^22.0.0",
-    "electron-builder": "^22.10.3",
+    "electron-builder": "^24.6.3",
     "electron-toolkit": "^1.0.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
