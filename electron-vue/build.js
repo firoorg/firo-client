@@ -1,7 +1,7 @@
 const config = require('../webpack.config');
 const compileWrapper = require('./compile-wrapper');
 
-module.exports = [async () => {
+(async () => {
     try {
         config.mode = 'production';
         return compileWrapper(config);
@@ -12,4 +12,4 @@ module.exports = [async () => {
         //        message and core dump, but meh.
         process.abort();
     }
-}];
+})();
