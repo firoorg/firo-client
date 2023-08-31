@@ -104,15 +104,14 @@ export default {
         }),
 
         mnemonic() {
+            if (!this.mnemonicPhrase)
+                return;
+
             return {
                 mnemonic: this.mnemonicPhrase,
                 mnemonicPassphrase: this.mnemonicPassphrase,
-                isNewMnemonic: JSON.parse(this.isNewMnemonic)
+                isNewMnemonic: this.isNewMnemonic
             };
-        },
-
-        _isExistingWallet() {
-            return JSON.parse(this.isExistingWallet || "false");
         },
 
         hasMismatchedPassphrase() {
@@ -120,7 +119,7 @@ export default {
         },
 
         canProceed() {
-            return this.passphrase && this.passphrase === this.confirmPassphrase && (!this._isExistingWallet || this.hasConfirmedExistingWallet);
+            return this.passphrase && this.passphrase === this.confirmPassphrase && (!this.isExistingWallet || this.hasConfirmedExistingWallet);
         }
     },
 
@@ -134,12 +133,12 @@ export default {
         },
 
         async lockWallet() {
-            if ((this._isExistingWallet && (this.mnemonic || !$daemon)) ||
-                (!this.mnemonic && !this._isExistingWallet)) {
+            if ((this.isExistingWallet && (this.mnemonic || !$daemon)) ||
+                (!this.mnemonic && !this.isExistingWallet)) {
                 await $quitApp("Firo Client failed an internal sanity check. Report this to the Firo team.");
             }
 
-            if (this._isExistingWallet) {
+            if (this.isExistingWallet) {
                 $setWaitingReason("Preparing to lock your wallet...");
             } else if (this.mnemonic.isNewMnemonic) {
                 $setWaitingReason("Initializing firod with our mnemonic...");
@@ -148,7 +147,7 @@ export default {
             }
 
             let initialDaemon;
-            if (!this._isExistingWallet) {
+            if (!this.isExistingWallet) {
                 try {
                     initialDaemon = new Firod(this.firoClientNetwork, this.firodLocation, this.blockchainLocation, [], {apiStatus});
                     await initialDaemon.start(this.mnemonic);
@@ -172,7 +171,7 @@ export default {
 
             await $startDaemon();
 
-            if (!this._isExistingWallet) {
+            if (!this.isExistingWallet) {
                 $setWaitingReason("Sanity checking recovery seed phrase...");
                 const mnemonicSanityCheck = (await $daemon.showMnemonics(this.passphrase)).join(' ');
                 if (mnemonicSanityCheck !== this.mnemonic.mnemonic) {
