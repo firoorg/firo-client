@@ -83,6 +83,10 @@ window.addEventListener('beforeunload', async () => await $daemon?.closeSockets(
         store.commit('Elysium/initSelectedTokens', settings.selectedElysiumTokens);
     }
 
+    if (settings.showMints) {
+        store.commit('App/setShowMints', settings.showMints);
+    }
+
     store.commit('App/setAppPath', await ipcRenderer.invoke('get-path', 'app'));
     store.commit('App/setUserDataPath', await ipcRenderer.invoke('get-path', 'userData'));
 

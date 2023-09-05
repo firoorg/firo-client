@@ -142,7 +142,7 @@ export default {
             },
 
             set(value) {
-                this.$store.commit('App/setShowMints', value);
+                this.setShowMints(value);
             }
         }
     },
@@ -175,7 +175,8 @@ export default {
 
         ...mapActions({
             setColorTheme: 'App/setColorTheme',
-            setEnableElysium: 'App/setEnableElysium'
+            setEnableElysium: 'App/setEnableElysium',
+            setShowMints: 'App/setShowMints'
         }),
 
         async openBackupDialog() {

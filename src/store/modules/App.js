@@ -128,6 +128,11 @@ const actions = {
         }
         await getAppSettings().set('colorTheme', value);
         commit('setColorTheme', value);
+    },
+
+    async setShowMints({commit}, value) {
+        await getAppSettings().set('showMints', value);
+        commit('setShowMints', value);
     }
 }
 
