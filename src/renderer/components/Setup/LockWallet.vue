@@ -110,7 +110,7 @@ export default {
             return {
                 mnemonic: this.mnemonicPhrase,
                 mnemonicPassphrase: this.mnemonicPassphrase,
-                isNewMnemonic: this.isNewMnemonic
+                isNewMnemonic: JSON.parse(this.isNewMnemonic)
             };
         },
 
