@@ -110,9 +110,14 @@ export default {
             const tableData = [];
 
             for (const txo of this.userVisibleTransactions) {
+                const label =
+                    (txo.isFromMe && txo.isToMe && !txo.destination && `${txo.privacyUse[0].toUpperCase()}${txo.privacyUse.slice(1)} Mint`) ||
+                    this.addressBook[txo.destination]?.label ||
+                    txo.destination;
+
                 tableData.push({
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
-                    label: (this.addressBook[txo.destination] || {}).label || txo.destination,
+                    label,
                     extraSearchText:
                         `${txo.isFromMe ? '-' : '+'}${bigintToString(txo.amount)}` + '\0' +
                         (txo.elysium ? ` elysium ${txo.elysium.sender} ${txo.elysium.receiver} ${txo.elysium.amount} ${txo.elysium.property && txo.elysium.property.name}` : '') + '\0' +

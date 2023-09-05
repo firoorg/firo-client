@@ -53,6 +53,11 @@
                 <input type="checkbox" :checked="allowBreakingMasternodes" />
             </div>
 
+            <div class="checkbox-option" @click="showMints = !showMints">
+                <label>Show Mints in Transactions Page</label>
+                <input type="checkbox" :checked="showMints" />
+            </div>
+
             <a @click="openBackupDialog">Backup Wallet</a>
 
             <a id="change-passphrase-button" @click="show = 'change-passphrase'">Change Passphrase</a>
@@ -92,7 +97,8 @@ export default {
             daemonVersion: 'ApiStatus/version',
             _colorTheme: 'App/colorTheme',
             _enableElysium: 'App/enableElysium',
-            _allowBreakingMasternodes: 'App/allowBreakingMasternodes'
+            _allowBreakingMasternodes: 'App/allowBreakingMasternodes',
+            _showMints: 'App/showMints'
         }),
 
         allowBreakingMasternodes: {
@@ -127,6 +133,16 @@ export default {
 
             set(value) {
                 this.setColorTheme(value);
+            }
+        },
+
+        showMints: {
+            get() {
+                return this._showMints;
+            },
+
+            set(value) {
+                this.$store.commit('App/setShowMints', value);
             }
         }
     },

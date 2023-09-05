@@ -18,7 +18,8 @@ const state = {
     colorTheme: 'system',
     appPath: '',
     userDataPath: '',
-    logMessages: []
+    logMessages: [],
+    showMints: false
 }
 
 const mutations = {
@@ -84,6 +85,10 @@ const mutations = {
 
     setUserDataPath(state, value) {
         state.userDataPath = value;
+    },
+
+    setShowMints(state, value) {
+        state.showMints = value;
     },
 
     appendLogMessages(state, msgs) {
@@ -205,6 +210,7 @@ const getters = {
     waitingReason: (state) => state.waitingReason,
     cachedMnemonic: (state) => state.cachedMnemonic,
     enableElysium: (state) => state.enableElysium || false,
+    showMints: (state) => state.showMints,
     colorTheme: (state) => state.colorTheme || 'system',
     showCoinswap: (state, getters) => getters.firoClientNetwork === 'mainnet' && keys.HAS_KEYS,
     appPath: (state) => state.appPath,
