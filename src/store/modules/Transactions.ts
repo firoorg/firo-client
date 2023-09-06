@@ -273,7 +273,7 @@ const getters = {
                 !(txo.isElysiumReferenceOutput && txo.elysium.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
                 !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
                 !(txo.elysium.type === 'Lelantus Mint') &&
-                (txo.isElysiumReferenceOutput || txo.destination || (txo.privacyUse == 'spark' && (rootGetters['App/showMints'] || !(txo.isFromMe && txo.isToMe))) || (rootGetters['App/showMints'] && txo.privacyUse == 'lelantus')) &&
+                (txo.isElysiumReferenceOutput || txo.destination || (txo.scriptType == 'spark-mint' && (rootGetters['App/showMints'] || !txo.isFromMe || !txo.isToMe)) || ['spark-smint', 'spark-spend'].includes(txo.scriptType) || (rootGetters['App/showMints'] && txo.privacyUse == 'lelantus')) &&
                 (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
                 (txo.isFromMe || txo.isToMe || txo.elysium.isToMe)
         )
