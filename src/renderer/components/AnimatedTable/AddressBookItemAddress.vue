@@ -24,7 +24,7 @@ export default {
 
 <style scoped lang="scss">
 .address .inner {
-    max-width: 50vw;
+    max-width: var(--address-width);
     text-overflow: ellipsis;
     overflow: hidden;
 }

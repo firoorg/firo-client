@@ -24,8 +24,8 @@ export default {
 
 <style scoped lang="scss">
 td.label {
-    width: 180px;
-    max-width: 180px;
+    width: var(--label-width);
+    max-width: var(--label-width);
 
     .inner-label {
         white-space: nowrap;
