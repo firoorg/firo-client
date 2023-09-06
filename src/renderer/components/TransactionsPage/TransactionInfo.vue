@@ -137,6 +137,11 @@
                 <td v-if="tx.elysium" class="received-amount"><ElysiumAmount :tx="tx" /></td>
                 <td v-else class="received-amount"><Amount :amount="tx.amount" ticker="FIRO" /></td>
             </tr>
+
+            <tr v-if="tx.sparkMemo">
+                <td>Memo</td>
+                <td>{{ tx.sparkMemo }}</td>
+            </tr>
         </table>
 
         <div class="buttons">

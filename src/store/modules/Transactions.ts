@@ -27,6 +27,7 @@ export interface TXO extends TxOut {
     elysium?: ElysiumData;
     lelantusInputSerialHashes?: string[];
     sparkInputSerialHashes?: string[];
+    sparkMemo?: string;
 }
 
 function txosFromTx(tx: Transaction, spentSparkSerialHashes: Set<string>, spentLelantusSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
