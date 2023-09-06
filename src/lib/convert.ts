@@ -1,13 +1,19 @@
 export function bigintToString(satoshi: bigint, decimals: number=8): string {
     if (typeof satoshi !== 'bigint') return;
 
+    let minus = false;
+    if (satoshi < 0) {
+        minus = true;
+        satoshi = -satoshi;
+    }
+
     const whole = satoshi / 10n**BigInt(decimals);
     const part = satoshi % 10n**BigInt(decimals);
 
     if (!part) return `${whole}`;
 
     const partS = part.toString().substr(0, decimals);
-    return `${whole}.${("0".repeat(decimals-partS.length) + partS).match(/^(\d*[1-9])0*$/)[1]}`;
+    return `${minus ? '-' : ''}${whole}.${("0".repeat(decimals-partS.length) + partS).match(/^(\d*[1-9])0*$/)[1]}`;
 }
 
 export function stringToBigint(coin: string, decimals: number=8): bigint {
