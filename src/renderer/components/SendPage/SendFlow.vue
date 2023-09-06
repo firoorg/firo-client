@@ -134,13 +134,13 @@ export default {
                         const coinControl = this.coinControl || this.selectInputs('public', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
 
                         if (isValidSparkAddress(this.address, this.network))
-                            await $daemon.mintSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
+                            await $daemon.mintSpark(passphrase, "", this.address, this.amount, this.txFeePerKb, this.subtractFeeFromAmount, coinControl);
                         else
                             await $daemon.publicSend(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
                                 this.subtractFeeFromAmount, coinControl);
                     } else if (this.isSparkAllowed) {
                         const coinControl = this.coinControl || this.selectInputs('spark', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                        await $daemon.spendSpark(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                        await $daemon.spendSpark(passphrase, "", this.address, this.amount, this.txFeePerKb,
                             this.subtractFeeFromAmount, coinControl);
                     } else {
                         const coinControl = this.coinControl || this.selectInputs('lelantus', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
