@@ -28,25 +28,41 @@ export interface TXO extends TxOut {
     lelantusInputSerialHashes?: string[];
     sparkInputSerialHashes?: string[];
     sparkMemo?: string;
+    // This will exist only if isFromMe is true.
+    totalSparkOutput?: bigint;
 }
 
-function txosFromTx(tx: Transaction, mySparkSerialHashes: Set<string>, spentSparkSerialHashes: Set<string>, spentLelantusSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
+function txosFromTx(tx: Transaction, mySparkOutputAmounts: Map<string, bigint>, spentSparkSerialHashes: Set<string>, spentLelantusSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
     const txos: TXO[] = [];
+
+    let sparkInputAmount = 0n;
+    for (const serialHash of tx.sparkInputSerialHashes) {
+        const amount = mySparkOutputAmounts.get(serialHash);
+        if (sparkInputAmount && !amount)
+            console.warn(`Only some inputs of spark tx ${tx.txid} are from us; information about this tx may be inaccurate.`);
+
+        sparkInputAmount += amount || 0n;
+    }
+    const changeTxoAmount = tx.outputs
+        .filter(txo => txo.isChange)
+        .reduce((a: bigint, txo: TxOut) => a + txo.amount, 0n);
+    const nonChangeTxos = tx.outputs.filter(txo => !txo.isChange).length;
+
+    // These will only exist for transactions from us.
+    let totalSparkOutput: bigint;
+    if (sparkInputAmount > 0n) {
+        totalSparkOutput = sparkInputAmount - changeTxoAmount - tx.fee;
+    }
 
     let index = -1;
     for (const txout of tx.outputs) {
         index += 1;
 
         let isFromMe = false;
-        if (["spark-smint", "spark-spend"].includes(txout.scriptType)) {
-            for (const serialHash of tx.sparkInputSerialHashes) {
-                if (mySparkSerialHashes.has(serialHash)) {
-                    isFromMe = true;
-                    break;
-                }
-            }
-        } else {
+        if (typeof tx.isFromMe == 'boolean') {
             isFromMe = tx.isFromMe;
+        } else {
+            isFromMe = sparkInputAmount > 0n;
         }
 
         // This is for txouts of multi-recipient transactions that we've received funds from that go to other wallets.
@@ -107,7 +123,13 @@ function txosFromTx(tx: Transaction, mySparkSerialHashes: Set<string>, spentSpar
         else if (privacyUse == 'spark')
             isSpent = spentSparkSerialHashes.has(txout.sparkSerialHash);
 
+        let amount = txout.amount || 0n;
+        if (!amount && totalSparkOutput && nonChangeTxos == 1) {
+            amount = totalSparkOutput;
+        }
+
         txos.push({
+            amount,
             blockHash: tx.blockHash,
             blockHeight: tx.blockHeight,
             blockTime: tx.blockTime,
@@ -126,6 +148,7 @@ function txosFromTx(tx: Transaction, mySparkSerialHashes: Set<string>, spentSpar
             lelantusInputSerialHashes: tx.lelantusInputSerialHashes,
             sparkInputSerialHashes: tx.sparkInputSerialHashes,
             isSpent,
+            totalSparkOutput,
             ...txout
         });
     }
@@ -225,14 +248,17 @@ function selectUTXOs(privacy: PrivacyType, amount: bigint, feePerKb: bigint, sub
 
 const getters = {
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
-    mySparkSerialHashes: (state, getters): Set<string> => new Set(
-        Object.values(getters.transactions)
-        .map((tx: Transaction) =>
-            tx.outputs
-                .filter((txout: TxOut) => txout.isToMe && txout.sparkSerialHash)
-                .map((txout: TxOut) => txout.sparkSerialHash)
-        ).reduce((a: string[], x: string[]) => [...a, ...x], [])
-    ),
+    mySparkOutputAmounts: (state, getters): Map<string, bigint> => {
+        const amounts = new Map<string, bigint>();
+        for (const tx of <Transaction[]>Object.values(getters.transactions)) {
+            for (const output of tx.outputs) {
+                if (output.sparkSerialHash) {
+                    amounts.set(output.sparkSerialHash, output.amount);
+                }
+            }
+        }
+        return amounts;
+    },
     spentLelantusSerialHashes: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.lelantusInputSerialHashes], [])),
     spentSparkSerialHashes: (state, getters): Set<string> =>
@@ -240,7 +266,7 @@ const getters = {
     spentPublicInputs: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.publicInputs], []).map(i => `${i[0]}-${i[1]}`)),
     allTXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions)).reduce(
-        (a: TXO[], tx: Transaction): TXO[] => [...a, ...txosFromTx(tx, getters.mySparkSerialHashes, getters.spentSparkSerialHashes, getters.spentLelantusSerialHashes, getters.spentPublicInputs)],
+        (a: TXO[], tx: Transaction): TXO[] => [...a, ...txosFromTx(tx, getters.mySparkOutputAmounts, getters.spentSparkSerialHashes, getters.spentLelantusSerialHashes, getters.spentPublicInputs)],
         []
     ),
     TXOs: (state, getters): TXO[] => getters.allTXOs
