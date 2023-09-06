@@ -30,15 +30,27 @@ export interface TXO extends TxOut {
     sparkMemo?: string;
 }
 
-function txosFromTx(tx: Transaction, spentSparkSerialHashes: Set<string>, spentLelantusSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
+function txosFromTx(tx: Transaction, mySparkSerialHashes: Set<string>, spentSparkSerialHashes: Set<string>, spentLelantusSerialHashes: Set<string>, spentPublicInputs: Set<string>): TXO[] {
     const txos: TXO[] = [];
 
     let index = -1;
     for (const txout of tx.outputs) {
         index += 1;
 
+        let isFromMe = false;
+        if (["spark-smint", "spark-spend"].includes(txout.scriptType)) {
+            for (const serialHash of tx.sparkInputSerialHashes) {
+                if (mySparkSerialHashes.has(serialHash)) {
+                    isFromMe = true;
+                    break;
+                }
+            }
+        } else {
+            isFromMe = tx.isFromMe;
+        }
+
         // This is for txouts of multi-recipient transactions that we've received funds from that go to other wallets.
-        if (!tx.isFromMe && !txout.isToMe && !tx.elysium.isToMe) continue;
+        if (!isFromMe && !txout.isToMe && !tx.elysium.isToMe) continue;
 
         let privacyUse: PrivacyType;
         let spendSize = undefined;
@@ -103,7 +115,7 @@ function txosFromTx(tx: Transaction, spentSparkSerialHashes: Set<string>, spentL
             index,
             privacyUse,
             inputPrivacy: tx.inputType,
-            isFromMe: tx.isFromMe,
+            isFromMe,
             validAt,
             firstSeenAt: tx.firstSeenAt,
             spendSize,
@@ -213,6 +225,14 @@ function selectUTXOs(privacy: PrivacyType, amount: bigint, feePerKb: bigint, sub
 
 const getters = {
     transactions: (state): {[txid: string]: Transaction} => state.transactions,
+    mySparkSerialHashes: (state, getters): Set<string> => new Set(
+        Object.values(getters.transactions)
+        .map((tx: Transaction) =>
+            tx.outputs
+                .filter((txout: TxOut) => txout.isToMe && txout.sparkSerialHash)
+                .map((txout: TxOut) => txout.sparkSerialHash)
+        ).reduce((a: string[], x: string[]) => [...a, ...x], [])
+    ),
     spentLelantusSerialHashes: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.lelantusInputSerialHashes], [])),
     spentSparkSerialHashes: (state, getters): Set<string> =>
@@ -220,7 +240,7 @@ const getters = {
     spentPublicInputs: (state, getters): Set<string> =>
         new Set((<Transaction[]>Object.values(getters.transactions)).reduce((a, tx) => [...a, ...tx.publicInputs], []).map(i => `${i[0]}-${i[1]}`)),
     allTXOs: (state, getters): TXO[] => (<Transaction[]>Object.values(getters.transactions)).reduce(
-        (a: TXO[], tx: Transaction): TXO[] => [...a, ...txosFromTx(tx, getters.spentSparkSerialHashes, getters.spentLelantusSerialHashes, getters.spentPublicInputs)],
+        (a: TXO[], tx: Transaction): TXO[] => [...a, ...txosFromTx(tx, getters.mySparkSerialHashes, getters.spentSparkSerialHashes, getters.spentLelantusSerialHashes, getters.spentPublicInputs)],
         []
     ),
     TXOs: (state, getters): TXO[] => getters.allTXOs
@@ -247,6 +267,7 @@ const getters = {
         !(txo.privacyUse == 'spark' && !rootGetters['ApiStatus/isSparkAllowed'])
     ),
     lockedUTXOs: (state, getters) => getters.UTXOs.filter((txo: TXO) => txo.isLocked),
+
 
     // This will display:
     // 1) valid Elysium non-Lelantus Mint transactions
