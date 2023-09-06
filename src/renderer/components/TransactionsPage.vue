@@ -107,26 +107,40 @@ export default {
         },
 
         latestTableData () {
-            const tableData = [];
+            return this.userVisibleTransactions.map(txo => {
+                let label;
+                if (txo.elysium && this.addressBook[txo.elysium.destination])
+                    label = this.addressBook[txo.elysium.destination].label;
+                else if (txo.elysium && txo.elysium.destination)
+                    label = txo.elysium.destination;
+                else if (txo.elysium)
+                    label = 'Elysium Transaction';
+                else if (txo.sparkMemo)
+                    label = txo.sparkMemo;
+                else if (txo.scriptType == 'lelantus-mint')
+                    label = 'Lelantus Mint';
+                else if (this.addressBook[txo.destination]?.label)
+                    label = this.addressBook[txo.destination].label;
+                else if (txo.destination)
+                    label = txo.destination;
+                else if (txo.isFromMe && txo.isToMe && txo.scriptType == 'spark-mint')
+                    label = 'Spark Mint';
+                else if (['spark-smint', 'spark-spend'].includes(txo.scriptType))
+                    label = 'Spark Spend';
+                else
+                    label = 'Firo Transaction';
 
-            for (const txo of this.userVisibleTransactions) {
-                const label =
-                    (txo.isFromMe && txo.isToMe && !txo.destination && `${txo.privacyUse[0].toUpperCase()}${txo.privacyUse.slice(1)} Mint`) ||
-                    this.addressBook[txo.destination]?.label ||
-                    txo.destination;
-
-                tableData.push({
+                return {
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
                     label,
                     extraSearchText:
                         `${txo.isFromMe ? '-' : '+'}${bigintToString(txo.amount)}` + '\0' +
-                        (txo.elysium ? ` elysium ${txo.elysium.sender} ${txo.elysium.receiver} ${txo.elysium.amount} ${txo.elysium.property && txo.elysium.property.name}` : '') + '\0' +
-                        `${txo.blockHeight || 'Unconfirmed'}`,
+                        (txo.elysium ? ` elysium\0${txo.elysium.sender}\0${txo.elysium.receiver}\0${txo.elysium.amount}\0${txo.elysium.property?.name}` : '') + '\0' +
+                        `${txo.blockHeight || 'Unconfirmed'}` + '\0' +
+                        label,
                     ...txo
-                });
-            }
-
-            return tableData;
+                };
+            });
         },
 
         filteredTableData () {
