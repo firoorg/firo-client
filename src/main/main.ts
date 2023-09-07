@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import {app, ipcMain, BrowserWindow, Menu, dialog} from 'electron';
+import {app, ipcMain, BrowserWindow, Menu, MenuItem, dialog} from 'electron';
 import menuTemplate from './lib/menuTemplate';
 import OpenDialogOptions = Electron.OpenDialogOptions;
 
@@ -119,6 +119,22 @@ if (app) {
             const r = await dialog.showOpenDialog(ourWindow, options);
             if (r.canceled) return;
             return r.filePaths;
+        });
+
+        ipcMain.handle('show-context-menu', async (ev, menuItems: string[]) => {
+            return await new Promise(resolve => {
+                const menu = new Menu();
+
+                for (const menuItem of menuItems)
+                    menu.append(new MenuItem({
+                        label: menuItem,
+                        click() {
+                            resolve(menuItem);
+                        }
+                    }));
+
+                menu.popup({callback() { resolve(null); }});
+            });
         });
 
         // This is used to check if we're reloading, so we can avoid restarting firod.
