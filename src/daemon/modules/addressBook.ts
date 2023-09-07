@@ -7,3 +7,5 @@ export async function initialize(store: any, firod: Firod) {
     const data = await firod.readAddressBook();
     store.commit('AddressBook/setAddressBook', data);
 }
+
+export const name = 'addressBook';

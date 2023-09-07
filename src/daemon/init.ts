@@ -1,5 +1,13 @@
 // Initialization routines for firod.
 
+import * as addressBook from './modules/addressBook';
+import * as apiStatus from './modules/apiStatus';
+import * as masternodeList from './modules/masternodeList';
+import * as masternode from './modules/masternode';
+import * as settings from './modules/settings';
+import * as stateWallet from './modules/stateWallet';
+import * as transaction from './modules/transaction';
+
 import { Firod, MnemonicSettings, Network } from './firod';
 
 /// Start up firod, connect to it, and return a Firod instance. If allowMultipleFirodInstances is true, instead of
@@ -23,18 +31,16 @@ async function firod(store: any, network: Network, firodLocation: string, firodD
     const eventHandlers: {[topic: string]: (firod: Firod, eventData: any) => Promise<void>} = {};
     const initializers = [];
 
-    const daemonComponents = require.context('./modules', true, /[^\/]\.ts$/);
-    for (const fileName of daemonComponents.keys()) {
-        const component = daemonComponents(fileName);
-        const topic = fileName.match(/([^\/]+)\.ts$/)[1];
+    for (const component of [addressBook, apiStatus, masternodeList, masternode, settings, stateWallet, transaction]) {
+        const topic = component.name;
 
-        if (component.handleEvent) {
-            eventHandlers[topic] = async (firod, eventData) => component.handleEvent(store, firod, eventData);
+        if (component['handleEvent']) {
+            eventHandlers[topic] = async (firod, eventData) => component['handleEvent'](store, firod, eventData);
         }
 
-        if (component.initialize) {
+        if (component['initialize']) {
             // Things won't work properly if component.initialize isn't an AsyncFunction.
-            if (component.initialize.constructor.name !== "AsyncFunction") {
+            if (component['initialize'].constructor.name !== "AsyncFunction") {
                 throw `invalid initializer for ${topic}: initializer must be an async function`;
             }
 
@@ -45,7 +51,7 @@ async function firod(store: any, network: Network, firodLocation: string, firodD
                         return;
                     }
 
-                    await component.initialize(store, firod)
+                    await component['initialize'](store, firod);
                 }
             );
         }

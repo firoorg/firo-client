@@ -11,3 +11,5 @@ export async function initialize(store: any, firod: Firod) {
         store.dispatch('Masternode/updateMasternodeList', Object.values(data));
     });
 }
+
+export const name = 'masternodeList';

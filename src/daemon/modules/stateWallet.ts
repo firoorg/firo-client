@@ -6,3 +6,5 @@ export async function initialize(store: any, firod: Firod) {
 
     store.commit('Transactions/setWalletState', await firod.getStateWallet());
 }
+
+export const name = 'stateWallet';

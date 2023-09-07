@@ -1773,11 +1773,11 @@ export class Firod {
         return d.isSpark;
     }
 
-    async mintSpark(auth: string, memo: string, recipient: string, amount: number, feePerKb: number,
+    async mintSpark(auth: string, label: string, recipient: string, amount: number, feePerKb: number,
                     subtractFeeFromAmount: boolean, coinControl?: CoinControl
     ): Promise<string[]> {
         const data = await this.send(auth, 'create', 'mintSpark', {
-            memo,
+            label,
             recipient,
             amount,
             subtractFeeFromAmount,
