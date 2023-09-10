@@ -9,7 +9,7 @@
                 </div>
 
                 <div v-if="newTableData.length" class="awaiting-updates">
-                    New payments have arrived. <a href='#' @click="reloadTable">Click here</a> to load new transactions.
+                    New payments have arrived. <a @click="reloadTable">Click here</a> to load new transactions.
                 </div>
             </div>
 
