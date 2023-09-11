@@ -134,7 +134,7 @@ export default {
                     id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
                     label,
                     extraSearchText:
-                        `${txo.isFromMe ? '-' : '+'}${bigintToString(txo.amount)}` + '\0' +
+                        `${txo.isFromMe && !txo.isToMe ? '-' : ''}${!txo.isFromMe && txo.isToMe ? '+' : ''}${bigintToString(txo.amount)}` + '\0' +
                         (txo.elysium ? ` elysium\0${txo.elysium.sender}\0${txo.elysium.receiver}\0${txo.elysium.amount}\0${txo.elysium.property?.name}` : '') + '\0' +
                         `${txo.blockHeight || 'Unconfirmed'}` + '\0' +
                         label,
