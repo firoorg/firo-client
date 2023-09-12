@@ -313,6 +313,7 @@ const getters = {
     userVisibleTransactions: (state, getters, rootState, rootGetters): TXO[] => getters.allTXOs
         .filter((txo: TXO) =>
                 !(txo.isChange && !txo.isElysiumReferenceOutput) &&
+                txo.scriptType != 'lelantus-jmint' &&
                 !(txo.inputPrivacy === 'mined' && !txo.blockHeight) &&
                 !(txo.elysium && !txo.isElysiumReferenceOutput) &&
                 !(txo.isElysiumReferenceOutput && txo.index !== 1) &&
