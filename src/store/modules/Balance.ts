@@ -6,7 +6,7 @@ const getters = {
         let nextHeight: number = rootGetters['ApiStatus/currentBlockHeight'] + 1;
 
         for (const txo of <TXO[]>rootGetters['Transactions/UTXOs']) {
-            if (!txo.isToMe || txo.isSpent) continue;
+            if (!txo.isToMe) continue;
             else if (txo.isElysiumReferenceOutput) locked += txo.amount;
             else if (txo.isLocked) locked += txo.amount;
             else if (txo.inputPrivacy == 'mined' && txo.validAt > nextHeight) immature += txo.amount;

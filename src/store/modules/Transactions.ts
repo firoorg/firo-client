@@ -312,18 +312,17 @@ const getters = {
     // 6) Elysium Lelantus Mint transactions
     userVisibleTransactions: (state, getters, rootState, rootGetters): TXO[] => getters.allTXOs
         .filter((txo: TXO) =>
-                !(txo.isChange && !txo.isElysiumReferenceOutput) &&
+                !txo.isChange &&
+                !txo.isElysiumReferenceOutput &&
                 txo.scriptType != 'lelantus-jmint' &&
                 !(txo.inputPrivacy === 'mined' && !txo.blockHeight) &&
-                !(txo.elysium && !txo.isElysiumReferenceOutput) &&
-                !(txo.isElysiumReferenceOutput && txo.index !== 1) &&
-                !(txo.isElysiumReferenceOutput && !rootGetters['App/enableElysium']) &&
-                !(txo.isElysiumReferenceOutput && txo.elysium.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property.creationTx)) &&
-                !((txo.blockHeight || !txo.isFromMe) && txo.elysium.valid === false) &&
-                !(txo.elysium.type === 'Lelantus Mint') &&
-                (txo.isElysiumReferenceOutput || txo.destination || (txo.scriptType == 'spark-mint' && (rootGetters['App/showMints'] || !txo.isFromMe || !txo.isToMe)) || ['spark-smint', 'spark-spend'].includes(txo.scriptType) || (rootGetters['App/showMints'] && txo.privacyUse == 'lelantus')) &&
+                !(txo.elysium && !rootGetters['App/enableElysium']) &&
+                !(!rootGetters['Elysium/showAllTokens'] && txo.elysium?.property && !rootGetters['Elysium/selectedTokens'].includes(txo.elysium.property?.creationTx)) &&
+                !((txo.blockHeight || !txo.isFromMe) && txo.elysium?.valid === false) &&
+                !(txo.elysium?.type === 'Lelantus Mint') &&
+                (txo.elysium || txo.destination || (txo.scriptType == 'spark-mint' && (rootGetters['App/showMints'] || !txo.isFromMe || !txo.isToMe)) || ['spark-smint', 'spark-spend'].includes(txo.scriptType) || (rootGetters['App/showMints'] && txo.privacyUse == 'lelantus')) &&
                 (txo.isInstantSendLocked || txo.blockHeight || txo.isFromMe) &&
-                (txo.isFromMe || txo.isToMe || txo.elysium.isToMe)
+                (txo.isFromMe || txo.isToMe || txo.elysium?.isToMe)
         )
         .sort((a, b) => b.firstSeenAt - a.firstSeenAt),
 

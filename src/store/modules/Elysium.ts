@@ -148,6 +148,7 @@ const getters = {
         return r;
     },
 
+    showAllTokens: () => false,
     allSelectedTokens: (state) => state.allSelectedTokens,
     hasModifiedSelectedTokens: (state) => state.hasModifiedSelectedTokens,
     selectedTokens: (state, getters, rootState, rootGetters) => getters.allSelectedTokens[rootGetters['ApiStatus/block1']] || [],

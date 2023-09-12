@@ -2,9 +2,9 @@
     <th v-if="isHeader">Amount</th>
 
     <td v-else>
-        <span v-if="rowData.elysium && rowData.isFromMe && rowData.elysium.isToMe">±<ElysiumAmount :tx="rowData" /></span>
-        <span v-else-if="rowData.elysium && rowData.isFromMe">-<ElysiumAmount :tx="rowData" /></span>
-        <span v-else-if="rowData.elysium && rowData.elysium.isToMe">+<ElysiumAmount :tx="rowData" /></span>
+        <span v-if="!rowData.isElysiumReferenceOutput && rowData.elysium && rowData.isFromMe && rowData.elysium.isToMe">±<ElysiumAmount :tx="rowData" /></span>
+        <span v-else-if="!rowData.isElysiumReferenceOutput && rowData.elysium && rowData.isFromMe">-<ElysiumAmount :tx="rowData" /></span>
+        <span v-else-if="!rowData.isElysiumReferenceOutput && rowData.elysium && rowData.elysium.isToMe">+<ElysiumAmount :tx="rowData" /></span>
         <span v-else-if="rowData.amount === 0">0</span>
         <span v-else-if="rowData.isFromMe && rowData.isToMe" class="incoming-outgoing">±<Amount :amount="rowData.amount" ticker="FIRO" /></span>
         <span v-else-if="rowData.isFromMe" class="outgoing">-<Amount :amount="rowData.amount" ticker="FIRO" /></span>

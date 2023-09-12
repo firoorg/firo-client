@@ -127,6 +127,8 @@ export default {
                     label = 'Spark Mint';
                 else if (['spark-smint', 'spark-spend'].includes(txo.scriptType))
                     label = 'Spark Spend';
+                else if (['pay-to-public-key', 'pay-to-public-key-hash'].includes(txo.scriptType))
+                    label = 'Public Transaction';
                 else
                     label = 'Firo Transaction';
 
