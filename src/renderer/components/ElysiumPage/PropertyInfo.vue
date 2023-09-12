@@ -70,8 +70,11 @@
             </table>
 
             <div class="buttons">
-                <button class="solid-button unrecommended" @click="$emit('delete')">
-                    Delete Property
+                <button v-if="selectedTokens.includes(creationtx)" class="solid-button unrecommended" @click="$emit('delete')">
+                    Remove Token
+                </button>
+                <button v-else class="solid-button" @click="addToken()">
+                    Add Token
                 </button>
 
                 <button v-if="isMine && property.isManaged" class="solid-button" @click="show = 'grantPrompt'">
@@ -142,7 +145,7 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 import {Form, Field} from "vee-validate";
 import TransactionId from "renderer/components/shared/TransactionId.vue";
 import Amount from "renderer/components/shared/Amount.vue";
@@ -173,7 +176,9 @@ export default {
             balances: 'Elysium/balances',
             TXOMap: 'Transactions/TXOMap',
             availableUTXOs: 'Transactions/availableUTXOs',
-            allTotalIssued: 'Elysium/totalIssued'
+            allTotalIssued: 'Elysium/totalIssued',
+            selectedTokens: 'Elysium/selectedTokens',
+            block1: 'ApiStatus/block1'
         }),
 
         validationSchema() {
@@ -215,6 +220,14 @@ export default {
     },
 
     methods: {
+        ...mapActions({
+            addSelectedTokens: 'Elysium/addSelectedTokens'
+        }),
+
+        addToken() {
+            this.addSelectedTokens([this.creationtx]);
+        },
+
         goToMain() {
             this.show = 'main';
             this.grantee = '';
