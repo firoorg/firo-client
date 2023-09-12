@@ -44,7 +44,7 @@ function txosFromTx(tx: Transaction, mySparkOutputAmounts: Map<string, bigint>, 
         sparkInputAmount += amount || 0n;
     }
     const changeTxoAmount = tx.outputs
-        .filter(txo => txo.isChange)
+        .filter(txo => txo.isChange && txo.amount)
         .reduce((a: bigint, txo: TxOut) => a + txo.amount, 0n);
     const nonChangeTxos = tx.outputs.filter(txo => !txo.isChange).length;
 
