@@ -61,7 +61,7 @@ interface ElysiumBalances {
 const getters = {
     balances: (state, getters, rootState, rootGetters): ElysiumBalances => {
         const r: ElysiumBalances = {};
-        for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
+        for (const txo of <TXO[]>rootGetters['Transactions/allTXOs']) {
             const e: ElysiumData = txo.elysium;
             if (!e || (txo.blockHeight && !e.valid) || txo.scriptType !== 'elysium' || !e.property || !e.amount) continue;
 
@@ -133,7 +133,7 @@ const getters = {
     // our UI.
     totalIssued: (state, getters, rootState, rootGetters): {[property: number]: bigint} => {
         const r: {[property: string]: bigint} = {};
-        for (const txo of <TXO[]>rootGetters['Transactions/TXOs']) {
+        for (const txo of <TXO[]>rootGetters['Transactions/allTXOs']) {
             const p = txo.elysium && txo.elysium.property && txo.elysium.property.creationTx;
             if (
                 !p ||

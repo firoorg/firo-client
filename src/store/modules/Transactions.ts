@@ -269,15 +269,10 @@ const getters = {
         (a: TXO[], tx: Transaction): TXO[] => [...a, ...txosFromTx(tx, getters.mySparkOutputAmounts, getters.spentSparkSerialHashes, getters.spentLelantusSerialHashes, getters.spentPublicInputs)],
         []
     ),
-    TXOs: (state, getters): TXO[] => getters.allTXOs
-        // Don't display orphaned mining transactions.
-        .filter(txo => !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined'))
-        // Hide Elysium notification transactions. These shouldn't be spent normally because a TXO outputting to a given
-        // Elysium address is required to mint or spend publicly from that address.
-        .filter(txo => !txo.isElysiumReferenceOutput),
     TXOMap: (state, getters): {[txidIndex: string]: TXO} => fromPairs(getters.allTXOs.map(txo => [`${txo.txid}-${txo.index}`, txo])),
-    UTXOs: (state, getters): TXO[] => getters.TXOs.filter((txo: TXO) =>
-        !txo.isSpent &&
+    UTXOs: (state, getters): TXO[] => getters.allTXOs.filter((txo: TXO) =>
+        // Don't display orphaned mining transactions.
+        !(txo.blockHash && !txo.blockHeight && txo.inputPrivacy === 'mined') &&
         !getters.spentSparkSerialHashes.has(txo.sparkSerialHash) &&
         !getters.spentLelantusSerialHashes.has(txo.lelantusSerialHash) &&
         !getters.spentPublicInputs.has(`${txo.txid}-${txo.index}`)

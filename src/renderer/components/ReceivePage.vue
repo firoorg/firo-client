@@ -99,7 +99,7 @@ export default {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook',
             receiveAddresses: 'AddressBook/receiveAddresses',
-            txos: 'Transactions/TXOs',
+            allTxos: 'Transactions/allTXOs',
             isSparkAllowed: 'ApiStatus/isSparkAllowed'
         }),
 
