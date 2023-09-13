@@ -129,7 +129,7 @@ export default {
                     await new Promise(r => setTimeout(r, 100));
                 }
 
-                if (!this.address || (this.isDefaultAddress && this.txos.find(txo => txo.destination === this.address))) {
+                if (!this.address || (this.isDefaultAddress && this.allTxos.find(txo => txo.destination === this.address))) {
                     await this.refreshAddress(true);
                 }
             }
