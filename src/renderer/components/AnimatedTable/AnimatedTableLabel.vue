@@ -1,8 +1,5 @@
 <template>
-    <th
-        v-if="isHeader"
-        @click="$emit('click', rowField, $event)"
-    >
+    <th v-if="isHeader">
         Label
     </th>
 
@@ -17,7 +14,10 @@
 // The default values here should be coordinated with the assignment of extraSearchText in PaymentsList.
 
 import VuetableFieldMixin from 'vue3-vuetable/src/components/VuetableFieldMixin.vue';
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters} from "vuex";
+import { ipcRenderer } from 'electron';
+import EditLabelPopupComponent from 'renderer/components/shared/EditLabelPopup.vue';
+import {h, render} from 'vue';
 
 export default {
     name: "AnimatedTableLabel",
@@ -28,8 +28,36 @@ export default {
 
     data() {
         return {
-            eventListener: null
+            contextmenuListener: null,
+            resizeListener: null,
+            newLabel: this.label,
+            show: 'main'
         };
+    },
+
+    mounted() {
+        if (!this.$refs.outer) return;
+
+        this.setOuterWidth();
+        // this is used to overcome slow calculation of the width of the element; $nextTick is not enough
+        setTimeout(this.setOuterWidth, 500);
+        this.resizeListener = window.addEventListener('resize', this.setOuterWidth);
+
+        this.contextmenuListener = this.$refs.outer.addEventListener('contextmenu', async () => {
+            const label = 'Edit Transaction Label';
+            const res = await ipcRenderer.invoke('show-context-menu', [label]);
+            if (res != label) return;
+
+            this.showEditPopup();
+        }, false);
+    },
+
+    beforeUnmount() {
+        if (!this.$refs.outer) return;
+
+        window.removeEventListener('resize', this.resizeListener)
+        this.$refs.outer.removeEventListener('contextmenu', this.contextmenuListener);
+        this.closeEditPopup();
     },
 
     computed: {
@@ -49,18 +77,35 @@ export default {
     methods: {
         setOuterWidth() {
             this.$refs.outer?.style.setProperty('--outer-width', `${this.$refs.outer.clientWidth}px`);
+        },
+
+        showEditPopup() {
+            const popup = h(EditLabelPopupComponent, {
+                label: this.label,
+
+                cancel: () => {
+                    this.closeEditPopup();
+                },
+
+                save: async (label) => {
+                    if (label != this.label)
+                        await $daemon.setTxoLabel([this.rowData.txid, this.rowData.index], label);
+
+                    this.closeEditPopup();
+                }
+            });
+            popup.appContext = this.appContext;
+
+            this.popupContainer = document.createElement('div');
+            this.popupContainer.id = 'edit-label-popup';
+
+            document.getElementById('main-layout').appendChild(this.popupContainer);
+            render(popup, this.popupContainer);
+        },
+
+        closeEditPopup() {
+            document.getElementById('edit-label-popup')?.remove();
         }
-    },
-
-    mounted() {
-        this.setOuterWidth();
-        // this is used to overcome slow calculation of the width of the element; $nextTick is not enough
-        setTimeout(this.setOuterWidth, 500);
-        this.eventListener = window.addEventListener('resize', this.setOuterWidth);
-    },
-
-    unmounted() {
-        window.removeEventListener('resize', this.eventListener);
     }
 }
 </script>

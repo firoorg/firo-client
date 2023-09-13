@@ -224,6 +224,7 @@ export interface TxOut {
     destination?: string;
     lelantusSerialHash?: string;
     sparkSerialHash?: string;
+    txoLabel?: string;
 }
 
 type ElysiumPropertyLelantusStatus = "SoftDisabled" | "SoftEnabled" | "HardDisabled" | "HardEnabled";
@@ -1494,6 +1495,14 @@ export class Firod {
         }
 
         throw new UnexpectedFirodResponse('create/readAddressBook', data);
+    }
+
+    async setTxoLabel([txid, index]: [string, number], label: string): Promise<void> {
+        await this.send(null, null, 'settxolabel', {
+            txid,
+            index,
+            label
+        });
     }
 
     async addAddressBookItem(item: AddressBookItem): Promise<void> {

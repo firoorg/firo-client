@@ -109,7 +109,9 @@ export default {
         latestTableData () {
             return this.userVisibleTransactions.map(txo => {
                 let label;
-                if (txo.elysium && this.addressBook[txo.elysium.destination])
+                if (txo.txoLabel)
+                    label = txo.txoLabel;
+                else if (txo.elysium && this.addressBook[txo.elysium.destination])
                     label = this.addressBook[txo.elysium.destination].label;
                 else if (txo.elysium && txo.elysium.destination)
                     label = txo.elysium.destination;
@@ -133,7 +135,7 @@ export default {
                     label = 'Firo Transaction';
 
                 return {
-                    id: `${txo.blockHash}-${txo.txid}-${txo.index}`,
+                    id: `${txo.blockHash}-${txo.txid}-${txo.index}-${JSON.stringify(label)}`,
                     label,
                     extraSearchText:
                         `${txo.isFromMe && !txo.isToMe ? '-' : ''}${!txo.isFromMe && txo.isToMe ? '+' : ''}${bigintToString(txo.amount)}` + '\0' +
