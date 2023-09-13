@@ -64,6 +64,6 @@ export default {
 @import "src/renderer/styles/info-popup";
 
 .address.value {
-    max-width: var(--address-width);
+    max-width: 400px;
 }
 </style>

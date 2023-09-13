@@ -6,10 +6,10 @@
         Label
     </th>
 
-    <td v-else>
-        <span v-if="label" class="label-text">
+    <td v-else ref="outer" class="outer-label">
+        <div class="label-text">
             {{ label }}
-        </span>
+        </div>
     </td>
 </template>
 
@@ -26,6 +26,12 @@ export default {
         VuetableFieldMixin
     ],
 
+    data() {
+        return {
+            eventListener: null
+        };
+    },
+
     computed: {
         ...mapGetters({
             addressBook: 'AddressBook/addressBook'
@@ -38,9 +44,35 @@ export default {
             if (!address) return "Unknown Address";
             return address;
         }
+    },
+
+    methods: {
+        setOuterWidth() {
+            this.$refs.outer?.style.setProperty('--outer-width', `${this.$refs.outer.clientWidth}px`);
+        }
+    },
+
+    mounted() {
+        this.setOuterWidth();
+        // this is used to overcome slow calculation of the width of the element; $nextTick is not enough
+        setTimeout(this.setOuterWidth, 500);
+        this.eventListener = window.addEventListener('resize', this.setOuterWidth);
+    },
+
+    unmounted() {
+        window.removeEventListener('resize', this.eventListener);
     }
 }
 </script>
 
 <style scoped lang="scss">
+.outer-label {
+    --outer-width: 1px;
+
+    .label-text {
+        max-width: calc(var(--outer-width) - 40px);
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}
 </style>

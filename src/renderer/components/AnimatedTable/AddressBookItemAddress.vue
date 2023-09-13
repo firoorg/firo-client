@@ -3,7 +3,7 @@
         Address
     </th>
 
-    <td v-else class="address">
+    <td v-else ref="outer" class="address">
         <div class="inner">
             {{ rowData.address }}
         </div>
@@ -18,14 +18,41 @@ export default {
 
     mixins: [
         VuetableFieldMixin
-    ]
+    ],
+
+    data() {
+        return {
+            eventListener: null
+        };
+    },
+
+    methods: {
+        setOuterWidth() {
+            this.$refs.outer?.style.setProperty('--outer-width', `${this.$refs.outer.clientWidth}px`);
+        }
+    },
+
+    mounted() {
+        this.setOuterWidth();
+        // this is used to overcome slow calculation of the width of the element; $nextTick is not enough\
+        setTimeout(this.setOuterWidth, 500);
+        this.eventListener = window.addEventListener('resize', this.setOuterWidth);
+    },
+
+    unmounted() {
+        window.removeEventListener('resize', this.eventListener);
+    }
 }
 </script>
 
 <style scoped lang="scss">
-.address .inner {
-    max-width: var(--address-width);
-    text-overflow: ellipsis;
-    overflow: hidden;
+.address {
+    --outer-width: 1px;
+
+    .inner {
+        max-width: calc(var(--outer-width) - 40px);
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 </style>
