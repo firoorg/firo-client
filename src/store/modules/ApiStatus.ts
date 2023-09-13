@@ -47,7 +47,7 @@ const getters = {
     isLelantusAllowed: (state): boolean => !state.apiStatus.disabledSporks.includes("lelantus"),
     isSparkAllowed: (state, getters): boolean => getters.apiStatus.isSpark,
     smartFeePerKb: (state): bigint => state.apiStatus.smartFeePerKb,
-    isBlockchainSynced: (state): boolean => ['regtest', 'regtest-ql'].includes(state.apiStatus.network) || state.apiStatus.synced,
+    isBlockchainSynced: (state): boolean => state.apiStatus.synced,
     connections: (state): number => state.apiStatus.connections,
     unlockRequested: (state): boolean => state.apiStatus.unlockRequested
 };
