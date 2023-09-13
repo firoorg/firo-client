@@ -5,7 +5,7 @@
         <div class="title">Edit Label</div>
         <div class="content">
           <InputFrame label="">
-            <input type="text" v-model="newLabel" @keydown.enter="save_" />
+            <input ref="input" type="text" v-model="newLabel" @keydown.enter="save_" />
           </InputFrame>
         </div>
 
@@ -21,17 +21,22 @@
 <script setup lang="ts">
 import Popup from './Popup.vue';
 import InputFrame from './InputFrame.vue';
-import {ref} from 'vue';
+import {VueElement, onMounted, ref, Ref} from 'vue';
+
+const input: Ref<VueElement> = ref(null);
+onMounted(() => {
+    input.value.focus();
+});
 
 const {label, cancel, save} = defineProps<{
-  label: String,
-  cancel: () => void,
-  save: (label: string) => void,
+    label: String,
+    cancel: () => void,
+    save: (label: string) => void,
 }>();
 const newLabel = ref(<string>label);
 
 function save_() {
-  save(newLabel.value);
+    save(newLabel.value);
 }
 </script>
 
@@ -39,8 +44,8 @@ function save_() {
 @import "renderer/styles/popup";
 
 .edit-label-popup {
-  @include popup();
+    @include popup();
 
-  margin: var(--padding-base);
+    margin: var(--padding-base);
 }
 </style>
