@@ -64,7 +64,7 @@ export default {
             const segments = [];
             let x = this.currentBlockHeight_;
             while (x > 0) {
-                segments.push(x % 1000);
+                segments.push((1000 + x % 1000).toString().slice(1));
                 x = Math.floor(x / 1000);
             }
             return segments.reverse().join(',');
