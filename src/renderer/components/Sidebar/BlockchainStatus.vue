@@ -55,10 +55,20 @@ export default {
         ...mapGetters({
             network: 'ApiStatus/network',
             connections: 'ApiStatus/connections',
-            currentBlockHeight: 'ApiStatus/currentBlockHeight',
+            currentBlockHeight_: 'ApiStatus/currentBlockHeight',
             isBlockchainSynced: 'ApiStatus/isBlockchainSynced',
             latestBlockTimestamp: 'ApiStatus/latestBlockTimestamp'
         }),
+
+        currentBlockHeight() {
+            const segments = [];
+            let x = this.currentBlockHeight_;
+            while (x > 0) {
+                segments.push(x % 1000);
+                x = Math.floor(x / 1000);
+            }
+            return segments.reverse().join(',');
+        },
 
         latestBlockRelativeDate() {
             this.tick;
