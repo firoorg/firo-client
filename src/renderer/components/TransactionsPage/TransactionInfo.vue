@@ -127,7 +127,7 @@
                 </tr>
             </template>
 
-            <tr>
+            <tr v-if="tx.fee !== undefined">
                 <td>Fee</td>
                 <td class="fee"><Amount :amount="tx.fee" ticker="FIRO" /></td>
             </tr>

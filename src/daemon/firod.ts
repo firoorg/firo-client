@@ -271,11 +271,11 @@ export interface Transaction {
     inputType: 'public' | 'mined' | 'zerocoin' | 'sigma' | 'lelantus' | 'sparkmint' | 'sparkspend';
     isFromMe: boolean;
     firstSeenAt: number;
-    fee: bigint;
     outputs: TxOut[];
     publicInputs: CoinControl;
     lelantusInputSerialHashes: string[];
     sparkInputSerialHashes: string[];
+    fee?: bigint;
     elysium?: ElysiumData;
 
     // blockHash MAY be set without blockHeight or blockTime, in which case the transaction is from an orphaned block.

@@ -22,7 +22,7 @@ export interface TXO extends TxOut {
     validAt: number;
     firstSeenAt: number;
     isFromMe: boolean;
-    fee: bigint;
+    fee?: bigint;
     spendSize?: number; // undefined if unknown
     elysium?: ElysiumData;
     lelantusInputSerialHashes?: string[];
