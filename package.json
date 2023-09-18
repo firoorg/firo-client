@@ -132,7 +132,7 @@
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "devtron": "^1.4.0",
-    "electron": "^22.0.0",
+    "electron": "^22.3.24",
     "electron-builder": "^24.6.3",
     "electron-toolkit": "^1.0.1",
     "file-loader": "^6.2.0",
