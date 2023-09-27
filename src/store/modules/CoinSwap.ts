@@ -170,6 +170,7 @@ const actions = {
                 orderStatus = await coinSwapApi.getOrderStatus(record.chainName, record.orderId);
             } catch(e) {
                 console.error(`Failed to fetch status for CoinSwap record ${record.orderId}: ${e}`);
+                return;
             }
 
             if (orderStatus.status !== record.status) {
