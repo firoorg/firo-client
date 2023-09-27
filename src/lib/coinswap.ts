@@ -74,6 +74,7 @@ export class UnavailablePairError extends CoinSwapError {
 export abstract class AbstractCoinSwapApi {
     provider: Provider;
     apiKey: ApiKey;
+    refreshInterval: number = 60e3 * 3;
 
     abstract getPairs(): Promise<[Ticker, Ticker][]>;
     abstract getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo>;
@@ -219,7 +220,7 @@ export class ChangeNowApi extends AbstractCoinSwapApi {
     }
 
     async fetchMarketInfoIfOutdated() {
-        if (!this.marketInfo || this.fetchTime < Date.now() - 60e3 * 3) {
+        if (!this.marketInfo || this.fetchTime < Date.now() - this.refreshInterval) {
             const response = await axios.get(`${this.API}/market-info/fixed-rate/${this.apiKey}`);
             this.marketInfo = response.data.map(info => ({
                 provider: this.provider,
@@ -281,7 +282,7 @@ export class ExolixApi extends AbstractCoinSwapApi {
     }
 
     async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
-        if (this.lastQuoteTime[`${from}-${to}`] > Date.now() - 60e3 * 3)
+        if (this.lastQuoteTime[`${from}-${to}`] > Date.now() - this.refreshInterval)
             return this.lastQuote[`${from}-${to}`];
 
         let r;
