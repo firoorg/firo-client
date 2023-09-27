@@ -3,7 +3,7 @@ const execSync = require('child_process').execSync;
 const writeFileSync = require('fs').writeFileSync;
 const webpack = require('webpack');
 
-const PROVIDERS = ['ChangeNow'];
+const PROVIDERS = ['ChangeNow', 'Exolix'];
 
 module.exports = function (config) {
     return new Promise((resolve, reject) => {

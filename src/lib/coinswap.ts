@@ -1,9 +1,9 @@
 import axios from 'axios';
 import {bigintToString, stringToBigint} from './convert';
 
-export const PROVIDERS: Provider[] = ['ChangeNow'];//, 'StealthEx', 'SwapZone', 'Exolix'];
+export const PROVIDERS: Provider[] = ['ChangeNow', 'Exolix'];
 export type Provider = 'ChangeNow' | 'StealthEx' | 'SwapZone' | 'Exolix';
-export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'finished' | 'refunded' | 'failed';
+export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'confirmation' | 'finished' | 'refunded' | 'failed';
 export type Ticker = string;
 export type QuoteId = string | null;
 export type OrderId = string;
@@ -236,8 +236,196 @@ export class ChangeNowApi extends AbstractCoinSwapApi {
     }
 }
 
+export class ExolixApi extends AbstractCoinSwapApi {
+    API: string = 'https:///exolix.com/api';
+    provider: Provider = 'Exolix';
+    lastQuote: {[pair: string]: PairInfo};
+    lastQuoteTime: {[pair: string]: number};
+
+    constructor(apiKey: ApiKey) {
+        super();
+        this.apiKey = apiKey;
+        this.lastQuote = {};
+        this.lastQuoteTime = {};
+    }
+
+    async getPairs(): Promise<[Ticker, Ticker][]> {
+        return [
+            ["FIRO", "BTC"],
+            ["BTC", "FIRO"],
+            ["ETH", "FIRO"],
+            ["FIRO", "ETH"],
+            ["ZEC", "FIRO"],
+            ["FIRO", "ZEC"],
+            ["LTC", "FIRO"],
+            ["FIRO", "LTC"],
+            ["XRP", "FIRO"],
+            ["FIRO", "XRP"],
+            ["XLM", "FIRO"],
+            ["FIRO", "XLM"],
+            ["BNB", "FIRO"],
+            ["FIRO", "BNB"],
+            ["USDT", "FIRO"],
+            ["FIRO", "USDT"],
+            ["USDC", "FIRO"],
+            ["FIRO", "USDC"],
+            ["DAI", "FIRO"],
+            ["FIRO", "DAI"],
+            ["DASH", "FIRO"],
+            ["FIRO", "DASH"],
+            ["DCR", "FIRO"],
+            ["FIRO", "DCR"],
+            ["BCH", "FIRO"],
+            ["FIRO", "BCH"]
+        ];
+    }
+
+    async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
+        if (this.lastQuoteTime[`${from}-${to}`] > Date.now() - 60e3 * 3)
+            return this.lastQuote[`${from}-${to}`];
+
+        let r;
+
+        try {
+            r = await axios.post(
+                `${this.API}/rate`,
+                {
+                    coin_from: from,
+                    coin_to: to,
+                    deposit_amount: bigintToString(amount) || '0'
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': this.apiKey
+                    }
+                }
+            );
+        } catch (e) {
+            if (e?.response?.data?.detail)
+                throw e.response.data.detail;
+
+            throw e;
+        }
+
+        if (r.data.message)
+            throw r.data.message;
+
+        this.lastQuoteTime[`${from}-${to}`] = Date.now();
+        this.lastQuote[`${from}-${to}`] = {
+            provider: this.provider,
+            quoteId: null,
+            from,
+            to,
+            rate: stringToBigint(r.data.rate),
+            min: stringToBigint(r.data.min_amount),
+            max: null,
+            fee: 0n
+        };
+
+        return this.lastQuote[`${from}-${to}`];
+    }
+
+    async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
+        const response = await axios.get(
+            `${this.API}/exchange/${orderId}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': this.apiKey
+                }
+            }
+        );
+
+        return {
+            provider: this.provider,
+
+            sendAmount: stringToBigint(String(response.data.amount_from)),
+            refundAddress: response.data.refund_address,
+            destinationAddress: response.data.destination_address,
+
+            from: response.data.coin_from.toUpperCase(),
+            to: response.data.coin_to.toUpperCase(),
+            rate: stringToBigint(String(response.data.rate)),
+            fee: 0n,
+
+            orderId: response.data.id,
+            exchangeAddress: response.data.deposit_address,
+            status: response.data.status,
+            receiveAmount: stringToBigint(String(response.data.amount_to)),
+
+            fromTxId: response.data.hash_in || undefined,
+            toTxId: response.data.hash_out || undefined,
+            refundTxId: undefined,
+
+            createdAt:Date.parse(response.data.created_at),
+            receivedAt: undefined,
+            updatedAt: undefined,
+            validUntil: Date.parse(response.data.created_at) + 60 * 60 * 24
+        };
+    }
+
+    async makeOrder(order: Order): Promise<OrderInfo> {
+        const url = `${this.API}/v2/transactions`;
+
+        let response;
+        try {
+            response = await axios.post(url, {
+                coinFrom: order.pairInfo.from,
+                coinTo: order.pairInfo.to,
+                withdrawalAddress: order.destinationAddress,
+                refundAddress: order.refundAddress,
+                amount: Number(bigintToString(order.sendAmount))
+            });
+        } catch (e) {
+            throw Object.values(e?.response?.data?.errors || {})[0] || e;
+        }
+
+        if (!response)
+            throw new Error('Invalid response from provider');
+
+        if (response.data?.refundAddress != order.refundAddress ||
+            response.data?.withdrawalAddress != order.destinationAddress ||
+            response.data?.coinFrom?.coinCode != order.pairInfo.from ||
+            response.data?.coinTo?.coinCode != order.pairInfo.to
+        ) throw new Error("response doesn't match request");
+
+        const receiveAmount = stringToBigint(String(response.data.amountTo));
+        if (!receiveAmount)
+            throw new Error('invalid response');
+
+        // If the amount we're supposed to receive is less than the expected amount by more than 1 FIRO, throw an error
+        // and refuse to continue.
+        const expectedReceiveAmount = order.sendAmount * order.pairInfo.rate / (10n**8n);
+        if (expectedReceiveAmount - order.pairInfo.rate > receiveAmount)
+            throw new Error(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
+                `${order.pairInfo.to} but got a promise of only ${bigintToString(receiveAmount)}.`)
+
+        return {
+            provider: this.provider,
+
+            sendAmount: order.sendAmount,
+            refundAddress: order.refundAddress,
+            destinationAddress: order.destinationAddress,
+
+            from: order.pairInfo.from,
+            to: order.pairInfo.to,
+            rate: order.pairInfo.rate,
+            fee: order.pairInfo.fee,
+
+            orderId: response.data.id,
+            exchangeAddress: response.data.depositAddress,
+            status: 'waiting',
+            receiveAmount,
+
+            createdAt: Math.floor(Date.now() / 1000)
+        };
+    }
+}
+
 const ApiClasses = {
-    ChangeNow: ChangeNowApi
+    ChangeNow: ChangeNowApi,
+    Exolix: ExolixApi
 };
 
 export class CoinSwapApiWrapper {
