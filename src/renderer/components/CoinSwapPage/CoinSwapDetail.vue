@@ -409,7 +409,8 @@ export default {
                     console.debug(`Fetching available pairs from ${this.provider}...`);
                     this.providerPairs[this.provider] = await this.coinSwapApi.getPairs(this.provider);
                 }
-                this.availablePairs = this.providerPairs[this.provider];
+                this.availablePairs = this.providerPairs[this.provider]
+                    .filter(([from, to]) => CoinNames[to] && CoinNames[from]);
 
                 if (!this.availablePairs.find(([from, to]) => from == 'FIRO' || to == 'FIRO')) {
                     this.marketError = `${this.provider} does not support FIRO`;

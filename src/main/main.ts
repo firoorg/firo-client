@@ -74,7 +74,8 @@ if (app) {
             minHeight: 800,
             webPreferences: {
                 nodeIntegration: true,
-                contextIsolation: false
+                contextIsolation: false,
+                webSecurity: false
             }
         });
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
