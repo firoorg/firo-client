@@ -240,14 +240,10 @@ export class ChangeNowApi extends AbstractCoinSwapApi {
 export class ExolixApi extends AbstractCoinSwapApi {
     API: string = 'https:///exolix.com/api';
     provider: Provider = 'Exolix';
-    lastQuote: {[pair: string]: PairInfo};
-    lastQuoteTime: {[pair: string]: number};
 
     constructor(apiKey: ApiKey) {
         super();
         this.apiKey = apiKey;
-        this.lastQuote = {};
-        this.lastQuoteTime = {};
     }
 
     async getPairs(): Promise<[Ticker, Ticker][]> {
@@ -282,9 +278,6 @@ export class ExolixApi extends AbstractCoinSwapApi {
     }
 
     async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
-        if (this.lastQuoteTime[`${from}-${to}`] > Date.now() - this.refreshInterval)
-            return this.lastQuote[`${from}-${to}`];
-
         let r;
 
         try {
@@ -312,8 +305,7 @@ export class ExolixApi extends AbstractCoinSwapApi {
         if (r.data.message)
             throw r.data.message;
 
-        this.lastQuoteTime[`${from}-${to}`] = Date.now();
-        this.lastQuote[`${from}-${to}`] = {
+        return {
             provider: this.provider,
             quoteId: null,
             from,
@@ -323,8 +315,6 @@ export class ExolixApi extends AbstractCoinSwapApi {
             max: null,
             fee: 0n
         };
-
-        return this.lastQuote[`${from}-${to}`];
     }
 
     async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
