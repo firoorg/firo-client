@@ -81,7 +81,7 @@
                     </div>
 
                     <div v-if="currentMarketInfo" class="total-field">
-                        <label>{{ CoinNames[selectedCoin] }} Transaction Fee:</label>
+                        <label>{{ isSwapFrom ? CoinNames[selectedCoin] : 'FIRO' }} Transaction Fee:</label>
 
                         <div class="value">
                             <Amount :amount="currentMarketInfo.fee" :ticker="isSwapFrom ? selectedCoin : 'FIRO'" />
