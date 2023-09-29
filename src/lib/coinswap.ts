@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {bigintToString, stringToBigint} from './convert';
 
-export const PROVIDERS: Provider[] = ['ChangeNow', 'Exolix', 'StealthEx'];
 export type Provider = 'ChangeNow' | 'StealthEx' | 'SwapZone' | 'Exolix';
 export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'confirmation' | 'finished' | 'refunded' | 'failed';
 export type Ticker = string;
@@ -533,6 +532,7 @@ const ApiClasses = {
     Exolix: ExolixApi,
     StealthEx: StealthExApi
 };
+export const PROVIDERS: Provider[] = <Provider[]>Object.keys(ApiClasses);
 
 export class CoinSwapApiWrapper {
     apis: {[provider: string]: AbstractCoinSwapApi};
