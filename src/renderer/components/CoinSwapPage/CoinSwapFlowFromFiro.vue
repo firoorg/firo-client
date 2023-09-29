@@ -34,7 +34,7 @@ import CoinSwapInfo from 'renderer/components/CoinSwapPage/CoinSwapInfo.vue';
 import ErrorStep from './ErrorStep.vue';
 import WaitOverlay from 'renderer/components/shared/WaitOverlay.vue';
 import {bigintToString} from "lib/convert";
-import {mapActions, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import PassphraseInput from "renderer/components/shared/PassphraseInput.vue";
 import { CoinSwapApiWrapper } from 'lib/coinswap';
 import ApiKeys from 'keys';
@@ -73,6 +73,10 @@ export default {
     created() {
         this.coinSwapApi = new CoinSwapApiWrapper(ApiKeys);
     },
+
+    computed: mapGetters({
+        isSparkAllowed: 'ApiStatus/isSparkAllowed'
+    }),
 
     methods: {
         ...mapActions({
@@ -186,7 +190,9 @@ export default {
             this.passphrase = '';
 
             try {
-                if (this.isPrivate) {
+                if (this.isPrivate && this.isSparkAllowed) {
+                    await $daemon.spendSpark(passphrase, '', this.coinSwap.exchangeAddress, this.sendAmount, this.txFeePerKb, false);
+                } else if (this.isPrivate) {
                     await $daemon.sendLelantus(passphrase, this.coinSwapRecord.exchangeAddress, this.sendAmount,
                         this.txFeePerKb, false);
                 } else {
