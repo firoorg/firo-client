@@ -98,7 +98,9 @@ export class ChangeNowApi extends AbstractCoinSwapApi {
     async getPairs(): Promise<[Ticker, Ticker][]> {
         await this.fetchMarketInfoIfOutdated();
 
-        return this.marketInfo.map(info => [info.from, info.to]);
+        return this.marketInfo
+            .filter(info => (info.from == 'FIRO') != (info.to == 'FIRO'))
+            .map(info => [info.from, info.to]);
     }
 
     async getPairInfo(from: string, to: string, amount: bigint): Promise<PairInfo> {
@@ -247,34 +249,9 @@ export class ExolixApi extends AbstractCoinSwapApi {
     }
 
     async getPairs(): Promise<[Ticker, Ticker][]> {
-        return [
-            ["FIRO", "BTC"],
-            ["BTC", "FIRO"],
-            ["ETH", "FIRO"],
-            ["FIRO", "ETH"],
-            ["ZEC", "FIRO"],
-            ["FIRO", "ZEC"],
-            ["LTC", "FIRO"],
-            ["FIRO", "LTC"],
-            ["XRP", "FIRO"],
-            ["FIRO", "XRP"],
-            ["XLM", "FIRO"],
-            ["FIRO", "XLM"],
-            ["BNB", "FIRO"],
-            ["FIRO", "BNB"],
-            ["USDT", "FIRO"],
-            ["FIRO", "USDT"],
-            ["USDC", "FIRO"],
-            ["FIRO", "USDC"],
-            ["DAI", "FIRO"],
-            ["FIRO", "DAI"],
-            ["DASH", "FIRO"],
-            ["FIRO", "DASH"],
-            ["DCR", "FIRO"],
-            ["FIRO", "DCR"],
-            ["BCH", "FIRO"],
-            ["FIRO", "BCH"]
-        ];
+        return ["BTC", "ETH", "ZEC", "LTC", "XRP", "XLM", "BNB", "USDT", "USDC", "DAI", "DASH", "DCR", "BCH"]
+            .map((ticker: Ticker): [Ticker, Ticker][] => [["FIRO", ticker], [ticker, "FIRO"]])
+            .reduce((a, x) => [...a, ...x], []);
     }
 
     async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
