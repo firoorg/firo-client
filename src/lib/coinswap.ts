@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {bigintToString, stringToBigint} from './convert';
 
-// PROVIDERS needs to be synced with compile-wrapper.js
 export const PROVIDERS: Provider[] = ['ChangeNow', 'Exolix', 'StealthEx'];
 export type Provider = 'ChangeNow' | 'StealthEx' | 'SwapZone' | 'Exolix';
 export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'confirmation' | 'finished' | 'refunded' | 'failed';
