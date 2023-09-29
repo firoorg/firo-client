@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {bigintToString, stringToBigint} from './convert';
 
-export type Provider = 'ChangeNow' | 'StealthEx' | 'Exolix';
+export type Provider = 'ChangeNow' | 'StealthEx' | 'Exolix' | 'HoudiniSwap';
 export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'confirmation' | 'finished' | 'refunded' | 'failed';
 export type Ticker = string;
 export type QuoteId = string | null;
@@ -74,6 +74,7 @@ export abstract class AbstractCoinSwapApi {
     provider: Provider;
     apiKey: ApiKey;
     refreshInterval: number = 60e3 * 3;
+    hasRefundAddress: boolean = true;
 
     abstract getPairs(): Promise<[Ticker, Ticker][]>;
     abstract getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo>;
@@ -388,7 +389,6 @@ export class ExolixApi extends AbstractCoinSwapApi {
         };
     }
 }
-
 export class StealthExApi extends AbstractCoinSwapApi {
     API: string = 'https://api.stealthex.io/api/v2';
     provider: Provider = 'StealthEx';
@@ -527,10 +527,175 @@ export class StealthExApi extends AbstractCoinSwapApi {
     }
 }
 
+export class HoudiniSwapApi extends AbstractCoinSwapApi {
+    API: string = 'https://api-partner.houdiniswap.com';
+    provider: Provider = 'HoudiniSwap';
+    pairs: [Ticker, Ticker][];
+    hasRefundAddress: boolean = false;
+
+    constructor(apiKey: ApiKey) {
+        super();
+        this.apiKey = apiKey;
+    }
+
+    async getPairs(): Promise<[Ticker, Ticker][]> {
+        if (this.pairs)
+            return this.pairs;
+
+        const r = await axios.get(`${this.API}/tokens`, {headers: {
+            Authorization: this.apiKey
+        }});
+
+        this.pairs = r.data
+            .map(x => x.symbol)
+            .sort()
+            .reduce((a, x) => a[a.length - 1] == x ? a : [...a, x], [])
+            .map(ticker => [['FIRO', ticker.toUpperCase()], [ticker.toUpperCase(), 'FIRO']])
+            .reduce((a, x) => [...a, ...x], []);
+
+        return this.pairs;
+    }
+
+    async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
+        if (!amount)
+            throw new Error('amount must be specified');
+
+        const r = await axios.get(`${this.API}/quote?amount=${bigintToString(amount)}&from=${from}&to=${to}&anonymous=true`, {
+            headers: {
+                Authorization: this.apiKey
+            }
+        });
+
+        const toReceive = stringToBigint(String(r.data.amountOut));
+        if (!toReceive)
+            throw 'invalid response';
+
+        const rate = (toReceive * 10n**8n) / amount;
+
+        return {
+            provider: this.provider,
+            quoteId: null,
+            from,
+            to,
+            rate,
+            min: stringToBigint(String(r.data.min)),
+            max: stringToBigint(String(r.data.max)),
+            fee: 0n
+        };
+    }
+
+    async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
+        const r = await axios.get(`${this.API}/status?id=${orderId}`, {
+            headers: {
+                Authorization: this.apiKey
+            }
+        });
+
+        const rate = stringToBigint(String(r.data.inAmount)) * 10n ** 8n / stringToBigint(String(r.data.outAmount));
+        const validUntil = Date.parse(r.data.expires);
+
+        let status: OrderStatus;
+        if (r.data.status == 0 && Date.now() > validUntil)
+            status = 'expired';
+        else if (r.data.status == 0)
+            status = 'waiting';
+        else if (r.data.status == 1)
+            status = 'received'
+        else if (r.data.status == 4)
+            status = 'finished';
+        else
+            status = <OrderStatus>String(r.data.status);
+
+        return {
+            provider: this.provider,
+
+            sendAmount: stringToBigint(String(r.data.inAmount)),
+            refundAddress: undefined,
+            destinationAddress: r.data.receiverAddress,
+
+            from: r.data.inSymbol,
+            to: r.data.outSymbol,
+            rate: rate,
+            fee: 0n,
+
+            orderId: r.data.houdiniId,
+            exchangeAddress: r.data.senderAddress,
+            status,
+            receiveAmount: stringToBigint(String(r.data.inAmount)),
+
+            fromTxId: undefined,
+            toTxId: undefined,
+            refundTxId: undefined,
+
+            createdAt: Date.parse(r.data.created),
+            receivedAt: undefined,
+            updatedAt: undefined,
+            validUntil
+        };
+    }
+
+    async makeOrder(order: Order): Promise<OrderInfo> {
+        const response = await axios.post(`${this.API}/exchange`, {
+            amount: Number(bigintToString(order.sendAmount)),
+            from: order.pairInfo.from,
+            to: order.pairInfo.to,
+            receiverTag: '',
+            addressTo: order.destinationAddress,
+            anonymous: true,
+            fixed: true,
+            direction: "from",
+            ip: "0.0.0.0",
+            userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            timezone: "UTC"
+        }, {
+            headers: {
+                Authorization: this.apiKey
+            }
+        });
+
+        if (response.data?.receiverAddress != order.destinationAddress ||
+            response.data?.inSymbol != order.pairInfo.from ||
+            response.data?.outSymbol != order.pairInfo.to
+        ) throw new Error("response doesn't match request");
+
+        const receiveAmount = stringToBigint(String(response.data.outAmount));
+        if (!receiveAmount)
+            throw new Error('invalid response');
+
+        // If the amount we're supposed to receive is less than the expected amount by more than 1 FIRO, throw an error
+        // and refuse to continue.
+        const expectedReceiveAmount = order.sendAmount * order.pairInfo.rate / (10n**8n);
+        if (expectedReceiveAmount - order.pairInfo.rate > receiveAmount)
+            throw new Error(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
+                `${order.pairInfo.to} but got a promise of only ${bigintToString(receiveAmount)}.`)
+
+        return {
+            provider: this.provider,
+
+            sendAmount: order.sendAmount,
+            refundAddress: undefined,
+            destinationAddress: order.destinationAddress,
+
+            from: order.pairInfo.from,
+            to: order.pairInfo.to,
+            rate: order.pairInfo.rate,
+            fee: order.pairInfo.fee,
+
+            orderId: response.data.houdiniId,
+            exchangeAddress: response.data.senderAddress,
+            status: 'waiting',
+            receiveAmount,
+
+            createdAt: Math.floor(Date.now() / 1000)
+        };
+    }
+}
+
 const ApiClasses = {
     ChangeNow: ChangeNowApi,
     Exolix: ExolixApi,
-    StealthEx: StealthExApi
+    StealthEx: StealthExApi,
+    HoudiniSwap: HoudiniSwapApi
 };
 export const PROVIDERS: Provider[] = <Provider[]>Object.keys(ApiClasses);
 
@@ -573,5 +738,12 @@ export class CoinSwapApiWrapper {
             throw new CoinSwapError('unknown provider');
 
         return await this.apis[order.pairInfo.provider].makeOrder(order);
+    }
+
+    hasRefundAddress(provider: Provider): boolean {
+        if (!this.apis[provider])
+            throw new CoinSwapError('unknown provider');
+
+        return this.apis[provider].hasRefundAddress;
     }
 }

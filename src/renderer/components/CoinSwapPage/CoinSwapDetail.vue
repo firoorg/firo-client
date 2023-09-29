@@ -43,7 +43,10 @@
                     />
                 </InputFrame>
 
-                <InputFrame :label="`${selectedCoin ? `${selectedCoin} ` : ''}${isSwapFrom ? ' Destination' : ' Refund'} Address`">
+                <InputFrame
+                    v-if="isSwapFrom || hasRefundAddress"
+                    :label="`${selectedCoin ? `${selectedCoin} ` : ''}${isSwapFrom ? ' Destination' : ' Refund'} Address`"
+                >
                     <Field
                         id="address"
                         ref="address"
@@ -384,6 +387,10 @@ export default {
             if (!this.amount) return;
 
             return ((this.amount * this.currentMarketInfo.rate) / 10n ** 8n) - this.currentMarketInfo.fee;
+        },
+
+        hasRefundAddress() {
+            return this.coinSwapApi.hasRefundAddress(this.provider);
         }
     },
 
