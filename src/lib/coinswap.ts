@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {bigintToString, stringToBigint} from './convert';
 
-export type Provider = 'ChangeNow' | 'StealthEx' | 'SwapZone' | 'Exolix';
+export type Provider = 'ChangeNow' | 'StealthEx' | 'Exolix';
 export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'confirmation' | 'finished' | 'refunded' | 'failed';
 export type Ticker = string;
 export type QuoteId = string | null;
