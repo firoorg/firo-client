@@ -349,23 +349,23 @@ export class ExolixApi extends AbstractCoinSwapApi {
         }
 
         if (!response)
-            throw new Error('Invalid response from provider');
+            throw new CoinSwapError('Invalid response from provider');
 
         if (response.data?.refundAddress != order.refundAddress ||
             response.data?.withdrawalAddress != order.destinationAddress ||
             response.data?.coinFrom?.coinCode != order.pairInfo.from ||
             response.data?.coinTo?.coinCode != order.pairInfo.to
-        ) throw new Error("response doesn't match request");
+        ) throw new CoinSwapError("response doesn't match request");
 
         const receiveAmount = stringToBigint(String(response.data.amountTo));
         if (!receiveAmount)
-            throw new Error('invalid response');
+            throw new CoinSwapError('invalid response');
 
         // If the amount we're supposed to receive is less than the expected amount by more than 1 FIRO, throw an error
         // and refuse to continue.
         const expectedReceiveAmount = order.sendAmount * order.pairInfo.rate / (10n**8n);
         if (expectedReceiveAmount - order.pairInfo.rate > receiveAmount)
-            throw new Error(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
+            throw new CoinSwapError(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
                 `${order.pairInfo.to} but got a promise of only ${bigintToString(receiveAmount)}.`)
 
         return {
@@ -413,7 +413,7 @@ export class StealthExApi extends AbstractCoinSwapApi {
 
     async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
         if (!amount)
-            throw new Error('amount must be specified');
+            throw new CoinSwapError('amount must be specified');
 
         const r = await axios.get(`${this.API}/estimate/${from}/${to}?amount=${bigintToString(amount)}&api_key=${this.apiKey}`);
 
@@ -480,29 +480,29 @@ export class StealthExApi extends AbstractCoinSwapApi {
             });
         } catch (e) {
             if (e?.response?.data?.message)
-                throw new Error(e.response.data.message);
+                throw new CoinSwapError(e.response.data.message);
 
             throw e;
         }
 
         if (!response)
-            throw new Error('Invalid response from provider');
+            throw new CoinSwapError('Invalid response from provider');
 
         if (response.data?.refund_address != order.refundAddress ||
             response.data?.address_to != order.destinationAddress ||
             response.data?.currency_from.toUpperCase() != order.pairInfo.from ||
             response.data?.currency_to.toUpperCase() != order.pairInfo.to
-        ) throw new Error("response doesn't match request");
+        ) throw new CoinSwapError("response doesn't match request");
 
         const receiveAmount = stringToBigint(response.data.amount_to);
         if (!receiveAmount)
-            throw new Error('invalid response');
+            throw new CoinSwapError('invalid response');
 
         // If the amount we're supposed to receive is less than the expected amount by more than 1 FIRO, throw an error
         // and refuse to continue.
         const expectedReceiveAmount = order.sendAmount * order.pairInfo.rate / (10n**8n);
         if (expectedReceiveAmount - order.pairInfo.rate > receiveAmount)
-            throw new Error(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
+            throw new CoinSwapError(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
                 `${order.pairInfo.to} but got a promise of only ${bigintToString(receiveAmount)}.`)
 
         return {
@@ -558,7 +558,7 @@ export class HoudiniSwapApi extends AbstractCoinSwapApi {
 
     async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
         if (!amount)
-            throw new Error('amount must be specified');
+            throw new CoinSwapError('amount must be specified');
 
         const r = await axios.get(`${this.API}/quote?amount=${bigintToString(amount)}&from=${from}&to=${to}&anonymous=true`, {
             headers: {
@@ -656,17 +656,17 @@ export class HoudiniSwapApi extends AbstractCoinSwapApi {
         if (response.data?.receiverAddress != order.destinationAddress ||
             response.data?.inSymbol != order.pairInfo.from ||
             response.data?.outSymbol != order.pairInfo.to
-        ) throw new Error("response doesn't match request");
+        ) throw new CoinSwapError("response doesn't match request");
 
         const receiveAmount = stringToBigint(String(response.data.outAmount));
         if (!receiveAmount)
-            throw new Error('invalid response');
+            throw new CoinSwapError('invalid response');
 
         // If the amount we're supposed to receive is less than the expected amount by more than 1 FIRO, throw an error
         // and refuse to continue.
         const expectedReceiveAmount = order.sendAmount * order.pairInfo.rate / (10n**8n);
         if (expectedReceiveAmount - order.pairInfo.rate > receiveAmount)
-            throw new Error(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
+            throw new CoinSwapError(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
                 `${order.pairInfo.to} but got a promise of only ${bigintToString(receiveAmount)}.`)
 
         return {
