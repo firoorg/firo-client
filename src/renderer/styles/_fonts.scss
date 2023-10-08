@@ -1,9 +1,14 @@
+html {
+    --font-weight-bold: 500;
+}
+
 // IcoFont
 // See https://icofont.com/license
 
 @font-face {
     src: url("~fonts/IcoFont.ttf");
     font-family: "IcoFont";
+    font-display: block;
 }
 
 // Robot Mono
@@ -11,12 +16,14 @@
 @font-face {
     src: url("~fonts/RobotMono/RobotoMono-VariableFont_wght.ttf");
     font-family: "Robot Mono";
+    font-display: block;
 }
 
 @font-face {
     src: url("~fonts/RobotMono/RobotoMono-Italic-VariableFont_wght.ttf");
     font-family: "Robot Mono";
     font-style: italic;
+    font-display: block;
 }
 
 // Rubik
@@ -24,10 +31,12 @@
 @font-face {
     src: url("~fonts/Rubik.ttf");
     font-family: "Rubik";
+    font-display: block;
 }
 
 @font-face {
     src: url("~fonts/Rubik-Italic.ttf");
     font-family: "Rubik";
     font-style: italic;
+    font-display: block;
 }

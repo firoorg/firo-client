@@ -15,6 +15,6 @@ export default {
 <style scoped>
 .error-message {
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
 }
 </style>

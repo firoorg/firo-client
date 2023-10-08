@@ -205,7 +205,7 @@ export default {
         width: 400px;
         text-align: center;
         margin-bottom: var(--padding-base);
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
     }
 
     .existing-wallet-confirmation {

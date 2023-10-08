@@ -4,7 +4,7 @@
     .title {
         text-align: center;
         padding-bottom: var(--padding-base);
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
         border-bottom: {
             style: solid;
             width: 1px;
@@ -35,7 +35,7 @@
                 vertical-align: middle;
 
                 &:first-child {
-                    font-weight: bold;
+                    font-weight: var(--font-weight-bold);
                 }
 
                 &:last-child {

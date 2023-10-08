@@ -199,7 +199,7 @@ export default {
 
             .show-unsynced-warning, .awaiting-updates {
                 text-align: center;
-                font-weight: bold;
+                font-weight: var(--font-weight-bold);
 
                 margin-bottom: var(--padding-base);
             }

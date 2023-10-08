@@ -22,7 +22,7 @@
     .error {
         user-select: text;
         text-align: center;
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
         margin: {
             top: var(--padding-base);
             bottom: var(--padding-base);

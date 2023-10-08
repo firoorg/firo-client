@@ -3,7 +3,7 @@
     height: 100%;
     background: var(--color-warning-background);
     color: var(--color-warning-text);
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
     text-align: center;
     display: flex;
     flex-direction: column;

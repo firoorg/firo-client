@@ -90,14 +90,14 @@ export default {
 
         label {
             width: fit-content;
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
         }
 
         .amount {
             flex-grow: 1;
             text-align: right;
             color: var(--color-primary);
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
         }
     }
 
@@ -108,7 +108,7 @@ export default {
             color: var(--color-text-disabled);
         }
 
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
         user-select: none;
 
         .toggle-switch {

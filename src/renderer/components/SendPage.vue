@@ -613,7 +613,7 @@ export default {
 
                     label {
                         color: var(--color-secondary);
-                        font-weight: bold;
+                        font-weight: var(--font-weight-bold);
                     }
                 }
 
@@ -633,7 +633,7 @@ export default {
                 .max-send {
                     margin-bottom: 10px;
                     opacity: 0.5;
-                    font-weight: bold;
+                    font-weight: var(--font-weight-bold);
 
                     label {
                         white-space: pre;
@@ -666,7 +666,7 @@ export default {
 
             .bottom {
                 .error {
-                    font-weight: bold;
+                    font-weight: var(--font-weight-bold);
                     text-align: center;
                     margin-bottom: var(--padding-base);
                 }

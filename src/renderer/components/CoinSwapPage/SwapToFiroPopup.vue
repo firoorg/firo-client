@@ -151,7 +151,7 @@ export default {
 }
 
 .amount {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
 }
 
 .content {
@@ -164,7 +164,7 @@ export default {
         label {
             margin-right: var(--padding-base);
             width: fit-content;
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
         }
 
         .value {

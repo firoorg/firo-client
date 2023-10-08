@@ -233,7 +233,7 @@ export default {
         color: var(--color-primary);
         font: {
             size: 24px;
-            weight: bold;
+            weight: var(--font-weight-bold);
         }
 
         display: flex;
@@ -255,7 +255,7 @@ export default {
     .options {
         a, .checkbox-option, .select-option {
             cursor: pointer;
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
             text-decoration: none;
 
             display: block;

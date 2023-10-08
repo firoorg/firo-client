@@ -225,7 +225,7 @@ $menu-padding: 6px;
         &, input {
             font: {
                 size: 13.3333px;
-                weight: bold;
+                weight: var(--font-weight-bold);
             }
         }
 
@@ -242,7 +242,7 @@ $menu-padding: 6px;
 
         .vs__dropdown-toggle {
             color: var(--color-text-primary) !important;
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
             height: 100%;
             width: 100%;
             padding: $menu-padding;
@@ -265,7 +265,7 @@ $menu-padding: 6px;
         .option, .scroll {
             display: flex;
 
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
 
             padding: $menu-padding;
 

@@ -418,7 +418,7 @@ export default {
         padding: var(--padding-base);
 
         .input-line {
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
 
             .prompt, .input {
                 display: inline;
@@ -432,12 +432,12 @@ export default {
                 word-break: normal;
 
                 .bold {
-                    font-weight: bold;
+                    font-weight: var(--font-weight-bold);
                 }
             }
 
             .input {
-                font-weight: bold;
+                font-weight: var(--font-weight-bold);
             }
 
             .output {
@@ -471,7 +471,7 @@ export default {
 
                 &.selected {
                     color: var(--color-text-secondary);
-                    font-weight: bold;
+                    font-weight: var(--font-weight-bold);
                 }
             }
         }

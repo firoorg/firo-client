@@ -230,7 +230,7 @@ export default {
 
             th {
                 padding-bottom: var(--padding-base);
-                font-weight: bold;
+                font-weight: var(--font-weight-bold);
             }
         }
 

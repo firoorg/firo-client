@@ -120,7 +120,7 @@ export default {
 .content {
     .not-found {
         margin-top: var(--padding-base);
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
     }
 
     .token-data {

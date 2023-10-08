@@ -29,7 +29,7 @@ export default {
 
 <style lang="scss" scoped>
 .welcome {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
 
     .content {
         min-width: 250px !important;

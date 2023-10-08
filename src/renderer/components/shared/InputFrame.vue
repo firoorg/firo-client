@@ -64,7 +64,7 @@ export default {
         }
 
         input {
-            font-weight: bold;
+            font-weight: var(--font-weight-bold);
             height: 100%;
             width: 100%;
             padding: {

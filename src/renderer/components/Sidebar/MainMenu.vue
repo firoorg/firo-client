@@ -58,7 +58,7 @@ nav {
         display: block;
 
         color: var(--color-text-primary);
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
         text-decoration: none;
 
         padding: 8px;

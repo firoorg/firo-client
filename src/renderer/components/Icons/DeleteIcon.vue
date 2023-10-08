@@ -11,6 +11,6 @@ export default {
 <style scoped>
     .delete-icon {
         color: white;
-        font-weight: bolder;
+        font-weight: var(--font-weight-bold)er;
     }
 </style>

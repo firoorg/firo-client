@@ -23,7 +23,7 @@ export default {
 
 <style scoped lang="scss">
 .amount {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
 
     .amount-value {
         color: var(--color-amount);

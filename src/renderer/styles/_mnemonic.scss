@@ -19,12 +19,12 @@
         padding: 0 !important;
         font: {
             family: sans-serif;
-            weight: bold;
+            weight: var(--font-weight-bold);
         }
 
         display: inline-flex;
         outline: none;
-        font-weight: bold;
+        font-weight: var(--font-weight-bold);
 
         background-color: inherit;
 
@@ -36,7 +36,7 @@
             -webkit-appearance: none;
             font: {
                 family: sans-serif;
-                weight: bold;
+                weight: var(--font-weight-bold);
             }
 
             border-bottom: {

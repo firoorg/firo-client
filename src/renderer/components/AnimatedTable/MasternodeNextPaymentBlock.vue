@@ -26,6 +26,6 @@ export default {
 
 <style scoped lang="scss">
 .banned {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
 }
 </style>

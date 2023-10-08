@@ -508,7 +508,7 @@ export default {
             }
 
             .market-error {
-                font-weight: bold;
+                font-weight: var(--font-weight-bold);
                 text-align: center;
                 color: var(--color-status-error);
             }
