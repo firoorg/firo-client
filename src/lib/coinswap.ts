@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {bigintToString, stringToBigint} from './convert';
 
-export type Provider = 'ChangeNow' | 'StealthEx' | 'Exolix' | 'HoudiniSwap';
+export type Provider = 'ChangeNow' | 'StealthEx' | 'Exolix' | 'HoudiniSwap' | 'Majestic';
 export type OrderStatus = 'waiting' | 'expired' | 'received' | 'confirming' | 'exchanging' | 'confirmed' | 'confirmation' | 'finished' | 'refunded' | 'failed';
 export type Ticker = string;
 export type QuoteId = string | null;
@@ -56,6 +56,14 @@ export interface OrderInfo {
     validUntil?: Timestamp;
 }
 
+export interface OrderStatusInfo {
+    status: OrderStatus;
+    receivedAt?: Timestamp;
+    fromTxId?: TransactionId;
+    toTxId?: TransactionId;
+    refundTxId?: TransactionId;
+}
+
 export class CoinSwapError extends Error {
     constructor(message: string) {
         super(message);
@@ -78,7 +86,7 @@ export abstract class AbstractCoinSwapApi {
 
     abstract getPairs(): Promise<[Ticker, Ticker][]>;
     abstract getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo>;
-    abstract getOrderStatus(orderId: OrderId): Promise<OrderInfo>;
+    abstract getOrderStatus(orderId: OrderId): Promise<OrderStatusInfo>;
     abstract makeOrder(order: Order): Promise<OrderInfo>;
 }
 
@@ -113,7 +121,7 @@ export class ChangeNowApi extends AbstractCoinSwapApi {
         return pairInfo;
     }
 
-    async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
+    async getOrderStatus(orderId: OrderId): Promise<OrderStatusInfo> {
         const response = await axios.get(
             `${this.API}/transactions/${orderId}/${this.apiKey}`,
             {headers: {'Content-Type': 'application/json'}}
@@ -128,30 +136,11 @@ export class ChangeNowApi extends AbstractCoinSwapApi {
         const validUntil = response.data.validUntil && Math.floor(Date.parse(response.data.validUntil) / 1000);
 
         return {
-            provider: this.provider,
-
-            sendAmount: stringToBigint(String(response.data.amountSend)),
-            refundAddress: response.data.receiveAddress,
-            destinationAddress: response.data.payoutAddress,
-
-            from: response.data.fromCurrency.toUpperCase(),
-            to: response.data.toCurrency.toUpperCase(),
-            rate,
-            fee: stringToBigint(response.data.minerFee),
-
-            orderId: response.data.id,
-            exchangeAddress: response.data.payinAddress,
             status: response.data.status,
-            receiveAmount: stringToBigint(String(response.data.amountReceive)) || undefined,
-
             fromTxId: response.data.payinHash || undefined,
             toTxId: response.data.payoutHash || undefined,
             refundTxId: response.data.refundHash || undefined,
-
-            createdAt: Math.floor(Date.parse(response.data.createdAt) / 1000),
             receivedAt: response.data.depositReceivedAt && Math.floor(Date.parse(response.data.depositReceivedAt) / 1000),
-            updatedAt: response.data.updatedAt && Math.floor(Date.parse(response.data.updatedAt) / 1000),
-            validUntil
         };
     }
 
@@ -293,7 +282,7 @@ export class ExolixApi extends AbstractCoinSwapApi {
         };
     }
 
-    async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
+    async getOrderStatus(orderId: OrderId): Promise<OrderStatusInfo> {
         const response = await axios.get(
             `${this.API}/exchange/${orderId}`,
             {
@@ -305,30 +294,11 @@ export class ExolixApi extends AbstractCoinSwapApi {
         );
 
         return {
-            provider: this.provider,
-
-            sendAmount: stringToBigint(String(response.data.amount_from)),
-            refundAddress: response.data.refund_address,
-            destinationAddress: response.data.destination_address,
-
-            from: response.data.coin_from.toUpperCase(),
-            to: response.data.coin_to.toUpperCase(),
-            rate: stringToBigint(String(response.data.rate)),
-            fee: 0n,
-
-            orderId: response.data.id,
-            exchangeAddress: response.data.deposit_address,
             status: response.data.status,
-            receiveAmount: stringToBigint(String(response.data.amount_to)),
-
             fromTxId: response.data.hash_in || undefined,
             toTxId: response.data.hash_out || undefined,
             refundTxId: undefined,
-
-            createdAt:Date.parse(response.data.created_at),
-            receivedAt: undefined,
-            updatedAt: undefined,
-            validUntil: Date.parse(response.data.created_at) + 60 * 60 * 24
+            receivedAt: undefined
         };
     }
 
@@ -435,36 +405,17 @@ export class StealthExApi extends AbstractCoinSwapApi {
         };
     }
 
-    async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
+    async getOrderStatus(orderId: OrderId): Promise<OrderStatusInfo> {
         const r = await axios.get(`${this.API}/exchange/${orderId}?api_key=${this.apiKey}`);
 
         const rate = stringToBigint(r.data.amount_from) * 10n ** 8n / stringToBigint(r.data.amount_to);
 
         return {
-            provider: this.provider,
-
-            sendAmount: stringToBigint(r.data.amount_from),
-            refundAddress: r.data.refund_address,
-            destinationAddress: r.data.address_to,
-
-            from: r.data.currency_from.toUpperCase(),
-            to: r.data.currency_to.toUpperCase(),
-            rate: rate,
-            fee: 0n,
-
-            orderId: r.data.id,
-            exchangeAddress: r.data.address_to,
             status: r.data.status,
-            receiveAmount: stringToBigint(r.data.amount_to),
-
             fromTxId: r.data.tx_from || undefined,
             toTxId: r.data.tx_to || undefined,
             refundTxId: undefined,
-
-            createdAt: Date.parse(r.data.timestamp),
-            receivedAt: undefined,
-            updatedAt: Date.parse(r.data.updated_at),
-            validUntil: Date.parse(r.data.timestamp) + 60 * 60 * 24
+            receivedAt: Date.parse(r.data.updated_at)
         };
     }
 
@@ -584,7 +535,7 @@ export class HoudiniSwapApi extends AbstractCoinSwapApi {
         };
     }
 
-    async getOrderStatus(orderId: OrderId): Promise<OrderInfo> {
+    async getOrderStatus(orderId: OrderId): Promise<OrderStatusInfo> {
         const r = await axios.get(`${this.API}/status?id=${orderId}`, {
             headers: {
                 Authorization: this.apiKey
@@ -607,30 +558,11 @@ export class HoudiniSwapApi extends AbstractCoinSwapApi {
             status = <OrderStatus>String(r.data.status);
 
         return {
-            provider: this.provider,
-
-            sendAmount: stringToBigint(String(r.data.inAmount)),
-            refundAddress: undefined,
-            destinationAddress: r.data.receiverAddress,
-
-            from: r.data.inSymbol,
-            to: r.data.outSymbol,
-            rate: rate,
-            fee: 0n,
-
-            orderId: r.data.houdiniId,
-            exchangeAddress: r.data.senderAddress,
             status,
-            receiveAmount: stringToBigint(String(r.data.inAmount)),
-
             fromTxId: undefined,
             toTxId: undefined,
             refundTxId: undefined,
-
-            createdAt: Date.parse(r.data.created),
-            receivedAt: undefined,
-            updatedAt: undefined,
-            validUntil
+            receivedAt: Date.parse(r.data.created)
         };
     }
 
@@ -691,11 +623,146 @@ export class HoudiniSwapApi extends AbstractCoinSwapApi {
     }
 }
 
+export class MajesticApi extends AbstractCoinSwapApi {
+    API: string = 'https://www.bk.majesticbank.sc/api/v1';
+    provider: Provider = 'Majestic';
+    marketInfo: PairInfo[];
+    fetchTime: number;
+
+    constructor(apiKey: ApiKey) {
+        super();
+        this.apiKey = apiKey;
+        this.fetchTime = 0;
+        this.marketInfo = null;
+    }
+
+    async getPairs(): Promise<[Ticker, Ticker][]> {
+        await this.fetchMarketInfoIfOutdated();
+
+        return this.marketInfo
+            .filter(info => (info.from == 'FIRO') != (info.to == 'FIRO'))
+            .map(info => [info.from, info.to]);
+    }
+
+    async getPairInfo(from: string, to: string, amount: bigint): Promise<PairInfo> {
+        await this.fetchMarketInfoIfOutdated();
+
+        const pairInfo = this.marketInfo.find(info => info.from == from && info.to == to);
+        if (!pairInfo)
+            throw new UnavailablePairError(from, to);
+
+        return pairInfo;
+    }
+
+    async getOrderStatus(orderId: OrderId): Promise<OrderStatusInfo> {
+        const response = await axios.get(`${this.API}/track?trx=${orderId}`);
+
+        let status = response.data.status;
+        if (status == 'Processing payment')
+            status = 'waiting';
+        else if (status == 'Completed')
+            status = 'finished';
+
+
+        return {
+            status: status,
+            fromTxId: undefined,
+            toTxId: undefined,
+            refundTxId: undefined,
+            receivedAt: undefined
+        };
+    }
+
+    async makeOrder(order: Order): Promise<OrderInfo> {
+        const url = `${this.API}/exchange`;
+
+        const response = await axios.post(url, {
+            from_currency: order.pairInfo.from,
+            receive_currency: order.pairInfo.to,
+            receive_address: order.destinationAddress,
+            from_amount: bigintToString(order.sendAmount),
+            referral_code: this.apiKey
+        });
+
+        if (typeof response.data == 'string') {
+            console.warn(`Got error response from ${this.provider}:`);
+            console.warn(response.data);
+
+            throw new CoinSwapError('unknown error posting order');
+        }
+
+        if (response.data?.from_currency != order.pairInfo.from ||
+            response.data?.receive_currency != order.pairInfo.to
+        ) throw new CoinSwapError("response doesn't match request");
+
+        const receiveAmount = stringToBigint(String(response.data.receive_amount));
+        const validUntil = Date.now() / 1000 + 60 * Number(response.data.expiration);
+
+        if (!receiveAmount || isNaN(validUntil))
+            throw new CoinSwapError('invalid response');
+
+        if (validUntil < Date.now() / 1000)
+            throw new CoinSwapError('response is already stale');
+
+        // If the amount we're supposed to receive is less than the expected amount by more than 1 FIRO, throw an error
+        // and refuse to continue.
+        const expectedReceiveAmount = order.sendAmount * order.pairInfo.rate / (10n**8n);
+        if (expectedReceiveAmount - order.pairInfo.rate > receiveAmount)
+            throw new CoinSwapError(`We expected to receive ${bigintToString(expectedReceiveAmount)} ` +
+                `${order.pairInfo.to} but got a promise of only ${bigintToString(receiveAmount)}.`)
+
+        return {
+            provider: this.provider,
+
+            sendAmount: order.sendAmount,
+            refundAddress: order.refundAddress,
+            destinationAddress: order.destinationAddress,
+
+            from: order.pairInfo.from,
+            to: order.pairInfo.to,
+            rate: order.pairInfo.rate,
+            fee: order.pairInfo.fee,
+
+            orderId: response.data.trx,
+            exchangeAddress: response.data.address,
+            status: 'waiting',
+            receiveAmount,
+
+            createdAt: Math.floor(Date.now() / 1000),
+            validUntil
+        };
+    }
+
+    async fetchMarketInfoIfOutdated() {
+        if (!this.marketInfo || this.fetchTime < Date.now() - this.refreshInterval) {
+            const response = await axios.get(`${this.API}/rates`);
+
+            const pairs = Object.keys(response.data)
+                .map(k => k.match(/^([A-Z]+)-([A-Z]+)$/)?.slice(1))
+                .filter(x=>x);
+
+            this.marketInfo = pairs.map(([from, to]) => ({
+                provider: this.provider,
+                quoteId: null,
+                from,
+                to,
+                rate: stringToBigint(Number(response.data[`${from}-${to}`]).toFixed(8)),
+                fee: 0n,
+                min: stringToBigint(Number(response.data.limits[from].min).toFixed(8)),
+                max: stringToBigint(Number(response.data.limits[from].max).toFixed(8))
+            }));
+
+            this.fetchTime = Date.now();
+        }
+    }
+}
+
 const ApiClasses = {
     ChangeNow: ChangeNowApi,
     Exolix: ExolixApi,
     StealthEx: StealthExApi,
-    HoudiniSwap: HoudiniSwapApi
+    HoudiniSwap: HoudiniSwapApi,
+    Majestic: MajesticApi
 };
 export const PROVIDERS: Provider[] = <Provider[]>Object.keys(ApiClasses);
 
@@ -726,7 +793,7 @@ export class CoinSwapApiWrapper {
         return await this.apis[provider].getPairInfo(from, to, amount);
     }
 
-    async getOrderStatus(provider: Provider, orderId: OrderId): Promise<OrderInfo> {
+    async getOrderStatus(provider: Provider, orderId: OrderId): Promise<OrderStatusInfo> {
         if (!this.apis[provider])
             throw new CoinSwapError('unknown provider');
 

@@ -179,7 +179,7 @@ const actions = {
                 return {
                     ...record,
                     status: orderStatus.status,
-                    receivedAt: orderStatus.createdAt,
+                    receivedAt: orderStatus.receivedAt,
                     depositTxId: orderStatus.fromTxId,
                     refundTx: orderStatus.refundTxId,
                     outputTxId: orderStatus.toTxId

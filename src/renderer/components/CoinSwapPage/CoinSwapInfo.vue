@@ -124,7 +124,8 @@
                 <span v-if="coinSwapData.chainName==='ChangeNow'"><a href="mailto:support@changenow.io">support.changenow.io</a></span>
                 <span v-if="coinSwapData.chainName==='StealthEx'"><a href="mailto:support@stealthex.io">stealthex.io/contacts</a></span>
                 <span v-if="coinSwapData.chainName==='Swapzone'"><a href="mailto:support@swapzone.io">swapzone.io</a></span>
-                <span v-if="coinSwapData.chainName==='Exolix'"><a href="mailto:support@exolix.com">exolix.com/contact</a></span>.
+                <span v-if="coinSwapData.chainName==='Exolix'"><a href="mailto:support@exolix.com">exolix.com/contact</a></span>
+                <span v-if="coinSwapData.chainName==='Majestic'"><a href="mailto:info@majesticbank.so">info@majesticbank.so</a></span>
             </div>
         </div>
 
