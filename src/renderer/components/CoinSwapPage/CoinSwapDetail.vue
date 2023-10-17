@@ -216,6 +216,15 @@ const CoinNames = {
 const ChainOptions = PROVIDERS.map(p => ({id: p, name: p}));
 const DEFAULT_PROVIDER = PROVIDERS[0];
 
+function isValidLTCAddress(address) {
+    if (CryptoAddressValidator.validate(address, 'LTC'))
+        return true;
+
+    // This is actually a really terrible validation, but their addresses use custom stuff that no one supports and it's
+    // not really worth it to make a custom decoder just to parse their addresses.
+    return !!address.match(/^ltc[a-zA-Z0-9]{38,42}$/);
+}
+
 export default {
     name: 'CoinSwapDetail',
 
@@ -349,6 +358,9 @@ export default {
                         coin = this.selectedCoin;
                     else
                         return 'Unknown coin (this is a bug)';
+
+                    if (this.selectedCoin == 'LTC')
+                        return isValidLTCAddress(value) || 'Invalid address';
 
                     try {
                         return !!CryptoAddressValidator.validate(value, coin, 'prod') || 'Invalid address';
