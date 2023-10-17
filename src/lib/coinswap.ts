@@ -481,7 +481,6 @@ export class StealthExApi extends AbstractCoinSwapApi {
 export class HoudiniSwapApi extends AbstractCoinSwapApi {
     API: string = 'https://api-partner.houdiniswap.com';
     provider: Provider = 'HoudiniSwap';
-    pairs: [Ticker, Ticker][];
     hasRefundAddress: boolean = false;
 
     constructor(apiKey: ApiKey) {
@@ -490,21 +489,9 @@ export class HoudiniSwapApi extends AbstractCoinSwapApi {
     }
 
     async getPairs(): Promise<[Ticker, Ticker][]> {
-        if (this.pairs)
-            return this.pairs;
-
-        const r = await axios.get(`${this.API}/tokens`, {headers: {
-            Authorization: this.apiKey
-        }});
-
-        this.pairs = r.data
-            .map(x => x.symbol)
-            .sort()
-            .reduce((a, x) => a[a.length - 1] == x ? a : [...a, x], [])
-            .map(ticker => [['FIRO', ticker.toUpperCase()], [ticker.toUpperCase(), 'FIRO']])
+        return <[Ticker, Ticker][]>['BTC', 'BNB', 'DASH', 'DCR', 'ETH', 'LTC']
+            .map(ticker => [['FIRO', ticker], [ticker, 'FIRO']])
             .reduce((a, x) => [...a, ...x], []);
-
-        return this.pairs;
     }
 
     async getPairInfo(from: Ticker, to: Ticker, amount: bigint): Promise<PairInfo> {
