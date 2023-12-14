@@ -5,27 +5,32 @@ const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 const bs58 = require('base-x')(BASE58);
 const bech32 = require('bech32-buffer');
 
-const ADDRESS_PREFIXES: Record<Network, {pubkeyAddress: number, scriptAddress: number}> = {
+const ADDRESS_PREFIXES: Record<Network, {pubkeyAddress: number, scriptAddress: number, exchangeAddress: number[]}> = {
     main: {
         pubkeyAddress: 82, // ['a', 'Z'],
-        scriptAddress: 7 // ['3', '4']
+        scriptAddress: 7, // ['3', '4']
+        exchangeAddress: [1, 185, 187]
     },
     test: {
         pubkeyAddress: 65, // ['T'],
-        scriptAddress: 178 // ['2']
+        scriptAddress: 178, // ['2']
+        exchangeAddress: [1, 185, 177]
     },
     regtest: {
-        pubkeyAddress: 65, // ['T'],
-        scriptAddress: 178 // ['2']
+        pubkeyAddress: 65,  // ['T'],
+        scriptAddress: 178, // ['2']
+        exchangeAddress: [1, 185, 172]
     },
     'regtest-ql': {
         pubkeyAddress: 65, // ['T'],
-        scriptAddress: 178 // ['2']
+        scriptAddress: 178, // ['2']
+        exchangeAddress: [1, 185, 172]
     }
 };
 
 export function isValidAddress(address: string, network: Network): boolean {
-    return isValidLegacyAddress(address, network) || isValidSparkAddress(address, network);
+    return isValidExchangeAddress(address, network) || isValidLegacyAddress(address, network) ||
+        isValidSparkAddress(address, network);
 }
 
 export function isValidSparkAddress(address: string, network: Network): boolean {
@@ -83,6 +88,42 @@ export function isValidLegacyAddress(address: string, network: 'test' | 'main' |
     // Make sure the address is from the correct network.
     if (addressData[0] !== ADDRESS_PREFIXES[network].pubkeyAddress && addressData[0] !== ADDRESS_PREFIXES[network].scriptAddress) {
         return false;
+    }
+
+    const contentData = addressData.slice(0, -4);
+    const checksum = addressData.slice(-4);
+    // calculatedChecksum is the first four bytes of the sha256^2 of contentData
+    const calculatedChecksum = shajs('sha256')
+        .update(
+            shajs('sha256')
+            .update(contentData)
+            .digest()
+        )
+        .digest()
+        .slice(0, 4);
+
+    return [0, 1, 2, 3].every((i) => checksum[i] === calculatedChecksum[i]);
+}
+
+// Is address a valid exchamge address on the Firo {network} network?
+export function isValidExchangeAddress(address: string, network: 'test' | 'main' | 'regtest' | 'regtest-ql'): boolean {
+    let addressData;
+
+    try {
+        addressData = bs58.decode(address);
+    } catch(e) {
+        return false;
+    }
+
+    // A length of less than 5 would provide insufficient space for content and a checksum.
+    if (addressData.length < 5) {
+        return false;
+    }
+
+    // Make sure the address is from the correct network.
+    for (let i = 0; i < ADDRESS_PREFIXES[network].exchangeAddress.length; i++) {
+        if (addressData[i] != ADDRESS_PREFIXES[network].exchangeAddress[i])
+            return false;
     }
 
     const contentData = addressData.slice(0, -4);

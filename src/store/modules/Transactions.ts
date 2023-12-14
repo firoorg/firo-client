@@ -105,6 +105,10 @@ function txosFromTx(tx: Transaction, mySparkOutputAmounts: Map<string, bigint>, 
             case "elysium":
                 break;
 
+            // TODO: Support spending funds from pay-to-exchange-address outputs.
+            case "pay-to-exchange-address":
+                break
+
             default:
                 console.warn(`${tx.txid}-${index} has an unknown scriptType`);
         }

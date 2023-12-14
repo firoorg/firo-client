@@ -214,7 +214,8 @@ export interface ApiStatus {
 export interface TxOut {
     scriptType: 'pay-to-public-key' | 'pay-to-public-key-hash' | 'pay-to-script-hash' | 'pay-to-witness-script-hash' |
         'zerocoin-mint' | 'zerocoin-remint' | 'zerocoin-spend' | 'sigma-spend' | 'sigma-mint' | 'lelantus-mint' |
-        'lelantus-jmint' | 'lelantus-joinsplit' | 'elysium' | 'spark-mint'| 'spark-smint' | 'spark-spend' | 'unknown';
+        'lelantus-jmint' | 'lelantus-joinsplit' | 'elysium' | 'spark-mint'| 'spark-smint' | 'spark-spend' |
+        'pay-to-exchange-address' | 'unknown';
     amount: bigint;
     isChange: boolean;
     isLocked: boolean;

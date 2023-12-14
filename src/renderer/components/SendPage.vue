@@ -178,7 +178,7 @@ import {markRaw} from "vue";
 import { mapGetters } from 'vuex';
 import {Form, Field} from "vee-validate";
 import SendFlow from "renderer/components/SendPage/SendFlow.vue";
-import {isValidSparkAddress, isValidAddress, isValidLegacyAddress} from 'lib/isValidAddress';
+import {isValidSparkAddress, isValidAddress, isValidLegacyAddress, isValidExchangeAddress} from 'lib/isValidAddress';
 import {bigintToString, stringToBigint} from 'lib/convert';
 import Dropdown from "renderer/components/shared/Dropdown.vue";
 import Amount from "renderer/components/shared/Amount.vue";
@@ -336,8 +336,14 @@ export default {
                     if (!this.isSparkAllowed) return 'Spark is not yet enabled.'
                     else if (this.selectedAsset != 'FIRO') return 'Spark addresses cannot be used with Elysium.';
                     else return true;
-                } else if (isValidLegacyAddress(value, this.network))
+                } else if (isValidLegacyAddress(value, this.network)) {
                     return true;
+                } else if (isValidExchangeAddress(value, this.network)) {
+                    if (this.isPrivate)
+                        return 'Exchange addresses cannot be used to receive private funds.';
+                    else
+                        return true;
+                }
 
                 return 'The Firo address you entered is invalid';
             };

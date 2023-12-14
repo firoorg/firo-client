@@ -131,6 +131,8 @@ export default {
                     label = 'Spark Spend';
                 else if (['pay-to-public-key', 'pay-to-public-key-hash'].includes(txo.scriptType))
                     label = 'Public Transaction';
+                else if (txo.scriptType == 'pay-to-exchange-address')
+                    label = 'Exchange Transaction';
                 else
                     label = 'Firo Transaction';
 
