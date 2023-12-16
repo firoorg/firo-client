@@ -1792,6 +1792,7 @@ export class Firod {
             amount,
             subtractFeeFromAmount,
             feePerKb,
+            memo: '',
             coinControl: {
                 selected: coinControlToString(coinControl)
             }
