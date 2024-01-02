@@ -75,9 +75,10 @@ window.addEventListener('beforeunload', async () => await $daemon?.closeSockets(
         store.commit('App/setColorTheme', settings.colorTheme);
     }
 
-    if (settings.enableElysium) {
-        store.commit('App/setEnableElysium', settings.enableElysium);
-    }
+    // if (settings.enableElysium) {
+    //     store.commit('App/setEnableElysium', settings.enableElysium);
+    // }
+    store.commit('App/setEnableElysium', false);
 
     if (settings.selectedElysiumTokens) {
         store.commit('Elysium/initSelectedTokens', settings.selectedElysiumTokens);

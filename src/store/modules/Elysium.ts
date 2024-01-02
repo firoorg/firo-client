@@ -143,7 +143,7 @@ const getters = {
                 txo.elysium.type != "Grant Property Tokens"
             ) continue;
 
-            r[p] = (r[p] || 0n) + (txo.elysium.amount || 0n);
+            r[p] = (r[p] || 0n) + (txo?.elysium.amount || 0n);
         }
         return r;
     },

@@ -66,7 +66,7 @@ function txosFromTx(tx: Transaction, mySparkOutputAmounts: Map<string, bigint>, 
         }
 
         // This is for txouts of multi-recipient transactions that we've received funds from that go to other wallets.
-        if (!isFromMe && !txout.isToMe && !tx.elysium.isToMe) continue;
+        if (!isFromMe && !txout.isToMe && !tx.elysium?.isToMe) continue;
 
         let privacyUse: PrivacyType;
         let spendSize = undefined;
@@ -202,7 +202,9 @@ function selectUTXOs(privacy: PrivacyType, amount: bigint, feePerKb: bigint, sub
     else if (privacy == 'lelantus')
         constantSize = 1234n;
     else if (privacy == 'spark')
-    constantSize = 1281n;
+        constantSize = 1281n;
+    else if (privacy == 'exchange')
+        constantSize = 11n;
 
     if (coinControl) {
         let totalSize = 0n;

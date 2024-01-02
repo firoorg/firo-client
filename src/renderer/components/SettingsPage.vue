@@ -38,10 +38,12 @@
                 </select>
             </div>
 
+<!--
             <div class="checkbox-option" @click="enableElysium = !enableElysium">
                 <label>Enable Experimental Elysium Features (Requires Rescan)</label>
                 <input id="enable-elysium-checkbox" type="checkbox" :checked="enableElysium" />
             </div>
+-->
 
             <div class="checkbox-option" @click="useTor = !useTor">
                 <label>Connect to other nodes via Tor</label>
