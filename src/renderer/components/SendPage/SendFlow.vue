@@ -144,7 +144,7 @@ export default {
                             this.subtractFeeFromAmount, coinControl);
                     } else {
                         const coinControl = this.coinControl || this.selectInputs('lelantus', this.amount, this.txFeePerKb, this.subtractFeeFromAmount);
-                        await $daemon.sendLelantus(passphrase, this.label, this.address, this.amount, this.txFeePerKb,
+                        await $daemon.sendLelantus(passphrase, this.address, this.amount, this.txFeePerKb,
                             this.subtractFeeFromAmount, coinControl);
 
                     }
