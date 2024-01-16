@@ -32,7 +32,7 @@ function scaffold(this: Mocha.Suite, reinitialize: boolean) {
     this.timeout(20e3);
     this.slow(5e3);
 
-    this.beforeAll('starts the wallet with tracing', async function (this: This) {
+    this.beforeAll('starts the wallet with tracing', <any>async function (this: This) {
         process.env.IS_INITIALIZED = JSON.stringify(!reinitialize);
 
         this.app = await electron.launch({
@@ -48,7 +48,7 @@ function scaffold(this: Mocha.Suite, reinitialize: boolean) {
         this.page.setDefaultTimeout(5e3);
     });
 
-    this.afterAll('closes the wallet and stops tracing', async function (this: This) {
+    this.afterAll('closes the wallet and stops tracing', <any>async function (this: This) {
         await this.app.context().tracing.stop({path: path.join(__dirname, '..', 'traces', `${Date.now()}.zip`)});
         await this.app.close();
     });
@@ -58,12 +58,12 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
     scaffold.bind(this)(true);
     this.bail(true);
 
-    it('starts', async function (this: This) {
+    it('starts', <any>async function (this: This) {
         await this.page.locator('button').click();
         await this.page.locator('select').waitFor();
     });
 
-    it('allows selecting blockchain location and network', async function (this: This) {
+    it('allows selecting blockchain location and network', <any>async function (this: This) {
         await this.page.locator('#datadir-selector').selectOption('regtest-ql');
 
         const defaultDataDirLocation = await this.page.locator('#datadir-value').innerText();
@@ -93,7 +93,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await this.page.locator('.select-create-or-restore').waitFor();
     });
 
-    it('correctly displays and confirms mnemonic', async function (this: This) {
+    it('correctly displays and confirms mnemonic', <any>async function (this: This) {
         await this.page.locator('#create-new-wallet').click();
         await this.page.locator('.write-down-mnemonic').waitFor();
 
@@ -104,10 +104,10 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await this.page.locator('.confirm-mnemonic').waitFor();
 
         const wordElements = await this.page.locator('.mnemonic-word .word').all();
-        let lastHiddenIndex: number;
+        let lastHiddenIndex: number = 0;
 
         for (const [n, wordElement] of Object.entries(wordElements)) {
-            const classNames = (await wordElement.getAttribute('class')).split(' ');
+            const classNames = (await wordElement.getAttribute('class'))?.split(' ') || [];
             if (classNames.includes('hidden')) {
                 lastHiddenIndex = Number(n);
                 await wordElement.fill(mnemonicWords[n]);
@@ -130,13 +130,13 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await this.page.locator('#passphrase').waitFor();
     });
 
-    it('goes back from the passphrase step', async function (this: This) {
+    it('goes back from the passphrase step', <any>async function (this: This) {
         await this.page.locator('#back-button').click();
         await this.page.locator('.confirm-mnemonic').waitFor();
 
         const wordElements = await this.page.locator('.mnemonic-word .word').all();
         for (const [n, wordElement] of Object.entries(wordElements)) {
-            const classNames = (await wordElement.getAttribute('class')).split(' ');
+            const classNames = (await wordElement.getAttribute('class'))?.split(' ') || [];
             if (!classNames.includes('hidden'))
                 assert.equal(await wordElement.innerText(), mnemonicWords[n]);
         }
@@ -153,7 +153,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await this.page.locator('#recover-from-mnemonic').waitFor();
     });
 
-    it('can recover from mnemonics', async function (this: This) {
+    it('can recover from mnemonics', <any>async function (this: This) {
         let twelveMnemonicWords = ["nation", "tip", "mean", "govern", "tide", "comic", "figure", "gift", "upper", "love", "kitchen", "dolphin"];
 
         await this.page.locator('#recover-from-mnemonic').click();
@@ -190,7 +190,7 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await this.page.locator('#passphrase').waitFor();
     });
 
-    it('locks the wallet', async function (this: This) {
+    it('locks the wallet', <any>async function (this: This) {
         this.timeout(60e3);
         this.slow(20e3);
 
@@ -208,13 +208,13 @@ describe('Regtest Setup', function (this: Mocha.Suite) {
         await this.page.locator('.transactions-page').waitFor({timeout: 60e3});
     });
 
-    it('is using regtest-ql', async function (this: This) {
-        const badge = await this.page.locator('.network-badge');
+    it('is using regtest-ql', <any>async function (this: This) {
+        const badge = this.page.locator('.network-badge');
         assert.isTrue(await badge.isVisible());
         assert.equal(await badge.innerText(), 'Regtest');
     });
 
-    it('generates FIRO from the debug console', async function (this: This) {
+    it('generates FIRO from the debug console', <any>async function (this: This) {
         this.timeout(500e3);
         this.slow(100e3);
 
@@ -244,7 +244,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
     process.env.IS_INITIALIZED = 'true';
     scaffold.bind(this)(false);
 
-    this.beforeAll('waits to load our wallet', async function (this: This) {
+    this.beforeAll('waits to load our wallet', <any>async function (this: This) {
         if (process.env.FIROD_ARGS?.includes('-wait-for-usr1')) {
             this.timeout(Number.MAX_VALUE);
             this.slow(Number.MAX_VALUE);
@@ -256,7 +256,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
     });
 
-    this.beforeAll('is using regtest-ql', async function (this: This) {
+    this.beforeAll('is using regtest-ql', <any>async function (this: This) {
         await this.page.locator('.network-badge', {hasText: 'Regtest'}).waitFor();
     });
 
@@ -299,9 +299,9 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await this.page.evaluate(() => $daemon.legacyRpc('generate 1'));
         }
     }
-    this.beforeEach('generates Firo if not enough is available', generateSufficientFiro);
+    this.beforeEach('generates Firo if not enough is available', <any>generateSufficientFiro);
 
-    it('can change the passphrase', async function (this: This) {
+    it('can change the passphrase', <any>async function (this: This) {
         this.timeout(100e3);
 
         await this.page.locator('a[href="#/settings"]').click();
@@ -340,7 +340,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await new Promise(r => setTimeout(r, 500));
     });
 
-    it('anonymizes Firo', async function (this: This) {
+    it('anonymizes Firo', <any>async function (this: This) {
         this.timeout(100e3);
 
         const publicBalanceElement = this.page.locator('.balance.public .amount-value');
@@ -379,7 +379,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
     });
 
-    it('displays and updates the receiving address', async function (this: This) {
+    it('displays and updates the receiving address', <any>async function (this: This) {
         this.timeout(30e3);
 
         await this.page.locator('a[href="#/receive"]').click();
@@ -401,7 +401,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         }
     });
 
-    it('adds, edits, and properly orders receive addresses', async function (this: This) {
+    it('adds, edits, and properly orders receive addresses', <any>async function (this: This) {
         this.timeout(30e3);
 
         await this.page.locator('a[href="#/receive"]').click();
@@ -472,7 +472,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         checkValidations: boolean = false,
         elysium: boolean = false
     ): (this: This) => Promise<void> {
-        return async function (this: This) {
+        return <any>async function (this: This) {
             this.timeout(100e3);
 
             await setElysium.bind(this)(elysium);
@@ -541,7 +541,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
                     , [paymentType === 'private' ? 'spark' : 'public'])
             ).map(tx => ({...tx, amount: BigInt(tx.amount)}));
 
-            const selectedUTXOs = [];
+            const selectedUTXOs: string[] = [];
             let selectedUTXOsAmount = 0n;
             for (const utxo of availableUTXOs) {
                 if (selectedUTXOsAmount >= satoshiAmountToSend) break;
@@ -687,20 +687,20 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         };
     }
 
-    it('checks send validations', sendsAndReceivesPayment('private', false, false, false, true));
-    it('sends and checks validations with Elysium enabled', sendsAndReceivesPayment('private', false, false, false, true, true));
-    it('sends and receives a private payment', sendsAndReceivesPayment('private', false, false, false));
-    it('sends and receives a public payment', sendsAndReceivesPayment('public', false, false, false));
-    it('sends and receives a private payment subtracting tx fee', sendsAndReceivesPayment('private', true, false, false));
-    it('sends and receives a public payment subtracting tx fee', sendsAndReceivesPayment('public', true, false, false));
-    it('sends and receives a private payment with custom fee', sendsAndReceivesPayment('private', false, true, false));
-    it('sends and receives a public payment with custom fee', sendsAndReceivesPayment('public', false, true, false));
-    it('sends and receives a private payment with custom fee subtracted', sendsAndReceivesPayment('private', true, true, false));
-    it('sends and receives a private payment with coin control', sendsAndReceivesPayment('private', true, false, true));
-    it('sends and receives a public payment with coin control', sendsAndReceivesPayment('public', true, false, true));
+    it('checks send validations', <any>sendsAndReceivesPayment('private', false, false, false, true));
+    it('sends and checks validations with Elysium enabled', <any>sendsAndReceivesPayment('private', false, false, false, true, true));
+    it('sends and receives a private payment', <any>sendsAndReceivesPayment('private', false, false, false));
+    it('sends and receives a public payment', <any>sendsAndReceivesPayment('public', false, false, false));
+    it('sends and receives a private payment subtracting tx fee', <any>sendsAndReceivesPayment('private', true, false, false));
+    it('sends and receives a public payment subtracting tx fee', <any>sendsAndReceivesPayment('public', true, false, false));
+    it('sends and receives a private payment with custom fee', <any>sendsAndReceivesPayment('private', false, true, false));
+    it('sends and receives a public payment with custom fee', <any>sendsAndReceivesPayment('public', false, true, false));
+    it('sends and receives a private payment with custom fee subtracted', <any>sendsAndReceivesPayment('private', true, true, false));
+    it('sends and receives a private payment with coin control', <any>sendsAndReceivesPayment('private', true, false, true));
+    it('sends and receives a public payment with coin control', <any>sendsAndReceivesPayment('public', true, false, true));
 
     function hasCorrectBalance(balanceType: 'public' | 'private'): (this: This) => Promise<void> {
-        return async function (this: This) {
+        return <any>async function (this: This) {
             this.timeout(100e3);
 
             await this.page.locator('a[href="#/send"]').click();
@@ -807,7 +807,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await this.page.locator('a[href="#/transactions"]').click();
         await this.page.locator('tr:nth-child(2) .ticker', {hasText: ticker}).waitFor();
     }
-    it('allows creating an Elysium token', testCreateElysiumToken);
+    it('allows creating an Elysium token', <any>testCreateElysiumToken);
 
     async function testAnonymizesElysiumTokens(this: This): Promise<string> {
         this.timeout(100e3);
@@ -856,7 +856,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
 
         return id;
     }
-    it('anonymizes Elysium tokens', testAnonymizesElysiumTokens);
+    it('anonymizes Elysium tokens', <any>testAnonymizesElysiumTokens);
 
     async function testSendsElysiumTokens(this: This, id: string) {
         const ticker = await this.page.evaluate(([id]) => $store.getters["Elysium/tokenData"][id].ticker, [id]);
@@ -921,10 +921,10 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
         await testSendsElysiumTokens.bind(this)(id);
     });
 
-    it('has private coin control entries that sum to the correct amount', hasCorrectBalance('private'));
-    it('has public coin control entries that sum to the correct amount', hasCorrectBalance('public'));
+    it('has private coin control entries that sum to the correct amount', <any>hasCorrectBalance('private'));
+    it('has public coin control entries that sum to the correct amount', <any>hasCorrectBalance('public'));
 
-    it('navigates in the debug console', async function (this: This) {
+    it('navigates in the debug console', <any>async function (this: This) {
         await this.page.locator('a[href="#/debugconsole"]').click();
 
         const currentInput = await this.page.locator('#current-input')
@@ -956,7 +956,7 @@ describe('Opening an Existing Wallet', function (this: Mocha.Suite) {
             await new Promise(r => setTimeout(r, 100));
     });
 
-    it('properly sends debug commands', async function (this: This) {
+    it('properly sends debug commands', <any>async function (this: This) {
         await this.page.locator('a[href="#/debugconsole"]').click();
 
         const currentInput = await this.page.locator('#current-input');
