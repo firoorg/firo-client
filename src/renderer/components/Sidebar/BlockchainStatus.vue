@@ -63,10 +63,12 @@ export default {
         currentBlockHeight() {
             const segments = [];
             let x = this.currentBlockHeight_;
-            while (x > 0) {
+            while (x > 1000) {
                 segments.push((1000 + x % 1000).toString().slice(1));
                 x = Math.floor(x / 1000);
             }
+            if (x)
+                segments.push(x.toString());
             return segments.reverse().join(',');
         },
 
