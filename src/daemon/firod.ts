@@ -489,6 +489,12 @@ export class FirodStartupError extends FirodError {
     stderr: string;
 
     constructor(error: Error, stderr: string) {
+        if (error.message?.includes('mnemonic'))
+            error = new Error('[REDACTED]');
+
+        if (stderr.includes('mnemonic'))
+            stderr = '[REDACTED]';
+
         super(`error starting firod (${error}): ${stderr}`);
         this.name = 'FirodStartupError';
         this.error = error;
