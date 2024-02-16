@@ -43,6 +43,12 @@ jobs:
     - name: Install electron-builder
       run: npm install -g electron-builder
 
+    - name: Download firod for macOS
+      if: matrix.os == 'macos-latest'
+      run: |
+        curl -L https://artifacts.firo.org/client-api/latest/firod -o assets/core/darwin/firod
+        chmod +x assets/core/darwin/firod
+
     - name: Build
       shell: bash
       env:
